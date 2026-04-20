@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+{% block title %}Банки · PersFin{% endblock %}
+{% block page_title %}Импорт банковских выписок{% endblock %}
+
+{% block content %}
+<!-- Upload Section — main feature -->
+<section class="glass-panel w-full" style="margin-bottom:24px;">
+    <div class="section-head">
+        <div>
+            <h2 class="section-title">Загрузить выписку из банка</h2>
+            <p class="section-subtitle">Скачайте CSV-файл из онлайн-банка и загрузите сюда. Транзакции будут автоматически импортированы в журнал.</p>
+        </div>
+    </div>
+
+    <div style="padding:24px 28px;">
+        <form id="upload-form" enctype="multipart/form-data" style="display:flex; flex-direction:column; gap:20px; max-width:600px;">
+            <!-- Bank selector -->
+            <div class="field" style="margin-bottom:0;">
+                <label for="bank-select">Банк</label>
+                <select id="bank-select" name="bank_id" style="width:100%; background:rgba(0,0,0,.2); border:1px solid var(--c-border); color:var(--c-text); padding:11px 16px; border-radius:var(--r-md); font-family:inherit; font-size:.92rem;">
+                    <option value="tinkoff">Тинькофф Банк</option>
+                    <option value="sber">Сбербанк</option>
+                    <option value="alfa">Альфа-Банк</option>
+                    <option value="vtb">ВТБ</option>
+                    <option value="raiffeisen">Райффайзен Банк</option>
+                    <option value="universal">Другой банк (универсальный)</option>
+                </select>
+            </div>
+
+            <!-- File input -->
+            <div class="field" style="margin-bottom:0;">
+                <label>CSV-файл выписки</label>
+                <div id="drop-zone" style="border:2px dashed var(--c-border); border-radius:var(--r-md); padding:32px 24px; text-align:center; cursor:pointer; transition: all .25s;">
+                    <div style="font-size:2rem; margin-bottom:8px;">📄</div>
+                    <div style="font-weight:600; margin-bottom:4px;" id="drop-label">Перетащите файл сюда или нажмите для выбора</div>
+                    <div style="font-size:.78rem; color:var(--c-text3);">Поддерживается CSV из Тинькофф, Сбер, Альфа, ВТБ, Райффайзен</div>
+                    <input type="file" id="file-input" name="file" accept=".csv,.txt" style="display:none;">
+                </div>
+            </div>
+
+            <button class="primary-button" type="submit" id="upload-btn" disabled style="align-self:flex-start; padding:12px 32px;">
+                Импортировать операции
+            </button>
+        </form>
+
+        <div id="upload-result" style="margin-top:20px; display:none;"></div>
+    </div>
+</section>
+
+<!-- How to get statement -->
+<section class="glass-panel w-full" style="margin-bottom:24px;">
+    <div class="section-head compact">
+        <h2 class="section-title">Как скачать выписку</h2>
+    </div>
+    <div style="padding:24px 28px; display:grid; grid-template-columns:1fr 1fr; gap:24px;">
+        <div>
+            <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;">
+                <span style="font-size:1.2rem;">🟡</span>
+                <strong>Тинькофф</strong>
+            </div>
+            <ol style="font-size:.84rem; color:var(--c-text2); line-height:1.7; padding-left:18px;">
+                <li>Откройте <a href="https://www.tbank.ru" target="_blank" style="color:var(--c-accent-hl);">tbank.ru</a> → Счёт / Карта</li>
+                <li>Нажмите «Выписка» → выберите период</li>
+                <li>Формат: <strong>CSV</strong></li>
+                <li>Скачайте и загрузите сюда</li>
+            </ol>
+        </div>
+        <div>
+            <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;">
+                <span style="font-size:1.2rem;">🟢</span>
+                <strong>Сбербанк</strong>
+            </div>
+            <ol style="font-size:.84rem; color:var(--c-text2); line-height:1.7; padding-left:18px;">
+                <li>Откройте <a href="https://online.sberbank.ru" target="_blank" style="color:var(--c-accent-hl);">online.sberbank.ru</a></li>
+                <li>Карта → История операций</li>
+                <li>Нажмите «Выгрузить» → формат <strong>CSV</strong></li>
+                <li>Скачайте и загрузите сюда</li>
+            </ol>
+        </div>
+    </div>
+</section>
+
+<!-- Mock simulation section (secondary) -->
+<section class="glass-panel w-full">
+    <div class="section-head">
+        <div>
+            <h2 class="section-title">Демо-симулятор банков</h2>
+            <p class="section-subtitle">Для тестирования и демонстрации — генерирует случайные транзакции</p>
+        </div>
+        <button class="secondary-button" type="button" id="sync-all-btn">
+            Симулировать все банки
+        </button>
+    </div>
+    <div class="banks-grid" style="grid-template-columns: repeat(5, 1fr);">
+        <article class="bank-card glass-card" data-bank-id="tinkoff" style="cursor:pointer; padding:16px;">
+            <div style="text-align:center;">
+                <span style="font-size:1.5rem;">🟡</span>
+                <div style="font-weight:600; font-size:.88rem; margin-top:6px;">Тинькофф</div>
+                <div style="font-size:.72rem; color:var(--c-text3);" class="bank-sync-status" data-bank="tinkoff">Нажмите</div>
+            </div>
+        </article>
+        <article class="bank-card glass-card" data-bank-id="sber" style="cursor:pointer; padding:16px;">
+            <div style="text-align:center;">
+                <span style="font-size:1.5rem;">🟢</span>
+                <div style="font-weight:600; font-size:.88rem; margin-top:6px;">Сбербанк</div>
+                <div style="font-size:.72rem; color:var(--c-text3);" class="bank-sync-status" data-bank="sber">Нажмите</div>
+            </div>
+        </article>
+        <article class="bank-card glass-card" data-bank-id="alfa" style="cursor:pointer; padding:16px;">
+            <div style="text-align:center;">
+                <span style="font-size:1.5rem;">🔴</span>
+                <div style="font-weight:600; font-size:.88rem; margin-top:6px;">Альфа</div>
+                <div style="font-size:.72rem; color:var(--c-text3);" class="bank-sync-status" data-bank="alfa">Нажмите</div>
+            </div>
+        </article>
+        <article class="bank-card glass-card" data-bank-id="vtb" style="cursor:pointer; padding:16px;">
+            <div style="text-align:center;">
+                <span style="font-size:1.5rem;">🔵</span>
+                <div style="font-weight:600; font-size:.88rem; margin-top:6px;">ВТБ</div>
+                <div style="font-size:.72rem; color:var(--c-text3);" class="bank-sync-status" data-bank="vtb">Нажмите</div>
+            </div>
+        </article>
+        <article class="bank-card glass-card" data-bank-id="raiffeisen" style="cursor:pointer; padding:16px;">
+            <div style="text-align:center;">
+                <span style="font-size:1.5rem;">⚪</span>
+                <div style="font-weight:600; font-size:.88rem; margin-top:6px;">Райфф</div>
+                <div style="font-size:.72rem; color:var(--c-text3);" class="bank-sync-status" data-bank="raiffeisen">Нажмите</div>
+            </div>
+        </article>
+    </div>
+    <div id="sync-status-message" class="sync-message hidden"></div>
+</section>
+{% endblock %}

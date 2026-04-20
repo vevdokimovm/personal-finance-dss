@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ project_name }}</title>
+    <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+<body>
+    <div class="app-shell">
+        <header class="topbar">
+            <div class="brand-block">
+                <div class="brand-mark">PF</div>
+                <div class="brand-text">
+                    <div class="brand-title">{{ project_name }}</div>
+                    <div class="brand-subtitle">Система поддержки принятия решений для персональных финансов</div>
+                </div>
+            </div>
+
+            <nav class="topnav" aria-label="Основная навигация">
+                <a class="topnav-link active" href="#home-section">Главная</a>
+                <a class="topnav-link" href="#operations-section">Доходы и расходы</a>
+                <a class="topnav-link" href="#obligations-section">Обязательства</a>
+                <a class="topnav-link" href="#goals-section">Цели и копилка</a>
+                <a class="topnav-link" href="#demo-section">Демо-данные</a>
+            </nav>
+        </header>
+
+        <main class="dashboard-layout" id="home-section">
+            <section class="hero-panel">
+                <div class="hero-content">
+                    <div class="eyebrow">Финансовая панель</div>
+                    <h1>Персональная СППР</h1>
+                    <p class="hero-subtitle">для повседневных финансовых решений</p>
+                    <p class="lead">
+                        Отслеживайте доходы и расходы, обязательные платежи, цели накопления и
+                        ключевые показатели устойчивости в одном интерфейсе.
+                    </p>
+                </div>
+
+                <div class="hero-summary-grid">
+                    <article class="summary-mini-card">
+                        <span class="summary-mini-label">Доходы</span>
+                        <div class="summary-mini-value" id="summary-income">0</div>
+                        <div class="summary-mini-text">Сумма поступлений за текущий расчёт</div>
+                    </article>
+                    <article class="summary-mini-card">
+                        <span class="summary-mini-label">Расходы</span>
+                        <div class="summary-mini-value" id="summary-expense">0</div>
+                        <div class="summary-mini-text">Сумма текущих расходов</div>
+                    </article>
+                    <article class="summary-mini-card">
+                        <span class="summary-mini-label">Обязательства</span>
+                        <div class="summary-mini-value" id="summary-obligations">0</div>
+                        <div class="summary-mini-text">Ежемесячные обязательные платежи</div>
+                    </article>
+                </div>
+            </section>
+
+            <section class="content-grid">
+                <section class="panel panel-main">
+                    <div class="section-head">
+                        <div>
+                            <h2 class="section-title">Ключевые показатели</h2>
+                            <p class="section-subtitle">
+                                Основные показатели финансового состояния рассчитываются на основе
+                                доходов, расходов и обязательств.
+                            </p>
+                        </div>
+                        <div class="section-chip">Онлайн-расчёт</div>
+                    </div>
+
+                    <div class="metrics-grid">
+                        <article class="metric-card">
+                            <div class="metric-top">
+                                <span class="metric-name">Rt</span>
+                                <span class="metric-badge">Ресурс</span>
+                            </div>
+                            <div id="rt-value" class="metric-number">0</div>
+                            <div class="metric-caption">Доступный ресурс после учёта потока средств и обязательств.</div>
+                        </article>
+
+                        <article class="metric-card">
+                            <div class="metric-top">
+                                <span class="metric-name">Lt</span>
+                                <span class="metric-badge">Ликвидность</span>
+                            </div>
+                            <div id="lt-value" class="metric-number">0</div>
+                            <div class="metric-caption">Способность покрывать расходы доступными средствами.</div>
+                        </article>
+
+                        <article class="metric-card">
+                            <div class="metric-top">
+                                <span class="metric-name">Dt</span>
+                                <span class="metric-badge">Нагрузка</span>
+                            </div>
+                            <div id="dt-value" class="metric-number">0.0%</div>
+                            <div class="metric-caption">Доля обязательных платежей в структуре доходов.</div>
+                        </article>
+                    </div>
+
+                    <div class="indicators-visual-card">
+                        <div class="visual-card-head">
+                            <div>
+                                <h3 class="visual-card-title">Финансовый профиль</h3>
+                                <p class="visual-card-subtitle">
+                                    Наглядное соотношение доступного ресурса, ликвидности и долговой нагрузки.
+                                </p>
+                            </div>
+                            <div class="visual-card-chip">Живое обновление</div>
+                        </div>
+
+                        <div class="indicators-visual-grid">
+                            <div class="indicator-track-card">
+                                <div class="indicator-track-head">
+                                    <span class="indicator-track-label">Доступный ресурс</span>
+                                    <span id="resource-scale-text" class="indicator-track-value">0%</span>
+                                </div>
+                                <div class="indicator-track">
+                                    <div id="resource-scale-bar" class="indicator-track-fill resource-fill"></div>
+                                </div>
+                            </div>
+
+                            <div class="indicator-track-card">
+                                <div class="indicator-track-head">
+                                    <span class="indicator-track-label">Ликвидность</span>
+                                    <span id="liquidity-scale-text" class="indicator-track-value">0%</span>
+                                </div>
+                                <div class="indicator-track">
+                                    <div id="liquidity-scale-bar" class="indicator-track-fill liquidity-fill"></div>
+                                </div>
+                            </div>
+
+                            <div class="indicator-track-card">
+                                <div class="indicator-track-head">
+                                    <span class="indicator-track-label">Долговая нагрузка</span>
+                                    <span id="debt-scale-text" class="indicator-track-value">0%</span>
+                                </div>
+                                <div class="indicator-track">
+                                    <div id="debt-scale-bar" class="indicator-track-fill debt-fill"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="indicators-visual-footer">
+                            <div class="visual-legend">
+                                <span class="legend-dot legend-resource"></span>
+                                <span>Ресурс</span>
+                            </div>
+                            <div class="visual-legend">
+                                <span class="legend-dot legend-liquidity"></span>
+                                <span>Ликвидность</span>
+                            </div>
+                            <div class="visual-legend">
+                                <span class="legend-dot legend-debt"></span>
+                                <span>Нагрузка</span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <aside class="panel recommendation-panel">
+                    <div class="section-head compact">
+                        <div>
+                            <h2 class="section-title">Рекомендация</h2>
+                            <p class="section-subtitle">
+                                Система выбирает наиболее приоритетное действие по текущему состоянию.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="recommendation-card">
+                        <div class="recommendation-label">Приоритетное решение</div>
+                        <p id="recommendation-text" class="recommendation-text">Введите данные и выполните расчёт.</p>
+                        <p id="explanation-text" class="recommendation-note">Пояснение к рекомендации появится после расчёта показателей.</p>
+                    </div>
+
+                    <div class="status-card">
+                        <div class="status-card-title">Состояние системы</div>
+                        <div id="status" class="status">Система готова к расчёту.</div>
+                    </div>
+                </aside>
+
+                <section class="panel panel-wide summary-panel">
+                    <div class="section-head">
+                        <div>
+                            <h2 class="section-title">Краткая сводка</h2>
+                            <p class="section-subtitle">
+                                Быстрый ввод данных для расчёта показателей и текущая сводка по финансовым потокам.
+                            </p>
+                        </div>
+                    </div>
+
+                    <form id="analysis-form" class="summary-form">
+                        <div class="form-grid">
+                            <div class="field">
+                                <label for="income">Доходы</label>
+                                <span>Сумма поступлений за выбранный период</span>
+                                <input id="income" name="income" type="number" min="0" step="0.01" placeholder="120000" required>
+                            </div>
+                            <div class="field">
+                                <label for="expense">Расходы</label>
+                                <span>Сумма текущих расходов за выбранный период</span>
+                                <input id="expense" name="expense" type="number" min="0" step="0.01" placeholder="70000" required>
+                            </div>
+                        </div>
+
+                        <div class="action-row">
+                            <button class="submit-button" type="submit" id="submit-button">Рассчитать показатели</button>
+                            <button class="secondary-button restore-button" type="button" id="restore-summary-button">Вернуть как было</button>
+                        </div>
+                    </form>
+                </section>
+
+                <section class="panel panel-wide" id="operations-section">
+                    <div class="section-head">
+                        <div>
+                            <h2 class="section-title">Журнал операций</h2>
+                            <p class="section-subtitle">
+                                Список доходов и расходов с возможностью расширить интерфейс до полноценного журнала.
+                            </p>
+                        </div>
+                        <div class="section-actions">
+                            <button class="action-pill success-pill" type="button" id="open-income-modal">+ Новый доход</button>
+                            <button class="action-pill danger-pill" type="button" id="open-expense-modal">+ Новый расход</button>
+                        </div>
+                    </div>
+
+                    <div class="table-card">
+                        <div class="table-toolbar">
+                            <div class="table-toolbar-label">Показывать записей</div>
+                            <div class="table-limit-switcher" id="transactions-limit-switcher">
+                                <button class="limit-button" type="button" data-limit="5">5</button>
+                                <button class="limit-button active" type="button" data-limit="10">10</button>
+                                <button class="limit-button" type="button" data-limit="20">20</button>
+                                <button class="limit-button" type="button" data-limit="50">50</button>
+                                <button class="limit-button" type="button" data-limit="100">100</button>
+                            </div>
+                        </div>
+                        <div class="table-header">
+                            <span>Дата</span>
+                            <span>Категория</span>
+                            <span>Тип</span>
+                            <span>Сумма</span>
+                        </div>
+                        <div id="transactions-list" class="table-list">
+                            <div class="table-row empty-row">
+                                <span>Нет записей</span>
+                                <span>Добавьте доход или расход</span>
+                                <span>—</span>
+                                <span>0</span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="panel" id="obligations-section">
+                    <div class="section-head">
+                        <div>
+                            <h2 class="section-title">Обязательства</h2>
+                            <p class="section-subtitle">
+                                Ежемесячные обязательные платежи, влияющие на долговую нагрузку и итоговую рекомендацию.
+                            </p>
+                        </div>
+                        <button class="secondary-button" type="button" id="open-obligation-modal">+ Добавить обязательство</button>
+                    </div>
+
+                    <div class="stack-list" id="obligations-list">
+                        <article class="stack-item empty-stack-item">
+                            <div class="stack-item-title">Список обязательств пока пуст</div>
+                            <div class="stack-item-text">Добавьте обязательство, чтобы учитывать его в расчёте показателей.</div>
+                        </article>
+                    </div>
+                </section>
+
+                <section class="panel" id="goals-section">
+                    <div class="section-head">
+                        <div>
+                            <h2 class="section-title">Цели и копилка</h2>
+                            <p class="section-subtitle">
+                                Цели накопления помогают системе предлагать направление свободного ресурса в копилку.
+                            </p>
+                        </div>
+                        <button class="secondary-button" type="button" id="open-goal-modal">+ Добавить цель</button>
+                    </div>
+
+                    <div class="stack-list" id="goals-list">
+                        <article class="stack-item empty-stack-item">
+                            <div class="stack-item-title">Активных целей пока нет</div>
+                            <div class="stack-item-text">Добавьте цель, чтобы видеть её в dashboard и учитывать в рекомендациях.</div>
+                        </article>
+                    </div>
+                </section>
+
+                <section class="panel panel-wide" id="demo-section">
+                    <div class="section-head">
+                        <div>
+                            <h2 class="section-title">Демо-данные</h2>
+                            <p class="section-subtitle">
+                                Быстро загрузите демонстрационный сценарий или очистите данные для нового расчёта.
+                            </p>
+                        </div>
+                        <div class="section-actions">
+                            <button class="secondary-button" type="button" id="load-demo-button">Загрузить демо-данные</button>
+                            <button class="secondary-button danger-button" type="button" id="clear-demo-button">Очистить данные</button>
+                        </div>
+                    </div>
+                </section>
+            </section>
+        </main>
+    </div>
+
+    <div class="modal-backdrop" id="transaction-modal" aria-hidden="true">
+        <div class="modal-card">
+            <div class="modal-head">
+                <div>
+                    <h3 class="modal-title" id="transaction-modal-title">Новая операция</h3>
+                    <p class="modal-subtitle">Добавьте новый доход или расход в журнал операций.</p>
+                </div>
+                <button class="modal-close" type="button" data-close-modal="transaction-modal">Закрыть</button>
+            </div>
+
+            <form id="transaction-form" class="modal-form">
+                <input type="hidden" id="transaction-type" name="type">
+
+                <div class="field">
+                    <label for="transaction-category">Категория</label>
+                    <input id="transaction-category" name="category" type="text" placeholder="Например, Зарплата" required>
+                </div>
+
+                <div class="field-grid">
+                    <div class="field">
+                        <label for="transaction-amount">Сумма</label>
+                        <input id="transaction-amount" name="amount" type="number" min="0" step="0.01" placeholder="0" required>
+                    </div>
+                    <div class="field">
+                        <label for="transaction-date">Дата</label>
+                        <input id="transaction-date" name="date" type="date" required>
+                    </div>
+                </div>
+
+                <div class="modal-actions">
+                    <button class="submit-button" type="submit">Сохранить операцию</button>
+                    <button class="secondary-button" type="button" data-close-modal="transaction-modal">Отмена</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal-backdrop" id="obligation-modal" aria-hidden="true">
+        <div class="modal-card">
+            <div class="modal-head">
+                <div>
+                    <h3 class="modal-title">Новое обязательство</h3>
+                    <p class="modal-subtitle">Укажите параметры обязательного ежемесячного платежа.</p>
+                </div>
+                <button class="modal-close" type="button" data-close-modal="obligation-modal">Закрыть</button>
+            </div>
+
+            <form id="obligation-form" class="modal-form">
+                <div class="field">
+                    <label for="obligation-name">Название</label>
+                    <input id="obligation-name" name="name" type="text" placeholder="Например, Кредит" required>
+                </div>
+
+                <div class="field-grid">
+                    <div class="field">
+                        <label for="obligation-amount">Общая сумма</label>
+                        <input id="obligation-amount" name="amount" type="number" min="0" step="0.01" placeholder="0" required>
+                    </div>
+                    <div class="field">
+                        <label for="obligation-monthly-payment">Ежемесячный платёж</label>
+                        <input id="obligation-monthly-payment" name="monthly_payment" type="number" min="0" step="0.01" placeholder="0" required>
+                    </div>
+                </div>
+
+                <div class="field-grid">
+                    <div class="field">
+                        <label for="obligation-payment-day">День платежа</label>
+                        <input id="obligation-payment-day" name="payment_day" type="number" min="1" max="31" step="1" value="1" required>
+                    </div>
+                    <div class="field">
+                        <label for="obligation-interest-rate">Ставка</label>
+                        <input id="obligation-interest-rate" name="interest_rate" type="number" min="0" step="0.01" value="0">
+                    </div>
+                </div>
+
+                <div class="field-grid">
+                    <div class="field">
+                        <label for="obligation-term">Срок в месяцах</label>
+                        <input id="obligation-term" name="term" type="number" min="0" step="1" value="0">
+                    </div>
+                    <div class="field">
+                        <label for="obligation-comment">Комментарий</label>
+                        <input id="obligation-comment" name="comment" type="text" placeholder="Необязательно">
+                    </div>
+                </div>
+
+                <div class="modal-actions">
+                    <button class="submit-button" type="submit">Сохранить обязательство</button>
+                    <button class="secondary-button" type="button" data-close-modal="obligation-modal">Отмена</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal-backdrop" id="goal-modal" aria-hidden="true">
+        <div class="modal-card">
+            <div class="modal-head">
+                <div>
+                    <h3 class="modal-title">Новая цель</h3>
+                    <p class="modal-subtitle">Добавьте цель накопления или копилку с текущим прогрессом.</p>
+                </div>
+                <button class="modal-close" type="button" data-close-modal="goal-modal">Закрыть</button>
+            </div>
+
+            <form id="goal-form" class="modal-form">
+                <div class="field">
+                    <label for="goal-name">Название цели</label>
+                    <input id="goal-name" name="name" type="text" placeholder="Например, Отпуск" required>
+                </div>
+
+                <div class="field-grid">
+                    <div class="field">
+                        <label for="goal-target-amount">Целевая сумма</label>
+                        <input id="goal-target-amount" name="target_amount" type="number" min="0" step="0.01" placeholder="0" required>
+                    </div>
+                    <div class="field">
+                        <label for="goal-current-amount">Уже накоплено</label>
+                        <input id="goal-current-amount" name="current_amount" type="number" min="0" step="0.01" value="0">
+                    </div>
+                </div>
+
+                <div class="field-grid">
+                    <div class="field">
+                        <label for="goal-deadline">Срок</label>
+                        <input id="goal-deadline" name="deadline" type="date" required>
+                    </div>
+                    <div class="field">
+                        <label for="goal-comment">Комментарий</label>
+                        <input id="goal-comment" name="comment" type="text" placeholder="Необязательно">
+                    </div>
+                </div>
+
+                <div class="modal-actions">
+                    <button class="submit-button" type="submit">Сохранить цель</button>
+                    <button class="secondary-button" type="button" data-close-modal="goal-modal">Отмена</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="/static/js/app.js"></script>
+</body>
+</html>

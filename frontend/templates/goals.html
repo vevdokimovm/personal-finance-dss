@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}Цели · PersFin{% endblock %}
+{% block page_title %}Цели накопления{% endblock %}
+
+{% block content %}
+<section class="glass-panel w-full">
+    <div class="section-head">
+        <div>
+            <h2 class="section-title">Копилка и цели</h2>
+            <p class="section-subtitle">Активные цели учитываются ИИ при распределении свободного ресурса Rt</p>
+        </div>
+        <button class="primary-button" type="button" id="open-goal-modal">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="vertical-align:-2px; margin-right:6px;"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Создать цель
+        </button>
+    </div>
+    <div class="goals-grid" id="goals-list">
+        <article class="stack-item empty-stack-item glass-card"><div class="stack-item-title" style="color:var(--c-text3)">Загрузка…</div></article>
+    </div>
+</section>
+{% endblock %}
+
+{% block modals %}
+<div class="modal-backdrop" id="goal-modal" aria-hidden="true">
+    <div class="modal-card glass-panel">
+        <div class="modal-head">
+            <h3 class="modal-title">Новая цель</h3>
+            <button class="modal-close ghost-button" type="button" data-close-modal="goal-modal">✕</button>
+        </div>
+        <form id="goal-form" class="modal-form">
+            <div class="field">
+                <label for="goal-name">Название</label>
+                <input id="goal-name" name="name" type="text" placeholder="Машина, Путешествие, Фонд…" required>
+            </div>
+            <div class="field-grid">
+                <div class="field">
+                    <label for="goal-target-amount">Нужно накопить</label>
+                    <input id="goal-target-amount" name="target_amount" type="number" min="0" step="0.01" placeholder="0" required>
+                </div>
+                <div class="field">
+                    <label for="goal-current-amount">Уже есть</label>
+                    <input id="goal-current-amount" name="current_amount" type="number" min="0" step="0.01" value="0">
+                </div>
+            </div>
+            <div class="field-grid">
+                <div class="field">
+                    <label for="goal-deadline">Срок</label>
+                    <input id="goal-deadline" name="deadline" type="date" required>
+                </div>
+                <div class="field">
+                    <label for="goal-comment">Комментарий</label>
+                    <input id="goal-comment" name="comment" type="text" placeholder="Необязательно">
+                </div>
+            </div>
+            <div class="modal-actions mt-4">
+                <button class="primary-button" type="submit">Сохранить</button>
+                <button class="ghost-button" type="button" data-close-modal="goal-modal">Отмена</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+{% block title %}Обзор · PersFin{% endblock %}
+{% block page_title %}Финансовый обзор{% endblock %}
+
+{% block content %}
+<!-- Row 1: Hero -->
+<section class="hero-panel glass-panel" style="padding:24px 28px; margin-bottom:20px;">
+    <div class="hero-content">
+        <div class="eyebrow">СППР · Персональные финансы</div>
+        <h1 style="font-size:1.6rem; margin-bottom:4px;">Алгоритмический анализ</h1>
+        <p class="hero-subtitle" style="font-size:.85rem;">Математические методы поддержки принятия финансовых решений</p>
+    </div>
+    <div class="hero-summary-grid">
+        <article class="summary-mini-card" style="padding:12px 16px; min-width:110px;">
+            <span class="summary-mini-label">Доходы</span>
+            <div class="summary-mini-value income-text" id="summary-income" style="font-size:1.15rem;">—</div>
+        </article>
+        <article class="summary-mini-card" style="padding:12px 16px; min-width:110px;">
+            <span class="summary-mini-label">Расходы</span>
+            <div class="summary-mini-value expense-text" id="summary-expense" style="font-size:1.15rem;">—</div>
+        </article>
+        <article class="summary-mini-card" style="padding:12px 16px; min-width:110px;">
+            <span class="summary-mini-label">Обязат.</span>
+            <div class="summary-mini-value debt-text" id="summary-obligations" style="font-size:1.15rem;">—</div>
+        </article>
+    </div>
+</section>
+
+<!-- Row 2: 3 Metric Cards -->
+<section class="metrics-grid" style="margin-bottom:20px;">
+    <article class="metric-card glass-panel" style="padding:18px 22px;">
+        <div class="metric-top" style="margin-bottom:8px;">
+            <span class="metric-name">Rt</span>
+            <span class="metric-badge primary">Ресурс</span>
+        </div>
+        <div id="rt-value" class="metric-number" style="font-size:1.8rem; margin-bottom:4px;">—</div>
+        <div class="metric-caption">Свободные средства</div>
+    </article>
+    <article class="metric-card glass-panel" style="padding:18px 22px;">
+        <div class="metric-top" style="margin-bottom:8px;">
+            <span class="metric-name">Lt</span>
+            <span class="metric-badge success">Ликвидность</span>
+        </div>
+        <div id="lt-value" class="metric-number" style="font-size:1.8rem; margin-bottom:4px;">—</div>
+        <div class="metric-caption">Покрытие расходов</div>
+    </article>
+    <article class="metric-card glass-panel" style="padding:18px 22px;">
+        <div class="metric-top" style="margin-bottom:8px;">
+            <span class="metric-name">Dt</span>
+            <span class="metric-badge danger">Нагрузка</span>
+        </div>
+        <div id="dt-value" class="metric-number" style="font-size:1.8rem; margin-bottom:4px;">—</div>
+        <div class="metric-caption">Доля платежей в доходах</div>
+    </article>
+</section>
+
+<!-- Row 3: Profile + Recommendation + Simulator  -->
+<div style="display:grid; grid-template-columns:1fr 1fr 300px; gap:20px;">
+    <!-- Col 1: Progress bars -->
+    <section class="indicators-visual-card glass-panel" style="padding:20px;">
+        <div class="visual-card-head" style="margin-bottom:16px;">
+            <h3 class="visual-card-title" style="font-size:.95rem;">Финансовый профиль</h3>
+        </div>
+        <div class="indicators-visual-grid" style="gap:16px;">
+            <div>
+                <div class="indicator-track-head"><span class="indicator-track-label">Ресурс</span><span id="resource-scale-text" class="indicator-track-value">—</span></div>
+                <div class="indicator-track"><div id="resource-scale-bar" class="indicator-track-fill resource-fill" style="width:0"></div></div>
+            </div>
+            <div>
+                <div class="indicator-track-head"><span class="indicator-track-label">Ликвидность</span><span id="liquidity-scale-text" class="indicator-track-value">—</span></div>
+                <div class="indicator-track"><div id="liquidity-scale-bar" class="indicator-track-fill liquidity-fill" style="width:0"></div></div>
+            </div>
+            <div>
+                <div class="indicator-track-head"><span class="indicator-track-label">Долговая нагрузка</span><span id="debt-scale-text" class="indicator-track-value">—</span></div>
+                <div class="indicator-track"><div id="debt-scale-bar" class="indicator-track-fill debt-fill" style="width:0"></div></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Col 2: Recommendation -->
+    <section class="glass-panel" style="display:flex; flex-direction:column;">
+        <div style="padding:16px 20px; border-bottom:1px solid var(--c-border); display:flex; align-items:center; justify-content:space-between;">
+            <h3 style="font-size:.92rem; font-weight:700;">Рекомендация СППР</h3>
+            <span class="rec-status" id="rec-status">Ожидание</span>
+        </div>
+        <div style="padding:16px 20px; flex:1; overflow-y:auto;" id="rec-container">
+            <div id="recommendation-text" style="font-size:.84rem; line-height:1.6; color:var(--c-text2);">
+                Загрузите данные для расчёта.
+            </div>
+            <div id="explanation-text" style="margin-top:12px;"></div>
+        </div>
+    </section>
+
+    <!-- Col 3: Simulator -->
+    <section class="glass-panel">
+        <div style="padding:14px 20px; border-bottom:1px solid var(--c-border);">
+            <h3 style="font-size:.92rem; font-weight:700;">Симулятор</h3>
+        </div>
+        <form id="analysis-form" style="padding:14px 20px;">
+            <div class="field" style="margin-bottom:10px;">
+                <label for="income">Тест. доходы</label>
+                <input id="income" name="income" type="number" min="0" step="0.01" placeholder="0 ₽" required style="padding:8px 12px;">
+            </div>
+            <div class="field" style="margin-bottom:10px;">
+                <label for="expense">Тест. расходы</label>
+                <input id="expense" name="expense" type="number" min="0" step="0.01" placeholder="0 ₽" required style="padding:8px 12px;">
+            </div>
+            <div style="display:flex; flex-direction:column; gap:8px;">
+                <button class="primary-button w-full" type="submit" id="submit-button" style="padding:8px;">Рассчитать</button>
+                <button class="ghost-button w-full" type="button" id="restore-summary-button" style="padding:8px;">Сброс</button>
+            </div>
+        </form>
+    </section>
+</div>
+{% endblock %}

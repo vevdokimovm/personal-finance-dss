@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block title %}Операции · PersFin{% endblock %}
+{% block page_title %}Журнал операций{% endblock %}
+
+{% block content %}
+<section class="glass-panel w-full">
+    <div class="section-head">
+        <div>
+            <h2 class="section-title">Все операции</h2>
+            <p class="section-subtitle">Доходы, расходы и банковские синхронизации в одном месте</p>
+        </div>
+        <div class="section-actions">
+            <button class="action-pill success-pill" type="button" id="open-income-modal">
+                <span class="icon">+</span> Доход
+            </button>
+            <button class="action-pill danger-pill" type="button" id="open-expense-modal">
+                <span class="icon">+</span> Расход
+            </button>
+        </div>
+    </div>
+
+    <div class="table-card">
+        <div class="table-toolbar">
+            <span>Записей на странице:</span>
+            <div class="table-limit-switcher" id="transactions-limit-switcher">
+                <button class="limit-button" type="button" data-limit="5">5</button>
+                <button class="limit-button active" type="button" data-limit="10">10</button>
+                <button class="limit-button" type="button" data-limit="25">25</button>
+                <button class="limit-button" type="button" data-limit="50">50</button>
+            </div>
+        </div>
+        <div class="table-header">
+            <span>Источник</span>
+            <span>Дата</span>
+            <span>Категория</span>
+            <span>Тип</span>
+            <span class="text-right">Сумма</span>
+            <span class="text-right"></span>
+        </div>
+        <div id="transactions-list" class="table-list">
+            <div class="empty-row">Загрузка…</div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block modals %}
+<div class="modal-backdrop" id="transaction-modal" aria-hidden="true">
+    <div class="modal-card glass-panel">
+        <div class="modal-head">
+            <h3 class="modal-title" id="transaction-modal-title">Новая операция</h3>
+            <button class="modal-close ghost-button" type="button" data-close-modal="transaction-modal">✕</button>
+        </div>
+        <form id="transaction-form" class="modal-form">
+            <input type="hidden" id="transaction-type" name="type">
+            <div class="field">
+                <label for="transaction-category">Категория</label>
+                <input id="transaction-category" name="category" type="text" placeholder="Зарплата, Продукты, Кафе…" required>
+            </div>
+            <div class="field-grid">
+                <div class="field">
+                    <label for="transaction-amount">Сумма</label>
+                    <input id="transaction-amount" name="amount" type="number" min="0" step="0.01" placeholder="0" required>
+                </div>
+                <div class="field">
+                    <label for="transaction-date">Дата</label>
+                    <input id="transaction-date" name="date" type="date" required>
+                </div>
+            </div>
+            <div class="modal-actions mt-4">
+                <button class="primary-button" type="submit">Сохранить</button>
+                <button class="ghost-button" type="button" data-close-modal="transaction-modal">Отмена</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

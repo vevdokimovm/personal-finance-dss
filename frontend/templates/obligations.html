@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% block title %}Обязательства · PersFin{% endblock %}
+{% block page_title %}Обязательства{% endblock %}
+
+{% block content %}
+<section class="glass-panel w-full">
+    <div class="section-head">
+        <div>
+            <h2 class="section-title">Ежемесячные платежи</h2>
+            <p class="section-subtitle">Кредиты, подписки, аренда — регулярные списания, учитываемые в показателе долговой нагрузки Dt</p>
+        </div>
+        <button class="primary-button" type="button" id="open-obligation-modal">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="vertical-align:-2px; margin-right:6px;"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Добавить
+        </button>
+    </div>
+    <div class="stack-list" id="obligations-list">
+        <article class="stack-item empty-stack-item"><div class="stack-item-title" style="color:var(--c-text3)">Загрузка…</div></article>
+    </div>
+</section>
+{% endblock %}
+
+{% block modals %}
+<div class="modal-backdrop" id="obligation-modal" aria-hidden="true">
+    <div class="modal-card glass-panel">
+        <div class="modal-head">
+            <h3 class="modal-title">Новое обязательство</h3>
+            <button class="modal-close ghost-button" type="button" data-close-modal="obligation-modal">✕</button>
+        </div>
+        <form id="obligation-form" class="modal-form">
+            <div class="field">
+                <label for="obligation-name">Название</label>
+                <input id="obligation-name" name="name" type="text" placeholder="Ипотека, Netflix, Аренда…" required>
+            </div>
+            <div class="field-grid">
+                <div class="field">
+                    <label for="obligation-amount">Сумма долга</label>
+                    <input id="obligation-amount" name="amount" type="number" min="0" step="0.01" placeholder="0" required>
+                </div>
+                <div class="field">
+                    <label for="obligation-monthly-payment">Платёж / мес</label>
+                    <input id="obligation-monthly-payment" name="monthly_payment" type="number" min="0" step="0.01" placeholder="0" required>
+                </div>
+            </div>
+            <div class="field-grid">
+                <div class="field">
+                    <label for="obligation-payment-day">День платежа</label>
+                    <input id="obligation-payment-day" name="payment_day" type="number" min="1" max="31" value="1" required>
+                </div>
+                <div class="field">
+                    <label for="obligation-interest-rate">Ставка %</label>
+                    <input id="obligation-interest-rate" name="interest_rate" type="number" min="0" step="0.01" value="0">
+                </div>
+            </div>
+            <div class="field-grid">
+                <div class="field">
+                    <label for="obligation-term">Срок (мес)</label>
+                    <input id="obligation-term" name="term" type="number" min="0" value="0">
+                </div>
+                <div class="field">
+                    <label for="obligation-comment">Комментарий</label>
+                    <input id="obligation-comment" name="comment" type="text" placeholder="Необязательно">
+                </div>
+            </div>
+            <div class="modal-actions mt-4">
+                <button class="primary-button" type="submit">Сохранить</button>
+                <button class="ghost-button" type="button" data-close-modal="obligation-modal">Отмена</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
