@@ -1,4 +1,4 @@
-<img width="320" height="320" alt="Screenshot 2026-05-22 at 23 01 57" src="https://github.com/user-attachments/assets/7f8b5dae-efe9-4e19-93e9-82b609e7085e" />
+<img width="360" height="320" alt="лого высокое качество" src="https://github.com/user-attachments/assets/7bfe6ee0-d261-496f-9e7c-1cb8285a4d86" />
 
 
 # personal-finance-dss
