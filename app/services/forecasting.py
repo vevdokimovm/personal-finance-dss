@@ -1,0 +1,86 @@
+"""
+Оркестратор прогнозирования — собирает SES + Monte Carlo из core/forecast
+с накоплением баланса по форм. 35 ВКР.
+"""
+from __future__ import annotations
+
+from typing import Optional
+
+from app.core.forecast import (
+    build_history_from_current,
+    detect_trend,
+    monte_carlo_intervals,
+    ses_forecast,
+    SES_ALPHA,
+    MC_SIMULATIONS,
+)
+
+
+def forecast_indicators(
+    balance: float,
+    rt: float,
+    lt: float,
+    dt: float,
+    income_total: float,
+    expense_total: float,
+    obligation_payments: float,
+    horizon: int = 6,
+    income_history: Optional[list] = None,
+    expense_history: Optional[list] = None,
+    obligation_history: Optional[list] = None,
+) -> dict:
+    """
+    Прогноз вектора состояния {Rt+h, Lt+h, Dt+h} на горизонт H (форм. 35 ВКР).
+    Bt+h накапливается: Bt+h = Bt+h-1 + (CF̂ − ΣP̂).
+    """
+    if income_history is None or len(income_history) < 2:
+        income_history = build_history_from_current(income_total, seed=1)
+    if expense_history is None or len(expense_history) < 2:
+        expense_history = build_history_from_current(expense_total, seed=2)
+    if obligation_history is None or len(obligation_history) < 2:
+        obligation_history = build_history_from_current(obligation_payments, seed=3)
+
+    income_forecast = ses_forecast(income_history, horizon=horizon)
+    expense_forecast = ses_forecast(expense_history, horizon=horizon)
+    obl_forecast = ses_forecast(obligation_history, horizon=horizon)
+
+    forecast = []
+    bt_running = balance
+    for h in range(horizon):
+        i_h, e_h, p_h = income_forecast[h], expense_forecast[h], obl_forecast[h]
+        cf_h = i_h - e_h
+        bt_running = bt_running + (cf_h - p_h)  # форм. 35: накопление баланса
+        rt_h = bt_running + cf_h - p_h
+        lt_h = bt_running / e_h if e_h > 0 else 0.0
+        dt_h = p_h / i_h if i_h > 0 else 0.0
+        forecast.append({
+            "period": h + 1,
+            "Bt": round(bt_running, 2),
+            "income": round(i_h, 2),
+            "expense": round(e_h, 2),
+            "obligations": round(p_h, 2),
+            "cash_flow": round(cf_h, 2),
+            "Rt": round(rt_h, 2),
+            "Lt": round(lt_h, 4),
+            "Dt": round(dt_h, 4),
+        })
+
+    point_rt = [f["Rt"] for f in forecast]
+    intervals = monte_carlo_intervals(point_rt, horizon=horizon)
+    for i, ci in enumerate(intervals):
+        forecast[i]["Rt_p10"] = ci["p10"]
+        forecast[i]["Rt_p50"] = ci["p50"]
+        forecast[i]["Rt_p90"] = ci["p90"]
+
+    trend = detect_trend(rt, point_rt)
+
+    return {
+        "current": {"Bt": balance, "Rt": rt, "Lt": lt, "Dt": dt},
+        "horizon": horizon,
+        "forecast": forecast,
+        "trend": trend,
+        "method": {
+            "point": f"SES α={SES_ALPHA} (Brown, 1956) с накоплением Bt по форм. 35 ВКР",
+            "interval": f"Monte-Carlo N={MC_SIMULATIONS}, σ(h)=σ₀√(1+0.5·h), 80% CI [p10..p90]",
+        },
+    }
