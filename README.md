@@ -1,3 +1,6 @@
+<img width="320" height="320" alt="Screenshot 2026-05-22 at 23 01 57" src="https://github.com/user-attachments/assets/7f8b5dae-efe9-4e19-93e9-82b609e7085e" />
+
+
 # personal-finance-dss
 
 > **Personal Finance Decision Support System** — a full-stack web application for personal finance management with AI-driven recommendations, budget forecasting, and goal tracking.
