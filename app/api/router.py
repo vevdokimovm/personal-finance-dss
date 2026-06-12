@@ -2,6 +2,8 @@ from fastapi import APIRouter
 
 from app.api.routes_analysis import router as analysis_router
 from app.api.routes_banks import router as banks_router
+from app.api.routes_budgets import router as budgets_router
+from app.api.routes_categories import router as categories_router
 from app.api.routes_demo import router as demo_router
 from app.api.routes_goals import router as goals_router
 from app.api.routes_liquid_assets import router as liquid_assets_router
@@ -12,15 +14,16 @@ from app.api.routes_transactions import router as transactions_router
 from app.api.routes_user_prefs import router as user_prefs_router
 from app.config import settings
 
-
 router = APIRouter(prefix=settings.API_PREFIX)
 router.include_router(transactions_router)
 router.include_router(obligations_router)
 router.include_router(goals_router)
 router.include_router(liquid_assets_router)
+router.include_router(categories_router)
 router.include_router(user_prefs_router)
 router.include_router(analysis_router)
 router.include_router(recommendation_router)
 router.include_router(demo_router)
 router.include_router(banks_router)
+router.include_router(budgets_router)
 router.include_router(planning_router)

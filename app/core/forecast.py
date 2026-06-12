@@ -12,7 +12,6 @@ import math
 import random
 from typing import List, Optional
 
-
 SES_ALPHA = 0.3
 MC_SIMULATIONS = 1000
 MC_SIGMA_BASE = 0.05

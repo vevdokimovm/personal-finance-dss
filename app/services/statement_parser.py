@@ -4,122 +4,116 @@
   - Тинькофф (CSV-выписка из личного кабинета)
   - Сбербанк (CSV-выписка)
   - Универсальный формат (дата, категория, сумма, тип)
+
+DATA-04: описание операции и MCC сохраняются в отдельном поле `description`
+и НЕ склеиваются в строку категории — это сырьё для категоризатора (FR-13)
+и merchant-аналитики (FR-14).
 """
 from __future__ import annotations
 
 import csv
 import io
+import re
 from datetime import datetime
 from typing import Any
+
+try:
+    import pdfplumber
+except ImportError:  # PDF-парсер опционален: без него работает всё, кроме импорта PDF
+    pdfplumber = None
+
+
+def _classify(amount: float) -> tuple[str, float]:
+    """Знак суммы → тип операции. Возвращает (type, abs_amount)."""
+    if amount < 0:
+        return "expense", abs(amount)
+    return "income", amount
 
 
 def parse_tinkoff_csv(content: str) -> list[dict[str, Any]]:
     """
     Парсит CSV-выписку из Тинькофф Банка.
-    
+
     Формат Тинькофф (обычно с разделителем ;):
     Дата операции;Дата платежа;Номер карты;Статус;Сумма операции;
     Валюта операции;Сумма платежа;Валюта платежа;Кэшбэк;Категория;MCC;Описание
     """
     transactions = []
-    
-    # Тинькофф может использовать ; или , как разделитель
     delimiter = ';' if ';' in content[:500] else ','
-    
     reader = csv.DictReader(io.StringIO(content), delimiter=delimiter)
-    
-    # Нормализуем заголовки (убираем BOM и пробелы)
     if reader.fieldnames:
         reader.fieldnames = [f.strip().lstrip('\ufeff') for f in reader.fieldnames]
-    
+
     for row in reader:
         try:
-            # Ищем нужные поля (Тинькофф может менять названия колонок)
             date_str = _get_field(row, ['Дата операции', 'Дата платежа', 'date'])
             amount_str = _get_field(row, ['Сумма платежа', 'Сумма операции', 'amount'])
             category = _get_field(row, ['Категория', 'category']) or 'Без категории'
-            description = _get_field(row, ['Описание', 'description']) or ''
+            description = _get_field(row, ['Описание', 'description'])
+            mcc = _get_field(row, ['MCC', 'mcc'])
             status = _get_field(row, ['Статус', 'status']) or ''
-            
-            # Пропускаем неуспешные операции
+
             if status and status.upper() not in ('OK', 'COMPLETED', ''):
                 continue
-            
             if not amount_str:
                 continue
-                
-            # Парсим сумму (может быть с запятой как десятичный)
-            amount = float(amount_str.replace(' ', '').replace(',', '.'))
-            
-            # Парсим дату
-            t_date = _parse_date(date_str) if date_str else datetime.now()
-            
-            # Определяем тип: отрицательная = расход, положительная = доход
-            if amount < 0:
-                t_type = 'expense'
-                amount = abs(amount)
-            else:
-                t_type = 'income'
-            
-            # Имя категории — если есть описание, добавляем
-            cat_name = category.strip()
-            if description.strip() and description.strip() != cat_name:
-                cat_name = f"{cat_name}: {description.strip()}"
-            
-            transactions.append({
-                'amount': round(amount, 2),
-                'category': cat_name[:100],  # Обрезаем до 100 символов
-                'type': t_type,
-                'date': t_date.isoformat(),
-                'is_synced': True,
-            })
-        except (ValueError, KeyError, TypeError):
-            continue  # Пропускаем невалидные строки
-    
-    return transactions
 
-
-def parse_sber_csv(content: str) -> list[dict[str, Any]]:
-    """
-    Парсит CSV-выписку из Сбербанка.
-    Формат может варьироваться, но обычно:
-    №;Дата;Описание;Категория;Сумма;Валюта;Статус
-    """
-    transactions = []
-    delimiter = ';' if ';' in content[:500] else ','
-    
-    reader = csv.DictReader(io.StringIO(content), delimiter=delimiter)
-    if reader.fieldnames:
-        reader.fieldnames = [f.strip().lstrip('\ufeff') for f in reader.fieldnames]
-    
-    for row in reader:
-        try:
-            date_str = _get_field(row, ['Дата', 'Дата операции', 'date'])
-            amount_str = _get_field(row, ['Сумма', 'Сумма операции', 'amount'])
-            category = _get_field(row, ['Категория', 'Описание', 'category']) or 'Без категории'
-            
-            if not amount_str:
-                continue
-            
             amount = float(amount_str.replace(' ', '').replace(',', '.').replace('\xa0', ''))
             t_date = _parse_date(date_str) if date_str else datetime.now()
-            
-            if amount < 0:
-                t_type = 'expense'
-                amount = abs(amount)
-            else:
-                t_type = 'income'
-            
+            t_type, amount = _classify(amount)
+
+            merchant = (description.strip() if description else '') or category.strip() or 'Операция'
             transactions.append({
                 'amount': round(amount, 2),
-                'category': category.strip()[:100],
+                'description': merchant[:255],
+                'mcc': mcc,
                 'type': t_type,
                 'date': t_date.isoformat(),
                 'is_synced': True,
             })
         except (ValueError, KeyError, TypeError):
             continue
-    
+
+    return transactions
+
+
+def parse_sber_csv(content: str) -> list[dict[str, Any]]:
+    """
+    Парсит CSV-выписку из Сбербанка.
+    Формат обычно: №;Дата;Описание;Категория;Сумма;Валюта;Статус
+    """
+    transactions = []
+    delimiter = ';' if ';' in content[:500] else ','
+    reader = csv.DictReader(io.StringIO(content), delimiter=delimiter)
+    if reader.fieldnames:
+        reader.fieldnames = [f.strip().lstrip('\ufeff') for f in reader.fieldnames]
+
+    for row in reader:
+        try:
+            date_str = _get_field(row, ['Дата', 'Дата операции', 'date'])
+            amount_str = _get_field(row, ['Сумма', 'Сумма операции', 'amount'])
+            category = _get_field(row, ['Категория', 'category']) or 'Без категории'
+            description = _get_field(row, ['Описание', 'Назначение', 'description'])
+
+            if not amount_str:
+                continue
+
+            amount = float(amount_str.replace(' ', '').replace(',', '.').replace('\xa0', ''))
+            t_date = _parse_date(date_str) if date_str else datetime.now()
+            t_type, amount = _classify(amount)
+
+            merchant = (description.strip() if description else '') or category.strip() or 'Операция'
+            transactions.append({
+                'amount': round(amount, 2),
+                'description': merchant[:255],
+                'mcc': None,
+                'type': t_type,
+                'date': t_date.isoformat(),
+                'is_synced': True,
+            })
+        except (ValueError, KeyError, TypeError):
+            continue
+
     return transactions
 
 
@@ -130,11 +124,10 @@ def parse_universal_csv(content: str) -> list[dict[str, Any]]:
     """
     transactions = []
     delimiter = ';' if ';' in content[:500] else ','
-    
     reader = csv.DictReader(io.StringIO(content), delimiter=delimiter)
     if reader.fieldnames:
         reader.fieldnames = [f.strip().lstrip('\ufeff') for f in reader.fieldnames]
-    
+
     for row in reader:
         try:
             date_str = _get_field(row, [
@@ -145,33 +138,31 @@ def parse_universal_csv(content: str) -> list[dict[str, Any]]:
                 'Сумма платежа', 'Сумма операции', 'Сумма', 'Amount', 'amount',
                 'Сумма в валюте счёта', 'Sum'
             ])
-            category = _get_field(row, [
-                'Категория', 'Описание', 'Category', 'Description',
-                'Назначение', 'Merchant', 'MCC Description'
-            ]) or 'Импорт'
-            
+            category = _get_field(row, ['Категория', 'Category']) or 'Импорт'
+            description = _get_field(row, [
+                'Описание', 'Назначение', 'Description', 'Merchant', 'MCC Description'
+            ])
+            mcc = _get_field(row, ['MCC', 'mcc'])
+
             if not amount_str:
                 continue
-            
+
             amount = float(amount_str.replace(' ', '').replace(',', '.').replace('\xa0', ''))
             t_date = _parse_date(date_str) if date_str else datetime.now()
-            
-            if amount < 0:
-                t_type = 'expense'
-                amount = abs(amount)
-            else:
-                t_type = 'income'
-            
+            t_type, amount = _classify(amount)
+
+            merchant = (description.strip() if description else '') or category.strip() or 'Импорт'
             transactions.append({
                 'amount': round(amount, 2),
-                'category': category.strip()[:100],
+                'description': merchant[:255],
+                'mcc': mcc,
                 'type': t_type,
                 'date': t_date.isoformat(),
                 'is_synced': True,
             })
         except (ValueError, KeyError, TypeError):
             continue
-    
+
     return transactions
 
 
@@ -189,30 +180,69 @@ def _parse_date(s: str) -> datetime:
     """Парсит дату из различных форматов."""
     if not s:
         return datetime.now()
-    
+
     s = s.strip()
-    
     formats = [
         '%d.%m.%Y %H:%M:%S',
         '%d.%m.%Y %H:%M',
         '%d.%m.%Y',
+        '%d.%m.%y %H:%M',
+        '%d.%m.%y',
         '%Y-%m-%dT%H:%M:%S',
         '%Y-%m-%d %H:%M:%S',
         '%Y-%m-%d',
         '%d/%m/%Y',
         '%m/%d/%Y',
     ]
-    
     for fmt in formats:
         try:
             return datetime.strptime(s, fmt)
         except ValueError:
             continue
-    
+
     return datetime.now()
 
 
 # Маппинг банков → парсеров
+# ── PDF-выписка Тинькофф ──────────────────────────────────────────────────
+_PDF_DATE = r"\d{2}\.\d{2}\.\d{2}"
+# Строка операции: дата [время] дата_обработки описание [знак] сумма ₽.
+# Сумма берётся последняя в строке («в валюте счёта») — она не склеивается
+# с числами из описания. Знак «+» → поступление, иначе расход.
+_PDF_OP = re.compile(
+    rf"^({_PDF_DATE})(?:\s+\d{{2}}:\d{{2}})?\s+{_PDF_DATE}\s+(.+?)\s+([+\-]?)\s*"
+    rf"(\d{{1,3}}(?:\s\d{{3}})*[.,]\d{{2}})\s*₽\s*$"
+)
+
+
+def parse_tinkoff_pdf(raw: bytes) -> list[dict[str, Any]]:
+    """Парсит PDF-выписку Тинькофф: извлекает операции по картам."""
+    if pdfplumber is None:
+        raise ValueError("Для импорта PDF установите pdfplumber: pip install pdfplumber")
+    transactions: list[dict[str, Any]] = []
+    with pdfplumber.open(io.BytesIO(raw)) as pdf:
+        for page in pdf.pages:
+            text = page.extract_text() or ""
+            for line in text.split("\n"):
+                match = _PDF_OP.match(line.strip())
+                if match is None:
+                    continue
+                date_str, description, sign, amount_str = match.groups()
+                amount = float(
+                    amount_str.replace(" ", "").replace("\u00a0", "").replace(",", ".")
+                )
+                merchant = description.strip() or "Операция"
+                transactions.append({
+                    "amount": round(amount, 2),
+                    "description": merchant[:255],
+                    "mcc": None,
+                    "type": "income" if sign == "+" else "expense",
+                    "date": _parse_date(date_str).isoformat(),
+                    "is_synced": True,
+                })
+    return transactions
+
+
 BANK_PARSERS = {
     'tinkoff': parse_tinkoff_csv,
     'sber': parse_sber_csv,

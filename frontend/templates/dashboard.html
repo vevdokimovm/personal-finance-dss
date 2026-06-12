@@ -6,9 +6,10 @@
 <!-- Row 1: Hero -->
 <section class="hero-panel glass-panel" style="padding:24px 28px; margin-bottom:20px;">
     <div class="hero-content">
-        <div class="eyebrow">СППР · Персональные финансы</div>
-        <h1 style="font-size:1.6rem; margin-bottom:4px;">Алгоритмический анализ</h1>
-        <p class="hero-subtitle" style="font-size:.85rem;">Математические методы поддержки принятия финансовых решений</p>
+        <div class="eyebrow">Свободные деньги в этом месяце</div>
+        <div id="hero-rt-value" style="font-size:2.8rem; font-weight:800; line-height:1.1; margin:6px 0;">—</div>
+        <p class="hero-subtitle" style="font-size:.85rem; max-width:460px;">Столько остаётся после доходов, обязательных расходов и платежей по кредитам — этими деньгами можно свободно распорядиться.</p>
+        <a href="/planning" class="primary-button" style="display:inline-flex; align-items:center; gap:8px; margin-top:14px; text-decoration:none;">Построить план распределения →</a>
     </div>
     <div class="hero-summary-grid">
         <article class="summary-mini-card" style="padding:12px 16px; min-width:110px;">
@@ -29,41 +30,44 @@
 <!-- Simulation indicator -->
 <div id="summary-header"></div>
 
-<!-- Row 2: 4 Metric Cards (Rt, Lt, Dt, BLR) -->
+<!-- Row 2: 4 человекочитаемых показателя -->
 <section class="metrics-grid metrics-grid-4" style="margin-bottom:20px;">
-    <article class="metric-card glass-panel" style="padding:18px 22px;">
+    <article class="metric-card glass-panel metric-clickable" data-metric="rt" style="padding:18px 22px;">
         <div class="metric-top" style="margin-bottom:8px;">
-            <span class="metric-name">Rt</span>
-            <span class="metric-badge primary">Ресурс</span>
+            <span class="metric-name">Свободные деньги</span>
+            <span class="metric-badge primary">в месяц</span>
         </div>
         <div id="rt-value" class="metric-number" style="font-size:1.8rem; margin-bottom:4px;">—</div>
-        <div class="metric-caption">Свободные средства</div>
+        <div class="metric-caption">Остаётся после всех обязательных трат</div>
     </article>
-    <article class="metric-card glass-panel" style="padding:18px 22px;">
+    <article class="metric-card glass-panel metric-clickable" data-metric="lt" style="padding:18px 22px;">
         <div class="metric-top" style="margin-bottom:8px;">
-            <span class="metric-name">Lt</span>
-            <span class="metric-badge success">Ликвидность</span>
+            <span class="metric-name">Запас прочности</span>
+            <span class="metric-badge success">норма от 0.3</span>
         </div>
         <div id="lt-value" class="metric-number" style="font-size:1.8rem; margin-bottom:4px;">—</div>
-        <div class="metric-caption">Покрытие расходов</div>
+        <div class="metric-caption">Насколько свободно от обязательных платежей</div>
     </article>
-    <article class="metric-card glass-panel" style="padding:18px 22px;">
+    <article class="metric-card glass-panel metric-clickable" data-metric="dt" style="padding:18px 22px;">
         <div class="metric-top" style="margin-bottom:8px;">
-            <span class="metric-name">Dt</span>
-            <span class="metric-badge danger">Нагрузка</span>
+            <span class="metric-name">Долговая нагрузка</span>
+            <span class="metric-badge danger">порог 40%</span>
         </div>
         <div id="dt-value" class="metric-number" style="font-size:1.8rem; margin-bottom:4px;">—</div>
-        <div class="metric-caption">Доля платежей в доходах</div>
+        <div class="metric-caption">Какая часть дохода уходит на кредиты</div>
     </article>
-    <article class="metric-card glass-panel blr-card" style="padding:18px 22px;">
+    <article class="metric-card glass-panel blr-card metric-clickable" data-metric="blr" style="padding:18px 22px;">
         <div class="metric-top" style="margin-bottom:8px;">
-            <span class="metric-name">BLR</span>
-            <span class="metric-badge blr-badge" id="blr-status-badge">Greninger 1996</span>
+            <span class="metric-name">Подушка безопасности</span>
+            <span class="metric-badge blr-badge" id="blr-status-badge">норма 3–6 мес</span>
         </div>
         <div id="blr-value" class="metric-number" style="font-size:1.8rem; margin-bottom:4px;">—</div>
-        <div class="metric-caption">Резерв в месяцах расходов</div>
+        <div class="metric-caption">На сколько месяцев хватит без дохода</div>
     </article>
 </section>
+
+<!-- Панель детального пояснения метрики (открывается кликом по карточке) -->
+<div id="metric-explain" style="display:none; margin-bottom:20px;"></div>
 
 <!-- Row 3: Profile + Recommendation + Simulator  -->
 <div style="display:grid; grid-template-columns:1fr 1fr 300px; gap:20px;">
@@ -118,8 +122,7 @@
                 <input id="expense" name="expense" type="number" min="0" step="0.01" placeholder="0 ₽" required style="padding:8px 12px;">
             </div>
             <div style="font-size:.7rem; color:var(--c-text3); margin-bottom:10px; padding:8px; background:var(--c-surface2); border-radius:var(--r-sm); line-height:1.5;">
-                <strong>Что считается:</strong> Rt = Bt + (It−Σej) − ΣP по форм. 8 ВКР.
-                Реальные обязательства и цели (Bt) берутся из БД, доход/расход — из формы.
+                <strong>Прикидка «что если»:</strong> подставьте другие доходы и расходы — система пересчитает, сколько денег останется свободными. Кредиты и цели берутся из ваших реальных данных, в базе ничего не меняется.
             </div>
             <div style="display:flex; flex-direction:column; gap:8px;">
                 <button class="primary-button w-full" type="submit" id="submit-button" style="padding:8px;">Рассчитать</button>
@@ -128,4 +131,46 @@
         </form>
     </section>
 </div>
+
+<!-- FR-14: разрез расходов «куда уходят деньги» -->
+<section class="glass-panel" style="padding:20px; margin-top:20px;">
+    <div style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom:4px;">
+        <h3 style="font-size:.92rem; font-weight:700;">Куда уходят деньги</h3>
+        <span style="font-size:.72rem; color:var(--c-text3);">за последние 30 дней</span>
+    </div>
+    <div style="font-size:.72rem; color:var(--c-text3); margin-bottom:16px;">Расходы разложены по категориям автоматически.</div>
+    <div class="spending-grid" style="display:grid; grid-template-columns:1.4fr 1fr; gap:24px;">
+        <div>
+            <div style="font-size:.78rem; font-weight:600; color:var(--c-text2); margin-bottom:12px;">По категориям</div>
+            <div id="spending-categories"><div style="font-size:.8rem; color:var(--c-text3);">Загрузка…</div></div>
+        </div>
+        <div>
+            <div style="font-size:.78rem; font-weight:600; color:var(--c-text2); margin-bottom:12px;">Топ-мерчанты</div>
+            <div id="spending-merchants"><div style="font-size:.8rem; color:var(--c-text3);">—</div></div>
+        </div>
+    </div>
+</section>
+
+<!-- FR-22: категорийные бюджеты -->
+<section class="glass-panel" style="padding:20px; margin-top:20px;">
+    <div style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom:4px;">
+        <h3 style="font-size:.92rem; font-weight:700;">Бюджеты по категориям</h3>
+        <span style="font-size:.72rem; color:var(--c-text3);">факт за 30 дней</span>
+    </div>
+    <div style="font-size:.72rem; color:var(--c-text3); margin-bottom:16px;">Лимит на категорию и сколько уже потрачено.</div>
+    <div id="budgets-list"><div style="font-size:.8rem; color:var(--c-text3);">Загрузка…</div></div>
+    <form id="budget-form" style="display:flex; gap:10px; margin-top:16px; flex-wrap:wrap; align-items:flex-end;">
+        <div style="flex:1; min-width:140px;">
+            <label style="font-size:.72rem; color:var(--c-text3); display:block; margin-bottom:4px;">Категория</label>
+            <input id="budget-category" type="text" placeholder="Продукты" required
+                   style="width:100%; padding:8px 10px; border-radius:8px; border:1px solid var(--c-border); background:var(--c-bg); color:var(--c-text);">
+        </div>
+        <div style="width:130px;">
+            <label style="font-size:.72rem; color:var(--c-text3); display:block; margin-bottom:4px;">Лимит, ₽</label>
+            <input id="budget-limit" type="number" min="1" step="100" placeholder="15000" required
+                   style="width:100%; padding:8px 10px; border-radius:8px; border:1px solid var(--c-border); background:var(--c-bg); color:var(--c-text);">
+        </div>
+        <button type="submit" class="primary-button" style="padding:9px 18px;">Задать</button>
+    </form>
+</section>
 {% endblock %}

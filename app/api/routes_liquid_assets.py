@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Response, status
 from sqlalchemy.orm import Session
 
 from app.database.crud import (
@@ -10,7 +10,6 @@ from app.database.crud import (
 )
 from app.dependencies import get_db
 from app.schemas.liquid_asset import LiquidAssetCreate, LiquidAssetResponse
-
 
 router = APIRouter(prefix="/liquid-assets", tags=["Ликвидные активы"])
 
@@ -37,7 +36,8 @@ def add_asset(payload: LiquidAssetCreate, db: Session = Depends(get_db)) -> Liqu
     )
 
 
-@router.delete("/{asset_id}", status_code=status.HTTP_204_NO_CONTENT, summary="Удалить ликвидный актив")
+@router.delete("/{asset_id}", summary="Удалить ликвидный актив")
 def remove_asset(asset_id: int, db: Session = Depends(get_db)):
     if delete_liquid_asset(db, asset_id) is None:
         raise HTTPException(status_code=404, detail="Актив не найден")
+    return Response(status_code=status.HTTP_204_NO_CONTENT)

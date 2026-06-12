@@ -12,7 +12,7 @@ from datetime import datetime
 from typing import Any
 
 from app.core.avalanche import allocate_obligations_avalanche
-from app.core.goals_priority import calculate_goals_si
+from app.core.goals_priority import calculate_goals_si, goals_allocation_breakdown
 
 
 def _alt_name(d: int, r: int, g: int, steps: int) -> str:
@@ -125,6 +125,33 @@ def evaluate_alternative(
     )
     new_obligation_payments = sum(float(o.get("monthly_payment", 0)) for o in new_obls)
 
+    # Объяснимость Avalanche: кто прошёл фильтр, сколько влито, экономия платежа
+    _old_by_id = {o.get("id"): o for o in obligations}
+    _passed, _skipped = [], []
+    for o in new_obls:
+        old = _old_by_id.get(o.get("id"), o)
+        rate = float(old.get("interest_rate", 0))
+        paid_in = round(float(old.get("amount", 0)) - float(o.get("amount", 0)), 2)
+        if rate >= r_bench:
+            _passed.append({
+                "name": old.get("name", ""),
+                "interest_rate": rate,
+                "paid_in": paid_in,
+                "closed": float(o.get("amount", 0)) <= 0,
+                "payment_saved": round(float(old.get("monthly_payment", 0)) - float(o.get("monthly_payment", 0)), 2),
+            })
+        else:
+            _skipped.append({"name": old.get("name", ""), "interest_rate": rate})
+    alt["avalanche_detail"] = {
+        "r_bench": r_bench,
+        "passed": sorted(_passed, key=lambda x: -x["interest_rate"]),
+        "skipped": _skipped,
+        "x_unused_to_goals": round(x_obl_unused, 2),
+        "delta_payment": round(
+            sum(float(o.get("monthly_payment", 0)) for o in obligations) - new_obligation_payments, 2
+        ),
+    }
+
     # Нераспределённая часть x_obl возвращается на цели (форм. 41, шаг 3)
     x_goals_total += x_obl_unused
 
@@ -150,6 +177,7 @@ def evaluate_alternative(
         for o in new_obls
     ]
     alt["goal_allocation"] = goal_allocation
+    alt["goal_breakdown"] = goals_allocation_breakdown(x_goals_total, goals, today)
     alt["Rt_new"] = round(new_rt, 2)
     alt["Lt_new"] = round(new_lt, 4)
     alt["Dt_new"] = round(new_dt, 4)

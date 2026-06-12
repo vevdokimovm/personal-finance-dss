@@ -2,14 +2,14 @@ from __future__ import annotations
 
 from typing import Any
 
-from fastapi import APIRouter, Depends, File, UploadFile, Form
+from fastapi import APIRouter, Depends, File, Form, UploadFile
 from sqlalchemy.orm import Session
 
-from app.dependencies import get_db
 from app.database.crud import create_transaction
-from app.services.bank_api import sync_bank, sync_all_banks, get_available_banks
-from app.services.statement_parser import parse_bank_statement
-
+from app.dependencies import get_db
+from app.services.bank_api import get_available_banks, sync_all_banks, sync_bank
+from app.services.event_logger import log_event
+from app.services.statement_parser import parse_bank_statement, parse_tinkoff_pdf
 
 router = APIRouter(prefix="/banks", tags=["Банки"])
 
@@ -41,45 +41,57 @@ async def upload_statement(
     """
     # Читаем файл
     raw = await file.read()
-    
-    # Пробуем разные кодировки (Тинькофф часто использует cp1251)
-    content = None
-    for encoding in ['utf-8-sig', 'utf-8', 'cp1251', 'windows-1251', 'latin-1']:
-        try:
-            content = raw.decode(encoding)
-            break
-        except (UnicodeDecodeError, UnicodeError):
-            continue
-    
-    if content is None:
-        return {"status": "error", "message": "Не удалось определить кодировку файла."}
-    
-    # Парсим
-    transactions = parse_bank_statement(content, bank_id)
-    
+
+    # PDF-выписка (Тинькофф из приложения отдаёт PDF) — отдельный парсер
+    if raw[:5] == b"%PDF-":
+        transactions = parse_tinkoff_pdf(raw)
+        if not transactions:
+            return {
+                "status": "error",
+                "message": "Не удалось распознать операции в PDF. Поддерживается PDF-выписка Тинькофф.",
+            }
+    else:
+        # CSV: пробуем разные кодировки (Тинькофф часто использует cp1251)
+        content = None
+        for encoding in ['utf-8-sig', 'utf-8', 'cp1251', 'windows-1251', 'latin-1']:
+            try:
+                content = raw.decode(encoding)
+                break
+            except (UnicodeDecodeError, UnicodeError):
+                continue
+
+        if content is None:
+            return {"status": "error", "message": "Не удалось определить кодировку файла."}
+
+        # Парсим
+        transactions = parse_bank_statement(content, bank_id)
+
     if not transactions:
         return {
             "status": "error",
             "message": "Не удалось распознать транзакции. Проверьте формат файла и выбранный банк.",
         }
-    
+
     # Сохраняем в БД
     added = 0
     total_income = 0.0
     total_expense = 0.0
-    
+
     for t in transactions:
         try:
             from datetime import datetime
             t_date = datetime.fromisoformat(t['date']) if isinstance(t['date'], str) else t['date']
-            
+
             create_transaction(
                 db=db,
                 amount=t['amount'],
-                category=t['category'],
                 type=t['type'],
                 date=t_date,
                 is_synced=True,
+                description=t.get('description'),
+                mcc=t.get('mcc'),
+                bank=bank_id,
+                autocommit=False,
             )
             added += 1
             if t['type'] == 'income':
@@ -88,7 +100,15 @@ async def upload_statement(
                 total_expense += t['amount']
         except Exception:
             continue
-    
+
+    db.commit()
+
+    log_event("statement_imported", {
+        "source": file.filename,
+        "added_count": added,
+        "total_income": round(total_income, 2),
+        "total_expense": round(total_expense, 2),
+    })
     return {
         "status": "success",
         "message": f"Импортировано {added} операций из {file.filename}",

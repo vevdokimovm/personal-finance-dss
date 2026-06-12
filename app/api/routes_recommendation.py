@@ -6,6 +6,7 @@ from fastapi import APIRouter, Depends
 from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
 
+from app.api._guards import ensure_calculable
 from app.database.crud import (
     get_goals,
     get_liquid_assets,
@@ -46,6 +47,8 @@ def create_recommendation(
         obligations = get_obligations(db)
         goals = get_goals(db)
         liquid_assets = get_liquid_assets(db)
+
+    ensure_calculable(transactions, obligations)
 
     result = run_pipeline(
         transactions=transactions,

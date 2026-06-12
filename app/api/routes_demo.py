@@ -27,7 +27,6 @@ from sqlalchemy.orm import Session
 from app.database.models import Goal, LiquidAsset, Obligation, Transaction
 from app.dependencies import get_db
 
-
 router = APIRouter(tags=["Демо-данные"])
 
 

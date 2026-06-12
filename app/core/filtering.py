@@ -6,7 +6,6 @@ from __future__ import annotations
 
 from typing import Any
 
-
 # Пороговые значения по умолчанию
 DT_MAX = 0.40      # ПДН: строже регуляторного порога ЦБ РФ (Указ. № 4892-У, 50%)
 LT_CRIT = 0.0      # Lt' не должна быть отрицательной (параметр пользователя Lmin)
@@ -27,11 +26,11 @@ def filter_alternatives(
     for alt in alternatives:
         violations = []
         if alt.get("Rt_new", 0) < b_min:
-            violations.append(f"Rt' ({alt['Rt_new']:,.0f}) < B_min ({b_min})")
+            violations.append("увёл бы бюджет в минус — свободных денег не осталось бы")
         if alt.get("Lt_new", 0) < lt_crit:
-            violations.append(f"Lt' ({alt['Lt_new']:.2f}) < Lt_crit ({lt_crit})")
+            violations.append("почти не оставил бы свободных денег — ниже безопасного запаса прочности")
         if alt.get("Dt_new", 0) > dt_max:
-            violations.append(f"Dt' ({alt['Dt_new']*100:.1f}%) > Dt_max ({dt_max*100:.0f}%)")
+            violations.append(f"долговая нагрузка осталась бы выше безопасного порога {dt_max*100:.0f}%")
 
         alt["violations"] = violations
         alt["is_admissible"] = len(violations) == 0

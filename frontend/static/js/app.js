@@ -24,10 +24,36 @@ const $$ = (s, p) => (p || document).querySelectorAll(s);
 
 function on(el, ev, fn) { if (el) el.addEventListener(ev, fn); }
 
+// BUG-01: защита форм создания от двойной отправки (двойной клик / холодный старт).
+// Блокирует submit-кнопку и игнорирует повторный submit, пока запрос в полёте.
+function bindSubmit(formSel, handler) {
+    const form = $(formSel);
+    if (!form) return;
+    let inFlight = false;
+    form.addEventListener('submit', async e => {
+        e.preventDefault();
+        if (inFlight) return;
+        inFlight = true;
+        const btn = form.querySelector('button[type="submit"]');
+        if (btn) btn.disabled = true;
+        try {
+            await handler(e);
+        } finally {
+            inFlight = false;
+            if (btn) btn.disabled = false;
+        }
+    });
+}
+
 async function api(url, opts = {}) {
     const r = await fetch(url, opts);
-    const ct = r.headers.get('content-type') || '';
-    const d = ct.includes('json') ? await r.json() : {};
+    let d = {};
+    if (r.status !== 204) {
+        const text = await r.text();
+        if (text) {
+            try { d = JSON.parse(text); } catch { d = {}; }
+        }
+    }
     if (!r.ok) throw new Error(d.detail || 'Ошибка сервера');
     return d;
 }
@@ -38,14 +64,168 @@ function closeModal(m) { if (m) { m.setAttribute('aria-hidden', 'true'); } }
 // ── State ────────────────────────────────────────────────────
 const state = {
     limit: 10,
+    page: 1,
+    dateFrom: null,
+    dateTo: null,
     transactions: [],
     obligations: [],
     goals: [],
     liquid_assets: [],
 };
 
+// ── Theme (светлая / тёмная) ─────────────────────────────────
+const SUN_SVG  = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>`;
+const MOON_SVG = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>`;
+
+function initTheme() {
+    const btn = document.getElementById('theme-toggle');
+    const stored = () => { try { return localStorage.getItem('finpilot-theme'); } catch (e) { return null; } };
+    const apply = t => {
+        document.documentElement.setAttribute('data-theme', t);
+        try { localStorage.setItem('finpilot-theme', t); } catch (e) {}
+        if (btn) btn.innerHTML = t === 'light' ? MOON_SVG : SUN_SVG;
+    };
+    apply(stored() || 'dark');
+    on(btn, 'click', () => {
+        const next = document.documentElement.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+        apply(next);
+    });
+}
+
+// ── FR-14: разрез расходов «куда уходят деньги» ──
+function escapeHtml(s) {
+    const div = document.createElement('div');
+    div.textContent = s == null ? '' : String(s);
+    return div.innerHTML;
+}
+
+async function loadSpendingBreakdown() {
+    const catBox = $('#spending-categories');
+    const merchBox = $('#spending-merchants');
+    if (!catBox) return;
+    try {
+        const res = await api('/api/analysis/spending?days=30');
+        const cats = res.categories || [];
+        const total = res.total_expense || 0;
+        if (!cats.length) {
+            catBox.innerHTML = '<div style="font-size:.8rem; color:var(--c-text3);">Нет расходов за период.</div>';
+            if (merchBox) merchBox.innerHTML = '<div style="font-size:.8rem; color:var(--c-text3);">—</div>';
+            return;
+        }
+        const max = Math.max(...cats.map(c => c.total));
+        catBox.innerHTML = cats.map(c => {
+            const pct = max > 0 ? Math.round(c.total / max * 100) : 0;
+            const share = total > 0 ? Math.round(c.total / total * 100) : 0;
+            return `<div style="margin-bottom:12px;">
+                <div style="display:flex; justify-content:space-between; font-size:.8rem; margin-bottom:4px;">
+                    <span>${escapeHtml(c.category)} <span style="color:var(--c-text3);">· ${c.count}</span></span>
+                    <span style="font-weight:600;">${fmt.cur(c.total)} <span style="color:var(--c-text3); font-weight:400;">${share}%</span></span>
+                </div>
+                <div class="indicator-track"><div class="indicator-track-fill resource-fill" style="width:${pct}%;"></div></div>
+            </div>`;
+        }).join('');
+        const merchants = res.top_merchants || [];
+        if (merchBox) {
+            merchBox.innerHTML = merchants.length
+                ? merchants.map((m, i) => `<div style="display:flex; justify-content:space-between; font-size:.8rem; padding:7px 0; border-bottom:1px solid var(--c-border);">
+                    <span><span style="color:var(--c-text3);">${i + 1}.</span> ${escapeHtml(m.merchant)}</span>
+                    <span style="font-weight:600;">${fmt.cur(m.total)}</span>
+                </div>`).join('')
+                : '<div style="font-size:.8rem; color:var(--c-text3);">—</div>';
+        }
+    } catch (e) { console.error('Spending breakdown error:', e); }
+}
+
+// ── FR-22: категорийные бюджеты на дашборде ──
+async function loadBudgets() {
+    const box = $('#budgets-list');
+    if (!box) return;
+    try {
+        const items = await api('/api/budgets/status');
+        if (!items.length) {
+            box.innerHTML = '<div style="font-size:.8rem; color:var(--c-text3);">Бюджеты не заданы. Добавьте лимит на категорию ниже.</div>';
+            return;
+        }
+        box.innerHTML = items.map(b => {
+            const pct = Math.min(b.pct, 100);
+            const color = b.over ? 'var(--c-red)' : b.pct > 80 ? 'var(--c-amber)' : 'var(--c-green)';
+            return `<div style="margin-bottom:14px;">
+                <div style="display:flex; justify-content:space-between; font-size:.82rem; margin-bottom:4px;">
+                    <span>${escapeHtml(b.category)}${b.over ? ' <span style="color:var(--c-red); font-size:.72rem;">превышен</span>' : ''}</span>
+                    <span><strong>${fmt.cur(b.spent)}</strong> <span style="color:var(--c-text3);">/ ${fmt.cur(b.limit_amount)} · ${b.pct}%</span>
+                        <button class="budget-del" data-budget-id="${b.id}" title="Удалить" style="background:none; border:none; color:var(--c-text3); cursor:pointer; padding:0 4px; font-size:.9rem;">✕</button>
+                    </span>
+                </div>
+                <div class="indicator-track"><div class="indicator-track-fill" style="width:${pct}%; background:${color};"></div></div>
+            </div>`;
+        }).join('');
+    } catch (e) { console.error('Budgets error:', e); }
+}
+
+// ── FR-09: совет распределить поступивший доход ──
+function showIncomeAdvice(amount) {
+    document.querySelectorAll('.income-advice-toast').forEach(t => t.remove());
+    const toast = document.createElement('div');
+    toast.className = 'income-advice-toast';
+    toast.innerHTML = `
+        <div style="flex:1; min-width:0;">
+            <strong>Поступил доход ${fmt.cur(amount)}</strong>
+            <div style="font-size:.76rem; color:var(--c-text3); margin-top:2px;">Распределить между долгом, резервом и целями?</div>
+        </div>
+        <button type="button" class="income-advice-btn">Построить план</button>`;
+    document.body.appendChild(toast);
+    const timer = setTimeout(() => toast.remove(), 10000);
+    toast.querySelector('.income-advice-btn').addEventListener('click', () => {
+        clearTimeout(timer);
+        toast.remove();
+        window.location.href = '/planning';
+    });
+}
+
+// ── Undo-уведомление для восстановления удалённой транзакции (BUG-03) ──
+function showUndoToast(transactionId) {
+    document.querySelectorAll('.undo-toast').forEach(t => t.remove());
+    const toast = document.createElement('div');
+    toast.className = 'undo-toast';
+    toast.innerHTML = `<span>Операция удалена</span><button type="button" class="undo-toast-btn">Вернуть</button>`;
+    document.body.appendChild(toast);
+    const timer = setTimeout(() => toast.remove(), 7000);
+    toast.querySelector('.undo-toast-btn').addEventListener('click', async () => {
+        clearTimeout(timer);
+        try {
+            await api(`/api/transactions/${transactionId}/restore`, { method: 'POST' });
+            await loadPage();
+        } catch (e) { alert(e.message); }
+        toast.remove();
+    });
+}
+
+
+// ── Undo для целей/обязательств/активов: пересоздание из снапшота ──
+function showRestoreToast(message, snapshot, postUrl) {
+    document.querySelectorAll('.undo-toast').forEach(t => t.remove());
+    const toast = document.createElement('div');
+    toast.className = 'undo-toast';
+    toast.innerHTML = `<span>${message}</span><button type="button" class="undo-toast-btn">Вернуть</button>`;
+    document.body.appendChild(toast);
+    const timer = setTimeout(() => toast.remove(), 7000);
+    toast.querySelector('.undo-toast-btn').addEventListener('click', async () => {
+        clearTimeout(timer);
+        try {
+            await api(postUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(snapshot),
+            });
+            await loadPage();
+        } catch (e) { alert(e.message); }
+        toast.remove();
+    });
+}
+
 // ── Boot ─────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
+    initTheme();
     bindGlobalUI();
     bindPlanningUI();
     loadPage();
@@ -111,8 +291,9 @@ function bindGlobalUI() {
     });
 
     // Transaction form
-    on($('#transaction-form'), 'submit', async e => {
-        e.preventDefault();
+    bindSubmit('#transaction-form', async () => {
+        const txType = $('#transaction-type').value;
+        const txAmount = pn($('#transaction-amount').value);
         try {
             await api('/api/transactions', {
                 method: 'POST',
@@ -127,6 +308,31 @@ function bindGlobalUI() {
             closeModal($('#transaction-modal'));
             $('#transaction-form').reset();
             await loadPage();
+            if (txType === 'income' && txAmount > 0) showIncomeAdvice(txAmount);
+        } catch (e) { alert(e.message); }
+    });
+
+    bindSubmit('#budget-form', async () => {
+        const category = $('#budget-category').value.trim();
+        const limit = pn($('#budget-limit').value);
+        if (!category || !(limit > 0)) return;
+        try {
+            await api('/api/budgets', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ category, limit_amount: limit }),
+            });
+            $('#budget-form').reset();
+            loadBudgets();
+        } catch (e) { alert(e.message); }
+    });
+
+    on($('#budgets-list'), 'click', async e => {
+        const btn = e.target.closest('.budget-del');
+        if (!btn) return;
+        try {
+            await api(`/api/budgets/${btn.dataset.budgetId}`, { method: 'DELETE' });
+            loadBudgets();
         } catch (e) { alert(e.message); }
     });
 
@@ -135,8 +341,7 @@ function bindGlobalUI() {
         openModal($('#obligation-modal'));
     });
 
-    on($('#obligation-form'), 'submit', async e => {
-        e.preventDefault();
+    bindSubmit('#obligation-form', async () => {
         try {
             await api('/api/obligations', {
                 method: 'POST',
@@ -163,8 +368,7 @@ function bindGlobalUI() {
         openModal($('#goal-modal'));
     });
 
-    on($('#goal-form'), 'submit', async e => {
-        e.preventDefault();
+    bindSubmit('#goal-form', async () => {
         try {
             await api('/api/goals', {
                 method: 'POST',
@@ -187,8 +391,7 @@ function bindGlobalUI() {
     // Liquid assets — модал и форма
     on($('#open-asset-modal'), 'click', () => openModal($('#asset-modal')));
 
-    on($('#asset-form'), 'submit', async e => {
-        e.preventDefault();
+    bindSubmit('#asset-form', async () => {
         try {
             await api('/api/liquid-assets', {
                 method: 'POST',
@@ -211,9 +414,11 @@ function bindGlobalUI() {
         const btn = e.target.closest('.delete-asset-button');
         if (!btn) return;
         btn.disabled = true;
+        const snap = state.liquid_assets.find(a => String(a.id) === String(btn.dataset.assetId));
         try {
             await api(`/api/liquid-assets/${btn.dataset.assetId}`, { method: 'DELETE' });
             await loadPage();
+            if (snap) showRestoreToast('Актив удалён', snap, '/api/liquid-assets');
         } catch(e) { alert(e.message); btn.disabled = false; }
     });
 
@@ -221,10 +426,12 @@ function bindGlobalUI() {
     on($('#transactions-list'), 'click', async e => {
         const btn = e.target.closest('.delete-button');
         if (!btn) return;
+        const txId = btn.dataset.transactionId;
         btn.disabled = true;
         try {
-            await api(`/api/transactions/${btn.dataset.transactionId}`, { method: 'DELETE' });
+            await api(`/api/transactions/${txId}`, { method: 'DELETE' });
             await loadPage();
+            showUndoToast(txId);
         } catch(e) { alert(e.message); btn.disabled = false; }
     });
 
@@ -232,9 +439,11 @@ function bindGlobalUI() {
         const btn = e.target.closest('.delete-button');
         if (!btn) return;
         btn.disabled = true;
+        const snap = state.obligations.find(o => String(o.id) === String(btn.dataset.obligationId));
         try {
             await api(`/api/obligations/${btn.dataset.obligationId}`, { method: 'DELETE' });
             await loadPage();
+            if (snap) showRestoreToast('Обязательство удалено', snap, '/api/obligations');
         } catch(e) { alert(e.message); btn.disabled = false; }
     });
 
@@ -242,9 +451,11 @@ function bindGlobalUI() {
         const btn = e.target.closest('.delete-button');
         if (!btn) return;
         btn.disabled = true;
+        const snap = state.goals.find(g => String(g.id) === String(btn.dataset.goalId));
         try {
             await api(`/api/goals/${btn.dataset.goalId}`, { method: 'DELETE' });
             await loadPage();
+            if (snap) showRestoreToast('Цель удалена', snap, '/api/goals');
         } catch(e) { alert(e.message); btn.disabled = false; }
     });
 
@@ -253,6 +464,7 @@ function bindGlobalUI() {
         const btn = e.target.closest('[data-limit]');
         if (!btn) return;
         state.limit = Number(btn.dataset.limit);
+        state.page = 1;
         $$('.limit-button').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         renderTransactions();
@@ -463,6 +675,8 @@ async function loadPage() {
                 });
                 renderDashboardCards(res);
             } catch(e) { console.error('Recommendation error:', e); }
+            loadSpendingBreakdown();
+            loadBudgets();
         }
 
         if (tList) renderTransactions();
@@ -481,39 +695,219 @@ function setText(sel, text) {
     if (el) el.textContent = text;
 }
 
+const BANK_LABELS = {
+    tinkoff: 'Тинькофф', sber: 'Сбер', alfa: 'Альфа-Банк',
+    vtb: 'ВТБ', raiffeisen: 'Райффайзен',
+};
+
+function filteredTransactions() {
+    let list = state.transactions;
+    if (state.dateFrom) list = list.filter(t => t.date.slice(0, 10) >= state.dateFrom);
+    if (state.dateTo)   list = list.filter(t => t.date.slice(0, 10) <= state.dateTo);
+    return list;
+}
+
 function renderTransactions() {
     const list = $('#transactions-list');
     if (!list) return;
 
-    const visible = state.transactions.slice(0, state.limit);
-    
+    const all = filteredTransactions();
+    const pages = Math.max(1, Math.ceil(all.length / state.limit));
+    if (state.page > pages) state.page = pages;
+    const start = (state.page - 1) * state.limit;
+    const visible = all.slice(start, start + state.limit);
+
     if (visible.length === 0) {
-        list.innerHTML = `<div class="empty-row">Нет записей — добавьте операцию или синхронизируйте банк</div>`;
-        return;
+        list.innerHTML = `<div class="empty-row">Нет записей — добавьте операцию, измените период или синхронизируйте банк</div>`;
+    } else {
+        list.innerHTML = visible.map(t => {
+            const isIncome = t.type === 'income';
+            const color = isIncome ? 'var(--c-green)' : 'var(--c-red)';
+            const sign = isIncome ? '+' : '−';
+            const typePill = isIncome
+                ? '<span class="action-pill success-pill" style="pointer-events:none;font-size:.72rem;padding:4px 10px;">Доход</span>'
+                : '<span class="action-pill danger-pill" style="pointer-events:none;font-size:.72rem;padding:4px 10px;">Расход</span>';
+            const source = t.is_synced
+                ? `<span style="color:var(--c-cyan);font-size:.78rem;font-weight:600;">● ${BANK_LABELS[t.bank] || 'Банк'}</span>`
+                : '<span style="color:var(--c-text3);font-size:.78rem;">○ Ручной</span>';
+
+            return `<div class="table-row">
+                <span>${source}</span>
+                <span>${fmt.date(t.date)}</span>
+                <span style="font-weight:500;">${esc(t.category)}</span>
+                <span>${typePill}</span>
+                <span class="text-right" style="color:${color};font-weight:600;">${sign}${fmt.cur(t.amount)}</span>
+                <span class="text-right">
+                    <button class="ghost-button delete-button" data-transaction-id="${t.id}" style="padding:4px 8px;color:var(--c-red);font-size:.85rem;" title="Удалить">✕</button>
+                </span>
+            </div>`;
+        }).join('');
     }
 
-    list.innerHTML = visible.map(t => {
-        const isIncome = t.type === 'income';
-        const color = isIncome ? 'var(--c-green)' : 'var(--c-red)';
-        const sign = isIncome ? '+' : '−';
-        const typePill = isIncome
-            ? '<span class="action-pill success-pill" style="pointer-events:none;font-size:.72rem;padding:4px 10px;">Доход</span>'
-            : '<span class="action-pill danger-pill" style="pointer-events:none;font-size:.72rem;padding:4px 10px;">Расход</span>';
-        const source = t.is_synced
-            ? '<span style="color:var(--c-cyan);font-size:.78rem;font-weight:600;">● Банк</span>'
-            : '<span style="color:var(--c-text3);font-size:.78rem;">○ Ручной</span>';
+    renderTransactionsPagination(all.length, pages);
+    renderOperationsStats(all);
+}
 
-        return `<div class="table-row">
-            <span>${source}</span>
-            <span>${fmt.date(t.date)}</span>
-            <span style="font-weight:500;">${esc(t.category)}</span>
-            <span>${typePill}</span>
-            <span class="text-right" style="color:${color};font-weight:600;">${sign}${fmt.cur(t.amount)}</span>
-            <span class="text-right">
-                <button class="ghost-button delete-button" data-transaction-id="${t.id}" style="padding:4px 8px;color:var(--c-red);font-size:.85rem;" title="Удалить">✕</button>
-            </span>
+function renderTransactionsPagination(total, pages) {
+    const pg = $('#transactions-pagination');
+    if (!pg) return;
+    if (total === 0) { pg.innerHTML = ''; return; }
+    const from = (state.page - 1) * state.limit + 1;
+    const to = Math.min(state.page * state.limit, total);
+
+    // компактный ряд страниц: 1 … p-1 p p+1 … N
+    const nums = new Set([1, pages, state.page - 1, state.page, state.page + 1]);
+    const seq = [...nums].filter(n => n >= 1 && n <= pages).sort((a, b) => a - b);
+    let btns = '', prev = 0;
+    for (const n of seq) {
+        if (n - prev > 1) btns += `<span style="color:var(--c-text3); padding:0 2px;">…</span>`;
+        btns += `<button class="limit-button${n === state.page ? ' active' : ''}" type="button" data-page="${n}">${n}</button>`;
+        prev = n;
+    }
+    pg.innerHTML = `
+        <span style="color:var(--c-text3);">Показано ${from}–${to} из ${total}</span>
+        <div style="display:flex; gap:6px; align-items:center;">
+            <button class="limit-button" type="button" data-page="${state.page - 1}" ${state.page <= 1 ? 'disabled style="opacity:.4;"' : ''}>‹</button>
+            ${btns}
+            <button class="limit-button" type="button" data-page="${state.page + 1}" ${state.page >= pages ? 'disabled style="opacity:.4;"' : ''}>›</button>
         </div>`;
+}
+
+
+// ── Визуальный дашборд операций: donut + месячные бары ───────
+const CHART_COLORS = ['#6366F1', '#22C55E', '#F59E0B', '#EF4444', '#06B6D4', '#A855F7', '#EC4899', '#94A3B8'];
+
+function renderDonutChart(all) {
+    const el = $('#chart-donut');
+    if (!el) return;
+    const expenses = all.filter(t => t.type === 'expense');
+    const total = expenses.reduce((s, t) => s + pn(t.amount), 0);
+    if (!total) { el.innerHTML = '<div class="empty-row">Нет расходов за период</div>'; return; }
+
+    const byCat = {};
+    for (const t of expenses) {
+        const k = t.category || 'Прочее';
+        byCat[k] = (byCat[k] || 0) + pn(t.amount);
+    }
+    let entries = Object.entries(byCat).sort((a, b) => b[1] - a[1]);
+    if (entries.length > 7) {
+        const head = entries.slice(0, 7);
+        const restSum = entries.slice(7).reduce((s, e) => s + e[1], 0);
+        entries = [...head, ['Остальное', restSum]];
+    }
+
+    // сегменты через stroke-dasharray
+    const R = 70, C = 2 * Math.PI * R;
+    let offset = 0;
+    const segs = entries.map(([name, sum], i) => {
+        const frac = sum / total;
+        const seg = `<circle r="${R}" cx="90" cy="90" fill="none"
+            stroke="${CHART_COLORS[i % CHART_COLORS.length]}" stroke-width="26"
+            stroke-dasharray="${(frac * C).toFixed(2)} ${C.toFixed(2)}"
+            stroke-dashoffset="${(-offset * C).toFixed(2)}"
+            transform="rotate(-90 90 90)"><title>${esc(name)}: ${fmt.cur(sum)} (${(frac * 100).toFixed(0)}%)</title></circle>`;
+        offset += frac;
+        return seg;
     }).join('');
+
+    const legend = entries.map(([name, sum], i) => `
+        <div style="display:flex; align-items:center; gap:8px; font-size:.78rem; margin-bottom:6px; min-width:0;">
+            <span style="width:10px; height:10px; border-radius:3px; background:${CHART_COLORS[i % CHART_COLORS.length]}; flex-shrink:0;"></span>
+            <span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; flex:1;">${esc(name)}</span>
+            <span style="color:var(--c-text3); white-space:nowrap;">${(sum / total * 100).toFixed(0)}%</span>
+        </div>`).join('');
+
+    el.innerHTML = `
+        <div style="display:flex; gap:20px; align-items:center; flex-wrap:wrap;">
+            <svg width="180" height="180" viewBox="0 0 180 180" style="flex-shrink:0;">
+                ${segs}
+                <text x="90" y="84" text-anchor="middle" style="font-size:11px; fill:var(--c-text3);">расходы</text>
+                <text x="90" y="102" text-anchor="middle" style="font-size:13px; font-weight:700; fill:var(--c-text);">${fmt.num(total)} ₽</text>
+            </svg>
+            <div style="flex:1; min-width:160px;">${legend}</div>
+        </div>`;
+}
+
+function renderMonthsChart(all) {
+    const el = $('#chart-months');
+    if (!el) return;
+    if (!all.length) { el.innerHTML = '<div class="empty-row">Нет данных</div>'; return; }
+
+    const byMonth = {};
+    for (const t of all) {
+        const k = t.date.slice(0, 7); // YYYY-MM
+        (byMonth[k] ||= { inc: 0, exp: 0 });
+        if (t.type === 'income') byMonth[k].inc += pn(t.amount);
+        else byMonth[k].exp += pn(t.amount);
+    }
+    const months = Object.keys(byMonth).sort().slice(-8); // последние 8 месяцев периода
+    const max = Math.max(...months.flatMap(m => [byMonth[m].inc, byMonth[m].exp]), 1);
+
+    const W = 420, H = 190, padB = 26, barArea = H - padB - 8;
+    const groupW = W / months.length;
+    const barW = Math.min(22, groupW / 3);
+    const MN = ['янв', 'фев', 'мар', 'апр', 'май', 'июн', 'июл', 'авг', 'сен', 'окт', 'ноя', 'дек'];
+
+    const bars = months.map((m, i) => {
+        const x0 = i * groupW + groupW / 2;
+        const hI = byMonth[m].inc / max * barArea;
+        const hE = byMonth[m].exp / max * barArea;
+        const [y, mo] = m.split('-');
+        return `
+            <rect x="${(x0 - barW - 2).toFixed(1)}" y="${(8 + barArea - hI).toFixed(1)}" width="${barW}" height="${hI.toFixed(1)}" rx="3" fill="var(--c-green)" opacity=".85"><title>${MN[+mo-1]} ${y}: доход ${fmt.cur(byMonth[m].inc)}</title></rect>
+            <rect x="${(x0 + 2).toFixed(1)}" y="${(8 + barArea - hE).toFixed(1)}" width="${barW}" height="${hE.toFixed(1)}" rx="3" fill="var(--c-red)" opacity=".85"><title>${MN[+mo-1]} ${y}: расход ${fmt.cur(byMonth[m].exp)}</title></rect>
+            <text x="${x0.toFixed(1)}" y="${H - 8}" text-anchor="middle" style="font-size:10px; fill:var(--c-text3);">${MN[+mo-1]} ${y.slice(2)}</text>`;
+    }).join('');
+
+    el.innerHTML = `<svg width="100%" viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet">
+        <line x1="0" y1="${8 + barArea}" x2="${W}" y2="${8 + barArea}" stroke="var(--c-border)" stroke-width="1"/>
+        ${bars}
+    </svg>`;
+}
+
+function renderOperationsStats(all) {
+    renderDonutChart(all);
+    renderMonthsChart(all);
+    const catEl = $('#stats-by-category');
+    const merEl = $('#stats-by-merchant');
+    if (!catEl && !merEl) return;
+
+    const expenses = all.filter(t => t.type === 'expense');
+    const totalExp = expenses.reduce((s, t) => s + pn(t.amount), 0);
+
+    const barList = (groups, el) => {
+        if (!el) return;
+        const top = Object.entries(groups).sort((a, b) => b[1].sum - a[1].sum).slice(0, 8);
+        if (!top.length || totalExp === 0) { el.innerHTML = '<div class="empty-row">Нет расходов за период</div>'; return; }
+        const max = top[0][1].sum;
+        el.innerHTML = top.map(([name, g]) => `
+            <div style="margin-bottom:10px;">
+                <div style="display:flex; justify-content:space-between; font-size:.8rem; margin-bottom:3px;">
+                    <span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:60%;">${esc(name)} <span style="color:var(--c-text3);">· ${g.count}</span></span>
+                    <span style="white-space:nowrap;"><b>${fmt.cur(g.sum)}</b> <span style="color:var(--c-text3);">${(g.sum / totalExp * 100).toFixed(0)}%</span></span>
+                </div>
+                <div style="height:6px; background:var(--c-surface2); border-radius:3px; overflow:hidden;">
+                    <div style="height:100%; width:${(g.sum / max * 100).toFixed(1)}%; background:var(--c-accent); border-radius:3px;"></div>
+                </div>
+            </div>`).join('');
+    };
+
+    const byCat = {};
+    for (const t of expenses) {
+        const k = t.category || 'Прочее';
+        (byCat[k] ||= { sum: 0, count: 0 });
+        byCat[k].sum += pn(t.amount); byCat[k].count++;
+    }
+    barList(byCat, catEl);
+
+    const byMer = {};
+    for (const t of expenses) {
+        const k = (t.description || '').trim();
+        if (!k) continue;
+        (byMer[k] ||= { sum: 0, count: 0 });
+        byMer[k].sum += pn(t.amount); byMer[k].count++;
+    }
+    barList(byMer, merEl);
 }
 
 function renderObligations() {
@@ -555,7 +949,12 @@ function renderGoals() {
         emotional: 'эмоциональная',
     };
 
-    list.innerHTML = state.goals.map(g => {
+    const totalAccum = state.goals.reduce((x, g) => x + pn(g.current_amount), 0);
+    const accumLine = totalAccum > 0 ? `
+        <div style="font-size:.78rem; color:var(--c-text3); padding:8px 0; margin-bottom:8px; border-bottom:1px solid var(--c-border);">
+            Всего накоплено по целям: <strong style="color:var(--c-green);">${fmt.cur(totalAccum)}</strong> — эти деньги учитываются в подушке безопасности и в плане распределения
+        </div>` : '';
+    list.innerHTML = accumLine + state.goals.map(g => {
         const pct = g.target_amount > 0 ? Math.min(100, (g.current_amount / g.target_amount * 100)) : 0;
         const cat = g.category || 'material';
         const catLabel = CAT_LABELS[cat] || cat;
@@ -617,14 +1016,80 @@ function renderLiquidAssets() {
         `).join('')}`;
 }
 
+
+// ── Детальные пояснения метрик дашборда (по клику на карточку) ──
+function metricExplainHTML(key, ind) {
+    const m = v => fmt.cur(v);
+    const It = ind.It || 0, Et = ind.Et || 0, SigmaP = ind.SigmaP || 0;
+    const Rt = ind.Rt || 0, Lt = ind.Lt || 0, Dt = ind.Dt || 0;
+    const Bt = ind.Bt || 0, Bliq = ind.Bliq || 0, BLR = ind.BLR || 0;
+    const oblig = Et + SigmaP;
+
+    const block = (title, rows, note) => `
+        <section class="glass-panel" style="padding:18px 22px; position:relative;">
+            <button id="metric-explain-close" style="position:absolute; top:12px; right:14px; background:none; border:none; color:var(--c-text3); cursor:pointer; font-size:1rem;">✕</button>
+            <h3 style="font-size:.95rem; margin:0 0 12px;">${title}</h3>
+            <div style="display:flex; flex-direction:column; gap:8px; font-size:.82rem;">${rows}</div>
+            ${note ? `<div style="margin-top:12px; padding-top:10px; border-top:1px solid var(--c-border); font-size:.78rem; color:var(--c-text3);">${note}</div>` : ''}
+        </section>`;
+    const row = (label, val) => `<div style="display:flex; justify-content:space-between; gap:16px;"><span style="color:var(--c-text2);">${label}</span><span style="text-align:right;">${val}</span></div>`;
+
+    if (key === 'rt') {
+        const verdict = Rt > 0
+            ? `Эти <b>${m(Rt)}</b> каждый месяц можно направлять на досрочное погашение, в резерв или на цели — именно эту сумму система распределяет в плане.`
+            : `Свободных денег нет: траты и платежи превышают доход на <b>${m(Math.abs(Rt))}</b>. Сначала нужно сократить расходы или увеличить доход — распределять пока нечего.`;
+        return block('Свободные деньги (Rt) — как посчитано',
+            row('Доходы за месяц', `<b style="color:var(--c-green);">+${m(It)}</b>`) +
+            row('− Обычные расходы', `<b style="color:var(--c-red);">−${m(Et)}</b>`) +
+            row('− Платежи по кредитам', `<b style="color:var(--c-red);">−${m(SigmaP)}</b>`) +
+            row('= Свободные деньги', `<b style="color:${Rt >= 0 ? 'var(--c-green)' : 'var(--c-red)'};">${m(Rt)}</b>`),
+            verdict);
+    }
+    if (key === 'lt') {
+        const verdict = Lt >= 0.3
+            ? `Значение <b>${Lt.toFixed(2)}</b> выше нормы 0.30 — после обязательных трат остаётся солидный запас.`
+            : Lt >= 0 ? `Значение <b>${Lt.toFixed(2)}</b> ниже нормы 0.30 — бюджет натянут, почти всё уходит на обязательные траты.`
+            : `Значение отрицательное — обязательные траты больше дохода, бюджет в дефиците.`;
+        return block('Запас прочности (Lt) — как посчитано',
+            row('Свободные деньги', `<b>${m(Rt)}</b>`) +
+            row('÷ Обязательные траты (расходы + кредиты)', `<b>${m(oblig)}</b>`) +
+            row('= Запас прочности', `<b>${Lt.toFixed(3)}</b>`),
+            `Показывает, какую долю от обязательных трат составляют свободные деньги. Норма — от 0.30 (Greninger, 1996). ${verdict}`);
+    }
+    if (key === 'dt') {
+        const verdict = Dt <= 0.36
+            ? `Ваши <b>${fmt.pct(Dt)}</b> — в зелёной зоне.`
+            : Dt <= 0.5 ? `Ваши <b>${fmt.pct(Dt)}</b> — повышенная нагрузка, банки могут отказывать в новых кредитах.`
+            : `Ваши <b>${fmt.pct(Dt)}</b> — опасная зона, выше половины дохода уходит на долги.`;
+        return block('Долговая нагрузка (Dt / ПДН) — как посчитано',
+            row('Платежи по кредитам в месяц', `<b>${m(SigmaP)}</b>`) +
+            row('÷ Доходы за месяц', `<b>${m(It)}</b>`) +
+            row('= Долговая нагрузка', `<b>${fmt.pct(Dt)}</b>`),
+            `Это «показатель долговой нагрузки» (ПДН) — его же считает Банк России при выдаче кредитов. Порог регулятора — 40%. ${verdict}`);
+    }
+    if (key === 'blr') {
+        const verdict = BLR < 1 ? 'Это критично: без дохода деньги закончатся почти сразу.'
+            : BLR < 2.5 ? 'Это ниже нормы: подушку стоит наращивать.'
+            : BLR <= 6 ? 'Это норма: запас от 2.5 до 6 месяцев считается здоровым.'
+            : 'Это избыток: часть денег можно перевести в доходные инструменты — лежащие без дела деньги съедает инфляция.';
+        return block('Подушка безопасности (BLR) — как посчитано',
+            row('Накоплено на целях (Bt)', `<b>${m(Bt)}</b>`) +
+            row('+ Накопления и депозиты (Bliq)', `<b>${m(Bliq)}</b>`) +
+            row('÷ Обычные расходы в месяц', `<b>${m(Et)}</b>`) +
+            row('= Хватит на', `<b>${BLR.toFixed(1)} мес</b>`),
+            `Показывает, сколько месяцев вы проживёте при полной потере дохода, тратя как сейчас. ${verdict}`);
+    }
+    return '';
+}
+
 function renderDashboardCards(res, isSimulation = false) {
     if (!res || !res.indicators) return;
 
-    const { Rt, Lt, Dt, Bt, CFt, BLR, Bliq, BLR_status } = res.indicators;
+    state.lastIndicators = res.indicators;
+    const { Rt, Lt, Dt, Bt, BLR, Bliq, BLR_status } = res.indicators;
     const blr = BLR ?? 0;
     const bliq = Bliq ?? 0;
     const bt = Bt ?? 0;
-    const cf = CFt ?? 0;
 
     // Indicator — симуляция или факт
     const headerEl = $('#summary-header');
@@ -641,6 +1106,11 @@ function renderDashboardCards(res, isSimulation = false) {
 
     // ─── Metric values ───────────────────────────────────────────
     setText('#rt-value', fmt.num(Rt));
+    const heroRt = $('#hero-rt-value');
+    if (heroRt) {
+        heroRt.textContent = fmt.cur(Rt);
+        heroRt.style.color = Rt >= 0 ? 'var(--c-green)' : 'var(--c-red)';
+    }
     setText('#lt-value', Number(Lt).toFixed(2));
     setText('#dt-value', fmt.pct(Dt));
     setText('#blr-value', `${blr.toFixed(1)} мес`);
@@ -691,35 +1161,28 @@ function renderDashboardCards(res, isSimulation = false) {
     // Render breakdown — формулы ВКР + бенчмарки
     const explEl = $('#explanation-text');
     if (explEl) {
-        const ltBench = Lt >= 0.3 ? 'норма' : Lt >= 0 ? 'низкая' : 'отрицательная';
-        const dtBench = Dt <= 0.36 ? 'норма' : Dt <= 0.5 ? 'повышенный' : Dt <= 0.8 ? 'опасный' : 'критический';
+        const ltGround = Lt >= 0.3
+            ? "Свободные деньги уверенно покрывают обязательные траты — здоровый уровень."
+            : Lt >= 0
+                ? "Свободных денег пока мало по сравнению с обязательными тратами — подушка набирается медленно."
+                : "Обязательные траты превышают доход — бюджет уходит в минус.";
+        const dtGround = Dt <= 0.36
+            ? "Это в пределах нормы (безопасная граница — 40% дохода)."
+            : Dt <= 0.5
+                ? "Нагрузка повышенная — новые кредиты сейчас брать не стоит."
+                : "Нагрузка высокая — снижать долг стоит в первую очередь.";
+        const blrGround = blr < 2.5
+            ? "Маловато — комфортный запас это 3–6 месяцев расходов."
+            : blr <= 6
+                ? "Здоровый запас на случай потери дохода."
+                : "Запас даже с избытком — лишнее можно направить в цели или накопления.";
 
-        let html = `<div class="rec-formula" style="margin-top:0;">
-            <div style="font-size:.72rem; color:var(--c-text3); margin-bottom:6px; text-transform:uppercase; letter-spacing:.5px;">Расчёт по формулам ВКР</div>
-            <div style="display:grid; grid-template-columns:auto 1fr auto; gap:4px 12px; font-size:.78rem; align-items:center;">
-                <span style="opacity:.6;">CFt</span>
-                  <span style="font-family:var(--font-mono);">= It − Σej = ${fmt.num(cf)} ₽</span>
-                  <span style="font-size:.7rem; color:var(--c-text3);">форм. 3</span>
-
-                <span style="opacity:.6; color:var(--c-violet);">Rt</span>
-                  <span style="font-family:var(--font-mono); color:var(--c-violet);">= CFt − ΣP = ${fmt.num(Rt)} ₽</span>
-                  <span style="font-size:.7rem; color:var(--c-text3);">форм. 11</span>
-
-                <span style="opacity:.6; color:var(--c-green);">Lt</span>
-                  <span style="font-family:var(--font-mono); color:var(--c-green);">= Rt / (Σej + ΣP) = ${Lt.toFixed(3)}</span>
-                  <span style="font-size:.7rem; color:${Lt >= 0.3 ? 'var(--c-green)' : Lt >= 0 ? 'var(--c-amber)' : 'var(--c-red)'};">${ltBench}</span>
-
-                <span style="opacity:.6; color:var(--c-amber);">Dt</span>
-                  <span style="font-family:var(--font-mono); color:var(--c-amber);">= ΣP / It = ${fmt.pct(Dt)}</span>
-                  <span style="font-size:.7rem; color:${Dt <= 0.36 ? 'var(--c-green)' : Dt <= 0.5 ? 'var(--c-amber)' : 'var(--c-red)'};">${dtBench}</span>
-
-                <span style="opacity:.6; color:${blrColors[blrLevel]};">BLR</span>
-                  <span style="font-family:var(--font-mono); color:${blrColors[blrLevel]};">= (Bt + Bliq) / Σej = ${blr.toFixed(2)} мес</span>
-                  <span style="font-size:.7rem; color:${blrColors[blrLevel]};">${blrLabel}</span>
-            </div>
-            <div style="margin-top:8px; padding-top:8px; border-top:1px solid var(--c-border); font-size:.68rem; color:var(--c-text3); line-height:1.5;">
-                Bt = ${fmt.num(bt)} ₽ (баланс целей) · Bliq = ${fmt.num(bliq)} ₽ (депозиты, накопит. счета).
-                BLR — Basic Liquidity Ratio, Greninger 1996. Dt — ПДН ЦБ РФ (Указ. 4892-У).
+        let html = `<div class="rec-grounding" style="margin-top:0;">
+            <div style="font-size:.72rem; color:var(--c-text3); margin-bottom:8px; text-transform:uppercase; letter-spacing:.5px;">Что значат эти числа</div>
+            <div style="display:flex; flex-direction:column; gap:8px; font-size:.78rem; line-height:1.5;">
+                <div><strong>Запас прочности — ${Number(Lt).toFixed(2)}.</strong> ${ltGround}</div>
+                <div><strong>Долговая нагрузка — ${fmt.pct(Dt)}.</strong> ${dtGround}</div>
+                <div><strong>Подушка безопасности — ${blr.toFixed(1)} мес.</strong> ${blrGround}</div>
             </div>
         </div>`;
 
@@ -809,6 +1272,43 @@ function bindPlanningUI() {
         finally { btn.disabled = false; btn.textContent = 'Рассчитать альтернативы'; }
     });
 
+    // FR-07: пересчёт и сохранение сценария «что если»
+    let lastScenario = null;
+    on($('#scenario-calc-btn'), 'click', async () => {
+        const inc = $('#scenario-income').value.trim();
+        const exp = $('#scenario-expense').value.trim();
+        const params = { risk_tolerance: planRisk, l_min: planLmin };
+        if (inc !== '') params.income_override = pn(inc);
+        if (exp !== '') params.expense_override = pn(exp);
+        const sbtn = $('#scenario-calc-btn');
+        sbtn.disabled = true; sbtn.textContent = 'Пересчёт…';
+        try {
+            const res = await api('/api/planning/calculate', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(params),
+            });
+            renderPlanning(res);
+            lastScenario = { parameters: params, result: { Rt: res.indicators ? res.indicators.Rt : null } };
+            $('#scenario-save-btn').style.display = '';
+            $('#scenario-hint').textContent = 'План пересчитан под сценарий — можно сохранить.';
+        } catch (e) { alert(e.message); }
+        finally { sbtn.disabled = false; sbtn.textContent = 'Пересчитать сценарий'; }
+    });
+    on($('#scenario-save-btn'), 'click', async () => {
+        if (!lastScenario) return;
+        const name = prompt('Название сценария:', 'Мой сценарий');
+        if (!name) return;
+        try {
+            await api('/api/planning/scenarios', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name, parameters: lastScenario.parameters, result: lastScenario.result }),
+            });
+            $('#scenario-hint').textContent = 'Сценарий сохранён ✓';
+        } catch (e) { alert(e.message); }
+    });
+
     // Horizon selector → reload forecast
     const horizonSel = $('#forecast-horizon');
     if (horizonSel) {
@@ -829,6 +1329,84 @@ async function loadForecast(horizon = 6) {
         });
         renderForecast(data);
     } catch(e) { console.error('forecast error', e); }
+}
+
+// ── SVG fan-chart прогноза Rt с 80% доверительным интервалом ──
+function forecastChartSVG(data) {
+    const pts = (data && data.forecast) || [];
+    if (!pts.length) return '';
+
+    const W = 760, H = 300, padL = 70, padR = 24, padT = 24, padB = 46;
+    const innerW = W - padL - padR, innerH = H - padT - padB;
+    const n = pts.length;
+    const hasCI = pts.every(p => p.Rt_p10 != null && p.Rt_p90 != null);
+
+    const vals = [0];
+    pts.forEach(p => { vals.push(p.Rt); if (hasCI) { vals.push(p.Rt_p10, p.Rt_p90); } });
+    let minV = Math.min(...vals), maxV = Math.max(...vals);
+    if (minV === maxV) { maxV += 1; minV -= 1; }
+    const span = (maxV - minV) * 0.10; minV -= span; maxV += span;
+
+    const xOf = i => padL + (n === 1 ? innerW / 2 : innerW * i / (n - 1));
+    const yOf = v => padT + innerH * (1 - (v - minV) / (maxV - minV));
+
+    // Горизонтальная сетка + подписи оси Y (5 уровней)
+    let grid = '', yTicks = '';
+    const LEVELS = 4;
+    for (let g = 0; g <= LEVELS; g++) {
+        const v = minV + (maxV - minV) * g / LEVELS;
+        const y = yOf(v).toFixed(1);
+        grid += `<line x1="${padL}" y1="${y}" x2="${W - padR}" y2="${y}" stroke="var(--c-border)" stroke-width="1"/>`;
+        yTicks += `<text x="${padL - 10}" y="${(yOf(v) + 4).toFixed(1)}" text-anchor="end" font-size="11" fill="var(--c-text3)" font-family="var(--font-mono),monospace">${fmt.num(Math.round(v))}</text>`;
+    }
+
+    // Нулевая линия
+    let zero = '';
+    if (minV < 0 && maxV > 0) {
+        const zy = yOf(0).toFixed(1);
+        zero = `<line x1="${padL}" y1="${zy}" x2="${W - padR}" y2="${zy}" stroke="var(--c-text2)" stroke-width="1.5" stroke-dasharray="5 4" opacity="0.6"/>`;
+    }
+
+    // CI-полоса (80%) + её границы
+    let band = '';
+    if (hasCI) {
+        const top = pts.map((p, i) => `${xOf(i).toFixed(1)},${yOf(p.Rt_p90).toFixed(1)}`);
+        const bot = pts.map((p, i) => `${xOf(i).toFixed(1)},${yOf(p.Rt_p10).toFixed(1)}`).reverse();
+        band = `<polygon points="${top.concat(bot).join(' ')}" fill="var(--c-amber)" opacity="0.14"/>`
+             + `<polyline points="${top.join(' ')}" fill="none" stroke="var(--c-amber)" stroke-width="1" opacity="0.5"/>`
+             + `<polyline points="${pts.map((p, i) => `${xOf(i).toFixed(1)},${yOf(p.Rt_p10).toFixed(1)}`).join(' ')}" fill="none" stroke="var(--c-amber)" stroke-width="1" opacity="0.5"/>`;
+    }
+
+    // Линия точечного прогноза Rt + точки
+    const line = pts.map((p, i) => `${xOf(i).toFixed(1)},${yOf(p.Rt).toFixed(1)}`).join(' ');
+    const linePoly = `<polyline points="${line}" fill="none" stroke="var(--c-accent)" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>`;
+    const dots = pts.map((p, i) => {
+        const col = p.Rt >= 0 ? 'var(--c-green)' : 'var(--c-red)';
+        return `<circle cx="${xOf(i).toFixed(1)}" cy="${yOf(p.Rt).toFixed(1)}" r="3.5" fill="${col}" stroke="var(--c-bg)" stroke-width="1.5"/>`;
+    }).join('');
+
+    // Подписи оси X (прореживаем, если периодов много)
+    const stepX = n <= 12 ? 1 : Math.ceil(n / 12);
+    let xTicks = '';
+    pts.forEach((p, i) => {
+        if (i % stepX !== 0 && i !== n - 1) return;
+        xTicks += `<text x="${xOf(i).toFixed(1)}" y="${H - padB + 20}" text-anchor="middle" font-size="11" fill="var(--c-text3)">+${p.period}м</text>`;
+    });
+
+    const legend = `
+        <div style="display:flex; gap:18px; justify-content:flex-end; font-size:.72rem; color:var(--c-text2); margin-bottom:6px;">
+            <span style="display:inline-flex; align-items:center; gap:6px;"><span style="width:14px; height:3px; background:var(--c-accent); border-radius:2px;"></span>Rt (точечный, SES)</span>
+            ${hasCI ? `<span style="display:inline-flex; align-items:center; gap:6px;"><span style="width:14px; height:10px; background:var(--c-amber); opacity:.3; border-radius:2px;"></span>Вероятный диапазон (80%)</span>` : ''}
+        </div>`;
+
+    return `
+        <div style="margin-bottom:16px;">
+            <div style="font-size:.82rem; font-weight:600; margin-bottom:8px;">График прогноза доступного ресурса Rt</div>
+            ${legend}
+            <svg viewBox="0 0 ${W} ${H}" width="100%" preserveAspectRatio="xMidYMid meet" style="display:block; max-width:100%;">
+                ${grid}${zero}${band}${linePoly}${dots}${yTicks}${xTicks}
+            </svg>
+        </div>`;
 }
 
 function renderForecast(data) {
@@ -858,16 +1436,29 @@ function renderForecast(data) {
         </tr>`;
     }).join('');
 
+    const alert = data.deficit_alert;
+    const alertHtml = alert ? `
+        <div style="margin-bottom:14px; padding:12px 16px; border-radius:10px; background:rgba(239,68,68,.08); border:1px solid rgba(239,68,68,.3); font-size:.84rem; line-height:1.5;">
+            <strong style="color:var(--c-red);">⚠️ ${alert.pessimistic ? 'Риск нехватки денег' : 'Прогноз: денег может не хватить'}</strong><br/>
+            Через <strong>${alert.period} мес.</strong> ${alert.pessimistic ? 'при неблагоприятном сценарии ' : ''}свободных денег может не хватить — разрыв около <strong>${fmt.cur(alert.gap)}</strong>. Стоит заранее снизить расходы или отложить крупные траты.
+        </div>` : '';
+
     body.innerHTML = `
+        ${alertHtml}
+        ${forecastChartSVG(data)}
         <div style="margin-bottom:10px; font-size:.78rem; color:var(--c-text3); line-height:1.5;">
             Тренд Rt: <strong style="color:${TREND_COLOR[trend]};">${TREND_LABEL[trend]}</strong>
-            <div style="margin-top:4px; font-size:.72rem;">
-                Точечный прогноз: <span style="color:var(--c-text2);">${method.point || 'baseline'}</span><br/>
-                Интервальная оценка: <span style="color:var(--c-amber);">${method.interval || '—'}</span>
-                — диапазон в столбце «80% CI» снизу
-            </div>
-            <div style="margin-top:6px; font-size:.7rem; color:var(--c-text3); font-style:italic;">
-                Dt константно при стабильных доходах/платежах — снижение требует активной досрочки (через рекомендации СППР), а не пассивного ожидания.
+            <details style="margin-top:6px;">
+                <summary style="cursor:pointer; font-size:.74rem; color:var(--c-text2);">Что показывает этот график и как его проверить</summary>
+                <div style="margin-top:8px; font-size:.74rem; line-height:1.55;">
+                    <p style="margin:0 0 6px;"><b>Что это.</b> Синяя линия — сколько свободных денег у вас будет накапливаться (или сгорать) месяц за месяцем, если доходы и расходы останутся как в среднем по вашей истории. Жёлтый коридор — диапазон, куда значение попадёт с вероятностью 80%: система прогоняет 1000 случайных сценариев вокруг прогноза.</p>
+                    <p style="margin:0 0 6px;"><b>Почему линия прямая.</b> Прогноз строится по среднему: каждый месяц прибавляется примерно одинаковая сумма, поэтому накопление ложится прямой. Это не баг — при стабильных данных так и должно быть. Чем «шумнее» история, тем шире жёлтый коридор.</p>
+                    <p style="margin:0;"><b>Как проверить.</b> Введите гипотетический доход или расходы в «Сценарий "что если"» — наклон изменится сразу. Либо добавьте крупный расход в операции: прогноз пересчитается, линия уйдёт вниз.</p>
+                </div>
+            </details>
+            <div style="margin-top:6px; font-size:.7rem; color:var(--c-text3);">
+                Точечный прогноз: <span style="color:var(--c-text2);">${method.point || 'baseline'}</span> ·
+                интервал: <span style="color:var(--c-amber);">${method.interval || '—'}</span> — диапазон в столбце «80% CI» снизу
             </div>
         </div>
         <table style="width:100%; border-collapse:collapse; font-size:.82rem;">
@@ -876,9 +1467,9 @@ function renderForecast(data) {
                     <th style="padding:6px 10px; text-align:left; font-weight:600;">Период</th>
                     <th style="padding:6px 10px; text-align:right; font-weight:600;">Bt</th>
                     <th style="padding:6px 10px; text-align:right; font-weight:600;">Rt (точка)</th>
-                    <th style="padding:6px 10px; text-align:right; font-weight:600; color:var(--c-amber);">80% CI Rt (Monte-Carlo)</th>
-                    <th style="padding:6px 10px; text-align:right; font-weight:600;">Lt</th>
-                    <th style="padding:6px 10px; text-align:right; font-weight:600;">Dt</th>
+                    <th style="padding:6px 10px; text-align:right; font-weight:600; color:var(--c-amber);">Вероятный диапазон (80%)</th>
+                    <th style="padding:6px 10px; text-align:right; font-weight:600;">Запас прочности</th>
+                    <th style="padding:6px 10px; text-align:right; font-weight:600;">Долговая нагрузка</th>
                 </tr>
             </thead>
             <tbody>${rows}</tbody>
@@ -929,7 +1520,7 @@ function renderAllocationDetails(a) {
         if (parseFloat(a.x_obl_effective || 0) <= 0 || !obl.length) return '';
         return `
         <div class="alt-detail-block">
-            <div class="alt-detail-title" style="color:#F472B6;">Распределение досрочки (Avalanche, форм. 41)</div>
+            <div class="alt-detail-title" style="color:#F472B6;">Куда идёт досрочное погашение</div>
             ${obl.map(o => {
                 const rate = (parseFloat(o.interest_rate || 0) * 100).toFixed(1);
                 return `
@@ -948,7 +1539,7 @@ function renderAllocationDetails(a) {
     const goalIds = Object.keys(goal).filter(k => parseFloat(goal[k]) > 0);
     const goalBlock = goalIds.length ? `
         <div class="alt-detail-block">
-            <div class="alt-detail-title" style="color:#4ADE80;">Распределение на цели (w·u, форм. 16)</div>
+            <div class="alt-detail-title" style="color:#4ADE80;">Как делятся деньги между целями</div>
             ${goalIds.map(id => `
                 <div class="alt-detail-item">
                     <span class="alt-arrow">→</span>
@@ -960,7 +1551,7 @@ function renderAllocationDetails(a) {
     return oblBlock + goalBlock;
 }
 
-function renderTop3Card(a, rank, indicators) {
+function renderTop3Card(a, rank, indicators, weights, rival) {
     const e = a.explanation || {};
     const d = e.delta || {};
     const gains = (e.gains || []);
@@ -984,7 +1575,7 @@ function renderTop3Card(a, rank, indicators) {
     const dDtStr   = d.Dt  !== undefined ? `${deltaSign(d.Dt*100)}${(d.Dt*100).toFixed(1)}%` : '';
 
     return `
-    <article class="glass-panel" style="border:1px solid ${bc}; padding:20px 22px; margin-bottom:16px;">
+    <article class="glass-panel alt-card" style="border:1px solid ${bc}; padding:20px 22px; margin-bottom:16px; cursor:pointer;" title="Нажмите, чтобы раскрыть разбор">
         <!-- Заголовок -->
         <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:12px; margin-bottom:14px;">
             <div style="display:flex; align-items:center; gap:10px;">
@@ -994,7 +1585,7 @@ function renderTop3Card(a, rank, indicators) {
                 </div>
                 <div>
                     <div style="font-weight:700; font-size:.95rem;">${esc(a.name)}</div>
-                    <div style="font-size:.72rem; color:${rc}; margin-top:2px;">${rankLabels[rank]} · U(a) = <strong>${a.utility}</strong></div>
+                    <div style="font-size:.72rem; color:${rc}; margin-top:2px;">${rankLabels[rank]} · оценка <strong>${a.utility}</strong></div>
                 </div>
             </div>
         </div>
@@ -1054,7 +1645,114 @@ function renderTop3Card(a, rank, indicators) {
                 ${dDtStr ? `<div style="font-size:.70rem; color:${deltaColor(d.Dt, true)};">${dDtStr}</div>` : ''}
             </div>
         </div>
+        ${renderCalcDetails(a, indicators, weights, rival)}
     </article>`;
+}
+
+// ── Раскрываемый расчёт альтернативы (детали формул) ──────────
+function renderCalcDetails(a, ind, weights, rival) {
+    const It = ind.It || 0, Et = ind.Et || 0, SigmaP = ind.SigmaP || 0, Rt = ind.Rt || 0;
+    const m = v => fmt.cur(v);
+    const step = (n, title, body) => `
+        <div class="calc-row">
+            <span class="calc-label">Шаг ${n} · ${title}</span>
+            <div style="margin-top:4px;">${body}</div>
+        </div>`;
+
+    // ── Шаг 1: свободные деньги ──
+    const s1 = `${m(It)} доход − ${m(Et)} расходы − ${m(SigmaP)} платежи по кредитам = <b>${m(Rt)}</b>`;
+
+    // ── Шаг 2: перебор вариантов ──
+    const s2 = `Алгоритм перебрал <b>21 вариант</b> распределения этой суммы (доли с шагом 20%: долг / резерв / цели), отбросил нарушающие ограничения по ликвидности и долговой нагрузке, остальные оценил и отранжировал. Этот план: на досрочку <b>${m(a.x_obligations)}</b> · в резерв <b>${m(a.x_reserve)}</b> · на цели <b>${m(a.x_goals)}</b>.`;
+
+    // ── Шаг 3: Avalanche (досрочка) ──
+    let s3 = '';
+    const av = a.avalanche_detail;
+    if (av && (a.x_obligations > 0 || (av.skipped || []).length)) {
+        const rb = (av.r_bench * 100).toFixed(1);
+        let parts = [];
+        if ((av.passed || []).length) {
+            parts.push(`Досрочно гасим только кредиты со ставкой ≥ ${rb}% (ниже — деньгам выгоднее работать на накопительном счёте), в порядке убывания ставки:`);
+            parts.push((av.passed || []).map(o => `
+                <div class="alt-detail-item"><span class="alt-arrow">→</span>
+                <span><strong>${esc(o.name)}</strong> (${(o.interest_rate * 100).toFixed(1)}%): влито ${m(o.paid_in)}${o.closed ? ' — <b style="color:var(--c-green);">кредит закрыт</b>' : ''}${o.payment_saved > 0 ? `, платёж ↓ на ${m(o.payment_saved)}/мес` : ''}</span></div>`).join(''));
+        }
+        if ((av.skipped || []).length) {
+            parts.push(`<div style="margin-top:4px;">Не гасим досрочно: ${(av.skipped || []).map(o => `<strong>${esc(o.name)}</strong> (${(o.interest_rate * 100).toFixed(1)}% &lt; ${rb}%)`).join(', ')} — дешевле бенчмарка.</div>`);
+        }
+        if (av.x_unused_to_goals > 0) {
+            parts.push(`<div style="margin-top:4px;">Высвобожденные <b>${m(av.x_unused_to_goals)}</b> перенаправлены на цели.</div>`);
+        }
+        if (av.delta_payment > 0) {
+            parts.push(`<div style="margin-top:4px;">Итог: ежемесячные платежи снизятся на <b style="color:var(--c-green);">${m(av.delta_payment)}</b>.</div>`);
+        }
+        if (parts.length) s3 = step(3, 'Какие кредиты гасим (стратегия Avalanche)', parts.join(''));
+    }
+
+    // ── Шаг 4: распределение по целям ──
+    let s4 = '';
+    const gb = a.goal_breakdown || [];
+    if (gb.length && a.x_goals > 0) {
+        const CAT_RU = { income_growth: 'рост дохода', safety: 'безопасность', material: 'материальная', emotional: 'эмоциональная' };
+        const rows = gb.map(g => `
+            <div style="display:grid; grid-template-columns:minmax(0,1.4fr) auto auto auto auto; gap:6px 10px; font-size:.76rem; padding:3px 0; align-items:center;">
+                <span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${esc(g.name)}</span>
+                <span style="color:var(--c-text3);">вес ${g.weight} (${CAT_RU[g.category] || g.category})</span>
+                <span style="color:var(--c-text3);">срочн. ×${g.urgency}</span>
+                <span style="color:var(--c-text3);">${(g.share * 100).toFixed(0)}%</span>
+                <span style="text-align:right;"><b>${m(g.amount)}</b></span>
+            </div>`).join('');
+        s4 = step(s3 ? 4 : 3, 'Как поделили деньги между целями', `
+            <div style="font-size:.76rem; color:var(--c-text3); margin-bottom:6px;">Каждая цель получает долю по формуле: вес категории × срочность (12 ÷ месяцев до срока). Важные и близкие цели получают больше.</div>
+            <div style="padding:8px 12px; background:rgba(255,255,255,.03); border-radius:8px;">${rows}</div>`);
+    }
+
+    // ── Шаг 5: оценка U с сырыми значениями ──
+    let s5 = '';
+    if (a.scores && weights) {
+        const crit = [
+            { label: 'Свободные деньги', raw: a.Rt_new !== undefined ? m(a.Rt_new) : '—', w: weights.w_rt, n: a.scores.Rt_norm },
+            { label: 'Ликвидность', raw: a.Lt_new !== undefined ? a.Lt_new.toFixed(3) : '—', w: weights.w_lt, n: a.scores.Lt_norm },
+            { label: 'Снижение долга', raw: a.Dt_new !== undefined ? (a.Dt_new * 100).toFixed(1) + '%' : '—', w: weights.w_dt, n: a.scores.Dt_norm },
+            { label: 'Цели', raw: a.Si !== undefined ? (a.Si * 100).toFixed(1) + '%' : '—', w: weights.w_goals, n: a.scores.Si_norm },
+        ];
+        const rows = crit.map(c => `
+            <div style="display:grid; grid-template-columns:minmax(0,1fr) auto auto; gap:6px 12px; font-size:.76rem; padding:3px 0;">
+                <span style="color:var(--c-text2);">${c.label} <span style="color:var(--c-text3);">(${c.raw})</span></span>
+                <span style="color:var(--c-text3); white-space:nowrap;">${c.n.toFixed(2)} × вес ${c.w.toFixed(2)}</span>
+                <span style="text-align:right;"><b>${(c.w * c.n).toFixed(3)}</b></span>
+            </div>`).join('');
+        const dominant = crit.reduce((x, y) => (y.w * y.n > x.w * x.n ? y : x));
+        let rivalLine = '';
+        if (rival && rival.utility !== undefined) {
+            const diff = a.utility - rival.utility;
+            rivalLine = diff > 0.0005
+                ? `<div style="margin-top:6px; font-size:.76rem;">Ближайший конкурент «${esc(rival.name || 'Альтернатива #2')}» набрал <b>${rival.utility}</b> — этот план впереди на <b>${diff.toFixed(3)}</b>.</div>`
+                : `<div style="margin-top:6px; font-size:.76rem;">План «${esc(rival.name || 'Альтернатива #2')}» набрал столько же (<b>${rival.utility}</b>) — по вашему профилю они равноценны, можно выбрать любой.</div>`;
+        }
+        s5 = step(s3 && s4 ? 5 : (s3 || s4 ? 4 : 3), `Итоговая оценка U = ${a.utility}`, `
+            <div style="font-size:.76rem; color:var(--c-text3); margin-bottom:6px;">Каждый критерий сравнивается со всеми допустимыми планами и приводится к шкале 0–1 (1.00 = лучший среди всех по этому критерию), затем умножается на вес вашего профиля риска.</div>
+            <div style="padding:8px 12px; background:rgba(255,255,255,.03); border-radius:8px;">
+                ${rows}
+                <div style="display:flex; justify-content:space-between; font-size:.76rem; padding-top:6px; margin-top:4px; border-top:1px solid var(--c-border);">
+                    <span style="color:var(--c-text2);">Итог</span><span><b>${a.utility}</b> из 1.00</span>
+                </div>
+            </div>
+            <div style="margin-top:6px; font-size:.76rem; color:var(--c-text3);">Наибольший вклад дал критерий «${dominant.label}» — по нему этот план обходит остальные.</div>
+            ${rivalLine}`);
+    }
+
+    return `
+    <details class="calc-details">
+        <summary>Как алгоритм пришёл к этому — полный разбор</summary>
+        <div class="calc-body">
+            ${step(1, 'Свободные деньги (Rt)', s1)}
+            ${step(2, 'Перебор и отбор вариантов', s2)}
+            ${s3}
+            ${s4}
+            ${s5}
+        </div>
+    </details>`;
 }
 
 // ── Компактная строка для полного списка ──────────────────────
@@ -1074,7 +1772,7 @@ function renderAltRow(a, idx) {
 function renderPlanning(res) {
     if (!res) return;
     const ind = res.indicators || {};
-    const { Rt, Lt, Dt, Bt = 0, Bliq = 0, BLR = 0, CFt = 0, SigmaP = 0, It = 0, Et = 0 } = ind;
+    const { Rt, Lt, Dt, Bt = 0, Bliq = 0, BLR = 0, SigmaP = 0, It = 0, Et = 0 } = ind;
 
     // Показатели
     const rtEl = $('#plan-rt');
@@ -1084,13 +1782,13 @@ function renderPlanning(res) {
     if (ltEl) { ltEl.textContent = Number(Lt).toFixed(3); ltEl.style.color = Lt >= 0.3 ? 'var(--c-green)' : Lt >= 0 ? 'var(--c-amber)' : 'var(--c-red)'; }
     if (dtEl) { dtEl.textContent = fmt.pct(Dt); dtEl.style.color = Dt <= 0.36 ? 'var(--c-green)' : Dt <= 0.5 ? 'var(--c-amber)' : 'var(--c-red)'; }
 
-    // Подписи с реальными числами под формулами (форм. 11/12/13 ВКР)
+    // Человекочитаемая расшифровка показателей (без формульной нотации)
     const rtForm = $('#plan-rt-formula');
     const ltForm = $('#plan-lt-formula');
     const dtForm = $('#plan-dt-formula');
-    if (rtForm) rtForm.innerHTML = `${fmt.num(It)} − ${fmt.num(Et)} − ${fmt.num(SigmaP)}<br/><span style="opacity:.7;">It − Σej − ΣP (форм. 11)</span>`;
-    if (ltForm) ltForm.innerHTML = `${fmt.num(Rt)} / (${fmt.num(Et)} + ${fmt.num(SigmaP)})<br/><span style="opacity:.7;">Rt / (Σej + ΣP) (форм. 12)</span>`;
-    if (dtForm) dtForm.innerHTML = `${fmt.num(SigmaP)} / ${fmt.num(It)}<br/><span style="opacity:.7;">ΣP / It (форм. 13)</span>`;
+    if (rtForm) rtForm.innerHTML = `${fmt.num(It)} доход − ${fmt.num(Et)} траты − ${fmt.num(SigmaP)} кредиты`;
+    if (ltForm) ltForm.innerHTML = `свободные деньги на фоне обязательных трат`;
+    if (dtForm) dtForm.innerHTML = `${fmt.num(SigmaP)} платежей из ${fmt.num(It)} дохода`;
 
     // Веса
     const wd = $('#weights-display');
@@ -1114,18 +1812,28 @@ function renderPlanning(res) {
     const inp = $('#input-display');
     if (inp) {
         const s = res.input_summary || {};
+        const rowI = (label, val) => `<div style="display:flex; justify-content:space-between; gap:8px; padding:4px 0; flex-wrap:wrap;"><span style="color:var(--c-text3); min-width:0;">${label}</span><strong style="color:var(--c-green); text-align:right; margin-left:auto;">${val}</strong></div>`;
+        const rowE = (label, val) => `<div style="display:flex; justify-content:space-between; gap:8px; padding:4px 0; flex-wrap:wrap;"><span style="color:var(--c-text3); min-width:0;">${label}</span><strong style="color:var(--c-red); text-align:right; margin-left:auto;">${val}</strong></div>`;
         inp.innerHTML = `
             <div style="font-size:.68rem; color:var(--c-text3); margin-bottom:10px; padding:6px 10px; background:var(--c-surface2); border-radius:var(--r-sm); text-align:center;">
                 Источник данных: <strong style="color:var(--c-text2);">база данных пользователя</strong>
             </div>
-            <div style="display:grid; grid-template-columns:1fr auto; gap:4px 12px; font-size:.8rem;">
-                <span style="color:var(--c-text3);">Доходы It</span><strong style="color:var(--c-green);">${fmt.cur(s.income)}</strong>
-                <span style="color:var(--c-text3);">Расходы Σej</span><strong style="color:var(--c-red);">${fmt.cur(s.expense)}</strong>
-                <span style="color:var(--c-text3);">Платежи ΣP</span><strong>${fmt.cur(SigmaP)}</strong>
-                <span style="color:var(--c-text3);">Bt (баланс целей)</span><strong>${fmt.cur(Bt)}</strong>
-                <span style="color:var(--c-text3);">Bliq (депозиты)</span><strong style="color:#60A5FA;">${fmt.cur(Bliq)}</strong>
-                <span style="color:var(--c-text3);">BLR</span><strong>${BLR.toFixed(2)} мес</strong>
-                <span style="color:var(--c-text3);">r_bench (OCR)</span><strong>${((s.r_bench||0.14)*100).toFixed(1)}%</strong>
+            <div style="display:grid; grid-template-columns:1fr; gap:12px; font-size:.8rem;">
+                <div style="min-width:0; border:1px solid rgba(74,222,128,.35); border-radius:var(--r-sm); padding:10px 12px; background:rgba(74,222,128,.05);">
+                    <div style="font-size:.68rem; font-weight:700; letter-spacing:.06em; color:var(--c-green); margin-bottom:6px;">ПРИХОДИТ / ЕСТЬ</div>
+                    ${rowI('Доходы в месяц', fmt.cur(s.income))}
+                    ${rowI('Накоплено на целях (Bt)', fmt.cur(Bt))}
+                    ${rowI('Накопления (Bliq)', fmt.cur(Bliq))}
+                </div>
+                <div style="min-width:0; border:1px solid rgba(248,113,113,.35); border-radius:var(--r-sm); padding:10px 12px; background:rgba(248,113,113,.05);">
+                    <div style="font-size:.68rem; font-weight:700; letter-spacing:.06em; color:var(--c-red); margin-bottom:6px;">УХОДИТ</div>
+                    ${rowE('Расходы в месяц', fmt.cur(s.expense))}
+                    ${rowE('Платежи по кредитам', fmt.cur(SigmaP))}
+                </div>
+            </div>
+            <div style="display:grid; grid-template-columns:1fr auto; gap:4px 12px; font-size:.78rem; margin-top:10px; padding-top:10px; border-top:1px solid var(--c-border);">
+                <span style="color:var(--c-text3);">Подушка (BLR)</span><strong>${BLR.toFixed(2)} мес</strong>
+                <span style="color:var(--c-text3);">Ставка-ориентир (r_bench)</span><strong>${((s.r_bench||0.14)*100).toFixed(1)}%${s.r_bench_source === 'best_asset_rate' ? ' <span style="font-weight:400; color:var(--c-text3); font-size:.7rem;">— из вашего накопит. счёта</span>' : ''}</strong>
             </div>
             <div style="margin-top:10px; font-size:.72rem; color:var(--c-text3);">
                 ${s.transactions_count || 0} операций · ${s.obligations_count || 0} обяз. · ${s.goals_count || 0} целей · ${s.liquid_assets_count || 0} ликв. активов
@@ -1137,17 +1845,17 @@ function renderPlanning(res) {
     if (bp && bp.closed_goals && bp.closed_goals.length) {
         const banner = `
             <div class="alt-detail-block" style="border-color:#60A5FA; margin-bottom:12px;">
-                <div class="alt-detail-title" style="color:#60A5FA;">Предобработка ликвидной позиции (этап 4.0 ВКР)</div>
+                <div class="alt-detail-title" style="color:#60A5FA;">Близкие цели можно закрыть из накоплений</div>
                 <div style="font-size:.82rem; color:var(--c-text); margin-bottom:8px;">
-                    Из Bliq разово закрыто <strong>${fmt.cur(bp.bliq_used)}</strong> на близкие цели (дедлайн ≤ 3 мес):
+                    У вас есть накопления, которыми можно разом закрыть цели с близким сроком (до 3 месяцев) — на это уйдёт <strong>${fmt.cur(bp.bliq_used)}</strong>:
                 </div>
                 ${bp.closed_goals.map(g => `
                     <div class="alt-detail-item">
                         <span class="alt-arrow">→</span>
-                        <span><strong>${esc(g.name)}</strong>: ${fmt.cur(g.amount)} ₽</span>
+                        <span><strong>${esc(g.name)}</strong>: ${fmt.cur(g.amount)}</span>
                     </div>
                 `).join('')}
-                <div class="alt-meta" style="margin-top:6px;">Bliq после: ${fmt.cur(bp.bliq_remaining)} ₽</div>
+                <div class="alt-meta" style="margin-top:6px;">Останется накоплений: ${fmt.cur(bp.bliq_remaining)}</div>
             </div>`;
         const bpEl = $('#bliq-preallocation');
         if (bpEl) bpEl.innerHTML = banner;
@@ -1166,7 +1874,7 @@ function renderPlanning(res) {
                     Допустимых: <strong>${res.admissible_count}</strong> ·
                     Отклонено: <strong>${res.rejected_count}</strong>
                 </div>
-                ${res.top3.map((a, i) => renderTop3Card(a, i, res.indicators)).join('')}`;
+                ${res.top3.map((a, i) => renderTop3Card(a, i, res.indicators, res.weights, res.top3[i + 1] || null)).join('')}`;
         } else {
             optC.innerHTML = `
                 <div class="glass-panel" style="border:1px solid rgba(244,63,94,.2); padding:20px 24px; text-align:center;">
@@ -1196,7 +1904,7 @@ function renderPlanning(res) {
                         <span style="color:var(--c-red);">Долг</span>
                         <span style="color:var(--c-amber);">Резерв</span>
                         <span style="color:var(--c-green);">Цели</span>
-                        <span>U(a)</span>
+                        <span>Оценка</span>
                     </div>
                     ${res.ranked.map((a, i) => renderAltRow(a, i)).join('')}
                 </div>
@@ -1229,3 +1937,61 @@ function renderPlanning(res) {
     }
 }
 
+// ── Клик по метрик-картам дашборда → детальное пояснение ─────
+document.addEventListener('click', e => {
+    const closeBtn = e.target.closest('#metric-explain-close');
+    if (closeBtn) {
+        const panel = $('#metric-explain');
+        if (panel) { panel.style.display = 'none'; panel.innerHTML = ''; }
+        document.querySelectorAll('.metric-clickable.metric-active').forEach(c => c.classList.remove('metric-active'));
+        return;
+    }
+    const card = e.target.closest('.metric-clickable');
+    if (!card) return;
+    const panel = $('#metric-explain');
+    if (!panel || !state.lastIndicators) return;
+    const key = card.dataset.metric;
+    const wasActive = card.classList.contains('metric-active');
+    document.querySelectorAll('.metric-clickable.metric-active').forEach(c => c.classList.remove('metric-active'));
+    if (wasActive) {
+        panel.style.display = 'none'; panel.innerHTML = '';
+        return;
+    }
+    card.classList.add('metric-active');
+    panel.innerHTML = metricExplainHTML(key, state.lastIndicators);
+    panel.style.display = 'block';
+});
+
+// ── Клик по карточке альтернативы → раскрыть/свернуть разбор ──
+document.addEventListener('click', e => {
+    const card = e.target.closest('.alt-card');
+    if (!card) return;
+    // клики по самим details/summary обрабатывает браузер — не дублируем
+    if (e.target.closest('.calc-details')) return;
+    const det = card.querySelector('.calc-details');
+    if (det) det.open = !det.open;
+});
+
+// ── Пагинация журнала операций ────────────────────────────────
+document.addEventListener('click', e => {
+    const btn = e.target.closest('#transactions-pagination [data-page]');
+    if (!btn || btn.disabled) return;
+    const p = Number(btn.dataset.page);
+    if (!p || p === state.page) return;
+    state.page = p;
+    renderTransactions();
+});
+
+// ── Фильтр по датам в журнале ─────────────────────────────────
+document.addEventListener('change', e => {
+    if (e.target.id === 'tx-date-from') { state.dateFrom = e.target.value || null; state.page = 1; renderTransactions(); }
+    if (e.target.id === 'tx-date-to')   { state.dateTo   = e.target.value || null; state.page = 1; renderTransactions(); }
+});
+document.addEventListener('click', e => {
+    if (e.target.id !== 'tx-date-reset') return;
+    state.dateFrom = state.dateTo = null;
+    state.page = 1;
+    const f = $('#tx-date-from'), t = $('#tx-date-to');
+    if (f) f.value = ''; if (t) t.value = '';
+    renderTransactions();
+});

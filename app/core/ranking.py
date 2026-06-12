@@ -12,7 +12,6 @@ from __future__ import annotations
 
 from typing import Any
 
-
 # Профили риска R ∈ {1..5} → веса целевой функции (форм. 22 ВКР)
 RISK_PROFILES: dict[int, dict[str, Any]] = {
     1: {"w_rt": 0.15, "w_lt": 0.40, "w_dt": 0.35, "w_goals": 0.10, "label": "Консервативный"},

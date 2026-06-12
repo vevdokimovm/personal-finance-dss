@@ -7,10 +7,11 @@ from app.database.crud import (
     create_transaction,
     delete_transaction,
     get_transactions,
+    restore_transaction,
 )
 from app.dependencies import get_db
 from app.schemas.transaction import TransactionCreate, TransactionResponse
-
+from app.services.event_logger import log_event
 
 router = APIRouter(tags=["Транзакции"])
 
@@ -42,7 +43,14 @@ def create_transaction_endpoint(
         category=payload.category,
         type=payload.type,
         date=payload.date,
+        description=payload.description,
+        mcc=payload.mcc,
     )
+    log_event("transaction_created", {
+        "type": payload.type,
+        "category": payload.category,
+        "amount": payload.amount,
+    })
     return transaction
 
 
@@ -61,4 +69,24 @@ def delete_transaction_endpoint(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Транзакция не найдена.",
         )
+    log_event("transaction_deleted", {"transaction_id": transaction_id})
+    return transaction
+
+
+@router.post(
+    "/transactions/{transaction_id}/restore",
+    response_model=TransactionResponse,
+    summary="Восстановить удалённую транзакцию (undo)",
+)
+def restore_transaction_endpoint(
+    transaction_id: int,
+    db: Session = Depends(get_db),
+) -> TransactionResponse:
+    transaction = restore_transaction(db=db, transaction_id=transaction_id)
+    if transaction is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Удалённая транзакция не найдена.",
+        )
+    log_event("transaction_restored", {"transaction_id": transaction_id})
     return transaction

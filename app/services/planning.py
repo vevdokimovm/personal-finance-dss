@@ -17,7 +17,7 @@ from datetime import datetime
 from typing import Any
 
 from app.core.alternatives import evaluate_alternative, generate_alternatives
-from app.core.filtering import DT_MAX, LT_CRIT, B_MIN, filter_alternatives
+from app.core.filtering import B_MIN, DT_MAX, LT_CRIT, filter_alternatives
 from app.core.goals_priority import preallocate_from_bliq
 from app.core.metrics import (
     calculate_blr,

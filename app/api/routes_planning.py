@@ -6,21 +6,25 @@ from fastapi import APIRouter, Depends
 from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
 
+from app.api._guards import ensure_calculable
 from app.core.metrics import (
     calculate_expense_total,
     calculate_income_total,
-    sum_obligation_payments,
     sum_liquid_assets,
+    sum_obligation_payments,
 )
 from app.core.preprocessing import prepare_data
 from app.database.crud import (
     get_goals,
     get_liquid_assets,
     get_obligations,
+    get_scenarios,
     get_transactions,
     get_user_prefs,
+    save_scenario,
 )
 from app.dependencies import get_db
+from app.services.event_logger import log_event, log_recommendation
 from app.services.forecasting import forecast_indicators
 from app.services.planning import run_planning
 
@@ -29,10 +33,18 @@ class PlanningRequest(BaseModel):
     risk_tolerance: Optional[int] = Field(None, ge=1, le=5, description="Профиль риска (1–5)")
     l_min: Optional[float] = Field(None, ge=0.0, le=10.0, description="Lmin — мин. допустимая Lt'")
     r_bench: Optional[float] = Field(None, ge=0.0, le=1.0, description="OCR — порог Avalanche")
+    income_override: Optional[float] = Field(None, ge=0, description="Сценарий: доход вместо фактического")
+    expense_override: Optional[float] = Field(None, ge=0, description="Сценарий: расходы вместо фактических")
 
 
 class ForecastRequest(BaseModel):
     horizon: int = Field(6, ge=1, le=24)
+
+
+class ScenarioSave(BaseModel):
+    name: str = Field(..., min_length=1, max_length=255)
+    parameters: dict[str, Any] = Field(default_factory=dict)
+    result: dict[str, Any] = Field(default_factory=dict)
 
 
 router = APIRouter(prefix="/planning", tags=["Планирование"])
@@ -82,12 +94,25 @@ def calculate_plan(
     prefs = get_user_prefs(db)
     risk_tolerance = payload.risk_tolerance if payload.risk_tolerance is not None else prefs.risk_tolerance
     l_min = payload.l_min if payload.l_min is not None else prefs.l_min
-    r_bench = payload.r_bench if payload.r_bench is not None else prefs.r_bench
 
     transactions = get_transactions(db)
     obligations = _serialize_obligations(get_obligations(db))
     goals = _serialize_goals(get_goals(db))
     assets = _serialize_assets(get_liquid_assets(db))
+
+    # r_bench (OCR): явный из запроса → лучшая ставка ликвидных активов → дефолт prefs.
+    # Экономический смысл: альтернативная доходность рубля = ваша реальная ставка по накоплениям.
+    if payload.r_bench is not None:
+        r_bench = payload.r_bench
+        r_bench_source = "request"
+    else:
+        best_asset_rate = max((float(a.get("interest_rate") or 0.0) for a in assets), default=0.0)
+        if best_asset_rate > 0:
+            r_bench = best_asset_rate
+            r_bench_source = "best_asset_rate"
+        else:
+            r_bench = prefs.r_bench
+            r_bench_source = "prefs_default"
 
     prepared = prepare_data(
         transactions=transactions,
@@ -96,9 +121,17 @@ def calculate_plan(
         liquid_assets=assets,
     )
 
-    income_total = calculate_income_total(prepared["transactions"])
-    expense_total = calculate_expense_total(prepared["transactions"])
+    income_total = (
+        payload.income_override if payload.income_override is not None
+        else calculate_income_total(prepared["transactions"])
+    )
+    expense_total = (
+        payload.expense_override if payload.expense_override is not None
+        else calculate_expense_total(prepared["transactions"])
+    )
     bliq = sum_liquid_assets(prepared["liquid_assets"])
+
+    ensure_calculable(prepared["transactions"], prepared["obligations"])
 
     # active_goals = только незакрытые цели
     active_goals = prepared["active_goals"]
@@ -123,9 +156,18 @@ def calculate_plan(
         "goals_count": len(prepared["active_goals"]),
         "liquid_assets_count": len(prepared["liquid_assets"]),
         "r_bench": r_bench,
+        "r_bench_source": r_bench_source,
         "l_min": l_min,
         "risk_tolerance": risk_tolerance,
     }
+
+    log_recommendation(result)
+    log_event("recommendation_generated", {
+        "risk_profile": result.get("risk_profile"),
+        "alternatives_total": result.get("alternatives_total"),
+        "admissible_count": result.get("admissible_count"),
+        "u_score": (result.get("best") or {}).get("utility"),
+    })
     return result
 
 
@@ -136,6 +178,8 @@ def get_forecast(payload: ForecastRequest, db: Session = Depends(get_db)) -> dic
     goals = _serialize_goals(get_goals(db))
 
     prepared = prepare_data(transactions=transactions, obligations=obligations, goals=goals)
+
+    ensure_calculable(prepared["transactions"], prepared["obligations"])
 
     income = calculate_income_total(prepared["transactions"])
     expense = calculate_expense_total(prepared["transactions"])
@@ -156,3 +200,29 @@ def get_forecast(payload: ForecastRequest, db: Session = Depends(get_db)) -> dic
         obligation_payments=obl_payments,
         horizon=payload.horizon,
     )
+
+
+@router.post("/scenarios", summary="Сохранить сценарий что-если (LOG-06)")
+def save_scenario_endpoint(payload: ScenarioSave, db: Session = Depends(get_db)) -> dict[str, Any]:
+    scenario = save_scenario(
+        db, name=payload.name, parameters=payload.parameters, result=payload.result
+    )
+    log_event("scenario_saved", {"name": payload.name, "parameters": payload.parameters})
+    return {
+        "id": scenario.id,
+        "name": scenario.name,
+        "created_at": scenario.created_at.isoformat(),
+    }
+
+
+@router.get("/scenarios", summary="Список сохранённых сценариев")
+def list_scenarios_endpoint(db: Session = Depends(get_db)) -> list[dict[str, Any]]:
+    return [
+        {
+            "id": s.id,
+            "name": s.name,
+            "parameters": s.parameters_json,
+            "created_at": s.created_at.isoformat(),
+        }
+        for s in get_scenarios(db)
+    ]

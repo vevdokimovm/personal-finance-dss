@@ -7,10 +7,10 @@
 <section class="glass-panel w-full" style="margin-bottom:24px;">
     <div class="section-head">
         <div>
-            <h2 class="section-title">Ликвидная позиция <span style="color:var(--c-text3); font-weight:500;">(B<sub>liq</sub>)</span></h2>
+            <h2 class="section-title">Накопления и резервы</h2>
             <p class="section-subtitle">
-                Депозиты, накопительные счета и кэш — независимая ликвидная позиция, не привязанная к целям.
-                Алгоритм использует её для разового закрытия ближайших целей (этап 4.0 ВКР).
+                Депозиты, накопительные счета и наличные — деньги, которые можно быстро задействовать.
+                Система может предложить закрыть ими ближайшие цели одним разом.
             </p>
         </div>
         <button class="primary-button" type="button" id="open-asset-modal">
@@ -26,7 +26,7 @@
     <div class="section-head">
         <div>
             <h2 class="section-title">Импорт выписок</h2>
-            <p class="section-subtitle">Загрузите CSV из онлайн-банка — операции пополнят журнал транзакций.</p>
+            <p class="section-subtitle">Загрузите выписку из онлайн-банка — операции пополнят журнал транзакций.</p>
         </div>
     </div>
 
@@ -45,11 +45,11 @@
             </div>
 
             <div class="field" style="margin-bottom:0;">
-                <label>CSV-файл выписки</label>
+                <label>Файл выписки</label>
                 <div id="drop-zone" style="border:2px dashed var(--c-border); border-radius:var(--r-md); padding:32px 24px; text-align:center; cursor:pointer; transition: all .25s;">
                     <div style="font-weight:600; margin-bottom:4px;" id="drop-label">Перетащите файл сюда или нажмите для выбора</div>
-                    <div style="font-size:.78rem; color:var(--c-text3);">CSV из Тинькофф, Сбера, Альфы, ВТБ, Райффайзен</div>
-                    <input type="file" id="file-input" name="file" accept=".csv,.txt" style="display:none;">
+                    <div style="font-size:.78rem; color:var(--c-text3);">Тинькофф — PDF или CSV · Сбер, Альфа, ВТБ, Райффайзен — CSV</div>
+                    <input type="file" id="file-input" name="file" accept=".csv,.txt,.pdf" style="display:none;">
                 </div>
             </div>
 

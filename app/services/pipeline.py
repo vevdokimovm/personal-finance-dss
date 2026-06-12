@@ -23,7 +23,6 @@ from app.core.metrics import (
 from app.core.preprocessing import prepare_data
 from app.core.recommendation import build_recommendation_text
 
-
 Item = Union[dict[str, Any], Any]
 
 

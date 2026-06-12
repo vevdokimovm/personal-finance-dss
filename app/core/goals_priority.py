@@ -14,7 +14,6 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Any
 
-
 CATEGORY_WEIGHTS: dict[str, float] = {
     "income_growth": 3.0,
     "safety":        2.0,
@@ -135,3 +134,48 @@ def preallocate_from_bliq(
         return bliq, [], list(goals)
 
     return bliq - total_near, near, far
+
+def goals_allocation_breakdown(
+    x_goals: float,
+    goals: list[dict[str, Any]],
+    today: datetime | None = None,
+) -> list[dict[str, Any]]:
+    """
+    Объяснимое распределение x_goals по целям (форм. 16 ВКР) — для UI.
+
+    Возвращает по каждой цели: имя, категорию, вес категории w_s,
+    срочность u_s, приоритет w_s·u_s, долю и сумму.
+    """
+    today = today or datetime.utcnow()
+    if not goals or x_goals <= 0:
+        return []
+
+    enriched = []
+    for g in goals:
+        remaining = max(0.0, float(g.get("target_amount", 0)) - float(g.get("current_amount", 0)))
+        if remaining <= 0:
+            continue
+        months = _months_left(g.get("deadline"), today)
+        urgency = max(1.0, 12.0 / months)
+        weight = CATEGORY_WEIGHTS.get(str(g.get("category", "material")), 1.0)
+        enriched.append({
+            "id": g.get("id"),
+            "name": g.get("name", ""),
+            "category": str(g.get("category", "material")),
+            "weight": round(weight, 2),
+            "urgency": round(urgency, 2),
+            "months_left": round(months, 1),
+            "priority": weight * urgency,
+            "remaining": round(remaining, 2),
+        })
+
+    total_priority = sum(g["priority"] for g in enriched)
+    if total_priority <= 0:
+        return []
+
+    for g in enriched:
+        share = g["priority"] / total_priority
+        g["share"] = round(share, 4)
+        g["amount"] = round(min(x_goals * share, g["remaining"]), 2)
+        g["priority"] = round(g["priority"], 2)
+    return enriched

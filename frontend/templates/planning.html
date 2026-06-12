@@ -1,8 +1,9 @@
 {% extends "base.html" %}
 {% block title %}Прогнозирование · FINPILOT{% endblock %}
-{% block page_title %}Генерация, ранжирование альтернатив и прогноз{% endblock %}
+{% block page_title %}Ваш план распределения денег{% endblock %}
 
 {% block content %}
+<div style="background:var(--c-accent-bg); border:1px solid var(--c-border); border-radius:var(--r-sm); padding:12px 16px; margin-bottom:20px; font-size:.84rem; color:var(--c-text2);">Выберите профиль риска слева и нажмите «Рассчитать альтернативы» — система предложит, как распределить ваши свободные деньги между погашением кредитов, подушкой безопасности и целями.</div>
 <div style="display:grid; grid-template-columns:320px 1fr; gap:24px;">
 
     <!-- Left: Parameters -->
@@ -45,10 +46,33 @@
             </form>
         </section>
 
+        <!-- FR-07: сценарий что-если -->
+        <section class="glass-panel" style="margin-bottom:20px;">
+            <div style="padding:16px 20px; border-bottom:1px solid var(--c-border);">
+                <h3 style="font-size:.88rem; font-weight:700;">Сценарий «что если»</h3>
+                <div style="font-size:.72rem; color:var(--c-text3); margin-top:4px;">Подставьте гипотетические доход или расходы и пересчитайте план. Пусто — берутся фактические значения.</div>
+            </div>
+            <div style="padding:16px 20px;">
+                <div class="field" style="margin-bottom:12px;">
+                    <label style="font-size:.78rem;">Доход, ₽ (гипотетический)</label>
+                    <input type="number" id="scenario-income" min="0" step="1000" placeholder="как сейчас"
+                           style="width:100%; margin-top:6px; padding:8px 10px; border-radius:8px; border:1px solid var(--c-border); background:var(--c-bg); color:var(--c-text);">
+                </div>
+                <div class="field" style="margin-bottom:14px;">
+                    <label style="font-size:.78rem;">Расходы, ₽ (гипотетические)</label>
+                    <input type="number" id="scenario-expense" min="0" step="1000" placeholder="как сейчас"
+                           style="width:100%; margin-top:6px; padding:8px 10px; border-radius:8px; border:1px solid var(--c-border); background:var(--c-bg); color:var(--c-text);">
+                </div>
+                <button type="button" id="scenario-calc-btn" class="primary-button w-full" style="padding:10px; margin-bottom:8px;">Пересчитать сценарий</button>
+                <button type="button" id="scenario-save-btn" class="ghost-button w-full" style="padding:9px; display:none;">Сохранить сценарий</button>
+                <div id="scenario-hint" style="font-size:.72rem; color:var(--c-text3); margin-top:8px;"></div>
+            </div>
+        </section>
+
         <!-- Weights -->
         <section class="glass-panel" style="margin-bottom:20px;" id="weights-panel">
             <div style="padding:16px 20px; border-bottom:1px solid var(--c-border);">
-                <h3 style="font-size:.88rem; font-weight:700;">Весовые коэффициенты U(a)</h3>
+                <h3 style="font-size:.88rem; font-weight:700;">Что для вас важнее при выборе плана</h3>
             </div>
             <div id="weights-display" style="padding:16px 20px; font-size:.82rem;"></div>
         </section>
@@ -67,19 +91,19 @@
         <!-- Current indicators -->
         <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px; margin-bottom:20px;">
             <div class="glass-panel" style="padding:16px 20px; text-align:center;">
-                <div style="font-size:.72rem; text-transform:uppercase; letter-spacing:.5px; color:var(--c-text3); margin-bottom:4px;">Rt — Доступный ресурс</div>
+                <div style="font-size:.72rem; text-transform:uppercase; letter-spacing:.5px; color:var(--c-text3); margin-bottom:4px;">Свободные деньги</div>
                 <div id="plan-rt" style="font-size:1.3rem; font-weight:700;">—</div>
-                <div id="plan-rt-formula" style="font-size:.66rem; color:var(--c-text3); margin-top:6px; font-family:var(--font-mono); line-height:1.4;">Bt + CFt − ΣP (форм. 8)</div>
+                <div id="plan-rt-formula" style="font-size:.66rem; color:var(--c-text3); margin-top:6px; line-height:1.4;">после доходов, трат и кредитов</div>
             </div>
             <div class="glass-panel" style="padding:16px 20px; text-align:center;">
-                <div style="font-size:.72rem; text-transform:uppercase; letter-spacing:.5px; color:var(--c-text3); margin-bottom:4px;">Lt — Ликвидность</div>
+                <div style="font-size:.72rem; text-transform:uppercase; letter-spacing:.5px; color:var(--c-text3); margin-bottom:4px;">Запас прочности</div>
                 <div id="plan-lt" style="font-size:1.3rem; font-weight:700;">—</div>
-                <div id="plan-lt-formula" style="font-size:.66rem; color:var(--c-text3); margin-top:6px; font-family:var(--font-mono); line-height:1.4;">Bt / Σej (форм. 9)</div>
+                <div id="plan-lt-formula" style="font-size:.66rem; color:var(--c-text3); margin-top:6px; line-height:1.4;">насколько свободно от платежей</div>
             </div>
             <div class="glass-panel" style="padding:16px 20px; text-align:center;">
-                <div style="font-size:.72rem; text-transform:uppercase; letter-spacing:.5px; color:var(--c-text3); margin-bottom:4px;">Dt — Долговая нагрузка</div>
+                <div style="font-size:.72rem; text-transform:uppercase; letter-spacing:.5px; color:var(--c-text3); margin-bottom:4px;">Долговая нагрузка</div>
                 <div id="plan-dt" style="font-size:1.3rem; font-weight:700;">—</div>
-                <div id="plan-dt-formula" style="font-size:.66rem; color:var(--c-text3); margin-top:6px; font-family:var(--font-mono); line-height:1.4;">ΣP / It (форм. 10)</div>
+                <div id="plan-dt-formula" style="font-size:.66rem; color:var(--c-text3); margin-top:6px; line-height:1.4;">доля дохода на кредиты</div>
             </div>
         </div>
 
@@ -93,9 +117,9 @@
             <div class="glass-panel" style="padding:48px 24px; text-align:center;">
                 <div style="font-size:2.5rem; margin-bottom:12px; opacity:.5;">📐</div>
                 <div style="font-size:1rem; font-weight:600; margin-bottom:8px;">Нажмите «Рассчитать альтернативы»</div>
-                <div style="font-size:.85rem; color:var(--c-text3);">Система сгенерирует множество альтернатив A,<br>
-                    выполнит фильтрацию по ограничениям<br>
-                    и ранжирует через функцию полезности U(a)</div>
+                <div style="font-size:.85rem; color:var(--c-text3);">Система разберёт разные способы распределить ваши свободные деньги,<br>
+                    отсеет небезопасные варианты<br>
+                    и выберет лучший под ваш профиль риска</div>
             </div>
         </div>
 
@@ -105,7 +129,7 @@
         <!-- Forecast -->
         <section class="glass-panel" id="forecast-container" style="margin-top:24px; display:none;">
             <div style="padding:16px 20px; border-bottom:1px solid var(--c-border); display:flex; align-items:center; justify-content:space-between;">
-                <h3 style="font-size:.88rem; font-weight:700;">Прогноз Rt / Lt / Dt (ВКР, форм. 35)</h3>
+                <h3 style="font-size:.88rem; font-weight:700;">Прогноз на ближайшие месяцы</h3>
                 <div style="display:flex; align-items:center; gap:8px; font-size:.78rem; color:var(--c-text3);">
                     Горизонт:
                     <select id="forecast-horizon" style="background:var(--c-surface2); border:1px solid var(--c-border); border-radius:var(--r-sm); padding:2px 6px; font-size:.78rem; color:var(--c-text1);">

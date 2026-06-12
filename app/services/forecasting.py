@@ -7,12 +7,12 @@ from __future__ import annotations
 from typing import Optional
 
 from app.core.forecast import (
+    MC_SIMULATIONS,
+    SES_ALPHA,
     build_history_from_current,
     detect_trend,
     monte_carlo_intervals,
     ses_forecast,
-    SES_ALPHA,
-    MC_SIMULATIONS,
 )
 
 
@@ -74,10 +74,24 @@ def forecast_indicators(
 
     trend = detect_trend(rt, point_rt)
 
+    # FR-08: первый месяц прогнозного дефицита (Rt < 0).
+    # Сначала ищем дефицит в основном прогнозе, иначе — в пессимистичном сценарии (p10).
+    deficit_alert = None
+    for f in forecast:
+        if f["Rt"] < 0:
+            deficit_alert = {"period": f["period"], "gap": round(abs(f["Rt"]), 2), "pessimistic": False}
+            break
+    if deficit_alert is None:
+        for f in forecast:
+            if f.get("Rt_p10", 0) < 0:
+                deficit_alert = {"period": f["period"], "gap": round(abs(f["Rt_p10"]), 2), "pessimistic": True}
+                break
+
     return {
         "current": {"Bt": balance, "Rt": rt, "Lt": lt, "Dt": dt},
         "horizon": horizon,
         "forecast": forecast,
+        "deficit_alert": deficit_alert,
         "trend": trend,
         "method": {
             "point": f"SES α={SES_ALPHA} (Brown, 1956) с накоплением Bt по форм. 35 ВКР",

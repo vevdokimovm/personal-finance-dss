@@ -1,51 +1,41 @@
-from sqlalchemy import inspect, text
+"""Инициализация БД: применение Alembic-миграций + гарантия user_prefs (INFRA-03)."""
+from __future__ import annotations
 
-from app.database.db import Base, engine
-from app.database.models import Goal, LiquidAsset, Obligation, Transaction, UserPrefs
+from pathlib import Path
+
+from alembic.config import Config
+from sqlalchemy import inspect
+from sqlalchemy.orm import Session
+
+from alembic import command
+from app.database.db import engine
+from app.database.models import UserPrefs
+
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
 
 
-def _add_missing_sqlite_columns() -> None:
-    """SQLite-only автомиграция: добавляет недостающие колонки."""
-    if engine.dialect.name != "sqlite":
-        return
+def _alembic_config() -> Config:
+    cfg = Config(str(PROJECT_ROOT / "alembic.ini"))
+    cfg.set_main_option("script_location", str(PROJECT_ROOT / "alembic"))
+    return cfg
 
-    required_columns = {
-        "obligations": {
-            "name": "ALTER TABLE obligations ADD COLUMN name VARCHAR(255) NOT NULL DEFAULT 'Обязательство'",
-            "payment_day": "ALTER TABLE obligations ADD COLUMN payment_day INTEGER NOT NULL DEFAULT 1",
-            "comment": "ALTER TABLE obligations ADD COLUMN comment TEXT",
-        },
-        "goals": {
-            "current_amount": "ALTER TABLE goals ADD COLUMN current_amount FLOAT NOT NULL DEFAULT 0.0",
-            "comment": "ALTER TABLE goals ADD COLUMN comment TEXT",
-            "category": "ALTER TABLE goals ADD COLUMN category VARCHAR(32) NOT NULL DEFAULT 'material'",
-        },
-    }
 
+def run_migrations() -> None:
+    """Приводит схему к head. Существующую дореляembic-БД сначала штампует baseline."""
+    cfg = _alembic_config()
     inspector = inspect(engine)
-
-    with engine.begin() as connection:
-        for table_name, columns in required_columns.items():
-            if not inspector.has_table(table_name):
-                continue
-            existing = {c["name"] for c in inspector.get_columns(table_name)}
-            for column_name, stmt in columns.items():
-                if column_name not in existing:
-                    connection.execute(text(stmt))
+    if inspector.has_table("transactions") and not inspector.has_table("alembic_version"):
+        command.stamp(cfg, "0001")
+    command.upgrade(cfg, "head")
 
 
 def _ensure_user_prefs() -> None:
-    """Гарантирует, что в таблице user_prefs всегда есть строка с id=1."""
-    from sqlalchemy.orm import Session
-
     with Session(engine) as session:
-        prefs = session.get(UserPrefs, 1)
-        if prefs is None:
+        if session.get(UserPrefs, 1) is None:
             session.add(UserPrefs(id=1))
             session.commit()
 
 
 def init_db() -> None:
-    Base.metadata.create_all(bind=engine)
-    _add_missing_sqlite_columns()
+    run_migrations()
     _ensure_user_prefs()

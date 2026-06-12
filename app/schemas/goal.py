@@ -21,15 +21,7 @@ class GoalCreate(BaseModel):
     deadline: datetime
     category: GoalCategory = GoalCategory.material
     comment: Optional[str] = None
-
-
-class GoalUpdate(BaseModel):
-    name: Optional[str] = None
-    target_amount: Optional[float] = None
-    current_amount: Optional[float] = None
-    deadline: Optional[datetime] = None
-    category: Optional[GoalCategory] = None
-    comment: Optional[str] = None
+    priority: int = 0
 
 
 class GoalResponse(BaseModel):
@@ -42,3 +34,6 @@ class GoalResponse(BaseModel):
     deadline: datetime
     category: str
     comment: Optional[str] = None
+    priority: int = 0
+    is_active: bool = True
+    achieved_at: Optional[datetime] = None

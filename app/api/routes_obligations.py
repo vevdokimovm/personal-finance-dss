@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Response, status
 from sqlalchemy.orm import Session
 
 from app.database.crud import (
@@ -10,7 +10,7 @@ from app.database.crud import (
 )
 from app.dependencies import get_db
 from app.schemas.obligation import ObligationCreate, ObligationResponse
-
+from app.services.event_logger import log_event
 
 router = APIRouter(tags=["Обязательства"])
 
@@ -45,23 +45,30 @@ def create_obligation_endpoint(
         monthly_payment=payload.monthly_payment,
         payment_day=payload.payment_day,
         comment=payload.comment,
+        bank=payload.bank,
+        type=payload.type,
+        start_date=payload.start_date,
     )
+    log_event("obligation_created", {
+        "type": payload.type,
+        "bank": payload.bank,
+        "amount": payload.amount,
+        "interest_rate": payload.interest_rate,
+    })
     return obligation
 
 
 @router.delete(
     "/obligations/{obligation_id}",
-    response_model=ObligationResponse,
     summary="Удалить обязательство",
 )
 def delete_obligation_endpoint(
     obligation_id: int,
     db: Session = Depends(get_db),
-) -> ObligationResponse:
-    obligation = delete_obligation(db=db, obligation_id=obligation_id)
-    if obligation is None:
+):
+    if delete_obligation(db=db, obligation_id=obligation_id) is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Обязательство не найдено.",
         )
-    return obligation
+    return Response(status_code=status.HTTP_204_NO_CONTENT)

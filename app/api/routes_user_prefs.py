@@ -7,7 +7,6 @@ from app.database.crud import get_user_prefs, update_user_prefs
 from app.dependencies import get_db
 from app.schemas.user_prefs import UserPrefsResponse, UserPrefsUpdate
 
-
 router = APIRouter(prefix="/user-prefs", tags=["Параметры пользователя"])
 
 

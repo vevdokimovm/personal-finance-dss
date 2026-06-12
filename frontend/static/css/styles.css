@@ -333,12 +333,13 @@ body::after {
 
 .metric-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-float); }
 
-.metric-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
-.metric-name { font-size: 1.15rem; font-weight: 800; color: var(--c-text2); font-family: 'Courier New', monospace; }
+.metric-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; margin-bottom: 14px; }
+.metric-name { font-size: 1.15rem; font-weight: 800; color: var(--c-text2); font-family: 'Courier New', monospace; min-width: 0; }
 .metric-badge {
     font-size: .7rem; font-weight: 600;
     padding: 4px 10px; border-radius: var(--r-full);
     text-transform: uppercase; letter-spacing: .5px;
+    white-space: nowrap; flex-shrink: 0;
 }
 .metric-badge.primary { background: var(--c-accent-bg); color: var(--c-accent-hl); }
 .metric-badge.success { background: var(--c-green-bg); color: var(--c-green); }
@@ -1045,3 +1046,128 @@ input::placeholder { color: var(--c-text3); }
 .goal-category-safety        { background: rgba(96, 165, 250, .15); color: #60A5FA; }
 .goal-category-material      { background: rgba(251, 191, 36, .15); color: #FBBF24; }
 .goal-category-emotional     { background: rgba(244, 114, 182, .15); color: #F472B6; }
+
+/* INFRA-13 — версия приложения в футере */
+.app-footer {
+    margin-top: auto;
+    padding: 18px 28px;
+    text-align: right;
+    font-size: .74rem;
+    letter-spacing: .03em;
+    color: var(--c-text3);
+    opacity: .7;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   Светлая тема (data-theme="light") — переопределение токенов
+   ═══════════════════════════════════════════════════════════ */
+[data-theme="light"] {
+    --c-bg:         #eef2f9;
+    --c-bg2:        #e3e9f3;
+    --c-surface:    rgba(255, 255, 255, .82);
+    --c-surface-up: rgba(255, 255, 255, .95);
+    --c-border:     rgba(15, 23, 42, .10);
+    --c-border-hl:  rgba(15, 23, 42, .20);
+
+    --c-text:       #0f172a;
+    --c-text2:      #475569;
+    --c-text3:      #8a97a8;
+
+    --c-accent-bg:  rgba(99, 102, 241, .12);
+    --c-accent-glow:rgba(99, 102, 241, .25);
+    --c-green-bg:   rgba(34, 197, 94, .14);
+    --c-green-glow: rgba(34, 197, 94, .22);
+    --c-red-bg:     rgba(244, 63, 94, .12);
+    --c-red-glow:   rgba(244, 63, 94, .22);
+    --c-amber-bg:   rgba(245, 158, 11, .14);
+
+    --shadow-card:  0 1px 3px rgba(15,23,42,.08), 0 8px 24px rgba(15,23,42,.06);
+    --shadow-float: 0 8px 32px rgba(15,23,42,.14);
+}
+[data-theme="light"] body { background: var(--c-bg); }
+[data-theme="light"] body::before { background: radial-gradient(circle, rgba(99,102,241,.14), transparent 70%); }
+[data-theme="light"] body::after  { background: radial-gradient(circle, rgba(6,182,212,.10), transparent 70%); }
+[data-theme="light"] .sidebar     { background: rgba(255,255,255,.86); }
+[data-theme="light"] .top-header  { background: rgba(255,255,255,.80); }
+[data-theme="light"] .nav-item:hover { background: rgba(15,23,42,.05); color: var(--c-text); }
+[data-theme="light"] .hero-content h1 {
+    background: linear-gradient(135deg, #0f172a 30%, var(--c-text2));
+    -webkit-background-clip: text; background-clip: text;
+}
+[data-theme="light"] .summary-mini-card { background: rgba(255,255,255,.72); }
+
+/* ── Theme toggle button ──────────────────────────────────── */
+.theme-toggle {
+    display: grid; place-items: center;
+    width: 38px; height: 38px;
+    border-radius: var(--r-full);
+    border: 1px solid var(--c-border);
+    background: var(--c-surface);
+    color: var(--c-text2);
+    cursor: pointer;
+    transition: color .25s var(--ease), border-color .25s var(--ease), transform .25s var(--ease);
+}
+.theme-toggle:hover { color: var(--c-accent-hl); border-color: var(--c-border-hl); transform: rotate(-15deg); }
+.theme-toggle svg { display: block; }
+
+/* ── Undo-уведомление о восстановлении (BUG-03) ── */
+.undo-toast {
+    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+    z-index: 1000; display: flex; align-items: center; gap: 16px;
+    background: var(--c-surface-up); border: 1px solid var(--c-border-hl);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, .28); border-radius: 12px;
+    padding: 12px 20px; font-size: .86rem; color: var(--c-text);
+    animation: undoToastIn .25s ease;
+}
+.undo-toast-btn {
+    background: var(--c-accent); color: #fff; border: none; border-radius: 8px;
+    padding: 6px 14px; font-size: .82rem; font-weight: 600; cursor: pointer;
+}
+.undo-toast-btn:hover { opacity: .9; }
+@keyframes undoToastIn {
+    from { opacity: 0; transform: translate(-50%, 12px); }
+    to   { opacity: 1; transform: translate(-50%, 0); }
+}
+
+/* FR-14: разрез расходов — на узких экранах в одну колонку */
+@media (max-width: 720px) {
+    .spending-grid { grid-template-columns: 1fr !important; }
+}
+
+/* FR-09: совет при поступлении дохода */
+.income-advice-toast {
+    position: fixed; bottom: 24px; right: 24px;
+    z-index: 1000; display: flex; align-items: flex-start; gap: 16px; max-width: 380px;
+    background: var(--c-surface-up); border: 1px solid var(--c-accent);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, .28); border-radius: 12px;
+    padding: 14px 18px; color: var(--c-text);
+    animation: adviceIn .25s ease;
+}
+.income-advice-btn {
+    background: var(--c-accent); color: #fff; border: none; border-radius: 8px;
+    padding: 8px 16px; font-size: .82rem; font-weight: 600; cursor: pointer; white-space: nowrap; flex-shrink: 0; align-self: center;
+}
+.income-advice-btn:hover { opacity: .9; }
+@keyframes adviceIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Баг 2: раскрываемый расчёт альтернативы */
+.calc-details { margin-top: 12px; border-top: 1px solid var(--c-border); padding-top: 10px; }
+.calc-details summary {
+    cursor: pointer; font-size: .78rem; font-weight: 600;
+    color: var(--c-accent-hl); list-style: none; user-select: none;
+}
+.calc-details summary::-webkit-details-marker { display: none; }
+.calc-details summary::before { content: '▸ '; }
+.calc-details[open] summary::before { content: '▾ '; }
+.calc-body { margin-top: 10px; display: flex; flex-direction: column; gap: 8px; }
+.calc-row { display: flex; flex-direction: column; gap: 2px; font-size: .78rem; color: var(--c-text2); line-height: 1.45; }
+.calc-label { color: var(--c-text3); font-size: .70rem; text-transform: uppercase; letter-spacing: .4px; }
+.calc-note { font-size: .72rem; color: var(--c-text3); font-style: italic; margin-top: 4px; line-height: 1.4; }
+
+/* ── Кликабельные метрик-карты ── */
+.metric-clickable { cursor: pointer; transition: border-color .15s ease, transform .1s ease; }
+.metric-clickable:hover { border-color: var(--c-accent); }
+.metric-clickable.metric-active { border-color: var(--c-accent); box-shadow: 0 0 0 1px var(--c-accent) inset; }

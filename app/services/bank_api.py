@@ -8,11 +8,12 @@ from __future__ import annotations
 import random
 from datetime import datetime, timedelta
 from typing import Any
+from uuid import uuid4
 
 from sqlalchemy.orm import Session
 
 from app.database.crud import create_transaction
-
+from app.services.event_logger import log_event
 
 # ── Конфигурация банков ───────────────────────────────────────
 BANKS = {
@@ -129,13 +130,20 @@ def sync_bank(db: Session, bank_id: str) -> dict[str, Any]:
         create_transaction(
             db=db,
             amount=amount,
-            category=f"{cat} ({bank['name']})",
             type=t_type,
             date=t_date,
             is_synced=True,
+            description=cat,
+            external_id=f"mock-{uuid4().hex[:12]}",
+            bank=bank_id,
         )
         added += 1
 
+    log_event("bank_synced", {
+        "bank_id": bank_id,
+        "bank_name": bank["name"],
+        "added_count": added,
+    })
     return {
         "status": "success",
         "bank_id": bank_id,

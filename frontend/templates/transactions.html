@@ -7,7 +7,7 @@
     <div class="section-head">
         <div>
             <h2 class="section-title">Все операции</h2>
-            <p class="section-subtitle">Доходы, расходы и банковские синхронизации в одном месте</p>
+            <p class="section-subtitle">Вносите сюда доходы и расходы — на их основе система считает, сколько у вас свободных денег.</p>
         </div>
         <div class="section-actions">
             <button class="action-pill success-pill" type="button" id="open-income-modal">
@@ -20,13 +20,22 @@
     </div>
 
     <div class="table-card">
-        <div class="table-toolbar">
-            <span>Записей на странице:</span>
-            <div class="table-limit-switcher" id="transactions-limit-switcher">
-                <button class="limit-button" type="button" data-limit="5">5</button>
-                <button class="limit-button active" type="button" data-limit="10">10</button>
-                <button class="limit-button" type="button" data-limit="25">25</button>
-                <button class="limit-button" type="button" data-limit="50">50</button>
+        <div class="table-toolbar" style="flex-wrap:wrap; gap:12px;">
+            <div style="display:flex; align-items:center; gap:8px;">
+                <span>Записей на странице:</span>
+                <div class="table-limit-switcher" id="transactions-limit-switcher">
+                    <button class="limit-button" type="button" data-limit="5">5</button>
+                    <button class="limit-button active" type="button" data-limit="10">10</button>
+                    <button class="limit-button" type="button" data-limit="25">25</button>
+                    <button class="limit-button" type="button" data-limit="50">50</button>
+                </div>
+            </div>
+            <div style="display:flex; align-items:center; gap:8px; margin-left:auto; font-size:.8rem;">
+                <span style="color:var(--c-text3);">Период:</span>
+                <input type="date" id="tx-date-from" class="modal-input" style="padding:6px 10px; font-size:.78rem; width:auto;">
+                <span style="color:var(--c-text3);">—</span>
+                <input type="date" id="tx-date-to" class="modal-input" style="padding:6px 10px; font-size:.78rem; width:auto;">
+                <button class="ghost-button" type="button" id="tx-date-reset" style="font-size:.74rem; padding:6px 10px;">Сбросить</button>
             </div>
         </div>
         <div class="table-header">
@@ -40,6 +49,35 @@
         <div id="transactions-list" class="table-list">
             <div class="empty-row">Загрузка…</div>
         </div>
+        <div id="transactions-pagination" style="display:flex; justify-content:space-between; align-items:center; padding:12px 16px; border-top:1px solid var(--c-border); font-size:.8rem;"></div>
+    </div>
+
+    <!-- Визуальный дашборд: donut по категориям + помесячная динамика -->
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-top:20px;">
+        <section class="glass-panel" style="padding:20px 22px;">
+            <h3 style="font-size:.95rem; margin:0 0 4px;">Структура расходов</h3>
+            <div style="font-size:.74rem; color:var(--c-text3); margin-bottom:14px;">Доля каждой категории за период</div>
+            <div id="chart-donut"><div class="empty-row">Нет данных</div></div>
+        </section>
+        <section class="glass-panel" style="padding:20px 22px;">
+            <h3 style="font-size:.95rem; margin:0 0 4px;">Доходы и расходы по месяцам</h3>
+            <div style="font-size:.74rem; color:var(--c-text3); margin-bottom:14px;"><span style="color:var(--c-green);">■</span> доходы · <span style="color:var(--c-red);">■</span> расходы</div>
+            <div id="chart-months"><div class="empty-row">Нет данных</div></div>
+        </section>
+    </div>
+
+    <!-- Статистика по операциям: категории и мерчанты -->
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-top:20px;">
+        <section class="glass-panel" style="padding:20px 22px;">
+            <h3 style="font-size:.95rem; margin:0 0 4px;">Расходы по категориям</h3>
+            <div style="font-size:.74rem; color:var(--c-text3); margin-bottom:14px;">За выбранный период</div>
+            <div id="stats-by-category"><div class="empty-row">Нет данных</div></div>
+        </section>
+        <section class="glass-panel" style="padding:20px 22px;">
+            <h3 style="font-size:.95rem; margin:0 0 4px;">Топ-мерчанты</h3>
+            <div style="font-size:.74rem; color:var(--c-text3); margin-bottom:14px;">Кому уходит больше всего</div>
+            <div id="stats-by-merchant"><div class="empty-row">Нет данных</div></div>
+        </section>
     </div>
 </section>
 {% endblock %}
