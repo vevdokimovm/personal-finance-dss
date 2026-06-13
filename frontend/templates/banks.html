@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+{% block title %}Ликвидные активы · FINPILOT{% endblock %}
+{% block page_title %}Ликвидные активы и интеграции{% endblock %}
+
+{% block content %}
+<!-- ═══ Ликвидная позиция Bliq ═══ -->
+<section class="glass-panel w-full" style="margin-bottom:24px;">
+    <div class="section-head">
+        <div>
+            <h2 class="section-title">Накопления и резервы</h2>
+            <p class="section-subtitle">
+                Депозиты, накопительные счета и наличные — деньги, которые можно быстро задействовать.
+                Система может предложить закрыть ими ближайшие цели одним разом.
+            </p>
+        </div>
+        <button class="primary-button" type="button" id="open-asset-modal">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="vertical-align:-2px; margin-right:6px;"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Добавить актив
+        </button>
+    </div>
+    <div id="liquid-assets-list" class="stack-list" style="padding:8px 28px 24px;"></div>
+</section>
+
+<!-- ═══ Импорт банковских выписок ═══ -->
+<section class="glass-panel w-full" style="margin-bottom:24px;">
+    <div class="section-head">
+        <div>
+            <h2 class="section-title">Импорт выписок</h2>
+            <p class="section-subtitle">Загрузите CSV из онлайн-банка — операции пополнят журнал транзакций.</p>
+        </div>
+    </div>
+
+    <div style="padding:24px 28px;">
+        <form id="upload-form" enctype="multipart/form-data" style="display:flex; flex-direction:column; gap:20px; max-width:600px;">
+            <div class="field" style="margin-bottom:0;">
+                <label for="bank-select">Банк</label>
+                <select id="bank-select" name="bank_id" style="width:100%; background:rgba(0,0,0,.2); border:1px solid var(--c-border); color:var(--c-text); padding:11px 16px; border-radius:var(--r-md); font-family:inherit; font-size:.92rem;">
+                    <option value="tinkoff">Тинькофф Банк</option>
+                    <option value="sber">Сбербанк</option>
+                    <option value="alfa">Альфа-Банк</option>
+                    <option value="vtb">ВТБ</option>
+                    <option value="raiffeisen">Райффайзен Банк</option>
+                    <option value="universal">Другой банк (универсальный)</option>
+                </select>
+            </div>
+
+            <div class="field" style="margin-bottom:0;">
+                <label>CSV-файл выписки</label>
+                <div id="drop-zone" style="border:2px dashed var(--c-border); border-radius:var(--r-md); padding:32px 24px; text-align:center; cursor:pointer; transition: all .25s;">
+                    <div style="font-weight:600; margin-bottom:4px;" id="drop-label">Перетащите файл сюда или нажмите для выбора</div>
+                    <div style="font-size:.78rem; color:var(--c-text3);">CSV из Тинькофф, Сбера, Альфы, ВТБ, Райффайзен</div>
+                    <input type="file" id="file-input" name="file" accept=".csv,.txt" style="display:none;">
+                </div>
+            </div>
+
+            <button class="primary-button" type="submit" id="upload-btn" disabled style="align-self:flex-start; padding:12px 32px;">
+                Импортировать операции
+            </button>
+        </form>
+
+        <div id="upload-result" style="margin-top:20px; display:none;"></div>
+    </div>
+</section>
+
+{% endblock %}
+
+{% block modals %}
+<div class="modal-backdrop" id="asset-modal" aria-hidden="true">
+    <div class="modal-card glass-panel">
+        <div class="modal-head">
+            <h3 class="modal-title">Новый ликвидный актив</h3>
+            <button class="modal-close ghost-button" type="button" data-close-modal="asset-modal">✕</button>
+        </div>
+        <form id="asset-form" class="modal-form">
+            <div class="field">
+                <label for="asset-name">Название</label>
+                <input id="asset-name" name="name" type="text" placeholder="Депозит, Накопительный счёт, Кэш…" required>
+            </div>
+            <div class="field-grid">
+                <div class="field">
+                    <label for="asset-amount">Сумма</label>
+                    <input id="asset-amount" name="amount" type="number" min="0" step="0.01" placeholder="0" required>
+                </div>
+                <div class="field">
+                    <label for="asset-rate">Ставка, % годовых</label>
+                    <input id="asset-rate" name="interest_rate" type="number" min="0" max="100" step="0.1" value="14.0">
+                </div>
+            </div>
+            <div class="field">
+                <label for="asset-type">Тип</label>
+                <select id="asset-type" name="type">
+                    <option value="deposit">Депозит</option>
+                    <option value="savings_account">Накопительный счёт</option>
+                    <option value="cash">Кэш</option>
+                </select>
+            </div>
+            <div class="field">
+                <label for="asset-comment">Комментарий</label>
+                <input id="asset-comment" name="comment" type="text" placeholder="Необязательно">
+            </div>
+            <div class="modal-actions mt-4">
+                <button class="primary-button" type="submit">Сохранить</button>
+                <button class="ghost-button" type="button" data-close-modal="asset-modal">Отмена</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
