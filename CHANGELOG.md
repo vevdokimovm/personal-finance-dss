@@ -1,0 +1,59 @@
+# Changelog
+
+Формат: [Keep a Changelog](https://keepachangelog.com/ru/1.0.0/). Версионирование — [SemVer](https://semver.org/lang/ru/).
+
+## [3.0.0] — 2026-06-12 — Международный / многопользовательский режим (MAJOR)
+
+Ломающий релиз: схема БД расширена (`users`, FK `user_id`, денежные поля → `numeric`),
+появилась аутентификация и изоляция данных по пользователю. Логика ядра СППР
+(SAW + Avalanche + Monte-Carlo) не изменена — KEEP-01..05 сохранены.
+
+### Added
+- **Аутентификация (INFRA-06, NFR-05, DATA-03):** модель `User` (uuid), bcrypt-хеши,
+  JWT (httpOnly-cookie + Bearer), маршруты `/api/auth/{register,login,logout,me}`.
+- **Изоляция данных:** все пользовательские сущности получили FK `user_id`; роуты
+  фильтруют по текущему пользователю. Анонимный режим (без токена) видит только
+  данные без владельца.
+- **Single→multi миграция без потери:** первый зарегистрированный пользователь
+  усыновляет данные анонимного режима (`adopt_orphan_rows`).
+- **Мультивалюта (FR-19, DATA-08):** поле `currency` на сущностях, `base_currency`
+  у пользователя, таблица `fx_rates` (USD-пивот), `CurrencyConverter`, маршруты
+  `/api/fx/{rates,convert}`.
+- **Ingestion-слой (DATA-07, KEEP-07):** каноническая модель `FinancialSnapshot`,
+  Protocol-контракты (`FinanceEngine`, `FinancialDataProvider`, `TokenStore`,
+  `PlaidClient`), адаптер реального ядра `CoreFinanceEngine` (INFRA-15, REFACTOR-04).
+- **Provider: Manual с персистентностью (INFRA-18):** `manual_snapshots`, репозиторий
+  ручного ввода переживает рестарт.
+- **Provider: Plaid (FR-18, INFRA-16/17):** `EncryptedTokenStore` (Fernet-шифрование
+  токенов «в покое»), `PlaidProvider`, ленивый `RealPlaidClient`, маршруты
+  `/api/plaid/{exchange,sync}`. Опционально — активируется `PLAID_*`.
+- **B2B API (FR-23):** `/v1/analyze` принимает канонический снимок партнёра и
+  возвращает рекомендацию; авторизация по `X-API-Key`. Активируется `B2B_API_KEYS`.
+- **UI:** виджет входа/профиля в шапке, модалка вход/регистрация, `auth.js`
+  (Bearer-перехват fetch).
+- **Миграция 0009:** users, FK, numeric-типы, fx_rates, ingestion-таблицы; upgrade/downgrade.
+- **Тесты:** `tests/test_auth.py` (изоляция, усыновление, хеши), `tests/test_international.py`
+  (валюта, ingestion-движок, шифрование, B2B).
+
+### Changed
+- Денежные поля: `Float` → `Numeric(14,2)`, ставки → `Numeric(6,4)` во всех таблицах
+  (точность денег, устранение ошибок округления).
+- `UserPrefs`: одна строка на пользователя (`user_id` unique FK) + `base_currency`.
+- `events`/`recommendations`: `user_id` `int` → `uuid`-строка.
+- CSRF-middleware пропускает запросы по Bearer/API-Key (нет амбиентных cookie → нет CSRF-риска).
+- Rate-limit распространён на `/api/auth/login`, `/api/auth/register`, `/v1/analyze`.
+- `APP_VERSION` → `3.0.0`.
+
+### Security
+- Пароли — только bcrypt-хеш с солью (NFR-05).
+- Plaid-токены шифруются Fernet «в покое» и не утекают в логи/URL (NFR-06, INFRA-17).
+- Новые секреты (`JWT_SECRET`, `PLAID_*`, `TOKEN_ENCRYPTION_KEY`) — только через `.env`.
+
+### Notes
+- Совместимость: 105 существующих тестов проходят без изменений (анонимный режим = поведение v2.x).
+- Open banking и B2B по умолчанию выключены (пустые ключи). На рынке РФ основной путь
+  загрузки — импорт CSV-выписок (KEEP-06).
+
+## [2.2.3] — 2026-06-12
+- Undo «Вернуть» для всех сущностей, cache-busting статики, совместимость 204-роутов с WebKit.
+  Полный список — в истории релизов на GitHub.

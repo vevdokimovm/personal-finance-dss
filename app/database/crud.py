@@ -1,0 +1,601 @@
+from __future__ import annotations
+
+from datetime import datetime, timedelta
+from typing import Optional
+
+from sqlalchemy import func
+from sqlalchemy.orm import Session
+
+from app.core.categorization import classify_transaction
+from app.database.models import (
+    Budget,
+    Category,
+    Goal,
+    GoalContribution,
+    LiquidAsset,
+    Obligation,
+    ObligationPayment,
+    Scenario,
+    Transaction,
+    UserPrefs,
+)
+
+
+def _owner_filter(query, model, user_id):
+    """Фильтр изоляции по пользователю.
+
+    user_id задан  → строки этого пользователя.
+    user_id=None   → строки без владельца (анонимный/legacy-режим). После того как
+                     первый зарегистрированный пользователь усыновил данные, аноним
+                     перестаёт видеть чужие строки — это закрывает доступ к данным
+                     других пользователей в multi-user-режиме.
+    """
+    if user_id is not None:
+        return query.filter(model.user_id == user_id)
+    return query.filter(model.user_id.is_(None))
+
+
+# ── Categories (DATA-04) ─────────────────────────────────────────────────
+def create_category(db: Session, name: str, type: str = "expense", is_system: bool = False) -> Category:
+    category = Category(name=name, type=type, is_system=is_system)
+    db.add(category)
+    db.commit()
+    db.refresh(category)
+    return category
+
+
+def get_categories(db: Session, type: Optional[str] = None) -> list[Category]:
+    query = db.query(Category)
+    if type is not None:
+        query = query.filter(Category.type == type)
+    return query.order_by(Category.name.asc()).all()
+
+
+def get_or_create_category(db: Session, name: str, type: str = "expense") -> Category:
+    existing = db.query(Category).filter(Category.name == name, Category.type == type).first()
+    if existing is not None:
+        return existing
+    return create_category(db, name=name, type=type, is_system=False)
+
+
+# ── Transactions ─────────────────────────────────────────────────────────
+def create_transaction(
+    db: Session,
+    amount: float,
+    type: str,
+    date: datetime,
+    category: Optional[str] = None,
+    is_synced: bool = False,
+    description: Optional[str] = None,
+    external_id: Optional[str] = None,
+    category_id: Optional[int] = None,
+    mcc: Optional[str] = None,
+    bank: Optional[str] = None,
+    currency: str = "RUB",
+    user_id: Optional[str] = None,
+    autocommit: bool = True,
+) -> Transaction:
+    resolved_category = category or classify_transaction(description, mcc, type)
+    transaction = Transaction(
+        amount=amount,
+        category=resolved_category,
+        type=type,
+        date=date,
+        is_synced=is_synced,
+        description=description,
+        external_id=external_id,
+        category_id=category_id,
+        mcc=mcc,
+        bank=bank,
+        currency=currency,
+        user_id=user_id,
+        is_recurring=_is_recurring(db, description, type),
+    )
+    db.add(transaction)
+    if autocommit:
+        db.commit()
+        db.refresh(transaction)
+    return transaction
+
+
+def _is_recurring(db: Session, description: Optional[str], txn_type: str) -> bool:
+    """Помечает операцию повторяющейся, если уже есть ≥2 таких же (FR-13)."""
+    if not description:
+        return False
+    count = (
+        db.query(Transaction)
+        .filter(
+            Transaction.description == description,
+            Transaction.type == txn_type,
+            Transaction.is_deleted == False,  # noqa: E712
+        )
+        .count()
+    )
+    return count >= 2
+
+
+def get_spending_by_category(db: Session, days: int = 30, top_n: int = 5) -> dict:
+    """Разрез расходов по категориям и топ-мерчанты за период (FR-14)."""
+    since = datetime.now() - timedelta(days=days)
+    base_filter = (
+        Transaction.type == "expense",
+        Transaction.is_deleted == False,  # noqa: E712
+        Transaction.date >= since,
+    )
+
+    cat_rows = (
+        db.query(
+            Transaction.category,
+            func.sum(Transaction.amount).label("total"),
+            func.count(Transaction.id).label("cnt"),
+        )
+        .filter(*base_filter)
+        .group_by(Transaction.category)
+        .order_by(func.sum(Transaction.amount).desc())
+        .all()
+    )
+    categories = [
+        {"category": row.category, "total": round(row.total or 0.0, 2), "count": row.cnt}
+        for row in cat_rows
+    ]
+
+    merchant_rows = (
+        db.query(
+            Transaction.description,
+            func.sum(Transaction.amount).label("total"),
+            func.count(Transaction.id).label("cnt"),
+        )
+        .filter(*base_filter, Transaction.description.isnot(None))
+        .group_by(Transaction.description)
+        .order_by(func.sum(Transaction.amount).desc())
+        .limit(top_n)
+        .all()
+    )
+    top_merchants = [
+        {"merchant": row.description, "total": round(row.total or 0.0, 2), "count": row.cnt}
+        for row in merchant_rows
+    ]
+
+    total_expense = round(sum(c["total"] for c in categories), 2)
+    return {
+        "categories": categories,
+        "top_merchants": top_merchants,
+        "total_expense": total_expense,
+        "period_days": days,
+    }
+
+
+def get_budgets(db: Session) -> list[Budget]:
+    return db.query(Budget).order_by(Budget.category).all()
+
+
+def create_budget(db: Session, category: str, limit_amount: float) -> Budget:
+    """Создаёт бюджет; при существующей категории — обновляет лимит (FR-22)."""
+    existing = db.query(Budget).filter(Budget.category == category).first()
+    if existing is not None:
+        existing.limit_amount = limit_amount
+        db.commit()
+        db.refresh(existing)
+        return existing
+    budget = Budget(category=category, limit_amount=limit_amount)
+    db.add(budget)
+    db.commit()
+    db.refresh(budget)
+    return budget
+
+
+def delete_budget(db: Session, budget_id: int) -> bool:
+    budget = db.get(Budget, budget_id)
+    if budget is None:
+        return False
+    db.delete(budget)
+    db.commit()
+    return True
+
+
+def save_scenario(
+    db: Session,
+    name: str,
+    parameters: dict,
+    result: dict,
+    parent_recommendation_id: Optional[int] = None,
+    description: Optional[str] = None,
+) -> Scenario:
+    """Сохраняет снимок сценария что-если (LOG-06)."""
+    scenario = Scenario(
+        name=name,
+        description=description,
+        parameters_json=parameters,
+        result_json=result,
+        parent_recommendation_id=parent_recommendation_id,
+    )
+    db.add(scenario)
+    db.commit()
+    db.refresh(scenario)
+    return scenario
+
+
+def get_scenarios(db: Session, limit: int = 20) -> list[Scenario]:
+    return db.query(Scenario).order_by(Scenario.created_at.desc()).limit(limit).all()
+
+
+def get_budget_status(db: Session, days: int = 30) -> list[dict]:
+    """План-факт по категорийным бюджетам за период (FR-22)."""
+    since = datetime.now() - timedelta(days=days)
+    statuses = []
+    for b in db.query(Budget).order_by(Budget.category).all():
+        spent = (
+            db.query(func.sum(Transaction.amount))
+            .filter(
+                Transaction.type == "expense",
+                Transaction.is_deleted == False,  # noqa: E712
+                Transaction.category == b.category,
+                Transaction.date >= since,
+            )
+            .scalar()
+        ) or 0.0
+        pct = round(spent / b.limit_amount * 100, 1) if b.limit_amount > 0 else 0.0
+        statuses.append({
+            "id": b.id,
+            "category": b.category,
+            "limit_amount": round(b.limit_amount, 2),
+            "spent": round(spent, 2),
+            "pct": pct,
+            "over": spent > b.limit_amount,
+        })
+    return statuses
+
+
+def get_transactions(db: Session, user_id: Optional[str] = None) -> list[Transaction]:
+    query = db.query(Transaction).filter(Transaction.is_deleted == False)  # noqa: E712
+    query = _owner_filter(query, Transaction, user_id)
+    return query.order_by(Transaction.date.desc()).all()
+
+
+def delete_transaction(db: Session, transaction_id: int) -> Optional[Transaction]:
+    """Мягкое удаление (BUG-03): запись сохраняется и может быть восстановлена."""
+    transaction = db.get(Transaction, transaction_id)
+    if transaction is None or transaction.is_deleted:
+        return None
+    transaction.is_deleted = True
+    transaction.deleted_at = datetime.utcnow()
+    db.commit()
+    db.refresh(transaction)
+    return transaction
+
+
+def restore_transaction(db: Session, transaction_id: int) -> Optional[Transaction]:
+    """Восстановление мягко удалённой транзакции (BUG-03)."""
+    transaction = db.get(Transaction, transaction_id)
+    if transaction is None or not transaction.is_deleted:
+        return None
+    transaction.is_deleted = False
+    transaction.deleted_at = None
+    db.commit()
+    db.refresh(transaction)
+    return transaction
+
+
+# ── Obligations ──────────────────────────────────────────────────────────
+def create_obligation(
+    db: Session,
+    name: str,
+    amount: float,
+    interest_rate: float,
+    term: int,
+    monthly_payment: float,
+    payment_day: int,
+    comment: Optional[str] = None,
+    bank: Optional[str] = None,
+    type: str = "other",
+    start_date: Optional[datetime] = None,
+    currency: str = "RUB",
+    user_id: Optional[str] = None,
+) -> Obligation:
+    obligation = Obligation(
+        name=name,
+        amount=amount,
+        interest_rate=interest_rate,
+        term=term,
+        monthly_payment=monthly_payment,
+        payment_day=payment_day,
+        comment=comment,
+        bank=bank,
+        type=type,
+        start_date=start_date or datetime.utcnow(),
+        is_active=True,
+        currency=currency,
+        user_id=user_id,
+    )
+    db.add(obligation)
+    db.commit()
+    db.refresh(obligation)
+    return obligation
+
+
+def get_obligations(
+    db: Session, active_only: bool = False, user_id: Optional[str] = None
+) -> list[Obligation]:
+    query = db.query(Obligation)
+    if active_only:
+        query = query.filter(Obligation.is_active.is_(True))
+    query = _owner_filter(query, Obligation, user_id)
+    return query.order_by(Obligation.id.desc()).all()
+
+
+def delete_obligation(db: Session, obligation_id: int) -> Optional[Obligation]:
+    obligation = db.get(Obligation, obligation_id)
+    if obligation is None:
+        return None
+    db.delete(obligation)
+    db.commit()
+    return obligation
+
+
+def close_obligation(db: Session, obligation_id: int) -> Optional[Obligation]:
+    obligation = db.get(Obligation, obligation_id)
+    if obligation is None:
+        return None
+    obligation.is_active = False
+    obligation.closed_at = datetime.utcnow()
+    db.commit()
+    db.refresh(obligation)
+    return obligation
+
+
+def record_obligation_payment(
+    db: Session,
+    obligation_id: int,
+    amount: float,
+    is_early: bool = False,
+    remaining_after: float = 0.0,
+    payment_date: Optional[datetime] = None,
+) -> ObligationPayment:
+    payment = ObligationPayment(
+        obligation_id=obligation_id,
+        amount=amount,
+        is_early=is_early,
+        remaining_after=remaining_after,
+        payment_date=payment_date or datetime.utcnow(),
+    )
+    db.add(payment)
+    db.commit()
+    db.refresh(payment)
+    return payment
+
+
+def get_obligation_payments(db: Session, obligation_id: int) -> list[ObligationPayment]:
+    return (
+        db.query(ObligationPayment)
+        .filter(ObligationPayment.obligation_id == obligation_id)
+        .order_by(ObligationPayment.payment_date.asc())
+        .all()
+    )
+
+
+# ── Goals ────────────────────────────────────────────────────────────────
+def create_goal(
+    db: Session,
+    name: str,
+    target_amount: float,
+    current_amount: float,
+    deadline: datetime,
+    category: str = "material",
+    comment: Optional[str] = None,
+    priority: int = 0,
+    currency: str = "RUB",
+    user_id: Optional[str] = None,
+) -> Goal:
+    goal = Goal(
+        name=name,
+        target_amount=target_amount,
+        current_amount=current_amount,
+        deadline=deadline,
+        category=category,
+        comment=comment,
+        priority=priority,
+        is_active=True,
+        currency=currency,
+        user_id=user_id,
+    )
+    db.add(goal)
+    db.commit()
+    db.refresh(goal)
+
+    # Стартовое накопление фиксируем в истории (DATA-06).
+    if current_amount and current_amount > 0:
+        db.add(GoalContribution(goal_id=goal.id, amount=current_amount, source="initial"))
+        db.commit()
+
+    return goal
+
+
+def get_goals(
+    db: Session, active_only: bool = False, user_id: Optional[str] = None
+) -> list[Goal]:
+    query = db.query(Goal)
+    if active_only:
+        query = query.filter(Goal.is_active.is_(True))
+    query = _owner_filter(query, Goal, user_id)
+    return query.order_by(Goal.deadline.asc()).all()
+
+
+def delete_goal(db: Session, goal_id: int) -> Optional[Goal]:
+    goal = db.get(Goal, goal_id)
+    if goal is None:
+        return None
+    db.delete(goal)
+    db.commit()
+    return goal
+
+
+def achieve_goal(db: Session, goal_id: int) -> Optional[Goal]:
+    goal = db.get(Goal, goal_id)
+    if goal is None:
+        return None
+    goal.is_active = False
+    goal.achieved_at = datetime.utcnow()
+    db.commit()
+    db.refresh(goal)
+    return goal
+
+
+def record_goal_contribution(
+    db: Session,
+    goal_id: int,
+    amount: float,
+    source: str = "manual",
+    contribution_date: Optional[datetime] = None,
+) -> GoalContribution:
+    contribution = GoalContribution(
+        goal_id=goal_id,
+        amount=amount,
+        source=source,
+        contribution_date=contribution_date or datetime.utcnow(),
+    )
+    db.add(contribution)
+    db.commit()
+    db.refresh(contribution)
+    return contribution
+
+
+def get_goal_contributions(db: Session, goal_id: int) -> list[GoalContribution]:
+    return (
+        db.query(GoalContribution)
+        .filter(GoalContribution.goal_id == goal_id)
+        .order_by(GoalContribution.contribution_date.asc())
+        .all()
+    )
+
+
+# ── Liquid Assets ────────────────────────────────────────────────────────
+def create_liquid_asset(
+    db: Session,
+    name: str = "Депозит",
+    amount: float = 0.0,
+    interest_rate: float = 0.0,
+    type: str = "deposit",
+    comment: Optional[str] = None,
+    currency: str = "RUB",
+    user_id: Optional[str] = None,
+) -> LiquidAsset:
+    asset = LiquidAsset(
+        name=name, amount=amount, interest_rate=interest_rate, type=type,
+        comment=comment, currency=currency, user_id=user_id,
+    )
+    db.add(asset)
+    db.commit()
+    db.refresh(asset)
+    return asset
+
+
+def get_liquid_assets(db: Session, user_id: Optional[str] = None) -> list[LiquidAsset]:
+    query = _owner_filter(db.query(LiquidAsset), LiquidAsset, user_id)
+    return query.order_by(LiquidAsset.id.desc()).all()
+
+
+def delete_liquid_asset(db: Session, asset_id: int) -> Optional[LiquidAsset]:
+    asset = db.get(LiquidAsset, asset_id)
+    if asset is None:
+        return None
+    db.delete(asset)
+    db.commit()
+    return asset
+
+
+# ── User Prefs (singleton, id=1) ─────────────────────────────────────────
+def get_user_prefs(db: Session, user_id: Optional[str] = None) -> UserPrefs:
+    """Параметры пользователя.
+
+    user_id=None → legacy single-user (строка без владельца), как в v2.x.
+    user_id задан → строка этого пользователя; создаётся при первом обращении.
+    """
+    if user_id is None:
+        prefs = db.query(UserPrefs).filter(UserPrefs.user_id.is_(None)).first()
+        if prefs is None:
+            prefs = UserPrefs(user_id=None)
+            db.add(prefs)
+            db.commit()
+            db.refresh(prefs)
+        return prefs
+
+    prefs = db.query(UserPrefs).filter(UserPrefs.user_id == user_id).first()
+    if prefs is None:
+        prefs = UserPrefs(user_id=user_id)
+        db.add(prefs)
+        db.commit()
+        db.refresh(prefs)
+    return prefs
+
+
+def update_user_prefs(
+    db: Session,
+    l_min: Optional[float] = None,
+    risk_tolerance: Optional[int] = None,
+    horizon: Optional[int] = None,
+    r_bench: Optional[float] = None,
+    base_currency: Optional[str] = None,
+    user_id: Optional[str] = None,
+) -> UserPrefs:
+    prefs = get_user_prefs(db, user_id=user_id)
+    if l_min is not None:
+        prefs.l_min = l_min
+    if risk_tolerance is not None:
+        prefs.risk_tolerance = risk_tolerance
+    if horizon is not None:
+        prefs.horizon = horizon
+    if r_bench is not None:
+        prefs.r_bench = r_bench
+    if base_currency is not None:
+        prefs.base_currency = base_currency
+    db.commit()
+    db.refresh(prefs)
+    return prefs
+
+
+# ── Users (DATA-03, INFRA-06) ────────────────────────────────────────────
+from app.database.models import User  # noqa: E402
+
+
+def create_user(db: Session, email: str, password_hash: str, display_name: Optional[str] = None) -> User:
+    user = User(email=email.lower().strip(), password_hash=password_hash, display_name=display_name)
+    db.add(user)
+    db.commit()
+    db.refresh(user)
+    return user
+
+
+def get_user_by_email(db: Session, email: str) -> Optional[User]:
+    return db.query(User).filter(User.email == email.lower().strip()).first()
+
+
+def get_user_by_id(db: Session, user_id: str) -> Optional[User]:
+    return db.get(User, user_id)
+
+
+def count_users(db: Session) -> int:
+    return db.query(User).count()
+
+
+_OWNED_MODELS = (Transaction, Obligation, Goal, LiquidAsset, Budget, Scenario)
+
+
+def adopt_orphan_rows(db: Session, user_id: str) -> int:
+    """Усыновление осиротевших строк первым пользователем (single→multi).
+
+    Все записи без владельца (user_id IS NULL), созданные в анонимном режиме,
+    привязываются к user_id. Также legacy-настройки (user_prefs.user_id IS NULL)
+    переносятся на нового владельца. Возвращает число затронутых строк.
+    """
+    affected = 0
+    for model in _OWNED_MODELS:
+        rows = db.query(model).filter(model.user_id.is_(None)).all()
+        for row in rows:
+            row.user_id = user_id
+            affected += 1
+    legacy_prefs = db.query(UserPrefs).filter(UserPrefs.user_id.is_(None)).first()
+    if legacy_prefs is not None and db.query(UserPrefs).filter(UserPrefs.user_id == user_id).first() is None:
+        legacy_prefs.user_id = user_id
+        affected += 1
+    db.commit()
+    return affected
