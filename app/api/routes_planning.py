@@ -1,0 +1,158 @@
+from __future__ import annotations
+
+from typing import Any, Optional
+
+from fastapi import APIRouter, Depends
+from pydantic import BaseModel, Field
+from sqlalchemy.orm import Session
+
+from app.core.metrics import (
+    calculate_expense_total,
+    calculate_income_total,
+    sum_obligation_payments,
+    sum_liquid_assets,
+)
+from app.core.preprocessing import prepare_data
+from app.database.crud import (
+    get_goals,
+    get_liquid_assets,
+    get_obligations,
+    get_transactions,
+    get_user_prefs,
+)
+from app.dependencies import get_db
+from app.services.forecasting import forecast_indicators
+from app.services.planning import run_planning
+
+
+class PlanningRequest(BaseModel):
+    risk_tolerance: Optional[int] = Field(None, ge=1, le=5, description="Профиль риска (1–5)")
+    l_min: Optional[float] = Field(None, ge=0.0, le=10.0, description="Lmin — мин. допустимая Lt'")
+    r_bench: Optional[float] = Field(None, ge=0.0, le=1.0, description="OCR — порог Avalanche")
+
+
+class ForecastRequest(BaseModel):
+    horizon: int = Field(6, ge=1, le=24)
+
+
+router = APIRouter(prefix="/planning", tags=["Планирование"])
+
+
+def _serialize_obligations(items) -> list[dict[str, Any]]:
+    return [
+        {
+            "id": o.id,
+            "name": o.name,
+            "amount": o.amount,
+            "interest_rate": o.interest_rate,
+            "term": o.term,
+            "monthly_payment": o.monthly_payment,
+        }
+        for o in items
+    ]
+
+
+def _serialize_goals(items) -> list[dict[str, Any]]:
+    return [
+        {
+            "id": g.id,
+            "name": g.name,
+            "target_amount": g.target_amount,
+            "current_amount": g.current_amount,
+            "deadline": g.deadline,
+            "category": g.category,
+        }
+        for g in items
+    ]
+
+
+def _serialize_assets(items) -> list[dict[str, Any]]:
+    return [
+        {"id": a.id, "name": a.name, "amount": a.amount,
+         "interest_rate": a.interest_rate, "type": a.type}
+        for a in items
+    ]
+
+
+@router.post("/calculate", summary="Полный цикл СППР: генерация и ранжирование альтернатив")
+def calculate_plan(
+    payload: PlanningRequest,
+    db: Session = Depends(get_db),
+) -> dict[str, Any]:
+    prefs = get_user_prefs(db)
+    risk_tolerance = payload.risk_tolerance if payload.risk_tolerance is not None else prefs.risk_tolerance
+    l_min = payload.l_min if payload.l_min is not None else prefs.l_min
+    r_bench = payload.r_bench if payload.r_bench is not None else prefs.r_bench
+
+    transactions = get_transactions(db)
+    obligations = _serialize_obligations(get_obligations(db))
+    goals = _serialize_goals(get_goals(db))
+    assets = _serialize_assets(get_liquid_assets(db))
+
+    prepared = prepare_data(
+        transactions=transactions,
+        obligations=obligations,
+        goals=goals,
+        liquid_assets=assets,
+    )
+
+    income_total = calculate_income_total(prepared["transactions"])
+    expense_total = calculate_expense_total(prepared["transactions"])
+    bliq = sum_liquid_assets(prepared["liquid_assets"])
+
+    # active_goals = только незакрытые цели
+    active_goals = prepared["active_goals"]
+
+    result = run_planning(
+        income_total=income_total,
+        expense_total=expense_total,
+        obligations=prepared["obligations"],
+        goals=active_goals,
+        bliq=bliq,
+        r_bench=r_bench,
+        risk_tolerance=risk_tolerance,
+        l_min=l_min,
+    )
+
+    result["input_summary"] = {
+        "income": round(income_total, 2),
+        "expense": round(expense_total, 2),
+        "bliq": round(bliq, 2),
+        "transactions_count": len(prepared["transactions"]),
+        "obligations_count": len(prepared["obligations"]),
+        "goals_count": len(prepared["active_goals"]),
+        "liquid_assets_count": len(prepared["liquid_assets"]),
+        "r_bench": r_bench,
+        "l_min": l_min,
+        "risk_tolerance": risk_tolerance,
+    }
+    return result
+
+
+@router.post("/forecast", summary="Прогноз Rt/Lt/Dt на горизонт H (форм. 35 ВКР)")
+def get_forecast(payload: ForecastRequest, db: Session = Depends(get_db)) -> dict[str, Any]:
+    transactions = get_transactions(db)
+    obligations = _serialize_obligations(get_obligations(db))
+    goals = _serialize_goals(get_goals(db))
+
+    prepared = prepare_data(transactions=transactions, obligations=obligations, goals=goals)
+
+    income = calculate_income_total(prepared["transactions"])
+    expense = calculate_expense_total(prepared["transactions"])
+    obl_payments = sum_obligation_payments(prepared["obligations"])
+    balance = sum(g.get("current_amount", 0) for g in prepared["active_goals"])
+    cash_flow = income - expense
+    rt = cash_flow - obl_payments
+    lt = rt / (expense + obl_payments) if (expense + obl_payments) > 0 else 0.0
+    dt = obl_payments / income if income > 0 else 0.0
+
+    return forecast_indicators(
+        balance=balance,
+        rt=rt,
+        lt=lt,
+        dt=dt,
+        income_total=income,
+        expense_total=expense,
+        obligation_payments=obl_payments,
+        horizon=payload.horizon,
+    )
