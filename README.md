@@ -21,6 +21,15 @@
 - **Сценарии «что если»** — пересчёт рекомендации под гипотетические доход/расходы с сохранением прогонов.
 - **Светлая и тёмная темы**, адаптивный интерфейс.
 
+### v3.0.0 — международный / многопользовательский режим
+
+- **Аутентификация** (JWT + bcrypt) с изоляцией данных: каждый пользователь видит только свои транзакции, цели, обязательства и настройки. При первом входе данные анонимного режима «усыновляются» — переход с single-user на multi-user без потери.
+- **Мультивалюта** — суммы хранятся в своей валюте и приводятся к базовой валюте пользователя через таблицу курсов (USD-пивот).
+- **Денежная точность** — все суммы на `Decimal`/`numeric(14,2)`, ставки `numeric(6,4)`; никаких ошибок округления `float`.
+- **Provider-agnostic ingestion** — каноническая модель `FinancialSnapshot` развязывает движок от источника данных (`FinanceEngine` Protocol). Новая страна = новый провайдер, движок не меняется.
+- **Open banking (Plaid)** для рынков US/CA — автосинхронизация счетов; токены хранятся в шифрованном виде. Опционально, для РФ не используется (основной путь — импорт выписок).
+- **B2B API** `/v1/analyze` — партнёр присылает снимок финансов в канонической модели, получает рекомендацию; авторизация по API-ключу.
+
 ---
 
 ## Технологии
@@ -103,6 +112,12 @@ docker compose up --build
 | `CORS_ORIGINS` | `localhost:8000,...` | разрешённые источники через запятую |
 | `RATE_LIMIT_REQUESTS` | `30` | лимит запросов на чувствительные эндпоинты за окно |
 | `RATE_LIMIT_WINDOW_SECONDS` | `60` | размер окна rate-limit |
+| `JWT_SECRET` | dev-заглушка | секрет подписи JWT — **обязательно сменить в проде** |
+| `JWT_TTL_HOURS` | `168` | срок жизни access-токена |
+| `DEFAULT_BASE_CURRENCY` | `RUB` | базовая валюта новых пользователей |
+| `B2B_API_KEYS` | пусто | ключи партнёров для `/v1/analyze` (пусто = выключено) |
+| `PLAID_CLIENT_ID` / `PLAID_SECRET` | пусто | Plaid open banking (пусто = выключено) |
+| `TOKEN_ENCRYPTION_KEY` | пусто | Fernet-ключ для Plaid-токенов (пусто = derive из `JWT_SECRET`) |
 
 Секреты передаются только через `.env` и никогда не хранятся в коде.
 
@@ -132,6 +147,45 @@ python3 -m pytest --cov=app/core --cov-report=term  # с покрытием яд
 
 ---
 
+## Аутентификация и API (v3.0.0)
+
+**Регистрация и вход** возвращают JWT (в теле ответа и в httpOnly-cookie). Для API-клиентов токен передаётся заголовком `Authorization: Bearer <token>`.
+
+```bash
+# Регистрация
+curl -X POST http://127.0.0.1:8000/api/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{"email":"you@example.com","password":"strongpass1","display_name":"Имя"}'
+
+# Вход
+curl -X POST http://127.0.0.1:8000/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"you@example.com","password":"strongpass1"}'
+
+# Запрос с токеном
+curl http://127.0.0.1:8000/api/transactions \
+  -H "Authorization: Bearer <ВАШ_ТОКЕН>"
+```
+
+**Изоляция данных:** без токена работает анонимный режим (видит только данные без владельца). Первый зарегистрированный пользователь усыновляет анонимные данные; дальше каждый пользователь изолирован.
+
+**Мультивалюта:** курсы — `GET/PUT /api/fx/rates`, конвертация — `POST /api/fx/convert`. Базовая валюта пользователя задаётся в настройках (`PATCH /api/user-prefs`, поле `base_currency`).
+
+**B2B `/v1/analyze`** (включается заданием `B2B_API_KEYS`): принимает снимок финансов в канонической модели `FinancialSnapshot`, возвращает рекомендацию. Авторизация — заголовок `X-API-Key`.
+
+```bash
+curl -X POST http://127.0.0.1:8000/v1/analyze \
+  -H "X-API-Key: <КЛЮЧ_ПАРТНЁРА>" -H "Content-Type: application/json" \
+  -d '{"base_currency":"RUB","risk_profile":3,
+       "transactions":[{"transaction_id":"t1","amount":180000,"type":1,"date":"2026-06-01T00:00:00"},
+                        {"transaction_id":"t2","amount":78000,"type":2,"date":"2026-06-02T00:00:00"}],
+       "debts":[{"debt_id":"d1","name":"Кредитка","balance":200000,"monthly_payment":25000,"interest_rate":0.249,"term_months":24}]}'
+```
+
+Полная интерактивная документация API — `http://127.0.0.1:8000/docs` (Swagger UI).
+
+---
+
 ## Качество и безопасность
 
 - **Линт:** `ruff check app/ tests/`
@@ -145,16 +199,18 @@ python3 -m pytest --cov=app/core --cov-report=term  # с покрытием яд
 
 ```
 app/
-  api/          роуты FastAPI
+  api/          роуты FastAPI (+ auth, fx, plaid, b2b)
   core/         бизнес-логика (метрики, альтернативы, прогноз, категоризация)
-  services/     оркестрация и логирование
+  ingestion/    провайдер-агностик слой: канон FinancialSnapshot, FinanceEngine
+                Protocol, адаптер ядра, провайдеры (manual, plaid)
+  services/     оркестрация, логирование, безопасность (JWT/bcrypt/Fernet), валюты
   database/     модели, CRUD, init
   schemas/      Pydantic-схемы
   config.py     настройки (pydantic-settings)
   main.py       сборка приложения, middleware, lifespan
   middleware.py rate-limit, CSRF, security-заголовки
-alembic/        миграции
-frontend/       шаблоны Jinja2 и статика (JS/CSS)
+alembic/        миграции (0001–0009)
+frontend/       шаблоны Jinja2 и статика (app.js, auth.js, styles.css)
 tests/          pytest
 Dockerfile, docker-compose.yml, gunicorn_conf.py
 ```

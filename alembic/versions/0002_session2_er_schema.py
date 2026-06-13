@@ -39,7 +39,7 @@ def upgrade() -> None:
         sa.Column("id", sa.Integer(), primary_key=True, index=True),
         sa.Column("name", sa.String(length=255), nullable=False, index=True),
         sa.Column("type", sa.String(length=20), nullable=False, server_default="expense"),
-        sa.Column("is_system", sa.Boolean(), nullable=False, server_default=sa.text("0")),
+        sa.Column("is_system", sa.Boolean(), nullable=False, server_default=sa.false()),
     )
 
     # ── DATA-06: история платежей и пополнений (новые таблицы) ─────────────
@@ -49,7 +49,7 @@ def upgrade() -> None:
         sa.Column("obligation_id", sa.Integer(), sa.ForeignKey("obligations.id"), nullable=False, index=True),
         sa.Column("amount", sa.Float(), nullable=False),
         sa.Column("payment_date", sa.DateTime(), nullable=False, server_default=sa.text("CURRENT_TIMESTAMP"), index=True),
-        sa.Column("is_early", sa.Boolean(), nullable=False, server_default=sa.text("0")),
+        sa.Column("is_early", sa.Boolean(), nullable=False, server_default=sa.false()),
         sa.Column("remaining_after", sa.Float(), nullable=False, server_default="0"),
     )
     op.create_table(
@@ -75,14 +75,14 @@ def upgrade() -> None:
         batch.add_column(sa.Column("bank", sa.String(length=255), nullable=True))
         batch.add_column(sa.Column("type", sa.String(length=32), nullable=False, server_default="other"))
         batch.add_column(sa.Column("start_date", sa.DateTime(), nullable=True))
-        batch.add_column(sa.Column("is_active", sa.Boolean(), nullable=False, server_default=sa.text("1")))
+        batch.add_column(sa.Column("is_active", sa.Boolean(), nullable=False, server_default=sa.true()))
         batch.add_column(sa.Column("closed_at", sa.DateTime(), nullable=True))
         batch.create_index("ix_obligations_is_active", ["is_active"])
 
     # ── DATA-06: жизненный цикл целей ─────────────────────────────────────
     with op.batch_alter_table("goals") as batch:
         batch.add_column(sa.Column("priority", sa.Integer(), nullable=False, server_default="0"))
-        batch.add_column(sa.Column("is_active", sa.Boolean(), nullable=False, server_default=sa.text("1")))
+        batch.add_column(sa.Column("is_active", sa.Boolean(), nullable=False, server_default=sa.true()))
         batch.add_column(sa.Column("achieved_at", sa.DateTime(), nullable=True))
         batch.create_index("ix_goals_is_active", ["is_active"])
 

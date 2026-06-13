@@ -13,18 +13,21 @@ from app.database.crud import (
     get_spending_by_category,
     get_transactions,
 )
-from app.dependencies import get_db
+from app.dependencies import get_current_user_id, get_db
 from app.services.pipeline import run_pipeline
 
 router = APIRouter(tags=["Анализ"])
 
 
 @router.get("/analysis", summary="Финансовые показатели текущего состояния")
-def get_analysis(db: Session = Depends(get_db)) -> dict[str, Any]:
-    transactions = get_transactions(db)
-    obligations = get_obligations(db)
-    goals = get_goals(db)
-    liquid_assets = get_liquid_assets(db)
+def get_analysis(
+    db: Session = Depends(get_db),
+    user_id: str | None = Depends(get_current_user_id),
+) -> dict[str, Any]:
+    transactions = get_transactions(db, user_id=user_id)
+    obligations = get_obligations(db, user_id=user_id)
+    goals = get_goals(db, user_id=user_id)
+    liquid_assets = get_liquid_assets(db, user_id=user_id)
 
     ensure_calculable(transactions, obligations)
 

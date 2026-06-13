@@ -10,6 +10,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
 from app.api.router import router as api_router
+from app.api.routes_b2b import router as b2b_router
 from app.config import settings
 from app.database.init_db import init_db
 from app.middleware import CSRFMiddleware, RateLimitMiddleware, SecurityHeadersMiddleware
@@ -40,7 +41,14 @@ app.add_middleware(
     RateLimitMiddleware,
     limit=settings.RATE_LIMIT_REQUESTS,
     window_seconds=settings.RATE_LIMIT_WINDOW_SECONDS,
-    protected_prefixes=("/api/recommendation", "/api/banks", "/api/analysis"),
+    protected_prefixes=(
+        "/api/recommendation",
+        "/api/banks",
+        "/api/analysis",
+        "/api/auth/login",
+        "/api/auth/register",
+        "/v1/analyze",
+    ),
 )
 app.add_middleware(CSRFMiddleware, allowed_origins=settings.cors_origins_list)
 app.add_middleware(SecurityHeadersMiddleware, hsts=settings.is_production)
@@ -54,6 +62,7 @@ app.add_middleware(
 
 app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
 app.include_router(api_router)
+app.include_router(b2b_router)  # B2B-контракт /v1/analyze вне /api-префикса (FR-23)
 
 
 @app.get("/", response_class=HTMLResponse, summary="Главная страница приложения")

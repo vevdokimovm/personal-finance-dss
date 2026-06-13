@@ -6,7 +6,7 @@ from fastapi import APIRouter, Depends, File, Form, UploadFile
 from sqlalchemy.orm import Session
 
 from app.database.crud import create_transaction
-from app.dependencies import get_db
+from app.dependencies import get_current_user_id, get_db
 from app.services.bank_api import get_available_banks, sync_all_banks, sync_bank
 from app.services.event_logger import log_event
 from app.services.statement_parser import parse_bank_statement, parse_tinkoff_pdf
@@ -20,13 +20,20 @@ def list_banks() -> list[dict[str, str]]:
 
 
 @router.post("/sync/{bank_id}", summary="Симуляция синхронизации одного банка")
-def trigger_single_sync(bank_id: str, db: Session = Depends(get_db)) -> dict[str, Any]:
-    return sync_bank(db=db, bank_id=bank_id)
+def trigger_single_sync(
+    bank_id: str,
+    db: Session = Depends(get_db),
+    user_id: str | None = Depends(get_current_user_id),
+) -> dict[str, Any]:
+    return sync_bank(db=db, bank_id=bank_id, user_id=user_id)
 
 
 @router.post("/sync", summary="Симуляция синхронизации всех банков")
-def trigger_sync_all(db: Session = Depends(get_db)) -> dict[str, Any]:
-    return sync_all_banks(db=db)
+def trigger_sync_all(
+    db: Session = Depends(get_db),
+    user_id: str | None = Depends(get_current_user_id),
+) -> dict[str, Any]:
+    return sync_all_banks(db=db, user_id=user_id)
 
 
 @router.post("/upload", summary="Загрузка банковской выписки (CSV)")
@@ -34,6 +41,7 @@ async def upload_statement(
     file: UploadFile = File(...),
     bank_id: str = Form(default="tinkoff"),
     db: Session = Depends(get_db),
+    user_id: str | None = Depends(get_current_user_id),
 ) -> dict[str, Any]:
     """
     Загружает CSV-выписку из банка и импортирует транзакции.
@@ -91,6 +99,7 @@ async def upload_statement(
                 description=t.get('description'),
                 mcc=t.get('mcc'),
                 bank=bank_id,
+                user_id=user_id,
                 autocommit=False,
             )
             added += 1

@@ -97,7 +97,7 @@ BANKS = {
 }
 
 
-def sync_bank(db: Session, bank_id: str) -> dict[str, Any]:
+def sync_bank(db: Session, bank_id: str, user_id: str | None = None) -> dict[str, Any]:
     """
     Синхронизация с конкретным банком.
     Имитирует OAuth → получение выписки → парсинг → сохранение.
@@ -136,6 +136,7 @@ def sync_bank(db: Session, bank_id: str) -> dict[str, Any]:
             description=cat,
             external_id=f"mock-{uuid4().hex[:12]}",
             bank=bank_id,
+            user_id=user_id,
         )
         added += 1
 
@@ -154,14 +155,14 @@ def sync_bank(db: Session, bank_id: str) -> dict[str, Any]:
     }
 
 
-def sync_all_banks(db: Session) -> dict[str, Any]:
+def sync_all_banks(db: Session, user_id: str | None = None) -> dict[str, Any]:
     """Синхронизация всех подключённых банков одним запросом."""
     results = []
     total_added = 0
     total_flow = 0.0
 
     for bank_id in BANKS:
-        r = sync_bank(db, bank_id)
+        r = sync_bank(db, bank_id, user_id=user_id)
         results.append(r)
         total_added += r.get("added_count", 0)
         total_flow += r.get("net_flow", 0)

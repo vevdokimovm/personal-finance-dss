@@ -25,16 +25,20 @@ from sqlalchemy import delete
 from sqlalchemy.orm import Session
 
 from app.database.models import Goal, LiquidAsset, Obligation, Transaction
-from app.dependencies import get_db
+from app.dependencies import get_current_user_id, get_db
 
 router = APIRouter(tags=["Демо-данные"])
 
 
-def _clear_all(db: Session) -> None:
-    db.execute(delete(Transaction))
-    db.execute(delete(Obligation))
-    db.execute(delete(Goal))
-    db.execute(delete(LiquidAsset))
+def _clear_all(db: Session, user_id: str | None = None) -> None:
+    """Очистка данных пользователя. user_id=None → строки анонимного режима."""
+    for model in (Transaction, Obligation, Goal, LiquidAsset):
+        stmt = delete(model)
+        if user_id is not None:
+            stmt = stmt.where(model.user_id == user_id)
+        else:
+            stmt = stmt.where(model.user_id.is_(None))
+        db.execute(stmt)
 
 
 def _make_income(amount: float, category: str, days_ago: int = 7) -> Transaction:
@@ -253,7 +257,11 @@ CASES = {
 
 
 @router.post("/demo/load", summary="Загрузить демо-данные")
-def load_demo(case: str = "anna", db: Session = Depends(get_db)) -> dict[str, str]:
+def load_demo(
+    case: str = "anna",
+    db: Session = Depends(get_db),
+    user_id: str | None = Depends(get_current_user_id),
+) -> dict[str, str]:
     """
     Загружает один из шести кейсов из портретов.
     Параметр case: anna | dmitriy | mikhail | igor | olga | viktor
@@ -261,17 +269,22 @@ def load_demo(case: str = "anna", db: Session = Depends(get_db)) -> dict[str, st
     if case not in CASES:
         raise HTTPException(status_code=400, detail=f"Неизвестный кейс: {case}. Доступно: {list(CASES.keys())}")
 
-    _clear_all(db)
+    _clear_all(db, user_id=user_id)
     data = CASES[case]()
     for items in data.values():
+        for item in items:
+            item.user_id = user_id  # привязка демо-данных к текущему пользователю
         db.add_all(items)
     db.commit()
     return {"detail": f"Загружен кейс «{case}»."}
 
 
 @router.post("/demo/clear", summary="Очистить все данные")
-def clear_demo(db: Session = Depends(get_db)) -> dict[str, str]:
-    _clear_all(db)
+def clear_demo(
+    db: Session = Depends(get_db),
+    user_id: str | None = Depends(get_current_user_id),
+) -> dict[str, str]:
+    _clear_all(db, user_id=user_id)
     db.commit()
     return {"detail": "Все данные удалены."}
 

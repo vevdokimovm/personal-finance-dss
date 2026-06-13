@@ -13,7 +13,7 @@ from app.database.crud import (
     get_obligations,
     get_transactions,
 )
-from app.dependencies import get_db
+from app.dependencies import get_current_user_id, get_db
 from app.schemas.recommendation import RecommendationResponse
 from app.services.pipeline import run_pipeline
 
@@ -36,6 +36,7 @@ router = APIRouter(tags=["Рекомендации"])
 def create_recommendation(
     payload: Optional[RecommendationRequest] = None,
     db: Session = Depends(get_db),
+    user_id: str | None = Depends(get_current_user_id),
 ) -> RecommendationResponse:
     if payload and (payload.transactions or payload.obligations or payload.goals or payload.liquid_assets):
         transactions = payload.transactions
@@ -43,10 +44,10 @@ def create_recommendation(
         goals = payload.goals
         liquid_assets = payload.liquid_assets
     else:
-        transactions = get_transactions(db)
-        obligations = get_obligations(db)
-        goals = get_goals(db)
-        liquid_assets = get_liquid_assets(db)
+        transactions = get_transactions(db, user_id=user_id)
+        obligations = get_obligations(db, user_id=user_id)
+        goals = get_goals(db, user_id=user_id)
+        liquid_assets = get_liquid_assets(db, user_id=user_id)
 
     ensure_calculable(transactions, obligations)
 

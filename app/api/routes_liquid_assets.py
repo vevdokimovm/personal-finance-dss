@@ -8,15 +8,18 @@ from app.database.crud import (
     delete_liquid_asset,
     get_liquid_assets,
 )
-from app.dependencies import get_db
+from app.dependencies import get_current_user_id, get_db
 from app.schemas.liquid_asset import LiquidAssetCreate, LiquidAssetResponse
 
 router = APIRouter(prefix="/liquid-assets", tags=["Ликвидные активы"])
 
 
 @router.get("", response_model=list[LiquidAssetResponse], summary="Список ликвидных активов (Bliq)")
-def list_assets(db: Session = Depends(get_db)) -> list[LiquidAssetResponse]:
-    return get_liquid_assets(db)
+def list_assets(
+    db: Session = Depends(get_db),
+    user_id: str | None = Depends(get_current_user_id),
+) -> list[LiquidAssetResponse]:
+    return get_liquid_assets(db, user_id=user_id)
 
 
 @router.post(
@@ -25,7 +28,11 @@ def list_assets(db: Session = Depends(get_db)) -> list[LiquidAssetResponse]:
     status_code=status.HTTP_201_CREATED,
     summary="Добавить ликвидный актив (депозит, накопит. счёт, кэш)",
 )
-def add_asset(payload: LiquidAssetCreate, db: Session = Depends(get_db)) -> LiquidAssetResponse:
+def add_asset(
+    payload: LiquidAssetCreate,
+    db: Session = Depends(get_db),
+    user_id: str | None = Depends(get_current_user_id),
+) -> LiquidAssetResponse:
     return create_liquid_asset(
         db,
         name=payload.name,
@@ -33,6 +40,7 @@ def add_asset(payload: LiquidAssetCreate, db: Session = Depends(get_db)) -> Liqu
         interest_rate=payload.interest_rate,
         type=payload.type,
         comment=payload.comment,
+        user_id=user_id,
     )
 
 

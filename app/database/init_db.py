@@ -9,7 +9,7 @@ from sqlalchemy.orm import Session
 
 from alembic import command
 from app.database.db import engine
-from app.database.models import UserPrefs
+from app.database.models import UserPrefs  # noqa: F401 — используется в _ensure_user_prefs
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 
@@ -30,9 +30,11 @@ def run_migrations() -> None:
 
 
 def _ensure_user_prefs() -> None:
+    """Гарантирует одну legacy-строку настроек (user_id=None) для анонимного режима."""
     with Session(engine) as session:
-        if session.get(UserPrefs, 1) is None:
-            session.add(UserPrefs(id=1))
+        existing = session.query(UserPrefs).filter(UserPrefs.user_id.is_(None)).first()
+        if existing is None:
+            session.add(UserPrefs(user_id=None))
             session.commit()
 
 

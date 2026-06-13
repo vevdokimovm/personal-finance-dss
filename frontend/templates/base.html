@@ -92,9 +92,11 @@
                 <h2>{% block page_title %}Главная{% endblock %}</h2>
                 <div style="display:flex; align-items:center; gap:16px;">
                     <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Переключить тему" title="Светлая / тёмная тема"></button>
-                    <div class="user-profile">
+                    <div class="user-profile" id="auth-widget">
                         <span class="status-indicator online"></span>
-                        Система активна
+                        <span id="auth-status">Система активна</span>
+                        <button id="auth-login-btn" type="button" class="auth-btn" style="display:none;">Войти</button>
+                        <button id="auth-logout-btn" type="button" class="auth-btn" style="display:none;">Выйти</button>
                     </div>
                 </div>
             </header>
@@ -109,7 +111,34 @@
 
     {% block modals %}{% endblock %}
 
+    <!-- Auth-модалка (вход / регистрация) -->
+    <div class="modal-backdrop" id="auth-modal" aria-hidden="true">
+        <div class="modal-card glass-panel">
+            <div class="modal-head">
+                <h3 class="modal-title" id="auth-modal-title">Вход в FINPILOT</h3>
+                <button class="modal-close ghost-button" type="button" data-close-modal="auth-modal">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="auth-tabs">
+                    <button type="button" class="auth-tab active" data-auth-tab="login">Вход</button>
+                    <button type="button" class="auth-tab" data-auth-tab="register">Регистрация</button>
+                </div>
+                <div id="auth-error" class="auth-error" style="display:none;"></div>
+                <label class="field-label" for="auth-email">Email</label>
+                <input type="email" id="auth-email" class="modal-input" autocomplete="email" placeholder="you@example.com">
+                <label class="field-label" for="auth-password" style="margin-top:12px;">Пароль</label>
+                <input type="password" id="auth-password" class="modal-input" autocomplete="current-password" placeholder="минимум 8 символов">
+                <div id="auth-name-row" style="display:none; margin-top:12px;">
+                    <label class="field-label" for="auth-name">Имя (необязательно)</label>
+                    <input type="text" id="auth-name" class="modal-input" autocomplete="name" placeholder="Как к вам обращаться">
+                </div>
+                <button type="button" id="auth-submit" class="primary-button w-full" style="margin-top:18px;">Войти</button>
+            </div>
+        </div>
+    </div>
+
     <script src="/static/js/app.js?v={{ app_version }}"></script>
+    <script src="/static/js/auth.js?v={{ app_version }}"></script>
     {% block scripts %}{% endblock %}
 </body>
 </html>

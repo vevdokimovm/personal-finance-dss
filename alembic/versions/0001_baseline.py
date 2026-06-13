@@ -24,7 +24,7 @@ def upgrade() -> None:
         sa.Column("category", sa.String(length=255), nullable=False, index=True),
         sa.Column("type", sa.String(length=20), nullable=False, index=True),
         sa.Column("date", sa.DateTime(), nullable=False, index=True),
-        sa.Column("is_synced", sa.Boolean(), nullable=False, server_default=sa.text("0")),
+        sa.Column("is_synced", sa.Boolean(), nullable=False, server_default=sa.false()),
     )
     op.create_table(
         "obligations",

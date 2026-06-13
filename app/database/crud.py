@@ -21,6 +21,20 @@ from app.database.models import (
 )
 
 
+def _owner_filter(query, model, user_id):
+    """Фильтр изоляции по пользователю.
+
+    user_id задан  → строки этого пользователя.
+    user_id=None   → строки без владельца (анонимный/legacy-режим). После того как
+                     первый зарегистрированный пользователь усыновил данные, аноним
+                     перестаёт видеть чужие строки — это закрывает доступ к данным
+                     других пользователей в multi-user-режиме.
+    """
+    if user_id is not None:
+        return query.filter(model.user_id == user_id)
+    return query.filter(model.user_id.is_(None))
+
+
 # ── Categories (DATA-04) ─────────────────────────────────────────────────
 def create_category(db: Session, name: str, type: str = "expense", is_system: bool = False) -> Category:
     category = Category(name=name, type=type, is_system=is_system)
@@ -57,6 +71,8 @@ def create_transaction(
     category_id: Optional[int] = None,
     mcc: Optional[str] = None,
     bank: Optional[str] = None,
+    currency: str = "RUB",
+    user_id: Optional[str] = None,
     autocommit: bool = True,
 ) -> Transaction:
     resolved_category = category or classify_transaction(description, mcc, type)
@@ -71,6 +87,8 @@ def create_transaction(
         category_id=category_id,
         mcc=mcc,
         bank=bank,
+        currency=currency,
+        user_id=user_id,
         is_recurring=_is_recurring(db, description, type),
     )
     db.add(transaction)
@@ -228,13 +246,10 @@ def get_budget_status(db: Session, days: int = 30) -> list[dict]:
     return statuses
 
 
-def get_transactions(db: Session) -> list[Transaction]:
-    return (
-        db.query(Transaction)
-        .filter(Transaction.is_deleted == False)  # noqa: E712
-        .order_by(Transaction.date.desc())
-        .all()
-    )
+def get_transactions(db: Session, user_id: Optional[str] = None) -> list[Transaction]:
+    query = db.query(Transaction).filter(Transaction.is_deleted == False)  # noqa: E712
+    query = _owner_filter(query, Transaction, user_id)
+    return query.order_by(Transaction.date.desc()).all()
 
 
 def delete_transaction(db: Session, transaction_id: int) -> Optional[Transaction]:
@@ -274,6 +289,8 @@ def create_obligation(
     bank: Optional[str] = None,
     type: str = "other",
     start_date: Optional[datetime] = None,
+    currency: str = "RUB",
+    user_id: Optional[str] = None,
 ) -> Obligation:
     obligation = Obligation(
         name=name,
@@ -287,6 +304,8 @@ def create_obligation(
         type=type,
         start_date=start_date or datetime.utcnow(),
         is_active=True,
+        currency=currency,
+        user_id=user_id,
     )
     db.add(obligation)
     db.commit()
@@ -294,10 +313,13 @@ def create_obligation(
     return obligation
 
 
-def get_obligations(db: Session, active_only: bool = False) -> list[Obligation]:
+def get_obligations(
+    db: Session, active_only: bool = False, user_id: Optional[str] = None
+) -> list[Obligation]:
     query = db.query(Obligation)
     if active_only:
         query = query.filter(Obligation.is_active.is_(True))
+    query = _owner_filter(query, Obligation, user_id)
     return query.order_by(Obligation.id.desc()).all()
 
 
@@ -361,6 +383,8 @@ def create_goal(
     category: str = "material",
     comment: Optional[str] = None,
     priority: int = 0,
+    currency: str = "RUB",
+    user_id: Optional[str] = None,
 ) -> Goal:
     goal = Goal(
         name=name,
@@ -371,6 +395,8 @@ def create_goal(
         comment=comment,
         priority=priority,
         is_active=True,
+        currency=currency,
+        user_id=user_id,
     )
     db.add(goal)
     db.commit()
@@ -384,10 +410,13 @@ def create_goal(
     return goal
 
 
-def get_goals(db: Session, active_only: bool = False) -> list[Goal]:
+def get_goals(
+    db: Session, active_only: bool = False, user_id: Optional[str] = None
+) -> list[Goal]:
     query = db.query(Goal)
     if active_only:
         query = query.filter(Goal.is_active.is_(True))
+    query = _owner_filter(query, Goal, user_id)
     return query.order_by(Goal.deadline.asc()).all()
 
 
@@ -447,9 +476,12 @@ def create_liquid_asset(
     interest_rate: float = 0.0,
     type: str = "deposit",
     comment: Optional[str] = None,
+    currency: str = "RUB",
+    user_id: Optional[str] = None,
 ) -> LiquidAsset:
     asset = LiquidAsset(
-        name=name, amount=amount, interest_rate=interest_rate, type=type, comment=comment
+        name=name, amount=amount, interest_rate=interest_rate, type=type,
+        comment=comment, currency=currency, user_id=user_id,
     )
     db.add(asset)
     db.commit()
@@ -457,8 +489,9 @@ def create_liquid_asset(
     return asset
 
 
-def get_liquid_assets(db: Session) -> list[LiquidAsset]:
-    return db.query(LiquidAsset).order_by(LiquidAsset.id.desc()).all()
+def get_liquid_assets(db: Session, user_id: Optional[str] = None) -> list[LiquidAsset]:
+    query = _owner_filter(db.query(LiquidAsset), LiquidAsset, user_id)
+    return query.order_by(LiquidAsset.id.desc()).all()
 
 
 def delete_liquid_asset(db: Session, asset_id: int) -> Optional[LiquidAsset]:
@@ -471,10 +504,24 @@ def delete_liquid_asset(db: Session, asset_id: int) -> Optional[LiquidAsset]:
 
 
 # ── User Prefs (singleton, id=1) ─────────────────────────────────────────
-def get_user_prefs(db: Session) -> UserPrefs:
-    prefs = db.get(UserPrefs, 1)
+def get_user_prefs(db: Session, user_id: Optional[str] = None) -> UserPrefs:
+    """Параметры пользователя.
+
+    user_id=None → legacy single-user (строка без владельца), как в v2.x.
+    user_id задан → строка этого пользователя; создаётся при первом обращении.
+    """
+    if user_id is None:
+        prefs = db.query(UserPrefs).filter(UserPrefs.user_id.is_(None)).first()
+        if prefs is None:
+            prefs = UserPrefs(user_id=None)
+            db.add(prefs)
+            db.commit()
+            db.refresh(prefs)
+        return prefs
+
+    prefs = db.query(UserPrefs).filter(UserPrefs.user_id == user_id).first()
     if prefs is None:
-        prefs = UserPrefs(id=1)
+        prefs = UserPrefs(user_id=user_id)
         db.add(prefs)
         db.commit()
         db.refresh(prefs)
@@ -487,8 +534,10 @@ def update_user_prefs(
     risk_tolerance: Optional[int] = None,
     horizon: Optional[int] = None,
     r_bench: Optional[float] = None,
+    base_currency: Optional[str] = None,
+    user_id: Optional[str] = None,
 ) -> UserPrefs:
-    prefs = get_user_prefs(db)
+    prefs = get_user_prefs(db, user_id=user_id)
     if l_min is not None:
         prefs.l_min = l_min
     if risk_tolerance is not None:
@@ -497,6 +546,56 @@ def update_user_prefs(
         prefs.horizon = horizon
     if r_bench is not None:
         prefs.r_bench = r_bench
+    if base_currency is not None:
+        prefs.base_currency = base_currency
     db.commit()
     db.refresh(prefs)
     return prefs
+
+
+# ── Users (DATA-03, INFRA-06) ────────────────────────────────────────────
+from app.database.models import User  # noqa: E402
+
+
+def create_user(db: Session, email: str, password_hash: str, display_name: Optional[str] = None) -> User:
+    user = User(email=email.lower().strip(), password_hash=password_hash, display_name=display_name)
+    db.add(user)
+    db.commit()
+    db.refresh(user)
+    return user
+
+
+def get_user_by_email(db: Session, email: str) -> Optional[User]:
+    return db.query(User).filter(User.email == email.lower().strip()).first()
+
+
+def get_user_by_id(db: Session, user_id: str) -> Optional[User]:
+    return db.get(User, user_id)
+
+
+def count_users(db: Session) -> int:
+    return db.query(User).count()
+
+
+_OWNED_MODELS = (Transaction, Obligation, Goal, LiquidAsset, Budget, Scenario)
+
+
+def adopt_orphan_rows(db: Session, user_id: str) -> int:
+    """Усыновление осиротевших строк первым пользователем (single→multi).
+
+    Все записи без владельца (user_id IS NULL), созданные в анонимном режиме,
+    привязываются к user_id. Также legacy-настройки (user_prefs.user_id IS NULL)
+    переносятся на нового владельца. Возвращает число затронутых строк.
+    """
+    affected = 0
+    for model in _OWNED_MODELS:
+        rows = db.query(model).filter(model.user_id.is_(None)).all()
+        for row in rows:
+            row.user_id = user_id
+            affected += 1
+    legacy_prefs = db.query(UserPrefs).filter(UserPrefs.user_id.is_(None)).first()
+    if legacy_prefs is not None and db.query(UserPrefs).filter(UserPrefs.user_id == user_id).first() is None:
+        legacy_prefs.user_id = user_id
+        affected += 1
+    db.commit()
+    return affected

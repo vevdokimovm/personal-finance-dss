@@ -10,6 +10,7 @@ class UserPrefsUpdate(BaseModel):
     risk_tolerance: Optional[int] = Field(None, ge=1, le=5)
     horizon: Optional[int] = Field(None, ge=1, le=24)
     r_bench: Optional[float] = Field(None, ge=0.0, le=1.0)
+    base_currency: Optional[str] = Field(None, min_length=3, max_length=3)
 
 
 class UserPrefsResponse(BaseModel):
@@ -20,3 +21,4 @@ class UserPrefsResponse(BaseModel):
     risk_tolerance: int
     horizon: int
     r_bench: float
+    base_currency: str = "RUB"

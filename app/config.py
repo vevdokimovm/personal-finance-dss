@@ -28,7 +28,7 @@ class Settings(BaseSettings):
         description="Название проекта.",
     )
     APP_VERSION: str = Field(
-        default="2.2.3",
+        default="3.0.0",
         description="Версия приложения (INFRA-13): код, UI-футер, git-тег.",
     )
     PROJECT_TAGLINE: str = Field(
@@ -51,6 +51,49 @@ class Settings(BaseSettings):
         default=60,
         description="Размер окна rate-limit в секундах (INFRA-12).",
     )
+
+
+    # ── v3.0.0 International: auth (INFRA-06, NFR-05) ──────────────────
+    JWT_SECRET: str = Field(
+        default="dev-insecure-secret-change-me-in-production-env-32b",
+        description="Секрет подписи JWT. В продакшне ОБЯЗАТЕЛЬНО задать в .env.",
+    )
+    JWT_ALGORITHM: str = Field(default="HS256", description="Алгоритм подписи JWT.")
+    JWT_TTL_HOURS: int = Field(default=168, description="Срок жизни access-токена, часов.")
+    AUTH_COOKIE_NAME: str = Field(default="fp_access", description="Имя httpOnly-cookie с JWT.")
+    COOKIE_SECURE: bool = Field(
+        default=False,
+        description=(
+            "Ставить ли флаг Secure на auth-cookie. False (по умолчанию) — кука "
+            "работает по HTTP (локально/Docker). True — только когда фронт реально "
+            "обслуживается по HTTPS, иначе браузер не пришлёт куку и вход сломается."
+        ),
+    )
+
+    # ── v3.0.0 International: мультивалюта (FR-19, DATA-08) ────────────
+    DEFAULT_BASE_CURRENCY: str = Field(
+        default="RUB",
+        description="Базовая валюта по умолчанию для новых пользователей.",
+    )
+
+    # ── v3.0.0 International: B2B /v1/analyze (FR-23) ──────────────────
+    B2B_API_KEYS: str = Field(
+        default="",
+        description="API-ключи партнёров через запятую. Пусто = эндпоинт отключён.",
+    )
+
+    # ── v3.0.0 International: Plaid (FR-18, INFRA-16, INFRA-17) ────────
+    PLAID_CLIENT_ID: str = Field(default="", description="Plaid client_id (sandbox/prod).")
+    PLAID_SECRET: str = Field(default="", description="Plaid secret. Только через .env.")
+    PLAID_ENV: str = Field(default="sandbox", description="Окружение Plaid: sandbox | production.")
+    TOKEN_ENCRYPTION_KEY: str = Field(
+        default="",
+        description="Fernet-ключ шифрования Plaid-токенов (INFRA-17). Пусто = derive из JWT_SECRET.",
+    )
+
+    @property
+    def b2b_api_keys_list(self) -> list[str]:
+        return [k.strip() for k in self.B2B_API_KEYS.split(",") if k.strip()]
 
     @property
     def is_production(self) -> bool:

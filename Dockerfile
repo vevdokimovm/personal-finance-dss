@@ -5,13 +5,13 @@ WORKDIR /app
 ENV PIP_NO_CACHE_DIR=1 \
     PIP_DISABLE_PIP_VERSION_CHECK=1
 
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends build-essential \
-    && rm -rf /var/lib/apt/lists/*
-
+# build-essential не нужен: весь стек ставится из готовых manylinux-wheel
+# (psycopg[binary], cryptography, bcrypt, pillow, pydantic-core и т.д.).
+# --only-binary=:all: запрещает компиляцию из sdist — сборка детерминирована
+# и не зависит от apt-зеркал (устраняет «Hash Sum mismatch» при apt-get).
 COPY requirements.txt .
 RUN python -m venv /opt/venv \
-    && /opt/venv/bin/pip install --no-cache-dir -r requirements.txt
+    && /opt/venv/bin/pip install --no-cache-dir --only-binary=:all: -r requirements.txt
 
 # ── Stage 2: runtime — только venv и код, без сборочных инструментов ──
 FROM python:3.12-slim AS runtime

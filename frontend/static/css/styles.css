@@ -1171,3 +1171,62 @@ input::placeholder { color: var(--c-text3); }
 .metric-clickable { cursor: pointer; transition: border-color .15s ease, transform .1s ease; }
 .metric-clickable:hover { border-color: var(--c-accent); }
 .metric-clickable.metric-active { border-color: var(--c-accent); box-shadow: 0 0 0 1px var(--c-accent) inset; }
+
+/* ── Auth (v3.0.0): вход / регистрация ──────────────────────────────── */
+.auth-btn {
+    background: transparent;
+    border: 1px solid var(--c-border);
+    color: var(--c-text2);
+    padding: 4px 12px;
+    border-radius: 8px;
+    font-size: .78rem;
+    cursor: pointer;
+    transition: all .15s ease;
+    margin-left: 8px;
+}
+.auth-btn:hover {
+    border-color: var(--c-accent);
+    color: var(--c-accent);
+}
+.auth-tabs {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 18px;
+    background: var(--c-bg2);
+    padding: 4px;
+    border-radius: 10px;
+}
+.auth-tab {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: var(--c-text3);
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: .85rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all .15s ease;
+}
+.auth-tab.active {
+    background: var(--c-surface);
+    color: var(--c-text);
+    box-shadow: 0 1px 3px rgba(0,0,0,.15);
+}
+.auth-error {
+    background: color-mix(in srgb, var(--c-red) 12%, transparent);
+    border: 1px solid color-mix(in srgb, var(--c-red) 40%, transparent);
+    color: var(--c-red);
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-size: .82rem;
+    margin-bottom: 14px;
+}
+.modal-body .field-label {
+    display: block;
+    font-size: .78rem;
+    color: var(--c-text3);
+    margin-bottom: 6px;
+    font-weight: 500;
+}
+.modal-body { padding: 4px 2px; }

@@ -22,6 +22,13 @@ services:
       DATABASE_URL: postgresql+psycopg://finpilot:finpilot@db:5432/finpilot
       ENVIRONMENT: production
       CORS_ORIGINS: http://localhost:8000,http://127.0.0.1:8000
+      # В проде задайте свой секрет (env/secrets), не оставляйте дефолт.
+      JWT_SECRET: ${JWT_SECRET:-change-me-in-production-min-32-chars-secret}
+      DEFAULT_BASE_CURRENCY: ${DEFAULT_BASE_CURRENCY:-RUB}
+      # B2B/Plaid выключены, пока не заданы ключи.
+      B2B_API_KEYS: ${B2B_API_KEYS:-}
+      PLAID_CLIENT_ID: ${PLAID_CLIENT_ID:-}
+      PLAID_SECRET: ${PLAID_SECRET:-}
     ports:
       - "8000:8000"
 

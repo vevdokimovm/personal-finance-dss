@@ -105,11 +105,16 @@ class CSRFMiddleware(BaseHTTPMiddleware):
 
     async def dispatch(self, request: Request, call_next):
         if request.method not in self.SAFE_METHODS:
-            origin = request.headers.get("origin")
-            if origin and origin not in self._allowed:
-                log_event("csrf_blocked", {"path": request.url.path, "origin": origin})
-                return JSONResponse(
-                    status_code=403,
-                    content={"detail": "Запрос с недоверенного источника отклонён."},
-                )
+            # Запросы по Bearer-токену или API-ключу не используют амбиентные cookies —
+            # CSRF им не угрожает (B2B /v1, Plaid, мобильные/серверные клиенты).
+            has_bearer = request.headers.get("authorization", "").lower().startswith("bearer ")
+            has_api_key = "x-api-key" in request.headers
+            if not has_bearer and not has_api_key:
+                origin = request.headers.get("origin")
+                if origin and origin not in self._allowed:
+                    log_event("csrf_blocked", {"path": request.url.path, "origin": origin})
+                    return JSONResponse(
+                        status_code=403,
+                        content={"detail": "Запрос с недоверенного источника отклонён."},
+                    )
         return await call_next(request)

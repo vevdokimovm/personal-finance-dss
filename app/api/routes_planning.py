@@ -23,7 +23,7 @@ from app.database.crud import (
     get_user_prefs,
     save_scenario,
 )
-from app.dependencies import get_db
+from app.dependencies import get_current_user_id, get_db
 from app.services.event_logger import log_event, log_recommendation
 from app.services.forecasting import forecast_indicators
 from app.services.planning import run_planning
@@ -90,15 +90,16 @@ def _serialize_assets(items) -> list[dict[str, Any]]:
 def calculate_plan(
     payload: PlanningRequest,
     db: Session = Depends(get_db),
+    user_id: str | None = Depends(get_current_user_id),
 ) -> dict[str, Any]:
-    prefs = get_user_prefs(db)
+    prefs = get_user_prefs(db, user_id=user_id)
     risk_tolerance = payload.risk_tolerance if payload.risk_tolerance is not None else prefs.risk_tolerance
     l_min = payload.l_min if payload.l_min is not None else prefs.l_min
 
-    transactions = get_transactions(db)
-    obligations = _serialize_obligations(get_obligations(db))
-    goals = _serialize_goals(get_goals(db))
-    assets = _serialize_assets(get_liquid_assets(db))
+    transactions = get_transactions(db, user_id=user_id)
+    obligations = _serialize_obligations(get_obligations(db, user_id=user_id))
+    goals = _serialize_goals(get_goals(db, user_id=user_id))
+    assets = _serialize_assets(get_liquid_assets(db, user_id=user_id))
 
     # r_bench (OCR): явный из запроса → лучшая ставка ликвидных активов → дефолт prefs.
     # Экономический смысл: альтернативная доходность рубля = ваша реальная ставка по накоплениям.
@@ -172,10 +173,14 @@ def calculate_plan(
 
 
 @router.post("/forecast", summary="Прогноз Rt/Lt/Dt на горизонт H (форм. 35 ВКР)")
-def get_forecast(payload: ForecastRequest, db: Session = Depends(get_db)) -> dict[str, Any]:
-    transactions = get_transactions(db)
-    obligations = _serialize_obligations(get_obligations(db))
-    goals = _serialize_goals(get_goals(db))
+def get_forecast(
+    payload: ForecastRequest,
+    db: Session = Depends(get_db),
+    user_id: str | None = Depends(get_current_user_id),
+) -> dict[str, Any]:
+    transactions = get_transactions(db, user_id=user_id)
+    obligations = _serialize_obligations(get_obligations(db, user_id=user_id))
+    goals = _serialize_goals(get_goals(db, user_id=user_id))
 
     prepared = prepare_data(transactions=transactions, obligations=obligations, goals=goals)
 

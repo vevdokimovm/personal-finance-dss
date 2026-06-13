@@ -8,7 +8,7 @@ from app.database.crud import (
     delete_obligation,
     get_obligations,
 )
-from app.dependencies import get_db
+from app.dependencies import get_current_user_id, get_db
 from app.schemas.obligation import ObligationCreate, ObligationResponse
 from app.services.event_logger import log_event
 
@@ -22,8 +22,9 @@ router = APIRouter(tags=["Обязательства"])
 )
 def get_obligations_endpoint(
     db: Session = Depends(get_db),
+    user_id: str | None = Depends(get_current_user_id),
 ) -> list[ObligationResponse]:
-    return get_obligations(db)
+    return get_obligations(db, user_id=user_id)
 
 
 @router.post(
@@ -35,6 +36,7 @@ def get_obligations_endpoint(
 def create_obligation_endpoint(
     payload: ObligationCreate,
     db: Session = Depends(get_db),
+    user_id: str | None = Depends(get_current_user_id),
 ) -> ObligationResponse:
     obligation = create_obligation(
         db=db,
@@ -48,6 +50,7 @@ def create_obligation_endpoint(
         bank=payload.bank,
         type=payload.type,
         start_date=payload.start_date,
+        user_id=user_id,
     )
     log_event("obligation_created", {
         "type": payload.type,

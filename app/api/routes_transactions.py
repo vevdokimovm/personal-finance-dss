@@ -9,7 +9,7 @@ from app.database.crud import (
     get_transactions,
     restore_transaction,
 )
-from app.dependencies import get_db
+from app.dependencies import get_current_user_id, get_db
 from app.schemas.transaction import TransactionCreate, TransactionResponse
 from app.services.event_logger import log_event
 
@@ -23,8 +23,9 @@ router = APIRouter(tags=["Транзакции"])
 )
 def get_transactions_endpoint(
     db: Session = Depends(get_db),
+    user_id: str | None = Depends(get_current_user_id),
 ) -> list[TransactionResponse]:
-    return get_transactions(db)
+    return get_transactions(db, user_id=user_id)
 
 
 @router.post(
@@ -36,6 +37,7 @@ def get_transactions_endpoint(
 def create_transaction_endpoint(
     payload: TransactionCreate,
     db: Session = Depends(get_db),
+    user_id: str | None = Depends(get_current_user_id),
 ) -> TransactionResponse:
     transaction = create_transaction(
         db=db,
@@ -45,6 +47,7 @@ def create_transaction_endpoint(
         date=payload.date,
         description=payload.description,
         mcc=payload.mcc,
+        user_id=user_id,
     )
     log_event("transaction_created", {
         "type": payload.type,

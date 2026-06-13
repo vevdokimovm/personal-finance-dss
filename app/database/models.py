@@ -1,9 +1,11 @@
 from __future__ import annotations
 
+import uuid
 from datetime import datetime
+from decimal import Decimal
 from typing import Optional
 
-from sqlalchemy import JSON, Boolean, DateTime, Float, ForeignKey, Integer, String, Text
+from sqlalchemy import JSON, Boolean, DateTime, Float, ForeignKey, Integer, Numeric, String, Text
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.database.db import Base
@@ -19,11 +21,64 @@ class Category(Base):
     is_system: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
 
 
+class User(Base):
+    """Пользователь системы (DATA-03, INFRA-06). PK — uuid в строке (кросс-СУБД)."""
+    __tablename__ = "users"
+
+    id: Mapped[str] = mapped_column(
+        String(36), primary_key=True, default=lambda: str(uuid.uuid4())
+    )
+    email: Mapped[str] = mapped_column(String(255), nullable=False, unique=True, index=True)
+    password_hash: Mapped[str] = mapped_column(String(255), nullable=False)
+    display_name: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=datetime.utcnow)
+    is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
+
+
+class FxRate(Base):
+    """Курс валюты к USD-пивоту (FR-19). convert(A→B) = amount · rate(A)/rate(B)."""
+    __tablename__ = "fx_rates"
+
+    currency: Mapped[str] = mapped_column(String(3), primary_key=True)
+    rate_to_usd: Mapped[Decimal] = mapped_column(Numeric(18, 8), nullable=False)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
+
+
+class ManualSnapshot(Base):
+    """Персистентное хранилище ручного FinancialSnapshot (INFRA-18)."""
+    __tablename__ = "manual_snapshots"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    user_ref: Mapped[str] = mapped_column(String(64), nullable=False, unique=True, index=True)
+    payload: Mapped[dict] = mapped_column(JSON, nullable=False, default=dict)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
+
+
+class PlaidToken(Base):
+    """Plaid access_token, шифрованный «в покое» Fernet (INFRA-17, NFR-06)."""
+    __tablename__ = "plaid_tokens"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    user_id: Mapped[str] = mapped_column(ForeignKey("users.id"), nullable=False, index=True)
+    item_id: Mapped[str] = mapped_column(String(128), nullable=False, index=True)
+    token_encrypted: Mapped[str] = mapped_column(Text, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=datetime.utcnow)
+
+
 class Transaction(Base):
     __tablename__ = "transactions"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
-    amount: Mapped[float] = mapped_column(Float, nullable=False)
+    user_id: Mapped[Optional[str]] = mapped_column(
+        ForeignKey("users.id"), nullable=True, index=True
+    )
+    currency: Mapped[str] = mapped_column(String(3), nullable=False, default="RUB")
+    amount: Mapped[Decimal] = mapped_column(
+        Numeric(14, 2), nullable=False)
     # Денормализованное имя категории — fallback и совместимость со старым кодом.
     category: Mapped[str] = mapped_column(String(255), nullable=False, index=True)
     # FK на справочник (DATA-04); заполняется движком категоризации (FR-13, Сессия 5).
@@ -49,11 +104,17 @@ class Obligation(Base):
     __tablename__ = "obligations"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    user_id: Mapped[Optional[str]] = mapped_column(
+        ForeignKey("users.id"), nullable=True, index=True
+    )
+    currency: Mapped[str] = mapped_column(String(3), nullable=False, default="RUB")
     name: Mapped[str] = mapped_column(String(255), nullable=False, index=True, default="Обязательство")
-    amount: Mapped[float] = mapped_column(Float, nullable=False)
-    interest_rate: Mapped[float] = mapped_column(Float, nullable=False, default=0.0)
+    amount: Mapped[Decimal] = mapped_column(
+        Numeric(14, 2), nullable=False)
+    interest_rate: Mapped[Decimal] = mapped_column(Numeric(6, 4), nullable=False, default=0.0)
     term: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
-    monthly_payment: Mapped[float] = mapped_column(Float, nullable=False)
+    monthly_payment: Mapped[Decimal] = mapped_column(
+        Numeric(14, 2), nullable=False)
     payment_day: Mapped[int] = mapped_column(Integer, nullable=False, default=1)
     # Жизненный цикл + атрибуты по ER (DATA-06, DATA-09).
     bank: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
@@ -68,9 +129,15 @@ class Goal(Base):
     __tablename__ = "goals"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    user_id: Mapped[Optional[str]] = mapped_column(
+        ForeignKey("users.id"), nullable=True, index=True
+    )
+    currency: Mapped[str] = mapped_column(String(3), nullable=False, default="RUB")
     name: Mapped[str] = mapped_column(String(255), nullable=False, index=True)
-    target_amount: Mapped[float] = mapped_column(Float, nullable=False)
-    current_amount: Mapped[float] = mapped_column(Float, nullable=False, default=0.0)
+    target_amount: Mapped[Decimal] = mapped_column(
+        Numeric(14, 2), nullable=False)
+    current_amount: Mapped[Decimal] = mapped_column(
+        Numeric(14, 2), nullable=False, default=0.0)
     deadline: Mapped[datetime] = mapped_column(DateTime, nullable=False, index=True)
     category: Mapped[str] = mapped_column(String(32), nullable=False, default="material", index=True)
     # Жизненный цикл по ER (DATA-06).
@@ -84,8 +151,12 @@ class Budget(Base):
     __tablename__ = "budgets"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    user_id: Mapped[Optional[str]] = mapped_column(
+        ForeignKey("users.id"), nullable=True, index=True
+    )
     category: Mapped[str] = mapped_column(String(64), nullable=False, unique=True, index=True)
-    limit_amount: Mapped[float] = mapped_column(Float, nullable=False)
+    limit_amount: Mapped[Decimal] = mapped_column(
+        Numeric(14, 2), nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=datetime.utcnow)
 
 
@@ -93,6 +164,9 @@ class Scenario(Base):
     __tablename__ = "scenarios"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    user_id: Mapped[Optional[str]] = mapped_column(
+        ForeignKey("users.id"), nullable=True, index=True
+    )
     parent_recommendation_id: Mapped[Optional[int]] = mapped_column(
         ForeignKey("recommendations.id"), nullable=True, index=True
     )
@@ -108,9 +182,14 @@ class LiquidAsset(Base):
     __tablename__ = "liquid_assets"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    user_id: Mapped[Optional[str]] = mapped_column(
+        ForeignKey("users.id"), nullable=True, index=True
+    )
+    currency: Mapped[str] = mapped_column(String(3), nullable=False, default="RUB")
     name: Mapped[str] = mapped_column(String(255), nullable=False, default="Депозит")
-    amount: Mapped[float] = mapped_column(Float, nullable=False, default=0.0)
-    interest_rate: Mapped[float] = mapped_column(Float, nullable=False, default=0.0)
+    amount: Mapped[Decimal] = mapped_column(
+        Numeric(14, 2), nullable=False, default=0.0)
+    interest_rate: Mapped[Decimal] = mapped_column(Numeric(6, 4), nullable=False, default=0.0)
     type: Mapped[str] = mapped_column(String(32), nullable=False, default="deposit")
     comment: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
 
@@ -120,15 +199,18 @@ class ObligationPayment(Base):
     __tablename__ = "obligation_payments"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+
     obligation_id: Mapped[int] = mapped_column(
         ForeignKey("obligations.id"), nullable=False, index=True
     )
-    amount: Mapped[float] = mapped_column(Float, nullable=False)
+    amount: Mapped[Decimal] = mapped_column(
+        Numeric(14, 2), nullable=False)
     payment_date: Mapped[datetime] = mapped_column(
         DateTime, nullable=False, default=datetime.utcnow, index=True
     )
     is_early: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
-    remaining_after: Mapped[float] = mapped_column(Float, nullable=False, default=0.0)
+    remaining_after: Mapped[Decimal] = mapped_column(
+        Numeric(14, 2), nullable=False, default=0.0)
 
 
 class GoalContribution(Base):
@@ -136,8 +218,10 @@ class GoalContribution(Base):
     __tablename__ = "goal_contributions"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+
     goal_id: Mapped[int] = mapped_column(ForeignKey("goals.id"), nullable=False, index=True)
-    amount: Mapped[float] = mapped_column(Float, nullable=False)
+    amount: Mapped[Decimal] = mapped_column(
+        Numeric(14, 2), nullable=False)
     contribution_date: Mapped[datetime] = mapped_column(
         DateTime, nullable=False, default=datetime.utcnow, index=True
     )
@@ -145,14 +229,22 @@ class GoalContribution(Base):
 
 
 class UserPrefs(Base):
-    """Параметры пользователя U = (Lmin, R, H, r_bench). updated_at — для аудита (LOG-07)."""
+    """Параметры пользователя U = (Lmin, R, H, r_bench, base_currency).
+
+    v3.0.0: одна строка на пользователя (user_id unique FK, DATA-03);
+    base_currency — валюта расчётов движка (FR-19).
+    """
     __tablename__ = "user_prefs"
 
-    id: Mapped[int] = mapped_column(Integer, primary_key=True, default=1)
-    l_min: Mapped[float] = mapped_column(Float, nullable=False, default=0.0)
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    user_id: Mapped[Optional[str]] = mapped_column(
+        ForeignKey("users.id"), nullable=True, unique=True, index=True
+    )
+    l_min: Mapped[Decimal] = mapped_column(Numeric(6, 4), nullable=False, default=Decimal("0.0"))
     risk_tolerance: Mapped[int] = mapped_column(Integer, nullable=False, default=3)
     horizon: Mapped[int] = mapped_column(Integer, nullable=False, default=12)
-    r_bench: Mapped[float] = mapped_column(Float, nullable=False, default=0.14)
+    r_bench: Mapped[Decimal] = mapped_column(Numeric(6, 4), nullable=False, default=Decimal("0.14"))
+    base_currency: Mapped[str] = mapped_column(String(3), nullable=False, default="RUB")
     updated_at: Mapped[datetime] = mapped_column(
         DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow
     )
@@ -167,7 +259,7 @@ class Event(Base):
     __tablename__ = "events"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
-    user_id: Mapped[Optional[int]] = mapped_column(Integer, nullable=True, index=True)
+    user_id: Mapped[Optional[str]] = mapped_column(String(36), nullable=True, index=True)
     session_id: Mapped[Optional[str]] = mapped_column(String(64), nullable=True, index=True)
     event_type: Mapped[str] = mapped_column(String(64), nullable=False, index=True)
     event_payload: Mapped[Optional[dict]] = mapped_column(JSON, nullable=True)
@@ -186,7 +278,7 @@ class Recommendation(Base):
     __tablename__ = "recommendations"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
-    user_id: Mapped[Optional[int]] = mapped_column(Integer, nullable=True, index=True)
+    user_id: Mapped[Optional[str]] = mapped_column(String(36), nullable=True, index=True)
 
     income_total: Mapped[float] = mapped_column(Float, nullable=False, default=0.0)
     expense_total: Mapped[float] = mapped_column(Float, nullable=False, default=0.0)
