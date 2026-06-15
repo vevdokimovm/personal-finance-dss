@@ -67,6 +67,25 @@ class TokenService:
         except jwt.PyJWTError:
             return None
 
+    def issue_verification(self, user_id: str, email: str, ttl_hours: int = 48) -> str:
+        """Токен подтверждения email (отдельное назначение, срок 48 ч)."""
+        now = datetime.now(timezone.utc)
+        payload = {
+            "sub": user_id,
+            "email": email,
+            "purpose": "email_verify",
+            "iat": now,
+            "exp": now + timedelta(hours=ttl_hours),
+        }
+        return jwt.encode(payload, self._secret, algorithm=self._algorithm)
+
+    def decode_verification(self, token: str) -> Optional[str]:
+        """Возвращает user_id, если токен валиден и предназначен для верификации."""
+        payload = self.decode(token)
+        if not payload or payload.get("purpose") != "email_verify":
+            return None
+        return payload.get("sub")
+
 
 class TokenCipher:
     """Симметричное шифрование Plaid-токенов (INFRA-17, NFR-06).

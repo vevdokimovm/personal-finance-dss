@@ -64,11 +64,18 @@
                     </span>
                     <span>Ликвидные активы</span>
                 </a>
+                <a href="/validation" id="nav-validation" class="nav-item {% if request.url.path == '/validation' %}active{% endif %}">
+                    <span class="nav-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                    </span>
+                    <span>Валидация</span>
+                </a>
             </nav>
 
             <div class="sidebar-footer">
-                <label class="demo-case-label" for="demo-case-select">Демо-кейс из ВКР</label>
+                <label class="demo-case-label" for="demo-case-select">Тест-кейсы</label>
                 <select id="demo-case-select" class="demo-case-select">
+                    <option value="" selected disabled>— выберите тест-кейс —</option>
                     <option value="anna">1. Анна (Москва, маркетолог)</option>
                     <option value="dmitriy">2. Дмитрий (СПб, IT)</option>
                     <option value="mikhail">3. Михаил (Казань, бизнес)</option>
@@ -94,7 +101,7 @@
                     <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Переключить тему" title="Светлая / тёмная тема"></button>
                     <div class="user-profile" id="auth-widget">
                         <span class="status-indicator online"></span>
-                        <span id="auth-status">Система активна</span>
+                        <a id="auth-status" href="/profile" style="color:inherit; text-decoration:none;" title="Личный профиль">Система активна</a>
                         <button id="auth-login-btn" type="button" class="auth-btn" style="display:none;">Войти</button>
                         <button id="auth-logout-btn" type="button" class="auth-btn" style="display:none;">Выйти</button>
                     </div>
@@ -124,15 +131,27 @@
                     <button type="button" class="auth-tab" data-auth-tab="register">Регистрация</button>
                 </div>
                 <div id="auth-error" class="auth-error" style="display:none;"></div>
-                <label class="field-label" for="auth-email">Email</label>
-                <input type="email" id="auth-email" class="modal-input" autocomplete="email" placeholder="you@example.com">
-                <label class="field-label" for="auth-password" style="margin-top:12px;">Пароль</label>
-                <input type="password" id="auth-password" class="modal-input" autocomplete="current-password" placeholder="минимум 8 символов">
-                <div id="auth-name-row" style="display:none; margin-top:12px;">
-                    <label class="field-label" for="auth-name">Имя (необязательно)</label>
-                    <input type="text" id="auth-name" class="modal-input" autocomplete="name" placeholder="Как к вам обращаться">
-                </div>
-                <button type="button" id="auth-submit" class="primary-button w-full" style="margin-top:18px;">Войти</button>
+                <form id="auth-form" autocomplete="on" onsubmit="return false;">
+                    <label class="field-label" for="auth-email">Email</label>
+                    <input type="email" id="auth-email" class="modal-input" name="email" autocomplete="username" placeholder="you@example.com">
+                    <label class="field-label" for="auth-password" style="margin-top:12px;">Пароль</label>
+                    <input type="password" id="auth-password" class="modal-input" name="password" autocomplete="current-password" placeholder="минимум 8 символов">
+                    <div id="auth-name-row" style="display:none; margin-top:12px;">
+                        <label class="field-label" for="auth-name">Имя (необязательно)</label>
+                        <input type="text" id="auth-name" class="modal-input" name="name" autocomplete="name" placeholder="Как к вам обращаться">
+                    </div>
+                    <div id="auth-consent-row" style="display:none; margin-top:14px; font-size:.82rem; line-height:1.45;">
+                        <label style="display:flex; align-items:flex-start; gap:8px; cursor:pointer; color:var(--c-text2);">
+                            <input type="checkbox" id="auth-consent" style="margin-top:3px; flex-shrink:0;">
+                            <span>Я согласен на обработку персональных данных в соответствии с политикой конфиденциальности <span style="color:var(--c-red);">*</span></span>
+                        </label>
+                        <label style="display:flex; align-items:flex-start; gap:8px; cursor:pointer; color:var(--c-text2); margin-top:10px;">
+                            <input type="checkbox" id="auth-newsletter" style="margin-top:3px; flex-shrink:0;">
+                            <span>Хочу получать новости и обновления FINPILOT (необязательно)</span>
+                        </label>
+                    </div>
+                    <button type="submit" id="auth-submit" class="primary-button w-full" style="margin-top:18px;">Войти</button>
+                </form>
             </div>
         </div>
     </div>
@@ -140,5 +159,38 @@
     <script src="/static/js/app.js?v={{ app_version }}"></script>
     <script src="/static/js/auth.js?v={{ app_version }}"></script>
     {% block scripts %}{% endblock %}
+<div id="app-toast" style="display:none; position:fixed; right:24px; bottom:24px; z-index:9999; max-width:420px;
+     background:var(--c-surface,#1a1d1a); color:var(--c-text,#fff); border:1px solid var(--c-border,#333);
+     border-left:4px solid var(--c-green,#2BBF6A); border-radius:12px; padding:16px 18px;
+     box-shadow:0 12px 40px rgba(0,0,0,.35); font-size:.88rem; line-height:1.5;">
+    <div id="app-toast-msg" style="margin-bottom:0;"></div>
+    <div id="app-toast-actions" style="margin-top:12px; display:none;"></div>
+    <button onclick="document.getElementById('app-toast').style.display='none'"
+            style="position:absolute; top:10px; right:12px; background:none; border:none; color:var(--c-text3,#999);
+                   font-size:1.1rem; cursor:pointer; line-height:1;">×</button>
+</div>
+<script>
+window.showToast = function (message, opts) {
+    opts = opts || {};
+    const box = document.getElementById('app-toast');
+    const msg = document.getElementById('app-toast-msg');
+    const actions = document.getElementById('app-toast-actions');
+    msg.textContent = message;
+    box.style.borderLeftColor = opts.error ? 'var(--c-red,#ef4444)' : 'var(--c-green,#2BBF6A)';
+    actions.innerHTML = '';
+    if (opts.linkUrl) {
+        const a = document.createElement('a');
+        a.href = opts.linkUrl;
+        a.textContent = opts.linkLabel || 'Открыть ссылку';
+        a.style.cssText = 'display:inline-block; padding:8px 18px; background:var(--c-green,#2BBF6A); color:#fff; text-decoration:none; border-radius:8px; font-weight:600; font-size:.82rem;';
+        actions.appendChild(a);
+        actions.style.display = 'block';
+    } else {
+        actions.style.display = 'none';
+    }
+    box.style.display = 'block';
+    if (!opts.linkUrl) setTimeout(() => { box.style.display = 'none'; }, opts.duration || 4000);
+};
+</script>
 </body>
 </html>

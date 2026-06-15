@@ -113,3 +113,19 @@ async def read_banks(request: Request) -> HTMLResponse:
         name="banks.html",
         context={"request": request, "project_name": settings.PROJECT_NAME},
     )
+
+@app.get("/validation", response_class=HTMLResponse, summary="Валидация алгоритма на портретах")
+async def read_validation(request: Request) -> HTMLResponse:
+    return templates.TemplateResponse(
+        request=request,
+        name="validation.html",
+        context={"request": request, "project_name": settings.PROJECT_NAME},
+    )
+
+@app.get("/profile", response_class=HTMLResponse, summary="Личный профиль и настройки")
+async def read_profile(request: Request) -> HTMLResponse:
+    return templates.TemplateResponse(
+        request=request,
+        name="profile.html",
+        context={"request": request, "project_name": settings.PROJECT_NAME},
+    )

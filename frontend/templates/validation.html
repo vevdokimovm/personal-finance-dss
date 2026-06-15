@@ -1,0 +1,183 @@
+{% extends "base.html" %}
+{% block title %}Валидация · FINPILOT{% endblock %}
+{% block page_title %}Валидация алгоритма{% endblock %}
+
+{% block content %}
+<section class="glass-panel w-full" style="margin-bottom:24px;">
+    <div class="section-head">
+        <div>
+            <h2 class="section-title">Как проверялся алгоритм</h2>
+            <p class="section-subtitle">Методика валидации СППР на типовых пользовательских профилях</p>
+        </div>
+    </div>
+    <div style="padding:8px 28px 24px; font-size:.9rem; line-height:1.65; color:var(--c-text2);">
+        <p style="margin:0 0 12px;">
+            Алгоритм проверяется на <strong>шести репрезентативных портретах</strong>, выведенных из
+            опроса по выбору финансовых стратегий. Портреты покрывают крайние и типичные ситуации:
+            от дефицитного бюджета до пред-пенсионной ликвидной позиции — чтобы убедиться, что система
+            ведёт себя корректно на всём диапазоне, а не только на «удобных» данных.
+        </p>
+        <p style="margin:0 0 12px;">
+            Для каждого портрета проверяется три вещи: <strong>(1)</strong> корректно ли считаются
+            базовые показатели (Rt, Lt, Dt, BLR); <strong>(2)</strong> срабатывает ли принцип
+            «честного отказа» (fail-loud) там, где свободных денег нет; <strong>(3)</strong> совпадает
+            ли рекомендация с экономически ожидаемой для этого типа пользователя.
+        </p>
+        <p style="margin:0; font-size:.82rem; color:var(--c-text3);">
+            Любой портрет можно загрузить в систему кнопкой ниже и проверить расчёт вживую на страницах
+            «Обзор» и «Прогнозирование».
+        </p>
+    </div>
+</section>
+
+<section class="glass-panel w-full">
+    <div class="section-head">
+        <div>
+            <h2 class="section-title">Шесть профилей и ожидаемое поведение</h2>
+            <p class="section-subtitle">Загрузите кейс, чтобы воспроизвести расчёт</p>
+        </div>
+    </div>
+    <div id="validation-grid" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(340px, 1fr)); gap:16px; padding:8px 28px 28px;"></div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+(function () {
+    const CASES = [
+        {
+            key: 'anna', n: 1, name: 'Анна Петрова, 36', role: 'Маркетолог · Москва',
+            tag: 'Пограничный', color: 'var(--c-amber)',
+            situation: 'Доход 180 000 ₽, есть кредиты и несколько целей. Свободный поток положительный, но долговая нагрузка ощутимая.',
+            expect: 'Алгоритм оптимизирует долг по стратегии Avalanche (гасит дорогие кредиты), удерживает ликвидность ≥ нормы и распределяет остаток на цели по их важности.'
+        },
+        {
+            key: 'dmitriy', n: 2, name: 'Дмитрий, 41', role: 'Senior IT · Санкт-Петербург',
+            tag: 'Здоровый бюджет', color: 'var(--c-green)',
+            situation: 'Высокий доход, низкая долговая нагрузка, заметные накопления. Подушка уже сформирована.',
+            expect: 'Основной акцент смещается на цели и рост: ликвидность в норме, гасить дешёвый долг досрочно невыгодно — деньги работают на накопительных инструментах.'
+        },
+        {
+            key: 'mikhail', n: 3, name: 'Михаил, 49', role: 'Своя мастерская · Казань',
+            tag: 'Критический', color: 'var(--c-red)',
+            situation: 'Расходы и платежи по кредитам съедают почти весь доход. Свободного потока фактически нет.',
+            expect: 'Срабатывает принцип fail-loud: вместо «красивой» рекомендации система выдаёт структурный диагноз — распределять нечего, нужен пересмотр расходов или рефинансирование.'
+        },
+        {
+            key: 'igor', n: 4, name: 'Игорь, 26', role: 'Junior-разработчик · Нижний Новгород',
+            tag: 'Старт карьеры', color: 'var(--c-cyan)',
+            situation: 'Невысокий доход, кредитов нет, накоплений почти нет. Начало финансового пути.',
+            expect: 'Приоритет — формирование подушки безопасности (BLR ниже нормы), затем цели роста дохода (категория income_growth, вес 3.0).'
+        },
+        {
+            key: 'olga', n: 5, name: 'Ольга, 44', role: 'Библиотекарь · Тула',
+            tag: 'Микс-стратегия', color: 'var(--c-violet)',
+            situation: 'Умеренный доход, смешанная ситуация: есть и долг, и цели, и частичная подушка.',
+            expect: 'Сбалансированное распределение между всеми тремя направлениями — ни один критерий не доминирует, выбирается компромиссная альтернатива.'
+        },
+        {
+            key: 'viktor', n: 6, name: 'Виктор, 58', role: 'Инженер · Екатеринбург',
+            tag: 'Пред-пенсионный', color: 'var(--c-text2)',
+            situation: 'Стабильный доход, крупная ликвидная позиция (депозиты), близкие по сроку цели.',
+            expect: 'Высокий вес ликвидности и безопасности. Может сработать правило разового закрытия близких целей из накоплений (Bliq), а не из месячного потока.'
+        }
+    ];
+
+    function card(c) {
+        return `
+        <article class="glass-panel" style="padding:18px 20px; border:1px solid var(--c-border); display:flex; flex-direction:column; gap:10px;">
+            <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:10px;">
+                <div>
+                    <div style="font-weight:700; font-size:.95rem;">${c.n}. ${c.name}</div>
+                    <div style="font-size:.76rem; color:var(--c-text3); margin-top:2px;">${c.role}</div>
+                </div>
+                <span style="font-size:.68rem; font-weight:700; text-transform:uppercase; letter-spacing:.4px;
+                             color:${c.color}; border:1px solid ${c.color}55; border-radius:999px; padding:3px 10px; white-space:nowrap;">${c.tag}</span>
+            </div>
+            <div style="font-size:.82rem; color:var(--c-text2); line-height:1.55;">
+                <strong style="color:var(--c-text3); font-size:.72rem; text-transform:uppercase; letter-spacing:.4px;">Ситуация</strong><br>${c.situation}
+            </div>
+            <div style="font-size:.82rem; color:var(--c-text2); line-height:1.55; padding:10px 12px; background:rgba(255,255,255,.03); border-radius:var(--r-sm); border-left:3px solid ${c.color};">
+                <strong style="color:${c.color}; font-size:.72rem; text-transform:uppercase; letter-spacing:.4px;">Ожидаемое поведение</strong><br>${c.expect}
+            </div>
+            <details class="case-detail" data-case="${c.key}">
+                <summary style="cursor:pointer; font-size:.8rem; font-weight:600; color:var(--c-accent); padding:6px 0;">📋 Подробный портрет — цифры, цели, обязательства</summary>
+                <div class="case-detail-body" style="margin-top:10px; font-size:.8rem;"><div style="color:var(--c-text3);">Загрузка…</div></div>
+            </details>
+            <button type="button" class="ghost-button validation-load" data-case="${c.key}" style="align-self:flex-start; padding:8px 16px; font-size:.8rem;">
+                Загрузить и проверить →
+            </button>
+        </article>`;
+    }
+
+    const grid = document.getElementById('validation-grid');
+    if (grid) {
+        grid.innerHTML = CASES.map(card).join('');
+
+        const fmtRub = (n) => new Intl.NumberFormat('ru-RU').format(Math.round(n)) + ' ₽';
+        const CAT_RU = { income_growth: 'рост дохода', safety: 'безопасность', material: 'материальная', emotional: 'эмоциональная' };
+
+        function renderPortrait(d) {
+            const m = d.metrics;
+            const expItems = d.expenses.items.map(i => `<li>${i.category}: ${fmtRub(i.amount)}</li>`).join('');
+            const incItems = d.income.items.map(i => `<li>${i.category}: ${fmtRub(i.amount)}</li>`).join('');
+            const obl = d.obligations.length ? d.obligations.map(o =>
+                `<li><strong>${o.name}</strong> — ${fmtRub(o.monthly_payment)}/мес, ставка ${(o.interest_rate*100).toFixed(1)}%, срок ${o.term} мес${o.comment ? ' · ' + o.comment : ''}</li>`).join('') : '<li style="color:var(--c-text3);">нет</li>';
+            const goals = d.goals.length ? d.goals.map(g => {
+                const pct = g.target_amount ? Math.round(g.current_amount / g.target_amount * 100) : 0;
+                return `<li><strong>${g.name}</strong> (${CAT_RU[g.category] || g.category}) — ${fmtRub(g.current_amount)} из ${fmtRub(g.target_amount)} (${pct}%), до цели ${g.months_left} мес</li>`;
+            }).join('') : '<li style="color:var(--c-text3);">нет</li>';
+            const assets = d.liquid_assets.length ? d.liquid_assets.map(a =>
+                `<li><strong>${a.name}</strong> — ${fmtRub(a.amount)}${a.interest_rate ? `, ${(a.interest_rate*100).toFixed(1)}% годовых` : ''}</li>`).join('') : '<li style="color:var(--c-text3);">нет</li>';
+            const rtColor = m.free_resource >= 0 ? 'var(--c-green)' : 'var(--c-red)';
+            return `
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px 16px; margin-bottom:12px; padding:10px 12px; background:rgba(99,102,241,.06); border-radius:var(--r-sm);">
+                <div>Доход: <strong>${fmtRub(m.income_total)}</strong></div>
+                <div>Расходы: <strong>${fmtRub(m.expense_total)}</strong></div>
+                <div>Платежи по кредитам: <strong>${fmtRub(m.payments_total)}</strong></div>
+                <div>Денежный поток (CF): <strong>${fmtRub(m.cash_flow)}</strong></div>
+                <div style="grid-column:1 / -1; margin-top:4px;">Свободный ресурс Rt: <strong style="color:${rtColor};">${fmtRub(m.free_resource)}</strong>${m.free_resource < 0 ? ' — отрицательный, сработает структурный диагноз' : ''}</div>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:10px; line-height:1.5;">
+                <div><strong style="color:var(--c-text3); font-size:.72rem; text-transform:uppercase;">Доходы</strong><ul style="margin:4px 0 0; padding-left:18px;">${incItems}</ul></div>
+                <div><strong style="color:var(--c-text3); font-size:.72rem; text-transform:uppercase;">Расходы</strong><ul style="margin:4px 0 0; padding-left:18px;">${expItems}</ul></div>
+                <div><strong style="color:var(--c-text3); font-size:.72rem; text-transform:uppercase;">Обязательства</strong><ul style="margin:4px 0 0; padding-left:18px;">${obl}</ul></div>
+                <div><strong style="color:var(--c-text3); font-size:.72rem; text-transform:uppercase;">Цели</strong><ul style="margin:4px 0 0; padding-left:18px;">${goals}</ul></div>
+                <div><strong style="color:var(--c-text3); font-size:.72rem; text-transform:uppercase;">Ликвидные активы</strong><ul style="margin:4px 0 0; padding-left:18px;">${assets}</ul></div>
+            </div>`;
+        }
+
+        // Ленивая загрузка портрета при первом разворачивании
+        grid.addEventListener('toggle', async (e) => {
+            const det = e.target.closest('.case-detail');
+            if (!det || !det.open || det.dataset.loaded) return;
+            det.dataset.loaded = '1';
+            const body = det.querySelector('.case-detail-body');
+            try {
+                const res = await fetch(`/api/demo/preview?case=${encodeURIComponent(det.dataset.case)}`);
+                body.innerHTML = renderPortrait(await res.json());
+            } catch (err) {
+                body.innerHTML = '<div style="color:var(--c-red);">Не удалось загрузить портрет.</div>';
+                det.dataset.loaded = '';
+            }
+        }, true);
+
+        grid.addEventListener('click', async (e) => {
+            const btn = e.target.closest('.validation-load');
+            if (!btn) return;
+            const caseKey = btn.dataset.case;
+            btn.disabled = true;
+            const original = btn.textContent;
+            btn.textContent = 'Загрузка…';
+            try {
+                await fetch(`/api/demo/load?case=${encodeURIComponent(caseKey)}`, { method: 'POST' });
+                window.location.href = '/planning';
+            } catch (err) {
+                btn.disabled = false;
+                btn.textContent = original;
+            }
+        });
+    }
+})();
+</script>
+{% endblock %}

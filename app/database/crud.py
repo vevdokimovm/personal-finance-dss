@@ -3,7 +3,7 @@ from __future__ import annotations
 from datetime import datetime, timedelta
 from typing import Optional
 
-from sqlalchemy import func
+from sqlalchemy import delete, func
 from sqlalchemy.orm import Session
 
 from app.core.categorization import classify_transaction
@@ -557,8 +557,21 @@ def update_user_prefs(
 from app.database.models import User  # noqa: E402
 
 
-def create_user(db: Session, email: str, password_hash: str, display_name: Optional[str] = None) -> User:
-    user = User(email=email.lower().strip(), password_hash=password_hash, display_name=display_name)
+def create_user(
+    db: Session,
+    email: str,
+    password_hash: str,
+    display_name: Optional[str] = None,
+    newsletter_opt_in: bool = False,
+    consent_at: Optional[datetime] = None,
+) -> User:
+    user = User(
+        email=email.lower().strip(),
+        password_hash=password_hash,
+        display_name=display_name,
+        newsletter_opt_in=newsletter_opt_in,
+        consent_at=consent_at or datetime.utcnow(),
+    )
     db.add(user)
     db.commit()
     db.refresh(user)
@@ -571,6 +584,52 @@ def get_user_by_email(db: Session, email: str) -> Optional[User]:
 
 def get_user_by_id(db: Session, user_id: str) -> Optional[User]:
     return db.get(User, user_id)
+
+
+def update_user_profile(
+    db: Session, user_id: str, display_name: Optional[str] = None
+) -> Optional[User]:
+    """Обновление данных профиля (пока имя)."""
+    user = db.get(User, user_id)
+    if user is None:
+        return None
+    if display_name is not None:
+        user.display_name = display_name.strip() or None
+    db.commit()
+    db.refresh(user)
+    return user
+
+
+def update_user_password(db: Session, user_id: str, password_hash: str) -> Optional[User]:
+    user = db.get(User, user_id)
+    if user is None:
+        return None
+    user.password_hash = password_hash
+    db.commit()
+    db.refresh(user)
+    return user
+
+
+def mark_email_verified(db: Session, user_id: str) -> Optional[User]:
+    user = db.get(User, user_id)
+    if user is None:
+        return None
+    user.email_verified = True
+    db.commit()
+    db.refresh(user)
+    return user
+
+
+def delete_user(db: Session, user_id: str) -> bool:
+    """Полное удаление аккаунта вместе со всеми данными пользователя."""
+    user = db.get(User, user_id)
+    if user is None:
+        return False
+    for model in (*_OWNED_MODELS, UserPrefs):
+        db.execute(delete(model).where(model.user_id == user_id))
+    db.delete(user)
+    db.commit()
+    return True
 
 
 def count_users(db: Session) -> int:

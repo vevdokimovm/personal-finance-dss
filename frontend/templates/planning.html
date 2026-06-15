@@ -42,6 +42,21 @@
                         <span>10</span>
                     </div>
                 </div>
+                <div class="field" style="margin-bottom:16px;">
+                    <label style="display:flex; justify-content:space-between; align-items:center;">
+                        <span>Ставка по накоплениям (% годовых)</span>
+                        <strong id="rbench-value" style="color:var(--c-accent-hl);">14.0%</strong>
+                    </label>
+                    <input type="range" id="rbench-slider" min="0" max="30" step="0.5" value="14"
+                        style="width:100%; margin-top:8px; accent-color:var(--c-accent-hl);">
+                    <div style="display:flex; justify-content:space-between; font-size:.70rem; color:var(--c-text3); margin-top:4px;">
+                        <span>0%</span>
+                        <span>порог досрочки</span>
+                        <span>30%</span>
+                    </div>
+                    <button type="button" id="rbench-cbr" class="ghost-button" style="margin-top:8px; font-size:.74rem; padding:5px 12px;">↻ Подставить ключевую ставку ЦБ</button>
+                    <div id="rbench-hint" style="font-size:.70rem; color:var(--c-text3); margin-top:6px; line-height:1.4;">Если ставка по вашим накоплениям выше ставки кредита — досрочно гасить невыгодно, деньги пойдут в накопления.</div>
+                </div>
                 <button class="primary-button w-full" type="submit" style="padding:10px;">Рассчитать альтернативы</button>
             </form>
         </section>
@@ -109,6 +124,11 @@
 
         <!-- Optimal recommendation -->
         <div id="bliq-preallocation"></div>
+
+        <div id="export-bar" style="display:none; gap:10px; margin-bottom:16px;">
+            <button type="button" id="export-csv" class="ghost-button" style="padding:8px 16px; font-size:.82rem;">⬇ Скачать CSV</button>
+            <button type="button" id="export-pdf" class="ghost-button" style="padding:8px 16px; font-size:.82rem;">🖨 Распечатать / PDF</button>
+        </div>
 
         <div id="best-container" style="margin-bottom:20px;"></div>
 

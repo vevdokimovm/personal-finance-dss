@@ -58,6 +58,8 @@ def run_pipeline(
         has_active_goals=bool(prepared["active_goals"]),
         expense_total=expense_total,
         obligation_payments=obligation_payments,
+        liquid_savings=bliq,
+        goals_accumulated=bt,
     )
 
     return {

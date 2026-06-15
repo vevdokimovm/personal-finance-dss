@@ -24,6 +24,8 @@ def build_recommendation_text(
     has_active_goals: bool,
     expense_total: float,
     obligation_payments: float,
+    liquid_savings: float = 0.0,
+    goals_accumulated: float = 0.0,
 ) -> str:
     """
     Базовая текстовая рекомендация по финансовому состоянию —
@@ -70,10 +72,31 @@ def build_recommendation_text(
                 f"(примерно {expense_total * 3:,.0f}–{expense_total * 6:,.0f} ₽ при ваших расходах)."
             )
     elif rt < 0:
-        parts.append(
-            f"Бюджет в минусе: обязательные траты превышают доход на {abs(rt):,.0f} ₽ в месяц. "
-            f"Свободных денег для распределения нет — нужно пересмотреть расходы и кредиты."
+        deficit = abs(rt)
+        savings = max(0.0, liquid_savings) + max(0.0, goals_accumulated)
+        msg = (
+            f"Бюджет в минусе: обязательные траты превышают доход на {deficit:,.0f} ₽ в месяц. "
         )
+        if savings > 0 and deficit > 0:
+            runway = int(savings // deficit)
+            if runway >= 1:
+                msg += (
+                    f"Покрыть дефицит можно из накоплений — у вас {savings:,.0f} ₽ "
+                    f"(подушка и ликвидные средства), этого хватит примерно на {runway} мес. "
+                    f"Но это временный буфер: за это время нужно сократить расходы, "
+                    f"увеличить доход или снизить нагрузку по кредитам, иначе накопления закончатся."
+                )
+            else:
+                msg += (
+                    f"Накоплений ({savings:,.0f} ₽) не хватит даже на месяц такого дефицита — "
+                    f"ситуация требует срочного пересмотра расходов или рефинансирования кредитов."
+                )
+        else:
+            msg += (
+                "Свободных денег и накоплений для покрытия нет — нужно срочно пересмотреть "
+                "расходы и кредиты."
+            )
+        parts.append(msg)
 
     if not parts:
         parts.append("Финансовое состояние стабильное — все показатели в норме.")
@@ -165,12 +188,34 @@ def explain_alternative(
             f"уменьшатся."
         )
 
-    # ── Главный вывод ─────────────────────────────────────────────────
+    # ── Главный вывод: конкретное распределение простым языком ────────
+    # Ведём с фактическим (эффективным) сплитом в % и ₽ — так карточки
+    # становятся понятными и отличаются друг от друга.
+    goals_sum = sum(float(v) for v in (alt.get("goal_allocation", {}) or {}).values())
+    eff_total = x_obl_eff + x_res + goals_sum
+    def _pct(part: float) -> int:
+        return round(part / eff_total * 100) if eff_total > 0 else 0
+
+    split_parts: list[str] = []
+    if x_obl_eff > 0:
+        split_parts.append(f"{_pct(x_obl_eff)}% на досрочку кредитов ({x_obl_eff:,.0f} ₽)")
+    if x_res > 0:
+        split_parts.append(f"{_pct(x_res)}% в подушку безопасности ({x_res:,.0f} ₽)")
+    if goals_sum > 0:
+        split_parts.append(f"{_pct(goals_sum)}% на цели ({goals_sum:,.0f} ₽)")
+    split_str = ", ".join(split_parts) if split_parts else "вся сумма остаётся свободной на следующий месяц"
+
     if alt.get("is_recommended"):
         insight.append(
-            f"Это лучший вариант для вашего подхода к деньгам — «{risk_profile_label}». "
-            f"Он точнее всего балансирует свободные деньги, запас прочности, "
-            f"снижение долга и продвижение к целям именно так, как важно для этого профиля."
+            f"Рекомендуем направить {split_str}. "
+            f"Это оптимальный баланс для профиля «{risk_profile_label}»: "
+            f"система сравнила 21 вариант и этот набрал наивысшую оценку."
+        )
+    else:
+        insight.append(
+            f"Здесь деньги идут так: {split_str}. "
+            f"Это рабочий план, но его оценка ниже лучшего — для профиля "
+            f"«{risk_profile_label}» такой перекос чуть менее выгоден."
         )
 
     if not gains:

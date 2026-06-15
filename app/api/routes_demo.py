@@ -271,12 +271,82 @@ def load_demo(
 
     _clear_all(db, user_id=user_id)
     data = CASES[case]()
+    now = datetime.utcnow()
+    # Для наглядности прогресса выплат: если дата взятия не задана, считаем, что
+    # пройдено примерно столько же, сколько осталось (start = сейчас − остаток срока).
+    for ob in data.get("obligations", []):
+        if getattr(ob, "start_date", None) is None and (ob.term or 0) > 0:
+            ob.start_date = now - timedelta(days=30 * int(ob.term))
     for items in data.values():
         for item in items:
             item.user_id = user_id  # привязка демо-данных к текущему пользователю
         db.add_all(items)
     db.commit()
     return {"detail": f"Загружен кейс «{case}»."}
+
+
+@router.get("/demo/preview", summary="Детальный портрет кейса без загрузки в БД")
+def preview_demo(case: str = "anna") -> dict[str, Any]:
+    """Возвращает финансовый портрет кейса (доходы, расходы, обязательства, цели,
+    накопления) и базовые метрики — без записи в БД. Для раздела «Валидация»."""
+    if case not in CASES:
+        raise HTTPException(status_code=400, detail=f"Неизвестный кейс: {case}.")
+    data = CASES[case]()
+    now = datetime.utcnow()
+
+    incomes = [t for t in data["transactions"] if t.type == "income"]
+    expenses = [t for t in data["transactions"] if t.type == "expense"]
+    income_total = sum(float(t.amount) for t in incomes)
+    expense_total = sum(float(t.amount) for t in expenses)
+    payments_total = sum(float(o.monthly_payment) for o in data["obligations"])
+    cf = income_total - expense_total
+    rt = cf - payments_total
+
+    def months_left(deadline: datetime) -> int:
+        return max(0, (deadline.year - now.year) * 12 + (deadline.month - now.month))
+
+    return {
+        "income": {
+            "total": income_total,
+            "items": [{"category": t.category, "amount": float(t.amount)} for t in incomes],
+        },
+        "expenses": {
+            "total": expense_total,
+            "items": [{"category": t.category, "amount": float(t.amount)} for t in expenses],
+        },
+        "obligations": [
+            {
+                "name": o.name,
+                "monthly_payment": float(o.monthly_payment),
+                "interest_rate": float(o.interest_rate),
+                "term": o.term,
+                "amount": float(o.amount),
+                "comment": o.comment,
+            }
+            for o in data["obligations"]
+        ],
+        "goals": [
+            {
+                "name": g.name,
+                "target_amount": float(g.target_amount),
+                "current_amount": float(g.current_amount),
+                "category": g.category,
+                "months_left": months_left(g.deadline),
+            }
+            for g in data["goals"]
+        ],
+        "liquid_assets": [
+            {"name": a.name, "amount": float(a.amount), "interest_rate": float(a.interest_rate or 0)}
+            for a in data["liquid_assets"]
+        ],
+        "metrics": {
+            "income_total": income_total,
+            "expense_total": expense_total,
+            "payments_total": payments_total,
+            "cash_flow": cf,
+            "free_resource": rt,
+        },
+    }
 
 
 @router.post("/demo/clear", summary="Очистить все данные")

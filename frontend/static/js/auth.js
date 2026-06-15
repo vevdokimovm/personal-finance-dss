@@ -34,6 +34,9 @@
     const passwordEl = document.getElementById('auth-password');
     const nameRow = document.getElementById('auth-name-row');
     const nameEl = document.getElementById('auth-name');
+    const consentRow = document.getElementById('auth-consent-row');
+    const consentEl = document.getElementById('auth-consent');
+    const newsletterEl = document.getElementById('auth-newsletter');
     const submitBtn = document.getElementById('auth-submit');
     const tabs = document.querySelectorAll('[data-auth-tab]');
 
@@ -48,9 +51,14 @@
         mode = next;
         tabs.forEach((t) => t.classList.toggle('active', t.dataset.authTab === next));
         nameRow.style.display = next === 'register' ? 'block' : 'none';
+        if (consentRow) consentRow.style.display = next === 'register' ? 'block' : 'none';
         submitBtn.textContent = next === 'register' ? 'Зарегистрироваться' : 'Войти';
         document.getElementById('auth-modal-title').textContent =
             next === 'register' ? 'Регистрация в FINPILOT' : 'Вход в FINPILOT';
+        // В режиме регистрации просим браузер предложить сгенерированный пароль.
+        if (passwordEl) {
+            passwordEl.setAttribute('autocomplete', next === 'register' ? 'new-password' : 'current-password');
+        }
         errorEl.style.display = 'none';
     }
 
@@ -83,7 +91,15 @@
 
         const endpoint = mode === 'register' ? '/api/auth/register' : '/api/auth/login';
         const payload = { email, password };
-        if (mode === 'register' && nameEl.value.trim()) payload.display_name = nameEl.value.trim();
+        if (mode === 'register') {
+            if (consentEl && !consentEl.checked) {
+                showError('Подтвердите согласие на обработку персональных данных.');
+                return;
+            }
+            if (nameEl.value.trim()) payload.display_name = nameEl.value.trim();
+            payload.consent = consentEl ? consentEl.checked : true;
+            payload.newsletter_opt_in = newsletterEl ? newsletterEl.checked : false;
+        }
 
         submitBtn.disabled = true;
         try {
@@ -97,6 +113,13 @@
             setToken(data.access_token);
             renderLoggedIn(data.user);
             closeModal();
+            // SMTP не настроен: показываем ссылку подтверждения email кнопкой в тосте
+            if (mode === 'register' && data.verification_url && window.showToast) {
+                window.showToast('Аккаунт создан. Подтвердите email по ссылке:', {
+                    linkUrl: data.verification_url, linkLabel: 'Подтвердить email',
+                });
+                return; // не перезагружаем — иначе тост исчезнет; шапка уже обновлена
+            }
             // Перезагрузка — данные на странице принадлежат новому пользователю
             window.location.reload();
         } catch {
@@ -116,7 +139,8 @@
     // ── События ──
     loginBtn && loginBtn.addEventListener('click', () => { setMode('login'); openModal(); });
     logoutBtn && logoutBtn.addEventListener('click', logout);
-    submitBtn && submitBtn.addEventListener('click', submit);
+    const authForm = document.getElementById('auth-form');
+    authForm && authForm.addEventListener('submit', (e) => { e.preventDefault(); submit(); });
     tabs.forEach((t) => t.addEventListener('click', () => setMode(t.dataset.authTab)));
     document.querySelectorAll('[data-close-modal="auth-modal"]').forEach((el) =>
         el.addEventListener('click', closeModal)

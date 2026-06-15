@@ -28,10 +28,16 @@ def forecast_indicators(
     income_history: Optional[list] = None,
     expense_history: Optional[list] = None,
     obligation_history: Optional[list] = None,
+    recurring_income: float = 0.0,
+    recurring_expense: float = 0.0,
 ) -> dict:
     """
     Прогноз вектора состояния {Rt+h, Lt+h, Dt+h} на горизонт H (форм. 35 ВКР).
     Bt+h накапливается: Bt+h = Bt+h-1 + (CF̂ − ΣP̂).
+
+    recurring_income/expense — суммы по регулярным операциям (is_recurring). На SES
+    они не влияют (математика модели неизменна), а отдаются как «стабильная база»:
+    доля предсказуемого денежного потока показывает надёжность прогноза.
     """
     if income_history is None or len(income_history) < 2:
         income_history = build_history_from_current(income_total, seed=1)
@@ -74,6 +80,17 @@ def forecast_indicators(
 
     trend = detect_trend(rt, point_rt)
 
+    # Стабильная регулярная база (is_recurring) — доля предсказуемого потока.
+    # На SES/Monte-Carlo не влияет, только характеризует надёжность прогноза.
+    recurring_cf = recurring_income - recurring_expense
+    stable_baseline = {
+        "recurring_income": round(recurring_income, 2),
+        "recurring_expense": round(recurring_expense, 2),
+        "recurring_cash_flow": round(recurring_cf, 2),
+        "income_share": round(recurring_income / income_total, 3) if income_total > 0 else 0.0,
+        "expense_share": round(recurring_expense / expense_total, 3) if expense_total > 0 else 0.0,
+    }
+
     # FR-08: первый месяц прогнозного дефицита (Rt < 0).
     # Сначала ищем дефицит в основном прогнозе, иначе — в пессимистичном сценарии (p10).
     deficit_alert = None
@@ -93,6 +110,7 @@ def forecast_indicators(
         "forecast": forecast,
         "deficit_alert": deficit_alert,
         "trend": trend,
+        "stable_baseline": stable_baseline,
         "method": {
             "point": f"SES α={SES_ALPHA} (Brown, 1956) с накоплением Bt по форм. 35 ВКР",
             "interval": f"Monte-Carlo N={MC_SIMULATIONS}, σ(h)=σ₀√(1+0.5·h), 80% CI [p10..p90]",

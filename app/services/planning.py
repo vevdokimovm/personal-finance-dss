@@ -86,12 +86,31 @@ def run_planning(
         alternatives, b_min=B_MIN, lt_crit=l_min, dt_max=DT_MAX
     )
 
-    # ── Этап 6: ранжирование ───────────────────────────────────────────
+    # ── Ранжирование ───────────────────────────────────────────────────
     ranked = rank_alternatives(admissible, risk_tolerance)
+
+    # Дедупликация по ФАКТИЧЕСКОМУ распределению: если досрочка перенаправлена
+    # в цели (кредиты дешевле бенчмарка), варианты, отличающиеся только долей
+    # досрочки, дают одинаковый эффект. Оставляем по одному представителю на
+    # уникальный эффективный сплит — чтобы топ-3 были реально разными планами.
+    def _effective_signature(alt: dict) -> tuple[int, int, int]:
+        x_obl_eff = round(float(alt.get("x_obl_effective", alt.get("x_obligations", 0))))
+        x_res = round(float(alt.get("x_reserve", 0)))
+        goals_sum = round(sum(float(v) for v in (alt.get("goal_allocation", {}) or {}).values()))
+        return (x_obl_eff, x_res, goals_sum)
+
+    seen_signatures: set[tuple[int, int, int]] = set()
+    distinct_ranked: list[dict] = []
+    for alt in ranked:
+        sig = _effective_signature(alt)
+        if sig in seen_signatures:
+            continue
+        seen_signatures.add(sig)
+        distinct_ranked.append(alt)
 
     # ── Top-3 с объяснениями ───────────────────────────────────────────
     top3 = []
-    for alt in ranked[:3]:
+    for alt in distinct_ranked[:3]:
         explanation = explain_alternative(
             alt=alt,
             rt=rt, lt=lt, dt=dt,

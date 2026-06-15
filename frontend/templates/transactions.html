@@ -36,6 +36,7 @@
                 <span style="color:var(--c-text3);">—</span>
                 <input type="date" id="tx-date-to" class="modal-input" style="padding:6px 10px; font-size:.78rem; width:auto;">
                 <button class="ghost-button" type="button" id="tx-date-reset" style="font-size:.74rem; padding:6px 10px;">Сбросить</button>
+                <button class="ghost-button" type="button" id="tx-export-csv" style="font-size:.74rem; padding:6px 10px;" title="Скачать операции в CSV">⬇ CSV</button>
             </div>
         </div>
         <div class="table-header">
@@ -79,6 +80,47 @@
             <div id="stats-by-merchant"><div class="empty-row">Нет данных</div></div>
         </section>
     </div>
+
+    <!-- ═══ Импорт банковских выписок ═══ -->
+    <section class="glass-panel w-full" style="margin-top:24px;">
+        <div class="section-head">
+            <div>
+                <h2 class="section-title">Импорт выписок</h2>
+                <p class="section-subtitle">Загрузите выписку из онлайн-банка — операции пополнят журнал.</p>
+            </div>
+        </div>
+
+        <div style="padding:24px 28px;">
+            <form id="upload-form" enctype="multipart/form-data" style="display:flex; flex-direction:column; gap:20px; max-width:600px;">
+                <div class="field" style="margin-bottom:0;">
+                    <label for="bank-select">Банк</label>
+                    <select id="bank-select" name="bank_id" style="width:100%; background:rgba(0,0,0,.2); border:1px solid var(--c-border); color:var(--c-text); padding:11px 16px; border-radius:var(--r-md); font-family:inherit; font-size:.92rem;">
+                        <option value="tinkoff">Тинькофф Банк</option>
+                        <option value="sber">Сбербанк</option>
+                        <option value="alfa">Альфа-Банк</option>
+                        <option value="vtb">ВТБ</option>
+                        <option value="raiffeisen">Райффайзен Банк</option>
+                        <option value="universal">Другой банк (универсальный)</option>
+                    </select>
+                </div>
+
+                <div class="field" style="margin-bottom:0;">
+                    <label>Файл выписки</label>
+                    <div id="drop-zone" style="border:2px dashed var(--c-border); border-radius:var(--r-md); padding:32px 24px; text-align:center; cursor:pointer; transition: all .25s;">
+                        <div style="font-weight:600; margin-bottom:4px;" id="drop-label">Перетащите файл сюда или нажмите для выбора</div>
+                        <div style="font-size:.78rem; color:var(--c-text3);">Тинькофф — PDF или CSV · Сбер, Альфа, ВТБ, Райффайзен — CSV</div>
+                        <input type="file" id="file-input" name="file" accept=".csv,.txt,.pdf" style="display:none;">
+                    </div>
+                </div>
+
+                <button class="primary-button" type="submit" id="upload-btn" disabled style="align-self:flex-start; padding:12px 32px;">
+                    Импортировать операции
+                </button>
+            </form>
+
+            <div id="upload-result" style="margin-top:20px; display:none;"></div>
+        </div>
+    </section>
 </section>
 {% endblock %}
 

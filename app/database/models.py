@@ -33,6 +33,9 @@ class User(Base):
     display_name: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=datetime.utcnow)
     is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
+    email_verified: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
+    newsletter_opt_in: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
+    consent_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
 
 
 class FxRate(Base):

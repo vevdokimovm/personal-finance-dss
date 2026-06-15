@@ -1,8 +1,11 @@
 from __future__ import annotations
 
+import csv
+import io
+from datetime import datetime
 from typing import Any, Optional
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Response
 from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
 
@@ -92,6 +95,22 @@ def calculate_plan(
     db: Session = Depends(get_db),
     user_id: str | None = Depends(get_current_user_id),
 ) -> dict[str, Any]:
+    result = _compute_plan(payload, db, user_id)
+    log_recommendation(result)
+    log_event("recommendation_generated", {
+        "risk_profile": result.get("risk_profile"),
+        "alternatives_total": result.get("alternatives_total"),
+        "admissible_count": result.get("admissible_count"),
+        "u_score": (result.get("best") or {}).get("utility"),
+    })
+    return result
+
+
+def _compute_plan(
+    payload: PlanningRequest,
+    db: Session,
+    user_id: str | None,
+) -> dict[str, Any]:
     prefs = get_user_prefs(db, user_id=user_id)
     risk_tolerance = payload.risk_tolerance if payload.risk_tolerance is not None else prefs.risk_tolerance
     l_min = payload.l_min if payload.l_min is not None else prefs.l_min
@@ -161,15 +180,58 @@ def calculate_plan(
         "l_min": l_min,
         "risk_tolerance": risk_tolerance,
     }
-
-    log_recommendation(result)
-    log_event("recommendation_generated", {
-        "risk_profile": result.get("risk_profile"),
-        "alternatives_total": result.get("alternatives_total"),
-        "admissible_count": result.get("admissible_count"),
-        "u_score": (result.get("best") or {}).get("utility"),
-    })
     return result
+
+
+def _plan_to_csv(result: dict[str, Any]) -> str:
+    """Формирует CSV-таблицу плана распределения (разделитель ; для Excel-RU)."""
+    buf = io.StringIO()
+    writer = csv.writer(buf, delimiter=";")
+    ind = result.get("indicators", {})
+    top3 = result.get("top3", [])
+    best = top3[0] if top3 else {}
+
+    writer.writerow(["FINPILOT — план распределения", ""])
+    writer.writerow(["Профиль риска", result.get("risk_profile", "")])
+    writer.writerow([])
+    writer.writerow(["ПОКАЗАТЕЛЬ", "ЗНАЧЕНИЕ"])
+    writer.writerow(["Свободные деньги (Rt), ₽", ind.get("Rt", "")])
+    writer.writerow(["Ликвидность (Lt)", ind.get("Lt", "")])
+    writer.writerow(["Долговая нагрузка (Dt), %", round(ind.get("Dt", 0) * 100, 1)])
+    writer.writerow(["Подушка (BLR), мес", round(ind.get("BLR", 0), 2)])
+    writer.writerow([])
+    writer.writerow(["РЕКОМЕНДОВАННОЕ РАСПРЕДЕЛЕНИЕ", best.get("name", "")])
+    writer.writerow(["На досрочное погашение, ₽", best.get("x_obligations", 0)])
+    writer.writerow(["В подушку безопасности, ₽", best.get("x_reserve", 0)])
+    writer.writerow(["На цели, ₽", best.get("x_goals", 0)])
+    writer.writerow(["Оценка полезности U", best.get("utility", "")])
+    writer.writerow([])
+    writer.writerow(["ВСЕ ВАРИАНТЫ (топ-3)", ""])
+    writer.writerow(["#", "Название", "Долг", "Резерв", "Цели", "Оценка"])
+    for i, alt in enumerate(top3, start=1):
+        writer.writerow([
+            i, alt.get("name", ""), alt.get("x_obligations", 0),
+            alt.get("x_reserve", 0), alt.get("x_goals", 0), alt.get("utility", ""),
+        ])
+    return buf.getvalue()
+
+
+@router.get("/export.csv", summary="Экспорт плана распределения в CSV (скачивание файла)")
+def export_plan_csv(
+    risk_tolerance: int | None = None,
+    l_min: float | None = None,
+    r_bench: float | None = None,
+    db: Session = Depends(get_db),
+    user_id: str | None = Depends(get_current_user_id),
+) -> Response:
+    payload = PlanningRequest(risk_tolerance=risk_tolerance, l_min=l_min, r_bench=r_bench)
+    result = _compute_plan(payload, db, user_id)
+    filename = f"finpilot-plan-{datetime.utcnow():%Y-%m-%d}.csv"
+    return Response(
+        content="\ufeff" + _plan_to_csv(result),
+        media_type="text/csv; charset=utf-8",
+        headers={"Content-Disposition": f'attachment; filename="{filename}"'},
+    )
 
 
 @router.post("/forecast", summary="Прогноз Rt/Lt/Dt на горизонт H (форм. 35 ВКР)")
@@ -181,6 +243,16 @@ def get_forecast(
     transactions = get_transactions(db, user_id=user_id)
     obligations = _serialize_obligations(get_obligations(db, user_id=user_id))
     goals = _serialize_goals(get_goals(db, user_id=user_id))
+
+    # Регулярные операции (is_recurring) — стабильная база прогноза (FR-13).
+    recurring_income = sum(
+        t.amount for t in transactions
+        if getattr(t, "is_recurring", False) and t.type == "income"
+    )
+    recurring_expense = sum(
+        t.amount for t in transactions
+        if getattr(t, "is_recurring", False) and t.type == "expense"
+    )
 
     prepared = prepare_data(transactions=transactions, obligations=obligations, goals=goals)
 
@@ -204,6 +276,8 @@ def get_forecast(
         expense_total=expense,
         obligation_payments=obl_payments,
         horizon=payload.horizon,
+        recurring_income=recurring_income,
+        recurring_expense=recurring_expense,
     )
 
 
@@ -231,3 +305,13 @@ def list_scenarios_endpoint(db: Session = Depends(get_db)) -> list[dict[str, Any
         }
         for s in get_scenarios(db)
     ]
+
+
+@router.get("/key-rate", summary="Текущая ключевая ставка ЦБ РФ")
+def key_rate_endpoint() -> dict[str, object]:
+    """Ключевая ставка Банка России (в долях) — ориентир для ставки накоплений.
+    При недоступности cbr.ru возвращает резервное значение из настроек."""
+    from app.config import settings
+    from app.services.cbr_rate import get_key_rate
+
+    return get_key_rate(fallback=settings.CBR_KEY_RATE_FALLBACK)

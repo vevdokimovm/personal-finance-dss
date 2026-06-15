@@ -3,6 +3,22 @@
 {% block page_title %}Финансовый обзор{% endblock %}
 
 {% block content %}
+<!-- Онбординг: как начать (можно свернуть) -->
+<details id="onboarding-panel" class="glass-panel" style="margin-bottom:20px; padding:0;" open>
+    <summary style="cursor:pointer; padding:16px 24px; font-weight:700; font-size:.95rem; list-style:none; display:flex; align-items:center; gap:10px;">
+        🚀 С чего начать — 3 шага
+        <span style="margin-left:auto; font-size:.74rem; color:var(--c-text3); font-weight:400;">нажмите, чтобы свернуть</span>
+    </summary>
+    <div style="padding:0 24px 22px; font-size:.88rem; line-height:1.6; color:var(--c-text2);">
+        <ol style="margin:0; padding-left:20px; display:flex; flex-direction:column; gap:12px;">
+            <li><strong>Внесите операции</strong> — на странице <a href="/transactions" style="color:var(--c-accent);">Операции</a> загрузите выписку из банка (CSV/PDF) или добавьте доходы и расходы вручную. Достаточно данных за 1–2 месяца. Регулярно вносить не обязательно — обновляйте, когда удобно.</li>
+            <li><strong>Добавьте обязательства и цели</strong> — кредиты на странице <a href="/obligations" style="color:var(--c-accent);">Обязательства</a>, накопительные цели на странице <a href="/goals" style="color:var(--c-accent);">Цели</a>. Это нужно, чтобы алгоритм знал, куда распределять деньги.</li>
+            <li><strong>Постройте план</strong> — на странице <a href="/planning" style="color:var(--c-accent);">Прогнозирование</a> нажмите «Рассчитать альтернативы». Алгоритм покажет, как распределить свободные деньги между досрочкой, подушкой и целями.</li>
+        </ol>
+        <p style="margin:14px 0 0; font-size:.82rem; color:var(--c-text3);">Хотите быстро посмотреть, как это работает? Выберите готовый тест-кейс в левой панели и нажмите «Загрузить кейс».</p>
+    </div>
+</details>
+
 <!-- Row 1: Hero -->
 <section class="hero-panel glass-panel" style="padding:24px 28px; margin-bottom:20px;">
     <div class="hero-content">
@@ -136,7 +152,12 @@
 <section class="glass-panel" style="padding:20px; margin-top:20px;">
     <div style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom:4px;">
         <h3 style="font-size:.92rem; font-weight:700;">Куда уходят деньги</h3>
-        <span style="font-size:.72rem; color:var(--c-text3);">за последние 30 дней</span>
+        <select id="spending-period" style="font-size:.74rem; padding:5px 10px; background:rgba(0,0,0,.15); border:1px solid var(--c-border); color:var(--c-text); border-radius:var(--r-sm); font-family:inherit;">
+            <option value="30">за 30 дней</option>
+            <option value="90">за 90 дней</option>
+            <option value="180">за полгода</option>
+            <option value="365">за год</option>
+        </select>
     </div>
     <div style="font-size:.72rem; color:var(--c-text3); margin-bottom:16px;">Расходы разложены по категориям автоматически.</div>
     <div class="spending-grid" style="display:grid; grid-template-columns:1.4fr 1fr; gap:24px;">

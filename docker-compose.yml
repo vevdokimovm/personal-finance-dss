@@ -29,8 +29,17 @@ services:
       B2B_API_KEYS: ${B2B_API_KEYS:-}
       PLAID_CLIENT_ID: ${PLAID_CLIENT_ID:-}
       PLAID_SECRET: ${PLAID_SECRET:-}
+      # Почта: задайте в файле .env рядом с docker-compose.yml (см. инструкцию).
+      # Пока пусто — письма выключены, подтверждение идёт по ссылке.
+      SMTP_HOST: ${SMTP_HOST:-}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASSWORD: ${SMTP_PASSWORD:-}
+      SMTP_FROM: ${SMTP_FROM:-}
+      SMTP_USE_TLS: ${SMTP_USE_TLS:-true}
     ports:
       - "8000:8000"
 
 volumes:
   pgdata:
+    name: finpilot_pgdata

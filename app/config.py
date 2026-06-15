@@ -28,12 +28,18 @@ class Settings(BaseSettings):
         description="Название проекта.",
     )
     APP_VERSION: str = Field(
-        default="3.0.0",
+        default="3.3.0",
         description="Версия приложения (INFRA-13): код, UI-футер, git-тег.",
     )
     PROJECT_TAGLINE: str = Field(
         default="Система поддержки принятия решений в персональных финансах",
         description="Подзаголовок продукта.",
+    )
+    CBR_KEY_RATE_FALLBACK: float = Field(
+        default=0.16,
+        ge=0.0,
+        le=1.0,
+        description="Резервная ключевая ставка ЦБ (доля), если cbr.ru недоступен.",
     )
     ENVIRONMENT: str = Field(
         default="development",
@@ -102,6 +108,19 @@ class Settings(BaseSettings):
     @property
     def cors_origins_list(self) -> list[str]:
         return [o.strip() for o in self.CORS_ORIGINS.split(",") if o.strip()]
+
+    # ── Email (приветственное письмо при регистрации) ──────────────────
+    # Пусто = почта выключена, регистрация работает без отправки (graceful).
+    SMTP_HOST: str = Field(default="", description="SMTP-сервер. Пусто = почта отключена.")
+    SMTP_PORT: int = Field(default=587, description="Порт SMTP (587 STARTTLS / 465 SSL).")
+    SMTP_USER: str = Field(default="", description="Логин SMTP.")
+    SMTP_PASSWORD: str = Field(default="", description="Пароль/токен SMTP.")
+    SMTP_FROM: str = Field(default="", description="Адрес отправителя. Пусто = SMTP_USER.")
+    SMTP_USE_TLS: bool = Field(default=True, description="STARTTLS (True) или SSL (False).")
+
+    @property
+    def email_enabled(self) -> bool:
+        return bool(self.SMTP_HOST and self.SMTP_USER and self.SMTP_PASSWORD)
 
 
 settings = Settings()

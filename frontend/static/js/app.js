@@ -99,12 +99,12 @@ function escapeHtml(s) {
     return div.innerHTML;
 }
 
-async function loadSpendingBreakdown() {
+async function loadSpendingBreakdown(days = 30) {
     const catBox = $('#spending-categories');
     const merchBox = $('#spending-merchants');
     if (!catBox) return;
     try {
-        const res = await api('/api/analysis/spending?days=30');
+        const res = await api(`/api/analysis/spending?days=${days}`);
         const cats = res.categories || [];
         const total = res.total_expense || 0;
         if (!cats.length) {
@@ -195,7 +195,7 @@ function showUndoToast(transactionId) {
         try {
             await api(`/api/transactions/${transactionId}/restore`, { method: 'POST' });
             await loadPage();
-        } catch (e) { alert(e.message); }
+        } catch (e) { window.showToast(e.message, {error:true}); }
         toast.remove();
     });
 }
@@ -218,7 +218,7 @@ function showRestoreToast(message, snapshot, postUrl) {
                 body: JSON.stringify(snapshot),
             });
             await loadPage();
-        } catch (e) { alert(e.message); }
+        } catch (e) { window.showToast(e.message, {error:true}); }
         toast.remove();
     });
 }
@@ -259,6 +259,7 @@ function bindGlobalUI() {
         const btn = $('#load-demo-button');
         const sel = $('#demo-case-select');
         const caseName = sel ? sel.value : 'anna';
+        if (!caseName) { window.showToast('Сначала выберите тест-кейс из списка.'); return; }
         btn.disabled = true; btn.textContent = 'Загрузка…';
         try {
             await api(`/api/demo/load?case=${encodeURIComponent(caseName)}`, { method: 'POST' });
@@ -309,7 +310,7 @@ function bindGlobalUI() {
             $('#transaction-form').reset();
             await loadPage();
             if (txType === 'income' && txAmount > 0) showIncomeAdvice(txAmount);
-        } catch (e) { alert(e.message); }
+        } catch (e) { window.showToast(e.message, {error:true}); }
     });
 
     bindSubmit('#budget-form', async () => {
@@ -324,7 +325,7 @@ function bindGlobalUI() {
             });
             $('#budget-form').reset();
             loadBudgets();
-        } catch (e) { alert(e.message); }
+        } catch (e) { window.showToast(e.message, {error:true}); }
     });
 
     on($('#budgets-list'), 'click', async e => {
@@ -333,7 +334,7 @@ function bindGlobalUI() {
         try {
             await api(`/api/budgets/${btn.dataset.budgetId}`, { method: 'DELETE' });
             loadBudgets();
-        } catch (e) { alert(e.message); }
+        } catch (e) { window.showToast(e.message, {error:true}); }
     });
 
     // Obligation modal
@@ -353,13 +354,14 @@ function bindGlobalUI() {
                     term: pn($('#obligation-term').value),
                     monthly_payment: pn($('#obligation-monthly-payment').value),
                     payment_day: pn($('#obligation-payment-day').value) || 1,
+                    start_date: $('#obligation-start-date').value || null,
                     comment: $('#obligation-comment').value.trim() || null,
                 }),
             });
             closeModal($('#obligation-modal'));
             $('#obligation-form').reset();
             await loadPage();
-        } catch (e) { alert(e.message); }
+        } catch (e) { window.showToast(e.message, {error:true}); }
     });
 
     // Goal modal
@@ -385,7 +387,7 @@ function bindGlobalUI() {
             closeModal($('#goal-modal'));
             $('#goal-form').reset();
             await loadPage();
-        } catch (e) { alert(e.message); }
+        } catch (e) { window.showToast(e.message, {error:true}); }
     });
 
     // Liquid assets — модал и форма
@@ -407,7 +409,7 @@ function bindGlobalUI() {
             closeModal($('#asset-modal'));
             $('#asset-form').reset();
             await loadPage();
-        } catch (e) { alert(e.message); }
+        } catch (e) { window.showToast(e.message, {error:true}); }
     });
 
     on($('#liquid-assets-list'), 'click', async e => {
@@ -419,7 +421,7 @@ function bindGlobalUI() {
             await api(`/api/liquid-assets/${btn.dataset.assetId}`, { method: 'DELETE' });
             await loadPage();
             if (snap) showRestoreToast('Актив удалён', snap, '/api/liquid-assets');
-        } catch(e) { alert(e.message); btn.disabled = false; }
+        } catch(e) { window.showToast(e.message, {error:true}); btn.disabled = false; }
     });
 
     // Delete handlers (delegated)
@@ -432,7 +434,7 @@ function bindGlobalUI() {
             await api(`/api/transactions/${txId}`, { method: 'DELETE' });
             await loadPage();
             showUndoToast(txId);
-        } catch(e) { alert(e.message); btn.disabled = false; }
+        } catch(e) { window.showToast(e.message, {error:true}); btn.disabled = false; }
     });
 
     on($('#obligations-list'), 'click', async e => {
@@ -444,7 +446,7 @@ function bindGlobalUI() {
             await api(`/api/obligations/${btn.dataset.obligationId}`, { method: 'DELETE' });
             await loadPage();
             if (snap) showRestoreToast('Обязательство удалено', snap, '/api/obligations');
-        } catch(e) { alert(e.message); btn.disabled = false; }
+        } catch(e) { window.showToast(e.message, {error:true}); btn.disabled = false; }
     });
 
     on($('#goals-list'), 'click', async e => {
@@ -456,7 +458,7 @@ function bindGlobalUI() {
             await api(`/api/goals/${btn.dataset.goalId}`, { method: 'DELETE' });
             await loadPage();
             if (snap) showRestoreToast('Цель удалена', snap, '/api/goals');
-        } catch(e) { alert(e.message); btn.disabled = false; }
+        } catch(e) { window.showToast(e.message, {error:true}); btn.disabled = false; }
     });
 
     // Limit switcher
@@ -675,7 +677,8 @@ async function loadPage() {
                 });
                 renderDashboardCards(res);
             } catch(e) { console.error('Recommendation error:', e); }
-            loadSpendingBreakdown();
+            const periodSel = $('#spending-period');
+            loadSpendingBreakdown(periodSel ? Number(periodSel.value) : 30);
             loadBudgets();
         }
 
@@ -919,18 +922,60 @@ function renderObligations() {
         return;
     }
 
-    list.innerHTML = state.obligations.map(o => `
-        <article class="stack-item">
-            <div>
-                <div class="stack-item-title">${esc(o.name)}</div>
-                <div class="stack-item-text">
-                    ${fmt.cur(o.monthly_payment)} / мес · Ставка ${o.interest_rate}% · Срок ${o.term} мес
-                    ${o.comment ? ' · ' + esc(o.comment) : ''}
+    list.innerHTML = state.obligations.map(o => {
+        const rate = pn(o.interest_rate);
+        // В интерфейсе ставка может прийти долей (0.085) или процентом (8.5) — нормализуем к %.
+        const ratePct = rate > 0 && rate < 1 ? rate * 100 : rate;
+
+        // Прогресс по сроку. term трактуем как ОСТАВШИЙСЯ срок; общий = прошло + остаток.
+        let progressBlock = '';
+        let elapsed = 0;
+        if (o.start_date) {
+            const start = new Date(o.start_date);
+            const now = new Date();
+            elapsed = Math.max(0, (now.getFullYear() - start.getFullYear()) * 12 + (now.getMonth() - start.getMonth()));
+        }
+        if (o.start_date && o.term > 0) {
+            const totalTerm = elapsed + o.term;
+            const pct = Math.min(100, elapsed / totalTerm * 100);
+            const paidSum = elapsed * pn(o.monthly_payment);
+            progressBlock = `
+                <div class="indicator-track" style="height:5px; margin-top:12px;">
+                    <div class="indicator-track-fill debt-fill" style="width:${pct}%"></div>
                 </div>
+                <div style="display:flex; justify-content:space-between; font-size:.76rem; color:var(--c-text3); margin-top:4px;">
+                    <span>Платите уже ${elapsed} мес (~${fmt.cur(paidSum)})</span>
+                    <span>Осталось ${o.term} мес</span>
+                </div>`;
+        }
+        const takenLine = o.start_date ? ` · взят ${fmt.date(o.start_date)}` : '';
+
+        // Раскрываемые детали
+        const details = `
+            <div style="margin-top:12px; padding-top:12px; border-top:1px solid var(--c-border); display:grid; grid-template-columns:1fr 1fr; gap:8px 18px; font-size:.8rem;">
+                <div>Платёж в месяц: <strong>${fmt.cur(o.monthly_payment)}</strong></div>
+                <div>Процентная ставка: <strong>${ratePct.toFixed(ratePct % 1 ? 1 : 0)}%</strong></div>
+                <div>Остаток долга: <strong>${fmt.cur(o.amount)}</strong></div>
+                <div>Осталось платежей: <strong>${o.term} мес</strong></div>
+                ${o.start_date ? `<div>Когда взят: <strong>${fmt.date(o.start_date)}</strong></div><div>Платите уже: <strong>${elapsed} мес</strong></div>` : ''}
+                ${o.comment ? `<div style="grid-column:1 / -1; color:var(--c-text2);">${esc(o.comment)}</div>` : ''}
             </div>
-            <button class="ghost-button delete-button" data-obligation-id="${o.id}" style="color:var(--c-red);font-size:.85rem;padding:6px 10px;" title="Удалить">✕</button>
-        </article>
-    `).join('');
+            ${progressBlock}`;
+
+        return `
+        <details class="stack-item" style="flex-direction:column; align-items:stretch; gap:0; cursor:pointer;">
+            <summary style="display:flex; justify-content:space-between; align-items:flex-start; list-style:none;">
+                <div>
+                    <div class="stack-item-title">${esc(o.name)}</div>
+                    <div class="stack-item-text">
+                        ${fmt.cur(o.monthly_payment)} / мес · Ставка ${ratePct.toFixed(ratePct % 1 ? 1 : 0)}% · Осталось ${o.term} мес${takenLine}
+                    </div>
+                </div>
+                <button class="ghost-button delete-button" data-obligation-id="${o.id}" style="color:var(--c-red);font-size:.85rem;padding:6px 10px;" title="Удалить" onclick="event.stopPropagation()">✕</button>
+            </summary>
+            ${details}
+        </details>`;
+    }).join('');
 }
 
 function renderGoals() {
@@ -1229,11 +1274,23 @@ function svgIcon(name, size = 16) {
 // ── Planning Page (ВКР: Генерация и ранжирование альтернатив) ──
 let planRisk = 3;
 let planLmin = 0.0;
+let planRbench = 0.14;
 const RISK_LABELS = {1:'Консервативный',2:'Умеренно-консервативный',3:'Сбалансированный',4:'Умеренно-агрессивный',5:'Агрессивный'};
 
 function bindPlanningUI() {
     const form = $('#planning-form');
     if (!form) return;
+
+    // Экспорт рекомендации: CSV — серверный эндпоинт (гарантированное скачивание),
+    // PDF — печать браузера.
+    on($('#export-csv'), 'click', () => {
+        const params = new URLSearchParams();
+        if (typeof planRisk === 'number') params.set('risk_tolerance', planRisk);
+        if (typeof planLmin === 'number') params.set('l_min', planLmin);
+        if (typeof planRbench === 'number') params.set('r_bench', planRbench);
+        window.location.href = `/api/planning/export.csv?${params.toString()}`;
+    });
+    on($('#export-pdf'), 'click', () => window.print());
 
     // L_min slider
     const lminSlider = $('#lmin-slider');
@@ -1244,6 +1301,29 @@ function bindPlanningUI() {
             if (lminVal) lminVal.textContent = planLmin.toFixed(1);
         });
     }
+
+    // Ставка по накоплениям (r_bench) + подстановка ключевой ставки ЦБ
+    const rbenchSlider = $('#rbench-slider');
+    const rbenchVal = $('#rbench-value');
+    const setRbench = (pct) => {
+        planRbench = pct / 100;
+        if (rbenchSlider) rbenchSlider.value = pct;
+        if (rbenchVal) rbenchVal.textContent = pct.toFixed(1) + '%';
+    };
+    if (rbenchSlider) {
+        rbenchSlider.addEventListener('input', () => setRbench(parseFloat(rbenchSlider.value)));
+    }
+    on($('#rbench-cbr'), 'click', async () => {
+        const hint = $('#rbench-hint');
+        try {
+            const r = await api('/api/planning/key-rate');
+            const pct = Math.round(r.key_rate * 1000) / 10;
+            setRbench(pct);
+            if (hint) hint.textContent = r.source === 'cbr'
+                ? `Ставка ЦБ на ${r.as_of}: ${pct.toFixed(1)}% — подставлена.`
+                : `ЦБ недоступен, подставлено резервное значение ${pct.toFixed(1)}%.`;
+        } catch (e) { window.showToast('Не удалось получить ставку ЦБ', {error:true}); }
+    });
 
     // Risk selector
     $$('.risk-btn').forEach(btn => {
@@ -1265,7 +1345,7 @@ function bindPlanningUI() {
             const res = await api('/api/planning/calculate', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ risk_tolerance: planRisk, l_min: planLmin }),
+                body: JSON.stringify({ risk_tolerance: planRisk, l_min: planLmin, r_bench: planRbench }),
             });
             renderPlanning(res);
         } catch(e) { console.error(e); }
@@ -1277,7 +1357,7 @@ function bindPlanningUI() {
     on($('#scenario-calc-btn'), 'click', async () => {
         const inc = $('#scenario-income').value.trim();
         const exp = $('#scenario-expense').value.trim();
-        const params = { risk_tolerance: planRisk, l_min: planLmin };
+        const params = { risk_tolerance: planRisk, l_min: planLmin, r_bench: planRbench };
         if (inc !== '') params.income_override = pn(inc);
         if (exp !== '') params.expense_override = pn(exp);
         const sbtn = $('#scenario-calc-btn');
@@ -1292,7 +1372,7 @@ function bindPlanningUI() {
             lastScenario = { parameters: params, result: { Rt: res.indicators ? res.indicators.Rt : null } };
             $('#scenario-save-btn').style.display = '';
             $('#scenario-hint').textContent = 'План пересчитан под сценарий — можно сохранить.';
-        } catch (e) { alert(e.message); }
+        } catch (e) { window.showToast(e.message, {error:true}); }
         finally { sbtn.disabled = false; sbtn.textContent = 'Пересчитать сценарий'; }
     });
     on($('#scenario-save-btn'), 'click', async () => {
@@ -1306,7 +1386,7 @@ function bindPlanningUI() {
                 body: JSON.stringify({ name, parameters: lastScenario.parameters, result: lastScenario.result }),
             });
             $('#scenario-hint').textContent = 'Сценарий сохранён ✓';
-        } catch (e) { alert(e.message); }
+        } catch (e) { window.showToast(e.message, {error:true}); }
     });
 
     // Horizon selector → reload forecast
@@ -1445,11 +1525,52 @@ function renderForecast(data) {
 
     body.innerHTML = `
         ${alertHtml}
+        ${(() => {
+            const pts = data.forecast || [];
+            if (!pts.length) return '';
+            const last = pts[pts.length - 1];
+            const cur = data.current || {};
+            const h = data.horizon || pts.length;
+            const curBt = cur.Bt != null ? cur.Bt : (pts[0] ? pts[0].Bt - pts[0].cash_flow : 0);
+            const deltaBt = last.Bt - curBt;
+            const hasCI = last.Rt_p10 != null && last.Rt_p90 != null;
+            const card = (label, value, sub, color) => `
+                <div style="flex:1; min-width:150px; padding:14px 16px; background:rgba(255,255,255,.03);
+                            border:1px solid var(--c-border); border-radius:var(--r-md);">
+                    <div style="font-size:.72rem; color:var(--c-text3); text-transform:uppercase; letter-spacing:.4px;">${label}</div>
+                    <div style="font-size:1.25rem; font-weight:700; margin-top:4px; color:${color || 'var(--c-text)'};">${value}</div>
+                    <div style="font-size:.72rem; color:var(--c-text3); margin-top:2px;">${sub}</div>
+                </div>`;
+            return `<div style="display:flex; flex-wrap:wrap; gap:12px; margin-bottom:18px;">
+                ${card('Баланс через ' + h + ' мес', fmt.cur(last.Bt) + ' ₽',
+                    (deltaBt >= 0 ? '▲ +' : '▼ ') + fmt.cur(Math.abs(deltaBt)) + ' ₽ к текущему',
+                    deltaBt >= 0 ? 'var(--c-green)' : 'var(--c-red)')}
+                ${card('Свободные деньги/мес', fmt.cur(last.Rt) + ' ₽', 'прогноз Rt на горизонте', 'var(--c-accent)')}
+                ${hasCI ? card('Диапазон (80%)', fmt.num(last.Rt_p10) + '…' + fmt.num(last.Rt_p90),
+                    'где окажется Rt с вероятностью 80%', 'var(--c-amber)') : ''}
+                ${card('Тренд', TREND_LABEL[trend], 'динамика свободных денег', TREND_COLOR[trend])}
+            </div>`;
+        })()}
         ${forecastChartSVG(data)}
+        ${(() => {
+            const sb = data.stable_baseline;
+            if (!sb || (sb.recurring_income <= 0 && sb.recurring_expense <= 0)) return '';
+            return `<div style="margin-bottom:10px; font-size:.78rem; color:var(--c-text2); line-height:1.5;
+                        padding:10px 14px; background:rgba(34,197,94,.06); border-radius:var(--r-sm);
+                        border-left:3px solid var(--c-green);">
+                <strong>Стабильная база прогноза:</strong> из дохода регулярны
+                <strong>${fmt.cur(sb.recurring_income)}</strong> (${(sb.income_share*100).toFixed(0)}%),
+                из расходов — <strong>${fmt.cur(sb.recurring_expense)}</strong> (${(sb.expense_share*100).toFixed(0)}%).
+                Чем выше доля регулярных операций, тем надёжнее прогноз.
+            </div>`;
+        })()}
         <div style="margin-bottom:10px; font-size:.78rem; color:var(--c-text3); line-height:1.5;">
             Тренд Rt: <strong style="color:${TREND_COLOR[trend]};">${TREND_LABEL[trend]}</strong>
             <details style="margin-top:6px;">
-                <summary style="cursor:pointer; font-size:.74rem; color:var(--c-text2);">Что показывает этот график и как его проверить</summary>
+                <summary style="cursor:pointer; font-size:.82rem; color:var(--c-accent); font-weight:600;
+                    display:inline-flex; align-items:center; gap:6px; padding:8px 14px;
+                    border:1px solid var(--c-accent); border-radius:var(--r-sm); list-style:none; width:fit-content;">
+                    💡 Что показывает этот график и почему линия прямая</summary>
                 <div style="margin-top:8px; font-size:.74rem; line-height:1.55;">
                     <p style="margin:0 0 6px;"><b>Что это.</b> Синяя линия — сколько свободных денег у вас будет накапливаться (или сгорать) месяц за месяцем, если доходы и расходы останутся как в среднем по вашей истории. Жёлтый коридор — диапазон, куда значение попадёт с вероятностью 80%: система прогоняет 1000 случайных сценариев вокруг прогноза.</p>
                     <p style="margin:0 0 6px;"><b>Почему линия прямая.</b> Прогноз строится по среднему: каждый месяц прибавляется примерно одинаковая сумма, поэтому накопление ложится прямой. Это не баг — при стабильных данных так и должно быть. Чем «шумнее» история, тем шире жёлтый коридор.</p>
@@ -1624,7 +1745,7 @@ function renderTop3Card(a, rank, indicators, weights, rival) {
             </div>`).join('')}
         </div>` : ''}
 
-        ${rank === 0 ? renderAllocationDetails(a) : ''}
+        ${renderAllocationDetails(a)}
 
         <!-- Показатели до / после -->
         <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; margin-top:14px;
@@ -1769,8 +1890,51 @@ function renderAltRow(a, idx) {
     </div>`;
 }
 
+function exportPlanCSV(res) {
+    if (!res || !res.top3 || !res.top3.length) return;
+    const ind = res.indicators || {};
+    const best = res.top3[0];
+    const rows = [];
+    const push = (a, b) => rows.push([a, b]);
+
+    push('FINPILOT — план распределения', '');
+    push('Профиль риска', res.risk_profile || '');
+    push('', '');
+    push('ПОКАЗАТЕЛЬ', 'ЗНАЧЕНИЕ');
+    push('Свободные деньги (Rt), ₽', ind.Rt ?? '');
+    push('Ликвидность (Lt)', ind.Lt ?? '');
+    push('Долговая нагрузка (Dt), %', ((ind.Dt ?? 0) * 100).toFixed(1));
+    push('Подушка (BLR), мес', (ind.BLR ?? 0).toFixed(2));
+    push('', '');
+    push('РЕКОМЕНДОВАННОЕ РАСПРЕДЕЛЕНИЕ', best.name || '');
+    push('На досрочное погашение, ₽', best.x_obligations ?? 0);
+    push('В подушку безопасности, ₽', best.x_reserve ?? 0);
+    push('На цели, ₽', best.x_goals ?? 0);
+    push('Оценка полезности U', best.utility ?? '');
+    push('', '');
+    push('ВСЕ АЛЬТЕРНАТИВЫ (топ-3)', '');
+    push('#', 'Название;Долг;Резерв;Цели;Оценка');
+    res.top3.forEach((a, i) => {
+        push(i + 1, `${a.name};${a.x_obligations || 0};${a.x_reserve || 0};${a.x_goals || 0};${a.utility}`);
+    });
+
+    const csv = rows.map(r => r.map(c => `"${String(c).replace(/"/g, '""')}"`).join(';')).join('\n');
+    const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `finpilot-plan-${new Date().toISOString().slice(0, 10)}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+}
+
 function renderPlanning(res) {
     if (!res) return;
+    state.lastPlan = res;  // для экспорта (CSV / печать)
+    const exportBar = $('#export-bar');
+    if (exportBar) exportBar.style.display = (res.top3 && res.top3.length) ? 'flex' : 'none';
     const ind = res.indicators || {};
     const { Rt, Lt, Dt, Bt = 0, Bliq = 0, BLR = 0, SigmaP = 0, It = 0, Et = 0 } = ind;
 
@@ -1982,10 +2146,28 @@ document.addEventListener('click', e => {
     renderTransactions();
 });
 
-// ── Фильтр по датам в журнале ─────────────────────────────────
+// ── Период трат на дашборде ───────────────────────────────────
 document.addEventListener('change', e => {
+    if (e.target.id === 'spending-period') {
+        loadSpendingBreakdown(Number(e.target.value) || 30);
+    }
+});
+
+// ── Фильтр по датам в журнале ─────────────────────────────────
+// Слушаем и change, и input: WebKit/DuckDuckGo шлёт change для type=date
+// только при потере фокуса, а input — сразу при выборе даты.
+function applyTxDateFilter(e) {
     if (e.target.id === 'tx-date-from') { state.dateFrom = e.target.value || null; state.page = 1; renderTransactions(); }
     if (e.target.id === 'tx-date-to')   { state.dateTo   = e.target.value || null; state.page = 1; renderTransactions(); }
+}
+document.addEventListener('change', applyTxDateFilter);
+document.addEventListener('input', applyTxDateFilter);
+document.addEventListener('click', e => {
+    if (e.target.id !== 'tx-export-csv') return;
+    const params = new URLSearchParams();
+    if (state.dateFrom) params.set('date_from', state.dateFrom);
+    if (state.dateTo) params.set('date_to', state.dateTo);
+    window.location.href = `/api/transactions/export.csv?${params.toString()}`;
 });
 document.addEventListener('click', e => {
     if (e.target.id !== 'tx-date-reset') return;

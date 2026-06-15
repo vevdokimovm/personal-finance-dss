@@ -1,6 +1,10 @@
 from __future__ import annotations
 
-from fastapi import APIRouter, Depends, HTTPException, status
+import csv
+import io
+from datetime import datetime
+
+from fastapi import APIRouter, Depends, HTTPException, Response, status
 from sqlalchemy.orm import Session
 
 from app.database.crud import (
@@ -14,6 +18,40 @@ from app.schemas.transaction import TransactionCreate, TransactionResponse
 from app.services.event_logger import log_event
 
 router = APIRouter(tags=["Транзакции"])
+
+
+@router.get("/transactions/export.csv", summary="Экспорт операций в CSV (скачивание)")
+def export_transactions_csv(
+    date_from: str | None = None,
+    date_to: str | None = None,
+    db: Session = Depends(get_db),
+    user_id: str | None = Depends(get_current_user_id),
+) -> Response:
+    rows = get_transactions(db, user_id=user_id)
+    if date_from:
+        rows = [t for t in rows if str(t.date)[:10] >= date_from]
+    if date_to:
+        rows = [t for t in rows if str(t.date)[:10] <= date_to]
+
+    buf = io.StringIO()
+    writer = csv.writer(buf, delimiter=";")
+    writer.writerow(["Дата", "Тип", "Категория", "Сумма", "Описание", "Источник"])
+    for t in rows:
+        writer.writerow([
+            str(t.date)[:10],
+            "Доход" if t.type == "income" else "Расход",
+            t.category or "",
+            t.amount,
+            getattr(t, "description", "") or "",
+            "Банк" if getattr(t, "is_synced", False) else "Ручной",
+        ])
+
+    filename = f"finpilot-operations-{datetime.utcnow():%Y-%m-%d}.csv"
+    return Response(
+        content="\ufeff" + buf.getvalue(),
+        media_type="text/csv; charset=utf-8",
+        headers={"Content-Disposition": f'attachment; filename="{filename}"'},
+    )
 
 
 @router.get(
