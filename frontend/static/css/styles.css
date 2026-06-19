@@ -1106,6 +1106,13 @@ input::placeholder { color: var(--c-text3); }
     box-shadow: var(--shadow-card);
 }
 [data-theme="light"] .indicator-track { background: rgba(15,23,42,.08); }
+[data-theme="light"] input,
+[data-theme="light"] select,
+[data-theme="light"] textarea,
+[data-theme="light"] .glass-input {
+    background: #ffffff;
+    border-color: rgba(15,23,42,.14);
+}
 
 /* ── Theme toggle button ──────────────────────────────────── */
 .theme-toggle {

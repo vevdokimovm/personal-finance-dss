@@ -80,16 +80,18 @@ async def upload_statement(
             "message": "Не удалось распознать транзакции. Проверьте формат файла и выбранный банк.",
         }
 
-    # Сохраняем в БД
+    # Сохраняем в БД батчами: один commit на тысячи строк строит гигантский
+    # INSERT (риск таймаута воркера и лимита параметров СУБД). Коммитим порциями.
+    from datetime import datetime
+    BATCH_SIZE = 500
     added = 0
     total_income = 0.0
     total_expense = 0.0
+    pending = 0
 
     for t in transactions:
         try:
-            from datetime import datetime
             t_date = datetime.fromisoformat(t['date']) if isinstance(t['date'], str) else t['date']
-
             create_transaction(
                 db=db,
                 amount=t['amount'],
@@ -103,10 +105,14 @@ async def upload_statement(
                 autocommit=False,
             )
             added += 1
+            pending += 1
             if t['type'] == 'income':
                 total_income += t['amount']
             else:
                 total_expense += t['amount']
+            if pending >= BATCH_SIZE:
+                db.commit()
+                pending = 0
         except Exception:
             continue
 

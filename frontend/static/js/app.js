@@ -1113,7 +1113,7 @@ function renderLiquidAssets() {
 
     list.innerHTML = `
         <div style="font-size:.78rem; color:var(--c-text3); padding:8px 0; margin-bottom:8px; border-bottom:1px solid var(--c-border);">
-            Bliq = <strong style="color:#60A5FA;">${fmt.cur(total)}</strong> (всего ${state.liquid_assets.length} активов)
+            B<sub>liq</sub> = <strong style="color:#60A5FA;">${fmt.cur(total)}</strong> (всего ${state.liquid_assets.length} активов)
         </div>
         ${state.liquid_assets.map(a => `
             <article class="stack-item">
@@ -1165,7 +1165,7 @@ function metricExplainHTML(key, ind) {
             ? `Значение <b>${Lt.toFixed(2)}</b> выше нормы 0.30 — после обязательных трат остаётся солидный запас.`
             : Lt >= 0 ? `Значение <b>${Lt.toFixed(2)}</b> ниже нормы 0.30 — бюджет натянут, почти всё уходит на обязательные траты.`
             : `Значение отрицательное — обязательные траты больше дохода, бюджет в дефиците.`;
-        return block('Запас прочности (Lt) — как посчитано',
+        return block('Запас прочности (L<sub>t</sub>) — как посчитано',
             row('Свободные деньги', `<b>${m(Rt)}</b>`) +
             row('÷ Обязательные траты (расходы + кредиты)', `<b>${m(oblig)}</b>`) +
             row('= Запас прочности', `<b>${Lt.toFixed(3)}</b>`),
@@ -1188,8 +1188,8 @@ function metricExplainHTML(key, ind) {
             : BLR <= 6 ? 'Это норма: запас от 2.5 до 6 месяцев считается здоровым.'
             : 'Это избыток: часть денег можно перевести в доходные инструменты — лежащие без дела деньги съедает инфляция.';
         return block('Подушка безопасности (BLR) — как посчитано',
-            row('Накоплено на целях (Bt)', `<b>${m(Bt)}</b>`) +
-            row('+ Накопления и депозиты (Bliq)', `<b>${m(Bliq)}</b>`) +
+            row('Накоплено на целях (B<sub>t</sub>)', `<b>${m(Bt)}</b>`) +
+            row('+ Накопления и депозиты (B<sub>liq</sub>)', `<b>${m(Bliq)}</b>`) +
             row('÷ Обычные расходы в месяц', `<b>${m(Et)}</b>`) +
             row('= Хватит на', `<b>${BLR.toFixed(1)} мес</b>`),
             `Показывает, сколько месяцев вы проживёте при полной потере дохода, тратя как сейчас. ${verdict}`);
@@ -1345,7 +1345,6 @@ function svgIcon(name, size = 16) {
 let planRisk = 3;
 let planLmin = 0.0;
 let planRbench = 0.14;
-let appliedSpendingCut = 0;
 const RISK_LABELS = {1:'Консервативный',2:'Умеренно-консервативный',3:'Сбалансированный',4:'Умеренно-агрессивный',5:'Агрессивный'};
 
 function bindPlanningUI() {
@@ -1479,16 +1478,6 @@ function bindPlanningUI() {
         horizonSel.addEventListener('change', () => loadForecast(Number(horizonSel.value)));
     }
 
-    // Советы по тратам: применить/сбросить what-if сокращение
-    const adviceBody = $('#spending-advice-body');
-    if (adviceBody) {
-        adviceBody.addEventListener('click', (e) => {
-            const applyBtn = e.target.closest('.apply-cut-btn');
-            if (applyBtn) { applySpendingCut(pn(applyBtn.dataset.saving)); return; }
-            if (e.target.closest('#spending-cut-reset')) { appliedSpendingCut = 0; recalcWithCut(); }
-        });
-    }
-
     // Auto-load
     form.dispatchEvent(new Event('submit'));
     loadForecast(6);
@@ -1531,53 +1520,20 @@ function renderSpendingAdvice(data) {
         return;
     }
 
-    const applied = appliedSpendingCut > 0
-        ? `<div style="display:flex; justify-content:space-between; align-items:center; gap:12px; padding:10px 14px; margin-bottom:14px; background:var(--c-green-bg); border:1px solid var(--c-green-glow); border-radius:var(--r-sm); font-size:.8rem;">
-               <span>В расчёт применено сокращение трат на <strong style="color:var(--c-green);">${fmt.cur(appliedSpendingCut)}</strong> — план пересчитан.</span>
-               <button type="button" id="spending-cut-reset" class="ghost-button" style="font-size:.74rem; padding:5px 12px; white-space:nowrap;">Сбросить</button>
-           </div>`
-        : '';
-
     const cards = advice.map(a => `
-        <div style="padding:12px 14px; border:1px solid var(--c-border); border-radius:var(--r-md); margin-bottom:10px;">
-            <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:12px;">
-                <div style="font-size:.82rem; line-height:1.5;">${esc(a.message)}</div>
-                <button type="button" class="ghost-button apply-cut-btn" data-saving="${a.potential_saving}"
-                        style="font-size:.74rem; padding:6px 12px; white-space:nowrap; flex-shrink:0; color:var(--c-green);">
-                    Применить −${fmt.cur(a.potential_saving)}
-                </button>
-            </div>
+        <div style="padding:12px 14px; border:1px solid var(--c-border); border-radius:var(--r-md); margin-bottom:10px; font-size:.82rem; line-height:1.5;">
+            ${esc(a.message)}
         </div>`).join('');
 
     const total = data.total_potential_saving || 0;
     const summary = total > 0
-        ? `<div style="font-size:.78rem; color:var(--c-text2); margin-top:6px;">Суммарно можно высвободить до <strong style="color:var(--c-green);">${fmt.cur(total)}</strong> в месяц.</div>`
+        ? `<div style="font-size:.78rem; color:var(--c-text2); margin-top:8px; padding:10px 14px; background:var(--c-surface-up); border-radius:var(--r-sm); line-height:1.5;">
+               Если постепенно привести эти траты к норме, в перспективе можно высвобождать <strong style="color:var(--c-green);">до ${fmt.cur(total)}</strong> в месяц — на досрочку, подушку или цели.
+               <br><span style="color:var(--c-text3);">Это ориентир на будущее, а не мгновенный эффект: план выше посчитан по вашим текущим тратам. Привычки меняются постепенно — начните с одной категории.</span>
+           </div>`
         : '';
 
-    body.innerHTML = applied + cards + summary;
-}
-
-async function applySpendingCut(saving) {
-    appliedSpendingCut = Math.round((appliedSpendingCut + saving) * 100) / 100;
-    await recalcWithCut();
-}
-
-async function recalcWithCut() {
-    try {
-        const res = await api('/api/planning/calculate', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                risk_tolerance: planRisk, l_min: planLmin, r_bench: planRbench,
-                spending_cut: appliedSpendingCut || undefined,
-            }),
-        });
-        renderPlanning(res);
-        loadSpendingAdvice();
-        window.showToast(appliedSpendingCut > 0
-            ? `План пересчитан с сокращением трат на ${fmt.cur(appliedSpendingCut)}`
-            : 'План пересчитан без сокращения трат');
-    } catch (e) { console.error(e); window.showToast('Не удалось пересчитать', {error:true}); }
+    body.innerHTML = cards + summary;
 }
 
 // ── SVG fan-chart прогноза Rt с 80% доверительным интервалом ──
@@ -1585,7 +1541,14 @@ function forecastChartSVG(data) {
     const pts = (data && data.forecast) || [];
     if (!pts.length) return '';
 
-    const W = 1160, H = 340, padL = 72, padR = 28, padT = 24, padB = 48;
+    const compact = (v) => {
+        const a = Math.abs(v);
+        if (a >= 1e6) return (v / 1e6).toFixed(a >= 1e7 ? 0 : 1).replace('.0', '') + 'M';
+        if (a >= 1e3) return Math.round(v / 1e3) + 'k';
+        return String(Math.round(v));
+    };
+
+    const W = 1160, H = 360, padL = 96, padR = 32, padT = 24, padB = 48;
     const innerW = W - padL - padR, innerH = H - padT - padB;
     const n = pts.length;
     const hasCI = pts.every(p => p.Rt_p10 != null && p.Rt_p90 != null);
@@ -1606,7 +1569,7 @@ function forecastChartSVG(data) {
         const v = minV + (maxV - minV) * g / LEVELS;
         const y = yOf(v).toFixed(1);
         grid += `<line x1="${padL}" y1="${y}" x2="${W - padR}" y2="${y}" stroke="var(--c-border)" stroke-width="1"/>`;
-        yTicks += `<text x="${padL - 10}" y="${(yOf(v) + 4).toFixed(1)}" text-anchor="end" font-size="11" fill="var(--c-text3)" font-family="var(--font-mono),monospace">${fmt.num(Math.round(v))}</text>`;
+        yTicks += `<text x="${padL - 10}" y="${(yOf(v) + 4).toFixed(1)}" text-anchor="end" font-size="11" fill="var(--c-text3)" font-family="var(--font-mono),monospace">${compact(v)}</text>`;
     }
 
     // Нулевая линия
@@ -1621,9 +1584,9 @@ function forecastChartSVG(data) {
     if (hasCI) {
         const top = pts.map((p, i) => `${xOf(i).toFixed(1)},${yOf(p.Rt_p90).toFixed(1)}`);
         const bot = pts.map((p, i) => `${xOf(i).toFixed(1)},${yOf(p.Rt_p10).toFixed(1)}`).reverse();
-        band = `<polygon points="${top.concat(bot).join(' ')}" fill="var(--c-amber)" opacity="0.14"/>`
-             + `<polyline points="${top.join(' ')}" fill="none" stroke="var(--c-amber)" stroke-width="1" opacity="0.5"/>`
-             + `<polyline points="${pts.map((p, i) => `${xOf(i).toFixed(1)},${yOf(p.Rt_p10).toFixed(1)}`).join(' ')}" fill="none" stroke="var(--c-amber)" stroke-width="1" opacity="0.5"/>`;
+        band = `<polygon points="${top.concat(bot).join(' ')}" fill="var(--c-amber)" opacity="0.16"/>`
+             + `<polyline points="${top.join(' ')}" fill="none" stroke="var(--c-amber)" stroke-width="1.5" opacity="0.65"/>`
+             + `<polyline points="${pts.map((p, i) => `${xOf(i).toFixed(1)},${yOf(p.Rt_p10).toFixed(1)}`).join(' ')}" fill="none" stroke="var(--c-amber)" stroke-width="1.5" opacity="0.65"/>`;
     }
 
     // Линия точечного прогноза Rt + точки
@@ -1644,13 +1607,13 @@ function forecastChartSVG(data) {
 
     const legend = `
         <div style="display:flex; gap:18px; justify-content:flex-end; font-size:.72rem; color:var(--c-text2); margin-bottom:6px;">
-            <span style="display:inline-flex; align-items:center; gap:6px;"><span style="width:14px; height:3px; background:var(--c-accent); border-radius:2px;"></span>Rt (точечный, SES)</span>
+            <span style="display:inline-flex; align-items:center; gap:6px;"><span style="width:14px; height:3px; background:var(--c-accent); border-radius:2px;"></span>Свободные деньги R<sub>t</sub> (прогноз)</span>
             ${hasCI ? `<span style="display:inline-flex; align-items:center; gap:6px;"><span style="width:14px; height:10px; background:var(--c-amber); opacity:.3; border-radius:2px;"></span>Вероятный диапазон (80%)</span>` : ''}
         </div>`;
 
     return `
         <div style="margin-bottom:16px;">
-            <div style="font-size:.82rem; font-weight:600; margin-bottom:8px;">График прогноза доступного ресурса Rt</div>
+            <div style="font-size:.82rem; font-weight:600; margin-bottom:8px;">График прогноза свободных денег R<sub>t</sub></div>
             ${legend}
             <svg viewBox="0 0 ${W} ${H}" width="100%" preserveAspectRatio="xMidYMid meet" style="display:block; max-width:100%;">
                 ${grid}${zero}${band}${linePoly}${dots}${yTicks}${xTicks}
@@ -1759,11 +1722,11 @@ function renderForecast(data) {
             <thead>
                 <tr style="border-bottom:1px solid var(--c-border); color:var(--c-text3); font-size:.72rem; text-transform:uppercase;">
                     <th style="padding:6px 10px; text-align:left; font-weight:600;">Период</th>
-                    <th style="padding:6px 10px; text-align:right; font-weight:600;">Bt</th>
-                    <th style="padding:6px 10px; text-align:right; font-weight:600;">Rt (точка)</th>
+                    <th style="padding:6px 10px; text-align:right; font-weight:600;">Баланс B<sub>t</sub></th>
+                    <th style="padding:6px 10px; text-align:right; font-weight:600;">Свободные R<sub>t</sub></th>
                     <th style="padding:6px 10px; text-align:right; font-weight:600; color:var(--c-amber);">Вероятный диапазон (80%)</th>
-                    <th style="padding:6px 10px; text-align:right; font-weight:600;">Запас прочности</th>
-                    <th style="padding:6px 10px; text-align:right; font-weight:600;">Долговая нагрузка</th>
+                    <th style="padding:6px 10px; text-align:right; font-weight:600;">Запас прочности L<sub>t</sub></th>
+                    <th style="padding:6px 10px; text-align:right; font-weight:600;">Долговая нагрузка D<sub>t</sub></th>
                 </tr>
             </thead>
             <tbody>${rows}</tbody>
@@ -1924,7 +1887,7 @@ function renderTop3Card(a, rank, indicators, weights, rival) {
         <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; margin-top:14px;
                     padding-top:12px; border-top:1px solid var(--c-border); font-size:.78rem;">
             <div style="background:rgba(255,255,255,.03); border-radius:var(--r-sm); padding:8px 10px;">
-                <div style="color:var(--c-text3); margin-bottom:2px;">Rt</div>
+                <div style="color:var(--c-text3); margin-bottom:2px;">Свободные R<sub>t</sub></div>
                 <div style="font-weight:700;">${afterRt}</div>
                 ${dRtStr ? `<div style="font-size:.70rem; color:${deltaColor(d.Rt)};">${dRtStr} к текущему</div>` : ''}
             </div>
