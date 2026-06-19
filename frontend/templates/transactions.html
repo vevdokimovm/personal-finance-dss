@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+{% block title %}Операции · FINPILOT{% endblock %}
+{% block page_title %}Журнал операций{% endblock %}
+
+{% block content %}
+<section class="glass-panel w-full">
+    <div class="section-head">
+        <div>
+            <h2 class="section-title">Все операции</h2>
+            <p class="section-subtitle">Вносите сюда доходы и расходы — на их основе система считает, сколько у вас свободных денег.</p>
+        </div>
+        <div class="section-actions">
+            <button class="action-pill success-pill" type="button" id="open-income-modal">
+                <span class="icon">+</span> Доход
+            </button>
+            <button class="action-pill danger-pill" type="button" id="open-expense-modal">
+                <span class="icon">+</span> Расход
+            </button>
+        </div>
+    </div>
+
+    <div class="table-card">
+        <div class="table-toolbar" style="flex-wrap:wrap; gap:12px;">
+            <div style="display:flex; align-items:center; gap:8px;">
+                <span>Записей на странице:</span>
+                <div class="table-limit-switcher" id="transactions-limit-switcher">
+                    <button class="limit-button" type="button" data-limit="5">5</button>
+                    <button class="limit-button active" type="button" data-limit="10">10</button>
+                    <button class="limit-button" type="button" data-limit="25">25</button>
+                    <button class="limit-button" type="button" data-limit="50">50</button>
+                </div>
+            </div>
+            <div style="display:flex; align-items:center; gap:8px; margin-left:auto; font-size:.8rem;">
+                <span style="color:var(--c-text3);">Период:</span>
+                <input type="date" id="tx-date-from" class="modal-input" style="padding:6px 10px; font-size:.78rem; width:auto;">
+                <span style="color:var(--c-text3);">—</span>
+                <input type="date" id="tx-date-to" class="modal-input" style="padding:6px 10px; font-size:.78rem; width:auto;">
+                <button class="ghost-button" type="button" id="tx-date-reset" style="font-size:.74rem; padding:6px 10px;">Сбросить</button>
+            </div>
+        </div>
+        <div class="table-header">
+            <span>Источник</span>
+            <span>Дата</span>
+            <span>Категория</span>
+            <span>Тип</span>
+            <span class="text-right">Сумма</span>
+            <span class="text-right"></span>
+        </div>
+        <div id="transactions-list" class="table-list">
+            <div class="empty-row">Загрузка…</div>
+        </div>
+        <div id="transactions-pagination" style="display:flex; justify-content:space-between; align-items:center; padding:12px 16px; border-top:1px solid var(--c-border); font-size:.8rem;"></div>
+    </div>
+
+    <!-- Статистика по операциям: категории и мерчанты -->
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-top:20px;">
+        <section class="glass-panel" style="padding:20px 22px;">
+            <h3 style="font-size:.95rem; margin:0 0 4px;">Расходы по категориям</h3>
+            <div style="font-size:.74rem; color:var(--c-text3); margin-bottom:14px;">За выбранный период</div>
+            <div id="stats-by-category"><div class="empty-row">Нет данных</div></div>
+        </section>
+        <section class="glass-panel" style="padding:20px 22px;">
+            <h3 style="font-size:.95rem; margin:0 0 4px;">Топ-мерчанты</h3>
+            <div style="font-size:.74rem; color:var(--c-text3); margin-bottom:14px;">Кому уходит больше всего</div>
+            <div id="stats-by-merchant"><div class="empty-row">Нет данных</div></div>
+        </section>
+    </div>
+</section>
+{% endblock %}
+
+{% block modals %}
+<div class="modal-backdrop" id="transaction-modal" aria-hidden="true">
+    <div class="modal-card glass-panel">
+        <div class="modal-head">
+            <h3 class="modal-title" id="transaction-modal-title">Новая операция</h3>
+            <button class="modal-close ghost-button" type="button" data-close-modal="transaction-modal">✕</button>
+        </div>
+        <form id="transaction-form" class="modal-form">
+            <input type="hidden" id="transaction-type" name="type">
+            <div class="field">
+                <label for="transaction-category">Категория</label>
+                <input id="transaction-category" name="category" type="text" placeholder="Зарплата, Продукты, Кафе…" required>
+            </div>
+            <div class="field-grid">
+                <div class="field">
+                    <label for="transaction-amount">Сумма</label>
+                    <input id="transaction-amount" name="amount" type="number" min="0" step="0.01" placeholder="0" required>
+                </div>
+                <div class="field">
+                    <label for="transaction-date">Дата</label>
+                    <input id="transaction-date" name="date" type="date" required>
+                </div>
+            </div>
+            <div class="modal-actions mt-4">
+                <button class="primary-button" type="submit">Сохранить</button>
+                <button class="ghost-button" type="button" data-close-modal="transaction-modal">Отмена</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
