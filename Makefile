@@ -1,4 +1,4 @@
-.PHONY: all lint test coverage clean precommit
+.PHONY: all lint test coverage e2e clean precommit
 
 PYTHON=python3
 TEST_ENV=SECRET_KEY=test-secret-key-for-ci
@@ -29,3 +29,8 @@ precommit:
 clean:
 	find . -name "*.pyc" -delete
 	rm -rf .mypy_cache __pycache__ htmlcov .pytest_cache .coverage
+
+# === Браузерные E2E (Playwright) — отдельно, требуют браузер ===
+e2e:
+	python3 -m playwright install chromium
+	pytest -m e2e
