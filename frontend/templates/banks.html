@@ -9,8 +9,8 @@
         <div>
             <h2 class="section-title">Накопления и резервы</h2>
             <p class="section-subtitle">
-                Депозиты, накопительные счета и наличные — деньги, которые можно быстро задействовать.
-                Система может предложить закрыть ими ближайшие цели одним разом.
+                Свободный резерв и подушка безопасности — депозиты, накопительные счета, наличные, не привязанные к конкретной цели.
+                Деньги под конкретное накопление заводите в разделе «Цели», а не здесь — чтобы не учитывать их дважды.
             </p>
         </div>
         <button class="primary-button" type="button" id="open-asset-modal">
@@ -33,6 +33,9 @@
             <button class="modal-close ghost-button" type="button" data-close-modal="asset-modal">✕</button>
         </div>
         <form id="asset-form" class="modal-form">
+            <div style="font-size:.76rem; line-height:1.5; color:var(--c-text2); background:var(--c-surface-up); border:1px solid var(--c-border); border-radius:var(--r-md); padding:12px 14px; margin-bottom:16px;">
+                Сюда — <strong style="color:var(--c-text);">свободный резерв и подушка безопасности</strong>, не привязанные к конкретной цели. Если деньги копятся под конкретное накопление, заводите их в разделе «Цели», а не здесь.
+            </div>
             <div class="field">
                 <label for="asset-name">Название</label>
                 <input id="asset-name" name="name" type="text" placeholder="Депозит, Накопительный счёт, Кэш…" required>

@@ -7,7 +7,7 @@
     <div class="section-head">
         <div>
             <h2 class="section-title">Копилка и цели</h2>
-            <p class="section-subtitle">Активные цели система учитывает при распределении ваших свободных денег</p>
+            <p class="section-subtitle">Цель — это деньги под конкретное накопление (отпуск, машина, фонд). Свободный резерв и подушку безопасности, не привязанные к цели, заводите в разделе «Ликвидные активы». Активные цели система учитывает при распределении свободных денег.</p>
         </div>
         <button class="primary-button" type="button" id="open-goal-modal">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="vertical-align:-2px; margin-right:6px;"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
@@ -28,6 +28,9 @@
             <button class="modal-close ghost-button" type="button" data-close-modal="goal-modal">✕</button>
         </div>
         <form id="goal-form" class="modal-form">
+            <div style="font-size:.76rem; line-height:1.5; color:var(--c-text2); background:var(--c-surface-up); border:1px solid var(--c-border); border-radius:var(--r-md); padding:12px 14px; margin-bottom:16px;">
+                <strong style="color:var(--c-text);">Цель</strong> — это деньги под конкретное накопление. Если копите на вкладе или счёте, укажите его ставку ниже. Чтобы не считать одни деньги дважды, <strong style="color:var(--c-text);">не заводите ту же сумму ещё и в «Ликвидных активах»</strong> — туда идёт только свободный резерв без цели.
+            </div>
             <div class="field">
                 <label for="goal-name">Название</label>
                 <input id="goal-name" name="name" type="text" placeholder="Машина, Путешествие, Фонд…" required>
