@@ -1157,15 +1157,16 @@ function metricExplainHTML(key, ind) {
             verdict);
     }
     if (key === 'lt') {
-        const verdict = Lt >= 0.3
-            ? `Значение <b>${Lt.toFixed(2)}</b> выше нормы 0.30 — после обязательных трат остаётся солидный запас.`
-            : Lt >= 0 ? `Значение <b>${Lt.toFixed(2)}</b> ниже нормы 0.30 — бюджет натянут, почти всё уходит на обязательные траты.`
-            : `Значение отрицательное — обязательные траты больше дохода, бюджет в дефиците.`;
+        const verdict = Lt >= 2.5
+            ? `Значение <b>${Lt.toFixed(1)} мес.</b> — в норме (2.5–6 месяцев по Greninger): на случай потери дохода есть запас.`
+            : Lt >= 1
+                ? `Значение <b>${Lt.toFixed(1)} мес.</b> — подушка ниже нормы (2.5–6 мес.), стоит её наращивать.`
+                : `Значение <b>${Lt.toFixed(1)} мес.</b> — выделенного резерва почти нет, имеет смысл в первую очередь его пополнять.`;
         return block('Запас прочности (L<sub>t</sub>) — как посчитано',
-            row('Свободные деньги', `<b>${m(Rt)}</b>`) +
-            row('÷ Обязательные траты (расходы + кредиты)', `<b>${m(oblig)}</b>`) +
-            row('= Запас прочности', `<b>${Lt.toFixed(3)}</b>`),
-            `Показывает, какую долю от обязательных трат составляют свободные деньги. Норма — от 0.30 (Greninger, 1996). ${verdict}`);
+            row('Ликвидная подушка (резерв)', `<b>${m(Bliq)}</b>`) +
+            row('÷ Месячные расходы', `<b>${m(Et)}</b>`) +
+            row('= Запас прочности', `<b>${Lt.toFixed(1)} мес.</b>`),
+            `Сколько месяцев вы проживёте на свободной ликвидной подушке без дохода (накопления на целях сюда не входят — они учтены в «Подушке безопасности»). Норма — 2.5–6 месяцев (Greninger, 1996). ${verdict}`);
     }
     if (key === 'dt') {
         const verdict = Dt <= 0.36
@@ -1222,7 +1223,7 @@ function renderDashboardCards(res, isSimulation = false) {
         heroRt.textContent = fmt.cur(Rt);
         heroRt.style.color = Rt >= 0 ? 'var(--c-green)' : 'var(--c-red)';
     }
-    setText('#lt-value', Number(Lt).toFixed(2));
+    setText('#lt-value', `${Number(Lt).toFixed(1)} мес`);
     setText('#dt-value', fmt.pct(Dt));
     setText('#blr-value', `${blr.toFixed(1)} мес`);
 
@@ -1234,8 +1235,8 @@ function renderDashboardCards(res, isSimulation = false) {
 
     // Rt: цвет по знаку
     if (rtEl) rtEl.style.color = Rt >= 0 ? 'var(--c-green)' : 'var(--c-red)';
-    // Lt: функциональная ликвидность — норма ≥ 0.3
-    if (ltEl) ltEl.style.color = Lt >= 0.3 ? 'var(--c-green)' : Lt >= 0 ? 'var(--c-amber)' : 'var(--c-red)';
+    // Lt: ликвидность — месяцы автономии, норма 2.5–6 (Greninger)
+    if (ltEl) ltEl.style.color = Lt >= 2.5 ? 'var(--c-green)' : Lt >= 1 ? 'var(--c-amber)' : 'var(--c-red)';
     // Dt: ПДН Банка России — ≤36% норма, 36–50% повышенный, >50% опасный
     if (dtEl) dtEl.style.color = Dt <= 0.36 ? 'var(--c-green)' : Dt <= 0.5 ? 'var(--c-amber)' : 'var(--c-red)';
     // BLR: Greninger — <1 критично, 1–2.5 слабо, 2.5–6 норма, >6 избыток
@@ -1251,7 +1252,7 @@ function renderDashboardCards(res, isSimulation = false) {
     // Status badge
     const statusEl = $('#rec-status');
     if (statusEl) {
-        if (Dt > 0.5 || Lt < 0 || Rt < 0) {
+        if (Dt > 0.5 || Rt < 0) {
             statusEl.textContent = '● Внимание';
             statusEl.className = 'rec-status status-danger';
         } else if (Dt > 0.36 || blr < 1) {
@@ -1272,11 +1273,11 @@ function renderDashboardCards(res, isSimulation = false) {
     // Render breakdown — формулы ВКР + бенчмарки
     const explEl = $('#explanation-text');
     if (explEl) {
-        const ltGround = Lt >= 0.3
-            ? "Свободные деньги уверенно покрывают обязательные траты — здоровый уровень."
-            : Lt >= 0
-                ? "Свободных денег пока мало по сравнению с обязательными тратами — подушка набирается медленно."
-                : "Обязательные траты превышают доход — бюджет уходит в минус.";
+        const ltGround = Lt >= 2.5
+            ? "Подушки хватит на несколько месяцев жизни без дохода — здоровый уровень."
+            : Lt >= 1
+                ? "Подушка ниже нормы (2.5–6 мес.) — её стоит наращивать."
+                : "Выделенного резерва почти нет — в первую очередь стоит его пополнять.";
         const dtGround = Dt <= 0.36
             ? "Это в пределах нормы (безопасная граница — 40% дохода)."
             : Dt <= 0.5
@@ -1291,7 +1292,7 @@ function renderDashboardCards(res, isSimulation = false) {
         let html = `<div class="rec-grounding" style="margin-top:0;">
             <div style="font-size:.72rem; color:var(--c-text3); margin-bottom:8px; text-transform:uppercase; letter-spacing:.5px;">Что значат эти числа</div>
             <div style="display:flex; flex-direction:column; gap:8px; font-size:.78rem; line-height:1.5;">
-                <div><strong>Запас прочности — ${Number(Lt).toFixed(2)}.</strong> ${ltGround}</div>
+                <div><strong>Запас прочности — ${Number(Lt).toFixed(1)} мес.</strong> ${ltGround}</div>
                 <div><strong>Долговая нагрузка — ${fmt.pct(Dt)}.</strong> ${dtGround}</div>
                 <div><strong>Подушка безопасности — ${blr.toFixed(1)} мес.</strong> ${blrGround}</div>
             </div>
@@ -1309,8 +1310,8 @@ function renderDashboardCards(res, isSimulation = false) {
     // Progress bars
     const maxR = 500000;
     setBar('#resource-scale-bar', '#resource-scale-text', clamp(Math.abs(Rt) / maxR * 100), fmt.cur(Rt));
-    // Lt прогресс: 100% = норма 0.5 (комфортная зона)
-    setBar('#liquidity-scale-bar', '#liquidity-scale-text', clamp((Lt / 0.5) * 100), Lt.toFixed(2));
+    // Lt прогресс: 100% = 6 месяцев (верх нормы Greninger)
+    setBar('#liquidity-scale-bar', '#liquidity-scale-text', clamp((Lt / 6) * 100), Lt.toFixed(1) + ' мес');
     setBar('#debt-scale-bar', '#debt-scale-text', clamp(Dt * 100), fmt.pct(Dt));
 }
 
@@ -1916,7 +1917,7 @@ function renderCalcDetails(a, ind, weights, rival) {
     const s1 = `${m(It)} доход − ${m(Et)} расходы − ${m(SigmaP)} платежи по кредитам = <b>${m(Rt)}</b>`;
 
     // ── Шаг 2: перебор вариантов ──
-    const s2 = `Алгоритм перебрал <b>21 вариант</b> распределения этой суммы (доли с шагом 20%: долг / резерв / цели), отбросил нарушающие ограничения по ликвидности и долговой нагрузке, остальные оценил и отранжировал. Этот план: на досрочку <b>${m(a.x_obligations)}</b> · в резерв <b>${m(a.x_reserve)}</b> · на цели <b>${m(a.x_goals)}</b>.`;
+    const s2 = `Алгоритм перебрал все варианты распределения этой суммы (доли с шагом 10%: долг / резерв / цели), отбросил нарушающие ограничения по долговой нагрузке и ликвидности, остальные оценил и отранжировал. Этот план: на досрочку <b>${m(a.x_obligations)}</b> · в резерв <b>${m(a.x_reserve)}</b> · на цели <b>${m(a.x_goals)}</b>.`;
 
     // ── Шаг 3: Avalanche (досрочка) ──
     let s3 = '';
@@ -2162,7 +2163,7 @@ function renderPlanning(res) {
     const ltEl = $('#plan-lt');
     const dtEl = $('#plan-dt');
     if (rtEl) { rtEl.textContent = fmt.cur(Rt); rtEl.style.color = Rt >= 0 ? 'var(--c-green)' : 'var(--c-red)'; }
-    if (ltEl) { ltEl.textContent = Number(Lt).toFixed(3); ltEl.style.color = Lt >= 0.3 ? 'var(--c-green)' : Lt >= 0 ? 'var(--c-amber)' : 'var(--c-red)'; }
+    if (ltEl) { ltEl.textContent = `${Number(Lt).toFixed(1)} мес`; ltEl.style.color = Lt >= 2.5 ? 'var(--c-green)' : Lt >= 1 ? 'var(--c-amber)' : 'var(--c-red)'; }
     if (dtEl) { dtEl.textContent = fmt.pct(Dt); dtEl.style.color = Dt <= 0.36 ? 'var(--c-green)' : Dt <= 0.5 ? 'var(--c-amber)' : 'var(--c-red)'; }
 
     // Человекочитаемая расшифровка показателей (без формульной нотации)
@@ -2170,7 +2171,7 @@ function renderPlanning(res) {
     const ltForm = $('#plan-lt-formula');
     const dtForm = $('#plan-dt-formula');
     if (rtForm) rtForm.innerHTML = `${fmt.num(It)} доход − ${fmt.num(Et)} траты − ${fmt.num(SigmaP)} кредиты`;
-    if (ltForm) ltForm.innerHTML = `свободные деньги на фоне обязательных трат`;
+    if (ltForm) ltForm.innerHTML = `месяцев жизни на свободной подушке`;
     if (dtForm) dtForm.innerHTML = `${fmt.num(SigmaP)} платежей из ${fmt.num(It)} дохода`;
 
     // Веса
