@@ -969,18 +969,14 @@ function renderObligations() {
         const ratePct = rate > 0 && rate < 1 ? rate * 100 : rate;
         const payment = pn(o.monthly_payment);
 
-        // Прогресс выплат (как в целях). term трактуем как ОСТАВШИЙСЯ срок; общий = прошло + остаток.
-        let elapsed = 0;
-        if (o.start_date) {
-            const start = new Date(o.start_date);
-            const now = new Date();
-            elapsed = Math.max(0, (now.getFullYear() - start.getFullYear()) * 12 + (now.getMonth() - start.getMonth()));
-        }
-        const hasProgress = o.start_date && o.term > 0 && payment > 0;
-        const totalTerm = elapsed + o.term;
+        // term — ОБЩИЙ срок кредита; «выплачено»/«осталось» приходят посчитанными с сервера.
+        const elapsed = pn(o.months_elapsed);
+        const remaining = pn(o.months_remaining);
+        const totalTerm = pn(o.term);
+        const hasProgress = o.start_date && totalTerm > 0 && payment > 0;
         const paidSum = elapsed * payment;       // сколько уже отдано банку
         const totalPay = totalTerm * payment;    // всего платежей по графику
-        const remainPay = o.term * payment;      // осталось выплатить
+        const remainPay = remaining * payment;   // осталось выплатить
         const pct = totalTerm > 0 ? Math.min(100, elapsed / totalTerm * 100) : 0;
 
         const takenLine = o.start_date ? ` · взят ${fmt.date(o.start_date)}` : '';
@@ -1003,7 +999,7 @@ function renderObligations() {
                 <div>Платёж в месяц: <strong>${fmt.cur(payment)}</strong></div>
                 <div>Процентная ставка: <strong>${ratePct.toFixed(ratePct % 1 ? 1 : 0)}%</strong></div>
                 <div>Остаток долга: <strong>${fmt.cur(o.amount)}</strong></div>
-                <div>Осталось платежей: <strong>${o.term} мес</strong></div>
+                <div>Осталось платежей: <strong>${remaining} мес</strong></div>
                 ${o.start_date ? `<div>Когда взят: <strong>${fmt.date(o.start_date)}</strong></div><div>Платите уже: <strong>${elapsed} мес</strong></div>` : ''}
                 ${hasProgress ? `<div style="grid-column:1 / -1; color:var(--c-text3);">Всего по графику: ${fmt.cur(totalPay)} (${totalTerm} платежей по ${fmt.cur(payment)}). Сумма включает проценты.</div>` : ''}
                 ${o.comment ? `<div style="grid-column:1 / -1; color:var(--c-text2);">${esc(o.comment)}</div>` : ''}
@@ -1017,7 +1013,7 @@ function renderObligations() {
                     <button class="ghost-button delete-button" data-obligation-id="${o.id}" style="color:var(--c-red);font-size:.85rem;padding:6px 10px;" title="Удалить" onclick="event.stopPropagation()">✕</button>
                 </div>
                 <div class="stack-item-text">
-                    ${fmt.cur(payment)} / мес · Ставка ${ratePct.toFixed(ratePct % 1 ? 1 : 0)}% · Осталось ${o.term} мес${takenLine}
+                    ${fmt.cur(payment)} / мес · Ставка ${ratePct.toFixed(ratePct % 1 ? 1 : 0)}% · Осталось ${remaining} мес${takenLine}
                 </div>
                 ${progressBlock}
             </summary>

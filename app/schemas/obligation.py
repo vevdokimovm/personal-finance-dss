@@ -3,7 +3,7 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Optional
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, computed_field
 
 
 class ObligationCreate(BaseModel):
@@ -35,3 +35,20 @@ class ObligationResponse(BaseModel):
     start_date: Optional[datetime] = None
     is_active: bool = True
     closed_at: Optional[datetime] = None
+
+    @computed_field
+    @property
+    def months_elapsed(self) -> int:
+        """Сколько месяцев уже выплачивается (от даты взятия, не больше общего срока)."""
+        if not self.start_date or self.term <= 0:
+            return 0
+        now = datetime.now()
+        sd = self.start_date.replace(tzinfo=None) if self.start_date.tzinfo else self.start_date
+        elapsed = (now.year - sd.year) * 12 + (now.month - sd.month)
+        return max(0, min(self.term, elapsed))
+
+    @computed_field
+    @property
+    def months_remaining(self) -> int:
+        """Сколько месяцев осталось платить (общий срок минус пройденное)."""
+        return max(0, self.term - self.months_elapsed)

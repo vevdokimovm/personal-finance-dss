@@ -273,13 +273,15 @@ def load_demo(
     data = CASES[case]()
     now = datetime.utcnow()
     # Для наглядности прогресса выплат: если дата взятия не задана, считаем, что
-    # Реалистичная дата взятия: к текущему моменту обычно выплачено больше, чем осталось.
-    # Множитель варьируем по обязательству, чтобы «платите уже» ≠ «осталось».
+    # term в демо задан как остаток; превращаем в ОБЩИЙ срок кредита и ставим
+    # реалистичную дату взятия. «Осталось» дальше считается динамически от даты.
     for ob in data.get("obligations", []):
         if getattr(ob, "start_date", None) is None and (ob.term or 0) > 0:
+            remaining = int(ob.term)
             seed = (int(ob.payment_day or 5)) % 6
-            elapsed_months = max(1, int(int(ob.term) * (1.4 + seed * 0.18)))
+            elapsed_months = max(1, int(remaining * (1.4 + seed * 0.18)))
             ob.start_date = now - timedelta(days=30 * elapsed_months)
+            ob.term = remaining + elapsed_months
     for items in data.values():
         for item in items:
             item.user_id = user_id  # привязка демо-данных к текущему пользователю
