@@ -54,8 +54,11 @@
                         <span>порог досрочки</span>
                         <span>30%</span>
                     </div>
-                    <button type="button" id="rbench-cbr" class="ghost-button" style="margin-top:8px; font-size:.74rem; padding:5px 12px; display:inline-flex; align-items:center; gap:6px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>Подставить ключевую ставку ЦБ</button>
-                    <div id="rbench-hint" style="font-size:.70rem; color:var(--c-text3); margin-top:6px; line-height:1.4;">Если ставка по вашим накоплениям выше ставки кредита — досрочно гасить невыгодно, деньги пойдут в накопления.</div>
+                    <div style="display:flex; gap:6px; margin-top:8px; flex-wrap:wrap;">
+                        <button type="button" id="rbench-cbr" class="ghost-button" style="font-size:.74rem; padding:5px 12px; display:inline-flex; align-items:center; gap:6px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>Ставка ЦБ</button>
+                        <button type="button" id="rbench-from-asset" class="ghost-button" style="font-size:.74rem; padding:5px 12px;">Из моего вклада</button>
+                    </div>
+                    <div id="rbench-hint" style="font-size:.70rem; color:var(--c-text3); margin-top:6px; line-height:1.4;">Ориентир — ставка ваших накоплений. Если она выше ставки кредита, досрочно гасить невыгодно: деньги пойдут в накопления. По умолчанию подставляется лучшая ставка среди ваших вкладов.</div>
                 </div>
                 <button class="primary-button w-full" type="submit" style="padding:10px;">Рассчитать альтернативы</button>
             </form>

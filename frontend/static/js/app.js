@@ -963,52 +963,59 @@ function renderObligations() {
         const rate = pn(o.interest_rate);
         // В интерфейсе ставка может прийти долей (0.085) или процентом (8.5) — нормализуем к %.
         const ratePct = rate > 0 && rate < 1 ? rate * 100 : rate;
+        const payment = pn(o.monthly_payment);
 
-        // Прогресс по сроку. term трактуем как ОСТАВШИЙСЯ срок; общий = прошло + остаток.
-        let progressBlock = '';
+        // Прогресс выплат (как в целях). term трактуем как ОСТАВШИЙСЯ срок; общий = прошло + остаток.
         let elapsed = 0;
         if (o.start_date) {
             const start = new Date(o.start_date);
             const now = new Date();
             elapsed = Math.max(0, (now.getFullYear() - start.getFullYear()) * 12 + (now.getMonth() - start.getMonth()));
         }
-        if (o.start_date && o.term > 0) {
-            const totalTerm = elapsed + o.term;
-            const pct = Math.min(100, elapsed / totalTerm * 100);
-            const paidSum = elapsed * pn(o.monthly_payment);
-            progressBlock = `
-                <div class="indicator-track" style="height:5px; margin-top:12px;">
-                    <div class="indicator-track-fill debt-fill" style="width:${pct}%"></div>
-                </div>
-                <div style="display:flex; justify-content:space-between; font-size:.76rem; color:var(--c-text3); margin-top:4px;">
-                    <span>Платите уже ${elapsed} мес (~${fmt.cur(paidSum)})</span>
-                    <span>Осталось ${o.term} мес</span>
-                </div>`;
-        }
+        const hasProgress = o.start_date && o.term > 0 && payment > 0;
+        const totalTerm = elapsed + o.term;
+        const paidSum = elapsed * payment;       // сколько уже отдано банку
+        const totalPay = totalTerm * payment;    // всего платежей по графику
+        const remainPay = o.term * payment;      // осталось выплатить
+        const pct = totalTerm > 0 ? Math.min(100, elapsed / totalTerm * 100) : 0;
+
         const takenLine = o.start_date ? ` · взят ${fmt.date(o.start_date)}` : '';
+
+        const progressBlock = hasProgress ? `
+            <div class="indicator-track" style="height:5px; margin-top:10px;">
+                <div class="indicator-track-fill debt-fill" style="width:${pct}%"></div>
+            </div>
+            <div style="display:flex; justify-content:space-between; font-size:.78rem; color:var(--c-text3); margin-top:4px;">
+                <span>Выплачено ${fmt.cur(paidSum)} из ${fmt.cur(totalPay)} · ${pct.toFixed(0)}%</span>
+                <span>Осталось ${fmt.cur(remainPay)}</span>
+            </div>` : `
+            <div style="font-size:.78rem; color:var(--c-text3); margin-top:8px;">
+                Остаток долга: <strong style="color:var(--c-text2);">${fmt.cur(o.amount)}</strong>
+            </div>`;
 
         // Раскрываемые детали
         const details = `
             <div style="margin-top:12px; padding-top:12px; border-top:1px solid var(--c-border); display:grid; grid-template-columns:1fr 1fr; gap:8px 18px; font-size:.8rem;">
-                <div>Платёж в месяц: <strong>${fmt.cur(o.monthly_payment)}</strong></div>
+                <div>Платёж в месяц: <strong>${fmt.cur(payment)}</strong></div>
                 <div>Процентная ставка: <strong>${ratePct.toFixed(ratePct % 1 ? 1 : 0)}%</strong></div>
                 <div>Остаток долга: <strong>${fmt.cur(o.amount)}</strong></div>
                 <div>Осталось платежей: <strong>${o.term} мес</strong></div>
                 ${o.start_date ? `<div>Когда взят: <strong>${fmt.date(o.start_date)}</strong></div><div>Платите уже: <strong>${elapsed} мес</strong></div>` : ''}
+                ${hasProgress ? `<div style="grid-column:1 / -1; color:var(--c-text3);">Всего по графику: ${fmt.cur(totalPay)} (${totalTerm} платежей по ${fmt.cur(payment)}). Сумма включает проценты.</div>` : ''}
                 ${o.comment ? `<div style="grid-column:1 / -1; color:var(--c-text2);">${esc(o.comment)}</div>` : ''}
-            </div>
-            ${progressBlock}`;
+            </div>`;
 
         return `
         <details class="stack-item" style="flex-direction:column; align-items:stretch; gap:0; cursor:pointer;">
-            <summary style="display:flex; justify-content:space-between; align-items:flex-start; list-style:none;">
-                <div>
+            <summary style="list-style:none; display:block;">
+                <div style="display:flex; justify-content:space-between; align-items:flex-start;">
                     <div class="stack-item-title">${esc(o.name)}</div>
-                    <div class="stack-item-text">
-                        ${fmt.cur(o.monthly_payment)} / мес · Ставка ${ratePct.toFixed(ratePct % 1 ? 1 : 0)}% · Осталось ${o.term} мес${takenLine}
-                    </div>
+                    <button class="ghost-button delete-button" data-obligation-id="${o.id}" style="color:var(--c-red);font-size:.85rem;padding:6px 10px;" title="Удалить" onclick="event.stopPropagation()">✕</button>
                 </div>
-                <button class="ghost-button delete-button" data-obligation-id="${o.id}" style="color:var(--c-red);font-size:.85rem;padding:6px 10px;" title="Удалить" onclick="event.stopPropagation()">✕</button>
+                <div class="stack-item-text">
+                    ${fmt.cur(payment)} / мес · Ставка ${ratePct.toFixed(ratePct % 1 ? 1 : 0)}% · Осталось ${o.term} мес${takenLine}
+                </div>
+                ${progressBlock}
             </summary>
             ${details}
         </details>`;
@@ -1362,6 +1369,19 @@ function bindPlanningUI() {
         } catch (e) { window.showToast('Не удалось получить ставку ЦБ', {error:true}); }
     });
 
+    on($('#rbench-from-asset'), 'click', () => {
+        const hint = $('#rbench-hint');
+        const assets = state.liquid_assets || [];
+        const best = assets.reduce((mx, a) => Math.max(mx, pn(a.interest_rate)), 0);
+        if (best <= 0) {
+            if (hint) hint.textContent = 'У вас пока нет вкладов со ставкой. Добавьте их в разделе «Банки и счета».';
+            return;
+        }
+        const pct = best > 0 && best < 1 ? best * 100 : best;
+        setRbench(Math.round(pct * 10) / 10);
+        if (hint) hint.textContent = `Подставлена лучшая ставка среди ваших вкладов: ${pct.toFixed(1)}%.`;
+    });
+
     // Risk selector
     $$('.risk-btn').forEach(btn => {
         btn.addEventListener('click', () => {
@@ -1607,17 +1627,21 @@ function renderForecast(data) {
                 <summary style="cursor:pointer; font-size:.82rem; color:var(--c-accent); font-weight:600;
                     display:inline-flex; align-items:center; gap:6px; padding:8px 14px;
                     border:1px solid var(--c-accent); border-radius:var(--r-sm); list-style:none; width:fit-content;">
-                    Что показывает этот график и почему линия прямая</summary>
+                    Как построен прогноз и можно ли ему доверять</summary>
                 <div style="margin-top:8px; font-size:.74rem; line-height:1.55;">
-                    <p style="margin:0 0 6px;"><b>Что это.</b> Синяя линия — сколько свободных денег у вас будет накапливаться (или сгорать) месяц за месяцем, если доходы и расходы останутся как в среднем по вашей истории. Жёлтый коридор — диапазон, куда значение попадёт с вероятностью 80%: система прогоняет 1000 случайных сценариев вокруг прогноза.</p>
-                    <p style="margin:0 0 6px;"><b>Почему линия прямая.</b> Прогноз строится по среднему: каждый месяц прибавляется примерно одинаковая сумма, поэтому накопление ложится прямой. Это не баг — при стабильных данных так и должно быть. Чем «шумнее» история, тем шире жёлтый коридор.</p>
-                    <p style="margin:0;"><b>Как проверить.</b> Введите гипотетический доход или расходы в «Сценарий "что если"» — наклон изменится сразу. Либо добавьте крупный расход в операции: прогноз пересчитается, линия уйдёт вниз.</p>
+                    <p style="margin:0 0 6px;"><b>Что показывает.</b> Синяя линия — сколько свободных денег у вас будет оставаться месяц за месяцем, если доходы и расходы сохранятся примерно как в вашей истории. Жёлтый коридор — диапазон, в который значение попадёт примерно в 80 случаях из 100.</p>
+                    <p style="margin:0 0 4px;"><b>Как строится — по шагам:</b></p>
+                    <ol style="margin:0 0 6px; padding-left:18px; display:flex; flex-direction:column; gap:3px;">
+                        <li>Берём вашу историю доходов и расходов по месяцам.</li>
+                        <li>Считаем устойчивый средний уровень — недавние месяцы весят больше старых, потому что свежие данные лучше описывают вашу текущую ситуацию.</li>
+                        <li>Проецируем этот уровень вперёд и накапливаем остаток месяц к месяцу — так получается синяя линия.</li>
+                        <li>Прогоняем 1000 случайных сценариев вокруг прогноза (с учётом того, насколько «скачут» ваши данные) — из них складывается жёлтый коридор 80%.</li>
+                    </ol>
+                    <p style="margin:0 0 6px;"><b>Почему этому можно доверять.</b> Чем больше у вас истории и чем стабильнее операции, тем уже коридор и точнее прогноз. Если данных мало или они сильно скачут — коридор становится широким, и это честный сигнал «пока многое неопределённо», а не ложная точность.</p>
+                    <p style="margin:0 0 6px;"><b>Почему линия часто прямая.</b> Прогноз идёт по среднему: каждый месяц прибавляется примерно одинаковая сумма, поэтому накопление ложится прямой. При стабильных данных так и должно быть.</p>
+                    <p style="margin:0;"><b>Как проверить самому.</b> Введите другой доход или расход в «Сценарий "что если"» — наклон линии изменится сразу. Или добавьте крупный расход в операции: прогноз пересчитается, и линия уйдёт вниз.</p>
                 </div>
             </details>
-            <div style="margin-top:6px; font-size:.7rem; color:var(--c-text3);">
-                Точечный прогноз: <span style="color:var(--c-text2);">${method.point || 'baseline'}</span> ·
-                интервал: <span style="color:var(--c-amber);">${method.interval || '—'}</span> — диапазон в столбце «80% CI» снизу
-            </div>
         </div>
         <table style="width:100%; border-collapse:collapse; font-size:.82rem;">
             <thead>

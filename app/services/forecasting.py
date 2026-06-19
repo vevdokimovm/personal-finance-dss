@@ -1,6 +1,6 @@
 """
 Оркестратор прогнозирования — собирает SES + Monte Carlo из core/forecast
-с накоплением баланса по форм. 35 ВКР.
+с накоплением баланса месяц к месяцу.
 """
 from __future__ import annotations
 
@@ -8,7 +8,6 @@ from typing import Optional
 
 from app.core.forecast import (
     MC_SIMULATIONS,
-    SES_ALPHA,
     build_history_from_current,
     detect_trend,
     monte_carlo_intervals,
@@ -32,7 +31,7 @@ def forecast_indicators(
     recurring_expense: float = 0.0,
 ) -> dict:
     """
-    Прогноз вектора состояния {Rt+h, Lt+h, Dt+h} на горизонт H (форм. 35 ВКР).
+    Прогноз вектора состояния {Rt+h, Lt+h, Dt+h} на горизонт H.
     Bt+h накапливается: Bt+h = Bt+h-1 + (CF̂ − ΣP̂).
 
     recurring_income/expense — суммы по регулярным операциям (is_recurring). На SES
@@ -112,7 +111,7 @@ def forecast_indicators(
         "trend": trend,
         "stable_baseline": stable_baseline,
         "method": {
-            "point": f"SES α={SES_ALPHA} (Brown, 1956) с накоплением Bt по форм. 35 ВКР",
-            "interval": f"Monte-Carlo N={MC_SIMULATIONS}, σ(h)=σ₀√(1+0.5·h), 80% CI [p10..p90]",
+            "point": "экспоненциальное сглаживание истории с накоплением баланса",
+            "interval": f"{MC_SIMULATIONS} случайных сценариев, диапазон 80%",
         },
     }
