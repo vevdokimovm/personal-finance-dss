@@ -1,0 +1,66 @@
+from typing import Optional
+
+from fastapi import Depends, HTTPException, Request, status
+from sqlalchemy.orm import Session
+
+from app.config import settings
+from app.database.crud import get_user_by_id
+from app.database.db import get_db
+from app.database.models import User
+from app.services.security import token_service
+
+__all__ = ["get_db", "get_current_user", "require_user", "get_current_user_id"]
+
+
+def _extract_token(request: Request) -> Optional[str]:
+    """JWT из заголовка Authorization: Bearer (приоритет) либо из httpOnly-cookie.
+
+    Явный Bearer-токен сильнее амбиентной cookie: API-клиент, передавший токен
+    заголовком, всегда работает от своего имени, даже если в запросе затесалась
+    чужая/устаревшая cookie.
+    """
+    header = request.headers.get("authorization", "")
+    if header.lower().startswith("bearer "):
+        return header[7:].strip()
+    cookie = request.cookies.get(settings.AUTH_COOKIE_NAME)
+    if cookie:
+        return cookie
+    return None
+
+
+def get_current_user(
+    request: Request, db: Session = Depends(get_db)
+) -> Optional[User]:
+    """Опциональный текущий пользователь.
+
+    Возвращает None в анонимном режиме (legacy single-user v2.x) — это не ошибка.
+    Защищённые роуты используют require_user, остальные деградируют к None.
+    """
+    token = _extract_token(request)
+    if not token:
+        return None
+    payload = token_service.decode(token)
+    if not payload:
+        return None
+    user_id = payload.get("sub")
+    if not user_id:
+        return None
+    return get_user_by_id(db, user_id)
+
+
+def require_user(user: Optional[User] = Depends(get_current_user)) -> User:
+    """Жёсткая защита: 401, если пользователь не аутентифицирован."""
+    if user is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Требуется аутентификация.",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    return user
+
+
+def get_current_user_id(
+    user: Optional[User] = Depends(get_current_user),
+) -> Optional[str]:
+    """Идентификатор владельца для фильтрации данных (None = анонимный режим)."""
+    return user.id if user is not None else None
