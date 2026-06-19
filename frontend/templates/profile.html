@@ -1,0 +1,200 @@
+{% extends "base.html" %}
+{% block title %}Профиль · FINPILOT{% endblock %}
+{% block page_title %}Личный профиль{% endblock %}
+
+{% block content %}
+<div id="profile-guest" style="display:none;">
+    <section class="glass-panel w-full" style="padding:40px; text-align:center;">
+        <h2 class="section-title" style="justify-content:center;">Вы не вошли в систему</h2>
+        <p style="color:var(--c-text2); margin:8px 0 20px;">Войдите в аккаунт, чтобы посмотреть профиль и настройки.</p>
+        <button id="profile-login-btn" class="primary-button" type="button" style="padding:10px 28px;">Войти</button>
+    </section>
+</div>
+
+<div id="profile-content" style="display:none; max-width:680px;">
+    <!-- Данные аккаунта -->
+    <section class="glass-panel w-full" style="margin-bottom:20px;">
+        <div class="section-head"><div><h2 class="section-title">Данные аккаунта</h2></div></div>
+        <div style="padding:8px 28px 24px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; padding:12px 0; border-bottom:1px solid var(--c-border);">
+                <span style="color:var(--c-text3);">Email</span>
+                <span id="pf-email" style="font-weight:600;">—</span>
+            </div>
+            <div style="display:flex; justify-content:space-between; align-items:center; padding:12px 0; border-bottom:1px solid var(--c-border);">
+                <span style="color:var(--c-text3);">Статус email</span>
+                <span style="display:flex; align-items:center; gap:10px;">
+                    <span id="pf-verify-badge" style="font-weight:600;">—</span>
+                    <button id="pf-resend" type="button" class="ghost-button" style="display:none; font-size:.74rem; padding:5px 12px;">Отправить письмо</button>
+                </span>
+            </div>
+            <div style="display:flex; justify-content:space-between; padding:12px 0; border-bottom:1px solid var(--c-border);">
+                <span style="color:var(--c-text3);">Дата регистрации</span>
+                <span id="pf-created" style="font-weight:600;">—</span>
+            </div>
+            <div style="margin-top:18px;">
+                <label class="field-label" for="pf-name">Имя</label>
+                <div style="display:flex; gap:10px; margin-top:6px;">
+                    <input type="text" id="pf-name" class="modal-input" placeholder="Как к вам обращаться" style="flex:1;">
+                    <button id="pf-name-save" class="primary-button" type="button" style="padding:10px 20px; white-space:nowrap;">Сохранить</button>
+                </div>
+                <div id="pf-name-msg" style="font-size:.8rem; margin-top:8px; display:none;"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Смена пароля -->
+    <section class="glass-panel w-full" style="margin-bottom:20px;">
+        <div class="section-head"><div><h2 class="section-title">Смена пароля</h2></div></div>
+        <div style="padding:8px 28px 24px;">
+            <label class="field-label" for="pf-cur-pass">Текущий пароль</label>
+            <input type="password" id="pf-cur-pass" class="modal-input" autocomplete="current-password" style="margin:6px 0 14px;">
+            <label class="field-label" for="pf-new-pass">Новый пароль (минимум 8 символов)</label>
+            <input type="password" id="pf-new-pass" class="modal-input" autocomplete="new-password" style="margin:6px 0 14px;">
+            <button id="pf-pass-save" class="primary-button" type="button" style="padding:10px 24px;">Обновить пароль</button>
+            <div id="pf-pass-msg" style="font-size:.8rem; margin-top:10px; display:none;"></div>
+        </div>
+    </section>
+
+    <!-- Опасная зона -->
+    <section class="glass-panel w-full" style="border:1px solid rgba(239,68,68,.35);">
+        <div class="section-head"><div><h2 class="section-title" style="color:var(--c-red);">Удаление аккаунта</h2></div></div>
+        <div style="padding:8px 28px 24px;">
+            <p style="color:var(--c-text2); font-size:.88rem; line-height:1.55; margin:0 0 16px;">
+                Удаление аккаунта необратимо. Будут стёрты все ваши данные: операции, обязательства,
+                цели, ликвидные активы и настройки. Это действие нельзя отменить.
+            </p>
+            <button id="pf-delete" class="ghost-button" type="button"
+                    style="padding:10px 24px; color:var(--c-red); border-color:rgba(239,68,68,.5);">
+                Удалить аккаунт навсегда
+            </button>
+        </div>
+    </section>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+(function () {
+    const guest = document.getElementById('profile-guest');
+    const content = document.getElementById('profile-content');
+
+    function showMsg(el, text, ok) {
+        el.textContent = text;
+        el.style.color = ok ? 'var(--c-green)' : 'var(--c-red)';
+        el.style.display = 'block';
+    }
+
+    async function authFetch(url, options) {
+        const token = localStorage.getItem('finpilot-token');
+        const headers = Object.assign({ 'Content-Type': 'application/json' }, (options && options.headers) || {});
+        if (token) headers['Authorization'] = 'Bearer ' + token;
+        return fetch(url, Object.assign({}, options, { headers }));
+    }
+
+    async function load() {
+        try {
+            const res = await authFetch('/api/auth/me');
+            if (!res.ok) throw new Error('unauthorized');
+            const user = await res.json();
+            document.getElementById('pf-email').textContent = user.email;
+            document.getElementById('pf-name').value = user.display_name || '';
+            const badge = document.getElementById('pf-verify-badge');
+            const resendBtn = document.getElementById('pf-resend');
+            if (user.email_verified) {
+                badge.textContent = '✓ Подтверждён';
+                badge.style.color = 'var(--c-green)';
+                resendBtn.style.display = 'none';
+            } else {
+                badge.textContent = '✗ Не подтверждён';
+                badge.style.color = 'var(--c-amber)';
+                resendBtn.style.display = 'inline-block';
+            }
+            if (user.created_at) {
+                const d = new Date(user.created_at);
+                document.getElementById('pf-created').textContent = d.toLocaleDateString('ru-RU', { year: 'numeric', month: 'long', day: 'numeric' });
+            }
+            content.style.display = 'block';
+            guest.style.display = 'none';
+        } catch {
+            guest.style.display = 'block';
+            content.style.display = 'none';
+        }
+    }
+
+    // Сохранить имя
+    document.getElementById('pf-name-save').addEventListener('click', async () => {
+        const msg = document.getElementById('pf-name-msg');
+        const res = await authFetch('/api/auth/me', {
+            method: 'PATCH',
+            body: JSON.stringify({ display_name: document.getElementById('pf-name').value }),
+        });
+        if (res.ok) showMsg(msg, 'Имя обновлено.', true);
+        else showMsg(msg, 'Не удалось сохранить.', false);
+    });
+
+    // Сменить пароль
+    document.getElementById('pf-pass-save').addEventListener('click', async () => {
+        const msg = document.getElementById('pf-pass-msg');
+        const cur = document.getElementById('pf-cur-pass').value;
+        const next = document.getElementById('pf-new-pass').value;
+        if (next.length < 8) { showMsg(msg, 'Новый пароль — минимум 8 символов.', false); return; }
+        const res = await authFetch('/api/auth/change-password', {
+            method: 'POST',
+            body: JSON.stringify({ current_password: cur, new_password: next }),
+        });
+        const data = await res.json().catch(() => ({}));
+        if (res.ok) {
+            showMsg(msg, 'Пароль обновлён.', true);
+            document.getElementById('pf-cur-pass').value = '';
+            document.getElementById('pf-new-pass').value = '';
+        } else {
+            showMsg(msg, data.detail || 'Не удалось сменить пароль.', false);
+        }
+    });
+
+    // Удалить аккаунт (двойное подтверждение)
+    document.getElementById('pf-delete').addEventListener('click', async () => {
+        if (!confirm('Удалить аккаунт и ВСЕ данные безвозвратно?')) return;
+        if (!confirm('Точно? Это действие нельзя отменить.')) return;
+        const res = await authFetch('/api/auth/me', { method: 'DELETE' });
+        if (res.ok) {
+            localStorage.removeItem('finpilot-token');
+            alert('Аккаунт удалён.');
+            window.location.href = '/';
+        } else {
+            alert('Не удалось удалить аккаунт.');
+        }
+    });
+
+    const loginBtn = document.getElementById('profile-login-btn');
+    if (loginBtn) loginBtn.addEventListener('click', () => {
+        const headerLogin = document.getElementById('auth-login-btn');
+        if (headerLogin) headerLogin.click();
+    });
+
+    // Повторная отправка письма подтверждения
+    const resendBtn = document.getElementById('pf-resend');
+    if (resendBtn) resendBtn.addEventListener('click', async () => {
+        resendBtn.disabled = true;
+        const res = await authFetch('/api/auth/resend-verification', { method: 'POST' });
+        const data = await res.json().catch(() => ({}));
+        if (data.verification_url) {
+            // SMTP не настроен: показываем ссылку кнопкой в тосте
+            window.showToast('SMTP не настроен. Подтвердите email по ссылке:', {
+                linkUrl: data.verification_url, linkLabel: 'Подтвердить email',
+            });
+        } else {
+            window.showToast(data.detail || 'Письмо отправлено на вашу почту.');
+        }
+        resendBtn.disabled = false;
+    });
+
+    // Баннер после перехода по ссылке подтверждения
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('verified') === '1') window.showToast('Email успешно подтверждён ✓');
+    else if (params.get('verified') === '0') window.showToast('Ссылка подтверждения недействительна или истекла.', { error: true });
+
+    load();
+})();
+</script>
+{% endblock %}
