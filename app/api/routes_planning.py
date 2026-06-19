@@ -39,7 +39,6 @@ class PlanningRequest(BaseModel):
     r_bench: Optional[float] = Field(None, ge=0.0, le=1.0, description="OCR — порог Avalanche")
     income_override: Optional[float] = Field(None, ge=0, description="Сценарий: доход вместо фактического")
     expense_override: Optional[float] = Field(None, ge=0, description="Сценарий: расходы вместо фактических")
-    spending_cut: Optional[float] = Field(None, ge=0, description="What-if: сократить расходы на эту сумму (применение совета по тратам)")
 
 
 class ForecastRequest(BaseModel):
@@ -158,9 +157,6 @@ def _compute_plan(
         payload.expense_override if payload.expense_override is not None
         else calculate_expense_total(prepared["transactions"])
     )
-    # What-if: применение совета по тратам — сокращаем расходы, Rt растёт на ту же сумму.
-    if payload.spending_cut:
-        expense_total = max(0.0, expense_total - payload.spending_cut)
     bliq = sum_liquid_assets(prepared["liquid_assets"])
 
     ensure_calculable(prepared["transactions"], prepared["obligations"])
