@@ -54,12 +54,18 @@ class TestCashFlow:
 
 
 class TestLiquidity:
-    def test_lt(self):
-        # Lt = Rt / (E + ΣP) = 400 / (400 + 200)
-        assert calculate_lt(400, 400, 200) == pytest.approx(0.6667, rel=1e-3)
+    def test_lt_autonomy_months(self):
+        # Lt (stock-based) = ликвидная подушка / месячные расходы = месяцы автономии
+        # 6000 ₽ подушки при 2000 ₽/мес расходов → 3 месяца
+        assert calculate_lt(6000, 2000) == pytest.approx(3.0)
 
-    def test_lt_zero_denominator(self):
-        assert calculate_lt(400, 0, 0) == 0.0
+    def test_lt_no_reserve(self):
+        # пустая подушка → ноль месяцев автономии
+        assert calculate_lt(0, 2000) == 0.0
+
+    def test_lt_zero_expense(self):
+        # нет расходов → деления на ноль нет, безопасный 0.0
+        assert calculate_lt(6000, 0) == 0.0
 
 
 class TestDebt:

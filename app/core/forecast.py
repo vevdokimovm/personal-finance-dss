@@ -2,9 +2,9 @@
 Прогнозирование показателей финансового состояния (этап 3 ВКР, форм. 14, 35).
 
 Подход:
-  1. SES α = 0.3 (Brown, 1956) — точечный прогноз It, Σej, ΣP
+  1. SES α = 0.3 (Brown 1956; совр. state-space трактовка — Hyndman et al. 2002)
   2. Накопление баланса B(t+h) по формуле 35 ВКР
-  3. Monte-Carlo N=1000 (Ulam, von Neumann, 1940-е) с растущей σ(h) — интервал [p10..p90]
+  3. Monte-Carlo N=1000 (Metropolis & Ulam 1949) с растущей σ(h) — интервал 80% [p10..p90]
 """
 from __future__ import annotations
 
@@ -16,10 +16,15 @@ SES_ALPHA = 0.3
 MC_SIMULATIONS = 1000
 MC_SIGMA_BASE = 0.05
 MC_SIGMA_GROWTH = 0.5
+# Доверительный интервал прогноза: 80% (p10..p90). Для персонального планирования на
+# 1–3 месяца 80% даёт читаемый коридор; 95% при растущей σ был бы слишком широким,
+# чтобы служить ориентиром для пользователя.
+MC_CI_LOWER = 0.10
+MC_CI_UPPER = 0.90
 
 
 def ses_forecast(history: List[float], alpha: float = SES_ALPHA, horizon: int = 1) -> List[float]:
-    """Экспоненциальное сглаживание (Brown, 1956, форм. 11 ВКР)."""
+    """Простое экспоненциальное сглаживание (Brown 1956; Hyndman et al. 2002)."""
     if not history:
         return [0.0] * horizon
     if len(history) == 1:
@@ -48,9 +53,9 @@ def monte_carlo_intervals(
         sigma_abs = abs(point) * sigma_h
         samples = [point + random.gauss(0.0, sigma_abs) for _ in range(n_sim)]
         samples.sort()
-        p10 = samples[int(0.10 * n_sim)]
+        p10 = samples[int(MC_CI_LOWER * n_sim)]
         p50 = samples[int(0.50 * n_sim)]
-        p90 = samples[int(0.90 * n_sim)]
+        p90 = samples[min(int(MC_CI_UPPER * n_sim), n_sim - 1)]
         intervals.append({"p10": round(p10, 2), "p50": round(p50, 2), "p90": round(p90, 2)})
     return intervals
 

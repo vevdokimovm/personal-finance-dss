@@ -51,3 +51,33 @@ class TestRanking:
         # B доминирует по всем критериям → должна победить при любом профиле
         ranked = rank_alternatives(self._alts(), risk_tolerance=1)
         assert ranked[0]["name"] == "B"
+
+    def test_single_alternative_no_crash(self):
+        # единственная альтернатива: min==max по всем критериям → нет деления на ноль
+        ranked = rank_alternatives(
+            [{"name": "solo", "Rt_new": 1000, "Lt_new": 2.0, "Dt_new": 0.2, "Si": 0.5}]
+        )
+        assert len(ranked) == 1 and ranked[0]["is_recommended"] is True
+        assert 0.0 <= ranked[0]["utility"] <= 1.0
+
+    def test_all_equal_debt_no_crash(self):
+        # пользователь без долгов: у всех Dt_new одинаков → нормализация не падает
+        alts = [
+            {"name": "A", "Rt_new": 1000, "Lt_new": 2.0, "Dt_new": 0.0, "Si": 0.3},
+            {"name": "B", "Rt_new": 2000, "Lt_new": 4.0, "Dt_new": 0.0, "Si": 0.6},
+        ]
+        ranked = rank_alternatives(alts, risk_tolerance=3)
+        assert all(0.0 <= a["utility"] <= 1.0 for a in ranked)
+
+    def test_profile_changes_choice(self):
+        # Главный эффект refined-модели: с ортогональными критериями профиль реально
+        # меняет выбор. Консерватор (вес ликвидности 0.45) выбирает высокую автономию;
+        # агрессор (вес целей 0.40) — высокую обеспеченность целей.
+        alts = [
+            {"name": "liquidity", "Rt_new": 1000, "Lt_new": 6.0, "Dt_new": 0.2, "Si": 0.1},
+            {"name": "goals", "Rt_new": 1000, "Lt_new": 1.0, "Dt_new": 0.2, "Si": 0.9},
+        ]
+        conservative = rank_alternatives([dict(a) for a in alts], risk_tolerance=1)
+        aggressive = rank_alternatives([dict(a) for a in alts], risk_tolerance=5)
+        assert conservative[0]["name"] == "liquidity"
+        assert aggressive[0]["name"] == "goals"

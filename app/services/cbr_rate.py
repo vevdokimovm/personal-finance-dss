@@ -31,6 +31,12 @@ _USER_AGENT = (
 # Кэш на процесс: (значение, источник, дата) на сутки.
 _cache: dict[str, object] = {"rate": None, "source": None, "fetched_on": None}
 
+# Память о недавней неудаче: при недоступности cbr.ru (зарубежный IP/блокировка)
+# не ходим в сеть на каждом запросе рекомендации — иначе каждый расчёт ждёт ответ.
+# Повторная попытка не чаще, чем раз в 15 минут.
+_FAIL_RETRY_SECONDS = 900
+_fail_until: dict[str, object] = {"ts": None, "detail": ""}
+
 
 def _build_soap_body(from_date: date, to_date: date) -> bytes:
     return (
@@ -76,9 +82,17 @@ def get_key_rate(fallback: float = 0.16) -> dict[str, object]:
     Возвращает {"key_rate": float, "source": "cbr"|"cache"|"fallback", "as_of": str}.
     """
     today = datetime.now(timezone.utc).date()
+    now = datetime.now(timezone.utc)
 
     if _cache["rate"] is not None and _cache["fetched_on"] == today:
         return {"key_rate": _cache["rate"], "source": "cache", "as_of": today.isoformat()}
+
+    # Недавняя неудача — не бьёмся в сеть на каждом запросе.
+    if _fail_until["ts"] is not None and now < _fail_until["ts"]:
+        return {
+            "key_rate": fallback, "source": "fallback",
+            "as_of": today.isoformat(), "detail": _fail_until["detail"],
+        }
 
     detail = ""
     try:
@@ -99,6 +113,7 @@ def get_key_rate(fallback: float = 0.16) -> dict[str, object]:
             rate = _parse_latest_rate(resp.read().decode("utf-8"))
         if rate is not None and 0 < rate < 1:
             _cache.update(rate=rate, source="cbr", fetched_on=today)
+            _fail_until.update(ts=None, detail="")
             return {"key_rate": rate, "source": "cbr", "as_of": today.isoformat(), "detail": ""}
         detail = "cbr.ru ответил, но ключевую ставку не удалось извлечь из ответа"
         _log.warning("CBR key rate: %s", detail)
@@ -118,4 +133,38 @@ def get_key_rate(fallback: float = 0.16) -> dict[str, object]:
         detail = f"ответ cbr.ru не распознан ({exc})"
         _log.warning("CBR key rate parse error: %s", detail)
 
+    _fail_until.update(ts=now + timedelta(seconds=_FAIL_RETRY_SECONDS), detail=detail)
     return {"key_rate": fallback, "source": "fallback", "as_of": today.isoformat(), "detail": detail}
+
+
+def get_opportunity_cost_rate(fallback: float = 0.14, tax_rate: float = 0.13) -> dict[str, object]:
+    """Альтернативная доходность рубля (OCR / r_bench) — порог фильтра Avalanche.
+
+    Накопительные счета и короткие ОФЗ держатся рядом с ключевой ставкой ЦБ, но с
+    процентного дохода удерживается НДФЛ. Поэтому посленалоговая доходность
+    безрисковой альтернативы ≈ ключевая × (1 − НДФЛ). Гасить кредит выгодно только
+    если его ставка выше этого ориентира.
+
+    При ключевой 16% и НДФЛ 13% → r_bench ≈ 0.139, что совпадает с историческим
+    дефолтом 0.14. Если ключевую получить нельзя (нет связи с cbr.ru / зарубежный
+    IP), возвращается fallback (обычно prefs.r_bench). Функция никогда не падает.
+
+    Возвращает {"r_bench": float, "source": "cbr_keyrate_post_tax"|"fallback", ...}.
+    """
+    kr = get_key_rate()
+    rate = kr.get("key_rate")
+    if kr.get("source") in ("cbr", "cache") and isinstance(rate, (int, float)) and 0 < rate < 1:
+        ocr = round(float(rate) * (1 - tax_rate), 4)
+        return {
+            "r_bench": ocr,
+            "source": "cbr_keyrate_post_tax",
+            "key_rate": float(rate),
+            "tax_rate": tax_rate,
+            "as_of": kr.get("as_of"),
+        }
+    return {
+        "r_bench": round(fallback, 4),
+        "source": "fallback",
+        "as_of": kr.get("as_of"),
+        "detail": kr.get("detail", ""),
+    }

@@ -28,6 +28,7 @@ from app.database.crud import (
     save_scenario,
 )
 from app.dependencies import get_current_user_id, get_db
+from app.services.cbr_rate import get_opportunity_cost_rate
 from app.services.event_logger import log_event, log_recommendation
 from app.services.forecasting import forecast_indicators
 from app.services.planning import run_planning
@@ -128,8 +129,10 @@ def _compute_plan(
     # r_bench при этом учитывает ставку всех активов (привязанный вклад — тоже доходность).
     goals, assets = apply_envelopes(goals, all_assets)
 
-    # r_bench (OCR): явный из запроса → лучшая ставка ликвидных активов → дефолт prefs.
-    # Экономический смысл: альтернативная доходность рубля = ваша реальная ставка по накоплениям.
+    # r_bench (OCR): явный из запроса → реальная ставка ликвидных активов пользователя
+    #             → ключевая ставка ЦБ после НДФЛ → дефолт prefs.
+    # Экономический смысл: альтернативная доходность рубля = ваша реальная посленалоговая
+    # доходность по накоплениям; если своих активов нет — рыночный ориентир (ключевая ЦБ).
     if payload.r_bench is not None:
         r_bench = payload.r_bench
         r_bench_source = "request"
@@ -139,8 +142,9 @@ def _compute_plan(
             r_bench = best_asset_rate
             r_bench_source = "best_asset_rate"
         else:
-            r_bench = prefs.r_bench
-            r_bench_source = "prefs_default"
+            ocr = get_opportunity_cost_rate(fallback=float(prefs.r_bench))
+            r_bench = ocr["r_bench"]
+            r_bench_source = ocr["source"]
 
     prepared = prepare_data(
         transactions=transactions,

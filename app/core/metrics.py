@@ -1,18 +1,19 @@
 """
-Базовые показатели финансового состояния — формулы 11–13a ВКР Евдокимова В.М.
+Базовые показатели финансового состояния FINPILOT.
 
-Принятая архитектура показателей:
-    Rt  = It − Σej − ΣPl,t                   форм. 11   (поток)
-    Lt  = Rt / (Σej + ΣPl,t)                 форм. 12   (функц. ликвидность для ранжирования)
-    Dt  = ΣPl,t / It                         форм. 13   (долговая нагрузка / ПДН ЦБ РФ)
-    BLR = (Bt + Bliq) / Σej                  форм. 13a  (диагност. индикатор для UI; Greninger 1996)
-    CFt = It − Σej                           форм. 3    (чистый поток)
-    Bt  = Σ current_amount по целям                     (баланс на счетах целей)
+Принятая архитектура показателей (refined model v3.0):
+    CFt = It − Σej                            чистый денежный поток
+    Rt  = CFt − ΣPl,t                         свободный РЕСУРС (поток после обязательств)
+    Lt  = Lreserve / Σej                      ЛИКВИДНОСТЬ — месяцы автономии (stock-based)
+    Dt  = ΣPl,t / It                          долговая нагрузка (ПДН Банка России)
+    BLR = (Bt + Bliq) / Σej                   диагностический индикатор ликвидности (Greninger 1996)
+    Bt  = Σ current_amount по целям           накопления на счетах целей
 
-Принцип «поток vs состояние»:
-    Rt — это поток периода;
-    Bt и Bliq — состояние счетов.
-    Они описывают разные аспекты картины и используются раздельно.
+Ключевое отличие refined-модели (v3.0): ресурс Rt — это ПОТОК, а ликвидность Lt — это
+ЗАПАС (месяцы жизни на подушке). Раньше Lt = Rt/(Σej+ΣP) был линейной функцией
+Rt → два из четырёх критериев свёртки несли одну и ту же информацию (r≈0.9998).
+Stock-based Lt ортогонален Rt: Rt реагирует на досрочку долга, Lt — на пополнение
+резерва. Это восстанавливает реальную работу профилей риска в SAW-свёртке.
 """
 from __future__ import annotations
 
@@ -79,13 +80,18 @@ def calculate_rt(cash_flow: float, obligation_payments: float) -> float:
     return cash_flow - obligation_payments
 
 
-def calculate_lt(rt: float, expense_total: float, obligation_payments: float) -> float:
+def calculate_lt(liquid_reserve: float, expense_total: float) -> float:
     """
-    Lt = Rt / (Σej + ΣPl,t)  (форм. 12 ВКР).
-    Безразмерный функциональный коэффициент ликвидности для ранжирования.
+    Lt = ликвидная подушка / Σej — месяцы автономии (stock-based).
+
+    Сколько месяцев пользователь проживёт на ликвидном резерве без дохода.
+    Stock-based по своей природе: зависит от запаса ликвидности, а не от
+    свободного потока Rt. Это делает критерий ликвидности ОРТОГОНАЛЬНЫМ ресурсу
+    Rt в свёртке полезности (раньше Lt = Rt/(Σej+ΣP) был линейно зависим от Rt,
+    что давало вырожденную пару коллинеарных критериев). Норма по Greninger
+    et al. (1996): 2.5–6 месяцев.
     """
-    denom = expense_total + obligation_payments
-    return rt / denom if denom > 0 else 0.0
+    return liquid_reserve / expense_total if expense_total > 0 else 0.0
 
 
 def calculate_dt(obligation_payments: float, income_total: float) -> float:

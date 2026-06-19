@@ -1,10 +1,10 @@
 """
 Генерация и оценка альтернатив распределения свободного ресурса Rt
-(этапы 4–4b алгоритма ВКР).
+(этапы 4–4b алгоритма FINPILOT).
 
 Каждая альтернатива — вектор (x_obl, x_res, x_goals) при xi ≥ 0 и xi1+xi2+xi3 ≤ Rt.
-Дискретизация с шагом 20% по stars-and-bars даёт ровно 21 комбинацию:
-    C(1/step + 2, 2) = C(7, 2) = 21.
+Дискретизация stars-and-bars с шагом 10% даёт ровно 66 комбинаций:
+    C(1/step + 2, 2) = C(12, 2) = 66.
 """
 from __future__ import annotations
 
@@ -39,14 +39,17 @@ def generate_alternatives(
     rt: float,
     obligation_payments: float,
     goals_total: float,
-    step: float = 0.20,
+    step: float = 0.10,
 ) -> list[dict[str, Any]]:
     """
-    Этап 4 ВКР: генерация множества A = {a1, …, an} через дискретизацию Rt.
+    Этап 4: генерация множества альтернатив A через дискретизацию Rt.
 
-    При rt ≤ 0 возвращает одну «дефицитную» альтернативу — кейс Михаила.
-    Это математически корректное отражение этапа 4.0:
-    распределять нечего, x_obl + x_res + x_goals = R+_t = max(rt, 0) = 0.
+    Дискретизация stars-and-bars с шагом 10% даёт C(12, 2) = 66 комбинаций
+    (раньше шаг 20% → 21 комбинация). Более мелкий шаг = более тонкие
+    рекомендации по распределению почти без потери скорости.
+
+    При rt ≤ 0 возвращает одну «дефицитную» альтернативу: распределять нечего,
+    x_obl + x_res + x_goals = R+_t = max(rt, 0) = 0.
     """
     if rt <= 0:
         return [{
@@ -59,7 +62,7 @@ def generate_alternatives(
             "x_remain": rt,
         }]
 
-    steps = round(1.0 / step)  # = 5 при step=0.20 → 21 альтернатива
+    steps = round(1.0 / step)  # = 10 при step=0.10 → 66 альтернатив
     alternatives = []
 
     for d in range(steps + 1):
@@ -105,16 +108,23 @@ def evaluate_alternative(
     obligations: list[dict[str, Any]],
     goals: list[dict[str, Any]],
     r_bench: float,
+    bliq: float = 0.0,
     today: datetime | None = None,
 ) -> dict[str, Any]:
     """
-    Этап 4b ВКР: пересчёт Rt', Lt', Dt', Si для альтернативы.
+    Этап 4b: пересчёт Rt', Lt', Dt', Si для альтернативы (refined model v3.0).
 
-    Использует доработки:
-      — Avalanche-распределение x_obl с OCR-фильтром (форм. 41)
-      — Взвешенную обеспеченность целей Si (форм. 15-16)
-    Если ни одно обязательство не проходит фильтр r_bench, нераспределённая
-    часть x_obl возвращается в x_goals.
+    Показатели после применения распределения:
+      — Rt' = It − Σej − ΣP'  (поток; реагирует на досрочку через снижение ΣP)
+      — Lt' = (Bliq + x_reserve) / Σej  (месяцы автономии; реагирует на резерв)
+      — Dt' = ΣP' / It  (ПДН; реагирует на досрочку)
+      — Si  — взвешенная обеспеченность целей (реагирует на x_goals)
+
+    Четыре критерия реагируют на разные компоненты альтернативы → они
+    ортогональны, и SAW-свёртка корректно различает профили риска.
+
+    Avalanche-распределение x_obl с OCR-фильтром: если ни одно обязательство не
+    проходит фильтр r_bench, нераспределённая часть x_obl возвращается в x_goals.
     """
     x_obl = float(alt.get("x_obligations", 0))
     x_goals_total = float(alt.get("x_goals", 0))
@@ -158,10 +168,12 @@ def evaluate_alternative(
     # 2. Взвешенная обеспеченность целей
     si, goal_allocation = calculate_goals_si(x_goals_total, goals, today)
 
-    # 3. Базовые показатели после применения альтернативы (форм. 11-13)
+    # 3. Базовые показатели после применения альтернативы (refined model v3.0)
+    x_res = float(alt.get("x_reserve", 0))
     new_rt = income_total - expense_total - new_obligation_payments
-    denom_lt = expense_total + new_obligation_payments
-    new_lt = new_rt / denom_lt if denom_lt > 0 else 0
+    # Lt' — месяцы автономии на ликвидной подушке + новый резерв (stock-based).
+    # Ортогонально Rt: реагирует на x_reserve, а не на досрочку.
+    new_lt = (bliq + x_res) / expense_total if expense_total > 0 else 0.0
     new_dt = new_obligation_payments / income_total if income_total > 0 else 0
 
     alt["x_obl_effective"] = round(x_obl_eff, 2)

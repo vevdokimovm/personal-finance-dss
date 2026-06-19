@@ -5,9 +5,9 @@
   1. preprocessing — нормализация входных данных
   2. metrics       — расчёт Rt, Lt, Dt, BLR, CFt, Bt
   3. goals_priority.preallocate_from_bliq — этап 4.0: разовое закрытие близких целей
-  4. alternatives.generate_alternatives — этап 4: генерация 21 альтернативы
+  4. alternatives.generate_alternatives — этап 4: генерация 66 альтернатив (шаг 10%)
   5. alternatives.evaluate_alternative  — этап 4b: пересчёт показателей с Avalanche+Si
-  6. filtering.filter_alternatives      — этап 5: фильтрация по B_min, Lcrit, Dmax
+  6. filtering.filter_alternatives      — этап 5: фильтрация по Rt>=0 и ПДН<=0.40
   7. ranking.rank_alternatives          — этап 6: ранжирование SAW
   8. recommendation.explain_alternative — формирование объяснения для top-3
 """
@@ -53,7 +53,7 @@ def run_planning(
     cash_flow = income_total - expense_total
     obligation_payments = sum(float(o.get("monthly_payment", 0)) for o in obligations)
     rt = calculate_rt(cash_flow=cash_flow, obligation_payments=obligation_payments)
-    lt = calculate_lt(rt=rt, expense_total=expense_total, obligation_payments=obligation_payments)
+    lt = calculate_lt(liquid_reserve=bliq_after, expense_total=expense_total)
     dt = calculate_dt(obligation_payments=obligation_payments, income_total=income_total)
     bt = calculate_bt(goals)
     blr = calculate_blr(balance=bt, liquid_assets=bliq_after, expense_total=expense_total)
@@ -78,6 +78,7 @@ def run_planning(
             obligations=obligations,
             goals=active_goals,
             r_bench=r_bench,
+            bliq=bliq_after,
             today=today,
         )
 
@@ -118,6 +119,7 @@ def run_planning(
             obligation_payments=obligation_payments,
             goals_total=goals_total,
             risk_profile_label=profile["label"],
+            alternatives_count=len(alternatives),
         )
         top3.append({**alt, "explanation": explanation})
 

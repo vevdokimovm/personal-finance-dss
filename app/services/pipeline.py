@@ -51,7 +51,7 @@ def run_pipeline(
     bt = calculate_bt(prepared["active_goals"])
 
     rt = calculate_rt(cash_flow=cash_flow, obligation_payments=obligation_payments)
-    lt = calculate_lt(rt=rt, expense_total=expense_total, obligation_payments=obligation_payments)
+    lt = calculate_lt(liquid_reserve=bliq, expense_total=expense_total)
     dt = calculate_dt(obligation_payments=obligation_payments, income_total=income_total)
     blr = calculate_blr(balance=bt, liquid_assets=bliq, expense_total=expense_total)
 
