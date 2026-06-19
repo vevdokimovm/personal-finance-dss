@@ -11,14 +11,22 @@
 """
 from __future__ import annotations
 
+import logging
 import urllib.error
 import urllib.request
 from datetime import date, datetime, timedelta, timezone
 from xml.etree import ElementTree as ET
 
+_log = logging.getLogger(__name__)
+
 _CBR_SOAP_URL = "https://www.cbr.ru/DailyInfoWebServ/DailyInfo.asmx"
 _SOAP_ACTION = "http://web.cbr.ru/KeyRate"
-_TIMEOUT_SECONDS = 4
+_TIMEOUT_SECONDS = 6
+# Реалистичный User-Agent: cbr.ru отклоняет запросы с дефолтным Python-urllib UA.
+_USER_AGENT = (
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+    "(KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
+)
 
 # Кэш на процесс: (значение, источник, дата) на сутки.
 _cache: dict[str, object] = {"rate": None, "source": None, "fetched_on": None}
@@ -77,7 +85,13 @@ def get_key_rate(fallback: float = 0.16) -> dict[str, object]:
         req = urllib.request.Request(
             _CBR_SOAP_URL,
             data=body,
-            headers={"Content-Type": "text/xml; charset=utf-8", "SOAPAction": _SOAP_ACTION},
+            headers={
+                "Content-Type": "text/xml; charset=utf-8",
+                # SOAP 1.1 требует SOAPAction в двойных кавычках — ASMX иначе отдаёт 500.
+                "SOAPAction": f'"{_SOAP_ACTION}"',
+                "User-Agent": _USER_AGENT,
+                "Accept": "text/xml, application/soap+xml, */*",
+            },
             method="POST",
         )
         with urllib.request.urlopen(req, timeout=_TIMEOUT_SECONDS) as resp:
@@ -85,7 +99,9 @@ def get_key_rate(fallback: float = 0.16) -> dict[str, object]:
         if rate is not None and 0 < rate < 1:
             _cache.update(rate=rate, source="cbr", fetched_on=today)
             return {"key_rate": rate, "source": "cbr", "as_of": today.isoformat()}
-    except (urllib.error.URLError, ET.ParseError, ValueError, TimeoutError, OSError):
-        pass
+        _log.warning("CBR key rate: ответ получен, но ставку извлечь не удалось")
+    except (urllib.error.URLError, ET.ParseError, ValueError, TimeoutError, OSError) as exc:
+        # Логируем реальную причину — иначе диагностика «почему fallback» невозможна.
+        _log.warning("CBR key rate fetch failed: %s", exc)
 
     return {"key_rate": fallback, "source": "fallback", "as_of": today.isoformat()}

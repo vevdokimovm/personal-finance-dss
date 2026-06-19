@@ -83,6 +83,9 @@
                     <option value="olga">5. Ольга (Тула)</option>
                     <option value="viktor">6. Виктор (ЕКБ, инженер)</option>
                 </select>
+                <div id="active-case-indicator" style="display:none; margin-top:8px; padding:7px 10px; font-size:.74rem; line-height:1.4; background:var(--c-green-bg); border:1px solid var(--c-green-glow); border-radius:var(--r-sm); color:var(--c-text2);">
+                    Загружен кейс: <strong id="active-case-name" style="color:var(--c-green);"></strong>
+                </div>
                 <button class="secondary-button w-full" type="button" id="load-demo-button">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: -2px; margin-right: 6px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                     Загрузить кейс
@@ -140,14 +143,14 @@
                         <label class="field-label" for="auth-name">Имя (необязательно)</label>
                         <input type="text" id="auth-name" class="modal-input" name="name" autocomplete="name" placeholder="Как к вам обращаться">
                     </div>
-                    <div id="auth-consent-row" style="display:none; margin-top:14px; font-size:.82rem; line-height:1.45;">
-                        <label style="display:flex; align-items:flex-start; gap:8px; cursor:pointer; color:var(--c-text2);">
-                            <input type="checkbox" id="auth-consent" style="margin-top:3px; flex-shrink:0;">
-                            <span>Я согласен на обработку персональных данных в соответствии с политикой конфиденциальности <span style="color:var(--c-red);">*</span></span>
+                    <div id="auth-consent-row" style="display:none; margin-top:16px; font-size:.86rem; line-height:1.5; padding:14px 16px; background:var(--c-surface-up); border:1px solid var(--c-border); border-radius:var(--r-md);">
+                        <label style="display:flex; align-items:flex-start; gap:10px; cursor:pointer; color:var(--c-text);">
+                            <input type="checkbox" id="auth-consent" style="margin-top:2px; flex-shrink:0; width:17px; height:17px; accent-color:var(--c-accent-hl); cursor:pointer;">
+                            <span>Я согласен на обработку персональных данных в соответствии с политикой конфиденциальности <span style="color:var(--c-red); font-weight:700;">*</span></span>
                         </label>
-                        <label style="display:flex; align-items:flex-start; gap:8px; cursor:pointer; color:var(--c-text2); margin-top:10px;">
-                            <input type="checkbox" id="auth-newsletter" style="margin-top:3px; flex-shrink:0;">
-                            <span>Хочу получать новости и обновления FINPILOT (необязательно)</span>
+                        <label style="display:flex; align-items:flex-start; gap:10px; cursor:pointer; color:var(--c-text); margin-top:12px;">
+                            <input type="checkbox" id="auth-newsletter" style="margin-top:2px; flex-shrink:0; width:17px; height:17px; accent-color:var(--c-accent-hl); cursor:pointer;">
+                            <span>Хочу получать новости и обновления FINPILOT <span style="color:var(--c-text3);">(необязательно)</span></span>
                         </label>
                     </div>
                     <button type="submit" id="auth-submit" class="primary-button w-full" style="margin-top:18px;">Войти</button>

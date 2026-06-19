@@ -231,8 +231,43 @@ document.addEventListener('DOMContentLoaded', () => {
     loadPage();
 });
 
+// ── Активный тест-кейс: помним, какой портрет загружен ───────
+const ACTIVE_CASE_KEY = 'finpilot-active-case';
+
+function showActiveCase(label) {
+    const ind = $('#active-case-indicator');
+    const nameEl = $('#active-case-name');
+    if (ind && nameEl && label) { nameEl.textContent = label; ind.style.display = 'block'; }
+}
+
+function setActiveCase(value, label) {
+    try { localStorage.setItem(ACTIVE_CASE_KEY, JSON.stringify({ value, label })); } catch (e) {}
+    showActiveCase(label);
+}
+
+function clearActiveCase() {
+    try { localStorage.removeItem(ACTIVE_CASE_KEY); } catch (e) {}
+    const ind = $('#active-case-indicator');
+    if (ind) ind.style.display = 'none';
+    const sel = $('#demo-case-select');
+    if (sel) sel.selectedIndex = 0;
+}
+
+function restoreActiveCase() {
+    let saved = null;
+    try { saved = JSON.parse(localStorage.getItem(ACTIVE_CASE_KEY) || 'null'); } catch (e) {}
+    if (!saved || !saved.value) return;
+    const sel = $('#demo-case-select');
+    if (sel) {
+        const opt = Array.from(sel.options).find(o => o.value === saved.value);
+        if (opt) sel.value = saved.value;
+    }
+    showActiveCase(saved.label || saved.value);
+}
+
 // ── Global UI Bindings ───────────────────────────────────────
 function bindGlobalUI() {
+    restoreActiveCase();
     // Close modals
     $$('[data-close-modal]').forEach(btn => {
         btn.addEventListener('click', () => {
@@ -263,6 +298,8 @@ function bindGlobalUI() {
         btn.disabled = true; btn.textContent = 'Загрузка…';
         try {
             await api(`/api/demo/load?case=${encodeURIComponent(caseName)}`, { method: 'POST' });
+            const label = sel && sel.selectedIndex >= 0 ? sel.options[sel.selectedIndex].text : caseName;
+            setActiveCase(caseName, label);
             await loadPage();
         }
         catch(e) { console.error(e); }
@@ -272,7 +309,7 @@ function bindGlobalUI() {
     on($('#clear-demo-button'), 'click', async () => {
         const btn = $('#clear-demo-button');
         btn.disabled = true; btn.textContent = 'Очистка…';
-        try { await api('/api/demo/clear', { method: 'POST' }); await loadPage(); }
+        try { await api('/api/demo/clear', { method: 'POST' }); clearActiveCase(); await loadPage(); }
         catch(e) { console.error(e); }
         finally { btn.disabled = false; btn.innerHTML = svgIcon('trash', 16) + ' Очистить'; }
     });
@@ -570,7 +607,7 @@ function bindGlobalUI() {
         });
 
         function onFileSelected(file) {
-            $('#drop-label').textContent = `📎 ${file.name} (${(file.size / 1024).toFixed(1)} КБ)`;
+            $('#drop-label').textContent = `Файл: ${file.name} (${(file.size / 1024).toFixed(1)} КБ)`;
             uploadBtn.disabled = false;
         }
     }
@@ -1416,7 +1453,7 @@ function forecastChartSVG(data) {
     const pts = (data && data.forecast) || [];
     if (!pts.length) return '';
 
-    const W = 760, H = 300, padL = 70, padR = 24, padT = 24, padB = 46;
+    const W = 1160, H = 340, padL = 72, padR = 28, padT = 24, padB = 48;
     const innerW = W - padL - padR, innerH = H - padT - padB;
     const n = pts.length;
     const hasCI = pts.every(p => p.Rt_p10 != null && p.Rt_p90 != null);
@@ -1519,7 +1556,7 @@ function renderForecast(data) {
     const alert = data.deficit_alert;
     const alertHtml = alert ? `
         <div style="margin-bottom:14px; padding:12px 16px; border-radius:10px; background:rgba(239,68,68,.08); border:1px solid rgba(239,68,68,.3); font-size:.84rem; line-height:1.5;">
-            <strong style="color:var(--c-red);">⚠️ ${alert.pessimistic ? 'Риск нехватки денег' : 'Прогноз: денег может не хватить'}</strong><br/>
+            <strong style="color:var(--c-red);">${alert.pessimistic ? 'Риск нехватки денег' : 'Прогноз: денег может не хватить'}</strong><br/>
             Через <strong>${alert.period} мес.</strong> ${alert.pessimistic ? 'при неблагоприятном сценарии ' : ''}свободных денег может не хватить — разрыв около <strong>${fmt.cur(alert.gap)}</strong>. Стоит заранее снизить расходы или отложить крупные траты.
         </div>` : '';
 
@@ -1570,7 +1607,7 @@ function renderForecast(data) {
                 <summary style="cursor:pointer; font-size:.82rem; color:var(--c-accent); font-weight:600;
                     display:inline-flex; align-items:center; gap:6px; padding:8px 14px;
                     border:1px solid var(--c-accent); border-radius:var(--r-sm); list-style:none; width:fit-content;">
-                    💡 Что показывает этот график и почему линия прямая</summary>
+                    Что показывает этот график и почему линия прямая</summary>
                 <div style="margin-top:8px; font-size:.74rem; line-height:1.55;">
                     <p style="margin:0 0 6px;"><b>Что это.</b> Синяя линия — сколько свободных денег у вас будет накапливаться (или сгорать) месяц за месяцем, если доходы и расходы останутся как в среднем по вашей истории. Жёлтый коридор — диапазон, куда значение попадёт с вероятностью 80%: система прогоняет 1000 случайных сценариев вокруг прогноза.</p>
                     <p style="margin:0 0 6px;"><b>Почему линия прямая.</b> Прогноз строится по среднему: каждый месяц прибавляется примерно одинаковая сумма, поэтому накопление ложится прямой. Это не баг — при стабильных данных так и должно быть. Чем «шумнее» история, тем шире жёлтый коридор.</p>
@@ -1877,17 +1914,104 @@ function renderCalcDetails(a, ind, weights, rival) {
 }
 
 // ── Компактная строка для полного списка ──────────────────────
-function renderAltRow(a, idx) {
+// ── Мини-разбор оценки альтернативы (для строк полного списка) ─
+function altBreakdownHTML(a, weights, best) {
+    if (!a.scores || !weights) return '';
+    const m = v => fmt.cur(v);
+    const crit = [
+        { key: 'Rt', label: 'Свободные деньги', raw: a.Rt_new != null ? m(a.Rt_new) : '—', w: weights.w_rt, n: a.scores.Rt_norm },
+        { key: 'Lt', label: 'Ликвидность', raw: a.Lt_new != null ? a.Lt_new.toFixed(3) : '—', w: weights.w_lt, n: a.scores.Lt_norm },
+        { key: 'Dt', label: 'Снижение долга', raw: a.Dt_new != null ? (a.Dt_new * 100).toFixed(1) + '%' : '—', w: weights.w_dt, n: a.scores.Dt_norm },
+        { key: 'Si', label: 'Цели', raw: a.Si != null ? (a.Si * 100).toFixed(1) + '%' : '—', w: weights.w_goals, n: a.scores.Si_norm },
+    ];
+    const rows = crit.map(c => `
+        <div style="display:grid; grid-template-columns:minmax(0,1fr) auto auto; gap:6px 12px; font-size:.74rem; padding:2px 0;">
+            <span style="color:var(--c-text2);">${c.label} <span style="color:var(--c-text3);">(${c.raw})</span></span>
+            <span style="color:var(--c-text3); white-space:nowrap;">${c.n.toFixed(2)} × ${c.w.toFixed(2)}</span>
+            <span style="text-align:right;"><b>${(c.w * c.n).toFixed(3)}</b></span>
+        </div>`).join('');
+
+    const isBest = a === best;
+    let cmp = '';
+    if (isBest) {
+        cmp = `<div style="margin-top:8px; font-size:.74rem; color:var(--c-green); line-height:1.5;">Это рекомендованный план — лучшая суммарная оценка по вашему профилю риска.</div>`;
+    } else if (best && best.scores && best.utility !== undefined) {
+        let worst = null, worstLoss = -1;
+        crit.forEach(c => {
+            const bn = best.scores[c.key + '_norm'];
+            if (bn === undefined) return;
+            const loss = c.w * bn - c.w * c.n;
+            if (loss > worstLoss) { worstLoss = loss; worst = c; }
+        });
+        const diff = best.utility - a.utility;
+        cmp = `<div style="margin-top:8px; font-size:.74rem; color:var(--c-text2); line-height:1.5;">
+            Уступает рекомендованному плану на <b style="color:var(--c-amber);">${diff.toFixed(3)}</b> балла${worst ? ` — главным образом по критерию «${worst.label}»` : ''}.
+        </div>`;
+    }
+
     return `
-    <div style="display:grid; grid-template-columns:28px 1fr auto auto auto auto; align-items:center;
-                gap:10px; padding:8px 12px; border-bottom:1px solid var(--c-border); font-size:.8rem;">
-        <span style="color:var(--c-text3); font-size:.72rem; text-align:center;">${idx+1}</span>
-        <span>${esc(a.name)}</span>
-        <span style="color:var(--c-red);   text-align:right;">${a.x_obligations > 0 ? fmt.cur(a.x_obligations) : '—'}</span>
-        <span style="color:var(--c-amber); text-align:right;">${a.x_reserve    > 0 ? fmt.cur(a.x_reserve)    : '—'}</span>
-        <span style="color:var(--c-green); text-align:right;">${a.x_goals      > 0 ? fmt.cur(a.x_goals)      : '—'}</span>
-        <span style="color:var(--c-accent-hl); font-weight:700; text-align:right;">${a.utility}</span>
-    </div>`;
+        <div style="padding:10px 14px 12px 50px; background:rgba(255,255,255,.02);">
+            <div style="font-size:.72rem; color:var(--c-text3); margin-bottom:6px;">Из чего сложилась оценка (норм. значение × вес профиля):</div>
+            <div style="padding:8px 12px; background:rgba(255,255,255,.03); border-radius:8px;">
+                ${rows}
+                <div style="display:flex; justify-content:space-between; font-size:.74rem; padding-top:5px; margin-top:4px; border-top:1px solid var(--c-border);">
+                    <span style="color:var(--c-text2);">Итог</span><span><b>${a.utility}</b> из 1.00</span>
+                </div>
+            </div>
+            ${cmp}
+        </div>`;
+}
+
+// ── Компактная кликабельная строка для полного списка ─────────
+function renderAltRow(a, idx, weights, best) {
+    const isBest = a === best;
+    return `
+    <details class="alt-row" style="border-bottom:1px solid var(--c-border);">
+        <summary style="display:grid; grid-template-columns:28px 1fr auto auto auto auto 16px; align-items:center;
+                    gap:10px; padding:8px 12px; font-size:.8rem; cursor:pointer;${isBest ? ' background:rgba(34,197,94,.05);' : ''}">
+            <span style="color:var(--c-text3); font-size:.72rem; text-align:center;">${idx + 1}</span>
+            <span>${esc(a.name)}${isBest ? ' <span style="color:var(--c-green); font-size:.68rem; font-weight:600;">рекомендованный</span>' : ''}</span>
+            <span style="color:var(--c-red);   text-align:right;">${a.x_obligations > 0 ? fmt.cur(a.x_obligations) : '—'}</span>
+            <span style="color:var(--c-amber); text-align:right;">${a.x_reserve    > 0 ? fmt.cur(a.x_reserve)    : '—'}</span>
+            <span style="color:var(--c-green); text-align:right;">${a.x_goals      > 0 ? fmt.cur(a.x_goals)      : '—'}</span>
+            <span style="color:var(--c-accent-hl); font-weight:700; text-align:right;">${a.utility}</span>
+            <span class="alt-row-chevron" style="color:var(--c-text3); font-size:.7rem; text-align:center;">▸</span>
+        </summary>
+        ${altBreakdownHTML(a, weights, best)}
+    </details>`;
+}
+
+// ── Кликабельная строка отклонённой альтернативы (почему отсеяли) ─
+function rejectedRowHTML(a) {
+    const viol = a.violations || [];
+    const vals = [
+        { label: 'Свободные деньги после плана (Rt)', val: a.Rt_new != null ? fmt.cur(a.Rt_new) + ' ₽' : '—' },
+        { label: 'Запас прочности (Lt)', val: a.Lt_new != null ? a.Lt_new.toFixed(3) : '—' },
+        { label: 'Долговая нагрузка (Dt)', val: a.Dt_new != null ? (a.Dt_new * 100).toFixed(1) + '%' : '—' },
+    ];
+    const rows = vals.map(c => `
+        <div style="display:grid; grid-template-columns:1fr auto; gap:6px 12px; font-size:.74rem; padding:2px 0;">
+            <span style="color:var(--c-text2);">${c.label}</span>
+            <span style="color:var(--c-text1); font-weight:600;">${c.val}</span>
+        </div>`).join('');
+    const why = viol.length
+        ? viol.map(v => `<div style="display:flex; gap:8px; font-size:.76rem; color:var(--c-text2); margin-top:4px; line-height:1.5;"><span style="color:var(--c-red); flex-shrink:0;">•</span><span>${esc(v)}</span></div>`).join('')
+        : '<div style="font-size:.76rem; color:var(--c-text3);">Не прошёл по ограничениям модели.</div>';
+    return `
+    <details class="alt-row" style="border-bottom:1px solid var(--c-border);">
+        <summary style="display:grid; grid-template-columns:1fr auto 16px; align-items:center; gap:10px;
+                    padding:7px 12px; font-size:.8rem; cursor:pointer; opacity:.78;">
+            <span>${esc(a.name)}</span>
+            <span style="font-size:.72rem; color:var(--c-red); text-align:right; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${viol.length ? esc(viol[0]) : 'не прошёл ограничения'}</span>
+            <span class="alt-row-chevron" style="color:var(--c-text3); font-size:.7rem; text-align:center;">▸</span>
+        </summary>
+        <div style="padding:10px 14px 12px; background:rgba(244,63,94,.03);">
+            <div style="font-size:.72rem; color:var(--c-text3); margin-bottom:8px;">Распределение: долг ${fmt.cur(a.x_obligations || 0)} · резерв ${fmt.cur(a.x_reserve || 0)} · цели ${fmt.cur(a.x_goals || 0)}</div>
+            <div style="font-size:.72rem; color:var(--c-red); font-weight:600; margin-bottom:2px;">Почему отклонён:</div>
+            ${why}
+            <div style="margin-top:8px; padding:8px 12px; background:rgba(255,255,255,.03); border-radius:8px;">${rows}</div>
+        </div>
+    </details>`;
 }
 
 function exportPlanCSV(res) {
@@ -2058,10 +2182,10 @@ function renderPlanning(res) {
             <details style="margin-top:4px;">
                 <summary style="font-size:.82rem; color:var(--c-text3); cursor:pointer; padding:8px 0;
                                 display:flex; align-items:center; gap:6px;">
-                    Все ${res.ranked.length} допустимых альтернатив (развернуть)
+                    Все ${res.ranked.length} допустимых альтернатив (нажмите на любую — разбор оценки)
                 </summary>
                 <div style="margin-top:10px; border:1px solid var(--c-border); border-radius:var(--r-sm); overflow:hidden;">
-                    <div style="display:grid; grid-template-columns:28px 1fr auto auto auto auto; gap:10px;
+                    <div style="display:grid; grid-template-columns:28px 1fr auto auto auto auto 16px; gap:10px;
                                 padding:6px 12px; font-size:.68rem; text-transform:uppercase; letter-spacing:.4px;
                                 color:var(--c-text3); border-bottom:1px solid var(--c-border); font-weight:600;">
                         <span>#</span><span>Название</span>
@@ -2069,8 +2193,9 @@ function renderPlanning(res) {
                         <span style="color:var(--c-amber);">Резерв</span>
                         <span style="color:var(--c-green);">Цели</span>
                         <span>Оценка</span>
+                        <span></span>
                     </div>
-                    ${res.ranked.map((a, i) => renderAltRow(a, i)).join('')}
+                    ${res.ranked.map((a, i) => renderAltRow(a, i, res.weights, res.ranked[0])).join('')}
                 </div>
             </details>`;
     } else if (altC) {
@@ -2083,17 +2208,10 @@ function renderPlanning(res) {
         rejC.innerHTML = `
             <details style="margin-top:4px;">
                 <summary style="font-size:.82rem; color:var(--c-text3); cursor:pointer; padding:8px 0;">
-                    Отклонено по ограничениям: ${res.rejected.length}
+                    Отклонено по ограничениям: ${res.rejected.length} (нажмите на любую — почему отсеяли)
                 </summary>
                 <div style="margin-top:8px; border:1px solid var(--c-border); border-radius:var(--r-sm); overflow:hidden;">
-                    ${res.rejected.map((a, i) => `
-                    <div style="display:flex; justify-content:space-between; align-items:center;
-                                padding:7px 12px; border-bottom:1px solid var(--c-border); font-size:.8rem; opacity:.6;">
-                        <span>${esc(a.name)}</span>
-                        <span style="font-size:.72rem; color:var(--c-red);">
-                            ${(a.violations || []).join(' · ')}
-                        </span>
-                    </div>`).join('')}
+                    ${res.rejected.map(a => rejectedRowHTML(a)).join('')}
                 </div>
             </details>`;
     } else if (rejC) {

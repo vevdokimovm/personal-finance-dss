@@ -1178,6 +1178,13 @@ input::placeholder { color: var(--c-text3); }
 .calc-label { color: var(--c-text3); font-size: .70rem; text-transform: uppercase; letter-spacing: .4px; }
 .calc-note { font-size: .72rem; color: var(--c-text3); font-style: italic; margin-top: 4px; line-height: 1.4; }
 
+/* Кликабельные строки альтернатив (полный список и отклонённые) */
+.alt-row > summary { list-style: none; user-select: none; }
+.alt-row > summary::-webkit-details-marker { display: none; }
+.alt-row > summary:hover { background: rgba(255,255,255,.03); }
+.alt-row-chevron { display: inline-block; transition: transform .15s var(--ease); }
+.alt-row[open] .alt-row-chevron { transform: rotate(90deg); }
+
 /* ── Кликабельные метрик-карты ── */
 .metric-clickable { cursor: pointer; transition: border-color .15s ease, transform .1s ease; }
 .metric-clickable:hover { border-color: var(--c-accent); }
