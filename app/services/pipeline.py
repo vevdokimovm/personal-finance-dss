@@ -7,6 +7,7 @@ from __future__ import annotations
 
 from typing import Any, Union
 
+from app.core.envelopes import apply_envelopes
 from app.core.metrics import (
     calculate_blr,
     calculate_bt,
@@ -32,11 +33,14 @@ def run_pipeline(
     goals: list[Item],
     liquid_assets: list[Item] | None = None,
 ) -> dict[str, Any]:
+    # Конверты: цели берут накопление из привязанных активов, привязанные активы
+    # исключаются из Bliq (подушки) — без двойного учёта на дашборде.
+    goals, liquid_assets = apply_envelopes(goals, liquid_assets or [])
     prepared = prepare_data(
         transactions=transactions,
         obligations=obligations,
         goals=goals,
-        liquid_assets=liquid_assets or [],
+        liquid_assets=liquid_assets,
     )
 
     income_total = calculate_income_total(prepared["transactions"])

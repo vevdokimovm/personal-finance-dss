@@ -23,6 +23,7 @@ class GoalCreate(BaseModel):
     comment: Optional[str] = None
     priority: int = 0
     savings_rate: float = 0.0
+    linked_asset_id: Optional[int] = None
 
 
 class GoalResponse(BaseModel):
@@ -37,5 +38,6 @@ class GoalResponse(BaseModel):
     comment: Optional[str] = None
     priority: int = 0
     savings_rate: float = 0.0
+    linked_asset_id: Optional[int] = None
     is_active: bool = True
     achieved_at: Optional[datetime] = None

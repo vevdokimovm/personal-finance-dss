@@ -404,10 +404,12 @@ function bindGlobalUI() {
     // Goal modal
     on($('#open-goal-modal'), 'click', () => {
         $('#goal-deadline').value = fmt.today();
+        populateGoalAssetSelect();
         openModal($('#goal-modal'));
     });
 
     bindSubmit('#goal-form', async () => {
+        const linkedRaw = $('#goal-linked-asset')?.value || '';
         try {
             await api('/api/goals', {
                 method: 'POST',
@@ -419,6 +421,7 @@ function bindGlobalUI() {
                     deadline: new Date($('#goal-deadline').value).toISOString(),
                     category: $('#goal-category')?.value || 'material',
                     savings_rate: pn($('#goal-savings-rate')?.value || 0) / 100,
+                    linked_asset_id: linkedRaw ? Number(linkedRaw) : null,
                     comment: $('#goal-comment').value.trim() || null,
                 }),
             });
@@ -1023,6 +1026,24 @@ function renderObligations() {
     }).join('');
 }
 
+function populateGoalAssetSelect() {
+    const sel = $('#goal-linked-asset');
+    if (!sel) return;
+    const assets = state.liquid_assets || [];
+    sel.innerHTML = '<option value="">— не привязан (деньги вне счетов) —</option>' +
+        assets.map(a => `<option value="${a.id}">${esc(a.name)} — ${fmt.cur(pn(a.amount))}${pn(a.interest_rate) > 0 ? ` (${(pn(a.interest_rate) * 100).toFixed(1)}%)` : ''}</option>`).join('');
+}
+
+// Эффективные значения цели с учётом привязки к активу (конверты).
+function effectiveGoal(g) {
+    let current = pn(g.current_amount), rate = pn(g.savings_rate), linkedName = null;
+    if (g.linked_asset_id) {
+        const a = (state.liquid_assets || []).find(x => x.id === g.linked_asset_id);
+        if (a) { current = pn(a.amount); rate = pn(a.interest_rate); linkedName = a.name; }
+    }
+    return { current, rate, linkedName };
+}
+
 function renderGoals() {
     const list = $('#goals-list');
     if (!list) return;
@@ -1039,15 +1060,18 @@ function renderGoals() {
         emotional: 'эмоциональная',
     };
 
-    const totalAccum = state.goals.reduce((x, g) => x + pn(g.current_amount), 0);
+    const totalAccum = state.goals.reduce((x, g) => x + effectiveGoal(g).current, 0);
     const accumLine = totalAccum > 0 ? `
         <div style="font-size:.78rem; color:var(--c-text3); padding:8px 0; margin-bottom:8px; border-bottom:1px solid var(--c-border);">
-            Всего накоплено по целям: <strong style="color:var(--c-green);">${fmt.cur(totalAccum)}</strong> — эти деньги учитываются в подушке безопасности и в плане распределения
+            Всего накоплено по целям: <strong style="color:var(--c-green);">${fmt.cur(totalAccum)}</strong> — учитывается в плане распределения
         </div>` : '';
     list.innerHTML = accumLine + state.goals.map(g => {
-        const pct = g.target_amount > 0 ? Math.min(100, (g.current_amount / g.target_amount * 100)) : 0;
+        const { current, rate, linkedName } = effectiveGoal(g);
+        const pct = g.target_amount > 0 ? Math.min(100, (current / g.target_amount * 100)) : 0;
         const cat = g.category || 'material';
         const catLabel = CAT_LABELS[cat] || cat;
+        const rateLine = rate > 0 ? ` · ставка ${(rate * 100).toFixed(1)}%` : '';
+        const linkLine = linkedName ? `<div style="font-size:.72rem; color:var(--c-accent-hl); margin-top:2px;">Копится на счёте: ${esc(linkedName)}</div>` : '';
         return `
         <article class="stack-item" style="flex-direction:column; align-items:stretch; gap:12px;">
             <div style="display:flex; justify-content:space-between; align-items:center;">
@@ -1055,7 +1079,8 @@ function renderGoals() {
                     <div class="stack-item-title">${esc(g.name)}
                         <span class="goal-category-badge goal-category-${esc(cat)}" style="margin-left:8px;">${catLabel}</span>
                     </div>
-                    <div class="stack-item-text">${fmt.cur(g.current_amount)} из ${fmt.cur(g.target_amount)} · до ${fmt.date(g.deadline)}${pn(g.savings_rate) > 0 ? ` · ставка ${(pn(g.savings_rate) * 100).toFixed(1)}%` : ''}</div>
+                    <div class="stack-item-text">${fmt.cur(current)} из ${fmt.cur(g.target_amount)} · до ${fmt.date(g.deadline)}${rateLine}</div>
+                    ${linkLine}
                 </div>
                 <button class="ghost-button delete-button" data-goal-id="${g.id}" style="color:var(--c-red);font-size:.85rem;padding:6px 10px;" title="Удалить">✕</button>
             </div>
@@ -1064,7 +1089,7 @@ function renderGoals() {
             </div>
             <div style="display:flex; justify-content:space-between; font-size:.78rem; color:var(--c-text3);">
                 <span>${pct.toFixed(0)}% выполнено</span>
-                <span>Осталось ${fmt.cur(Math.max(0, g.target_amount - g.current_amount))}</span>
+                <span>Осталось ${fmt.cur(Math.max(0, g.target_amount - current))}</span>
             </div>
         </article>`;
     }).join('');
@@ -1320,6 +1345,7 @@ function svgIcon(name, size = 16) {
 let planRisk = 3;
 let planLmin = 0.0;
 let planRbench = 0.14;
+let appliedSpendingCut = 0;
 const RISK_LABELS = {1:'Консервативный',2:'Умеренно-консервативный',3:'Сбалансированный',4:'Умеренно-агрессивный',5:'Агрессивный'};
 
 function bindPlanningUI() {
@@ -1453,9 +1479,20 @@ function bindPlanningUI() {
         horizonSel.addEventListener('change', () => loadForecast(Number(horizonSel.value)));
     }
 
+    // Советы по тратам: применить/сбросить what-if сокращение
+    const adviceBody = $('#spending-advice-body');
+    if (adviceBody) {
+        adviceBody.addEventListener('click', (e) => {
+            const applyBtn = e.target.closest('.apply-cut-btn');
+            if (applyBtn) { applySpendingCut(pn(applyBtn.dataset.saving)); return; }
+            if (e.target.closest('#spending-cut-reset')) { appliedSpendingCut = 0; recalcWithCut(); }
+        });
+    }
+
     // Auto-load
     form.dispatchEvent(new Event('submit'));
     loadForecast(6);
+    loadSpendingAdvice();
 }
 
 async function loadForecast(horizon = 6) {
@@ -1467,6 +1504,80 @@ async function loadForecast(horizon = 6) {
         });
         renderForecast(data);
     } catch(e) { console.error('forecast error', e); }
+}
+
+// ── Советы по тратам (мат-модель v3) ─────────────────────────
+async function loadSpendingAdvice() {
+    try {
+        const data = await api('/api/planning/spending-advice?months=6');
+        renderSpendingAdvice(data);
+    } catch (e) { console.error('spending-advice error', e); }
+}
+
+function renderSpendingAdvice(data) {
+    const container = $('#spending-advice-container');
+    const body = $('#spending-advice-body');
+    if (!container || !body) return;
+    container.style.display = 'block';
+
+    const advice = (data && data.advice) || [];
+    const monthsData = data ? data.months_with_data : 0;
+
+    if (!advice.length) {
+        const msg = monthsData < 3
+            ? 'Нужно больше истории операций — минимум 3 месяца, чтобы построить вашу персональную норму трат и сравнить с ней.'
+            : 'Аномальных или явно сокращаемых трат не нашли — ваши расходы в пределах обычной нормы.';
+        body.innerHTML = `<div style="font-size:.82rem; color:var(--c-text3); line-height:1.5;">${msg}</div>`;
+        return;
+    }
+
+    const applied = appliedSpendingCut > 0
+        ? `<div style="display:flex; justify-content:space-between; align-items:center; gap:12px; padding:10px 14px; margin-bottom:14px; background:var(--c-green-bg); border:1px solid var(--c-green-glow); border-radius:var(--r-sm); font-size:.8rem;">
+               <span>В расчёт применено сокращение трат на <strong style="color:var(--c-green);">${fmt.cur(appliedSpendingCut)}</strong> — план пересчитан.</span>
+               <button type="button" id="spending-cut-reset" class="ghost-button" style="font-size:.74rem; padding:5px 12px; white-space:nowrap;">Сбросить</button>
+           </div>`
+        : '';
+
+    const cards = advice.map(a => `
+        <div style="padding:12px 14px; border:1px solid var(--c-border); border-radius:var(--r-md); margin-bottom:10px;">
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:12px;">
+                <div style="font-size:.82rem; line-height:1.5;">${esc(a.message)}</div>
+                <button type="button" class="ghost-button apply-cut-btn" data-saving="${a.potential_saving}"
+                        style="font-size:.74rem; padding:6px 12px; white-space:nowrap; flex-shrink:0; color:var(--c-green);">
+                    Применить −${fmt.cur(a.potential_saving)}
+                </button>
+            </div>
+        </div>`).join('');
+
+    const total = data.total_potential_saving || 0;
+    const summary = total > 0
+        ? `<div style="font-size:.78rem; color:var(--c-text2); margin-top:6px;">Суммарно можно высвободить до <strong style="color:var(--c-green);">${fmt.cur(total)}</strong> в месяц.</div>`
+        : '';
+
+    body.innerHTML = applied + cards + summary;
+}
+
+async function applySpendingCut(saving) {
+    appliedSpendingCut = Math.round((appliedSpendingCut + saving) * 100) / 100;
+    await recalcWithCut();
+}
+
+async function recalcWithCut() {
+    try {
+        const res = await api('/api/planning/calculate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                risk_tolerance: planRisk, l_min: planLmin, r_bench: planRbench,
+                spending_cut: appliedSpendingCut || undefined,
+            }),
+        });
+        renderPlanning(res);
+        loadSpendingAdvice();
+        window.showToast(appliedSpendingCut > 0
+            ? `План пересчитан с сокращением трат на ${fmt.cur(appliedSpendingCut)}`
+            : 'План пересчитан без сокращения трат');
+    } catch (e) { console.error(e); window.showToast('Не удалось пересчитать', {error:true}); }
 }
 
 // ── SVG fan-chart прогноза Rt с 80% доверительным интервалом ──

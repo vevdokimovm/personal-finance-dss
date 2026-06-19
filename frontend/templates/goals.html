@@ -61,9 +61,16 @@
                 </div>
             </div>
             <div class="field">
+                <label for="goal-linked-asset">Копится на счёте</label>
+                <select id="goal-linked-asset" name="linked_asset_id">
+                    <option value="">— не привязан (деньги вне счетов) —</option>
+                </select>
+                <div style="font-size:.72rem; color:var(--c-text3); margin-top:4px;">Если деньги уже лежат на вкладе или счёте — выберите его. Сумма и ставка возьмутся из него, и эти деньги не будут считаться дважды.</div>
+            </div>
+            <div class="field">
                 <label for="goal-savings-rate">Ставка накопления, % годовых</label>
                 <input id="goal-savings-rate" name="savings_rate" type="number" min="0" max="100" step="0.1" value="0" placeholder="0">
-                <div style="font-size:.72rem; color:var(--c-text3); margin-top:4px;">Если копите на вкладе или накопительном счёте — укажите его ставку. 0 — если деньги просто лежат.</div>
+                <div style="font-size:.72rem; color:var(--c-text3); margin-top:4px;">Для непривязанной цели: если копите на вкладе — укажите ставку. 0 — если деньги просто лежат. При привязке к счёту берётся его ставка.</div>
             </div>
             <div class="field">
                 <label for="goal-comment">Комментарий</label>

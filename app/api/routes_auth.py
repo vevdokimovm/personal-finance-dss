@@ -145,11 +145,15 @@ def me(user: User = Depends(require_user)) -> UserResponse:
 @router.get("/verify", summary="Подтверждение email по ссылке из письма")
 def verify_email(
     token: str,
+    background_tasks: BackgroundTasks,
     db: Session = Depends(get_db),
 ) -> RedirectResponse:
     user_id = token_service.decode_verification(token)
-    if user_id and mark_email_verified(db, user_id):
-        log_event("email_verified", {}, user_id=user_id)
+    user = mark_email_verified(db, user_id) if user_id else None
+    if user:
+        log_event("email_verified", {}, user_id=user.id)
+        # Приветственное письмо — после подтверждения адреса, фоном.
+        background_tasks.add_task(email_service.send_welcome, user.email, user.display_name)
         return RedirectResponse(url="/profile?verified=1", status_code=status.HTTP_303_SEE_OTHER)
     return RedirectResponse(url="/profile?verified=0", status_code=status.HTTP_303_SEE_OTHER)
 

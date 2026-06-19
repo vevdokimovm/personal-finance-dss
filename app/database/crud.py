@@ -385,6 +385,7 @@ def create_goal(
     priority: int = 0,
     currency: str = "RUB",
     savings_rate: float = 0.0,
+    linked_asset_id: Optional[int] = None,
     user_id: Optional[str] = None,
 ) -> Goal:
     goal = Goal(
@@ -396,6 +397,7 @@ def create_goal(
         comment=comment,
         priority=priority,
         savings_rate=savings_rate,
+        linked_asset_id=linked_asset_id,
         is_active=True,
         currency=currency,
         user_id=user_id,

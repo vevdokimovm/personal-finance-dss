@@ -40,6 +40,7 @@ def create_goal_endpoint(
         comment=payload.comment,
         priority=payload.priority,
         savings_rate=payload.savings_rate,
+        linked_asset_id=payload.linked_asset_id,
         user_id=user_id,
     )
     log_event("goal_created", {

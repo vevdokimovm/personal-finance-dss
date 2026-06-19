@@ -10,6 +10,7 @@ from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
 
 from app.api._guards import ensure_calculable
+from app.core.envelopes import apply_envelopes
 from app.core.metrics import (
     calculate_expense_total,
     calculate_income_total,
@@ -38,6 +39,7 @@ class PlanningRequest(BaseModel):
     r_bench: Optional[float] = Field(None, ge=0.0, le=1.0, description="OCR — порог Avalanche")
     income_override: Optional[float] = Field(None, ge=0, description="Сценарий: доход вместо фактического")
     expense_override: Optional[float] = Field(None, ge=0, description="Сценарий: расходы вместо фактических")
+    spending_cut: Optional[float] = Field(None, ge=0, description="What-if: сократить расходы на эту сумму (применение совета по тратам)")
 
 
 class ForecastRequest(BaseModel):
@@ -76,6 +78,8 @@ def _serialize_goals(items) -> list[dict[str, Any]]:
             "current_amount": g.current_amount,
             "deadline": g.deadline,
             "category": g.category,
+            "savings_rate": g.savings_rate,
+            "linked_asset_id": g.linked_asset_id,
         }
         for g in items
     ]
@@ -118,7 +122,12 @@ def _compute_plan(
     transactions = get_transactions(db, user_id=user_id)
     obligations = _serialize_obligations(get_obligations(db, user_id=user_id))
     goals = _serialize_goals(get_goals(db, user_id=user_id))
-    assets = _serialize_assets(get_liquid_assets(db, user_id=user_id))
+    all_assets = _serialize_assets(get_liquid_assets(db, user_id=user_id))
+
+    # Конверты: цели берут накопление/ставку из привязанных активов, а сами
+    # привязанные активы исключаются из свободного резерва (Bliq) — без двойного учёта.
+    # r_bench при этом учитывает ставку всех активов (привязанный вклад — тоже доходность).
+    goals, assets = apply_envelopes(goals, all_assets)
 
     # r_bench (OCR): явный из запроса → лучшая ставка ликвидных активов → дефолт prefs.
     # Экономический смысл: альтернативная доходность рубля = ваша реальная ставка по накоплениям.
@@ -126,7 +135,7 @@ def _compute_plan(
         r_bench = payload.r_bench
         r_bench_source = "request"
     else:
-        best_asset_rate = max((float(a.get("interest_rate") or 0.0) for a in assets), default=0.0)
+        best_asset_rate = max((float(a.get("interest_rate") or 0.0) for a in all_assets), default=0.0)
         if best_asset_rate > 0:
             r_bench = best_asset_rate
             r_bench_source = "best_asset_rate"
@@ -149,6 +158,9 @@ def _compute_plan(
         payload.expense_override if payload.expense_override is not None
         else calculate_expense_total(prepared["transactions"])
     )
+    # What-if: применение совета по тратам — сокращаем расходы, Rt растёт на ту же сумму.
+    if payload.spending_cut:
+        expense_total = max(0.0, expense_total - payload.spending_cut)
     bliq = sum_liquid_assets(prepared["liquid_assets"])
 
     ensure_calculable(prepared["transactions"], prepared["obligations"])
@@ -315,3 +327,16 @@ def key_rate_endpoint() -> dict[str, object]:
     from app.services.cbr_rate import get_key_rate
 
     return get_key_rate(fallback=settings.CBR_KEY_RATE_FALLBACK)
+
+
+@router.get("/spending-advice", summary="Советы по расходам (анализ трат по категориям)")
+def spending_advice_endpoint(
+    months: int = 6,
+    db: Session = Depends(get_db),
+    user_id: str | None = Depends(get_current_user_id),
+) -> dict[str, Any]:
+    """Анализ расходов по категориям за окно месяцев: персональная норма (медиана),
+    аномалии (robust z-score) и мягкие советы по сокращению (мат-модель v3.0.0)."""
+    from app.services.spending import get_spending_advice
+
+    return get_spending_advice(db, user_id=user_id, months=months)
