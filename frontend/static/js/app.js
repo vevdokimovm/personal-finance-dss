@@ -418,6 +418,7 @@ function bindGlobalUI() {
                     current_amount: pn($('#goal-current-amount').value),
                     deadline: new Date($('#goal-deadline').value).toISOString(),
                     category: $('#goal-category')?.value || 'material',
+                    savings_rate: pn($('#goal-savings-rate')?.value || 0) / 100,
                     comment: $('#goal-comment').value.trim() || null,
                 }),
             });
@@ -1054,7 +1055,7 @@ function renderGoals() {
                     <div class="stack-item-title">${esc(g.name)}
                         <span class="goal-category-badge goal-category-${esc(cat)}" style="margin-left:8px;">${catLabel}</span>
                     </div>
-                    <div class="stack-item-text">${fmt.cur(g.current_amount)} из ${fmt.cur(g.target_amount)} · до ${fmt.date(g.deadline)}</div>
+                    <div class="stack-item-text">${fmt.cur(g.current_amount)} из ${fmt.cur(g.target_amount)} · до ${fmt.date(g.deadline)}${pn(g.savings_rate) > 0 ? ` · ставка ${(pn(g.savings_rate) * 100).toFixed(1)}%` : ''}</div>
                 </div>
                 <button class="ghost-button delete-button" data-goal-id="${g.id}" style="color:var(--c-red);font-size:.85rem;padding:6px 10px;" title="Удалить">✕</button>
             </div>
@@ -1365,7 +1366,7 @@ function bindPlanningUI() {
             setRbench(pct);
             if (hint) hint.textContent = r.source === 'cbr'
                 ? `Ставка ЦБ на ${r.as_of}: ${pct.toFixed(1)}% — подставлена.`
-                : `ЦБ недоступен, подставлено резервное значение ${pct.toFixed(1)}%.`;
+                : `ЦБ недоступен${r.detail ? ': ' + r.detail : ''} Подставлено резервное значение ${pct.toFixed(1)}%.`;
         } catch (e) { window.showToast('Не удалось получить ставку ЦБ', {error:true}); }
     });
 
@@ -1374,7 +1375,7 @@ function bindPlanningUI() {
         const assets = state.liquid_assets || [];
         const best = assets.reduce((mx, a) => Math.max(mx, pn(a.interest_rate)), 0);
         if (best <= 0) {
-            if (hint) hint.textContent = 'У вас пока нет вкладов со ставкой. Добавьте их в разделе «Банки и счета».';
+            if (hint) hint.textContent = 'У вас пока нет вкладов со ставкой. Добавьте их в разделе «Ликвидные активы».';
             return;
         }
         const pct = best > 0 && best < 1 ? best * 100 : best;

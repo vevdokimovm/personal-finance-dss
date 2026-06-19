@@ -143,6 +143,8 @@ class Goal(Base):
         Numeric(14, 2), nullable=False, default=0.0)
     deadline: Mapped[datetime] = mapped_column(DateTime, nullable=False, index=True)
     category: Mapped[str] = mapped_column(String(32), nullable=False, default="material", index=True)
+    # Ставка по инструменту, где копятся деньги цели (вклад/счёт), долей. 0 = без процентов.
+    savings_rate: Mapped[Decimal] = mapped_column(Numeric(6, 4), nullable=False, default=0.0)
     # Жизненный цикл по ER (DATA-06).
     priority: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
     is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True, index=True)

@@ -80,6 +80,7 @@ def get_key_rate(fallback: float = 0.16) -> dict[str, object]:
     if _cache["rate"] is not None and _cache["fetched_on"] == today:
         return {"key_rate": _cache["rate"], "source": "cache", "as_of": today.isoformat()}
 
+    detail = ""
     try:
         body = _build_soap_body(today - timedelta(days=30), today)
         req = urllib.request.Request(
@@ -98,10 +99,23 @@ def get_key_rate(fallback: float = 0.16) -> dict[str, object]:
             rate = _parse_latest_rate(resp.read().decode("utf-8"))
         if rate is not None and 0 < rate < 1:
             _cache.update(rate=rate, source="cbr", fetched_on=today)
-            return {"key_rate": rate, "source": "cbr", "as_of": today.isoformat()}
-        _log.warning("CBR key rate: ответ получен, но ставку извлечь не удалось")
-    except (urllib.error.URLError, ET.ParseError, ValueError, TimeoutError, OSError) as exc:
-        # Логируем реальную причину — иначе диагностика «почему fallback» невозможна.
-        _log.warning("CBR key rate fetch failed: %s", exc)
+            return {"key_rate": rate, "source": "cbr", "as_of": today.isoformat(), "detail": ""}
+        detail = "cbr.ru ответил, но ключевую ставку не удалось извлечь из ответа"
+        _log.warning("CBR key rate: %s", detail)
+    except urllib.error.HTTPError as exc:
+        if exc.code == 403:
+            detail = ("Банк России отклонил запрос (403). Частая причина — запрос идёт "
+                      "с зарубежного IP или из дата-центра: cbr.ru блокирует такие обращения. "
+                      "Решается запуском с российского IP/хостинга.")
+        else:
+            detail = f"cbr.ru вернул код {exc.code}"
+        _log.warning("CBR key rate HTTP error: %s", detail)
+    except (TimeoutError, urllib.error.URLError) as exc:
+        reason = getattr(exc, "reason", exc)
+        detail = f"нет связи с cbr.ru ({reason}) — проверьте интернет и доступ контейнера в сеть"
+        _log.warning("CBR key rate network error: %s", detail)
+    except (ET.ParseError, ValueError, OSError) as exc:
+        detail = f"ответ cbr.ru не распознан ({exc})"
+        _log.warning("CBR key rate parse error: %s", detail)
 
-    return {"key_rate": fallback, "source": "fallback", "as_of": today.isoformat()}
+    return {"key_rate": fallback, "source": "fallback", "as_of": today.isoformat(), "detail": detail}

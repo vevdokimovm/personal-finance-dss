@@ -22,6 +22,7 @@ class GoalCreate(BaseModel):
     category: GoalCategory = GoalCategory.material
     comment: Optional[str] = None
     priority: int = 0
+    savings_rate: float = 0.0
 
 
 class GoalResponse(BaseModel):
@@ -35,5 +36,6 @@ class GoalResponse(BaseModel):
     category: str
     comment: Optional[str] = None
     priority: int = 0
+    savings_rate: float = 0.0
     is_active: bool = True
     achieved_at: Optional[datetime] = None
