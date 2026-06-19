@@ -2,6 +2,30 @@
 
 Формат: [Keep a Changelog](https://keepachangelog.com/ru/1.0.0/). Версионирование — [SemVer](https://semver.org/lang/ru/).
 
+## [3.9.0] — 2026-06-18 — CI/линтеры/coverage: инфраструктура качества для git (MINOR)
+
+Перенесён полный набор инфраструктуры из курсового проекта (flake8 + pylint + mypy + black + coverage + pre-commit + Makefile + GitHub Actions) и настроен под FINPILOT. Поведение приложения не меняется — это инструментарий разработки.
+
+### Добавлено
+- **Конфиги линтеров** (правила и версии — как в курсе): `.flake8` (line 100, ignore F401/F403/F405), `.pylintrc` (disable C0114/5/6, R0903, W0718), `.mypy.ini` (ignore_missing_imports, follow_imports=skip), `.coveragerc` (`fail_under=90`, precision 2, show_missing, omit tests/alembic).
+- **`.pre-commit-config.yaml`**: black 23.3.0 → mypy v1.3.0 → flake8 7.1.0 → pylint v3.2.7 → локальные pytest и coverage. Хуки pytest/coverage обёрнуты в `SECRET_KEY` (тесты FINPILOT требуют переменную).
+- **`Makefile`**: цели `lint` (mypy + flake8 + pylint), `test` (coverage run + report + html), `all`, `precommit`, `clean`.
+- **`.github/workflows/validate.yml`**: пайплайн курса (flake8 → pylint → coverage run → coverage report) на push/PR в main; сохранены полезные джобы FINPILOT — `pip-audit` (информационный) и `docker build`. Старый `ci.yml` удалён, чтобы не было дублирующих прогонов.
+- В `requirements-dev.txt` добавлены инструменты тех же версий: flake8 7.1.0, pylint 3.2.7, coverage 7.6.1, black 23.3.0, mypy 1.3.0, pre-commit.
+
+### Адаптации под FINPILOT (структурно-необходимые, строгость правил сохранена)
+- Python 3.12 вместо 3.13 (целевая версия проекта — см. Dockerfile).
+- Пути линтеров: `pylint app` вместо `*/*.py`; в исключениях — `alembic` (автогенерируемые миграции).
+- `init-hook` в `.pylintrc` добавляет корень проекта в путь, чтобы pylint резолвил внутренние импорты `app.*` (аналог `export PYTHONPATH` в CI курса) — иначе 156 ложных import-error.
+
+### Текущее состояние гейтов (честный замер на коде v3.8.1)
+Инфраструктура работает и уже подсветила накопленный долг — приводить в зелёное предстоит отдельно:
+- **flake8:** 93 замечания (в основном E501 — строки длиннее 100; ruff раньше не включал это правило).
+- **pylint:** 9.48/10 после фикса пути. Остаток — line-too-long (45) и структурные (too-many-arguments 15, too-many-locals 13, import-outside-toplevel 10), плюс 3 import-error от опционального SDK `plaid`.
+- **mypy:** 9 ошибок в 3 файлах (преимущественно `services/bank_api.py`, object vs float).
+- **coverage:** 88.29% при пороге 90% — гейт красный примерно на 1.7%.
+
+
 ## [3.8.1] — 2026-06-18 — Фронтенд приведён к refined-модели v3.0.0 (PATCH)
 
 В 3.8.0 ликвидность переведена на stock-based в бэкенде, но UI остался на старой flow-семантике (норма-доля 0.30, «доля от обязательных трат»). Бэкенд отдавал месяцы автономии, а карточка показывала старую формулу и норму — отсюда рассинхрон (Lt = 0 с подписью «норма от 0.3»). Здесь UI приведён в соответствие.

@@ -1,0 +1,14 @@
+[MASTER]
+# Добавляем корень проекта в путь, чтобы pylint резолвил внутренние импорты app.*
+# (аналог export PYTHONPATH в CI курса). Иначе — ложные import-error.
+init-hook='import sys; sys.path.insert(0, ".")'
+disable=
+	C0114,  # missing-module-docstring
+	C0115,
+	C0116,
+	R0903,
+	W0718
+ignore=venv,.venv,__pycache__,.mypy_cache,alembic,migrations
+
+[FORMAT]
+max-line-length=100
