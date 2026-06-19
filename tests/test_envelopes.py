@@ -4,7 +4,6 @@
 участвует только через цель (в Sn), свободный — только в Bliq (подушка).
 Тесты написаны до реализации (TDD).
 """
-import pytest
 
 from app.core.envelopes import (
     apply_envelopes,
