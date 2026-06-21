@@ -34,7 +34,8 @@ class TestProductionConfigGuard:
         assert validate_production_security(s) == []
 
     def test_secure_production_passes(self) -> None:
-        s = Settings(ENVIRONMENT="production", JWT_SECRET="x" * 40, COOKIE_SECURE=True)
+        s = Settings(ENVIRONMENT="production", JWT_SECRET="x" * 40, COOKIE_SECURE=True,
+                     ADMIN_API_KEY="y" * 24)
         assert validate_production_security(s) == []
 
 

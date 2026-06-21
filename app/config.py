@@ -28,7 +28,7 @@ class Settings(BaseSettings):
         description="Название проекта.",
     )
     APP_VERSION: str = Field(
-        default="4.4.0",
+        default="4.16.0",
         description="Версия приложения (INFRA-13): код, UI-футер, git-тег.",
     )
     PROJECT_TAGLINE: str = Field(
@@ -66,8 +66,26 @@ class Settings(BaseSettings):
     )
     JWT_ALGORITHM: str = Field(default="HS256", description="Алгоритм подписи JWT.")
     JWT_TTL_HOURS: int = Field(default=168, description="Срок жизни access-токена, часов.")
+    ADMIN_API_KEY: str = Field(
+        default="",
+        description="Ключ доступа к админ-эндпоинтам (аналитика, cron-триггеры). "
+        "В продакшне ОБЯЗАТЕЛЕН; в dev пусто = эндпоинты открыты для удобства разработки (P3.4).",
+    )
     PASSWORD_RESET_TTL_HOURS: int = Field(
         default=1, ge=1, description="Срок жизни токена сброса пароля, часов (P1.3)."
+    )
+
+    # ── Наблюдаемость (P1.5) ──────────────────────────────────────────
+    SENTRY_DSN: str = Field(default="", description="DSN Sentry. Пусто = трекинг ошибок отключён.")
+    LOG_LEVEL: str = Field(default="INFO", description="Уровень логирования (DEBUG/INFO/WARNING).")
+    LOG_JSON: bool = Field(
+        default=True,
+        description="JSON-логи (True, для прода/агрегации) или человекочитаемый текст (False).",
+    )
+
+    # ── Импорт выписок (P2.1) ─────────────────────────────────────────
+    MAX_UPLOAD_SIZE_MB: int = Field(
+        default=10, ge=1, description="Максимальный размер загружаемого файла выписки, МБ."
     )
     AUTH_COOKIE_NAME: str = Field(default="fp_access", description="Имя httpOnly-cookie с JWT.")
 
@@ -223,4 +241,6 @@ def validate_production_security(s: Settings) -> list[str]:
         problems.append("JWT_SECRET не задан или дефолтный — задайте стойкий секрет (>=32 симв.) в .env")
     if not s.COOKIE_SECURE:
         problems.append("COOKIE_SECURE=false — в production cookie должна иметь флаг Secure (нужен HTTPS)")
+    if not s.ADMIN_API_KEY or len(s.ADMIN_API_KEY) < 16:
+        problems.append("ADMIN_API_KEY не задан или слишком короткий — задайте стойкий ключ (>=16 симв.) в .env для защиты админ-эндпоинтов")
     return problems

@@ -20,13 +20,14 @@ services:
         condition: service_healthy
     environment:
       DATABASE_URL: postgresql+psycopg://finpilot:finpilot@db:5432/finpilot
-      ENVIRONMENT: ${ENVIRONMENT:-production}
+      ENVIRONMENT: ${ENVIRONMENT:-development}
       CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:8000,http://127.0.0.1:8000}
-      # Secure-cookie включена по умолчанию (прод за HTTPS-прокси). Для локального
-      # HTTP-теста через Docker задайте COOKIE_SECURE=false и ENVIRONMENT=development.
-      COOKIE_SECURE: ${COOKIE_SECURE:-true}
-      # Обязателен: старт падает, если не задан, — не оставляем публичный дефолт-секрет.
-      JWT_SECRET: ${JWT_SECRET:?Set JWT_SECRET in .env (min 32 chars; openssl rand -hex 32)}
+      # Дефолты дружелюбны к локальному запуску: `docker compose up` поднимается из коробки
+      # по HTTP. Для прода переопредели в .env: ENVIRONMENT=production, COOKIE_SECURE=true,
+      # стойкий JWT_SECRET (openssl rand -hex 32). Дефолтный секрет в production отвергается
+      # самим приложением (fail-loud при старте) — защита на правильном слое.
+      COOKIE_SECURE: ${COOKIE_SECURE:-false}
+      JWT_SECRET: ${JWT_SECRET:-dev-insecure-secret-change-me-in-production-env-32b}
       DEFAULT_BASE_CURRENCY: ${DEFAULT_BASE_CURRENCY:-RUB}
       # B2B/Plaid выключены, пока не заданы ключи.
       B2B_API_KEYS: ${B2B_API_KEYS:-}
@@ -40,8 +41,18 @@ services:
       SMTP_PASSWORD: ${SMTP_PASSWORD:-}
       SMTP_FROM: ${SMTP_FROM:-}
       SMTP_USE_TLS: ${SMTP_USE_TLS:-true}
+      # Наблюдаемость (P1.5): Sentry опционален (пусто = выкл), логи JSON в проде.
+      SENTRY_DSN: ${SENTRY_DSN:-}
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+      LOG_JSON: ${LOG_JSON:-true}
     ports:
       - "8000:8000"
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://localhost:8000/health').status==200 else 1)\""]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 25s
 
 volumes:
   pgdata:

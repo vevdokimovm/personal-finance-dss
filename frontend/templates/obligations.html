@@ -21,11 +21,11 @@
 {% endblock %}
 
 {% block modals %}
-<div class="modal-backdrop" id="obligation-modal" aria-hidden="true">
+<div class="modal-backdrop" id="obligation-modal" role="dialog" aria-modal="true" aria-hidden="true">
     <div class="modal-card glass-panel">
         <div class="modal-head">
             <h3 class="modal-title">Новое обязательство</h3>
-            <button class="modal-close ghost-button" type="button" data-close-modal="obligation-modal">✕</button>
+            <button class="modal-close ghost-button" type="button" aria-label="Закрыть" data-close-modal="obligation-modal">✕</button>
         </div>
         <form id="obligation-form" class="modal-form">
             <div class="field">

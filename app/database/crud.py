@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import secrets
+import string
 from datetime import datetime, timedelta
 from typing import Optional
 
@@ -586,6 +588,34 @@ def update_user_prefs(
 from app.database.models import User  # noqa: E402
 
 
+def generate_referral_code(db: Session, length: int = 8) -> str:
+    """Генерирует уникальный реферальный код (заглавные буквы + цифры)."""
+    alphabet = string.ascii_uppercase + string.digits
+    for _ in range(10):
+        code = "".join(secrets.choice(alphabet) for _ in range(length))
+        if not db.query(User).filter(User.referral_code == code).first():
+            return code
+    raise RuntimeError("Не удалось сгенерировать уникальный реферальный код")
+
+
+def get_user_by_referral_code(db: Session, code: str) -> Optional[User]:
+    return db.query(User).filter(User.referral_code == code).first()
+
+
+def count_referrals(db: Session, code: str) -> int:
+    """Сколько пользователей пришло по этому реферальному коду."""
+    return db.query(User).filter(User.referred_by_code == code).count()
+
+
+def ensure_referral_code(db: Session, user: User) -> str:
+    """Лениво присваивает код пользователю без него (legacy-аккаунты до P3.2)."""
+    if not user.referral_code:
+        user.referral_code = generate_referral_code(db)
+        db.commit()
+        db.refresh(user)
+    return user.referral_code
+
+
 def create_user(
     db: Session,
     email: str,
@@ -593,6 +623,7 @@ def create_user(
     display_name: Optional[str] = None,
     newsletter_opt_in: bool = False,
     consent_at: Optional[datetime] = None,
+    referred_by_code: Optional[str] = None,
 ) -> User:
     user = User(
         email=email.lower().strip(),
@@ -600,6 +631,8 @@ def create_user(
         display_name=display_name,
         newsletter_opt_in=newsletter_opt_in,
         consent_at=consent_at or datetime.utcnow(),
+        referral_code=generate_referral_code(db),
+        referred_by_code=referred_by_code,
     )
     db.add(user)
     db.commit()

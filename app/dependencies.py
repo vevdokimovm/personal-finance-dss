@@ -1,6 +1,8 @@
 from typing import Optional
 
-from fastapi import Depends, HTTPException, Request, status
+import secrets
+
+from fastapi import Depends, Header, HTTPException, Request, status
 from sqlalchemy.orm import Session
 
 from app.config import settings
@@ -9,7 +11,28 @@ from app.database.db import get_db
 from app.database.models import User
 from app.services.security import token_service
 
-__all__ = ["get_db", "get_current_user", "require_user", "get_current_user_id"]
+__all__ = ["get_db", "get_current_user", "require_user", "get_current_user_id", "require_admin"]
+
+
+def require_admin(x_admin_key: Optional[str] = Header(None, alias="X-Admin-Key")) -> None:
+    """Защита админ-эндпоинтов (аналитика, cron-триггеры).
+
+    В production ADMIN_API_KEY обязателен (старт упадёт при отсутствии — fail-loud), и эндпоинт
+    требует совпадающий заголовок X-Admin-Key. В development при пустом ключе доступ открыт —
+    чтобы не мешать локальной разработке и тестам.
+    """
+    expected = settings.ADMIN_API_KEY
+    if not expected:
+        if settings.is_production:
+            raise HTTPException(
+                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+                detail="Админ-доступ не сконфигурирован (ADMIN_API_KEY).",
+            )
+        return
+    if not x_admin_key or not secrets.compare_digest(x_admin_key, expected):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, detail="Недействительный админ-ключ."
+        )
 
 
 def _extract_token(request: Request) -> Optional[str]:

@@ -6,17 +6,26 @@ from typing import Any, Optional
 
 from fastapi import Depends, FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import HTMLResponse, RedirectResponse
+from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
+from sqlalchemy import text
 
 from app.api.router import router as api_router
 from app.api.routes_b2b import router as b2b_router
 from app.config import settings, validate_production_security
+from app.database.db import engine
 from app.database.init_db import init_db
 from app.database.models import User
 from app.dependencies import get_current_user
-from app.middleware import CSRFMiddleware, RateLimitMiddleware, SecurityHeadersMiddleware
+from app.logging_config import setup_logging
+from app.middleware import (
+    CSRFMiddleware,
+    RateLimitMiddleware,
+    RequestLoggingMiddleware,
+    SecurityHeadersMiddleware,
+)
+from app.observability import init_sentry
 
 PROJECT_DIR = Path(__file__).resolve().parents[1]
 FRONTEND_DIR = PROJECT_DIR / "frontend"
@@ -25,6 +34,10 @@ STATIC_DIR = FRONTEND_DIR / "static"
 
 templates = Jinja2Templates(directory=str(TEMPLATES_DIR))
 templates.env.globals["app_version"] = settings.APP_VERSION
+
+# Наблюдаемость (P1.5): структурное логирование + опциональный Sentry.
+setup_logging(level=settings.LOG_LEVEL, json_format=settings.LOG_JSON)
+init_sentry(settings.SENTRY_DSN, environment=settings.ENVIRONMENT, release=settings.APP_VERSION)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -35,6 +48,9 @@ async def lifespan(app: FastAPI):
             "Небезопасная конфигурация для production:\n  - " + "\n  - ".join(problems)
         )
     init_db()
+    # init_db прогоняет миграции через alembic, чей fileConfig сбрасывает logging —
+    # восстанавливаем структурный JSON-логгер для рантайма.
+    setup_logging(level=settings.LOG_LEVEL, json_format=settings.LOG_JSON)
     yield
 
 
@@ -68,6 +84,28 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+# Внешний слой: логирует финальный статус каждого запроса и проставляет X-Request-ID.
+app.add_middleware(RequestLoggingMiddleware)
+
+
+@app.get("/health", include_in_schema=False)
+async def health() -> JSONResponse:
+    """Health-check: liveness + проверка коннекта к БД (для docker/балансировщика/мониторинга)."""
+    db_status = "ok"
+    try:
+        with engine.connect() as conn:
+            conn.execute(text("SELECT 1"))
+    except Exception:
+        db_status = "error"
+    healthy = db_status == "ok"
+    return JSONResponse(
+        {
+            "status": "ok" if healthy else "degraded",
+            "database": db_status,
+            "version": settings.APP_VERSION,
+        },
+        status_code=200 if healthy else 503,
+    )
 
 app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
 app.include_router(api_router)

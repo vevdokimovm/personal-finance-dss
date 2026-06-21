@@ -9,6 +9,7 @@ from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
 
 from app.database.db import get_db
+from app.dependencies import require_admin
 from app.database.models import FxRate
 from app.services.currency import CurrencyConverter
 
@@ -75,3 +76,12 @@ def convert(payload: ConvertRequest, db: Session = Depends(get_db)) -> dict:
         "to": payload.to_currency.upper(),
         "result": float(result),
     }
+
+
+@router.post("/refresh", summary="Обновить курсы валют с ЦБ РФ (живой источник)", dependencies=[Depends(require_admin)])
+def refresh_rates(db: Session = Depends(get_db)) -> dict:
+    """Тянет актуальные курсы с cbr.ru и обновляет таблицу. При недоступности источника
+    текущие курсы сохраняются (source=fallback). Защищено суточным кэшем от частых запросов."""
+    from app.services.cbr_fx import update_fx_rates
+
+    return update_fx_rates(db)
