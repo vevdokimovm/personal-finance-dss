@@ -6,6 +6,8 @@ from decimal import Decimal
 from typing import Optional
 
 from sqlalchemy import JSON, Boolean, DateTime, Float, ForeignKey, Integer, Numeric, String, Text
+
+from app.database.types import EncryptedString
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.database.db import Base
@@ -30,7 +32,7 @@ class User(Base):
     )
     email: Mapped[str] = mapped_column(String(255), nullable=False, unique=True, index=True)
     password_hash: Mapped[str] = mapped_column(String(255), nullable=False)
-    display_name: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+    display_name: Mapped[Optional[str]] = mapped_column(EncryptedString, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=datetime.utcnow)
     is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
     email_verified: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
@@ -128,7 +130,7 @@ class Obligation(Base):
     start_date: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
     is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True, index=True)
     closed_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
-    comment: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    comment: Mapped[Optional[str]] = mapped_column(EncryptedString, nullable=True)
 
 
 class Goal(Base):
@@ -156,7 +158,7 @@ class Goal(Base):
     priority: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
     is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True, index=True)
     achieved_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
-    comment: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    comment: Mapped[Optional[str]] = mapped_column(EncryptedString, nullable=True)
 
 
 class Budget(Base):
@@ -203,7 +205,7 @@ class LiquidAsset(Base):
         Numeric(14, 2), nullable=False, default=0.0)
     interest_rate: Mapped[Decimal] = mapped_column(Numeric(6, 4), nullable=False, default=0.0)
     type: Mapped[str] = mapped_column(String(32), nullable=False, default="deposit")
-    comment: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    comment: Mapped[Optional[str]] = mapped_column(EncryptedString, nullable=True)
 
 
 class ObligationPayment(Base):

@@ -211,6 +211,7 @@ def reset_password(
 
 @router.get("/me", response_model=UserResponse, summary="Текущий пользователь")
 def me(user: User = Depends(require_user)) -> UserResponse:
+    log_event("pii_access", {"resource": "profile", "action": "read"}, user_id=user.id)
     return UserResponse.model_validate(user)
 
 
@@ -254,6 +255,7 @@ def update_profile(
     db: Session = Depends(get_db),
 ) -> UserResponse:
     updated = update_user_profile(db, user_id=user.id, display_name=payload.display_name)
+    log_event("pii_access", {"resource": "profile", "action": "update"}, user_id=user.id)
     return UserResponse.model_validate(updated)
 
 
