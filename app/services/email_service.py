@@ -92,6 +92,56 @@ class EmailService:
 </div>"""
         return self._send(to_email, subject, text, html)
 
+    def send_goal_deadline_reminder(
+        self, to_email: str, goal_name: str, days_left: int,
+        current: float, target: float, display_name: str | None = None,
+    ) -> bool:
+        """Напоминание о приближении дедлайна цели."""
+        name = display_name or to_email.split("@")[0]
+        when = "сегодня" if days_left <= 0 else f"через {days_left} дн."
+        subject = f"Цель «{goal_name}» — дедлайн близко"
+        text = (
+            f"Здравствуйте, {name}!\n\n"
+            f"Дедлайн вашей цели «{goal_name}» наступает {when}. "
+            f"Накоплено {current:,.0f} из {target:,.0f} руб.\n\n"
+            "Загляните в FINPILOT, чтобы при необходимости скорректировать план.\n\n"
+            "— Команда FINPILOT"
+        ).replace(",", " ")
+        html = f"""\
+<div style="font-family:-apple-system,Segoe UI,Roboto,sans-serif;max-width:560px;margin:auto;color:#1a1a1a;">
+  <h2 style="color:#2BBF6A;">Дедлайн цели близко</h2>
+  <p>Здравствуйте, <strong>{name}</strong>!</p>
+  <p>Дедлайн цели «<strong>{goal_name}</strong>» наступает <strong>{when}</strong>.
+  Накоплено {current:,.0f} из {target:,.0f} руб.</p>
+  <p style="color:#777;font-size:13px;">Загляните в FINPILOT, чтобы скорректировать план.<br>— Команда FINPILOT</p>
+</div>""".replace(",", " ")
+        return self._send(to_email, subject, text, html)
+
+    def send_budget_overrun_alert(
+        self, to_email: str, category: str, spent: float, limit: float,
+        display_name: str | None = None,
+    ) -> bool:
+        """Уведомление о превышении бюджета по категории (информационное)."""
+        name = display_name or to_email.split("@")[0]
+        over = max(0.0, spent - limit)
+        subject = f"Превышен бюджет: «{category}»"
+        text = (
+            f"Здравствуйте, {name}!\n\n"
+            f"Расходы по категории «{category}» превысили бюджет: "
+            f"{spent:,.0f} из {limit:,.0f} руб (на {over:,.0f} больше).\n\n"
+            "Это информационное уведомление, а не списание.\n\n"
+            "— Команда FINPILOT"
+        ).replace(",", " ")
+        html = f"""\
+<div style="font-family:-apple-system,Segoe UI,Roboto,sans-serif;max-width:560px;margin:auto;color:#1a1a1a;">
+  <h2 style="color:#E0533D;">Превышен бюджет</h2>
+  <p>Здравствуйте, <strong>{name}</strong>!</p>
+  <p>Расходы по категории «<strong>{category}</strong>» превысили бюджет:
+  {spent:,.0f} из {limit:,.0f} руб (на {over:,.0f} больше).</p>
+  <p style="color:#777;font-size:13px;">Это информационное уведомление, а не списание.<br>— Команда FINPILOT</p>
+</div>""".replace(",", " ")
+        return self._send(to_email, subject, text, html)
+
     def _send(self, to_email: str, subject: str, text: str, html: str) -> bool:
         if not self.enabled:
             logger.info("Email отключён (нет SMTP-конфига) — письмо для %s не отправлено.", to_email)

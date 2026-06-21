@@ -317,3 +317,18 @@ class Recommendation(Base):
     created_at: Mapped[datetime] = mapped_column(
         DateTime, nullable=False, default=datetime.utcnow, index=True
     )
+
+
+class NotificationLog(Base):
+    """Журнал отправленных уведомлений (P2.5) — дедупликация.
+
+    dedup_key уникально описывает событие (например 'budget_overrun:Кафе:2026-06'),
+    чтобы одно и то же не отправлялось повторно при периодических прогонах.
+    """
+    __tablename__ = "notification_log"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    user_id: Mapped[str] = mapped_column(String(36), nullable=False, index=True)
+    notification_type: Mapped[str] = mapped_column(String(50), nullable=False)
+    dedup_key: Mapped[str] = mapped_column(String(255), nullable=False, index=True)
+    sent_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=datetime.utcnow)
