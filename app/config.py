@@ -28,7 +28,7 @@ class Settings(BaseSettings):
         description="Название проекта.",
     )
     APP_VERSION: str = Field(
-        default="4.6.0",
+        default="4.7.0",
         description="Версия приложения (INFRA-13): код, UI-футер, git-тег.",
     )
     PROJECT_TAGLINE: str = Field(
@@ -76,6 +76,11 @@ class Settings(BaseSettings):
     LOG_JSON: bool = Field(
         default=True,
         description="JSON-логи (True, для прода/агрегации) или человекочитаемый текст (False).",
+    )
+
+    # ── Импорт выписок (P2.1) ─────────────────────────────────────────
+    MAX_UPLOAD_SIZE_MB: int = Field(
+        default=10, ge=1, description="Максимальный размер загружаемого файла выписки, МБ."
     )
     AUTH_COOKIE_NAME: str = Field(default="fp_access", description="Имя httpOnly-cookie с JWT.")
 
