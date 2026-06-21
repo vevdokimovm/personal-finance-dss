@@ -2,6 +2,43 @@
 
 Формат: [Keep a Changelog](https://keepachangelog.com/ru/1.0.0/). Версионирование — [SemVer](https://semver.org/lang/ru/).
 
+## [4.5.0] — 2026-06-20 — Прод-инфра: health, структурное логирование, Sentry, бэкапы (MINOR)
+
+P1.5 из roadmap (кодовая часть). Postgres + docker-compose уже были закрыты в v4.2.0;
+здесь — наблюдаемость и эксплуатационная надёжность.
+
+### Health-check
+- `GET /health` — liveness + проверка коннекта к БД (`SELECT 1`). Отдаёт
+  `{status, database, version}`; 200 если БД доступна, 503 если нет.
+- docker-compose: healthcheck для web-сервиса через `/health` (interval 15s, retries 3).
+
+### Структурное логирование
+- `app/logging_config.py`: `JsonFormatter` (одна строка JSON: timestamp, level, logger,
+  message, + контекст) и `setup_logging` (JSON в проде, человекочитаемый текст при `LOG_JSON=false`).
+- `RequestLoggingMiddleware`: каждый HTTP-запрос логируется структурно (request_id, метод,
+  путь, статус, латентность); в ответ проставляется `X-Request-ID` для сквозной трассировки.
+- Логгер восстанавливается в lifespan после `init_db` (alembic `fileConfig` сбрасывает handlers).
+
+### Трекинг ошибок (Sentry) — опционально
+- `app/observability.py::init_sentry`: инициализация при заданном `SENTRY_DSN`, иначе тихий
+  no-op (dev/тесты без Sentry). `sentry-sdk[fastapi]` в requirements.
+
+### Бэкапы БД
+- `scripts/backup_db.sh`: сжатый `pg_dump` с временной меткой и ротацией
+  (`BACKUP_RETENTION_DAYS`). `scripts/README.md` — запуск, cron-расписание, восстановление.
+
+### Конфигурация
+- `SENTRY_DSN`, `LOG_LEVEL`, `LOG_JSON` в config / `.env.example` / docker-compose.
+
+### Тесты
+- `tests/test_observability.py` (7): health (БД ok, без авторизации), JSON-formatter
+  (валидный JSON + исключения), request_id в ответе, структурный лог запроса с контекстом,
+  Sentry no-op без DSN. Итого 333 passed.
+
+### Вне зоны кода (эксплуатация)
+- Аккаунт Sentry и DSN; запуск бэкапов по расписанию и их хранение вне сервера БД;
+  алерты и uptime-мониторинг (дёргать `/health`); реплики/отказоустойчивость БД.
+
 ## [4.4.1] — 2026-06-20 — Fix: docker-compose поднимается из коробки (PATCH)
 
 `docker compose up --build` падал на интерполяции `JWT_SECRET: ${JWT_SECRET:?...}` —

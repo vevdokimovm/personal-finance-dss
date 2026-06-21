@@ -28,7 +28,7 @@ class Settings(BaseSettings):
         description="Название проекта.",
     )
     APP_VERSION: str = Field(
-        default="4.4.1",
+        default="4.5.0",
         description="Версия приложения (INFRA-13): код, UI-футер, git-тег.",
     )
     PROJECT_TAGLINE: str = Field(
@@ -68,6 +68,14 @@ class Settings(BaseSettings):
     JWT_TTL_HOURS: int = Field(default=168, description="Срок жизни access-токена, часов.")
     PASSWORD_RESET_TTL_HOURS: int = Field(
         default=1, ge=1, description="Срок жизни токена сброса пароля, часов (P1.3)."
+    )
+
+    # ── Наблюдаемость (P1.5) ──────────────────────────────────────────
+    SENTRY_DSN: str = Field(default="", description="DSN Sentry. Пусто = трекинг ошибок отключён.")
+    LOG_LEVEL: str = Field(default="INFO", description="Уровень логирования (DEBUG/INFO/WARNING).")
+    LOG_JSON: bool = Field(
+        default=True,
+        description="JSON-логи (True, для прода/агрегации) или человекочитаемый текст (False).",
     )
     AUTH_COOKIE_NAME: str = Field(default="fp_access", description="Имя httpOnly-cookie с JWT.")
 
