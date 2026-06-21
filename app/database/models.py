@@ -6,8 +6,6 @@ from decimal import Decimal
 from typing import Optional
 
 from sqlalchemy import JSON, Boolean, DateTime, Float, ForeignKey, Integer, Numeric, String, Text
-
-from app.database.types import EncryptedString
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.database.db import Base
@@ -32,19 +30,12 @@ class User(Base):
     )
     email: Mapped[str] = mapped_column(String(255), nullable=False, unique=True, index=True)
     password_hash: Mapped[str] = mapped_column(String(255), nullable=False)
-    display_name: Mapped[Optional[str]] = mapped_column(EncryptedString, nullable=True)
+    display_name: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=datetime.utcnow)
     is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
     email_verified: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
     newsletter_opt_in: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
     consent_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
-    # Account lockout (P1.2): защита от перебора пароля.
-    failed_login_attempts: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
-    locked_until: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
-    referral_code: Mapped[Optional[str]] = mapped_column(
-        String(12), nullable=True, unique=True, index=True
-    )
-    referred_by_code: Mapped[Optional[str]] = mapped_column(String(12), nullable=True, index=True)
 
 
 class FxRate(Base):
@@ -134,7 +125,7 @@ class Obligation(Base):
     start_date: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
     is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True, index=True)
     closed_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
-    comment: Mapped[Optional[str]] = mapped_column(EncryptedString, nullable=True)
+    comment: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
 
 
 class Goal(Base):
@@ -162,7 +153,7 @@ class Goal(Base):
     priority: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
     is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True, index=True)
     achieved_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
-    comment: Mapped[Optional[str]] = mapped_column(EncryptedString, nullable=True)
+    comment: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
 
 
 class Budget(Base):
@@ -209,7 +200,7 @@ class LiquidAsset(Base):
         Numeric(14, 2), nullable=False, default=0.0)
     interest_rate: Mapped[Decimal] = mapped_column(Numeric(6, 4), nullable=False, default=0.0)
     type: Mapped[str] = mapped_column(String(32), nullable=False, default="deposit")
-    comment: Mapped[Optional[str]] = mapped_column(EncryptedString, nullable=True)
+    comment: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
 
 
 class ObligationPayment(Base):
@@ -321,18 +312,3 @@ class Recommendation(Base):
     created_at: Mapped[datetime] = mapped_column(
         DateTime, nullable=False, default=datetime.utcnow, index=True
     )
-
-
-class NotificationLog(Base):
-    """Журнал отправленных уведомлений (P2.5) — дедупликация.
-
-    dedup_key уникально описывает событие (например 'budget_overrun:Кафе:2026-06'),
-    чтобы одно и то же не отправлялось повторно при периодических прогонах.
-    """
-    __tablename__ = "notification_log"
-
-    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
-    user_id: Mapped[str] = mapped_column(String(36), nullable=False, index=True)
-    notification_type: Mapped[str] = mapped_column(String(50), nullable=False)
-    dedup_key: Mapped[str] = mapped_column(String(255), nullable=False, index=True)
-    sent_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=datetime.utcnow)

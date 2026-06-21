@@ -19,38 +19,6 @@ from app.database.crud import get_user_prefs
 from app.services.currency import to_base_currency
 from app.services.pipeline import run_pipeline
 
-import hashlib
-
-from app.services.cache import TTLCache
-
-# Кэш результатов рекомендации. Ключ включает отпечаток входных данных, поэтому любое
-# изменение операций/обязательств/целей даёт новый ключ и автоматический пересчёт.
-_recommendation_cache = TTLCache(ttl_seconds=180, max_size=512)
-
-
-def _data_fingerprint(transactions, obligations, goals, liquid_assets, base_currency: str) -> str:
-    def num(obj, attr: str) -> float:
-        return round(float(getattr(obj, attr, 0) or 0), 2)
-
-    parts = (
-        base_currency,
-        tuple(sorted(
-            (str(getattr(t, "type", "")), num(t, "amount"), str(getattr(t, "date", ""))[:10])
-            for t in transactions
-        )),
-        tuple(sorted(
-            (num(o, "amount"), round(float(getattr(o, "interest_rate", 0) or 0), 4),
-             num(o, "monthly_payment"))
-            for o in obligations
-        )),
-        tuple(sorted(
-            (num(g, "current_amount"), num(g, "target_amount"), str(getattr(g, "deadline", ""))[:10])
-            for g in goals
-        )),
-        tuple(sorted(num(a, "amount") for a in liquid_assets)),
-    )
-    return hashlib.sha256(repr(parts).encode("utf-8")).hexdigest()
-
 
 class RecommendationRequest(BaseModel):
     transactions: list[dict[str, Any]] = Field(default_factory=list)
@@ -91,24 +59,10 @@ def create_recommendation(
 
     ensure_calculable(transactions, obligations)
 
-    # Кэшируем только расчёт по данным пользователя из БД (не явный payload — он разовый).
-    use_cache = not (payload and (
-        payload.transactions or payload.obligations or payload.goals or payload.liquid_assets
-    ))
-    cache_key = None
-    if use_cache:
-        fingerprint = _data_fingerprint(transactions, obligations, goals, liquid_assets, base_currency)
-        cache_key = f"rec:{user_id or 'guest'}:{fingerprint}"
-        cached = _recommendation_cache.get(cache_key)
-        if cached is not None:
-            return RecommendationResponse(**cached)
-
     result = run_pipeline(
         transactions=transactions,
         obligations=obligations,
         goals=goals,
         liquid_assets=liquid_assets,
     )
-    if cache_key is not None:
-        _recommendation_cache.set(cache_key, result)
     return RecommendationResponse(**result)

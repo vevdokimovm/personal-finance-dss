@@ -86,25 +86,6 @@ class TokenService:
             return None
         return payload.get("sub")
 
-    def issue_password_reset(self, user_id: str, email: str, ttl_hours: int = 1) -> str:
-        """Токен сброса пароля (отдельное назначение, короткий срок)."""
-        now = datetime.now(timezone.utc)
-        payload = {
-            "sub": user_id,
-            "email": email,
-            "purpose": "password_reset",
-            "iat": now,
-            "exp": now + timedelta(hours=ttl_hours),
-        }
-        return jwt.encode(payload, self._secret, algorithm=self._algorithm)
-
-    def decode_password_reset(self, token: str) -> Optional[str]:
-        """Возвращает user_id, если токен валиден и предназначен для сброса пароля."""
-        payload = self.decode(token)
-        if not payload or payload.get("purpose") != "password_reset":
-            return None
-        return payload.get("sub")
-
 
 class TokenCipher:
     """Симметричное шифрование Plaid-токенов (INFRA-17, NFR-06).

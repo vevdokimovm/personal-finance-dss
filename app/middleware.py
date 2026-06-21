@@ -6,8 +6,6 @@
 from __future__ import annotations
 
 import time
-import uuid
-import logging
 from collections import defaultdict, deque
 
 from starlette.middleware.base import BaseHTTPMiddleware
@@ -15,48 +13,6 @@ from starlette.requests import Request
 from starlette.responses import JSONResponse
 
 from app.services.event_logger import log_event
-
-_request_logger = logging.getLogger("finpilot.request")
-
-
-class RequestLoggingMiddleware(BaseHTTPMiddleware):
-    """Структурное логирование каждого HTTP-запроса (P1.5).
-
-    Пишет request_id, метод, путь, статус и латентность; проставляет X-Request-ID
-    в ответ для сквозной трассировки между логами и Sentry.
-    """
-
-    async def dispatch(self, request: Request, call_next):
-        request_id = request.headers.get("X-Request-ID") or uuid.uuid4().hex[:16]
-        request.state.request_id = request_id
-        start = time.perf_counter()
-        try:
-            response = await call_next(request)
-        except Exception:
-            latency_ms = round((time.perf_counter() - start) * 1000, 2)
-            _request_logger.exception(
-                "request failed",
-                extra={
-                    "request_id": request_id,
-                    "method": request.method,
-                    "path": request.url.path,
-                    "latency_ms": latency_ms,
-                },
-            )
-            raise
-        latency_ms = round((time.perf_counter() - start) * 1000, 2)
-        _request_logger.info(
-            "request",
-            extra={
-                "request_id": request_id,
-                "method": request.method,
-                "path": request.url.path,
-                "status_code": response.status_code,
-                "latency_ms": latency_ms,
-            },
-        )
-        response.headers["X-Request-ID"] = request_id
-        return response
 
 
 class RateLimitMiddleware(BaseHTTPMiddleware):

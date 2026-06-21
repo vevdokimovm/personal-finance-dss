@@ -44,7 +44,6 @@ class ExpenseRecord:
     category: str
     amount: float
     period: str  # "YYYY-MM"
-    merchant: str | None = None
 
 
 @dataclass
@@ -71,17 +70,6 @@ class SpendingAdvice:
     current: float
     baseline: float
     message: str
-
-
-@dataclass
-class MerchantStats:
-    """Layer 2: агрегат по мерчанту за текущий период (информационно)."""
-    merchant: str
-    total: float          # суммарные траты у мерчанта за период
-    count: int            # число операций
-    avg_check: float      # средний чек
-    category: str
-    compressibility: float
 
 
 class SpendingAdvisor:
@@ -215,57 +203,6 @@ class SpendingAdvisor:
                 break
 
         return advice
-
-    @staticmethod
-    def _normalize_merchant(name: str) -> str:
-        """Схлопывает пробелы и обрезает края — «  Бар   У Джо » → «Бар У Джо»."""
-        return " ".join(name.split())
-
-    def analyze_merchants(
-        self,
-        records: list[ExpenseRecord],
-        current_period: str | None = None,
-        top_k: int = 5,
-    ) -> list["MerchantStats"]:
-        """Layer 2: топ дискреционных мерчантов текущего периода.
-
-        Чисто информационный слой (где сосредоточены сжимаемые траты). Несжимаемые
-        категории исключаются. Не входит в U(a) и не влияет на выбор a*.
-        """
-        period = self._resolve_current_period(records, current_period)
-        if period is None:
-            return []
-
-        agg: dict[str, dict] = {}
-        for rec in records:
-            if rec.period != period or not rec.merchant:
-                continue
-            name = self._normalize_merchant(rec.merchant)
-            if not name:
-                continue
-            slot = agg.setdefault(name, {"total": 0.0, "count": 0, "category": rec.category})
-            slot["total"] += rec.amount
-            slot["count"] += 1
-            slot["category"] = rec.category
-
-        result: list[MerchantStats] = []
-        for name, data in agg.items():
-            comp = self.compressibility(data["category"])
-            if comp <= OBLIGATORY_CEILING:
-                continue  # несжимаемые мерчанты (ЖКХ и т.п.) не советуем
-            count = data["count"]
-            total = round(data["total"], 2)
-            result.append(MerchantStats(
-                merchant=name,
-                total=total,
-                count=count,
-                avg_check=round(total / count, 2) if count else 0.0,
-                category=data["category"],
-                compressibility=comp,
-            ))
-
-        result.sort(key=lambda m: m.total, reverse=True)
-        return result[:top_k]
 
     @staticmethod
     def _format_message(category: str, saving: float, reason: str, current: float, baseline: float) -> str:

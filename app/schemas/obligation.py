@@ -3,15 +3,15 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Optional
 
-from pydantic import BaseModel, ConfigDict, Field, computed_field
+from pydantic import BaseModel, ConfigDict, computed_field
 
 
 class ObligationCreate(BaseModel):
     name: str
-    amount: float = Field(ge=0)
-    interest_rate: float = Field(default=0.0, ge=0)
+    amount: float
+    interest_rate: float = 0.0
     term: int = 0
-    monthly_payment: float = Field(ge=0)
+    monthly_payment: float
     payment_day: int = 1
     comment: Optional[str] = None
     bank: Optional[str] = None

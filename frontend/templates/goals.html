@@ -21,11 +21,11 @@
 {% endblock %}
 
 {% block modals %}
-<div class="modal-backdrop" id="goal-modal" role="dialog" aria-modal="true" aria-hidden="true">
+<div class="modal-backdrop" id="goal-modal" aria-hidden="true">
     <div class="modal-card glass-panel">
         <div class="modal-head">
             <h3 class="modal-title">Новая цель</h3>
-            <button class="modal-close ghost-button" type="button" aria-label="Закрыть" data-close-modal="goal-modal">✕</button>
+            <button class="modal-close ghost-button" type="button" data-close-modal="goal-modal">✕</button>
         </div>
         <form id="goal-form" class="modal-form">
             <div style="font-size:.76rem; line-height:1.5; color:var(--c-text2); background:var(--c-surface-up); border:1px solid var(--c-border); border-radius:var(--r-md); padding:12px 14px; margin-bottom:16px;">

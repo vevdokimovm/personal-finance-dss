@@ -16,7 +16,6 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Any
 
-from app.core.money import money
 from app.core.alternatives import evaluate_alternative, generate_alternatives
 from app.core.filtering import B_MIN, DT_MAX, L_MIN, filter_alternatives
 from app.core.goals_priority import preallocate_from_bliq
@@ -128,16 +127,16 @@ def run_planning(
 
     return {
         "indicators": {
-            "It": money(income_total),
-            "Et": money(expense_total),
-            "SigmaP": money(obligation_payments),
-            "CFt": money(cash_flow),
-            "Rt": money(rt),
+            "It": round(income_total, 2),
+            "Et": round(expense_total, 2),
+            "SigmaP": round(obligation_payments, 2),
+            "CFt": round(cash_flow, 2),
+            "Rt": round(rt, 2),
             "Lt": round(lt, 4),
             "Dt": round(dt, 4),
-            "Bt": money(bt),
-            "Bliq": money(bliq_after),
-            "BLR": money(blr),
+            "Bt": round(bt, 2),
+            "Bliq": round(bliq_after, 2),
+            "BLR": round(blr, 2),
             "BLR_status": classify_blr(blr),
         },
         "bliq_preallocation": {
@@ -145,12 +144,12 @@ def run_planning(
                 {
                     "id": g.get("id"),
                     "name": g.get("name", ""),
-                    "amount": money(g.get("_remaining", 0)),
+                    "amount": round(float(g.get("_remaining", 0)), 2),
                 }
                 for g in closed_goals
             ],
-            "bliq_used": money(bliq - bliq_after),
-            "bliq_remaining": money(bliq_after),
+            "bliq_used": round(bliq - bliq_after, 2),
+            "bliq_remaining": round(bliq_after, 2),
         },
         "risk_profile": profile["label"],
         "weights": {

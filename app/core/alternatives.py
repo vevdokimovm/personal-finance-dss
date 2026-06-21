@@ -11,8 +11,6 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Any
 
-from app.core.money import money
-
 from app.core.avalanche import allocate_obligations_avalanche
 from app.core.goals_priority import calculate_goals_si, goals_allocation_breakdown
 
@@ -143,14 +141,14 @@ def evaluate_alternative(
     for o in new_obls:
         old = _old_by_id.get(o.get("id"), o)
         rate = float(old.get("interest_rate", 0))
-        paid_in = money(float(old.get("amount", 0)) - float(o.get("amount", 0)))
+        paid_in = round(float(old.get("amount", 0)) - float(o.get("amount", 0)), 2)
         if rate >= r_bench:
             _passed.append({
                 "name": old.get("name", ""),
                 "interest_rate": rate,
                 "paid_in": paid_in,
                 "closed": float(o.get("amount", 0)) <= 0,
-                "payment_saved": money(float(old.get("monthly_payment", 0)) - float(o.get("monthly_payment", 0))),
+                "payment_saved": round(float(old.get("monthly_payment", 0)) - float(o.get("monthly_payment", 0)), 2),
             })
         else:
             _skipped.append({"name": old.get("name", ""), "interest_rate": rate})
@@ -158,9 +156,9 @@ def evaluate_alternative(
         "r_bench": r_bench,
         "passed": sorted(_passed, key=lambda x: -x["interest_rate"]),
         "skipped": _skipped,
-        "x_unused_to_goals": money(x_obl_unused),
-        "delta_payment": money(
-            sum(float(o.get("monthly_payment", 0)) for o in obligations) - new_obligation_payments
+        "x_unused_to_goals": round(x_obl_unused, 2),
+        "delta_payment": round(
+            sum(float(o.get("monthly_payment", 0)) for o in obligations) - new_obligation_payments, 2
         ),
     }
 

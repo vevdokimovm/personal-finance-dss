@@ -12,21 +12,11 @@ class RegisterRequest(BaseModel):
     display_name: Optional[str] = Field(default=None, max_length=255)
     consent: bool = Field(default=True, description="Согласие на обработку ПДн (152-ФЗ). Веб-форма требует явную галочку; явный false → отказ.")
     newsletter_opt_in: bool = Field(default=False, description="Согласие на новости/рассылку (необязательно).")
-    referral_code: Optional[str] = Field(default=None, max_length=12, description="Реферальный код пригласившего (необязательно).")
 
 
 class LoginRequest(BaseModel):
     email: EmailStr
     password: str = Field(min_length=1, max_length=128)
-
-
-class ForgotPasswordRequest(BaseModel):
-    email: EmailStr
-
-
-class ResetPasswordRequest(BaseModel):
-    token: str = Field(min_length=10)
-    new_password: str = Field(min_length=8, max_length=128)
 
 
 class UserResponse(BaseModel):

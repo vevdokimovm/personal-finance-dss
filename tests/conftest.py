@@ -10,12 +10,8 @@ import tempfile
 
 import pytest
 
-# По умолчанию — изолированный SQLite-файл. Но если DATABASE_URL задан извне
-# (например, PostgreSQL в CI/локальной верификации) — уважаем его, чтобы прогнать
-# тот же набор тестов на боевой СУБД.
-if not os.environ.get("DATABASE_URL"):
-    _TEST_DB = tempfile.NamedTemporaryFile(suffix=".db", delete=False)
-    os.environ["DATABASE_URL"] = f"sqlite:///{_TEST_DB.name}"
+_TEST_DB = tempfile.NamedTemporaryFile(suffix=".db", delete=False)
+os.environ["DATABASE_URL"] = f"sqlite:///{_TEST_DB.name}"
 
 from fastapi.testclient import TestClient
 
@@ -49,15 +45,3 @@ def db_session():
     finally:
         session.close()
         _reset_db()
-
-
-@pytest.fixture(autouse=True)
-def _clear_recommendation_cache():
-    """Кэш рекомендаций — модульный (живёт в процессе); чистим перед каждым тестом,
-    чтобы результаты не протекали между тестами."""
-    try:
-        from app.api.routes_recommendation import _recommendation_cache
-        _recommendation_cache.clear()
-    except Exception:
-        pass
-    yield
