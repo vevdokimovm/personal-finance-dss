@@ -64,14 +64,17 @@
                     </span>
                     <span>Ликвидные активы</span>
                 </a>
+                {% if not current_user %}
                 <a href="/validation" id="nav-validation" class="nav-item {% if request.url.path == '/validation' %}active{% endif %}">
                     <span class="nav-icon">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
                     </span>
                     <span>Валидация</span>
                 </a>
+                {% endif %}
             </nav>
 
+            {% if not current_user %}
             <div class="sidebar-footer">
                 <label class="demo-case-label" for="demo-case-select">Тест-кейсы</label>
                 <select id="demo-case-select" class="demo-case-select">
@@ -95,6 +98,7 @@
                     Очистить
                 </button>
             </div>
+            {% endif %}
         </aside>
 
         <main class="main-content">

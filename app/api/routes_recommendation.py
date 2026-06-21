@@ -15,6 +15,8 @@ from app.database.crud import (
 )
 from app.dependencies import get_current_user_id, get_db
 from app.schemas.recommendation import RecommendationResponse
+from app.database.crud import get_user_prefs
+from app.services.currency import to_base_currency
 from app.services.pipeline import run_pipeline
 
 
@@ -48,6 +50,12 @@ def create_recommendation(
         obligations = get_obligations(db, user_id=user_id)
         goals = get_goals(db, user_id=user_id)
         liquid_assets = get_liquid_assets(db, user_id=user_id)
+
+    base_currency = (get_user_prefs(db, user_id=user_id).base_currency or "RUB").upper()
+    transactions = to_base_currency(db, transactions, base_currency)
+    obligations = to_base_currency(db, obligations, base_currency)
+    goals = to_base_currency(db, goals, base_currency)
+    liquid_assets = to_base_currency(db, liquid_assets, base_currency)
 
     ensure_calculable(transactions, obligations)
 

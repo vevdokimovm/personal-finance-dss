@@ -15,7 +15,7 @@ os.environ["DATABASE_URL"] = f"sqlite:///{_TEST_DB.name}"
 
 from fastapi.testclient import TestClient
 
-from app.database.db import Base, engine
+from app.database.db import Base, SessionLocal, engine
 from app.main import app
 
 
@@ -31,3 +31,17 @@ def client() -> TestClient:
     with TestClient(app) as test_client:  # startup → init_db → run_migrations
         yield test_client
     _reset_db()
+
+
+@pytest.fixture
+def db_session():
+    """Сессия БД для юнит-тестов. Схема строится теми же миграциями (через startup)."""
+    _reset_db()
+    with TestClient(app):  # поднимает схему (миграции)
+        pass
+    session = SessionLocal()
+    try:
+        yield session
+    finally:
+        session.close()
+        _reset_db()

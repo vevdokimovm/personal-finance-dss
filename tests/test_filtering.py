@@ -1,7 +1,7 @@
 """Тесты фильтрации альтернатив по ограничениям допустимости (refined model v2.2).
 
 Жёсткие инварианты: Rt' ≥ 0 (не в минус), Dt' ≤ 0.40 (ПДН).
-Порог ликвидности lt_crit = минимум месяцев автономии, по умолчанию 0 (выключен) —
+Порог ликвидности l_min = минимум месяцев автономии, по умолчанию 0 (выключен) —
 ликвидность работает как критерий полезности, а не как фильтр, чтобы не выбрасывать
 пользователей с тонким бюджетом.
 """
@@ -32,19 +32,19 @@ class TestFiltering:
         assert len(rejected) == 1
 
     def test_liquidity_off_by_default(self):
-        # по умолчанию lt_crit=0 → даже нулевая автономия не отсевается (мягкий критерий)
+        # по умолчанию l_min=0 → даже нулевая автономия не отсевается (мягкий критерий)
         accepted, rejected = filter_alternatives(
             [{"name": "x", "Rt_new": 1000, "Lt_new": 0.0, "Dt_new": 0.2}]
         )
         assert len(accepted) == 1 and not rejected
 
     def test_custom_autonomy_threshold(self):
-        # при lt_crit=2.5 план с автономией 1 мес отсекается, с 3 мес проходит
+        # при l_min=2.5 план с автономией 1 мес отсекается, с 3 мес проходит
         alts = [
             {"name": "thin", "Rt_new": 1000, "Lt_new": 1.0, "Dt_new": 0.2},
             {"name": "safe", "Rt_new": 1000, "Lt_new": 3.0, "Dt_new": 0.2},
         ]
-        accepted, rejected = filter_alternatives(alts, lt_crit=2.5)
+        accepted, rejected = filter_alternatives(alts, l_min=2.5)
         assert len(accepted) == 1 and accepted[0]["name"] == "safe"
         assert len(rejected) == 1 and rejected[0]["name"] == "thin"
 

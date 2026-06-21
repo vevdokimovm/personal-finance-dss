@@ -24,6 +24,7 @@ class GoalCreate(BaseModel):
     priority: int = 0
     savings_rate: float = 0.0
     linked_asset_id: Optional[int] = None
+    currency: str = "RUB"
 
 
 class GoalResponse(BaseModel):

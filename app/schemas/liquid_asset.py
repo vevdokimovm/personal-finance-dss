@@ -11,6 +11,7 @@ class LiquidAssetCreate(BaseModel):
     interest_rate: float = 0.0
     type: str = "deposit"  # deposit | savings_account | cash
     comment: Optional[str] = None
+    currency: str = "RUB"
 
 
 class LiquidAssetUpdate(BaseModel):

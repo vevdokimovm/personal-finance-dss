@@ -50,6 +50,7 @@ def create_obligation_endpoint(
         bank=payload.bank,
         type=payload.type,
         start_date=payload.start_date,
+        currency=payload.currency,
         user_id=user_id,
     )
     log_event("obligation_created", {
@@ -68,8 +69,9 @@ def create_obligation_endpoint(
 def delete_obligation_endpoint(
     obligation_id: int,
     db: Session = Depends(get_db),
+    user_id: str | None = Depends(get_current_user_id),
 ):
-    if delete_obligation(db=db, obligation_id=obligation_id) is None:
+    if delete_obligation(db=db, obligation_id=obligation_id, user_id=user_id) is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Обязательство не найдено.",

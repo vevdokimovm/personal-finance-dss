@@ -40,12 +40,17 @@ def add_asset(
         interest_rate=payload.interest_rate,
         type=payload.type,
         comment=payload.comment,
+        currency=payload.currency,
         user_id=user_id,
     )
 
 
 @router.delete("/{asset_id}", summary="Удалить ликвидный актив")
-def remove_asset(asset_id: int, db: Session = Depends(get_db)):
-    if delete_liquid_asset(db, asset_id) is None:
+def remove_asset(
+    asset_id: int,
+    db: Session = Depends(get_db),
+    user_id: str | None = Depends(get_current_user_id),
+):
+    if delete_liquid_asset(db, asset_id, user_id=user_id) is None:
         raise HTTPException(status_code=404, detail="Актив не найден")
     return Response(status_code=status.HTTP_204_NO_CONTENT)

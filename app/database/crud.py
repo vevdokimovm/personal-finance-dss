@@ -114,13 +114,17 @@ def _is_recurring(db: Session, description: Optional[str], txn_type: str) -> boo
     return count >= 2
 
 
-def get_spending_by_category(db: Session, days: int = 30, top_n: int = 5) -> dict:
+def get_spending_by_category(
+    db: Session, days: int = 30, top_n: int = 5, user_id: Optional[str] = None
+) -> dict:
     """Разрез расходов по категориям и топ-мерчанты за период (FR-14)."""
     since = datetime.now() - timedelta(days=days)
+    owner = Transaction.user_id == user_id if user_id is not None else Transaction.user_id.is_(None)
     base_filter = (
         Transaction.type == "expense",
         Transaction.is_deleted == False,  # noqa: E712
         Transaction.date >= since,
+        owner,
     )
 
     cat_rows = (
@@ -165,28 +169,33 @@ def get_spending_by_category(db: Session, days: int = 30, top_n: int = 5) -> dic
     }
 
 
-def get_budgets(db: Session) -> list[Budget]:
-    return db.query(Budget).order_by(Budget.category).all()
+def get_budgets(db: Session, user_id: Optional[str] = None) -> list[Budget]:
+    query = _owner_filter(db.query(Budget), Budget, user_id)
+    return query.order_by(Budget.category).all()
 
 
-def create_budget(db: Session, category: str, limit_amount: float) -> Budget:
-    """Создаёт бюджет; при существующей категории — обновляет лимит (FR-22)."""
-    existing = db.query(Budget).filter(Budget.category == category).first()
+def create_budget(
+    db: Session, category: str, limit_amount: float, user_id: Optional[str] = None
+) -> Budget:
+    """Создаёт бюджет; при существующей категории у того же владельца — обновляет лимит (FR-22)."""
+    existing = _owner_filter(
+        db.query(Budget).filter(Budget.category == category), Budget, user_id
+    ).first()
     if existing is not None:
         existing.limit_amount = limit_amount
         db.commit()
         db.refresh(existing)
         return existing
-    budget = Budget(category=category, limit_amount=limit_amount)
+    budget = Budget(category=category, limit_amount=limit_amount, user_id=user_id)
     db.add(budget)
     db.commit()
     db.refresh(budget)
     return budget
 
 
-def delete_budget(db: Session, budget_id: int) -> bool:
+def delete_budget(db: Session, budget_id: int, user_id: Optional[str] = None) -> bool:
     budget = db.get(Budget, budget_id)
-    if budget is None:
+    if budget is None or budget.user_id != user_id:
         return False
     db.delete(budget)
     db.commit()
@@ -200,6 +209,7 @@ def save_scenario(
     result: dict,
     parent_recommendation_id: Optional[int] = None,
     description: Optional[str] = None,
+    user_id: Optional[str] = None,
 ) -> Scenario:
     """Сохраняет снимок сценария что-если (LOG-06)."""
     scenario = Scenario(
@@ -208,6 +218,7 @@ def save_scenario(
         parameters_json=parameters,
         result_json=result,
         parent_recommendation_id=parent_recommendation_id,
+        user_id=user_id,
     )
     db.add(scenario)
     db.commit()
@@ -215,15 +226,17 @@ def save_scenario(
     return scenario
 
 
-def get_scenarios(db: Session, limit: int = 20) -> list[Scenario]:
-    return db.query(Scenario).order_by(Scenario.created_at.desc()).limit(limit).all()
+def get_scenarios(db: Session, limit: int = 20, user_id: Optional[str] = None) -> list[Scenario]:
+    query = _owner_filter(db.query(Scenario), Scenario, user_id)
+    return query.order_by(Scenario.created_at.desc()).limit(limit).all()
 
 
-def get_budget_status(db: Session, days: int = 30) -> list[dict]:
+def get_budget_status(db: Session, days: int = 30, user_id: Optional[str] = None) -> list[dict]:
     """План-факт по категорийным бюджетам за период (FR-22)."""
     since = datetime.now() - timedelta(days=days)
+    owner = Transaction.user_id == user_id if user_id is not None else Transaction.user_id.is_(None)
     statuses = []
-    for b in db.query(Budget).order_by(Budget.category).all():
+    for b in _owner_filter(db.query(Budget), Budget, user_id).order_by(Budget.category).all():
         spent = (
             db.query(func.sum(Transaction.amount))
             .filter(
@@ -231,6 +244,7 @@ def get_budget_status(db: Session, days: int = 30) -> list[dict]:
                 Transaction.is_deleted == False,  # noqa: E712
                 Transaction.category == b.category,
                 Transaction.date >= since,
+                owner,
             )
             .scalar()
         ) or 0.0
@@ -252,10 +266,12 @@ def get_transactions(db: Session, user_id: Optional[str] = None) -> list[Transac
     return query.order_by(Transaction.date.desc()).all()
 
 
-def delete_transaction(db: Session, transaction_id: int) -> Optional[Transaction]:
+def delete_transaction(
+    db: Session, transaction_id: int, user_id: Optional[str] = None
+) -> Optional[Transaction]:
     """Мягкое удаление (BUG-03): запись сохраняется и может быть восстановлена."""
     transaction = db.get(Transaction, transaction_id)
-    if transaction is None or transaction.is_deleted:
+    if transaction is None or transaction.is_deleted or transaction.user_id != user_id:
         return None
     transaction.is_deleted = True
     transaction.deleted_at = datetime.utcnow()
@@ -323,9 +339,11 @@ def get_obligations(
     return query.order_by(Obligation.id.desc()).all()
 
 
-def delete_obligation(db: Session, obligation_id: int) -> Optional[Obligation]:
+def delete_obligation(
+    db: Session, obligation_id: int, user_id: Optional[str] = None
+) -> Optional[Obligation]:
     obligation = db.get(Obligation, obligation_id)
-    if obligation is None:
+    if obligation is None or obligation.user_id != user_id:
         return None
     db.delete(obligation)
     db.commit()
@@ -424,9 +442,9 @@ def get_goals(
     return query.order_by(Goal.deadline.asc()).all()
 
 
-def delete_goal(db: Session, goal_id: int) -> Optional[Goal]:
+def delete_goal(db: Session, goal_id: int, user_id: Optional[str] = None) -> Optional[Goal]:
     goal = db.get(Goal, goal_id)
-    if goal is None:
+    if goal is None or goal.user_id != user_id:
         return None
     db.delete(goal)
     db.commit()
@@ -498,9 +516,11 @@ def get_liquid_assets(db: Session, user_id: Optional[str] = None) -> list[Liquid
     return query.order_by(LiquidAsset.id.desc()).all()
 
 
-def delete_liquid_asset(db: Session, asset_id: int) -> Optional[LiquidAsset]:
+def delete_liquid_asset(
+    db: Session, asset_id: int, user_id: Optional[str] = None
+) -> Optional[LiquidAsset]:
     asset = db.get(LiquidAsset, asset_id)
-    if asset is None:
+    if asset is None or asset.user_id != user_id:
         return None
     db.delete(asset)
     db.commit()

@@ -13,6 +13,7 @@ class TransactionCreate(BaseModel):
     category: Optional[str] = None
     description: Optional[str] = None
     mcc: Optional[str] = None
+    currency: str = "RUB"
 
 
 class TransactionResponse(BaseModel):

@@ -13,7 +13,6 @@ from sqlalchemy.orm import Session
 
 from app.config import settings
 from app.database.crud import (
-    adopt_orphan_rows,
     count_users,
     create_user,
     delete_user,
@@ -93,10 +92,9 @@ def register(
         email_service.send_verification, user.email, verify_url, user.display_name
     )
 
-    # Первый пользователь усыновляет данные анонимного режима (single→multi).
-    if is_first_user:
-        adopted = adopt_orphan_rows(db, user.id)
-        log_event("orphan_rows_adopted", {"count": adopted}, user_id=user.id)
+    # Гостевой режим постоянный: новый пользователь начинает с чистого аккаунта,
+    # гостевые/демо-данные остаются в анонимном пуле (user_id IS NULL) и видны
+    # только в гостевом режиме.
 
     token = token_service.issue(user.id, user.email)
     _set_auth_cookie(response, token)

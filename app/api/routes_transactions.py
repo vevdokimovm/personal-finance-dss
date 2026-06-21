@@ -85,6 +85,7 @@ def create_transaction_endpoint(
         date=payload.date,
         description=payload.description,
         mcc=payload.mcc,
+        currency=payload.currency,
         user_id=user_id,
     )
     log_event("transaction_created", {
@@ -103,8 +104,9 @@ def create_transaction_endpoint(
 def delete_transaction_endpoint(
     transaction_id: int,
     db: Session = Depends(get_db),
+    user_id: str | None = Depends(get_current_user_id),
 ) -> TransactionResponse:
-    transaction = delete_transaction(db=db, transaction_id=transaction_id)
+    transaction = delete_transaction(db=db, transaction_id=transaction_id, user_id=user_id)
     if transaction is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,

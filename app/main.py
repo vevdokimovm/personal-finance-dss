@@ -2,10 +2,11 @@ from __future__ import annotations
 
 from contextlib import asynccontextmanager
 from pathlib import Path
+from typing import Any, Optional
 
-from fastapi import FastAPI, Request
+from fastapi import Depends, FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
@@ -13,6 +14,8 @@ from app.api.router import router as api_router
 from app.api.routes_b2b import router as b2b_router
 from app.config import settings
 from app.database.init_db import init_db
+from app.database.models import User
+from app.dependencies import get_current_user
 from app.middleware import CSRFMiddleware, RateLimitMiddleware, SecurityHeadersMiddleware
 
 PROJECT_DIR = Path(__file__).resolve().parents[1]
@@ -65,67 +68,57 @@ app.include_router(api_router)
 app.include_router(b2b_router)  # B2B-контракт /v1/analyze вне /api-префикса (FR-23)
 
 
+def page_context(
+    request: Request, current_user: Optional[User] = Depends(get_current_user)
+) -> dict[str, Any]:
+    """Контекст для SSR-страниц. current_user управляет видимостью гостевых элементов
+    (загрузка демо-портретов и раздел валидации скрыты для вошедших пользователей)."""
+    return {
+        "request": request,
+        "project_name": settings.PROJECT_NAME,
+        "current_user": current_user,
+    }
+
+
 @app.get("/", response_class=HTMLResponse, summary="Главная страница приложения")
 @app.get("/dashboard", response_class=HTMLResponse, summary="Обзорная панель")
-async def read_dashboard(request: Request) -> HTMLResponse:
-    return templates.TemplateResponse(
-        request=request,
-        name="dashboard.html",
-        context={"request": request, "project_name": settings.PROJECT_NAME},
-    )
+async def read_dashboard(ctx: dict = Depends(page_context)) -> HTMLResponse:
+    return templates.TemplateResponse(request=ctx["request"], name="dashboard.html", context=ctx)
+
 
 @app.get("/planning", response_class=HTMLResponse, summary="Планирование и рекомендации СППР")
-async def read_planning(request: Request) -> HTMLResponse:
-    return templates.TemplateResponse(
-        request=request,
-        name="planning.html",
-        context={"request": request, "project_name": settings.PROJECT_NAME},
-    )
+async def read_planning(ctx: dict = Depends(page_context)) -> HTMLResponse:
+    return templates.TemplateResponse(request=ctx["request"], name="planning.html", context=ctx)
+
 
 @app.get("/transactions", response_class=HTMLResponse, summary="Журнал операций")
-async def read_transactions(request: Request) -> HTMLResponse:
-    return templates.TemplateResponse(
-        request=request,
-        name="transactions.html",
-        context={"request": request, "project_name": settings.PROJECT_NAME},
-    )
+async def read_transactions(ctx: dict = Depends(page_context)) -> HTMLResponse:
+    return templates.TemplateResponse(request=ctx["request"], name="transactions.html", context=ctx)
+
 
 @app.get("/obligations", response_class=HTMLResponse, summary="Обязательства")
-async def read_obligations(request: Request) -> HTMLResponse:
-    return templates.TemplateResponse(
-        request=request,
-        name="obligations.html",
-        context={"request": request, "project_name": settings.PROJECT_NAME},
-    )
+async def read_obligations(ctx: dict = Depends(page_context)) -> HTMLResponse:
+    return templates.TemplateResponse(request=ctx["request"], name="obligations.html", context=ctx)
+
 
 @app.get("/goals", response_class=HTMLResponse, summary="Цели накопления")
-async def read_goals(request: Request) -> HTMLResponse:
-    return templates.TemplateResponse(
-        request=request,
-        name="goals.html",
-        context={"request": request, "project_name": settings.PROJECT_NAME},
-    )
+async def read_goals(ctx: dict = Depends(page_context)) -> HTMLResponse:
+    return templates.TemplateResponse(request=ctx["request"], name="goals.html", context=ctx)
+
 
 @app.get("/banks", response_class=HTMLResponse, summary="Банковская интеграция")
-async def read_banks(request: Request) -> HTMLResponse:
-    return templates.TemplateResponse(
-        request=request,
-        name="banks.html",
-        context={"request": request, "project_name": settings.PROJECT_NAME},
-    )
+async def read_banks(ctx: dict = Depends(page_context)) -> HTMLResponse:
+    return templates.TemplateResponse(request=ctx["request"], name="banks.html", context=ctx)
+
 
 @app.get("/validation", response_class=HTMLResponse, summary="Валидация алгоритма на портретах")
-async def read_validation(request: Request) -> HTMLResponse:
-    return templates.TemplateResponse(
-        request=request,
-        name="validation.html",
-        context={"request": request, "project_name": settings.PROJECT_NAME},
-    )
+async def read_validation(ctx: dict = Depends(page_context)):
+    # Раздел валидации — часть гостевой песочницы; вошедшим он не нужен.
+    if ctx["current_user"] is not None:
+        return RedirectResponse(url="/dashboard", status_code=303)
+    return templates.TemplateResponse(request=ctx["request"], name="validation.html", context=ctx)
+
 
 @app.get("/profile", response_class=HTMLResponse, summary="Личный профиль и настройки")
-async def read_profile(request: Request) -> HTMLResponse:
-    return templates.TemplateResponse(
-        request=request,
-        name="profile.html",
-        context={"request": request, "project_name": settings.PROJECT_NAME},
-    )
+async def read_profile(ctx: dict = Depends(page_context)) -> HTMLResponse:
+    return templates.TemplateResponse(request=ctx["request"], name="profile.html", context=ctx)

@@ -31,6 +31,7 @@ from app.dependencies import get_current_user_id, get_db
 from app.services.cbr_rate import get_opportunity_cost_rate
 from app.services.event_logger import log_event, log_recommendation
 from app.services.forecasting import forecast_indicators
+from app.services.currency import to_base_currency
 from app.services.planning import run_planning
 
 
@@ -119,10 +120,15 @@ def _compute_plan(
     risk_tolerance = payload.risk_tolerance if payload.risk_tolerance is not None else prefs.risk_tolerance
     l_min = payload.l_min if payload.l_min is not None else prefs.l_min
 
-    transactions = get_transactions(db, user_id=user_id)
-    obligations = _serialize_obligations(get_obligations(db, user_id=user_id))
-    goals = _serialize_goals(get_goals(db, user_id=user_id))
-    all_assets = _serialize_assets(get_liquid_assets(db, user_id=user_id))
+    base_currency = (prefs.base_currency or "RUB").upper()
+    transactions = to_base_currency(db, get_transactions(db, user_id=user_id), base_currency)
+    obligations = to_base_currency(
+        db, _serialize_obligations(get_obligations(db, user_id=user_id)), base_currency
+    )
+    goals = to_base_currency(db, _serialize_goals(get_goals(db, user_id=user_id)), base_currency)
+    all_assets = to_base_currency(
+        db, _serialize_assets(get_liquid_assets(db, user_id=user_id)), base_currency
+    )
 
     # Конверты: цели берут накопление/ставку из привязанных активов, а сами
     # привязанные активы исключаются из свободного резерва (Bliq) — без двойного учёта.
@@ -294,9 +300,14 @@ def get_forecast(
 
 
 @router.post("/scenarios", summary="Сохранить сценарий что-если (LOG-06)")
-def save_scenario_endpoint(payload: ScenarioSave, db: Session = Depends(get_db)) -> dict[str, Any]:
+def save_scenario_endpoint(
+    payload: ScenarioSave,
+    db: Session = Depends(get_db),
+    user_id: str | None = Depends(get_current_user_id),
+) -> dict[str, Any]:
     scenario = save_scenario(
-        db, name=payload.name, parameters=payload.parameters, result=payload.result
+        db, name=payload.name, parameters=payload.parameters, result=payload.result,
+        user_id=user_id,
     )
     log_event("scenario_saved", {"name": payload.name, "parameters": payload.parameters})
     return {
@@ -307,7 +318,10 @@ def save_scenario_endpoint(payload: ScenarioSave, db: Session = Depends(get_db))
 
 
 @router.get("/scenarios", summary="Список сохранённых сценариев")
-def list_scenarios_endpoint(db: Session = Depends(get_db)) -> list[dict[str, Any]]:
+def list_scenarios_endpoint(
+    db: Session = Depends(get_db),
+    user_id: str | None = Depends(get_current_user_id),
+) -> list[dict[str, Any]]:
     return [
         {
             "id": s.id,
@@ -315,7 +329,7 @@ def list_scenarios_endpoint(db: Session = Depends(get_db)) -> list[dict[str, Any
             "parameters": s.parameters_json,
             "created_at": s.created_at.isoformat(),
         }
-        for s in get_scenarios(db)
+        for s in get_scenarios(db, user_id=user_id)
     ]
 
 

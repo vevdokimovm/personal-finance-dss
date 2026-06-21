@@ -17,7 +17,7 @@ from datetime import datetime
 from typing import Any
 
 from app.core.alternatives import evaluate_alternative, generate_alternatives
-from app.core.filtering import B_MIN, DT_MAX, LT_CRIT, filter_alternatives
+from app.core.filtering import B_MIN, DT_MAX, L_MIN, filter_alternatives
 from app.core.goals_priority import preallocate_from_bliq
 from app.core.metrics import (
     calculate_blr,
@@ -39,7 +39,7 @@ def run_planning(
     bliq: float = 0.0,
     r_bench: float = 0.14,
     risk_tolerance: int = 3,
-    l_min: float = LT_CRIT,
+    l_min: float = L_MIN,
     today: datetime | None = None,
 ) -> dict[str, Any]:
     """Полный цикл планирования СППР по ВКР (этапы 1–6)."""
@@ -84,7 +84,7 @@ def run_planning(
 
     # ── Этап 5: фильтрация ─────────────────────────────────────────────
     admissible, rejected = filter_alternatives(
-        alternatives, b_min=B_MIN, lt_crit=l_min, dt_max=DT_MAX
+        alternatives, b_min=B_MIN, l_min=l_min, dt_max=DT_MAX
     )
 
     # ── Ранжирование ───────────────────────────────────────────────────

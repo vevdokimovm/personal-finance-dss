@@ -265,7 +265,14 @@ def load_demo(
     """
     Загружает один из шести кейсов из портретов.
     Параметр case: anna | dmitriy | mikhail | igor | olga | viktor
+    Доступно только в гостевом режиме — тестовая песочница не смешивается с данными
+    реального аккаунта.
     """
+    if user_id is not None:
+        raise HTTPException(
+            status_code=403,
+            detail="Демо-портреты доступны только в гостевом режиме (без входа в аккаунт).",
+        )
     if case not in CASES:
         raise HTTPException(status_code=400, detail=f"Неизвестный кейс: {case}. Доступно: {list(CASES.keys())}")
 

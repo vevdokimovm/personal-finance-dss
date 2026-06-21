@@ -58,16 +58,16 @@ def test_password_is_hashed_not_plaintext(client):
         db.close()
 
 
-def test_first_user_adopts_orphan_rows(client):
-    # Аноним создаёт данные до регистрации
+def test_new_user_starts_with_clean_account(client):
+    # Гость создаёт данные до регистрации
     client.post(
         "/api/transactions",
-        json={"amount": 50000, "type": "income", "date": "2026-06-01T00:00:00", "category": "Orphan"},
+        json={"amount": 50000, "type": "income", "date": "2026-06-01T00:00:00", "category": "Guest"},
     )
     header = _auth_header(client, "first@fp.io")
+    # Новый пользователь не наследует гостевые/демо-данные — аккаунт чистый
     txs = client.get("/api/transactions", headers=header).json()
-    assert len(txs) == 1
-    assert txs[0]["category"] == "Orphan"
+    assert txs == []
 
 
 def test_data_isolation_between_users(client):

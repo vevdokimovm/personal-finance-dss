@@ -83,3 +83,24 @@ def convert_rows_to_base(
 def get_rate(db: Session, currency: str) -> Optional[Decimal]:
     row = db.query(FxRate).filter(FxRate.currency == currency.upper()).first()
     return Decimal(str(row.rate_to_usd)) if row else None
+
+
+def _to_plain_dict(row: object) -> dict:
+    """Сериализует строку в dict: поддержка ORM, Pydantic и уже-dict."""
+    if isinstance(row, dict):
+        return dict(row)
+    if hasattr(row, "model_dump"):  # Pydantic v2
+        return row.model_dump()
+    from sqlalchemy import inspect as sa_inspect
+
+    return {c.key: getattr(row, c.key) for c in sa_inspect(row).mapper.column_attrs}
+
+
+def to_base_currency(db: Session, rows: list, base_currency: str) -> list[dict]:
+    """Приводит денежные поля строк (ORM/Pydantic/dict) к base_currency (FR-19).
+
+    Строки без поля currency считаются уже в базовой валюте (конвертация — no-op).
+    """
+    converter = CurrencyConverter.from_db(db)
+    dicts = [_to_plain_dict(r) for r in rows]
+    return convert_rows_to_base(dicts, converter, (base_currency or "RUB").upper())

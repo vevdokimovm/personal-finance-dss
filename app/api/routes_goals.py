@@ -41,6 +41,7 @@ def create_goal_endpoint(
         priority=payload.priority,
         savings_rate=payload.savings_rate,
         linked_asset_id=payload.linked_asset_id,
+        currency=payload.currency,
         user_id=user_id,
     )
     log_event("goal_created", {
@@ -54,7 +55,11 @@ def create_goal_endpoint(
     "/{goal_id}",
     summary="Удалить цель",
 )
-def delete_goal_endpoint(goal_id: int, db: Session = Depends(get_db)):
-    if delete_goal(db, goal_id) is None:
+def delete_goal_endpoint(
+    goal_id: int,
+    db: Session = Depends(get_db),
+    user_id: str | None = Depends(get_current_user_id),
+):
+    if delete_goal(db, goal_id, user_id=user_id) is None:
         raise HTTPException(status_code=404, detail="Цель не найдена")
     return Response(status_code=status.HTTP_204_NO_CONTENT)
