@@ -6,11 +6,12 @@
 """
 from __future__ import annotations
 
-from datetime import datetime
+from collections import defaultdict
+from datetime import datetime, timedelta
 
 from sqlalchemy.orm import Session
 
-from app.database.crud import get_budget_status, get_goals
+from app.database.crud import get_budget_status, get_goals, get_transactions
 from app.database.models import Goal, NotificationLog, User
 from app.services.email_service import email_service
 
@@ -33,6 +34,41 @@ def goals_near_deadline(
 def budgets_over(db: Session, user_id: str | None) -> list[dict]:
     """Бюджеты, по которым расходы превысили лимит."""
     return [b for b in get_budget_status(db, user_id=user_id) if b.get("over")]
+
+
+def _previous_month(today: datetime | None = None) -> str:
+    """YYYY-MM предыдущего календарного месяца."""
+    today = today or datetime.utcnow()
+    last_prev = today.replace(day=1) - timedelta(days=1)
+    return last_prev.strftime("%Y-%m")
+
+
+def build_monthly_digest(db: Session, user_id: str | None, year_month: str) -> dict:
+    """Сводка за месяц: доходы, расходы, чистый поток, топ-категория трат, число целей."""
+    income = expense = 0.0
+    count = 0
+    by_category: dict[str, float] = defaultdict(float)
+    for txn in get_transactions(db, user_id=user_id):
+        if txn.date.strftime("%Y-%m") != year_month:
+            continue
+        amount = float(txn.amount)
+        count += 1
+        if txn.type == "income":
+            income += amount
+        else:
+            expense += amount
+            by_category[txn.category or "Прочее"] += amount
+
+    top_category = max(by_category.items(), key=lambda kv: kv[1])[0] if by_category else None
+    return {
+        "period": year_month,
+        "income": round(income, 2),
+        "expense": round(expense, 2),
+        "net": round(income - expense, 2),
+        "transactions": count,
+        "top_expense_category": top_category,
+        "active_goals": len(get_goals(db, active_only=True, user_id=user_id)),
+    }
 
 
 def was_notified(db: Session, user_id: str, dedup_key: str) -> bool:
@@ -63,7 +99,7 @@ def run_user_notifications(db: Session, user: User) -> dict[str, int]:
     Возвращает счётчики реально отправленного (без дублей).
     """
     month = datetime.utcnow().strftime("%Y-%m")
-    sent = {"goal_deadline": 0, "budget_overrun": 0}
+    sent = {"goal_deadline": 0, "budget_overrun": 0, "digest": 0}
 
     for goal, days_left in goals_near_deadline(db, user.id):
         key = f"goal_deadline:{goal.id}:{month}"
@@ -87,15 +123,26 @@ def run_user_notifications(db: Session, user: User) -> dict[str, int]:
         record_notification(db, user.id, "budget_overrun", key)
         sent["budget_overrun"] += 1
 
+    # Месячный дайджест за прошлый завершённый месяц (если были операции).
+    prev = _previous_month()
+    digest_key = f"digest:{prev}"
+    if not was_notified(db, user.id, digest_key):
+        digest = build_monthly_digest(db, user.id, prev)
+        if digest["transactions"] > 0:
+            email_service.send_digest(user.email, digest, user.display_name)
+            record_notification(db, user.id, "digest", digest_key)
+            sent["digest"] += 1
+
     return sent
 
 
 def run_all_notifications(db: Session) -> dict[str, int]:
     """Оркестратор для cron: проходит по всем пользователям с email."""
-    totals = {"goal_deadline": 0, "budget_overrun": 0, "users": 0}
+    totals = {"goal_deadline": 0, "budget_overrun": 0, "digest": 0, "users": 0}
     for user in db.query(User).filter(User.email.isnot(None)).all():
         res = run_user_notifications(db, user)
         totals["goal_deadline"] += res["goal_deadline"]
         totals["budget_overrun"] += res["budget_overrun"]
+        totals["digest"] += res["digest"]
         totals["users"] += 1
     return totals

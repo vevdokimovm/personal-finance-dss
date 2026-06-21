@@ -142,6 +142,41 @@ class EmailService:
 </div>""".replace(",", " ")
         return self._send(to_email, subject, text, html)
 
+    def send_digest(self, to_email: str, digest: dict, display_name: str | None = None) -> bool:
+        """Месячная финансовая сводка одним письмом."""
+        name = display_name or to_email.split("@")[0]
+        period = digest["period"]
+        income, expense, net = digest["income"], digest["expense"], digest["net"]
+        top = digest.get("top_expense_category")
+        net_word = "отложено" if net >= 0 else "перерасход"
+        subject = f"Финансовая сводка за {period}"
+        text = (
+            f"Здравствуйте, {name}!\n\n"
+            f"Ваша сводка за {period}:\n"
+            f"- Доходы: {income:,.0f} руб\n"
+            f"- Расходы: {expense:,.0f} руб\n"
+            f"- Чистый поток: {net:,.0f} руб ({net_word})\n"
+            + (f"- Больше всего потрачено: {top}\n" if top else "")
+            + f"- Активных целей: {digest['active_goals']}\n\n"
+            "Загляните в FINPILOT, чтобы спланировать следующий месяц.\n\n"
+            "— Команда FINPILOT"
+        ).replace(",", " ")
+        top_row = f'<li>Больше всего потрачено: <strong>{top}</strong></li>' if top else ""
+        html = f"""\
+<div style="font-family:-apple-system,Segoe UI,Roboto,sans-serif;max-width:560px;margin:auto;color:#1a1a1a;">
+  <h2 style="color:#2BBF6A;">Сводка за {period}</h2>
+  <p>Здравствуйте, <strong>{name}</strong>!</p>
+  <ul style="line-height:1.7;">
+    <li>Доходы: <strong>{income:,.0f} руб</strong></li>
+    <li>Расходы: <strong>{expense:,.0f} руб</strong></li>
+    <li>Чистый поток: <strong>{net:,.0f} руб</strong> ({net_word})</li>
+    {top_row}
+    <li>Активных целей: <strong>{digest['active_goals']}</strong></li>
+  </ul>
+  <p style="color:#777;font-size:13px;">Загляните в FINPILOT, чтобы спланировать следующий месяц.<br>— Команда FINPILOT</p>
+</div>""".replace(",", " ")
+        return self._send(to_email, subject, text, html)
+
     def _send(self, to_email: str, subject: str, text: str, html: str) -> bool:
         if not self.enabled:
             logger.info("Email отключён (нет SMTP-конфига) — письмо для %s не отправлено.", to_email)

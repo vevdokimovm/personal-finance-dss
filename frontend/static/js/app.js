@@ -153,7 +153,7 @@ async function loadBudgets() {
                 <div style="display:flex; justify-content:space-between; font-size:.82rem; margin-bottom:4px;">
                     <span>${escapeHtml(b.category)}${b.over ? ' <span style="color:var(--c-red); font-size:.72rem;">превышен</span>' : ''}</span>
                     <span><strong>${fmt.cur(b.spent)}</strong> <span style="color:var(--c-text3);">/ ${fmt.cur(b.limit_amount)} · ${b.pct}%</span>
-                        <button class="budget-del" data-budget-id="${b.id}" title="Удалить" style="background:none; border:none; color:var(--c-text3); cursor:pointer; padding:0 4px; font-size:.9rem;">✕</button>
+                        <button class="budget-del" data-budget-id="${b.id}" title="Удалить" aria-label="Удалить" style="background:none; border:none; color:var(--c-text3); cursor:pointer; padding:0 4px; font-size:.9rem;">✕</button>
                     </span>
                 </div>
                 <div class="indicator-track"><div class="indicator-track-fill" style="width:${pct}%; background:${color};"></div></div>
@@ -790,7 +790,7 @@ function renderTransactions() {
                 <span>${typePill}</span>
                 <span class="text-right" style="color:${color};font-weight:600;">${sign}${fmt.cur(t.amount)}</span>
                 <span class="text-right">
-                    <button class="ghost-button delete-button" data-transaction-id="${t.id}" style="padding:4px 8px;color:var(--c-red);font-size:.85rem;" title="Удалить">✕</button>
+                    <button class="ghost-button delete-button" data-transaction-id="${t.id}" style="padding:4px 8px;color:var(--c-red);font-size:.85rem;" title="Удалить" aria-label="Удалить">✕</button>
                 </span>
             </div>`;
         }).join('');
@@ -1022,7 +1022,7 @@ function renderObligations() {
             <summary style="list-style:none; display:block;">
                 <div style="display:flex; justify-content:space-between; align-items:flex-start;">
                     <div class="stack-item-title">${esc(o.name)}</div>
-                    <button class="ghost-button delete-button" data-obligation-id="${o.id}" style="color:var(--c-red);font-size:.85rem;padding:6px 10px;" title="Удалить" onclick="event.preventDefault()">✕</button>
+                    <button class="ghost-button delete-button" data-obligation-id="${o.id}" style="color:var(--c-red);font-size:.85rem;padding:6px 10px;" title="Удалить" aria-label="Удалить" onclick="event.preventDefault()">✕</button>
                 </div>
                 <div class="stack-item-text">
                     ${fmt.cur(payment)} / мес · Ставка ${ratePct.toFixed(ratePct % 1 ? 1 : 0)}% · Осталось ${remaining} мес${takenLine}
@@ -1094,7 +1094,7 @@ function renderGoals() {
                     <div class="stack-item-text">${fmt.cur(current)} из ${fmt.cur(g.target_amount)} · до ${fmt.date(g.deadline)}${rateLine}</div>
                     ${linkLine}
                 </div>
-                <button class="ghost-button delete-button" data-goal-id="${g.id}" style="color:var(--c-red);font-size:.85rem;padding:6px 10px;" title="Удалить">✕</button>
+                <button class="ghost-button delete-button" data-goal-id="${g.id}" style="color:var(--c-red);font-size:.85rem;padding:6px 10px;" title="Удалить" aria-label="Удалить">✕</button>
             </div>
             <div class="indicator-track" style="height:5px;">
                 <div class="indicator-track-fill resource-fill" style="width:${pct}%"></div>
@@ -1138,7 +1138,7 @@ function renderLiquidAssets() {
                         ${a.comment ? `· ${esc(a.comment)}` : ''}
                     </div>
                 </div>
-                <button class="ghost-button delete-asset-button" data-asset-id="${a.id}" style="color:var(--c-red);font-size:.85rem;padding:6px 10px;" title="Удалить">✕</button>
+                <button class="ghost-button delete-asset-button" data-asset-id="${a.id}" style="color:var(--c-red);font-size:.85rem;padding:6px 10px;" title="Удалить" aria-label="Удалить">✕</button>
             </article>
         `).join('')}`;
 }
@@ -1154,7 +1154,7 @@ function metricExplainHTML(key, ind) {
 
     const block = (title, rows, note) => `
         <section class="glass-panel" style="padding:18px 22px; position:relative;">
-            <button id="metric-explain-close" style="position:absolute; top:12px; right:14px; background:none; border:none; color:var(--c-text3); cursor:pointer; font-size:1rem;">✕</button>
+            <button id="metric-explain-close" aria-label="Закрыть" style="position:absolute; top:12px; right:14px; background:none; border:none; color:var(--c-text3); cursor:pointer; font-size:1rem;">✕</button>
             <h3 style="font-size:.95rem; margin:0 0 12px;">${title}</h3>
             <div style="display:flex; flex-direction:column; gap:8px; font-size:.82rem;">${rows}</div>
             ${note ? `<div style="margin-top:12px; padding-top:10px; border-top:1px solid var(--c-border); font-size:.78rem; color:var(--c-text3);">${note}</div>` : ''}
