@@ -75,3 +75,12 @@ def convert(payload: ConvertRequest, db: Session = Depends(get_db)) -> dict:
         "to": payload.to_currency.upper(),
         "result": float(result),
     }
+
+
+@router.post("/refresh", summary="Обновить курсы валют с ЦБ РФ (живой источник)")
+def refresh_rates(db: Session = Depends(get_db)) -> dict:
+    """Тянет актуальные курсы с cbr.ru и обновляет таблицу. При недоступности источника
+    текущие курсы сохраняются (source=fallback). Защищено суточным кэшем от частых запросов."""
+    from app.services.cbr_fx import update_fx_rates
+
+    return update_fx_rates(db)
