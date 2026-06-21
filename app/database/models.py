@@ -41,6 +41,10 @@ class User(Base):
     # Account lockout (P1.2): защита от перебора пароля.
     failed_login_attempts: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
     locked_until: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+    referral_code: Mapped[Optional[str]] = mapped_column(
+        String(12), nullable=True, unique=True, index=True
+    )
+    referred_by_code: Mapped[Optional[str]] = mapped_column(String(12), nullable=True, index=True)
 
 
 class FxRate(Base):

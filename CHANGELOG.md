@@ -2,6 +2,37 @@
 
 Формат: [Keep a Changelog](https://keepachangelog.com/ru/1.0.0/). Версионирование — [SemVer](https://semver.org/lang/ru/).
 
+## [4.15.0] — 2026-06-21 — P3.4 аналитика + P3.2 рефералы + P3.5 i18n (MINOR)
+
+Три пункта P3 одним релизом.
+
+### P3.4 — продуктовая аналитика
+- `app/services/analytics.py`: агрегации поверх событийного лога (таблица events) — `event_counts`
+  (счётчики по типам), `active_users` (уникальные авторизованные), `funnel` (completion-воронка по
+  пересечению множеств: на каждом шаге пользователи, прошедшие все шаги до текущего), `analytics_overview`.
+- `GET /analytics/overview`, `GET /analytics/funnel` (воронка онбординга по умолчанию:
+  login_success → obligation_created → goal_created). В проде закрыть админ-доступом.
+- `tests/test_analytics.py` (7).
+
+### P3.2 — реферальная программа
+- Поля `referral_code` (уникальный) и `referred_by_code` в `users` (миграция `0017`).
+- `crud`: `generate_referral_code` (уникальный 8-символьный), `get_user_by_referral_code`,
+  `count_referrals`, `ensure_referral_code` (ленивая выдача legacy-аккаунтам). `create_user`
+  генерирует код; регистрация принимает код пригласившего (учитывается только если он реально существует).
+- `GET /referral/me` — мой код, число приглашённых, кем приглашён.
+- `tests/test_referral.py` (7).
+
+### P3.5 — интернационализация (фундамент)
+- `app/i18n.py`: каталог переводов RU/EN, `normalize_language`, `parse_accept_language`
+  (из HTTP-заголовка), `translate` (graceful-fallback на ключ), `catalog`.
+- `GET /i18n/translations?lang=` — словарь для фронтенда (язык из параметра или Accept-Language).
+- Полный перевод UI (сотни строк) — поэтапная работа; здесь заложен механизм для выхода за пределы РФ.
+- `tests/test_i18n.py` (14).
+
+### Проверено
+- 428 passed (SQLite). Рефералы/аналитика/i18n + миграция `0017` (включая unique-индекс
+  referral_code) зелёные на PostgreSQL 16.
+
 ## [4.14.0] — 2026-06-21 — P3.3: кэширование расчётов (MINOR)
 
 Перформанс: основной расчёт рекомендации дёргается на каждой загрузке дашборда. Добавлен кэш.

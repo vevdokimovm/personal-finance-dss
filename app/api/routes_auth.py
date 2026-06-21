@@ -19,6 +19,7 @@ from app.database.crud import (
     create_user,
     delete_user,
     get_user_by_email,
+    get_user_by_referral_code,
     mark_email_verified,
     register_failed_login,
     reset_failed_logins,
@@ -82,12 +83,19 @@ def register(
         )
 
     is_first_user = count_users(db) == 0
+    # Реферальный код учитываем только если он реально существует.
+    referred_by = None
+    if payload.referral_code:
+        inviter = get_user_by_referral_code(db, payload.referral_code.strip().upper())
+        if inviter:
+            referred_by = inviter.referral_code
     user = create_user(
         db=db,
         email=payload.email,
         password_hash=password_hasher.hash(payload.password),
         display_name=payload.display_name,
         newsletter_opt_in=payload.newsletter_opt_in,
+        referred_by_code=referred_by,
     )
 
     # Ссылка подтверждения email (токен на 48 ч).
