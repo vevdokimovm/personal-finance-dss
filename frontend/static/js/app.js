@@ -1010,7 +1010,7 @@ function renderObligations() {
             <summary style="list-style:none; display:block;">
                 <div style="display:flex; justify-content:space-between; align-items:flex-start;">
                     <div class="stack-item-title">${esc(o.name)}</div>
-                    <button class="ghost-button delete-button" data-obligation-id="${o.id}" style="color:var(--c-red);font-size:.85rem;padding:6px 10px;" title="Удалить" onclick="event.stopPropagation()">✕</button>
+                    <button class="ghost-button delete-button" data-obligation-id="${o.id}" style="color:var(--c-red);font-size:.85rem;padding:6px 10px;" title="Удалить" onclick="event.preventDefault()">✕</button>
                 </div>
                 <div class="stack-item-text">
                     ${fmt.cur(payment)} / мес · Ставка ${ratePct.toFixed(ratePct % 1 ? 1 : 0)}% · Осталось ${remaining} мес${takenLine}
