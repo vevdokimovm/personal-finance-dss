@@ -708,6 +708,14 @@ async function loadPage() {
             setText('#summary-expense', fmt.cur(exp));
             setText('#summary-obligations', fmt.cur(obl));
 
+            // Умный онбординг: панель «3 шага» сворачивается, когда пользователь уже начал
+            // пользоваться (есть операции/обязательства/цели), и не мозолит глаза.
+            const onboarding = $('#onboarding-panel');
+            const hasData = (state.transactions && state.transactions.length)
+                || (state.obligations && state.obligations.length)
+                || (state.goals && state.goals.length);
+            if (onboarding && hasData) onboarding.removeAttribute('open');
+
             if ($('#income') && !$('#income').value) $('#income').placeholder = `${fmt.num(inc)} ₽ (факт)`;
             if ($('#expense') && !$('#expense').value) $('#expense').placeholder = `${fmt.num(exp)} ₽ (факт)`;
 
@@ -959,7 +967,11 @@ function renderObligations() {
     if (!list) return;
 
     if (state.obligations.length === 0) {
-        list.innerHTML = `<article class="stack-item empty-stack-item"><div class="stack-item-title" style="color:var(--c-text3)">Обязательств пока нет</div></article>`;
+        list.innerHTML = `<article class="stack-item empty-stack-item" style="flex-direction:column; gap:12px; text-align:center; padding:32px 24px;">
+            <div class="stack-item-title" style="color:var(--c-text3)">Обязательств пока нет</div>
+            <div style="color:var(--c-text3); font-size:.84rem; max-width:360px;">Добавьте кредиты и рассрочки — алгоритм учтёт их платежи при распределении свободных денег.</div>
+            <button class="primary-button" type="button" onclick="document.getElementById('open-obligation-modal').click()">Добавить обязательство</button>
+        </article>`;
         return;
     }
 
@@ -1045,7 +1057,11 @@ function renderGoals() {
     if (!list) return;
 
     if (state.goals.length === 0) {
-        list.innerHTML = `<article class="stack-item empty-stack-item"><div class="stack-item-title" style="color:var(--c-text3)">Целей пока нет</div></article>`;
+        list.innerHTML = `<article class="stack-item empty-stack-item" style="flex-direction:column; gap:12px; text-align:center; padding:32px 24px;">
+            <div class="stack-item-title" style="color:var(--c-text3)">Целей пока нет</div>
+            <div style="color:var(--c-text3); font-size:.84rem; max-width:360px;">Поставьте накопительную цель — алгоритм будет направлять на неё часть свободных денег.</div>
+            <button class="primary-button" type="button" onclick="document.getElementById('open-goal-modal').click()">Добавить цель</button>
+        </article>`;
         return;
     }
 
