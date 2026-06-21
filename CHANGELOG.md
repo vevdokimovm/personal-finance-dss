@@ -2,6 +2,48 @@
 
 Формат: [Keep a Changelog](https://keepachangelog.com/ru/1.0.0/). Версионирование — [SemVer](https://semver.org/lang/ru/).
 
+## [4.2.0] — 2026-06-20 — Безопасность входа, fail-loud конфиг, PostgreSQL-готовность (MINOR)
+
+P1.2 из roadmap: защита логина уровня реального финтеха + честная верификация на боевой
+СУБД. Весь батч прогнан и на SQLite (315 passed), и на живом PostgreSQL 16.
+
+### Account lockout — защита от перебора пароля (P1.2, NFR-05)
+- Поля `users.failed_login_attempts` и `users.locked_until` (миграция `0014`).
+- После `LOGIN_MAX_ATTEMPTS` (5) неудачных входов аккаунт блокируется на
+  `LOGIN_LOCKOUT_MINUTES` (15). Блокировка действует даже при верном пароле (HTTP 429),
+  успешный вход сбрасывает счётчик. CRUD-хелперы `register_failed_login` / `reset_failed_logins`.
+- Хранение в БД (а не in-memory): переживает рестарт и консистентно между воркерами gunicorn.
+
+### Fail-loud конфигурация production (P1.2)
+- `validate_production_security()` в `app/config.py`: при `ENVIRONMENT=production` приложение
+  НЕ стартует с дефолтным/коротким (<32 симв.) `JWT_SECRET` или с `COOKIE_SECURE=false`.
+- Проверка встроена в lifespan `app/main.py` — падает на старте с понятной ошибкой.
+
+### Валидация сумм — закрыт BUG-018
+- Отрицательные денежные значения отклоняются (HTTP 422) в схемах `GoalCreate`,
+  `ObligationCreate`, `LiquidAssetCreate/Update` (`Field(ge=0)` на amount/target/rate/payment).
+
+### PostgreSQL: переход на боевую СУБД (P1.5, частично)
+- Весь БД-критичный набор прогнан на живом PostgreSQL 16 — вскрыты и исправлены два расхождения,
+  которые SQLite прятал (FK по умолчанию не форсятся):
+  - **Реальный баг**: удаление цели/обязательства с историей (`goal_contributions` /
+    `obligation_payments`) падало с FK violation. `delete_goal` / `delete_obligation` теперь
+    удаляют дочерние строки явно (кросс-СУБД, без хрупкой миграции имён constraint).
+  - **Полное удаление аккаунта** (152-ФЗ): `delete_user` дополнительно вычищает историю,
+    `events` и `recommendations` пользователя.
+- `docker-compose.yml`: безопасный прод-дефолт — `COOKIE_SECURE=true`, обязательный `JWT_SECRET`
+  (старт падает без него), управление профилем через `.env`.
+- `tests/conftest.py` уважает внешний `DATABASE_URL` — один набор тестов гоняется и на PG (CI-ready).
+
+### Тесты
+- `tests/test_security_hardening.py` (10), `tests/test_cascade_delete.py` (3); фикстура реальных
+  пользователей в `tests/test_data_isolation.py` (FK-корректность на PG). Итого 315 passed.
+
+### Вне зоны кода (инфраструктура/процесс)
+- HTTPS/TLS reverse-proxy (nginx/traefik/Caddy) перед контейнером web; внешний пентест;
+  секрет-хранилище в проде. Redis сознательно отложен (см. обсуждение): главную дыру закрывает
+  lockout в БД, Redis окупается во «вторую волну» вместе с кэшем и фоновыми очередями.
+
 ## [4.1.0] — 2026-06-20 — Юридический блок: публичные документы, footer, контакты (MINOR)
 
 P1.1 из roadmap: продукт получил опубликованную юридическую базу уровня реального

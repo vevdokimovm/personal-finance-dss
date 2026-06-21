@@ -36,6 +36,9 @@ class User(Base):
     email_verified: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
     newsletter_opt_in: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
     consent_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+    # Account lockout (P1.2): защита от перебора пароля.
+    failed_login_attempts: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    locked_until: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
 
 
 class FxRate(Base):

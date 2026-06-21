@@ -28,7 +28,7 @@ class Settings(BaseSettings):
         description="Название проекта.",
     )
     APP_VERSION: str = Field(
-        default="4.1.0",
+        default="4.2.0",
         description="Версия приложения (INFRA-13): код, UI-футер, git-тег.",
     )
     PROJECT_TAGLINE: str = Field(
@@ -67,6 +67,18 @@ class Settings(BaseSettings):
     JWT_ALGORITHM: str = Field(default="HS256", description="Алгоритм подписи JWT.")
     JWT_TTL_HOURS: int = Field(default=168, description="Срок жизни access-токена, часов.")
     AUTH_COOKIE_NAME: str = Field(default="fp_access", description="Имя httpOnly-cookie с JWT.")
+
+    # ── Account lockout: защита логина от перебора (P1.2, NFR-05) ──────
+    LOGIN_MAX_ATTEMPTS: int = Field(
+        default=5,
+        ge=1,
+        description="Число неудачных попыток входа до временной блокировки аккаунта.",
+    )
+    LOGIN_LOCKOUT_MINUTES: int = Field(
+        default=15,
+        ge=1,
+        description="Длительность блокировки аккаунта после превышения лимита, минут.",
+    )
     COOKIE_SECURE: bool = Field(
         default=False,
         description=(
@@ -186,3 +198,26 @@ class Settings(BaseSettings):
 
 
 settings = Settings()
+
+
+# Дефолтные значения секретов — их наличие в production недопустимо.
+_DEFAULT_JWT_SECRET = "dev-insecure-secret-change-me-in-production-env-32b"
+
+
+def validate_production_security(s: Settings) -> list[str]:
+    """Возвращает список проблем безопасности конфигурации для production.
+
+    В development всегда пусто — дефолты допустимы для локальной разработки.
+    В production пустой список означает «можно стартовать»; непустой —
+    приложение обязано упасть при старте (fail-loud), а не уехать в бой
+    с дев-секретом или незащищённой cookie.
+    """
+    if not s.is_production:
+        return []
+
+    problems: list[str] = []
+    if s.JWT_SECRET == _DEFAULT_JWT_SECRET or len(s.JWT_SECRET) < 32:
+        problems.append("JWT_SECRET не задан или дефолтный — задайте стойкий секрет (>=32 симв.) в .env")
+    if not s.COOKIE_SECURE:
+        problems.append("COOKIE_SECURE=false — в production cookie должна иметь флаг Secure (нужен HTTPS)")
+    return problems

@@ -12,7 +12,7 @@ from fastapi.templating import Jinja2Templates
 
 from app.api.router import router as api_router
 from app.api.routes_b2b import router as b2b_router
-from app.config import settings
+from app.config import settings, validate_production_security
 from app.database.init_db import init_db
 from app.database.models import User
 from app.dependencies import get_current_user
@@ -28,6 +28,12 @@ templates.env.globals["app_version"] = settings.APP_VERSION
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    # Fail-loud: в production не стартуем с дефолтными секретами / незащищённой cookie.
+    problems = validate_production_security(settings)
+    if problems:
+        raise RuntimeError(
+            "Небезопасная конфигурация для production:\n  - " + "\n  - ".join(problems)
+        )
     init_db()
     yield
 

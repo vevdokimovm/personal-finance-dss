@@ -7,6 +7,8 @@
 """
 from __future__ import annotations
 
+from datetime import datetime
+
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Request, Response, status
 from fastapi.responses import RedirectResponse
 from sqlalchemy.orm import Session
@@ -18,6 +20,8 @@ from app.database.crud import (
     delete_user,
     get_user_by_email,
     mark_email_verified,
+    register_failed_login,
+    reset_failed_logins,
     update_user_password,
     update_user_profile,
 )
@@ -112,7 +116,21 @@ def register(
 @router.post("/login", response_model=AuthResponse, summary="Вход")
 def login(payload: LoginRequest, response: Response, db: Session = Depends(get_db)) -> AuthResponse:
     user = get_user_by_email(db, payload.email)
+
+    # Блокировка действует даже при верном пароле, пока не истечёт срок.
+    if user is not None and user.locked_until and user.locked_until > datetime.utcnow():
+        retry_min = max(1, int((user.locked_until - datetime.utcnow()).total_seconds() // 60) + 1)
+        log_event("login_locked", user_id=user.id)
+        raise HTTPException(
+            status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+            detail=f"Слишком много неудачных попыток. Повторите через {retry_min} мин.",
+        )
+
     if user is None or not password_hasher.verify(payload.password, user.password_hash):
+        if user is not None:
+            register_failed_login(
+                db, user, settings.LOGIN_MAX_ATTEMPTS, settings.LOGIN_LOCKOUT_MINUTES
+            )
         log_event("login_failed", {"email_domain": payload.email.split("@")[-1]})
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -123,6 +141,7 @@ def login(payload: LoginRequest, response: Response, db: Session = Depends(get_d
             status_code=status.HTTP_403_FORBIDDEN, detail="Учётная запись отключена."
         )
 
+    reset_failed_logins(db, user)
     token = token_service.issue(user.id, user.email)
     _set_auth_cookie(response, token)
     log_event("login_success", user_id=user.id)

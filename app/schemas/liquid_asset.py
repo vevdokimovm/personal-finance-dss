@@ -2,13 +2,13 @@ from __future__ import annotations
 
 from typing import Optional
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class LiquidAssetCreate(BaseModel):
     name: str = "Депозит"
-    amount: float = 0.0
-    interest_rate: float = 0.0
+    amount: float = Field(default=0.0, ge=0)
+    interest_rate: float = Field(default=0.0, ge=0)
     type: str = "deposit"  # deposit | savings_account | cash
     comment: Optional[str] = None
     currency: str = "RUB"
@@ -16,8 +16,8 @@ class LiquidAssetCreate(BaseModel):
 
 class LiquidAssetUpdate(BaseModel):
     name: Optional[str] = None
-    amount: Optional[float] = None
-    interest_rate: Optional[float] = None
+    amount: Optional[float] = Field(default=None, ge=0)
+    interest_rate: Optional[float] = Field(default=None, ge=0)
     type: Optional[str] = None
     comment: Optional[str] = None
 
