@@ -20,10 +20,14 @@ services:
         condition: service_healthy
     environment:
       DATABASE_URL: postgresql+psycopg://finpilot:finpilot@db:5432/finpilot
-      ENVIRONMENT: production
-      CORS_ORIGINS: http://localhost:8000,http://127.0.0.1:8000
-      # В проде задайте свой секрет (env/secrets), не оставляйте дефолт.
-      JWT_SECRET: ${JWT_SECRET:-change-me-in-production-min-32-chars-secret}
+      ENVIRONMENT: ${ENVIRONMENT:-development}
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:8000,http://127.0.0.1:8000}
+      # Дефолты дружелюбны к локальному запуску: `docker compose up` поднимается из коробки
+      # по HTTP. Для прода переопредели в .env: ENVIRONMENT=production, COOKIE_SECURE=true,
+      # стойкий JWT_SECRET (openssl rand -hex 32). Дефолтный секрет в production отвергается
+      # самим приложением (fail-loud при старте) — защита на правильном слое.
+      COOKIE_SECURE: ${COOKIE_SECURE:-false}
+      JWT_SECRET: ${JWT_SECRET:-dev-insecure-secret-change-me-in-production-env-32b}
       DEFAULT_BASE_CURRENCY: ${DEFAULT_BASE_CURRENCY:-RUB}
       # B2B/Plaid выключены, пока не заданы ключи.
       B2B_API_KEYS: ${B2B_API_KEYS:-}

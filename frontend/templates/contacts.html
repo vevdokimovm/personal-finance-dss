@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block page_title %}Контакты{% endblock %}
+{% block content %}
+<div class="legal-doc">
+    {% include "legal/_notice.html" %}
+
+    <h1>Контакты</h1>
+    <p class="legal-intro">
+        По вопросам работы Сервиса, а также для реализации прав субъекта персональных данных
+        (доступ к данным, уточнение, удаление, отзыв согласия) используйте контакты ниже.
+    </p>
+
+    <h2>Оператор</h2>
+    <table class="legal-requisites">
+        <tr><td>Наименование</td><td>{{ legal.operator_name }}</td></tr>
+        <tr><td>ИНН</td><td>{{ legal.operator_inn }}</td></tr>
+        <tr><td>Адрес</td><td>{{ legal.operator_address }}</td></tr>
+        <tr><td>E-mail</td><td><a href="mailto:{{ legal.contact_email }}">{{ legal.contact_email }}</a></td></tr>
+    </table>
+
+    <h2>Обращения по персональным данным</h2>
+    <p>
+        Запрос на доступ к своим данным, их уточнение или удаление, а также отзыв согласия на
+        обработку можно направить на
+        <a href="mailto:{{ legal.contact_email }}">{{ legal.contact_email }}</a>.
+        Удалить учётную запись со всеми данными можно самостоятельно в разделе
+        <a href="/profile">Профиль</a>.
+    </p>
+
+    <h2>Документы</h2>
+    <p>
+        <a href="/legal/privacy">Политика обработки персональных данных</a> ·
+        <a href="/legal/terms">Пользовательское соглашение</a> ·
+        <a href="/legal/consent">Согласие на обработку ПДн</a> ·
+        <a href="/legal/financial-consent">Согласие на финансовые данные</a>
+    </p>
+</div>
+{% endblock %}

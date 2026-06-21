@@ -12,7 +12,7 @@ from fastapi.templating import Jinja2Templates
 
 from app.api.router import router as api_router
 from app.api.routes_b2b import router as b2b_router
-from app.config import settings
+from app.config import settings, validate_production_security
 from app.database.init_db import init_db
 from app.database.models import User
 from app.dependencies import get_current_user
@@ -28,6 +28,12 @@ templates.env.globals["app_version"] = settings.APP_VERSION
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    # Fail-loud: в production не стартуем с дефолтными секретами / незащищённой cookie.
+    problems = validate_production_security(settings)
+    if problems:
+        raise RuntimeError(
+            "Небезопасная конфигурация для production:\n  - " + "\n  - ".join(problems)
+        )
     init_db()
     yield
 
@@ -77,6 +83,7 @@ def page_context(
         "request": request,
         "project_name": settings.PROJECT_NAME,
         "current_user": current_user,
+        "legal": settings.legal_context,
     }
 
 
@@ -122,3 +129,55 @@ async def read_validation(ctx: dict = Depends(page_context)):
 @app.get("/profile", response_class=HTMLResponse, summary="Личный профиль и настройки")
 async def read_profile(ctx: dict = Depends(page_context)) -> HTMLResponse:
     return templates.TemplateResponse(request=ctx["request"], name="profile.html", context=ctx)
+
+
+# ── Юридический блок (P1.1): публичные документы и контакты ────────────
+@app.get("/legal/privacy", response_class=HTMLResponse, summary="Политика обработки ПДн (152-ФЗ)")
+async def read_legal_privacy(ctx: dict = Depends(page_context)) -> HTMLResponse:
+    return templates.TemplateResponse(
+        request=ctx["request"], name="legal/privacy.html", context=ctx
+    )
+
+
+@app.get("/legal/terms", response_class=HTMLResponse, summary="Пользовательское соглашение (оферта)")
+async def read_legal_terms(ctx: dict = Depends(page_context)) -> HTMLResponse:
+    return templates.TemplateResponse(request=ctx["request"], name="legal/terms.html", context=ctx)
+
+
+@app.get("/legal/consent", response_class=HTMLResponse, summary="Согласие на обработку ПДн")
+async def read_legal_consent(ctx: dict = Depends(page_context)) -> HTMLResponse:
+    return templates.TemplateResponse(
+        request=ctx["request"], name="legal/consent.html", context=ctx
+    )
+
+
+@app.get(
+    "/legal/financial-consent",
+    response_class=HTMLResponse,
+    summary="Согласие на обработку финансовых данных",
+)
+async def read_legal_financial_consent(ctx: dict = Depends(page_context)) -> HTMLResponse:
+    return templates.TemplateResponse(
+        request=ctx["request"], name="legal/financial_consent.html", context=ctx
+    )
+
+
+@app.get("/contacts", response_class=HTMLResponse, summary="Контакты и реквизиты оператора")
+async def read_contacts(ctx: dict = Depends(page_context)) -> HTMLResponse:
+    return templates.TemplateResponse(request=ctx["request"], name="contacts.html", context=ctx)
+
+
+@app.get("/reset-password", response_class=HTMLResponse, summary="Страница установки нового пароля")
+async def read_reset_password(
+    token: str = "", ctx: dict = Depends(page_context)
+) -> HTMLResponse:
+    return templates.TemplateResponse(
+        request=ctx["request"], name="reset_password.html", context={**ctx, "reset_token": token}
+    )
+
+
+@app.get("/forgot-password", response_class=HTMLResponse, summary="Страница запроса сброса пароля")
+async def read_forgot_password(ctx: dict = Depends(page_context)) -> HTMLResponse:
+    return templates.TemplateResponse(
+        request=ctx["request"], name="forgot_password.html", context=ctx
+    )

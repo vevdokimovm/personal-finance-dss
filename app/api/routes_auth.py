@@ -7,6 +7,8 @@
 """
 from __future__ import annotations
 
+from datetime import datetime
+
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Request, Response, status
 from fastapi.responses import RedirectResponse
 from sqlalchemy.orm import Session
@@ -18,6 +20,8 @@ from app.database.crud import (
     delete_user,
     get_user_by_email,
     mark_email_verified,
+    register_failed_login,
+    reset_failed_logins,
     update_user_password,
     update_user_profile,
 )
@@ -26,8 +30,10 @@ from app.dependencies import get_db, require_user
 from app.schemas.auth import (
     AuthResponse,
     ChangePasswordRequest,
+    ForgotPasswordRequest,
     LoginRequest,
     RegisterRequest,
+    ResetPasswordRequest,
     UpdateProfileRequest,
     UserResponse,
 )
@@ -112,7 +118,21 @@ def register(
 @router.post("/login", response_model=AuthResponse, summary="Вход")
 def login(payload: LoginRequest, response: Response, db: Session = Depends(get_db)) -> AuthResponse:
     user = get_user_by_email(db, payload.email)
+
+    # Блокировка действует даже при верном пароле, пока не истечёт срок.
+    if user is not None and user.locked_until and user.locked_until > datetime.utcnow():
+        retry_min = max(1, int((user.locked_until - datetime.utcnow()).total_seconds() // 60) + 1)
+        log_event("login_locked", user_id=user.id)
+        raise HTTPException(
+            status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+            detail=f"Слишком много неудачных попыток. Повторите через {retry_min} мин.",
+        )
+
     if user is None or not password_hasher.verify(payload.password, user.password_hash):
+        if user is not None:
+            register_failed_login(
+                db, user, settings.LOGIN_MAX_ATTEMPTS, settings.LOGIN_LOCKOUT_MINUTES
+            )
         log_event("login_failed", {"email_domain": payload.email.split("@")[-1]})
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -123,6 +143,7 @@ def login(payload: LoginRequest, response: Response, db: Session = Depends(get_d
             status_code=status.HTTP_403_FORBIDDEN, detail="Учётная запись отключена."
         )
 
+    reset_failed_logins(db, user)
     token = token_service.issue(user.id, user.email)
     _set_auth_cookie(response, token)
     log_event("login_success", user_id=user.id)
@@ -133,6 +154,59 @@ def login(payload: LoginRequest, response: Response, db: Session = Depends(get_d
 def logout(response: Response) -> dict[str, str]:
     response.delete_cookie(key=settings.AUTH_COOKIE_NAME, path="/")
     return {"detail": "Сессия завершена."}
+
+
+@router.post("/forgot-password", summary="Запрос сброса пароля")
+def forgot_password(
+    payload: ForgotPasswordRequest,
+    request: Request,
+    background_tasks: BackgroundTasks,
+    db: Session = Depends(get_db),
+) -> dict[str, str | None]:
+    user = get_user_by_email(db, payload.email)
+
+    # Энумерация закрыта: ответ одинаков независимо от того, есть ли такой email.
+    reset_url: str | None = None
+    if user is not None:
+        token = token_service.issue_password_reset(
+            user.id, user.email, settings.PASSWORD_RESET_TTL_HOURS
+        )
+        reset_url = str(request.base_url).rstrip("/") + f"/reset-password?token={token}"
+        background_tasks.add_task(
+            email_service.send_password_reset, user.email, reset_url, user.display_name
+        )
+        log_event("password_reset_requested", user_id=user.id)
+
+    # В dev (без SMTP) отдаём ссылку прямо в ответе — чтобы можно было сбросить локально.
+    dev_link = reset_url if (user is not None and not settings.email_enabled) else None
+    return {
+        "detail": "Если аккаунт с таким email существует, на него отправлена ссылка для сброса пароля.",
+        "reset_url": dev_link,
+    }
+
+
+@router.post("/reset-password", summary="Установка нового пароля по токену")
+def reset_password(
+    payload: ResetPasswordRequest, db: Session = Depends(get_db)
+) -> dict[str, str]:
+    user_id = token_service.decode_password_reset(payload.token)
+    if user_id is None:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Ссылка для сброса недействительна или истекла.",
+        )
+
+    user = update_user_password(db, user_id, password_hasher.hash(payload.new_password))
+    if user is None:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Ссылка для сброса недействительна или истекла.",
+        )
+
+    # Сброс пароля снимает блокировку аккаунта — пользователь восстановил доступ.
+    reset_failed_logins(db, user)
+    log_event("password_reset_completed", user_id=user.id)
+    return {"detail": "Пароль обновлён. Теперь вы можете войти с новым паролем."}
 
 
 @router.get("/me", response_model=UserResponse, summary="Текущий пользователь")

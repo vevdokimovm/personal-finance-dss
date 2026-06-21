@@ -28,7 +28,7 @@ class Settings(BaseSettings):
         description="Название проекта.",
     )
     APP_VERSION: str = Field(
-        default="4.0.0",
+        default="4.4.1",
         description="Версия приложения (INFRA-13): код, UI-футер, git-тег.",
     )
     PROJECT_TAGLINE: str = Field(
@@ -66,7 +66,22 @@ class Settings(BaseSettings):
     )
     JWT_ALGORITHM: str = Field(default="HS256", description="Алгоритм подписи JWT.")
     JWT_TTL_HOURS: int = Field(default=168, description="Срок жизни access-токена, часов.")
+    PASSWORD_RESET_TTL_HOURS: int = Field(
+        default=1, ge=1, description="Срок жизни токена сброса пароля, часов (P1.3)."
+    )
     AUTH_COOKIE_NAME: str = Field(default="fp_access", description="Имя httpOnly-cookie с JWT.")
+
+    # ── Account lockout: защита логина от перебора (P1.2, NFR-05) ──────
+    LOGIN_MAX_ATTEMPTS: int = Field(
+        default=5,
+        ge=1,
+        description="Число неудачных попыток входа до временной блокировки аккаунта.",
+    )
+    LOGIN_LOCKOUT_MINUTES: int = Field(
+        default=15,
+        ge=1,
+        description="Длительность блокировки аккаунта после превышения лимита, минут.",
+    )
     COOKIE_SECURE: bool = Field(
         default=False,
         description=(
@@ -122,5 +137,90 @@ class Settings(BaseSettings):
     def email_enabled(self) -> bool:
         return bool(self.SMTP_HOST and self.SMTP_USER and self.SMTP_PASSWORD)
 
+    # ── Юридические реквизиты оператора (P1.1, 152-ФЗ) ─────────────────
+    # Подставляются в опубликованные документы и footer из единого места.
+    # ИНН и адрес по умолчанию пусты: их нельзя выдумывать — это реальные
+    # регистрационные данные. Пока не заполнены и флаг ниже не выставлен,
+    # на юр-страницах показывается баннер «документ в стадии оформления».
+    LEGAL_OPERATOR_NAME: str = Field(
+        default="ООО «ФИНПАЙЛОТ»",
+        description="Наименование оператора ПДн (юрлицо/ИП). До регистрации — заглушка.",
+    )
+    LEGAL_OPERATOR_INN: str = Field(
+        default="",
+        description="ИНН оператора. Пусто = не заполнено (фейковый ИНН недопустим).",
+    )
+    LEGAL_OPERATOR_ADDRESS: str = Field(
+        default="",
+        description="Юридический адрес оператора. Пусто = не заполнено.",
+    )
+    LEGAL_CONTACT_EMAIL: str = Field(
+        default="support@finpilot.app",
+        description="Контактный e-mail для обращений (в т.ч. по ПДн). Домен — заглушка.",
+    )
+    LEGAL_DOC_DATE: str = Field(
+        default="",
+        description="Дата вступления документов в силу (YYYY-MM-DD). Пусто = не указана.",
+    )
+    LEGAL_DATA_RETENTION_MONTHS: int = Field(
+        default=6,
+        ge=0,
+        description="Срок хранения данных после удаления учётной записи, месяцев.",
+    )
+    LEGAL_DETAILS_CONFIRMED: bool = Field(
+        default=False,
+        description=(
+            "Подтверждение, что реквизиты внесены и проверены (юрлицо зарегистрировано, "
+            "документы прошли юр-ревью). True — убирает баннер «в стадии оформления»."
+        ),
+    )
+
+    @property
+    def legal_details_complete(self) -> bool:
+        """Реквизиты готовы к публикации: ИНН и адрес заполнены и явно подтверждены."""
+        return bool(
+            self.LEGAL_DETAILS_CONFIRMED
+            and self.LEGAL_OPERATOR_INN.strip()
+            and self.LEGAL_OPERATOR_ADDRESS.strip()
+        )
+
+    @property
+    def legal_context(self) -> dict[str, object]:
+        """Реквизиты для шаблонов (документы + footer). Незаполненные поля —
+        видимые человекочитаемые заглушки, чтобы в вёрстке не зияли пустоты."""
+        return {
+            "operator_name": self.LEGAL_OPERATOR_NAME,
+            "operator_inn": self.LEGAL_OPERATOR_INN.strip() or "[ИНН — после регистрации юрлица]",
+            "operator_address": self.LEGAL_OPERATOR_ADDRESS.strip()
+            or "[адрес — после регистрации юрлица]",
+            "contact_email": self.LEGAL_CONTACT_EMAIL,
+            "doc_date": self.LEGAL_DOC_DATE.strip() or "[дата вступления в силу]",
+            "retention_months": self.LEGAL_DATA_RETENTION_MONTHS,
+            "complete": self.legal_details_complete,
+        }
+
 
 settings = Settings()
+
+
+# Дефолтные значения секретов — их наличие в production недопустимо.
+_DEFAULT_JWT_SECRET = "dev-insecure-secret-change-me-in-production-env-32b"
+
+
+def validate_production_security(s: Settings) -> list[str]:
+    """Возвращает список проблем безопасности конфигурации для production.
+
+    В development всегда пусто — дефолты допустимы для локальной разработки.
+    В production пустой список означает «можно стартовать»; непустой —
+    приложение обязано упасть при старте (fail-loud), а не уехать в бой
+    с дев-секретом или незащищённой cookie.
+    """
+    if not s.is_production:
+        return []
+
+    problems: list[str] = []
+    if s.JWT_SECRET == _DEFAULT_JWT_SECRET or len(s.JWT_SECRET) < 32:
+        problems.append("JWT_SECRET не задан или дефолтный — задайте стойкий секрет (>=32 симв.) в .env")
+    if not s.COOKIE_SECURE:
+        problems.append("COOKIE_SECURE=false — в production cookie должна иметь флаг Secure (нужен HTTPS)")
+    return problems

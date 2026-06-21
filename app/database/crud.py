@@ -7,14 +7,17 @@ from sqlalchemy import delete, func
 from sqlalchemy.orm import Session
 
 from app.core.categorization import classify_transaction
+from app.core.money import to_money
 from app.database.models import (
     Budget,
     Category,
+    Event,
     Goal,
     GoalContribution,
     LiquidAsset,
     Obligation,
     ObligationPayment,
+    Recommendation,
     Scenario,
     Transaction,
     UserPrefs,
@@ -77,7 +80,7 @@ def create_transaction(
 ) -> Transaction:
     resolved_category = category or classify_transaction(description, mcc, type)
     transaction = Transaction(
-        amount=amount,
+        amount=to_money(amount),
         category=resolved_category,
         type=type,
         date=date,
@@ -182,11 +185,11 @@ def create_budget(
         db.query(Budget).filter(Budget.category == category), Budget, user_id
     ).first()
     if existing is not None:
-        existing.limit_amount = limit_amount
+        existing.limit_amount = to_money(limit_amount)
         db.commit()
         db.refresh(existing)
         return existing
-    budget = Budget(category=category, limit_amount=limit_amount, user_id=user_id)
+    budget = Budget(category=category, limit_amount=to_money(limit_amount), user_id=user_id)
     db.add(budget)
     db.commit()
     db.refresh(budget)
@@ -310,10 +313,10 @@ def create_obligation(
 ) -> Obligation:
     obligation = Obligation(
         name=name,
-        amount=amount,
+        amount=to_money(amount),
         interest_rate=interest_rate,
         term=term,
-        monthly_payment=monthly_payment,
+        monthly_payment=to_money(monthly_payment),
         payment_day=payment_day,
         comment=comment,
         bank=bank,
@@ -345,6 +348,7 @@ def delete_obligation(
     obligation = db.get(Obligation, obligation_id)
     if obligation is None or obligation.user_id != user_id:
         return None
+    db.execute(delete(ObligationPayment).where(ObligationPayment.obligation_id == obligation_id))
     db.delete(obligation)
     db.commit()
     return obligation
@@ -371,9 +375,9 @@ def record_obligation_payment(
 ) -> ObligationPayment:
     payment = ObligationPayment(
         obligation_id=obligation_id,
-        amount=amount,
+        amount=to_money(amount),
         is_early=is_early,
-        remaining_after=remaining_after,
+        remaining_after=to_money(remaining_after),
         payment_date=payment_date or datetime.utcnow(),
     )
     db.add(payment)
@@ -408,8 +412,8 @@ def create_goal(
 ) -> Goal:
     goal = Goal(
         name=name,
-        target_amount=target_amount,
-        current_amount=current_amount,
+        target_amount=to_money(target_amount),
+        current_amount=to_money(current_amount),
         deadline=deadline,
         category=category,
         comment=comment,
@@ -446,6 +450,7 @@ def delete_goal(db: Session, goal_id: int, user_id: Optional[str] = None) -> Opt
     goal = db.get(Goal, goal_id)
     if goal is None or goal.user_id != user_id:
         return None
+    db.execute(delete(GoalContribution).where(GoalContribution.goal_id == goal_id))
     db.delete(goal)
     db.commit()
     return goal
@@ -471,7 +476,7 @@ def record_goal_contribution(
 ) -> GoalContribution:
     contribution = GoalContribution(
         goal_id=goal_id,
-        amount=amount,
+        amount=to_money(amount),
         source=source,
         contribution_date=contribution_date or datetime.utcnow(),
     )
@@ -502,7 +507,7 @@ def create_liquid_asset(
     user_id: Optional[str] = None,
 ) -> LiquidAsset:
     asset = LiquidAsset(
-        name=name, amount=amount, interest_rate=interest_rate, type=type,
+        name=name, amount=to_money(amount), interest_rate=interest_rate, type=type,
         comment=comment, currency=currency, user_id=user_id,
     )
     db.add(asset)
@@ -644,13 +649,48 @@ def mark_email_verified(db: Session, user_id: str) -> Optional[User]:
     return user
 
 
+def register_failed_login(
+    db: Session, user: User, max_attempts: int, lockout_minutes: int
+) -> User:
+    """Учитывает неудачную попытку входа. При достижении лимита — блокирует
+    аккаунт на lockout_minutes (P1.2, защита от перебора пароля)."""
+    user.failed_login_attempts = (user.failed_login_attempts or 0) + 1
+    if user.failed_login_attempts >= max_attempts:
+        user.locked_until = datetime.utcnow() + timedelta(minutes=lockout_minutes)
+    db.commit()
+    db.refresh(user)
+    return user
+
+
+def reset_failed_logins(db: Session, user: User) -> User:
+    """Сбрасывает счётчик и снимает блокировку после успешного входа."""
+    if user.failed_login_attempts or user.locked_until:
+        user.failed_login_attempts = 0
+        user.locked_until = None
+        db.commit()
+        db.refresh(user)
+    return user
+
+
 def delete_user(db: Session, user_id: str) -> bool:
-    """Полное удаление аккаунта вместе со всеми данными пользователя."""
+    """Полное удаление аккаунта со всеми данными пользователя (152-ФЗ)."""
     user = db.get(User, user_id)
     if user is None:
         return False
+    # История привязана к целям/обязательствам пользователя — на PostgreSQL её
+    # нужно удалить до родительских строк, иначе FK заблокирует удаление.
+    goal_ids = [row[0] for row in db.query(Goal.id).filter(Goal.user_id == user_id)]
+    obl_ids = [row[0] for row in db.query(Obligation.id).filter(Obligation.user_id == user_id)]
+    if goal_ids:
+        db.execute(delete(GoalContribution).where(GoalContribution.goal_id.in_(goal_ids)))
+    if obl_ids:
+        db.execute(delete(ObligationPayment).where(ObligationPayment.obligation_id.in_(obl_ids)))
+    # Основные сущности пользователя.
     for model in (*_OWNED_MODELS, UserPrefs):
         db.execute(delete(model).where(model.user_id == user_id))
+    # Аналитика и рекомендации — тоже персональные данные (право на удаление).
+    db.execute(delete(Event).where(Event.user_id == user_id))
+    db.execute(delete(Recommendation).where(Recommendation.user_id == user_id))
     db.delete(user)
     db.commit()
     return True

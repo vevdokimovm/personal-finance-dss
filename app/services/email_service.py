@@ -70,6 +70,28 @@ class EmailService:
 </div>"""
         return self._send(to_email, subject, text, html)
 
+    def send_password_reset(self, to_email: str, reset_url: str, display_name: str | None = None) -> bool:
+        """Письмо со ссылкой для сброса пароля."""
+        name = display_name or to_email.split("@")[0]
+        subject = "Сброс пароля — FINPILOT"
+        text = (
+            f"Здравствуйте, {name}!\n\n"
+            "Вы запросили сброс пароля в FINPILOT. Чтобы задать новый пароль, перейдите "
+            f"по ссылке:\n\n{reset_url}\n\n"
+            "Ссылка действует 1 час. Если вы не запрашивали сброс — просто проигнорируйте "
+            "это письмо, ваш пароль останется прежним.\n\n— Команда FINPILOT"
+        )
+        html = f"""\
+<div style="font-family:-apple-system,Segoe UI,Roboto,sans-serif;max-width:560px;margin:auto;color:#1a1a1a;">
+  <h2 style="color:#2BBF6A;">Сброс пароля</h2>
+  <p>Здравствуйте, <strong>{name}</strong>!</p>
+  <p>Вы запросили сброс пароля в FINPILOT. Задайте новый пароль:</p>
+  <p><a href="{reset_url}" style="display:inline-block;padding:12px 28px;background:#2BBF6A;
+     color:#fff;text-decoration:none;border-radius:8px;font-weight:600;">Задать новый пароль</a></p>
+  <p style="color:#777;font-size:13px;">Ссылка действует 1 час. Если вы не запрашивали сброс — проигнорируйте письмо.</p>
+</div>"""
+        return self._send(to_email, subject, text, html)
+
     def _send(self, to_email: str, subject: str, text: str, html: str) -> bool:
         if not self.enabled:
             logger.info("Email отключён (нет SMTP-конфига) — письмо для %s не отправлено.", to_email)

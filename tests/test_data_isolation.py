@@ -7,7 +7,20 @@ from __future__ import annotations
 
 from datetime import datetime
 
+import pytest
+
 from app.database import crud
+from app.database.models import User
+
+
+@pytest.fixture(autouse=True)
+def _seed_users(db_session):
+    """Тесты используют синтетические user_id; на PostgreSQL FK требует реальных
+    строк в users. Создаём их, чтобы проверять именно логику изоляции, а не FK."""
+    for uid in ("user-a", "user-b"):
+        if db_session.get(User, uid) is None:
+            db_session.add(User(id=uid, email=f"{uid}@test.io", password_hash="x"))
+    db_session.commit()
 
 
 def _txn(db, user_id, amount=100.0):

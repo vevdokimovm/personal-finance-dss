@@ -10,8 +10,12 @@ import tempfile
 
 import pytest
 
-_TEST_DB = tempfile.NamedTemporaryFile(suffix=".db", delete=False)
-os.environ["DATABASE_URL"] = f"sqlite:///{_TEST_DB.name}"
+# По умолчанию — изолированный SQLite-файл. Но если DATABASE_URL задан извне
+# (например, PostgreSQL в CI/локальной верификации) — уважаем его, чтобы прогнать
+# тот же набор тестов на боевой СУБД.
+if not os.environ.get("DATABASE_URL"):
+    _TEST_DB = tempfile.NamedTemporaryFile(suffix=".db", delete=False)
+    os.environ["DATABASE_URL"] = f"sqlite:///{_TEST_DB.name}"
 
 from fastapi.testclient import TestClient
 

@@ -119,7 +119,36 @@
                 {% block content %}{% endblock %}
             </div>
 
-            <footer class="app-footer">FINPILOT v{{ app_version }}</footer>
+            <footer class="site-footer">
+                <div class="site-footer-cols">
+                    <div class="footer-col">
+                        <div class="footer-col-title">FINPILOT</div>
+                        <a href="/dashboard">Дашборд</a>
+                        <a href="/planning">Планирование</a>
+                        <a href="/transactions">Операции</a>
+                        <a href="/goals">Цели</a>
+                    </div>
+                    <div class="footer-col">
+                        <div class="footer-col-title">Правовое</div>
+                        <a href="/legal/privacy">Политика конфиденциальности</a>
+                        <a href="/legal/terms">Пользовательское соглашение</a>
+                        <a href="/legal/consent">Согласие на обработку ПДн</a>
+                        <a href="/legal/financial-consent">Согласие на финансовые данные</a>
+                    </div>
+                    <div class="footer-col">
+                        <div class="footer-col-title">Контакты</div>
+                        <a href="/contacts">Контакты и реквизиты</a>
+                        {% if legal %}
+                        <a href="mailto:{{ legal.contact_email }}">{{ legal.contact_email }}</a>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="site-footer-bottom">
+                    {% if legal %}<span>© 2026 {{ legal.operator_name }}</span>{% endif %}
+                    <span class="footer-disclaimer">Рекомендации носят информационный характер и не являются индивидуальной инвестиционной рекомендацией.</span>
+                    <span class="footer-version">v{{ app_version }}</span>
+                </div>
+            </footer>
         </main>
     </div>
 
@@ -150,7 +179,7 @@
                     <div id="auth-consent-row" style="display:none; margin-top:16px; font-size:.86rem; line-height:1.5; padding:14px 16px; background:var(--c-surface-up); border:1px solid var(--c-border); border-radius:var(--r-md);">
                         <label style="display:flex; align-items:flex-start; gap:10px; cursor:pointer; color:var(--c-text);">
                             <input type="checkbox" id="auth-consent" style="margin-top:2px; flex-shrink:0; width:17px; height:17px; accent-color:var(--c-accent-hl); cursor:pointer;">
-                            <span>Я согласен на обработку персональных данных в соответствии с политикой конфиденциальности <span style="color:var(--c-red); font-weight:700;">*</span></span>
+                            <span>Я даю <a href="/legal/consent" target="_blank" style="color:var(--c-accent-hl); text-decoration:underline;">согласие на обработку персональных данных</a> в соответствии с <a href="/legal/privacy" target="_blank" style="color:var(--c-accent-hl); text-decoration:underline;">политикой конфиденциальности</a> <span style="color:var(--c-red); font-weight:700;">*</span></span>
                         </label>
                         <label style="display:flex; align-items:flex-start; gap:10px; cursor:pointer; color:var(--c-text); margin-top:12px;">
                             <input type="checkbox" id="auth-newsletter" style="margin-top:2px; flex-shrink:0; width:17px; height:17px; accent-color:var(--c-accent-hl); cursor:pointer;">
@@ -158,6 +187,9 @@
                         </label>
                     </div>
                     <button type="submit" id="auth-submit" class="primary-button w-full" style="margin-top:18px;">Войти</button>
+                    <p id="auth-forgot" style="margin-top:12px; text-align:center; font-size:.85rem;">
+                        <a href="/forgot-password" style="color:var(--c-accent-hl); text-decoration:underline;">Забыли пароль?</a>
+                    </p>
                 </form>
             </div>
         </div>
