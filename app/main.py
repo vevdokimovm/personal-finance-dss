@@ -165,3 +165,19 @@ async def read_legal_financial_consent(ctx: dict = Depends(page_context)) -> HTM
 @app.get("/contacts", response_class=HTMLResponse, summary="Контакты и реквизиты оператора")
 async def read_contacts(ctx: dict = Depends(page_context)) -> HTMLResponse:
     return templates.TemplateResponse(request=ctx["request"], name="contacts.html", context=ctx)
+
+
+@app.get("/reset-password", response_class=HTMLResponse, summary="Страница установки нового пароля")
+async def read_reset_password(
+    token: str = "", ctx: dict = Depends(page_context)
+) -> HTMLResponse:
+    return templates.TemplateResponse(
+        request=ctx["request"], name="reset_password.html", context={**ctx, "reset_token": token}
+    )
+
+
+@app.get("/forgot-password", response_class=HTMLResponse, summary="Страница запроса сброса пароля")
+async def read_forgot_password(ctx: dict = Depends(page_context)) -> HTMLResponse:
+    return templates.TemplateResponse(
+        request=ctx["request"], name="forgot_password.html", context=ctx
+    )

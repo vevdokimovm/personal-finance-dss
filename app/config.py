@@ -28,7 +28,7 @@ class Settings(BaseSettings):
         description="Название проекта.",
     )
     APP_VERSION: str = Field(
-        default="4.2.0",
+        default="4.3.0",
         description="Версия приложения (INFRA-13): код, UI-футер, git-тег.",
     )
     PROJECT_TAGLINE: str = Field(
@@ -66,6 +66,9 @@ class Settings(BaseSettings):
     )
     JWT_ALGORITHM: str = Field(default="HS256", description="Алгоритм подписи JWT.")
     JWT_TTL_HOURS: int = Field(default=168, description="Срок жизни access-токена, часов.")
+    PASSWORD_RESET_TTL_HOURS: int = Field(
+        default=1, ge=1, description="Срок жизни токена сброса пароля, часов (P1.3)."
+    )
     AUTH_COOKIE_NAME: str = Field(default="fp_access", description="Имя httpOnly-cookie с JWT.")
 
     # ── Account lockout: защита логина от перебора (P1.2, NFR-05) ──────
