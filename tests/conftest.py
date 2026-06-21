@@ -49,3 +49,15 @@ def db_session():
     finally:
         session.close()
         _reset_db()
+
+
+@pytest.fixture(autouse=True)
+def _clear_recommendation_cache():
+    """Кэш рекомендаций — модульный (живёт в процессе); чистим перед каждым тестом,
+    чтобы результаты не протекали между тестами."""
+    try:
+        from app.api.routes_recommendation import _recommendation_cache
+        _recommendation_cache.clear()
+    except Exception:
+        pass
+    yield
