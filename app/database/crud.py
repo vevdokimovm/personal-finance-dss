@@ -7,6 +7,7 @@ from sqlalchemy import delete, func
 from sqlalchemy.orm import Session
 
 from app.core.categorization import classify_transaction
+from app.core.money import to_money
 from app.database.models import (
     Budget,
     Category,
@@ -79,7 +80,7 @@ def create_transaction(
 ) -> Transaction:
     resolved_category = category or classify_transaction(description, mcc, type)
     transaction = Transaction(
-        amount=amount,
+        amount=to_money(amount),
         category=resolved_category,
         type=type,
         date=date,
@@ -184,11 +185,11 @@ def create_budget(
         db.query(Budget).filter(Budget.category == category), Budget, user_id
     ).first()
     if existing is not None:
-        existing.limit_amount = limit_amount
+        existing.limit_amount = to_money(limit_amount)
         db.commit()
         db.refresh(existing)
         return existing
-    budget = Budget(category=category, limit_amount=limit_amount, user_id=user_id)
+    budget = Budget(category=category, limit_amount=to_money(limit_amount), user_id=user_id)
     db.add(budget)
     db.commit()
     db.refresh(budget)
@@ -312,10 +313,10 @@ def create_obligation(
 ) -> Obligation:
     obligation = Obligation(
         name=name,
-        amount=amount,
+        amount=to_money(amount),
         interest_rate=interest_rate,
         term=term,
-        monthly_payment=monthly_payment,
+        monthly_payment=to_money(monthly_payment),
         payment_day=payment_day,
         comment=comment,
         bank=bank,
@@ -374,9 +375,9 @@ def record_obligation_payment(
 ) -> ObligationPayment:
     payment = ObligationPayment(
         obligation_id=obligation_id,
-        amount=amount,
+        amount=to_money(amount),
         is_early=is_early,
-        remaining_after=remaining_after,
+        remaining_after=to_money(remaining_after),
         payment_date=payment_date or datetime.utcnow(),
     )
     db.add(payment)
@@ -411,8 +412,8 @@ def create_goal(
 ) -> Goal:
     goal = Goal(
         name=name,
-        target_amount=target_amount,
-        current_amount=current_amount,
+        target_amount=to_money(target_amount),
+        current_amount=to_money(current_amount),
         deadline=deadline,
         category=category,
         comment=comment,
@@ -475,7 +476,7 @@ def record_goal_contribution(
 ) -> GoalContribution:
     contribution = GoalContribution(
         goal_id=goal_id,
-        amount=amount,
+        amount=to_money(amount),
         source=source,
         contribution_date=contribution_date or datetime.utcnow(),
     )
@@ -506,7 +507,7 @@ def create_liquid_asset(
     user_id: Optional[str] = None,
 ) -> LiquidAsset:
     asset = LiquidAsset(
-        name=name, amount=amount, interest_rate=interest_rate, type=type,
+        name=name, amount=to_money(amount), interest_rate=interest_rate, type=type,
         comment=comment, currency=currency, user_id=user_id,
     )
     db.add(asset)
