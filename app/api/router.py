@@ -11,6 +11,7 @@ from app.api.routes_goals import router as goals_router
 from app.api.routes_liquid_assets import router as liquid_assets_router
 from app.api.routes_obligations import router as obligations_router
 from app.api.routes_plaid import router as plaid_router
+from app.api.routes_export import router as export_router
 from app.api.routes_notifications import router as notifications_router
 from app.api.routes_planning import router as planning_router
 from app.api.routes_recommendation import router as recommendation_router
@@ -33,5 +34,6 @@ router.include_router(banks_router)
 router.include_router(budgets_router)
 router.include_router(planning_router)
 router.include_router(notifications_router)
+router.include_router(export_router)
 router.include_router(fx_router)
 router.include_router(plaid_router)

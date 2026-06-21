@@ -1373,6 +1373,10 @@ function bindPlanningUI() {
         if (typeof planRbench === 'number') params.set('r_bench', planRbench);
         window.location.href = `/api/planning/export.csv?${params.toString()}`;
     });
+
+    on($('#export-pdf'), 'click', () => {
+        window.location.href = '/api/export/report.pdf';
+    });
     on($('#export-pdf'), 'click', () => window.print());
 
     // L_min slider
