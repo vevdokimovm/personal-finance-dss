@@ -102,6 +102,36 @@ class TemporalPattern:
     message: str
 
 
+@dataclass(frozen=True)
+class GoalRecord:
+    """Цель в форме, независимой от ORM (слой 3-B).
+
+    months_to_deadline и monthly_contribution считает сервисный слой
+    (через канон goals_priority._months_left и историю GoalContribution).
+    """
+    name: str
+    target_amount: float
+    current_amount: float
+    months_to_deadline: float
+    monthly_contribution: float  # наблюдаемый темп пополнения, ₽/мес
+    priority: int = 0
+
+
+@dataclass
+class GoalImpact:
+    """Layer 3-B: эффект освобождённой экономии на цель (информационно)."""
+    goal_name: str
+    remaining: float
+    months_to_deadline: float
+    current_monthly: float       # текущий темп пополнения, ₽/мес
+    redirected_saving: float     # освобождённая экономия, направляемая на цель
+    eta_now: float | None        # мес до цели при текущем темпе (None — не пополняется)
+    eta_boosted: float           # мес до цели при темпе + экономия
+    months_earlier: float | None  # на сколько раньше (None если сейчас не пополняется)
+    on_track: bool               # успевает ли к дедлайну при текущем темпе
+    message: str
+
+
 class SpendingAdvisor:
     def __init__(
         self,
@@ -365,6 +395,75 @@ class SpendingAdvisor:
         return (
             f"Траты на «{category}» снижаются примерно на {abs(slope_pct):.0f}% в месяц "
             f"(норма ~{baseline:,.0f} ₽/мес). Хорошая динамика."
+        ).replace(",", " ")
+
+    def analyze_goal_impact(
+        self,
+        saving: float,
+        goals: list["GoalRecord"],
+        top_k: int | None = None,
+    ) -> list["GoalImpact"]:
+        """Layer 3-B: что освобождённая экономия даёт целям.
+
+        Для каждой недостигнутой активной цели считает, на сколько раньше она
+        закроется, если `saving` ₽/мес направить на её пополнение. База — текущий
+        наблюдаемый темп. Линейно, без процентов инструмента (консервативно).
+        Информационный слой: не входит в U(a) и не влияет на выбор a*.
+        """
+        top_k = self.top_k if top_k is None else top_k
+        if saving <= 0:
+            return []
+
+        impacts: list[GoalImpact] = []
+        for g in goals:
+            remaining = g.target_amount - g.current_amount
+            if remaining <= 0:
+                continue
+
+            rate = max(0.0, g.monthly_contribution)
+            eta_now = remaining / rate if rate > 0 else None
+            eta_boosted = remaining / (rate + saving)
+            months_earlier = (eta_now - eta_boosted) if eta_now is not None else None
+            on_track = eta_now is not None and eta_now <= g.months_to_deadline
+
+            impacts.append(GoalImpact(
+                goal_name=g.name,
+                remaining=round(remaining, 2),
+                months_to_deadline=round(g.months_to_deadline, 1),
+                current_monthly=round(rate, 2),
+                redirected_saving=round(saving, 2),
+                eta_now=round(eta_now, 1) if eta_now is not None else None,
+                eta_boosted=round(eta_boosted, 1),
+                months_earlier=round(months_earlier, 1) if months_earlier is not None else None,
+                on_track=on_track,
+                message=self._format_goal_impact(
+                    g.name, round(saving, 2), eta_now, round(eta_boosted, 1),
+                    round(months_earlier, 1) if months_earlier is not None else None,
+                ),
+            ))
+
+        impacts.sort(key=lambda i: (-self._priority_of(i.goal_name, goals), i.months_to_deadline))
+        return impacts[:top_k]
+
+    @staticmethod
+    def _priority_of(name: str, goals: list["GoalRecord"]) -> int:
+        for g in goals:
+            if g.name == name:
+                return g.priority
+        return 0
+
+    @staticmethod
+    def _format_goal_impact(name: str, saving: float, eta_now: float | None,
+                            eta_boosted: float, months_earlier: float | None) -> str:
+        if eta_now is not None and months_earlier is not None:
+            return (
+                f"Освободив ~{saving:,.0f} ₽/мес и направив их на цель «{name}», "
+                f"вы достигнете её примерно за {eta_boosted:.0f} мес. вместо {eta_now:.0f} — "
+                f"на ~{months_earlier:.0f} мес. раньше."
+            ).replace(",", " ")
+        return (
+            f"Цель «{name}» сейчас не пополняется. ~{saving:,.0f} ₽/мес позволят "
+            f"достичь её примерно за {eta_boosted:.0f} мес."
         ).replace(",", " ")
 
     @staticmethod

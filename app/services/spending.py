@@ -11,8 +11,9 @@ from datetime import datetime
 
 from sqlalchemy.orm import Session
 
-from app.core.spending_advice import ExpenseRecord, SpendingAdvisor
-from app.database.crud import get_transactions
+from app.core.goals_priority import _months_left
+from app.core.spending_advice import ExpenseRecord, GoalRecord, SpendingAdvisor
+from app.database.crud import get_goal_contributions, get_goals, get_transactions
 
 
 def _min_period(months: int) -> str:
@@ -21,6 +22,30 @@ def _min_period(months: int) -> str:
     index = now.year * 12 + (now.month - 1) - max(0, months - 1)
     year, month = divmod(index, 12)
     return f"{year:04d}-{month + 1:02d}"
+
+
+def _goal_records(db: Session, user_id: str | None, months: int, min_period: str, now: datetime) -> list[GoalRecord]:
+    """Активные недостигнутые цели → GoalRecord. Темп пополнения — средний за окно
+    (сумма взносов в окне / months), дедлайн — канон goals_priority._months_left."""
+    records: list[GoalRecord] = []
+    for goal in get_goals(db, active_only=True, user_id=user_id):
+        if float(goal.current_amount) >= float(goal.target_amount):
+            continue
+        contributed = sum(
+            float(c.amount)
+            for c in get_goal_contributions(db, goal.id)
+            if c.contribution_date.strftime("%Y-%m") >= min_period
+        )
+        monthly = contributed / months if months else 0.0
+        records.append(GoalRecord(
+            name=goal.name,
+            target_amount=float(goal.target_amount),
+            current_amount=float(goal.current_amount),
+            months_to_deadline=_months_left(goal.deadline, now),
+            monthly_contribution=monthly,
+            priority=goal.priority,
+        ))
+    return records
 
 
 def get_spending_advice(
@@ -56,6 +81,10 @@ def get_spending_advice(
     merchant_insights = advisor.analyze_merchants(records, current_period)
     trends = advisor.analyze_trends(records, current_period)
 
+    total_saving = round(sum(a.potential_saving for a in advice), 2)
+    goals = _goal_records(db, user_id, months, min_period, datetime.now())
+    goal_impact = advisor.analyze_goal_impact(total_saving, goals)
+
     return {
         "current_period": current_period,
         "months_window": months,
@@ -64,5 +93,6 @@ def get_spending_advice(
         "stats": [asdict(s) for s in stats],
         "merchant_insights": [asdict(m) for m in merchant_insights],
         "temporal_patterns": [asdict(t) for t in trends],
-        "total_potential_saving": round(sum(a.potential_saving for a in advice), 2),
+        "goal_impact": [asdict(g) for g in goal_impact],
+        "total_potential_saving": total_saving,
     }

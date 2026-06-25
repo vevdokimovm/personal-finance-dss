@@ -61,6 +61,7 @@ def test_spending_advice_endpoint_shape(client: TestClient) -> None:
     body = resp.json()
     assert "advice" in body and "stats" in body
     assert "temporal_patterns" in body
+    assert "goal_impact" in body
     assert "total_potential_saving" in body
 
 
