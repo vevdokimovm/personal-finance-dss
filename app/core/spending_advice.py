@@ -11,6 +11,7 @@ from __future__ import annotations
 
 from collections import defaultdict
 from dataclasses import dataclass
+from itertools import combinations
 from statistics import median
 
 # --- Параметры модели (мат-модель v3.0.0, §11) ---
@@ -21,6 +22,7 @@ MAD_SCALE: float = 0.6745    # приведение MAD к шкале сигмы
 SUGGESTED_CUT: float = 0.15  # предлагаемое умеренное сокращение дискреционного
 TOP_K: int = 3               # сколько советов отдавать
 MIN_SAVING: float = 500.0    # порог значимости экономии, ₽/мес
+TREND_PCT_THRESHOLD: float = 5.0  # %/мес: ниже по модулю — тренд незначим (flat), не показываем
 
 # Коэффициент сжимаемости v_c по категориям движка (мат-модель v3.0.0, §6.1).
 COMPRESSIBILITY: dict[str, float] = {
@@ -82,6 +84,22 @@ class MerchantStats:
     avg_check: float      # средний чек
     category: str
     compressibility: float
+
+
+@dataclass
+class TemporalPattern:
+    """Layer 3-A: тренд категории по завершённым месяцам (информационно).
+
+    Наклон робастный (Theil-Sen), считается по прошлым месяцам без текущего
+    (неполного) периода. slope_pct — относительно медианной нормы категории.
+    """
+    category: str
+    direction: str        # "rising" | "falling"
+    slope_abs: float      # ₽/мес, знаковый (Theil-Sen)
+    slope_pct: float      # %/мес относительно нормы, знаковый
+    baseline: float       # медианная норма по прошлым месяцам
+    months_observed: int
+    message: str
 
 
 class SpendingAdvisor:
@@ -266,6 +284,88 @@ class SpendingAdvisor:
 
         result.sort(key=lambda m: m.total, reverse=True)
         return result[:top_k]
+
+    @staticmethod
+    def theil_sen(points: list[tuple[float, float]]) -> float:
+        """Робастный наклон: медиана попарных наклонов (x по календарным месяцам)."""
+        slopes = [
+            (yj - yi) / (xj - xi)
+            for (xi, yi), (xj, yj) in combinations(points, 2)
+            if xj != xi
+        ]
+        return float(median(slopes)) if slopes else 0.0
+
+    @staticmethod
+    def _month_ordinal(period: str) -> int:
+        """«YYYY-MM» → порядковый номер месяца, чтобы наклон был на реальный месяц."""
+        year, month = period.split("-")
+        return int(year) * 12 + (int(month) - 1)
+
+    def analyze_trends(
+        self,
+        records: list[ExpenseRecord],
+        current_period: str | None = None,
+        top_k: int | None = None,
+    ) -> list["TemporalPattern"]:
+        """Layer 3-A: тренды категорий по завершённым месяцам.
+
+        Текущий (последний) период исключается из тренда — он обычно неполный.
+        Наклон робастный (Theil-Sen), пропуски месяцев учитываются по календарю.
+        Возвращаются только значимые тренды (|slope_pct| ≥ порога), отсортированные
+        по абсолютному ₽-влиянию, не более top_k. Информационный слой: не входит
+        в U(a) и не влияет на выбор a*.
+        """
+        top_k = self.top_k if top_k is None else top_k
+        current_period = self._resolve_current_period(records, current_period)
+        if current_period is None:
+            return []
+
+        sums: dict[str, dict[str, float]] = defaultdict(lambda: defaultdict(float))
+        for rec in records:
+            sums[rec.category][rec.period] += rec.amount
+
+        patterns: list[TemporalPattern] = []
+        for category, by_period in sums.items():
+            past_periods = sorted(p for p in by_period if p != current_period)
+            if len(past_periods) < self.min_months:
+                continue
+
+            points = [(self._month_ordinal(p), by_period[p]) for p in past_periods]
+            slope = self.theil_sen(points)
+            baseline = float(median([by_period[p] for p in past_periods]))
+            slope_pct = (slope / baseline * 100.0) if baseline else 0.0
+            if abs(slope_pct) < TREND_PCT_THRESHOLD:
+                continue
+
+            direction = "rising" if slope_pct > 0 else "falling"
+            slope = round(slope, 2)
+            slope_pct = round(slope_pct, 1)
+            baseline = round(baseline, 2)
+            patterns.append(TemporalPattern(
+                category=category,
+                direction=direction,
+                slope_abs=slope,
+                slope_pct=slope_pct,
+                baseline=baseline,
+                months_observed=len(past_periods),
+                message=self._format_trend(category, direction, slope, slope_pct, baseline),
+            ))
+
+        patterns.sort(key=lambda p: abs(p.slope_abs), reverse=True)
+        return patterns[:top_k]
+
+    @staticmethod
+    def _format_trend(category: str, direction: str, slope_abs: float, slope_pct: float, baseline: float) -> str:
+        if direction == "rising":
+            return (
+                f"Траты на «{category}» растут примерно на {abs(slope_pct):.0f}% в месяц "
+                f"(+{slope_abs:,.0f} ₽/мес к норме ~{baseline:,.0f} ₽). "
+                f"Если динамика сохранится, стоит присмотреться к этой категории."
+            ).replace(",", " ")
+        return (
+            f"Траты на «{category}» снижаются примерно на {abs(slope_pct):.0f}% в месяц "
+            f"(норма ~{baseline:,.0f} ₽/мес). Хорошая динамика."
+        ).replace(",", " ")
 
     @staticmethod
     def _format_message(category: str, saving: float, reason: str, current: float, baseline: float) -> str:

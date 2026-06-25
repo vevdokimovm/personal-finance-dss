@@ -54,6 +54,7 @@ def get_spending_advice(
     stats = advisor.analyze(records, current_period)
     advice = advisor.generate_advice(records, current_period)
     merchant_insights = advisor.analyze_merchants(records, current_period)
+    trends = advisor.analyze_trends(records, current_period)
 
     return {
         "current_period": current_period,
@@ -62,5 +63,6 @@ def get_spending_advice(
         "advice": [asdict(a) for a in advice],
         "stats": [asdict(s) for s in stats],
         "merchant_insights": [asdict(m) for m in merchant_insights],
+        "temporal_patterns": [asdict(t) for t in trends],
         "total_potential_saving": round(sum(a.potential_saving for a in advice), 2),
     }

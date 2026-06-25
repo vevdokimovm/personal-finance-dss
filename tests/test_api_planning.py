@@ -60,6 +60,7 @@ def test_spending_advice_endpoint_shape(client: TestClient) -> None:
     assert resp.status_code == 200
     body = resp.json()
     assert "advice" in body and "stats" in body
+    assert "temporal_patterns" in body
     assert "total_potential_saving" in body
 
 
