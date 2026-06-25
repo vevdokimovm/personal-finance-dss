@@ -32,5 +32,10 @@ USER appuser
 
 EXPOSE 8000
 
+# Docker сам отслеживает живость контейнера по /health (liveness + проверка БД).
+# curl в slim-образе нет — используем python из venv (тот же чек, что в compose).
+HEALTHCHECK --interval=30s --timeout=5s --start-period=30s --retries=3 \
+    CMD python -c "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://localhost:8000/health').status==200 else 1)"
+
 ENTRYPOINT ["./docker-entrypoint.sh"]
 CMD ["gunicorn", "app.main:app", "-c", "gunicorn_conf.py"]

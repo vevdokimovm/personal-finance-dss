@@ -1,0 +1,10 @@
+[Unit]
+Description=FINPILOT — обновление курсов валют с ЦБ РФ
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+WorkingDirectory=/opt/finpilot
+EnvironmentFile=/opt/finpilot/.env
+ExecStart=/opt/finpilot/scripts/cron_fx_refresh.sh

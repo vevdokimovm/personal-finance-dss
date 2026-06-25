@@ -1,0 +1,11 @@
+[Unit]
+Description=FINPILOT — бэкап PostgreSQL
+After=network-online.target
+
+[Service]
+Type=oneshot
+WorkingDirectory=/opt/finpilot
+EnvironmentFile=/opt/finpilot/.env
+# PGPASSWORD маппится из POSTGRES_PASSWORD; БД доступна на loopback (см. compose).
+Environment=PGHOST=127.0.0.1 PGPORT=5432 PGUSER=finpilot PGDATABASE=finpilot
+ExecStart=/bin/bash -c 'PGPASSWORD="$POSTGRES_PASSWORD" /opt/finpilot/scripts/backup_db.sh /var/backups/finpilot'

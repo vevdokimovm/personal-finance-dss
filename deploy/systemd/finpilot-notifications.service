@@ -1,0 +1,10 @@
+[Unit]
+Description=FINPILOT — рассылка уведомлений (дайджест, напоминания)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+WorkingDirectory=/opt/finpilot
+EnvironmentFile=/opt/finpilot/.env
+ExecStart=/opt/finpilot/scripts/cron_notifications.sh

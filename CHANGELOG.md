@@ -2,6 +2,41 @@
 
 Формат: [Keep a Changelog](https://keepachangelog.com/ru/1.0.0/). Версионирование — [SemVer](https://semver.org/lang/ru/).
 
+## [4.16.2] — 2026-06-21 — Production-контейнеризация и деплой-инфраструктура (PATCH)
+
+Доведение контейнеризации до прод-уровня и артефакты для деплоя на VPS с доменом и TLS.
+Питоновский код не менялся (431 тест без изменений) — только инфраструктура.
+
+### Контейнеризация
+- **HEALTHCHECK** в `Dockerfile` (на базе `/health`) — Docker отслеживает живость и при
+  запуске вне compose.
+- **docker-compose.prod.yml** — прод-профиль: наружу только nginx (80/443); `web` и `db`
+  привязаны к loopback хоста (127.0.0.1), в интернет не публикуются; секреты строго из `.env`
+  (без dev-дефолтов — fail-loud работает как задумано); `restart: unless-stopped` на всех
+  сервисах; том `finpilot_pgdata` сохранён (BUG-010 — иначе потеря данных при redeploy).
+
+### Reverse proxy + TLS
+- **nginx/templates/finpilot.conf.template** — HTTP→HTTPS редирект, ACME-challenge webroot,
+  TLS (Let's Encrypt), заголовки безопасности (HSTS, X-Frame-Options, X-Content-Type-Options,
+  Referrer-Policy, Permissions-Policy, CSP), gzip, `client_max_body_size 12m`, кэш статики.
+  Домен подставляется из `.env` через envsubst (фильтр только по `DOMAIN`).
+
+### Деплой-обвязка
+- **.env.prod.example** — полный шаблон боевых переменных (P0.5), один источник правды для
+  пароля БД, генерация секретов через `openssl rand`.
+- **scripts/cron_notifications.sh**, **scripts/cron_fx_refresh.sh** — дёргают идемпотентные
+  `/api/notifications/run` и `/api/fx/refresh` с `X-Admin-Key` (P0.6).
+- **scripts/restore_db.sh** — восстановление БД из бэкапа (парный к `backup_db.sh`).
+- **scripts/backup_verify.sh** — проверка восстановимости: backup → restore во временную БД →
+  проверка целостности → cleanup. Бэкап без восстановления — не бэкап (P0.7).
+- **deploy/systemd/** — service+timer для уведомлений (08:00), курсов ЦБ (будни 12:30),
+  бэкапов (03:30).
+
+### Документация
+- **docs/DEPLOY.md** — пошаговая инструкция: сервер (Docker + миррор, firewall) → код → `.env` →
+  TLS-сертификат → запуск → проверка → systemd-таймеры → проверка восстановимости → автообновление
+  сертификата. Учтены 152-ФЗ (РФ-хостинг) и Docker Hub geo-block.
+
 ## [4.16.1] — 2026-06-21 — Процессная документация для команды (PATCH)
 
 Добавлены практичные инструкции в `docs/` — для любого участника (разработчик, ревьюер), а не
