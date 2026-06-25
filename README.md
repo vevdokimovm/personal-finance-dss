@@ -1,5 +1,7 @@
 # FINPILOT — СППР для персональных финансов
 
+[![CI](https://github.com/vevdokimovm/personal-finance-dss/actions/workflows/ci.yml/badge.svg)](https://github.com/vevdokimovm/personal-finance-dss/actions/workflows/ci.yml)
+
 **FINPILOT** — система поддержки принятия решений (СППР), которая помогает грамотно
 распределять свободные деньги между тремя направлениями: **досрочное погашение долга**,
 **резерв ликвидности** и **финансовые цели**.

@@ -2,6 +2,31 @@
 
 Формат: [Keep a Changelog](https://keepachangelog.com/ru/1.0.0/). Версионирование — [SemVer](https://semver.org/lang/ru/).
 
+## [4.16.3] — 2026-06-21 — CI на GitHub Actions + PG-готовность тестов (PATCH)
+
+Непрерывная интеграция на каждый push/PR и приведение всего test-suite к зелёному на
+PostgreSQL (не только SQLite).
+
+### Исправлено (BUG-023)
+- Два теста `test_currency_engine.py::TestRowsToBase` падали на PostgreSQL с
+  `ForeignKeyViolation`: создавали транзакцию с `user_id="u1"`, не создавая самого
+  пользователя. SQLite не форсит FK и прятал это (тот же класс, что BUG-019), PostgreSQL —
+  отвергает. Фикс: пользователь создаётся через `crud.create_user`, используется его `id`.
+  Ядро и код приложения не тронуты — правка только в тестовых данных. Результат:
+  **431 passed и на SQLite, и на PostgreSQL 16** (было 429/2 на PG).
+
+### CI (.github/workflows/ci.yml)
+- **Тесты + покрытие — блокирующий гейт**, матрицей на двух СУБД (SQLite и PostgreSQL
+  service-контейнер). `coverage report` валит билд при покрытии < 90%. Закрывает QA-приоритет
+  «прогон на PostgreSQL в CI».
+- **Линтеры (flake8 + mypy + pylint) — информационный job** (`continue-on-error`): замечания
+  видны в логах, merge не блокируют. Переключаются в блокирующие после чистки (P1.4) удалением
+  одной строки.
+- Триггеры: push и pull_request в `main`. Кэш pip, Python 3.12.
+
+### Документация
+- README: бейдж статуса CI.
+
 ## [4.16.2] — 2026-06-21 — Production-контейнеризация и деплой-инфраструктура (PATCH)
 
 Доведение контейнеризации до прод-уровня и артефакты для деплоя на VPS с доменом и TLS.
