@@ -2,6 +2,25 @@
 
 Формат: [Keep a Changelog](https://keepachangelog.com/ru/1.0.0/). Версионирование — [SemVer](https://semver.org/lang/ru/).
 
+## [4.16.17] — 2026-06-24 — P1.6: подключение Sentry-мониторинга в lifespan (PATCH)
+
+`init_sentry` существовал в `observability.py` (вместе с зависимостью
+`sentry-sdk[fastapi]` и настройкой `SENTRY_DSN`), но **нигде не вызывался** — Sentry
+не инициализировался даже при заданном DSN (мёртвый код). Подключаем его в `lifespan`
+приложения первым шагом, чтобы трекинг покрывал и сбои старта.
+
+- `app/main.py` — `lifespan` вызывает `init_sentry(settings.SENTRY_DSN,
+  environment=settings.ENVIRONMENT, release=settings.APP_VERSION)` до проверок и
+  миграций. `release = версия` → ошибки группируются по релизу в Sentry. Без DSN —
+  тихий no-op (локальная разработка и тесты не затронуты).
+- DSN задаётся на стороне деплоя (VPS, `.env.prod`); код активации теперь на месте.
+
+### tests/
+- `test_observability.py::TestSentry` — добавлены 2 проверки (было 1): (1) при заданном
+  DSN `init_sentry` пробрасывает `dsn`/`environment`/`release` в `sentry_sdk.init`
+  (мок); (2) lifespan приложения вызывает `init_sentry` на старте с `SENTRY_DSN` и
+  `release == APP_VERSION`. Цикл red→green (интеграционный тест ловил отсутствие вызова).
+
 ## [4.16.16] — 2026-06-24 — P1.2: кэш расчёта плана (Monte Carlo для `/calculate`) (PATCH)
 
 `/api/planning/calculate` гоняет Monte Carlo внутри `run_planning` — это

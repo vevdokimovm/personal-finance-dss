@@ -41,6 +41,13 @@ init_sentry(settings.SENTRY_DSN, environment=settings.ENVIRONMENT, release=setti
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    # Трекинг ошибок: Sentry подключаем первым, чтобы ловить и сбои старта.
+    # release = версия (ошибки группируются по релизу); no-op без DSN (локально/тесты).
+    init_sentry(
+        settings.SENTRY_DSN,
+        environment=settings.ENVIRONMENT,
+        release=settings.APP_VERSION,
+    )
     # Fail-loud: в production не стартуем с дефолтными секретами / незащищённой cookie.
     problems = validate_production_security(settings)
     if problems:

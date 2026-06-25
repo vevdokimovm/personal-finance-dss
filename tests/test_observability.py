@@ -80,3 +80,41 @@ class TestSentry:
     def test_init_sentry_without_dsn_is_noop(self) -> None:
         assert init_sentry("") is False
         assert init_sentry(None) is False
+
+    def test_init_sentry_with_dsn_passes_release_and_env(self, monkeypatch) -> None:
+        import sentry_sdk
+
+        captured: dict = {}
+        monkeypatch.setattr(sentry_sdk, "init", lambda **kw: captured.update(kw))
+
+        ok = init_sentry(
+            "https://examplePublicKey@o0.ingest.sentry.io/0",
+            environment="staging",
+            release="9.9.9",
+        )
+        assert ok is True
+        assert captured["dsn"].startswith("https://")
+        assert captured["environment"] == "staging"
+        assert captured["release"] == "9.9.9"
+
+    def test_lifespan_initialises_sentry_with_app_version(self, monkeypatch) -> None:
+        # Sentry должен подключаться на старте приложения, а DSN/release — браться из
+        # настроек (release = версия, чтобы ошибки группировались по релизу).
+        import app.main as main_mod
+        from app.config import settings
+
+        captured: dict = {}
+
+        def _fake_init(dsn, **kw):
+            captured["dsn"] = dsn
+            captured.update(kw)
+            return False
+
+        monkeypatch.setattr(main_mod, "init_sentry", _fake_init)
+        with TestClient(main_mod.app):
+            pass
+
+        assert "dsn" in captured, "init_sentry не вызван при старте приложения (lifespan)"
+        assert captured["dsn"] == settings.SENTRY_DSN
+        assert captured.get("release") == settings.APP_VERSION
+        assert captured.get("environment") == settings.ENVIRONMENT
