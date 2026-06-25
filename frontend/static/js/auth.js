@@ -44,8 +44,8 @@
 
     let mode = 'login';
 
-    const openModal = () => { modal.setAttribute('aria-hidden', 'false'); errorEl.style.display = 'none'; };
-    const closeModal = () => { modal.setAttribute('aria-hidden', 'true'); };
+    const openModal = () => { modal.removeAttribute('inert'); modal.setAttribute('aria-hidden', 'false'); errorEl.style.display = 'none'; };
+    const closeModal = () => { modal.setAttribute('inert', ''); modal.setAttribute('aria-hidden', 'true'); };
     const showError = (msg) => { errorEl.textContent = msg; errorEl.style.display = 'block'; };
     function setMode(next) {
         mode = next;

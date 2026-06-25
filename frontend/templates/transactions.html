@@ -3,6 +3,7 @@
 {% block page_title %}Журнал операций{% endblock %}
 
 {% block content %}
+    <h1 class="sr-only">Журнал операций</h1>
 <section class="glass-panel w-full">
     <div class="section-head">
         <div>
@@ -32,9 +33,9 @@
             </div>
             <div style="display:flex; align-items:center; gap:8px; margin-left:auto; font-size:.8rem;">
                 <span style="color:var(--c-text3);">Период:</span>
-                <input type="date" id="tx-date-from" class="modal-input" style="padding:6px 10px; font-size:.78rem; width:auto;">
+                <input type="date" id="tx-date-from" aria-label="Дата начала периода" class="modal-input" style="padding:6px 10px; font-size:.78rem; width:auto;">
                 <span style="color:var(--c-text3);">—</span>
-                <input type="date" id="tx-date-to" class="modal-input" style="padding:6px 10px; font-size:.78rem; width:auto;">
+                <input type="date" id="tx-date-to" aria-label="Дата конца периода" class="modal-input" style="padding:6px 10px; font-size:.78rem; width:auto;">
                 <button class="ghost-button" type="button" id="tx-date-reset" style="font-size:.74rem; padding:6px 10px;">Сбросить</button>
                 <button class="ghost-button" type="button" id="tx-export-csv" style="font-size:.74rem; padding:6px 10px; display:inline-flex; align-items:center; gap:5px;" title="Скачать операции в CSV"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>CSV</button>
             </div>
@@ -109,7 +110,7 @@
                     <div id="drop-zone" style="border:2px dashed var(--c-border); border-radius:var(--r-md); padding:32px 24px; text-align:center; cursor:pointer; transition: all .25s;">
                         <div style="font-weight:600; margin-bottom:4px;" id="drop-label">Перетащите файл сюда или нажмите для выбора</div>
                         <div style="font-size:.78rem; color:var(--c-text3);">Тинькофф — PDF или CSV · Сбер, Альфа, ВТБ, Райффайзен — CSV</div>
-                        <input type="file" id="file-input" name="file" accept=".csv,.txt,.pdf" style="display:none;">
+                        <input type="file" id="file-input" aria-label="Файл банковской выписки" name="file" accept=".csv,.txt,.pdf" style="display:none;">
                     </div>
                 </div>
 
@@ -125,7 +126,7 @@
 {% endblock %}
 
 {% block modals %}
-<div class="modal-backdrop" id="transaction-modal" role="dialog" aria-modal="true" aria-hidden="true">
+<div class="modal-backdrop" id="transaction-modal" role="dialog" aria-modal="true" aria-hidden="true" inert>
     <div class="modal-card glass-panel">
         <div class="modal-head">
             <h3 class="modal-title" id="transaction-modal-title">Новая операция</h3>

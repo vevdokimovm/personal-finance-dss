@@ -3,6 +3,7 @@
 {% block page_title %}Цели накопления{% endblock %}
 
 {% block content %}
+    <h1 class="sr-only">Цели накопления</h1>
 <section class="glass-panel w-full">
     <div class="section-head">
         <div>
@@ -21,7 +22,7 @@
 {% endblock %}
 
 {% block modals %}
-<div class="modal-backdrop" id="goal-modal" role="dialog" aria-modal="true" aria-hidden="true">
+<div class="modal-backdrop" id="goal-modal" role="dialog" aria-modal="true" aria-hidden="true" inert>
     <div class="modal-card glass-panel">
         <div class="modal-head">
             <h3 class="modal-title">Новая цель</h3>

@@ -3,6 +3,7 @@
 {% block page_title %}Финансовый обзор{% endblock %}
 
 {% block content %}
+    <h1 class="sr-only">Финансовый обзор</h1>
 <!-- Онбординг: как начать (можно свернуть) -->
 <details id="onboarding-panel" class="glass-panel" style="margin-bottom:20px; padding:0;" open>
     <summary style="cursor:pointer; padding:16px 24px; font-weight:700; font-size:.95rem; list-style:none; display:flex; align-items:center; gap:10px;">
@@ -152,7 +153,7 @@
 <section class="glass-panel" style="padding:20px; margin-top:20px;">
     <div style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom:4px;">
         <h3 style="font-size:.92rem; font-weight:700;">Куда уходят деньги</h3>
-        <select id="spending-period" style="font-size:.74rem; padding:5px 10px; background:rgba(0,0,0,.15); border:1px solid var(--c-border); color:var(--c-text); border-radius:var(--r-sm); font-family:inherit;">
+        <select id="spending-period" aria-label="Период анализа расходов" style="font-size:.74rem; padding:5px 10px; background:rgba(0,0,0,.15); border:1px solid var(--c-border); color:var(--c-text); border-radius:var(--r-sm); font-family:inherit;">
             <option value="30">за 30 дней</option>
             <option value="90">за 90 дней</option>
             <option value="180">за полгода</option>
@@ -182,12 +183,12 @@
     <div id="budgets-list"><div style="font-size:.8rem; color:var(--c-text3);">Загрузка…</div></div>
     <form id="budget-form" style="display:flex; gap:10px; margin-top:16px; flex-wrap:wrap; align-items:flex-end;">
         <div style="flex:1; min-width:140px;">
-            <label style="font-size:.72rem; color:var(--c-text3); display:block; margin-bottom:4px;">Категория</label>
+            <label style="font-size:.72rem; color:var(--c-text3); display:block; margin-bottom:4px;" for="budget-category">Категория</label>
             <input id="budget-category" type="text" placeholder="Продукты" required
                    style="width:100%; padding:8px 10px; border-radius:8px; border:1px solid var(--c-border); background:var(--c-bg); color:var(--c-text);">
         </div>
         <div style="width:130px;">
-            <label style="font-size:.72rem; color:var(--c-text3); display:block; margin-bottom:4px;">Лимит, ₽</label>
+            <label style="font-size:.72rem; color:var(--c-text3); display:block; margin-bottom:4px;" for="budget-limit">Лимит, ₽</label>
             <input id="budget-limit" type="number" min="1" step="100" placeholder="15000" required
                    style="width:100%; padding:8px 10px; border-radius:8px; border:1px solid var(--c-border); background:var(--c-bg); color:var(--c-text);">
         </div>

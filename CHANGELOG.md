@@ -2,6 +2,38 @@
 
 Формат: [Keep a Changelog](https://keepachangelog.com/ru/1.0.0/). Версионирование — [SemVer](https://semver.org/lang/ru/).
 
+## [4.16.14] — 2026-06-24 — A11Y P1.1 (механическая часть): метки, заголовки, фокус модалок (PATCH)
+
+Первый заход по P1.1 (доступность): механические правила axe-core (critical/serious/moderate),
+без изменения визуала и без правки токенов контраста (контраст — отдельным заходом). Введён
+детерминированный TDD-харнесс, проверяющий a11y-инварианты рендером реальных страниц через TestClient.
+
+### tests/
+- `test_a11y_mechanical.py` (новый) — 90 проверок (15 SSR-страниц × 6 инвариантов): ровно один
+  `<h1>`; accessible-имя у каждого `<select>`/`<input>`; отсутствие фокус-ловушки в скрытых модалках
+  (`aria-hidden` без `inert`); отсутствие вложенной интерактивности; уникальность landmark.
+  Парсинг — `beautifulsoup4` (добавлен в `requirements-dev.txt`).
+
+### frontend/ — нулевой визуал
+- **Фокус модалок** (serious, `aria-hidden-focus`): все 8 модалок (`auth-modal` в base + obligation/
+  asset/goal/transaction) получают `inert` в скрытом состоянии; `openModal`/`closeModal` в `app.js`
+  и `auth.js` снимают/ставят `inert` синхронно с `aria-hidden`. Скрытая модалка больше не держит
+  фокусируемые поля в tab-order.
+- **Заголовки** (moderate, `page-has-heading-one`): 8 страниц без `<h1>` (dashboard, planning,
+  transactions, obligations, goals, banks, validation, profile) получили sr-only `<h1>` из своего
+  `page_title`. Добавлен утилити-класс `.sr-only`.
+- **Метки полей** (critical, `label` / `select-name`): `aria-label` для `spending-period`,
+  `forecast-horizon`, слайдеров `lmin`/`rbench`, дат `tx-date-from`/`tx-date-to`, `file-input`;
+  `for=` связал видимые подписи с `budget-category`, `budget-limit`, `scenario-income`, `scenario-expense`.
+
+### Проверки
+- a11y-харнесс: 90 passed (до правок — красный по h1 / label / select-name / focus-trap).
+- Регрессия: 538 unit/integration passed, 10 e2e passed — ноль падений.
+
+### Отложено (следующий заход P1.1)
+- Контраст токенов (`color-contrast`, 429 узлов) — правит визуал, делается отдельно вместе с Василием.
+- `nested-interactive` и `landmark-unique` оказались уже чисты на текущих роутах (правка не требовалась).
+
 ## [4.16.13] — 2026-06-24 — Docs enrichment: стек алгоритмов, UI/UX-стандарт, безопасность (PATCH)
 
 Расширен `docs/` — теория и стандарты, нужные для понимания и развития кода, перенесены/созданы

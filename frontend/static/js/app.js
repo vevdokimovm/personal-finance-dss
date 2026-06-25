@@ -58,8 +58,8 @@ async function api(url, opts = {}) {
     return d;
 }
 
-function openModal(m)  { if (m) { m.setAttribute('aria-hidden', 'false'); } }
-function closeModal(m) { if (m) { m.setAttribute('aria-hidden', 'true'); } }
+function openModal(m)  { if (m) { m.removeAttribute('inert'); m.setAttribute('aria-hidden', 'false'); } }
+function closeModal(m) { if (m) { m.setAttribute('inert', ''); m.setAttribute('aria-hidden', 'true'); } }
 
 // ── State ────────────────────────────────────────────────────
 const state = {
