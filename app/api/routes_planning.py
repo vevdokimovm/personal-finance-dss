@@ -1,7 +1,10 @@
 from __future__ import annotations
 
+import copy
 import csv
+import hashlib
 import io
+import json
 from datetime import datetime
 from typing import Any, Optional
 
@@ -29,10 +32,63 @@ from app.database.crud import (
 )
 from app.dependencies import get_current_user_id, get_db
 from app.services.cbr_rate import get_opportunity_cost_rate
+from app.services.cache import TTLCache
 from app.services.event_logger import log_event, log_recommendation
 from app.services.forecasting import forecast_indicators
 from app.services.currency import to_base_currency
 from app.services.planning import run_planning
+
+
+# ── Кэш расчёта плана (P1.2) ──────────────────────────────────────────────
+# Бутылочное горло /calculate — Monte Carlo внутри run_planning (нагрузочный P0.4).
+# Кэшируем по отпечатку РЕАЛЬНЫХ входов run_planning (после резолва prefs и r_bench),
+# а не по сырому payload: один набор данных с разным профилем риска обязан считаться
+# отдельно. Логирование событий остаётся в роуте и срабатывает на каждый вызов.
+_planning_cache = TTLCache(ttl_seconds=180, max_size=256)
+
+
+def _round_floats(obj: Any, ndigits: int = 4) -> Any:
+    if isinstance(obj, float):
+        return round(obj, ndigits)
+    if isinstance(obj, dict):
+        return {k: _round_floats(v, ndigits) for k, v in obj.items()}
+    if isinstance(obj, list):
+        return [_round_floats(v, ndigits) for v in obj]
+    return obj
+
+
+def _stable_items(items: list[dict[str, Any]]) -> list[str]:
+    # Порядконезависимый отпечаток списка записей: каждая запись → канонический JSON,
+    # список строк сортируется (порядок строк из БД не должен влиять на ключ).
+    return sorted(
+        json.dumps(_round_floats(it), sort_keys=True, default=str, ensure_ascii=False)
+        for it in items
+    )
+
+
+def _plan_fingerprint(
+    *,
+    income_total: float,
+    expense_total: float,
+    obligations: list[dict[str, Any]],
+    goals: list[dict[str, Any]],
+    bliq: float,
+    r_bench: float,
+    risk_tolerance: int,
+    l_min: float,
+) -> str:
+    payload = {
+        "income": round(float(income_total), 2),
+        "expense": round(float(expense_total), 2),
+        "bliq": round(float(bliq), 2),
+        "r_bench": round(float(r_bench), 6),
+        "risk": int(risk_tolerance),
+        "l_min": round(float(l_min), 4),
+        "obligations": _stable_items(obligations),
+        "goals": _stable_items(goals),
+    }
+    blob = json.dumps(payload, sort_keys=True, default=str, ensure_ascii=False)
+    return hashlib.sha256(blob.encode("utf-8")).hexdigest()
 
 
 class PlanningRequest(BaseModel):
@@ -174,6 +230,24 @@ def _compute_plan(
     # active_goals = только незакрытые цели
     active_goals = prepared["active_goals"]
 
+    cache_key = "plan:%s:%s" % (
+        user_id or "guest",
+        _plan_fingerprint(
+            income_total=income_total,
+            expense_total=expense_total,
+            obligations=prepared["obligations"],
+            goals=active_goals,
+            bliq=bliq,
+            r_bench=r_bench,
+            risk_tolerance=risk_tolerance,
+            l_min=l_min,
+        ),
+    )
+    cached = _planning_cache.get(cache_key)
+    if cached is not None:
+        # Копия: вызывающий (и логирование) не должны мутировать объект в кэше.
+        return copy.deepcopy(cached)
+
     result = run_planning(
         income_total=income_total,
         expense_total=expense_total,
@@ -198,6 +272,7 @@ def _compute_plan(
         "l_min": l_min,
         "risk_tolerance": risk_tolerance,
     }
+    _planning_cache.set(cache_key, copy.deepcopy(result))
     return result
 
 

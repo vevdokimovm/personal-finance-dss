@@ -53,11 +53,16 @@ def db_session():
 
 @pytest.fixture(autouse=True)
 def _clear_recommendation_cache():
-    """Кэш рекомендаций — модульный (живёт в процессе); чистим перед каждым тестом,
-    чтобы результаты не протекали между тестами."""
+    """Модульные кэши (живут в процессе) чистим перед каждым тестом, чтобы
+    результаты не протекали между тестами: кэш рекомендаций и кэш расчёта плана."""
     try:
         from app.api.routes_recommendation import _recommendation_cache
         _recommendation_cache.clear()
+    except Exception:
+        pass
+    try:
+        from app.api.routes_planning import _planning_cache
+        _planning_cache.clear()
     except Exception:
         pass
     yield
