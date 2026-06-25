@@ -51,6 +51,9 @@ def live_server() -> Iterator[str]:
         **os.environ,
         "SECRET_KEY": "test-secret-key-for-e2e",
         "DATABASE_URL": f"sqlite:///{db_path}",
+        # Браузер E2E ходит на динамический порт — кладём его origin в CORS,
+        # иначе CSRFMiddleware режет браузерные POST (recommendation и пр.) как чужой origin.
+        "CORS_ORIGINS": f"http://127.0.0.1:{port}",
     }
     proc = subprocess.Popen(
         [sys.executable, "-m", "uvicorn", "app.main:app",

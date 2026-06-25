@@ -73,3 +73,28 @@ jobs:
         run: mypy app --config-file=.mypy.ini
       - name: pylint
         run: pylint app --rcfile=.pylintrc
+
+  # ── E2E (браузерные): ИНФОРМАЦИОННЫЙ job, пока стабилизируется. ───────────
+  #    Гоняет реальный браузер на chromium и webkit (WebKit — источник прошлых
+  #    багов, BUG-022). Когда прогон стабильно зелёный — убрать continue-on-error
+  #    и добавить в required checks (branch protection).
+  e2e:
+    name: E2E браузерные (информационно)
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Установка зависимостей
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt -r requirements-dev.txt
+      - name: Установка браузеров Playwright
+        run: playwright install --with-deps chromium webkit
+      - name: E2E тесты (chromium + webkit)
+        env:
+          SECRET_KEY: test-secret-key-for-e2e
+        run: pytest -m e2e --browser chromium --browser webkit

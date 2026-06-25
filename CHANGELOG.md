@@ -2,6 +2,28 @@
 
 Формат: [Keep a Changelog](https://keepachangelog.com/ru/1.0.0/). Версионирование — [SemVer](https://semver.org/lang/ru/).
 
+## [4.16.4] — 2026-06-21 — E2E: причина падений найдена и закрыта + E2E в CI (PATCH)
+
+P0.1 — браузерные E2E удалось впервые реально прогнать (3/10 проходили, 7 падали по
+таймауту). Причина вскрыта и устранена.
+
+### Исправлено (BUG-024)
+- Семь E2E (использующие фикстуру `seeded`) падали: карточки дашборда не заполнялись.
+  Корневая причина — **CSRF**: `CSRFMiddleware` блокирует POST с чужого Origin, а E2E
+  live-server поднимается на *динамическом* порту, которого нет в дефолтном
+  `CORS_ORIGINS` (только `:8000`). Браузер слал `Origin: http://127.0.0.1:{port}` →
+  `/api/recommendation` отбивался 403 → JS молча не заполнял `#*-value` → таймаут
+  `wait_for_function`. В TestClient (pytest) Origin не отправляется, поэтому unit/integration
+  тесты проблему не видели. Продукт корректен (в проде Origin = домен из `CORS_ORIGINS`).
+  Фикс — тестовая инфра: `tests/e2e/conftest.py` кладёт динамический origin live-server в
+  `CORS_ORIGINS`. Диагностика подтверждена: `/api/recommendation` на demo-данных гостя
+  отдаёт 200 с indicators.
+
+### CI
+- Добавлен **E2E job** (`.github/workflows/ci.yml`): реальный браузерный прогон на
+  **chromium и webkit** (WebKit — источник прошлых багов, BUG-022). Пока информационный
+  (`continue-on-error`), до стабильного зелёного прогона на CI; затем — в required checks.
+
 ## [4.16.3] — 2026-06-21 — CI на GitHub Actions + PG-готовность тестов (PATCH)
 
 Непрерывная интеграция на каждый push/PR и приведение всего test-suite к зелёному на
