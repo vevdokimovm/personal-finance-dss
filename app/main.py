@@ -61,19 +61,25 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
+# Эндпоинты под rate-лимитом: чувствительные (auth, импорт, анализ) + дорогие compute-пути
+# (planning/calculate и /forecast — Monte Carlo; защита от ресурсного абьюза, P0.4 hardening).
+RATE_LIMITED_PREFIXES = (
+    "/api/recommendation",
+    "/api/banks",
+    "/api/analysis",
+    "/api/auth/login",
+    "/api/auth/register",
+    "/api/planning/calculate",
+    "/api/planning/forecast",
+    "/v1/analyze",
+)
+
 # Rate-limit добавляется первым → внутренний слой; CORS — внешний (перехватывает preflight).
 app.add_middleware(
     RateLimitMiddleware,
     limit=settings.RATE_LIMIT_REQUESTS,
     window_seconds=settings.RATE_LIMIT_WINDOW_SECONDS,
-    protected_prefixes=(
-        "/api/recommendation",
-        "/api/banks",
-        "/api/analysis",
-        "/api/auth/login",
-        "/api/auth/register",
-        "/v1/analyze",
-    ),
+    protected_prefixes=RATE_LIMITED_PREFIXES,
 )
 app.add_middleware(CSRFMiddleware, allowed_origins=settings.cors_origins_list)
 app.add_middleware(SecurityHeadersMiddleware, hsts=settings.is_production)

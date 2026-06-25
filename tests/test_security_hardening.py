@@ -114,3 +114,26 @@ class TestAmountValidation:
             json={"name": "G", "target_amount": 100000, "deadline": "2027-01-01T00:00:00"},
         )
         assert r.status_code in (200, 201)
+
+
+class TestCalculateRateLimited:
+    """calculate/forecast (дорогие Monte Carlo пути) — под rate-лимитом (P0.4 hardening)."""
+
+    def _mw(self):
+        from app.main import RATE_LIMITED_PREFIXES
+        from app.middleware import RateLimitMiddleware
+
+        return RateLimitMiddleware(
+            app=None, limit=30, window_seconds=60, protected_prefixes=RATE_LIMITED_PREFIXES
+        )
+
+    def test_calculate_is_protected(self) -> None:
+        assert self._mw()._is_protected("/api/planning/calculate")
+
+    def test_forecast_is_protected(self) -> None:
+        assert self._mw()._is_protected("/api/planning/forecast")
+
+    def test_light_planning_not_protected(self) -> None:
+        mw = self._mw()
+        assert not mw._is_protected("/api/planning/key-rate")
+        assert not mw._is_protected("/api/planning/scenarios")

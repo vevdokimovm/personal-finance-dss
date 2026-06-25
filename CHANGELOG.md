@@ -2,6 +2,20 @@
 
 Формат: [Keep a Changelog](https://keepachangelog.com/ru/1.0.0/). Версионирование — [SemVer](https://semver.org/lang/ru/).
 
+## [4.16.12] — 2026-06-23 — Hardening: rate-лимит на дорогие compute-пути (PATCH)
+
+Закрыта находка из P0.4: самый дорогой путь (`planning/calculate`, Monte Carlo) был без защиты от
+ресурсного абьюза, тогда как дешёвый `recommendation` — под лимитом. Ядро не тронуто.
+
+### app/
+- `main.py` — список защищённых путей вынесен в константу `RATE_LIMITED_PREFIXES`; добавлены
+  `/api/planning/calculate` и `/api/planning/forecast` (оба гоняют Monte Carlo). Лимит общий —
+  30 req/60с на (IP + путь). Лёгкие `planning/key-rate`, `/scenarios` намеренно не лимитируются.
+
+### tests/
+- `test_security_hardening.py::TestCalculateRateLimited` — `calculate`/`forecast` под лимитом,
+  лёгкие planning-пути — нет. TDD: red → green.
+
 ## [4.16.11] — 2026-06-23 — P0.4 нагрузочное тестирование + вахтенный журнал (PATCH)
 
 P0.4: добавлен переиспользуемый locust-сценарий и снят baseline. Код/ядро не тронуты.
