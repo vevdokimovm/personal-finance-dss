@@ -91,3 +91,15 @@ def seeded(base_url: str) -> str:
     request = urllib.request.Request(base_url + "/api/demo/load", method="POST")
     urllib.request.urlopen(request, timeout=15)
     return base_url
+
+
+@pytest.fixture(scope="session")
+def browser_type_launch_args(browser_type_launch_args, browser_type):
+    """Флаги запуска chromium для контейнеров/CI, где browser-sandbox недоступен,
+    а /dev/shm мал. Применяются только к chromium (webkit их не понимает)."""
+    if browser_type.name == "chromium":
+        return {
+            **browser_type_launch_args,
+            "args": ["--no-sandbox", "--disable-dev-shm-usage", "--disable-gpu"],
+        }
+    return browser_type_launch_args
