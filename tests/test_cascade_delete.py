@@ -21,20 +21,27 @@ def _user(db, uid="u-del"):
     return uid
 
 
-def test_delete_goal_with_contributions(db_session) -> None:
+def test_delete_goal_is_soft_and_keeps_contributions(db_session) -> None:
     uid = _user(db_session, "u-goal")
     goal = crud.create_goal(
         db_session, name="G", target_amount=1000.0, current_amount=0.0,
         deadline=datetime.utcnow() + timedelta(days=30), user_id=uid,
     )
     crud.record_goal_contribution(db_session, goal.id, amount=100.0)
-    # На PG это падало бы FK violation без предварительной очистки истории.
+    # P1.7: мягкое удаление — запись помечается, история взносов сохраняется для restore.
     result = crud.delete_goal(db_session, goal.id, user_id=uid)
     assert result is not None
-    assert db_session.get(GoalContribution, 1) is None
+    assert result.is_deleted is True
+    assert goal.id not in [g.id for g in crud.get_goals(db_session, user_id=uid)]
+    kept = db_session.query(GoalContribution).filter(GoalContribution.goal_id == goal.id).count()
+    assert kept == 1
+    # restore возвращает цель в выборку
+    restored = crud.restore_goal(db_session, goal.id, user_id=uid)
+    assert restored is not None and restored.is_deleted is False
+    assert goal.id in [g.id for g in crud.get_goals(db_session, user_id=uid)]
 
 
-def test_delete_obligation_with_payments(db_session) -> None:
+def test_delete_obligation_is_soft_and_keeps_payments(db_session) -> None:
     uid = _user(db_session, "u-obl")
     obl = crud.create_obligation(
         db_session, name="O", amount=5000.0, interest_rate=0.1, term=12,
@@ -43,7 +50,12 @@ def test_delete_obligation_with_payments(db_session) -> None:
     crud.record_obligation_payment(db_session, obl.id, amount=500.0)
     result = crud.delete_obligation(db_session, obl.id, user_id=uid)
     assert result is not None
-    assert db_session.query(ObligationPayment).count() == 0
+    assert result.is_deleted is True
+    assert obl.id not in [o.id for o in crud.get_obligations(db_session, user_id=uid)]
+    kept = db_session.query(ObligationPayment).filter(
+        ObligationPayment.obligation_id == obl.id
+    ).count()
+    assert kept == 1
 
 
 def test_delete_user_purges_all_personal_data(db_session) -> None:

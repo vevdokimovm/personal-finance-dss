@@ -2,6 +2,40 @@
 
 Формат: [Keep a Changelog](https://keepachangelog.com/ru/1.0.0/). Версионирование — [SemVer](https://semver.org/lang/ru/).
 
+## [4.16.18] — 2026-06-24 — P1.7: симметричный soft-delete + undo для обязательств, целей, активов (PATCH)
+
+Транзакции имели мягкое удаление и восстановление (BUG-03), а обязательства, цели и
+ликвидные активы удалялись **жёстко, с каскадным сносом истории** — несимметрично и
+опасно (случайное удаление безвозвратно). Распространяем тот же паттерн на эти три
+сущности: восстановимое удаление + REST-эндпоинты undo. UI-модалки undo для всех
+сущностей — в отдельный дизайн-блок.
+
+- **Модель:** в `Obligation`, `Goal`, `LiquidAsset` добавлены `is_deleted` (Boolean, index)
+  и `deleted_at` — копия полей `Transaction`.
+- **Миграция 0018** — колонки в три таблицы (`server_default=sa.false()` для PostgreSQL),
+  индекс по `is_deleted` на каждой.
+- **crud:** `delete_obligation`/`delete_goal`/`delete_liquid_asset` теперь мягкие (флаг +
+  `deleted_at`); добавлены `restore_*`; `get_obligations`/`get_goals`/`get_liquid_assets`
+  фильтруют `is_deleted IS FALSE`. **Hard-каскад истории убран** — платежи/взносы остаются
+  привязанными и возвращаются при restore. `delete_user` (152-ФЗ, полный physical purge)
+  использует прямой SQL и не затронут — аккаунт по-прежнему удаляется со всеми данными.
+- **Безопасность:** `restore_*` проверяют владельца (`user_id`) — строже образца
+  `restore_transaction`; чужой не может ни удалить, ни восстановить запись.
+- **API:** `POST /obligations/{id}/restore`, `POST /goals/{id}/restore`,
+  `POST /liquid-assets/{id}/restore` (по образцу restore транзакции; событие `*_restored`).
+
+### tests/
+- `test_soft_delete.py` (новый, 6 проверок) — soft-delete скрывает запись из `get_*` и
+  ставит флаг; restore возвращает; изоляция владельца (чужой не удалит/не восстановит);
+  повторное удаление — no-op; end-to-end REST для обязательства (create→delete→restore).
+- `test_cascade_delete.py` — тесты удаления цели/обязательства переписаны под новый
+  контракт: запись помечается, история **сохраняется** (раньше проверялось физическое
+  каскадное удаление). Тест полного покрытия `delete_user` (152-ФЗ) не тронут.
+
+> Миграция 0018 + вся матрица (558) прогнаны на PostgreSQL 16.14 (поднят в песочнице:
+> apt + pg_ctlcluster + `DATABASE_URL=postgresql+psycopg://...`). FK на PG реальны — каскадное
+> поведение soft-delete проверено по-настоящему.
+
 ## [4.16.17] — 2026-06-24 — P1.6: подключение Sentry-мониторинга в lifespan (PATCH)
 
 `init_sentry` существовал в `observability.py` (вместе с зависимостью

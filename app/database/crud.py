@@ -337,7 +337,7 @@ def create_obligation(
 def get_obligations(
     db: Session, active_only: bool = False, user_id: Optional[str] = None
 ) -> list[Obligation]:
-    query = db.query(Obligation)
+    query = db.query(Obligation).filter(Obligation.is_deleted.is_(False))
     if active_only:
         query = query.filter(Obligation.is_active.is_(True))
     query = _owner_filter(query, Obligation, user_id)
@@ -347,12 +347,29 @@ def get_obligations(
 def delete_obligation(
     db: Session, obligation_id: int, user_id: Optional[str] = None
 ) -> Optional[Obligation]:
+    """Мягкое удаление (P1.7): запись помечается удалённой и может быть восстановлена.
+    История платежей сохраняется (привязана к записи) и возвращается при restore."""
     obligation = db.get(Obligation, obligation_id)
-    if obligation is None or obligation.user_id != user_id:
+    if obligation is None or obligation.is_deleted or obligation.user_id != user_id:
         return None
-    db.execute(delete(ObligationPayment).where(ObligationPayment.obligation_id == obligation_id))
-    db.delete(obligation)
+    obligation.is_deleted = True
+    obligation.deleted_at = datetime.utcnow()
     db.commit()
+    db.refresh(obligation)
+    return obligation
+
+
+def restore_obligation(
+    db: Session, obligation_id: int, user_id: Optional[str] = None
+) -> Optional[Obligation]:
+    """Восстановление мягко удалённого обязательства (P1.7)."""
+    obligation = db.get(Obligation, obligation_id)
+    if obligation is None or not obligation.is_deleted or obligation.user_id != user_id:
+        return None
+    obligation.is_deleted = False
+    obligation.deleted_at = None
+    db.commit()
+    db.refresh(obligation)
     return obligation
 
 
@@ -441,7 +458,7 @@ def create_goal(
 def get_goals(
     db: Session, active_only: bool = False, user_id: Optional[str] = None
 ) -> list[Goal]:
-    query = db.query(Goal)
+    query = db.query(Goal).filter(Goal.is_deleted.is_(False))
     if active_only:
         query = query.filter(Goal.is_active.is_(True))
     query = _owner_filter(query, Goal, user_id)
@@ -449,12 +466,26 @@ def get_goals(
 
 
 def delete_goal(db: Session, goal_id: int, user_id: Optional[str] = None) -> Optional[Goal]:
+    """Мягкое удаление (P1.7): цель помечается удалённой, история взносов сохраняется."""
     goal = db.get(Goal, goal_id)
-    if goal is None or goal.user_id != user_id:
+    if goal is None or goal.is_deleted or goal.user_id != user_id:
         return None
-    db.execute(delete(GoalContribution).where(GoalContribution.goal_id == goal_id))
-    db.delete(goal)
+    goal.is_deleted = True
+    goal.deleted_at = datetime.utcnow()
     db.commit()
+    db.refresh(goal)
+    return goal
+
+
+def restore_goal(db: Session, goal_id: int, user_id: Optional[str] = None) -> Optional[Goal]:
+    """Восстановление мягко удалённой цели (P1.7)."""
+    goal = db.get(Goal, goal_id)
+    if goal is None or not goal.is_deleted or goal.user_id != user_id:
+        return None
+    goal.is_deleted = False
+    goal.deleted_at = None
+    db.commit()
+    db.refresh(goal)
     return goal
 
 
@@ -519,18 +550,36 @@ def create_liquid_asset(
 
 
 def get_liquid_assets(db: Session, user_id: Optional[str] = None) -> list[LiquidAsset]:
-    query = _owner_filter(db.query(LiquidAsset), LiquidAsset, user_id)
+    query = db.query(LiquidAsset).filter(LiquidAsset.is_deleted.is_(False))
+    query = _owner_filter(query, LiquidAsset, user_id)
     return query.order_by(LiquidAsset.id.desc()).all()
 
 
 def delete_liquid_asset(
     db: Session, asset_id: int, user_id: Optional[str] = None
 ) -> Optional[LiquidAsset]:
+    """Мягкое удаление (P1.7): актив помечается удалённым и может быть восстановлен."""
     asset = db.get(LiquidAsset, asset_id)
-    if asset is None or asset.user_id != user_id:
+    if asset is None or asset.is_deleted or asset.user_id != user_id:
         return None
-    db.delete(asset)
+    asset.is_deleted = True
+    asset.deleted_at = datetime.utcnow()
     db.commit()
+    db.refresh(asset)
+    return asset
+
+
+def restore_liquid_asset(
+    db: Session, asset_id: int, user_id: Optional[str] = None
+) -> Optional[LiquidAsset]:
+    """Восстановление мягко удалённого ликвидного актива (P1.7)."""
+    asset = db.get(LiquidAsset, asset_id)
+    if asset is None or not asset.is_deleted or asset.user_id != user_id:
+        return None
+    asset.is_deleted = False
+    asset.deleted_at = None
+    db.commit()
+    db.refresh(asset)
     return asset
 
 

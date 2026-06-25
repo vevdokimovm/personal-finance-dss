@@ -7,6 +7,7 @@ from app.database.crud import (
     create_obligation,
     delete_obligation,
     get_obligations,
+    restore_obligation,
 )
 from app.dependencies import get_current_user_id, get_db
 from app.schemas.obligation import ObligationCreate, ObligationResponse
@@ -77,3 +78,23 @@ def delete_obligation_endpoint(
             detail="Обязательство не найдено.",
         )
     return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+
+@router.post(
+    "/obligations/{obligation_id}/restore",
+    response_model=ObligationResponse,
+    summary="Восстановить удалённое обязательство (undo)",
+)
+def restore_obligation_endpoint(
+    obligation_id: int,
+    db: Session = Depends(get_db),
+    user_id: str | None = Depends(get_current_user_id),
+) -> ObligationResponse:
+    obligation = restore_obligation(db=db, obligation_id=obligation_id, user_id=user_id)
+    if obligation is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Удалённое обязательство не найдено.",
+        )
+    log_event("obligation_restored", {"obligation_id": obligation_id})
+    return obligation

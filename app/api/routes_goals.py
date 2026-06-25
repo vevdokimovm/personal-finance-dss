@@ -3,7 +3,7 @@ from __future__ import annotations
 from fastapi import APIRouter, Depends, HTTPException, Response, status
 from sqlalchemy.orm import Session
 
-from app.database.crud import create_goal, delete_goal, get_goals
+from app.database.crud import create_goal, delete_goal, get_goals, restore_goal
 from app.dependencies import get_current_user_id, get_db
 from app.schemas.goal import GoalCreate, GoalResponse
 from app.services.event_logger import log_event
@@ -63,3 +63,20 @@ def delete_goal_endpoint(
     if delete_goal(db, goal_id, user_id=user_id) is None:
         raise HTTPException(status_code=404, detail="Цель не найдена")
     return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+
+@router.post(
+    "/{goal_id}/restore",
+    response_model=GoalResponse,
+    summary="Восстановить удалённую цель (undo)",
+)
+def restore_goal_endpoint(
+    goal_id: int,
+    db: Session = Depends(get_db),
+    user_id: str | None = Depends(get_current_user_id),
+) -> GoalResponse:
+    goal = restore_goal(db, goal_id, user_id=user_id)
+    if goal is None:
+        raise HTTPException(status_code=404, detail="Удалённая цель не найдена")
+    log_event("goal_restored", {"goal_id": goal_id})
+    return goal

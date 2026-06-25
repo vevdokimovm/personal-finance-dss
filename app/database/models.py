@@ -135,6 +135,8 @@ class Obligation(Base):
     is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True, index=True)
     closed_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
     comment: Mapped[Optional[str]] = mapped_column(EncryptedString, nullable=True)
+    is_deleted: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False, index=True)
+    deleted_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
 
 
 class Goal(Base):
@@ -163,6 +165,8 @@ class Goal(Base):
     is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True, index=True)
     achieved_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
     comment: Mapped[Optional[str]] = mapped_column(EncryptedString, nullable=True)
+    is_deleted: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False, index=True)
+    deleted_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
 
 
 class Budget(Base):
@@ -210,6 +214,8 @@ class LiquidAsset(Base):
     interest_rate: Mapped[Decimal] = mapped_column(Numeric(6, 4), nullable=False, default=0.0)
     type: Mapped[str] = mapped_column(String(32), nullable=False, default="deposit")
     comment: Mapped[Optional[str]] = mapped_column(EncryptedString, nullable=True)
+    is_deleted: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False, index=True)
+    deleted_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
 
 
 class ObligationPayment(Base):

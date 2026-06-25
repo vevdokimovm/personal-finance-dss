@@ -27,25 +27,37 @@
 
 ## §0. RESUME POINT — отсюда продолжаем
 
-- **Версия кода:** `v4.16.17`
-- **Последний завершённый батч:** v4.16.17 — **P1.6: подключение Sentry в lifespan.**
-  `init_sentry` существовал в `observability.py` (+ зависимость `sentry-sdk[fastapi]`,
-  настройка `SENTRY_DSN`), но **не вызывался** — мёртвый код. Добавлен вызов первым шагом
-  `lifespan` (`release=APP_VERSION`, `environment=ENVIRONMENT`); без DSN — no-op. Гард
-  `test_observability.py::TestSentry` +2 (проброс в `sentry_sdk.init` + вызов из lifespan).
-- **Предыдущий батч:** v4.16.16 — P1.2 кэш `/calculate` (см. §3).
-- **[СЛЕДУЮЩЕЕ] P1.7 — Undo на удаление, бэк-часть.** Транзакции **уже готовы целиком** (crud
-  `delete/restore_transaction` + API `/transactions/{id}/restore`, BUG-03). Незакрыто:
-  симметричный soft-delete для **Obligation / Goal / LiquidAsset** (сейчас hard delete с
-  каскадом). План: поля `is_deleted`/`deleted_at` в 3 модели (копия Transaction), миграция
-  **0018** (`server_default=sa.false()` для PG), `delete_*`→soft + `restore_*` + фильтр в
-  `get_*`, убрать hard-каскад payments/contributions (дети остаются, при restore возвращаются),
-  3 API restore-эндпоинта. UI-модалки undo для всех сущностей → дизайн-блок. Миграцию проверить
-  на PG (в песочнице только SQLite — PG на стороне Василия/CI).
-- **Маршрут бэк-захода (по команде «бэк по максу», UI отложен):** P1.6 ✅ → **P1.7** →
-  P2.4 (spending-advice слой 3) → P2.5 (экспорт XLSX/PDF) → P2.6 (история плана, бэк) →
-  P2.7 (обучение категоризации) → P3.5 (A/B-разбивка). Отложено в дизайн-блок: P1.5, P2.1,
-  P2.2, P3.1/P3.2. Вне песочницы: P3.3/P3.6/P3.7.
+- **Версия кода:** `v4.16.18`
+- **Последний завершённый батч:** v4.16.18 — **P1.7: симметричный soft-delete + undo** для
+  Obligation / Goal / LiquidAsset (транзакции уже имели это с BUG-03). Поля
+  `is_deleted`/`deleted_at` в 3 модели, миграция **0018** (`server_default=sa.false()`),
+  `delete_*`→мягкие + `restore_*` + фильтр в `get_*`, hard-каскад истории убран (дети
+  возвращаются при restore). `restore_*` проверяют владельца. 3 API restore-эндпоинта.
+  `delete_user` (152-ФЗ physical purge) **не затронут** (прямой SQL). Гарды
+  `test_soft_delete.py` (6) + переписан `test_cascade_delete` под новый контракт. UI-модалки
+  undo → дизайн-блок. Проверено: **558 unit/integration + 10 e2e**, ноль падений.
+- **Предыдущие:** v4.16.17 — P1.6 Sentry в lifespan; v4.16.16 — P1.2 кэш `/calculate` (см. §3).
+- **[СЛЕДУЮЩЕЕ] P2.4 — spending-advice слой 3** (temporal-паттерны + goal-aware советы).
+  Слои 1-2 готовы. **Чистый бэк, разрешено** трогать `spending_advice.py` (исключение §6.2).
+  Без миграции. **РАЗВЕДАНО (дизайн-план для следующего захода):**
+  - Поток: `routes_planning::spending_advice_endpoint` → `services/spending.py::get_spending_advice`
+    (ORM→ExpenseRecord) → `SpendingAdvisor` (`core/spending_advice.py`).
+  - `ExpenseRecord = {category, amount, period 'YYYY-MM', merchant}`. **period есть** → тренды
+    по месяцам реальны; **точной даты нет** → дни недели/внутримесячное потребуют расширения
+    ExpenseRecord (+поле date в services/spending.py при конвертации).
+  - **Цели в advisor НЕ передаются** → для goal-aware пробросить `goals` в `get_spending_advice`
+    + новый метод advisor'а.
+  - Слой 3 = (A) **temporal**: slope/momentum категории по периодам + dataclass `TemporalPattern`
+    («категория X растёт N% в месяц»); (B) **goal-aware**: связать `potential_saving` с целями
+    («экономия 5к/мес закроет цель X на N мес раньше»). Разумно разбить: A → 4.16.19, B → след.
+    Это алгоритмический дизайн (финточность критична) — брать со свежим контекстом, не впопыхах.
+- **Маршрут бэк-захода (UI отложен):** P1.6 ✅ → P1.7 ✅ → **P2.4** → P2.5 (экспорт XLSX/PDF)
+  → P2.6 (история плана, бэк) → P2.7 (обучение категоризации) → P3.5 (A/B-разбивка).
+  Отложено в дизайн-блок: P1.5, P2.1, P2.2, P3.1/P3.2. Вне песочницы: P3.3/P3.6/P3.7.
+- **PostgreSQL-матрица ПРОЙДЕНА В ПЕСОЧНИЦЕ (v4.16.18).** Миграция 0018 + **вся матрица
+  (558 тестов) зелёные на PostgreSQL 16.14**, поднятом локально в песочнице. Долга по PG нет.
+  Как поднять PG в песочнице — см. §5 (apt + pg_ctlcluster + DATABASE_URL). SQLite-only — миф,
+  PG гоняется здесь.
 
 ---
 
@@ -78,10 +90,11 @@
 
 ## §2. Состояние и статус роадмапа
 
-- **Версия:** v4.16.17. **Тесты:** база зелёная на SQLite; ключевые слои зелёные и на
-  PostgreSQL. Покрытие — гейт 90% (последний полный прогон 90.80%). Последний полный локальный
-  прогон в песочнице — на **v4.16.17: 552 unit/integration passed + 10 E2E passed**, ноль
-  падений (фронт НЕ тронут; v4.16.16 — кэш `run_planning`, v4.16.17 — Sentry в lifespan).
+- **Версия:** v4.16.18. **Тесты:** база зелёная на SQLite; **вся матрица (558) зелёная и на
+  PostgreSQL 16.14 — прогон выполнен в песочнице** (PG поднимается локально, см. §5).
+  Покрытие — гейт 90% (последний полный прогон 90.80%). Последний полный локальный прогон —
+  **v4.16.18: 558 unit/integration passed (SQLite И PostgreSQL) + 10 E2E passed**, ноль
+  падений (фронт НЕ тронут; P1.7 — soft-delete в crud/моделях, миграция 0018, API restore).
 - **Источник приоритетов — `03_Будущий_роадмап.md`** (P0-P3); полный срез всех пунктов
   продублирован ниже, чтобы журнал был самодостаточен без файла роадмапа. Идём строго по порядку номеров.
 
@@ -112,7 +125,9 @@
 - [ ] P1.5 UI по дизайн-стандарту (`06_ТЗ_на_современный_UI.md`).
 - [x] P1.6 Мониторинг/алертинг — **закрыт (v4.16.17).** `init_sentry` подключён в `lifespan`
   (`release=APP_VERSION`); existed но не вызывался. DSN — на VPS. Гард `TestSentry` (+2). См. §3.
-- [ ] P1.7 Undo-модалки на удаление.
+- [x] P1.7 Undo-модалки на удаление — **бэк закрыт (v4.16.18).** Симметричный soft-delete +
+  restore + 3 API-эндпоинта для Obligation/Goal/LiquidAsset (транзакции были готовы с BUG-03).
+  Миграция 0018. UI-модалки undo → **дизайн-блок** (вместе с P1.5). См. §3/§4.
 
 **P2 — желательный функционал (бэк часто уже готов — перед реализацией сверяйся с §4):**
 - [ ] P2.1 UI реферальной программы — **бэк готов** (`/referral/me`); нужна страница: код,
@@ -146,7 +161,19 @@
 
 ---
 
-## §3. Журнал сделанного (новое сверху; ветка v4.16.1 → v4.16.17)
+## §3. Журнал сделанного (новое сверху; ветка v4.16.1 → v4.16.18)
+
+- **v4.16.18** — P1.7: симметричный soft-delete + undo для Obligation/Goal/LiquidAsset
+  (**P1.7-бэк закрыт**). Транзакции имели мягкое удаление (BUG-03), остальные три сущности
+  удалялись жёстко с каскадом — несимметрично/опасно. Добавлены `is_deleted`/`deleted_at` в
+  3 модели, миграция 0018 (`server_default=sa.false()` для PG, индекс по `is_deleted`),
+  `delete_*`→мягкие, `restore_*`, фильтр `is_deleted IS FALSE` в `get_*`. **Hard-каскад истории
+  убран** (платежи/взносы остаются и возвращаются при restore). `restore_*` проверяют
+  владельца (строже образца transaction). `delete_user` (152-ФЗ physical purge) не затронут
+  (прямой SQL). 3 API restore-эндпоинта (`*_restored` события). Гарды `test_soft_delete.py`
+  (6) + `test_cascade_delete` переписан под новый контракт. UI-модалки → дизайн-блок.
+  Проверено: 558 unit/integration + 10 e2e, ноль падений. **Миграция 0018 + вся матрица
+  прогнаны и на PostgreSQL 16.14 в песочнице** (см. §5).
 
 - **v4.16.17** — P1.6: подключение Sentry в `lifespan` (**P1.6 закрыт**). `init_sentry` в
   `observability.py` существовал (с зависимостью `sentry-sdk[fastapi]` и `SENTRY_DSN`), но
@@ -271,6 +298,20 @@
     кэш протекал бы между тестами и давал бы ложные «0 пересчётов» в спай-проверках.
   - Что НЕ делалось намеренно: инвалидация по `today` (за TTL 180с протухнет сам); кэш
     forecast-роута (бутылочное горло — `calculate`, не `forecast`).
+- **P1.7 — soft-delete ЗАКРЫТ в v4.16.18 (Obligation/Goal/LiquidAsset).** Не переоткрывать:
+  - **`delete_user` (152-ФЗ) НЕ трогали** — он делает physical purge прямым SQL
+    (`db.execute(delete(...))`), не через `delete_*`-функции, поэтому soft-delete их не задел.
+    Аккаунт по-прежнему удаляется со всеми ПДн (тест `test_delete_user_purges_all_personal_data`).
+  - **Hard-каскад истории убран** из `delete_obligation`/`delete_goal`: дети
+    (payments/contributions) остаются привязанными и возвращаются при restore. Поэтому
+    `test_cascade_delete` тесты 1-2 переписаны (раньше проверяли физическое удаление детей).
+  - `restore_*` проверяют `user_id` (изоляция) — асимметрия с `restore_transaction`, который
+    владельца НЕ проверяет (можно ужесточить отдельно, не в скоупе P1.7).
+  - **Edge-case (известный, не блокер):** при soft-delete привязанного `LiquidAsset`
+    (`goal.linked_asset_id`) цель ссылается на скрытый актив; конверт (`apply_envelopes`) не
+    найдёт его в `get_liquid_assets`. Для undo приемлемо (restore возвращает). Если всплывёт —
+    отвязывать цель при удалении актива или предупреждать.
+  - **UI-модалки undo** для всех сущностей — в дизайн-блок (бэк готов, фронт нет).
 - **Код часто опережает роадмап** — перед «реализовать с нуля» проверяй код: уже оказались готовы
   rate limiting, CSRF, security-заголовки, SMTP, контейнеризация.
 
@@ -292,6 +333,18 @@
   сайд-эффекты, которые обязаны выполняться всегда (логирование, аналитика). Ключ строится по
   **эффективным входам функции** (после резолва дефолтов/prefs), иначе кэш «слипает» логически
   разные запросы и отдаёт чужой результат. (P1.2, v4.16.16.)
+- **PostgreSQL ПОДНИМАЕТСЯ В ПЕСОЧНИЦЕ — не спихивать PG-проверку на разработчика.**
+  Драйвер `psycopg[binary]` в requirements, `apt` доступен (archive.ubuntu.com в allowlist),
+  пользователь — root. Процедура (один раз за сессию):
+  1. `apt-get update -qq && DEBIAN_FRONTEND=noninteractive apt-get install -y -qq postgresql postgresql-contrib`
+  2. `pg_ctlcluster 16 main start` (кластер `main` создаётся пакетом; порт 5432).
+  3. Роль/БД: `su postgres -c "psql -c \"CREATE USER finpilot WITH PASSWORD 'finpilot' SUPERUSER;\""`
+     + `... CREATE DATABASE finpilot_test OWNER finpilot;`
+  4. Прогон: `DATABASE_URL="postgresql+psycopg://finpilot:finpilot@localhost:5432/finpilot_test"
+     SECRET_KEY=x ./.venv/bin/python -m pytest ...` (формат psycopg3 — `postgresql+psycopg://`).
+     `conftest.py` уважает внешний `DATABASE_URL` и гоняет тот же набор на PG.
+  Это и есть обязательная PG-половина матрицы (§6.3) — критична, т.к. SQLite молча игнорирует FK.
+  На v4.16.18 вся матрица (558) прошла на PG 16.14 в песочнице.
 
 ---
 

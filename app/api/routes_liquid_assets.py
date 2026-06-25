@@ -7,9 +7,11 @@ from app.database.crud import (
     create_liquid_asset,
     delete_liquid_asset,
     get_liquid_assets,
+    restore_liquid_asset,
 )
 from app.dependencies import get_current_user_id, get_db
 from app.schemas.liquid_asset import LiquidAssetCreate, LiquidAssetResponse
+from app.services.event_logger import log_event
 
 router = APIRouter(prefix="/liquid-assets", tags=["Ликвидные активы"])
 
@@ -54,3 +56,20 @@ def remove_asset(
     if delete_liquid_asset(db, asset_id, user_id=user_id) is None:
         raise HTTPException(status_code=404, detail="Актив не найден")
     return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+
+@router.post(
+    "/{asset_id}/restore",
+    response_model=LiquidAssetResponse,
+    summary="Восстановить удалённый ликвидный актив (undo)",
+)
+def restore_asset(
+    asset_id: int,
+    db: Session = Depends(get_db),
+    user_id: str | None = Depends(get_current_user_id),
+) -> LiquidAssetResponse:
+    asset = restore_liquid_asset(db, asset_id, user_id=user_id)
+    if asset is None:
+        raise HTTPException(status_code=404, detail="Удалённый актив не найден")
+    log_event("liquid_asset_restored", {"asset_id": asset_id})
+    return asset
