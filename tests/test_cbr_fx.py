@@ -1,10 +1,14 @@
-"""Живые курсы валют от ЦБ РФ (P2.3).
+"""Живые курсы валют от ЦБ РФ (P2.3 / P0.3).
 
-Парсинг тестируется на фикстуре XML_daily. Реальный fetch с cbr.ru из песочницы
-недоступен (только fallback) — живая проверка fetch выполняется на Docker.
+Парсинг тестируется и на синтетике, и на реальной фикстуре ответа ЦБ (XML_daily,
+снята с боевого формата — научная нотация, крупные номиналы, VunitRate). Сетевой fetch
+с cbr.ru из песочницы напрямую недоступен: cbr.ru отдаёт 403 на IP дата-центров — этот
+кейс покрыт тестом fallback. Живой сетевой fetch проверяется на проде с подходящим IP.
 """
 from __future__ import annotations
 
+import urllib.error
+from pathlib import Path
 from unittest.mock import patch
 
 import pytest
@@ -46,9 +50,49 @@ class TestParseCbrXml:
         assert parse_cbr_fx_xml("не xml вовсе") == {}
 
 
+_REAL_FIXTURE = Path(__file__).parent / "fixtures" / "cbr_daily_sample.xml"
+
+
+class TestParseRealCbrResponse:
+    """Парсинг на реальном ответе ЦБ (XML_daily, 23.06.2026): научная нотация,
+    крупные номиналы, поле VunitRate. Фикстура снята с боевого формата."""
+
+    @pytest.fixture
+    def rates(self) -> dict[str, float]:
+        return parse_cbr_fx_xml(_REAL_FIXTURE.read_text(encoding="utf-8"))
+
+    def test_usd_pivot(self, rates: dict[str, float]) -> None:
+        assert rates["USD"] == 1.0
+
+    def test_major_currencies(self, rates: dict[str, float]) -> None:
+        assert rates["EUR"] == pytest.approx(84.5863 / 73.765, abs=1e-6)
+        assert rates["CNY"] == pytest.approx(10.8847 / 73.765, abs=1e-6)
+
+    def test_nominal_100_normalized(self, rates: dict[str, float]) -> None:
+        # JPY: 45.6551 руб за 100 единиц → 0.456551 руб/JPY (парсер округляет до 8 знаков)
+        assert rates["JPY"] == round((45.6551 / 100) / 73.765, 8)
+
+    def test_scientific_notation_value(self, rates: dict[str, float]) -> None:
+        # IRR: 50.7659 руб за 1_000_000 — крошечный курс парсится без падения
+        assert rates["IRR"] > 0
+        assert rates["IRR"] == round((50.7659 / 1_000_000) / 73.765, 8)
+
+    def test_large_nominal(self, rates: dict[str, float]) -> None:
+        # VND: 29.2916 руб за 10000 единиц
+        assert rates["VND"] == round((29.2916 / 10000) / 73.765, 8)
+
+
 class TestFetchFallback:
     def test_fetch_returns_none_on_network_error(self) -> None:
         with patch("app.services.cbr_fx.urllib.request.urlopen", side_effect=OSError("blocked")):
+            assert fetch_cbr_fx_rates(use_cache=False) is None
+
+    def test_fetch_returns_none_on_http_403(self) -> None:
+        # cbr.ru отвечает 403 на IP дата-центров (DDoS-защита) — реальный прод-кейс.
+        err = urllib.error.HTTPError(
+            "https://www.cbr.ru/scripts/XML_daily.asp", 403, "Forbidden", {}, None
+        )
+        with patch("app.services.cbr_fx.urllib.request.urlopen", side_effect=err):
             assert fetch_cbr_fx_rates(use_cache=False) is None
 
 
