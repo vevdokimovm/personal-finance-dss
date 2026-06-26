@@ -2,6 +2,44 @@
 
 Формат: [Keep a Changelog](https://keepachangelog.com/ru/1.0.0/). Версионирование — [SemVer](https://semver.org/lang/ru/).
 
+## [4.16.29] — 2026-06-26 — Property-тесты ядра + 3-категорийный CI + инфраструктура тестов (PATCH)
+
+Очередь сессии 26.06 (8 пунктов по мультибраузерности и тестам) выполнена; после неё — возврат к
+роадмапу P2.7. Без схемных изменений (миграций нет) — PG-матрица валидна с 0019.
+
+- **`tests/test_core_properties.py` — property-based слой на ядро (hypothesis): 26 тестов.**
+  Математические инварианты мат-модели на тысячах случайных входов, строго по
+  `docs/math_model_v3_0_0.md`: `|A|=66` и сумма долей альтернативы = 1 (§4), `Rt(a)≥0` и ПДН
+  `Dt(a)≤0.40` (§6), `Lt`/`Dt`/`BLR` ≥ 0 и формулы (§3), сохранность сумм avalanche и платёж не
+  растёт (§11), `Rt'≥Rt`/`Dt'≤Dt` (§5), `U(a)∈[0,1]` и рекомендация = argmax (§8), нормировка
+  с защитой от вырожденности (§7), веса профилей = 1 и монотонность по риску (§9). Самый дешёвый
+  способ ловить математическую регрессию. `hypothesis==6.155.7` в `requirements-dev.txt`.
+- **Три категории тестов (как в проде) — `pytest.ini` маркеры + `.github/workflows/ci.yml`:**
+  - `fast` — каждый push/PR: unit + integration + property + e2e-smoke (chromium), гейт покрытия 90%,
+    матрица SQLite + PostgreSQL. Маркер `fast` навешивается авто-хуком в `tests/conftest.py` на всё,
+    что не `full`/`deep`/`e2e` — ручная разметка сотен тестов не нужна.
+  - `full` — на тегах `v*` и вручную: мультибраузер E2E (chromium + firefox + webkit) + визуальная
+    регрессия + live-a11y (axe) + security (bandit + pip-audit) + нагрузочный smoke (locust).
+  - `deep` — еженедельно/вручную: стресс-property (тысячи примеров) + мутации (mutmut).
+- **Мастхэв-файлы тиров:** `tests/full/test_visual_regression.py` (скриншот-регрессия Playwright),
+  `tests/full/test_a11y_axe.py` (live-a11y через axe-core), `tests/deep/test_property_stress.py`
+  (стресс-property, 2000 примеров). Дефолтный прогон их исключает (`addopts`), отбор — `-m full`/`-m deep`.
+- **`Makefile`:** цели `test-fast`, `test-full`, `test-deep`, `security` (bandit + pip-audit),
+  `mutation` (mutmut на `app/core`).
+- **`docs/testing_infrastructure.md`** — карта инфраструктуры тестов: уровни (unit/integration/
+  property/E2E/visual/a11y/load/security/mutation), три категории, PG-матрица, E2E-движки и почему
+  мультибраузер только в CI, грабли песочницы, карта файлов.
+- **`docs/incidents_summary.md`:** строки INC-CRUD-DELETE (удаление/restore CRUD; правило §13) и
+  INC-BROWSERS-SANDBOX (firefox/webkit — внешнее ограничение CDN). Полные разборы — отдельными
+  файлами вне репозитория (правило §12).
+- **firefox/webkit в песочнице — докопано до конца (правило §11):** перебраны все каналы доставки
+  бинарей (GitHub releases → 404, npm-пакет без бинарей, системный firefox несовместим с juggler,
+  apt — только либы). Корень: сборки только с Azure-CDN Playwright (вне allowlist, 403) — внешнее
+  ограничение, как ЦБ-403. chromium покрывает песочницу; мультибраузер — в CI (полный тир).
+- **Аудит покрытия:** TOTAL 91.61% (гейт 90% держится). Ядро `U(a)` покрыто: `ranking`/`filtering`
+  100%, `alternatives` 98.7%, `metrics` 95.7%, `avalanche` 89.7%. 6 CRUD-E2E (v4.16.28) на месте и
+  зелёные на chromium.
+
 ## [4.16.28] — 2026-06-26 — CRUD E2E + правила тестирования + реестр инцидентов (PATCH)
 
 - **`tests/e2e/test_crud_e2e.py` — 6 E2E на CRUD через UI:** создание + удаление + **восстановление

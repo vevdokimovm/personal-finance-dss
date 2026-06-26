@@ -66,3 +66,19 @@ def _clear_recommendation_cache():
     except Exception:
         pass
     yield
+
+
+def pytest_collection_modifyitems(config, items):
+    """Авто-маркировка категории `fast` (CI-тиры fast/full/deep).
+
+    Чтобы CI отбирал быстрый прогон через `-m fast`, не размечая вручную сотни
+    unit/integration-тестов: любой тест, не помеченный явно `full`, `deep` или
+    `e2e`, автоматически получает маркер `fast`. Тяжёлые/редкие тиры (визуальная
+    регрессия, live-a11y, стресс-property) маркируются явно в своих файлах —
+    всё прочее попадает в быстрый прогон по умолчанию.
+    """
+    tiered = {"full", "deep", "e2e"}
+    for item in items:
+        own = {marker.name for marker in item.iter_markers()}
+        if own.isdisjoint(tiered):
+            item.add_marker(pytest.mark.fast)

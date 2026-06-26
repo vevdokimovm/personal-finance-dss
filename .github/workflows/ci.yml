@@ -1,17 +1,24 @@
 name: CI
 
+# Три категории тестов (см. docs/testing_infrastructure.md):
+#   fast  — каждый push/PR: unit + integration + property + e2e-smoke (chromium), гейт 90%.
+#   full  — на тегах vX.Y.Z и вручную: мультибраузер E2E + визуальная регрессия + live-a11y + security.
+#   deep  — вручную и еженедельно: стресс-property (тысячи примеров) + мутационное тестирование.
 on:
   push:
     branches: [main]
+    tags: ["v*"]
   pull_request:
     branches: [main]
+  schedule:
+    - cron: "0 3 * * 1"   # понедельник 03:00 UTC — глубокий прогон
+  workflow_dispatch:       # ручной запуск full/deep
 
 jobs:
-  # ── Тесты + покрытие: БЛОКИРУЮЩИЙ гейт. Матрица на двух СУБД: ───────────────
-  #    SQLite (быстро) и PostgreSQL (ловит то, что SQLite прячет — FK и пр.).
-  #    coverage report падает, если покрытие < 90% (порог в .coveragerc).
-  test:
-    name: Тесты и покрытие (${{ matrix.db }})
+  # ── (1) БЫСТРЫЙ — БЛОКИРУЮЩИЙ гейт. Матрица SQLite + PostgreSQL, покрытие ≥ 90%. ──
+  fast:
+    name: Быстрый (${{ matrix.db }})
+    if: github.event_name == 'push' || github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -33,7 +40,6 @@ jobs:
           --health-retries 10
     env:
       SECRET_KEY: test-secret-key-for-ci
-      # Для sqlite — пусто (conftest сам поднимет временный SQLite).
       DATABASE_URL: ${{ matrix.db == 'postgresql' && 'postgresql+psycopg://finpilot:finpilot@localhost:5432/finpilot_test' || '' }}
     steps:
       - uses: actions/checkout@v4
@@ -45,16 +51,19 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt -r requirements-dev.txt
-      - name: Тесты + покрытие (порог 90%)
+      - name: Быстрые тесты + покрытие (unit + integration + property, порог 90%)
         run: |
-          coverage run -m pytest
+          coverage run -m pytest -m fast
           coverage report
+      - name: E2E-smoke (chromium)
+        run: |
+          playwright install --with-deps chromium
+          pytest -m e2e --browser chromium
 
-  # ── Линтеры: ИНФОРМАЦИОННЫЙ job (continue-on-error). Показывает замечания ──
-  #    в логах, но не блокирует merge. Когда код почистят (P1.4) — убрать
-  #    continue-on-error, и линтеры станут блокирующими.
+  # ── Линтеры: ИНФОРМАЦИОННЫЙ job (не блокирует). ──────────────────────────────
   lint:
     name: Линтеры (информационно)
+    if: github.event_name == 'push' || github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     continue-on-error: true
     steps:
@@ -74,14 +83,52 @@ jobs:
       - name: pylint
         run: pylint app --rcfile=.pylintrc
 
-  # ── E2E (браузерные): ИНФОРМАЦИОННЫЙ job, пока стабилизируется. ───────────
-  #    Гоняет реальный браузер на chromium и webkit (WebKit — источник прошлых
-  #    багов, BUG-022). Когда прогон стабильно зелёный — убрать continue-on-error
-  #    и добавить в required checks (branch protection).
-  e2e:
-    name: E2E браузерные (информационно)
+  # ── (2) ПОЛНЫЙ — на тегах vX.Y.Z и вручную. Здесь CDN Playwright доступен, ──
+  #    поэтому реально гоняются firefox и webkit (в песочнице CDN заблокирован).
+  full:
+    name: Полный (мультибраузер + визуал + a11y + security)
+    if: startsWith(github.ref, 'refs/tags/v') || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
-    continue-on-error: true
+    env:
+      SECRET_KEY: test-secret-key-for-e2e
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Установка зависимостей
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt -r requirements-dev.txt pillow
+      - name: Установка браузеров (chromium + firefox + webkit)
+        run: playwright install --with-deps chromium firefox webkit
+      - name: Мультибраузерные E2E (chromium + firefox + webkit)
+        run: pytest -m e2e --browser chromium --browser firefox --browser webkit
+      - name: Полный тир (визуальная регрессия + live-a11y)
+        run: pytest -m full --browser chromium
+      - name: Security — статанализ кода (bandit)
+        run: |
+          pip install -q bandit
+          bandit -q -r app -ll
+      - name: Security — аудит зависимостей (pip-audit)
+        run: |
+          pip install -q pip-audit
+          pip-audit -r requirements.txt
+      - name: Нагрузка — smoke locust (headless, коротко)
+        run: |
+          pip install -q locust
+          SECRET_KEY=x uvicorn app.main:app --port 8000 &
+          sleep 5
+          locust -f loadtest/locustfile.py --headless -u 20 -r 5 -t 30s --host http://127.0.0.1:8000 || true
+
+  # ── (3) ГЛУБОКИЙ — вручную и еженедельно. Стресс-property + мутации. ─────────
+  deep:
+    name: Глубокий (стресс-property + мутации)
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    env:
+      SECRET_KEY: test-secret-key-for-ci
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -92,9 +139,10 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt -r requirements-dev.txt
-      - name: Установка браузеров Playwright
-        run: playwright install --with-deps chromium webkit
-      - name: E2E тесты (chromium + webkit)
-        env:
-          SECRET_KEY: test-secret-key-for-e2e
-        run: pytest -m e2e --browser chromium --browser webkit
+      - name: Стресс-property (тысячи примеров)
+        run: pytest -m deep
+      - name: Мутационное тестирование ядра (mutmut)
+        run: |
+          pip install -q mutmut
+          mutmut run --paths-to-mutate app/core || true
+          mutmut results || true

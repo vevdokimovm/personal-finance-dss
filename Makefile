@@ -1,4 +1,4 @@
-.PHONY: all lint test coverage e2e clean precommit
+.PHONY: all lint test coverage e2e clean precommit test-fast test-full test-deep security mutation
 
 PYTHON=python3
 TEST_ENV=SECRET_KEY=test-secret-key-for-ci
@@ -34,3 +34,31 @@ clean:
 e2e:
 	python3 -m playwright install chromium
 	pytest -m e2e
+
+# === Три категории тестов (как в проде; подробно — docs/testing_infrastructure.md) ===
+# (1) Быстрый — каждый push: unit + integration + property + покрытие 90%.
+test-fast:
+	$(TEST_ENV) coverage run -m pytest -m fast
+	coverage report -m
+
+# (2) Полный — перед релизом/тегом: визуальная регрессия + live-a11y (нужен браузер).
+#     Дополняется security и нагрузкой (locust) на уровне CI/локально.
+test-full:
+	python3 -m playwright install chromium
+	$(TEST_ENV) pytest -m full
+
+# (3) Глубокий — редко/вручную: стресс-property (тысячи примеров) + мутации.
+test-deep:
+	$(TEST_ENV) pytest -m deep
+
+# Безопасность (полный тир): статанализ кода + аудит уязвимостей зависимостей.
+security:
+	pip install -q bandit pip-audit
+	bandit -q -r app -ll
+	pip-audit -r requirements.txt
+
+# Мутационное тестирование (глубокий тир): проверяет силу самих тестов.
+mutation:
+	pip install -q mutmut
+	mutmut run --paths-to-mutate app/core
+	mutmut results
