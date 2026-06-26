@@ -631,9 +631,10 @@ function bindGlobalUI() {
 
             try {
                 const res = await fetch('/api/banks/upload', { method: 'POST', body: formData });
-                const data = await res.json();
+                let data = null;
+                try { data = await res.json(); } catch { data = null; }
 
-                if (data.status === 'success') {
+                if (res.ok && data && data.status === 'success') {
                     resultDiv.style.display = 'block';
                     resultDiv.innerHTML = `
                         <div style="background:var(--c-green-bg); border:1px solid rgba(34,197,94,.25); border-radius:var(--r-md); padding:20px;">
@@ -644,15 +645,21 @@ function bindGlobalUI() {
                             </div>
                         </div>`;
                 } else {
+                    // 413/502/504 или обрезанное/не-JSON тело — почти всегда «файл большой,
+                    // сервер не успел». Показываем понятную причину вместо «Unexpected … JSON».
+                    const big = (res.status === 413 || res.status === 502 || res.status === 504);
+                    const msg = big
+                        ? 'Файл большой — сервер не успел обработать. Попробуйте выписку за меньший период.'
+                        : (data && data.message) || `Не удалось импортировать (код ${res.status}).`;
                     resultDiv.style.display = 'block';
                     resultDiv.innerHTML = `
                         <div style="background:var(--c-red-bg); border:1px solid rgba(244,63,94,.25); border-radius:var(--r-md); padding:20px;">
-                            <div style="font-weight:700; color:var(--c-red);">✗ ${esc(data.message)}</div>
+                            <div style="font-weight:700; color:var(--c-red);">✗ ${esc(msg)}</div>
                         </div>`;
                 }
             } catch(err) {
                 resultDiv.style.display = 'block';
-                resultDiv.innerHTML = `<div style="color:var(--c-red);">Ошибка: ${esc(err.message)}</div>`;
+                resultDiv.innerHTML = `<div style="color:var(--c-red);">Ошибка сети: ${esc(err.message)}. Проверьте соединение и попробуйте снова.</div>`;
             } finally {
                 uploadBtn.disabled = false;
                 uploadBtn.textContent = 'Импортировать операции';

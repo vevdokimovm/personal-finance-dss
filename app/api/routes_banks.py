@@ -7,12 +7,12 @@ from sqlalchemy.orm import Session
 
 from app.config import settings
 from app.core.money import to_money
-from app.database.crud import create_transaction
+from app.database.crud import bulk_create_transactions
 from app.database.models import Transaction
 from app.dependencies import get_current_user_id, get_db
 from app.services.bank_api import get_available_banks, sync_all_banks, sync_bank
 from app.services.event_logger import log_event
-from app.services.statement_parser import parse_bank_statement, parse_tinkoff_pdf
+from app.services.statement_parser import parse_bank_statement, parse_tinkoff_pdf, parse_xlsx
 
 router = APIRouter(prefix="/banks", tags=["Банки"])
 
@@ -68,6 +68,14 @@ async def upload_statement(
                 "status": "error",
                 "message": "Не удалось распознать операции в PDF. Поддерживается PDF-выписка Тинькофф.",
             }
+    elif raw[:4] == b"PK\x03\x04":
+        # XLSX — zip-контейнер; парсим теми же эвристиками, что и универсальный CSV
+        transactions = parse_xlsx(raw, bank_id)
+        if not transactions:
+            return {
+                "status": "error",
+                "message": "Не удалось распознать операции в XLSX. Проверьте, что в файле есть таблица с датой и суммой.",
+            }
     else:
         # CSV: пробуем разные кодировки (Тинькофф часто использует cp1251)
         content = None
@@ -90,17 +98,9 @@ async def upload_statement(
             "message": "Не удалось распознать транзакции. Проверьте формат файла и выбранный банк.",
         }
 
-    # Сохраняем в БД батчами: один commit на тысячи строк строит гигантский
-    # INSERT (риск таймаута воркера и лимита параметров СУБД). Коммитим порциями.
-    from datetime import datetime
-    BATCH_SIZE = 500
-    added = 0
-    total_income = 0.0
-    total_expense = 0.0
-    pending = 0
-
     # Дедупликация: ключи уже сохранённых операций пользователя — защита от повторного
     # импорта той же выписки. Загружаем один раз, проверяем в памяти (O(1) на строку).
+    from datetime import datetime
     owner = Transaction.user_id == user_id if user_id else Transaction.user_id.is_(None)
     existing_keys = {
         (row.date, row.amount, row.type, row.description)
@@ -108,41 +108,32 @@ async def upload_statement(
             Transaction.date, Transaction.amount, Transaction.type, Transaction.description
         ).filter(owner, Transaction.is_deleted == False)  # noqa: E712
     }
-    skipped_duplicates = 0
 
+    # Дедуп в памяти + подсчёт итогов. Вставка — bulk_create_transactions (без
+    # поштучного _is_recurring-запроса на строку), чтобы большая выписка (12k+ строк)
+    # не упиралась в таймаут воркера/прокси.
+    deduped: list[dict] = []
+    skipped_duplicates = 0
+    total_income = 0.0
+    total_expense = 0.0
     for t in transactions:
         try:
             t_date = datetime.fromisoformat(t['date']) if isinstance(t['date'], str) else t['date']
-            key = (t_date, to_money(t['amount']), t['type'], t.get('description'))
-            if key in existing_keys:
-                skipped_duplicates += 1
-                continue
-            existing_keys.add(key)
-            create_transaction(
-                db=db,
-                amount=t['amount'],
-                type=t['type'],
-                date=t_date,
-                is_synced=True,
-                description=t.get('description'),
-                mcc=t.get('mcc'),
-                bank=bank_id,
-                user_id=user_id,
-                autocommit=False,
-            )
-            added += 1
-            pending += 1
-            if t['type'] == 'income':
-                total_income += t['amount']
-            else:
-                total_expense += t['amount']
-            if pending >= BATCH_SIZE:
-                db.commit()
-                pending = 0
-        except Exception:
+        except (ValueError, TypeError):
             continue
+        key = (t_date, to_money(t['amount']), t['type'], t.get('description'))
+        if key in existing_keys:
+            skipped_duplicates += 1
+            continue
+        existing_keys.add(key)
+        t['date'] = t_date
+        deduped.append(t)
+        if t['type'] == 'income':
+            total_income += t['amount']
+        else:
+            total_expense += t['amount']
 
-    db.commit()
+    added = bulk_create_transactions(db, deduped, user_id=user_id, bank=bank_id)
 
     log_event("statement_imported", {
         "source": file.filename,

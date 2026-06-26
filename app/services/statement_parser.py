@@ -22,6 +22,11 @@ try:
 except ImportError:  # PDF-парсер опционален: без него работает всё, кроме импорта PDF
     pdfplumber = None
 
+try:
+    import openpyxl
+except ImportError:  # XLSX-парсер опционален: без него работает всё, кроме импорта XLSX
+    openpyxl = None
+
 
 def _classify(amount: float) -> tuple[str, float]:
     """Знак суммы → тип операции. Возвращает (type, abs_amount)."""
@@ -117,40 +122,98 @@ def parse_sber_csv(content: str) -> list[dict[str, Any]]:
     return transactions
 
 
-def parse_universal_csv(content: str) -> list[dict[str, Any]]:
+# ── Универсальный табличный парсер (CSV + XLSX) ───────────────────────────
+# Синонимы заголовков (нормализованные: \xa0→' ', ё→е, нижний регистр). Матчинг —
+# по подстроке, поэтому «Сумма в валюте счёта» ловится кандидатом «сумма».
+_H_DATE = ['дата операции', 'дата проводки', 'дата платежа', 'дата транзакции',
+           'дата', 'transaction date', 'date']
+_H_AMOUNT = ['сумма в валюте счета', 'сумма операции', 'сумма платежа', 'сумма',
+             'amount', 'sum']
+_H_CREDIT = ['приход', 'поступление', 'зачисление', 'кредит', 'credit']
+_H_DEBIT = ['расход', 'списание', 'дебет', 'debit']
+_H_CATEGORY = ['категория', 'category']
+_H_DESC = ['назначение платежа', 'назначение', 'описание', 'description', 'merchant']
+_H_MCC = ['mcc']
+
+
+def _norm(value: Any) -> str:
+    """Нормализует заголовок/ячейку для матчинга: неразрывный пробел, ё→е, регистр."""
+    return re.sub(r'\s+', ' ', str(value).replace('\xa0', ' ').replace('ё', 'е')).strip().lower()
+
+
+def _field(row: dict, candidates: list[str]) -> str | None:
+    """Значение колонки по списку синонимов заголовка (нормализованный матч по подстроке)."""
+    norm_row = [(_norm(k), v) for k, v in row.items() if k is not None]
+    for cand in candidates:
+        nc = _norm(cand)
+        for nk, value in norm_row:
+            if (nc == nk or nc in nk) and value is not None and str(value).strip():
+                return str(value)
+    return None
+
+
+def _num(value: str | None) -> float | None:
+    """«−2\xa0000,50» / «8 500» / «1 114,54 RUR» → float. Чужие символы отбрасываются."""
+    if value is None:
+        return None
+    s = str(value).replace('\xa0', '').replace(' ', '').replace('\u2212', '-').replace(',', '.')
+    s = re.sub(r'[^0-9.\-+]', '', s)
+    if s in ('', '-', '+', '.', '-.', '+.'):
+        return None
+    try:
+        return float(s)
+    except ValueError:
+        return None
+
+
+def _is_header_row(cells: list[Any]) -> bool:
+    """Строка-заголовок: есть колонка даты И колонка суммы (или приход/расход)."""
+    norm = [_norm(c) for c in cells if c is not None and str(c).strip()]
+    has_date = any(any(h == n or h in n for h in _H_DATE) for n in norm)
+    has_amount = any(
+        any(h == n or h in n for h in (_H_AMOUNT + _H_CREDIT + _H_DEBIT)) for n in norm
+    )
+    return has_date and has_amount
+
+
+def _table_rows(cells_rows: list[list[Any]]) -> list[dict]:
+    """Находит строку-заголовок (а не берёт первую) и отдаёт строки как dict.
+
+    Решает кейс банков (Альфа и пр.), где над таблицей идут метаданные счёта.
     """
-    Универсальный парсер — пытается найти колонки с датой, суммой, категорией.
-    Работает с любым банком если в CSV есть хотя бы дата и сумма.
-    """
+    header_idx = next((i for i, r in enumerate(cells_rows) if _is_header_row(r)), None)
+    if header_idx is None:
+        return []
+    header = [str(c).lstrip('\ufeff') if c is not None else '' for c in cells_rows[header_idx]]
+    out = []
+    for cells in cells_rows[header_idx + 1:]:
+        if not any(c is not None and str(c).strip() for c in cells):
+            continue
+        out.append({header[j]: (cells[j] if j < len(cells) else None) for j in range(len(header))})
+    return out
+
+
+def _rows_to_transactions(rows: list[dict]) -> list[dict[str, Any]]:
+    """Единая логика извлечения транзакций из строк-словарей (CSV и XLSX)."""
     transactions = []
-    delimiter = ';' if ';' in content[:500] else ','
-    reader = csv.DictReader(io.StringIO(content), delimiter=delimiter)
-    if reader.fieldnames:
-        reader.fieldnames = [f.strip().lstrip('\ufeff') for f in reader.fieldnames]
-
-    for row in reader:
+    for row in rows:
         try:
-            date_str = _get_field(row, [
-                'Дата операции', 'Дата платежа', 'Дата', 'Date', 'date',
-                'Дата транзакции', 'Transaction Date'
-            ])
-            amount_str = _get_field(row, [
-                'Сумма платежа', 'Сумма операции', 'Сумма', 'Amount', 'amount',
-                'Сумма в валюте счёта', 'Sum'
-            ])
-            category = _get_field(row, ['Категория', 'Category']) or 'Импорт'
-            description = _get_field(row, [
-                'Описание', 'Назначение', 'Description', 'Merchant', 'MCC Description'
-            ])
-            mcc = _get_field(row, ['MCC', 'mcc'])
-
-            if not amount_str:
+            amount = _num(_field(row, _H_AMOUNT))
+            if amount is None:  # split-колонки Приход/Расход (ВТБ и пр.)
+                credit = _num(_field(row, _H_CREDIT)) or 0.0
+                debit = _num(_field(row, _H_DEBIT)) or 0.0
+                if credit or debit:
+                    amount = credit - abs(debit)
+            if amount is None or amount == 0:
                 continue
 
-            amount = float(amount_str.replace(' ', '').replace(',', '.').replace('\xa0', ''))
+            date_str = _field(row, _H_DATE)
+            category = _field(row, _H_CATEGORY) or 'Импорт'
+            description = _field(row, _H_DESC)
+            mcc = _field(row, _H_MCC)
+
             t_date = _parse_date(date_str) if date_str else datetime.now()
             t_type, amount = _classify(amount)
-
             merchant = (description.strip() if description else '') or category.strip() or 'Импорт'
             transactions.append({
                 'amount': round(amount, 2),
@@ -162,8 +225,28 @@ def parse_universal_csv(content: str) -> list[dict[str, Any]]:
             })
         except (ValueError, KeyError, TypeError):
             continue
-
     return transactions
+
+
+def parse_universal_csv(content: str) -> list[dict[str, Any]]:
+    """Универсальный CSV-парсер: сам находит строку-заголовок и колонки даты/суммы.
+
+    Работает с любым банком, где в CSV есть дата и сумма (одной знаковой колонкой
+    или раздельными Приход/Расход). Терпит метаданные над таблицей, \xa0 и ё/е.
+    """
+    head = content[:2000]
+    delimiter = ';' if head.count(';') > head.count(',') else ','
+    cells_rows = list(csv.reader(io.StringIO(content), delimiter=delimiter))
+    return _rows_to_transactions(_table_rows(cells_rows))
+
+
+def parse_xlsx(raw: bytes, bank_id: str = 'universal') -> list[dict[str, Any]]:
+    """Парсит XLSX-выписку через те же эвристики, что и универсальный CSV."""
+    if openpyxl is None:
+        raise ValueError("Для импорта XLSX установите openpyxl: pip install openpyxl")
+    wb = openpyxl.load_workbook(io.BytesIO(raw), read_only=True, data_only=True)
+    cells_rows = [list(r) for r in wb.active.iter_rows(values_only=True)]
+    return _rows_to_transactions(_table_rows(cells_rows))
 
 
 # ── Helpers ───────────────────────────────────────────────────

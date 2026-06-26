@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import secrets
 import string
+from collections import Counter
 from datetime import datetime, timedelta
 from typing import Optional
 
@@ -101,6 +102,76 @@ def create_transaction(
         db.commit()
         db.refresh(transaction)
     return transaction
+
+
+def bulk_create_transactions(
+    db: Session,
+    rows: list[dict],
+    user_id: Optional[str] = None,
+    bank: Optional[str] = None,
+    currency: str = "RUB",
+    batch_size: int = 1000,
+) -> int:
+    """Массовая вставка транзакций без поштучных запросов в БД.
+
+    `create_transaction` зовёт `_is_recurring` (COUNT-запрос) на КАЖДУЮ строку —
+    на выписке в 12k операций это десятки тысяч запросов и таймаут воркера. Здесь
+    признак повторяемости (FR-13: ≥2 одинаковых описание+тип) считается ОДНИМ
+    проходом в памяти (Counter по существующим + входящим), вставка — `bulk_insert_mappings`
+    пачками. `rows` должны быть уже дедуплицированы вызывающим кодом.
+
+    Каждая строка: {amount, type, date(datetime|isoformat), description?, mcc?, is_synced?}.
+    """
+    if not rows:
+        return 0
+
+    owner = Transaction.user_id == user_id if user_id else Transaction.user_id.is_(None)
+    counts: Counter = Counter(
+        (desc, typ)
+        for desc, typ in db.query(Transaction.description, Transaction.type).filter(
+            owner, Transaction.is_deleted == False  # noqa: E712
+        )
+    )
+    for r in rows:
+        counts[(r.get("description"), r["type"])] += 1
+
+    now = datetime.utcnow()
+    mappings: list[dict] = []
+    inserted = 0
+
+    def _flush() -> None:
+        nonlocal inserted, mappings
+        if mappings:
+            db.bulk_insert_mappings(Transaction, mappings)
+            db.commit()
+            inserted += len(mappings)
+            mappings = []
+
+    for r in rows:
+        desc = r.get("description")
+        typ = r["type"]
+        date = r["date"]
+        if isinstance(date, str):
+            date = datetime.fromisoformat(date)
+        mappings.append({
+            "amount": to_money(r["amount"]),
+            "category": classify_transaction(desc, r.get("mcc"), typ),
+            "type": typ,
+            "date": date,
+            "description": desc,
+            "mcc": r.get("mcc"),
+            "bank": bank,
+            "currency": currency,
+            "user_id": user_id,
+            "is_synced": bool(r.get("is_synced", True)),
+            "is_recurring": counts[(desc, typ)] >= 2,
+            "is_deleted": False,
+            "created_at": now,
+        })
+        if len(mappings) >= batch_size:
+            _flush()
+    _flush()
+    return inserted
 
 
 def _is_recurring(db: Session, description: Optional[str], txn_type: str) -> bool:
