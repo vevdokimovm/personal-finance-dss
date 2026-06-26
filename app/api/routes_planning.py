@@ -8,7 +8,7 @@ import json
 from datetime import datetime
 from typing import Any, Optional
 
-from fastapi import APIRouter, Depends, Response
+from fastapi import APIRouter, Depends, HTTPException, Response
 from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
 
@@ -22,13 +22,17 @@ from app.core.metrics import (
 )
 from app.core.preprocessing import prepare_data
 from app.database.crud import (
+    create_plan_snapshot,
     get_goals,
     get_liquid_assets,
     get_obligations,
+    get_plan_snapshot,
+    get_plan_snapshots,
     get_scenarios,
     get_transactions,
     get_user_prefs,
     save_scenario,
+    soft_delete_plan_snapshot,
 )
 from app.dependencies import get_current_user_id, get_db
 from app.services.cbr_rate import get_opportunity_cost_rate
@@ -36,6 +40,7 @@ from app.services.cache import TTLCache
 from app.services.event_logger import log_event, log_recommendation
 from app.services.forecasting import forecast_indicators
 from app.services.currency import to_base_currency
+from app.services.plan_export import plan_to_pdf, plan_to_xlsx
 from app.services.planning import run_planning
 
 
@@ -325,6 +330,123 @@ def export_plan_csv(
         media_type="text/csv; charset=utf-8",
         headers={"Content-Disposition": f'attachment; filename="{filename}"'},
     )
+
+
+@router.get("/export.xlsx", summary="Экспорт плана распределения в XLSX (скачивание файла)")
+def export_plan_xlsx(
+    risk_tolerance: int | None = None,
+    l_min: float | None = None,
+    r_bench: float | None = None,
+    db: Session = Depends(get_db),
+    user_id: str | None = Depends(get_current_user_id),
+) -> Response:
+    payload = PlanningRequest(risk_tolerance=risk_tolerance, l_min=l_min, r_bench=r_bench)
+    result = _compute_plan(payload, db, user_id)
+    filename = f"finpilot-plan-{datetime.utcnow():%Y-%m-%d}.xlsx"
+    return Response(
+        content=plan_to_xlsx(result),
+        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        headers={"Content-Disposition": f'attachment; filename="{filename}"'},
+    )
+
+
+@router.get("/export.pdf", summary="Экспорт плана распределения в PDF (скачивание файла)")
+def export_plan_pdf(
+    risk_tolerance: int | None = None,
+    l_min: float | None = None,
+    r_bench: float | None = None,
+    db: Session = Depends(get_db),
+    user_id: str | None = Depends(get_current_user_id),
+) -> Response:
+    payload = PlanningRequest(risk_tolerance=risk_tolerance, l_min=l_min, r_bench=r_bench)
+    result = _compute_plan(payload, db, user_id)
+    filename = f"finpilot-plan-{datetime.utcnow():%Y-%m-%d}.pdf"
+    return Response(
+        content=plan_to_pdf(result),
+        media_type="application/pdf",
+        headers={"Content-Disposition": f'attachment; filename="{filename}"'},
+    )
+
+
+class PlanHistorySave(BaseModel):
+    """Параметры расчёта для сохранения снапшота плана в историю (P2.6)."""
+
+    risk_tolerance: int | None = None
+    l_min: float | None = None
+    r_bench: float | None = None
+    note: str | None = Field(default=None, max_length=500)
+
+
+def _snapshot_summary(s: Any) -> dict[str, Any]:
+    return {
+        "id": s.id,
+        "created_at": s.created_at.isoformat(),
+        "risk_profile": s.risk_profile,
+        "indicators": {"Rt": s.rt, "Lt": s.lt, "Dt": s.dt, "BLR": s.blr},
+        "best": {
+            "name": s.best_name,
+            "x_obligations": s.x_obligations,
+            "x_reserve": s.x_reserve,
+            "x_goals": s.x_goals,
+            "utility": s.utility,
+        },
+        "note": s.note,
+    }
+
+
+def _snapshot_detail(s: Any) -> dict[str, Any]:
+    data = _snapshot_summary(s)
+    data["top3"] = s.top3 or []
+    return data
+
+
+@router.post("/history", summary="Сохранить снапшот плана в историю (P2.6)")
+def save_plan_history(
+    payload: PlanHistorySave,
+    db: Session = Depends(get_db),
+    user_id: str | None = Depends(get_current_user_id),
+) -> dict[str, Any]:
+    req = PlanningRequest(
+        risk_tolerance=payload.risk_tolerance, l_min=payload.l_min, r_bench=payload.r_bench
+    )
+    result = _compute_plan(req, db, user_id)
+    snap = create_plan_snapshot(db, result, user_id=user_id, note=payload.note)
+    log_event("plan_snapshot_saved", {"id": snap.id, "risk_profile": snap.risk_profile})
+    return _snapshot_detail(snap)
+
+
+@router.get("/history", summary="История сохранённых планов (P2.6)")
+def list_plan_history(
+    limit: int = 50,
+    db: Session = Depends(get_db),
+    user_id: str | None = Depends(get_current_user_id),
+) -> dict[str, Any]:
+    limit = max(1, min(limit, 100))
+    snaps = get_plan_snapshots(db, user_id=user_id, limit=limit)
+    return {"items": [_snapshot_summary(s) for s in snaps], "count": len(snaps)}
+
+
+@router.get("/history/{snapshot_id}", summary="Снапшот плана по id (P2.6)")
+def get_plan_history(
+    snapshot_id: int,
+    db: Session = Depends(get_db),
+    user_id: str | None = Depends(get_current_user_id),
+) -> dict[str, Any]:
+    snap = get_plan_snapshot(db, snapshot_id, user_id=user_id)
+    if snap is None:
+        raise HTTPException(status_code=404, detail="Снапшот плана не найден")
+    return _snapshot_detail(snap)
+
+
+@router.delete("/history/{snapshot_id}", summary="Удалить снапшот плана (P2.6)")
+def delete_plan_history(
+    snapshot_id: int,
+    db: Session = Depends(get_db),
+    user_id: str | None = Depends(get_current_user_id),
+) -> dict[str, Any]:
+    if not soft_delete_plan_snapshot(db, snapshot_id, user_id=user_id):
+        raise HTTPException(status_code=404, detail="Снапшот плана не найден")
+    return {"status": "deleted", "id": snapshot_id}
 
 
 @router.post("/forecast", summary="Прогноз Rt/Lt/Dt на горизонт H (форм. 35 ВКР)")

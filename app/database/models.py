@@ -342,3 +342,39 @@ class NotificationLog(Base):
     notification_type: Mapped[str] = mapped_column(String(50), nullable=False)
     dedup_key: Mapped[str] = mapped_column(String(255), nullable=False, index=True)
     sent_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=datetime.utcnow)
+
+
+class PlanSnapshot(Base):
+    """Снапшот рассчитанного плана распределения (P2.6 — история плана).
+
+    Сохраняет результат _compute_plan на момент времени: профиль риска, показатели
+    Rt/Lt/Dt/BLR, выбранную (лучшую) альтернативу и полный топ-3 (JSON) для детального
+    просмотра. Soft-delete — как у остальных пользовательских сущностей.
+    """
+
+    __tablename__ = "plan_snapshots"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    user_id: Mapped[Optional[str]] = mapped_column(
+        ForeignKey("users.id"), nullable=True, index=True
+    )
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime, nullable=False, default=datetime.utcnow, index=True
+    )
+    risk_profile: Mapped[str] = mapped_column(String(64), nullable=False, default="")
+    # показатели на момент расчёта (Dt — доля, не проценты, как в каноне)
+    rt: Mapped[float] = mapped_column(Float, nullable=False, default=0.0)
+    lt: Mapped[float] = mapped_column(Float, nullable=False, default=0.0)
+    dt: Mapped[float] = mapped_column(Float, nullable=False, default=0.0)
+    blr: Mapped[float] = mapped_column(Float, nullable=False, default=0.0)
+    # выбранная (лучшая) альтернатива
+    best_name: Mapped[str] = mapped_column(String(255), nullable=False, default="")
+    x_obligations: Mapped[float] = mapped_column(Float, nullable=False, default=0.0)
+    x_reserve: Mapped[float] = mapped_column(Float, nullable=False, default=0.0)
+    x_goals: Mapped[float] = mapped_column(Float, nullable=False, default=0.0)
+    utility: Mapped[float] = mapped_column(Float, nullable=False, default=0.0)
+    # полный топ-3 (JSON) — для детального просмотра истории
+    top3: Mapped[Optional[list]] = mapped_column(JSON, nullable=True)
+    note: Mapped[Optional[str]] = mapped_column(String(500), nullable=True)
+    is_deleted: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False, index=True)
+    deleted_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)

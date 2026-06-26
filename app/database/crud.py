@@ -20,6 +20,7 @@ from app.database.models import (
     LiquidAsset,
     Obligation,
     ObligationPayment,
+    PlanSnapshot,
     Recommendation,
     Scenario,
     Transaction,
@@ -875,3 +876,80 @@ def adopt_orphan_rows(db: Session, user_id: str) -> int:
         affected += 1
     db.commit()
     return affected
+
+
+# ── История планов (P2.6) ─────────────────────────────────────────────────
+def create_plan_snapshot(
+    db: Session,
+    result: dict,
+    user_id: Optional[str] = None,
+    note: Optional[str] = None,
+) -> PlanSnapshot:
+    """Сохраняет снапшот результата _compute_plan в историю."""
+    ind = result.get("indicators", {}) or {}
+    top3 = result.get("top3", []) or []
+    best = top3[0] if top3 else {}
+
+    def _f(v) -> float:
+        try:
+            return float(v)
+        except (TypeError, ValueError):
+            return 0.0
+
+    snap = PlanSnapshot(
+        user_id=user_id,
+        risk_profile=str(result.get("risk_profile", "")),
+        rt=_f(ind.get("Rt")),
+        lt=_f(ind.get("Lt")),
+        dt=_f(ind.get("Dt")),
+        blr=_f(ind.get("BLR")),
+        best_name=str(best.get("name", "")),
+        x_obligations=_f(best.get("x_obligations")),
+        x_reserve=_f(best.get("x_reserve")),
+        x_goals=_f(best.get("x_goals")),
+        utility=_f(best.get("utility")),
+        top3=top3 or None,
+        note=(note or None),
+    )
+    db.add(snap)
+    db.commit()
+    db.refresh(snap)
+    return snap
+
+
+def get_plan_snapshots(
+    db: Session, user_id: Optional[str] = None, limit: int = 50
+) -> list[PlanSnapshot]:
+    owner = PlanSnapshot.user_id == user_id if user_id else PlanSnapshot.user_id.is_(None)
+    return (
+        db.query(PlanSnapshot)
+        .filter(owner, PlanSnapshot.is_deleted == False)  # noqa: E712
+        .order_by(PlanSnapshot.created_at.desc(), PlanSnapshot.id.desc())
+        .limit(limit)
+        .all()
+    )
+
+
+def get_plan_snapshot(
+    db: Session, snapshot_id: int, user_id: Optional[str] = None
+) -> Optional[PlanSnapshot]:
+    owner = PlanSnapshot.user_id == user_id if user_id else PlanSnapshot.user_id.is_(None)
+    return (
+        db.query(PlanSnapshot)
+        .filter(
+            PlanSnapshot.id == snapshot_id, owner, PlanSnapshot.is_deleted == False  # noqa: E712
+        )
+        .first()
+    )
+
+
+def soft_delete_plan_snapshot(
+    db: Session, snapshot_id: int, user_id: Optional[str] = None
+) -> bool:
+    snap = get_plan_snapshot(db, snapshot_id, user_id)
+    if snap is None:
+        return False
+    snap.is_deleted = True
+    snap.deleted_at = datetime.utcnow()
+    db.commit()
+    return True

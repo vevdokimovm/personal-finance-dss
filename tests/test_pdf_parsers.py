@@ -8,6 +8,7 @@
 from app.services.statement_parser import (
     PDF_PARSERS,
     _num,
+    _raif_table_to_transactions,
     _sber_text_to_transactions,
     _vtb_table_to_transactions,
 )
@@ -102,6 +103,41 @@ class TestSberText:
         assert txns[0]["date"].startswith("2025-06-25")
 
 
+class TestRaiffeisenTable:
+    def _row(self, num, dt, debit, credit, desc):
+        # [№, дата+время, документ, Debit, Credit, назначение, карта]
+        return [num, dt, "DOC123", debit, credit, desc, ""]
+
+    def test_debit_is_expense(self):
+        rows = [[self._row("1", "17.01.2025 17:30\n1", "- 2 670,12 ₽", "", "Телефон получателя")]]
+        txns = _raif_table_to_transactions(rows)
+        assert len(txns) == 1
+        assert txns[0]["type"] == "expense"
+        assert txns[0]["amount"] == 2670.12
+
+    def test_credit_is_income(self):
+        rows = [[self._row("2", "17.01.2025 17:29\n1", "", "+ 2 670,12 ₽", "Продали доллары")]]
+        txns = _raif_table_to_transactions(rows)
+        assert txns[0]["type"] == "income"
+        assert txns[0]["amount"] == 2670.12
+
+    def test_header_and_service_rows_skipped(self):
+        rows = [[
+            ["№ P/P", "Posting date", "Document number", "Debit", "Credit", "Payment details", "Card"],
+            [None, "Executed by the bank", None, None, None, None, None],
+            self._row("1", "26.09.2024 20:04\n2", "- 89,00 ₽", "", "Продукты"),
+        ]]
+        assert len(_raif_table_to_transactions(rows)) == 1
+
+    def test_date_from_first_line(self):
+        rows = [[self._row("1", "26.09.2024 20:04\n2", "- 89,00 ₽", "", "Продукты")]]
+        assert _raif_table_to_transactions(rows)[0]["date"].startswith("2024-09-26")
+
+    def test_empty_debit_and_credit_skipped(self):
+        rows = [[self._row("1", "26.09.2024", "", "", "Пустая")]]
+        assert _raif_table_to_transactions(rows) == []
+
+
 class TestPdfDispatch:
     def test_known_banks_mapped(self):
-        assert set(PDF_PARSERS) >= {"tinkoff", "vtb", "sber"}
+        assert set(PDF_PARSERS) >= {"tinkoff", "vtb", "sber", "raiffeisen"}

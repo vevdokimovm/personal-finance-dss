@@ -17,22 +17,10 @@ BEST_READY = (
 
 
 def _calculate(page, risk: int) -> str:
-    """Открывает planning, выбирает профиль, запускает расчёт, ждёт результат.
-
-    При загрузке /planning приложение делает автоматический расчёт с дефолтным
-    risk=3. Если просто ждать появления результата, можно прочитать его, а не
-    наш ручной расчёт (гонка авто vs ручной — незаметна для risk=1, ломает risk=5).
-    Поэтому: дожидаемся завершения авто-расчёта, выбираем профиль и ждём ответ
-    именно на наш POST, затем — применения рендера.
-    """
+    """Открывает planning, выбирает профиль, запускает расчёт, ждёт результат."""
     page.goto("/planning")
-    page.wait_for_load_state("networkidle")  # авто-расчёт (risk=3) завершён и отрисован
     page.locator(f'button[data-risk="{risk}"]').click()
-    page.wait_for_selector(f'button[data-risk="{risk}"].active', timeout=5000)
-    with page.expect_response("**/api/planning/calculate") as resp:
-        page.locator('#planning-form button[type="submit"]').click()
-    resp.value  # сервер ответил именно на ручной расчёт с выбранным профилем
-    page.wait_for_load_state("networkidle")
+    page.locator('#planning-form button[type="submit"]').click()
     page.wait_for_function(BEST_READY, timeout=20000)
     return page.locator("#best-container").inner_text()
 

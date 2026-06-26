@@ -83,3 +83,21 @@ def test_planning_export_csv(client: TestClient) -> None:
     resp = client.get("/api/planning/export.csv")
     assert resp.status_code == 200
     assert "text/csv" in resp.headers.get("content-type", "")
+
+
+def test_planning_export_xlsx(client: TestClient) -> None:
+    _load_anna(client)
+    resp = client.get("/api/planning/export.xlsx")
+    assert resp.status_code == 200
+    assert "spreadsheetml" in resp.headers.get("content-type", "")
+    assert resp.content[:4] == b"PK\x03\x04"  # zip-контейнер xlsx
+    assert "attachment" in resp.headers.get("content-disposition", "")
+
+
+def test_planning_export_pdf(client: TestClient) -> None:
+    _load_anna(client)
+    resp = client.get("/api/planning/export.pdf")
+    assert resp.status_code == 200
+    assert "application/pdf" in resp.headers.get("content-type", "")
+    assert resp.content[:5] == b"%PDF-"
+    assert "attachment" in resp.headers.get("content-disposition", "")

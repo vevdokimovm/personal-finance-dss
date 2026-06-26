@@ -422,10 +422,53 @@ def parse_sber_pdf(raw: bytes) -> list[dict[str, Any]]:
     return _sber_text_to_transactions(lines)
 
 
+# ── PDF-выписка Райффайзенбанка (табличная сетка, split Debit/Credit) ──────
+def _raif_table_to_transactions(tables: list) -> list[dict[str, Any]]:
+    """Таблицы pdfplumber Райффайзена → транзакции. Колонки: [№, дата+время, документ,
+    Debit, Credit, назначение, карта]. Debit (−) → расход, Credit (+) → приход.
+    По позициям колонок — поэтому EN- и RU-шапка обрабатываются одинаково."""
+    out: list[dict[str, Any]] = []
+    for table in tables:
+        for row in table:
+            if not row or len(row) < 5 or not row[0] or not str(row[0]).strip().isdigit():
+                continue  # данные — строки с номером № P/P; заголовки/служебные пропускаем
+            m = re.match(r'(\d{2}\.\d{2}\.\d{4})', str(row[1]) if row[1] else '')
+            if not m:
+                continue
+            debit = _num(row[3])
+            credit = _num(row[4]) if len(row) > 4 else None
+            amount = debit if debit not in (None, 0) else credit
+            if amount in (None, 0):
+                continue
+            desc = re.sub(r'\s+', ' ', str(row[5])).strip() if len(row) > 5 and row[5] else ''
+            t_type, amount = _classify(amount)
+            out.append({
+                'amount': round(amount, 2),
+                'description': (desc or 'Операция')[:255],
+                'mcc': None,
+                'type': t_type,
+                'date': _parse_date(m.group(1)).isoformat(),
+                'is_synced': True,
+            })
+    return out
+
+
+def parse_raiffeisen_pdf(raw: bytes) -> list[dict[str, Any]]:
+    """PDF-выписка Райффайзенбанка: табличная сетка со split Debit/Credit."""
+    if pdfplumber is None:
+        raise ValueError("Для импорта PDF установите pdfplumber: pip install pdfplumber")
+    tables: list = []
+    with pdfplumber.open(io.BytesIO(raw)) as pdf:
+        for page in pdf.pages:
+            tables.extend(page.extract_tables())
+    return _raif_table_to_transactions(tables)
+
+
 PDF_PARSERS = {
     'tinkoff': parse_tinkoff_pdf,
     'vtb': parse_vtb_pdf,
     'sber': parse_sber_pdf,
+    'raiffeisen': parse_raiffeisen_pdf,
 }
 
 
@@ -444,7 +487,69 @@ BANK_PARSERS = {
 }
 
 
+# ── Формат 1CClientBankExchange (универсальный для бизнес-счетов) ──────────
+# Текстовый формат обмена «банк-клиент» ↔ 1С: один парсер на ~все банки.
+# Шапка несёт РасчСчет владельца; знак операции — по тому, чей счёт плательщик/
+# получатель относительно владельца. Документы — между СекцияДокумент … КонецДокумента.
+def parse_1c_exchange(content: str) -> list[dict[str, Any]]:
+    """Парсит выписку формата 1CClientBankExchange (kl_to_1c).
+
+    Расход — если ПлательщикСчет = счёт владельца (деньги уходят); приход — если
+    ПолучательСчет = счёт владельца. Сумма из `Сумма=`, описание — `НазначениеПлатежа=`.
+    """
+    owner_accounts: set[str] = set()
+    docs: list[dict[str, str]] = []
+    cur: dict[str, str] = {}
+    in_doc = False
+
+    for raw_line in content.splitlines():
+        line = raw_line.strip()
+        if line.startswith('СекцияДокумент'):
+            in_doc, cur = True, {}
+            continue
+        if line.startswith('КонецДокумента'):
+            if in_doc:
+                docs.append(cur)
+            in_doc, cur = False, {}
+            continue
+        if '=' not in line:
+            continue
+        key, _, val = line.partition('=')
+        key, val = key.strip(), val.strip()
+        if in_doc:
+            cur[key] = val
+        elif key == 'РасчСчет' and val:  # счёт владельца (шапка / СекцияРасчСчет)
+            owner_accounts.add(val)
+
+    out: list[dict[str, Any]] = []
+    for d in docs:
+        amount = _num(d.get('Сумма'))
+        if amount is None or amount == 0:
+            continue
+        payer, payee = d.get('ПлательщикСчет', ''), d.get('ПолучательСчет', '')
+        if owner_accounts and payer in owner_accounts:
+            t_type = 'expense'
+        elif owner_accounts and payee in owner_accounts:
+            t_type = 'income'
+        else:  # владельца не определили — по наличию даты поступления/списания
+            t_type = 'income' if d.get('ДатаПоступило') else 'expense'
+        date_s = d.get('Дата') or d.get('ДатаСписано') or d.get('ДатаПоступило')
+        desc = (d.get('НазначениеПлатежа') or d.get('Получатель')
+                or d.get('Плательщик') or 'Операция')
+        out.append({
+            'amount': round(abs(amount), 2),
+            'description': desc[:255],
+            'mcc': None,
+            'type': t_type,
+            'date': _parse_date(date_s).isoformat() if date_s else datetime.now().isoformat(),
+            'is_synced': True,
+        })
+    return out
+
+
 def parse_bank_statement(content: str, bank_id: str = 'universal') -> list[dict[str, Any]]:
-    """Выбирает парсер по bank_id и парсит выписку."""
+    """Выбирает парсер по содержимому/bank_id и парсит выписку."""
+    if content.lstrip().startswith('1CClientBankExchange'):
+        return parse_1c_exchange(content)
     parser = BANK_PARSERS.get(bank_id, parse_universal_csv)
     return parser(content)

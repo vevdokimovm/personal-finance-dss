@@ -1381,6 +1381,14 @@ function bindPlanningUI() {
         window.location.href = `/api/planning/export.csv?${params.toString()}`;
     });
 
+    on($('#export-xlsx'), 'click', () => {
+        const params = new URLSearchParams();
+        if (typeof planRisk === 'number') params.set('risk_tolerance', planRisk);
+        if (typeof planLmin === 'number') params.set('l_min', planLmin);
+        if (typeof planRbench === 'number') params.set('r_bench', planRbench);
+        window.location.href = `/api/planning/export.xlsx?${params.toString()}`;
+    });
+
     on($('#export-pdf'), 'click', () => {
         window.location.href = '/api/export/report.pdf';
     });
