@@ -1,7 +1,8 @@
 # FINPILOT — Архитектурные диаграммы
 
-> Стабильные диаграммы, отражающие фундамент системы: слои приложения, модель данных
-> и математический конвейер ядра. Это «медленные» вещи — математика зафиксирована в
+> Стабильные диаграммы, отражающие фундамент системы: слои приложения, модель данных,
+> математический конвейер ядра, развёртывание и связи компонентов, жизненный цикл запроса,
+> аутентификацию и карту фронта. Это «медленные» вещи — математика зафиксирована в
 > `Математическая_модель_v3_0_0.md` (v3.0.0), структура сущностей и слоёв устоялась.
 > Диаграммы построены **по коду** (`app/`), а не по намерению. Формат — Mermaid (рендерится
 > в GitHub и большинстве IDE). При изменении кода, влияющего на схему, диаграмму обновляем
@@ -10,7 +11,11 @@
 > Содержание: [1. Архитектура слоёв](#1-архитектура-слоёв) ·
 > [2. Модель данных (ER)](#2-модель-данных-er) ·
 > [3. Конвейер ядра (9 шагов)](#3-конвейер-ядра-9-шагов) ·
-> [4. Поток запроса `/calculate`](#4-поток-запроса-apiplanningcalculate)
+> [4. Поток запроса `/calculate`](#4-поток-запроса-apiplanningcalculate) ·
+> [5. Развёртывание и компоненты](#5-развёртывание-и-компоненты) ·
+> [6. Жизненный цикл запроса](#6-жизненный-цикл-запроса-middleware-конвейер) ·
+> [7. Аутентификация и сессия](#7-аутентификация-и-сессия) ·
+> [8. Карта фронта](#8-карта-фронта-страницы-и-навигация)
 
 ---
 
@@ -209,4 +214,146 @@ sequenceDiagram
     P-->>R: результат
     R->>Log: log_recommendation + log_event (всегда)
     R-->>C: JSON (план, метрики, прогноз)
+```
+
+---
+
+## 5. Развёртывание и компоненты
+
+Как части системы связаны в проде. Сервер — единый процесс FastAPI под uvicorn (SSR-шаблоны
++ статика + API в одном приложении). Внешние зависимости немногочисленны и заменяемы; их
+недоступность не роняет приложение (ставка ЦБ имеет фолбэк, письма/мониторинг — опциональны).
+
+```mermaid
+flowchart LR
+    subgraph Client["Клиент (браузер)"]
+        UI["Jinja2 SSR-страницы +<br/>vanilla JS: app.js, auth.js<br/>токен в localStorage"]
+    end
+
+    subgraph Server["Сервер — uvicorn · FastAPI (один процесс)"]
+        MW["Middleware-цепочка"]
+        Routes["Роуты: страницы (HTML) · /api/* · /v1/analyze (B2B)"]
+        Svc["Сервисы + ядро (app/core)"]
+    end
+
+    subgraph Data["Хранилище"]
+        DB[("PostgreSQL (прод)<br/>SQLite (dev)")]
+    end
+
+    subgraph Ext["Внешние сервисы (заменяемы, с деградацией)"]
+        CBR["cbr-xml-daily.ru<br/>ставка ЦБ → r_bench<br/>(фолбэк 0.14)"]
+        SMTP["SMTP<br/>письма: verify, сброс пароля"]
+        Sentry["Sentry<br/>мониторинг ошибок"]
+    end
+
+    UI -->|"HTTPS: HTML + JSON API<br/>Authorization: Bearer"| MW
+    MW --> Routes --> Svc
+    Svc --> DB
+    Svc -. "ставка (с кэшем)" .-> CBR
+    Svc -. "уведомления" .-> SMTP
+    Server -. "события ошибок" .-> Sentry
+```
+
+---
+
+## 6. Жизненный цикл запроса (middleware-конвейер)
+
+Любой HTTP-запрос проходит сквозь цепочку middleware до роута и обратно. Порядок —
+обратный регистрации в `main.py` (последний `add_middleware` оборачивает снаружи). Это
+стабильный инфраструктурный слой, общий для страниц и API.
+
+```mermaid
+flowchart TD
+    Req["HTTP-запрос"]
+    L1["RequestLoggingMiddleware<br/>лог + request-id"]
+    L2["CORSMiddleware<br/>проверка origin"]
+    L3["SecurityHeadersMiddleware<br/>заголовки безопасности (+HSTS в проде)"]
+    L4["CSRFMiddleware<br/>проверка origin для мутаций"]
+    L5["RateLimitMiddleware<br/>лимит частоты"]
+    Router["Роут-хендлер:<br/>HTML-страница · /api/* · /v1/analyze"]
+    Resp["HTTP-ответ"]
+
+    Req --> L1 --> L2 --> L3 --> L4 --> L5 --> Router
+    Router -->|"ответ идёт обратно сквозь цепочку"| Resp
+```
+
+---
+
+## 7. Аутентификация и сессия
+
+Гостевой режим — первоклассный: без токена приложение работает с данными `user_id IS NULL`.
+Регистрация и вход возвращают Bearer-токен сразу; подтверждение email — фоновое (письмо через
+SMTP) и вход не блокирует. Токен хранится в localStorage и подставляется в `Authorization`.
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant U as Браузер (auth.js)
+    participant API as /api/auth
+    participant DB as БД
+    participant Mail as SMTP
+
+    Note over U,API: Гость — без токена, данные user_id = NULL
+
+    rect rgb(232, 245, 233)
+    Note over U: Регистрация
+    U->>API: POST /register {email, password, consent}
+    API->>DB: создать пользователя
+    API-->>U: access_token (Bearer) — сразу
+    API-)Mail: письмо подтверждения (фоном, не блокирует)
+    end
+
+    rect rgb(232, 240, 245)
+    Note over U: Вход
+    U->>API: POST /login {email, password}
+    API->>DB: проверить пароль
+    API-->>U: access_token
+    end
+
+    Note over U: токен → localStorage
+
+    U->>API: GET /me (Authorization: Bearer)
+    API-->>U: профиль → шапка показывает email + «Выход»
+
+    U->>API: POST /logout → токен очищается, снова гость
+```
+
+---
+
+## 8. Карта фронта (страницы и навигация)
+
+Тонкий SSR-фронт: один каркас `base.html` (навигация + модалка авторизации + подключение JS),
+от которого наследуются все страницы. Логика — два модуля: `app.js` (страницы, расчёты,
+CRUD-вызовы API) и `auth.js` (модалка входа/регистрации). Набор страниц давно стабилен.
+
+```mermaid
+flowchart TD
+    Base["base.html — каркас<br/>навигация · модалка #auth-modal · подключение app.js + auth.js"]
+
+    subgraph Core["Рабочие страницы"]
+        Index["/ — index (главная)"]
+        Dash["/dashboard — обзор"]
+        Plan["/planning — планирование (СППР)"]
+        Tx["/transactions — операции"]
+        Obl["/obligations — обязательства"]
+        Goals["/goals — цели"]
+        Banks["/banks — импорт выписок"]
+        Val["/validation — проверка на портретах"]
+        Profile["/profile — профиль и настройки"]
+    end
+
+    subgraph Legal["Юридические / служебные"]
+        Privacy["/legal/privacy · /legal/terms · /legal/consent"]
+        Contacts["/contacts — реквизиты оператора"]
+        Reset["/reset-password · forgot_password"]
+    end
+
+    subgraph JS["JS-модули"]
+        AppJs["app.js — логика страниц, расчёты, вызовы /api/*"]
+        AuthJs["auth.js — модалка авторизации, Bearer-токен"]
+    end
+
+    Base --> Core
+    Base --> Legal
+    Base -.-> JS
 ```
