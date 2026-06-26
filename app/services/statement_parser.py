@@ -153,13 +153,22 @@ def _field(row: dict, candidates: list[str]) -> str | None:
 
 
 def _num(value: str | None) -> float | None:
-    """«−2\xa0000,50» / «8 500» / «1 114,54 RUR» → float. Чужие символы отбрасываются."""
+    """Сумма → float, устойчиво к RU и EN форматам.
+
+    Десятичный разделитель — последний из «.» или «,»; второй считается разделителем
+    тысяч. «−2 000,50»/«1 114,54 RUR» (RU) и «3,000.00»/«-741.74» (ВТБ, EN) → корректно.
+    """
     if value is None:
         return None
-    s = str(value).replace('\xa0', '').replace(' ', '').replace('\u2212', '-').replace(',', '.')
-    s = re.sub(r'[^0-9.\-+]', '', s)
-    if s in ('', '-', '+', '.', '-.', '+.'):
+    s = str(value).replace('\xa0', '').replace(' ', '').replace('\u2212', '-')
+    s = re.sub(r'[^0-9.,\-+]', '', s)
+    if not re.search(r'\d', s):
         return None
+    last_comma, last_dot = s.rfind(','), s.rfind('.')
+    if last_comma > last_dot:      # запятая — десятичная (RU)
+        s = s.replace('.', '').replace(',', '.')
+    elif last_dot > last_comma:    # точка — десятичная (EN)
+        s = s.replace(',', '')
     try:
         return float(s)
     except ValueError:
@@ -324,6 +333,105 @@ def parse_tinkoff_pdf(raw: bytes) -> list[dict[str, Any]]:
                     "is_synced": True,
                 })
     return transactions
+
+
+# ── PDF-выписка ВТБ (табличная сетка → extract_tables) ────────────────────
+def _vtb_table_to_transactions(tables: list) -> list[dict[str, Any]]:
+    """Таблицы pdfplumber ВТБ → транзакции. Колонки: [дата+время, дата обработки,
+    ЗНАКОВАЯ сумма в валюте операции, Приход, Расход, Комиссия, Описание].
+    Берём знаковую колонку (минус → расход), даёт и приход, и расход одной логикой."""
+    out: list[dict[str, Any]] = []
+    for table in tables:
+        for row in table:
+            if not row or not row[0]:
+                continue
+            m = re.match(r'(\d{2}\.\d{2}\.\d{4})', str(row[0]))
+            if not m:  # строки-заголовки таблицы
+                continue
+            amount = _num(row[2]) if len(row) > 2 else None
+            if amount is None or amount == 0:
+                continue
+            desc = re.sub(r'\s+', ' ', str(row[6])).strip() if len(row) > 6 and row[6] else ''
+            t_type, amount = _classify(amount)
+            out.append({
+                'amount': round(amount, 2),
+                'description': (desc or 'Операция')[:255],
+                'mcc': None,
+                'type': t_type,
+                'date': _parse_date(m.group(1)).isoformat(),
+                'is_synced': True,
+            })
+    return out
+
+
+def parse_vtb_pdf(raw: bytes) -> list[dict[str, Any]]:
+    """PDF-выписка ВТБ: таблица со знаковой суммой в «валюте операции»."""
+    if pdfplumber is None:
+        raise ValueError("Для импорта PDF установите pdfplumber: pip install pdfplumber")
+    tables: list = []
+    with pdfplumber.open(io.BytesIO(raw)) as pdf:
+        for page in pdf.pages:
+            tables.extend(page.extract_tables())
+    return _vtb_table_to_transactions(tables)
+
+
+# ── PDF-выписка Сбербанка («Выписка по платёжному счёту» → текст) ──────────
+# Строка операции: дата время <категория> <сумма в валюте счёта> <остаток>.
+# Знак «+» у суммы → приход, иначе расход. Описание — на следующей строке.
+_SBER_OP = re.compile(
+    r'^(\d{2}\.\d{2}\.\d{4})\s+\d{2}:\d{2}\s+(.+?)\s+'
+    r'([+\-]?\d[\d ]*,\d{2})\s+[+\-]?\d[\d ]*,\d{2}\s*$'
+)
+
+
+def _sber_text_to_transactions(lines: list[str]) -> list[dict[str, Any]]:
+    out: list[dict[str, Any]] = []
+    for i, line in enumerate(lines):
+        m = _SBER_OP.match(line.strip())
+        if not m:
+            continue
+        date_s, category, amount_s = m.group(1), m.group(2).strip(), m.group(3)
+        amount = _num(amount_s)
+        if amount is None or amount == 0:
+            continue
+        t_type = 'income' if amount_s.strip().startswith('+') else 'expense'
+        description = category
+        if i + 1 < len(lines):  # описание + дата обработки + код авторизации
+            nxt = re.match(r'^\d{2}\.\d{2}\.\d{4}\s+\S+\s+(.+)$', lines[i + 1].strip())
+            if nxt:
+                description = nxt.group(1).strip()
+        out.append({
+            'amount': round(abs(amount), 2),
+            'description': (description or category or 'Операция')[:255],
+            'mcc': None,
+            'type': t_type,
+            'date': _parse_date(date_s).isoformat(),
+            'is_synced': True,
+        })
+    return out
+
+
+def parse_sber_pdf(raw: bytes) -> list[dict[str, Any]]:
+    """PDF-выписка Сбербанка («Выписка по платёжному счёту»)."""
+    if pdfplumber is None:
+        raise ValueError("Для импорта PDF установите pdfplumber: pip install pdfplumber")
+    lines: list[str] = []
+    with pdfplumber.open(io.BytesIO(raw)) as pdf:
+        for page in pdf.pages:
+            lines.extend((page.extract_text() or "").split("\n"))
+    return _sber_text_to_transactions(lines)
+
+
+PDF_PARSERS = {
+    'tinkoff': parse_tinkoff_pdf,
+    'vtb': parse_vtb_pdf,
+    'sber': parse_sber_pdf,
+}
+
+
+def parse_bank_pdf(raw: bytes, bank_id: str = 'tinkoff') -> list[dict[str, Any]]:
+    """Выбирает PDF-парсер по bank_id (по умолчанию — Тинькофф)."""
+    return PDF_PARSERS.get(bank_id, parse_tinkoff_pdf)(raw)
 
 
 BANK_PARSERS = {

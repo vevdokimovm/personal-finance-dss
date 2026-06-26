@@ -12,7 +12,7 @@ from app.database.models import Transaction
 from app.dependencies import get_current_user_id, get_db
 from app.services.bank_api import get_available_banks, sync_all_banks, sync_bank
 from app.services.event_logger import log_event
-from app.services.statement_parser import parse_bank_statement, parse_tinkoff_pdf, parse_xlsx
+from app.services.statement_parser import parse_bank_pdf, parse_bank_statement, parse_xlsx
 
 router = APIRouter(prefix="/banks", tags=["Банки"])
 
@@ -60,13 +60,14 @@ async def upload_statement(
             "message": f"Файл больше {settings.MAX_UPLOAD_SIZE_MB} МБ — слишком большой для импорта.",
         }
 
-    # PDF-выписка (Тинькофф из приложения отдаёт PDF) — отдельный парсер
+    # PDF-выписка — парсер по выбранному банку (Тинькофф / ВТБ / Сбер)
     if raw[:5] == b"%PDF-":
-        transactions = parse_tinkoff_pdf(raw)
+        transactions = parse_bank_pdf(raw, bank_id)
         if not transactions:
             return {
                 "status": "error",
-                "message": "Не удалось распознать операции в PDF. Поддерживается PDF-выписка Тинькофф.",
+                "message": "Не удалось распознать операции в PDF. Проверьте, что выбран правильный банк "
+                           "(PDF поддерживаются для Тинькофф, ВТБ, Сбер).",
             }
     elif raw[:4] == b"PK\x03\x04":
         # XLSX — zip-контейнер; парсим теми же эвристиками, что и универсальный CSV
