@@ -415,6 +415,7 @@ Dockerfile, docker-compose.yml, gunicorn_conf.py
 | Документ | О чём |
 |---|---|
 | [`docs/RELEASES.md`](docs/RELEASES.md) | Читаемая история развития продукта по вехам (эпохи v1→v4) |
+| [`docs/pitfalls.md`](docs/pitfalls.md) | Реестр частых ошибок воркфлоу (третий тип рядом с инцидентами/расследованиями) |
 | [`docs/math_model_v3_0_0.md`](docs/math_model_v3_0_0.md) | Каноническая математическая модель (источник истины по параметрам) |
 | [`docs/algorithm_stack.md`](docs/algorithm_stack.md) | Девятишаговый конвейер ядра по шагам в коде |
 | [`docs/diagrams.md`](docs/diagrams.md) | 8 диаграмм: слои, ER, конвейер, потоки, развёртывание, auth, фронт |
