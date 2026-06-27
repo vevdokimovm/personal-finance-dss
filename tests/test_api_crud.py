@@ -91,3 +91,39 @@ class TestValidation:
     def test_missing_required_field_rejected(self, client: TestClient) -> None:
         r = client.post("/api/transactions", json={"category": "Продукты", "type": "expense"})
         assert r.status_code == 422
+
+
+class TestTransactionEndpointEdges:
+    """Критичные ветки эндпоинтов операций: фильтры экспорта и 404-пути (P2.7-батч)."""
+
+    def _mk(self, client: TestClient, *, date: str, amount: int = 1000) -> int:
+        r = client.post("/api/transactions", json={
+            "amount": amount, "category": "Продукты", "type": "expense", "date": date})
+        assert r.status_code in (200, 201)
+        return r.json()["id"]
+
+    def test_export_csv_with_date_filters(self, client: TestClient) -> None:
+        self._mk(client, date="2026-01-15T00:00:00")
+        self._mk(client, date="2026-06-15T00:00:00")
+        self._mk(client, date="2026-12-15T00:00:00")
+        resp = client.get("/api/transactions/export.csv?date_from=2026-05-01&date_to=2026-08-01")
+        assert resp.status_code == 200
+        body = resp.text
+        assert "2026-06-15" in body
+        assert "2026-01-15" not in body  # отсечено date_from
+        assert "2026-12-15" not in body  # отсечено date_to
+
+    def test_delete_missing_transaction_404(self, client: TestClient) -> None:
+        assert client.delete("/api/transactions/999999").status_code == 404
+
+    def test_restore_missing_transaction_404(self, client: TestClient) -> None:
+        resp = client.post("/api/transactions/999999/restore")
+        assert resp.status_code == 404
+
+    def test_delete_then_restore_roundtrip(self, client: TestClient) -> None:
+        tid = self._mk(client, date="2026-06-01T00:00:00")
+        assert client.delete(f"/api/transactions/{tid}").status_code in (200, 204)
+        assert all(t["id"] != tid for t in client.get("/api/transactions").json())
+        restored = client.post(f"/api/transactions/{tid}/restore")
+        assert restored.status_code in (200, 201)
+        assert any(t["id"] == tid for t in client.get("/api/transactions").json())

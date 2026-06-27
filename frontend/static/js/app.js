@@ -467,6 +467,14 @@ function bindGlobalUI() {
 
     // Delete handlers (delegated)
     on($('#transactions-list'), 'click', async e => {
+        const recatBtn = e.target.closest('.recat-button');
+        if (recatBtn) {
+            const txn = state.transactions.find(
+                t => String(t.id) === String(recatBtn.dataset.transactionId)
+            );
+            if (txn) openRecatModal(txn);
+            return;
+        }
         const btn = e.target.closest('.delete-button');
         if (!btn) return;
         const txId = btn.dataset.transactionId;
@@ -500,6 +508,43 @@ function bindGlobalUI() {
             await loadPage();
             if (snap) showRestoreToast('Цель удалена', snap, '/api/goals');
         } catch(e) { window.showToast(e.message, {error:true}); btn.disabled = false; }
+    });
+
+    // P2.7: переназначение категории операции (+обучение правилом)
+    on($('#recat-form'), 'submit', async e => {
+        e.preventDefault();
+        const id = $('#recat-txn-id').value;
+        const category = $('#recat-category').value.trim();
+        const token = $('#recat-token').value.trim();
+        if (!category) return;
+        try {
+            const res = await api(`/api/transactions/${id}/category`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    category,
+                    match_token: token || null,
+                    apply_to_matching: $('#recat-apply').checked,
+                    learn: !!token,
+                }),
+            });
+            closeModal($('#recat-modal'));
+            const extra = res.updated_count ? ` (+${res.updated_count} похожих)` : '';
+            window.showToast(`Категория обновлена${extra}`);
+            await loadPage();
+            renderCategoryRules();
+        } catch(err) { window.showToast(err.message, { error: true }); }
+    });
+
+    // P2.7: удаление выученного правила
+    on($('#category-rules-list'), 'click', async e => {
+        const btn = e.target.closest('.rule-del');
+        if (!btn) return;
+        btn.disabled = true;
+        try {
+            await api(`/api/category-rules/${btn.dataset.ruleId}`, { method: 'DELETE' });
+            renderCategoryRules();
+        } catch(err) { window.showToast(err.message, { error: true }); btn.disabled = false; }
     });
 
     // Limit switcher
@@ -739,6 +784,7 @@ async function loadPage() {
         }
 
         if (tList) renderTransactions();
+        if (tList) renderCategoryRules();
         if (oList) renderObligations();
         if (gList) renderGoals();
         if (aList) renderLiquidAssets();
@@ -797,6 +843,7 @@ function renderTransactions() {
                 <span>${typePill}</span>
                 <span class="text-right" style="color:${color};font-weight:600;">${sign}${fmt.cur(t.amount)}</span>
                 <span class="text-right">
+                    <button class="ghost-button recat-button" data-transaction-id="${t.id}" style="padding:4px 8px;color:var(--c-text3);font-size:.85rem;" title="Сменить категорию" aria-label="Сменить категорию">↻</button>
                     <button class="ghost-button delete-button" data-transaction-id="${t.id}" style="padding:4px 8px;color:var(--c-red);font-size:.85rem;" title="Удалить" aria-label="Удалить">✕</button>
                 </span>
             </div>`;
@@ -805,6 +852,34 @@ function renderTransactions() {
 
     renderTransactionsPagination(all.length, pages);
     renderOperationsStats(all);
+}
+
+// P2.7: открыть модалку переназначения, префилл из объекта операции
+function openRecatModal(txn) {
+    $('#recat-txn-id').value = txn.id;
+    $('#recat-txn-type').value = txn.type;
+    $('#recat-category').value = txn.category || '';
+    $('#recat-token').value = txn.description || '';
+    $('#recat-apply').checked = true;
+    openModal($('#recat-modal'));
+    $('#recat-category').focus();
+}
+
+// P2.7: список выученных правил с удалением
+async function renderCategoryRules() {
+    const box = $('#category-rules-list');
+    if (!box) return;
+    try {
+        const rules = await api('/api/category-rules');
+        if (!rules.length) {
+            box.innerHTML = `<div class="empty-row">Пока нет правил — переназначьте категорию любой операции (кнопка ↻), и правило появится здесь</div>`;
+            return;
+        }
+        box.innerHTML = rules.map(r => `<div class="table-row" style="display:flex; justify-content:space-between; align-items:center; gap:10px;">
+            <span style="font-size:.85rem;"><span style="color:var(--c-text3);">описание содержит</span> <strong>${esc(r.match_token)}</strong> <span style="color:var(--c-text3);">→</span> <strong>${esc(r.category)}</strong> <span style="color:var(--c-text3); font-size:.78rem;">(${r.type === 'income' ? 'доход' : 'расход'})</span></span>
+            <button class="ghost-button rule-del" data-rule-id="${r.id}" style="padding:4px 8px; color:var(--c-red); font-size:.85rem;" title="Удалить правило" aria-label="Удалить правило">✕</button>
+        </div>`).join('');
+    } catch (e) { /* блок необязательный — тихо игнорируем */ }
 }
 
 function renderTransactionsPagination(total, pages) {
