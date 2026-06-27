@@ -139,7 +139,7 @@ E2E браузер-агностичны: `pytest -m e2e --browser chromium|firef
 сетевого allowlist песочницы (403) — та же категория ограничения, что `cbr.ru`. Это проверено по
 всем каналам (GitHub releases — 404, npm-пакет бинарей не содержит, системный firefox несовместим
 с juggler-протоколом Playwright, apt даёт только либы); подробности — в разборе
-`FINPILOT_browsers_sandbox_incident.md`. Поэтому:
+`FINPILOT_browsers_sandbox_investigation.md`. Поэтому:
 - быстрый прогон гоняет E2E-smoke на **chromium** (в песочнице и в CI);
 - полный тир гоняет **chromium + firefox + webkit** в CI, где CDN доступен.
 
