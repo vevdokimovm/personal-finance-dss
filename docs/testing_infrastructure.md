@@ -149,7 +149,7 @@ E2E браузер-агностичны: `pytest -m e2e --browser chromium|firef
 
 ## 5. Грабли запуска в песочнице (кратко)
 
-Полностью — `FINPILOT_Claude_sandbox_runbook.md`. Главное: shell — dash (POSIX, не bash);
+Полностью — `docs/sandbox_runbook.md`. Главное: shell — dash (POSIX, не bash);
 вывод pytest — в ФАЙЛ, не в пайп; длинные прогоны — в фон через `setsid` + опрос файла-маркера
 (`returncode -1` с пустым выводом — это способ вызова, а не смерть песочницы); chromium — только
 с `--no-sandbox`.
