@@ -10,7 +10,7 @@ from datetime import datetime, timedelta
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 
-from app.database.models import Event
+from app.database.models import Event, Experiment, ExperimentAssignment
 
 
 def event_counts(db: Session, since: datetime | None = None) -> dict[str, int]:
@@ -64,4 +64,56 @@ def analytics_overview(db: Session, days: int = 30) -> dict:
         "total_events": sum(counts.values()),
         "active_users": active_users(db, since=since),
         "event_counts": counts,
+    }
+
+
+def experiment_results(db: Session, key: str) -> dict | None:
+    """Результаты A/B-эксперимента (P3.5): по каждому варианту assigned/converted/rate.
+
+    Точность обеспечена фиксацией назначений: знаем поимённо, кто в каком варианте. Конверсия —
+    subject (user_id или session_id) с событием `conversion_event`. None — если эксперимента нет.
+    """
+    experiment = db.query(Experiment).filter(Experiment.key == key).first()
+    if experiment is None:
+        return None
+
+    subjects_by_variant: dict[str, set[str]] = {}
+    rows = (
+        db.query(ExperimentAssignment.variant, ExperimentAssignment.subject_id)
+        .filter(ExperimentAssignment.experiment_id == experiment.id)
+        .all()
+    )
+    for variant, subject in rows:
+        subjects_by_variant.setdefault(variant, set()).add(subject)
+
+    converted_subjects: set[str] = set()
+    if experiment.conversion_event:
+        for user_id, session_id in (
+            db.query(Event.user_id, Event.session_id)
+            .filter(Event.event_type == experiment.conversion_event)
+            .all()
+        ):
+            if user_id:
+                converted_subjects.add(user_id)
+            if session_id:
+                converted_subjects.add(session_id)
+
+    variants_out = []
+    for variant in experiment.variants:
+        name = variant["name"]
+        assigned = subjects_by_variant.get(name, set())
+        converted = len(assigned & converted_subjects)
+        total = len(assigned)
+        variants_out.append({
+            "variant": name,
+            "assigned": total,
+            "converted": converted,
+            "conversion_rate": round(converted / total, 4) if total else 0.0,
+        })
+
+    return {
+        "key": experiment.key,
+        "status": experiment.status,
+        "conversion_event": experiment.conversion_event,
+        "variants": variants_out,
     }

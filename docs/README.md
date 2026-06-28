@@ -18,7 +18,8 @@
 | Пишешь требование к UI/экрану/компоненту | `ui_requirements_guide.md` |
 | Нужна полная спецификация UI (токены, состояния, a11y) | `ui_ux_design_standard.md` |
 | Заводишь баг | `bug_report_template.md` (Severity/Priority, BUG-XXX) |
-| Разбираешь инцидент / «почему долго чинили» | `incident_postmortem.md` (post-mortem + investigation) |
+| Какой разбор выбрать (инцидент / расследование / баг / pitfall) | `report_types.md` (роутер-градация) |
+| Разбираешь инцидент / «почему долго чинили» | `incident_postmortem_guide.md` (шаблон post-mortem) |
 | Принимаешь важное техническое решение | `adr_template.md` (ADR — архитектурные решения) |
 | Тестируешь / готовишь релиз | `QA.md` (уровни тестирования, чек перед релизом) |
 | Деплоишь на прод | `DEPLOY.md` (VPS, Docker, TLS, cron, бэкапы, SMTP, cbr) |
@@ -40,7 +41,11 @@
 
 **Качество и инциденты:**
 - `bug_report_template.md` — карточка дефекта (две оси оценки, нумерация BUG-XXX).
-- `incident_postmortem.md` — разбор инцидента (post-mortem) и расследования (investigation).
+- `report_types.md` — роутер: какой тип разбора писать (инцидент / расследование / баг / pitfall), критерии.
+- `incident_postmortem_guide.md` — практический шаблон/метод инцидента (post-mortem, SEV, RCA).
+- `investigation_report_guide.md` — практический шаблон расследования (дефекта в коде нет).
+- `pitfalls.md` — реестр частых ошибок воркфлоу (строка-урок, третий лёгкий тип).
+- `documentation_methodology.md` — общая теория: blameless, RCA-методы, runbook, ADR/RFC, SLO/error budget.
 - `QA.md` — регламент тестирования и предрелизный чек.
 
 **Модель и предметная область:**

@@ -6,6 +6,8 @@ from app.api.routes_banks import router as banks_router
 from app.api.routes_budgets import router as budgets_router
 from app.api.routes_categories import router as categories_router
 from app.api.routes_demo import router as demo_router
+from app.api.routes_experiments import admin_router as experiments_admin_router
+from app.api.routes_experiments import router as experiments_router
 from app.api.routes_fx import router as fx_router
 from app.api.routes_goals import router as goals_router
 from app.api.routes_liquid_assets import router as liquid_assets_router
@@ -43,3 +45,5 @@ router.include_router(referral_router)
 router.include_router(i18n_router)
 router.include_router(fx_router)
 router.include_router(plaid_router)
+router.include_router(experiments_router)
+router.include_router(experiments_admin_router)

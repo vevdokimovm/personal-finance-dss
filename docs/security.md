@@ -79,7 +79,7 @@
 | Журналирование/мониторинг | ✅ события + PII-аудит; 🟢 алертинг — Sentry на проде |
 | Защита от типовых атак | ✅ ORM/CSRF/заголовки/XSS/валидация/rate limit |
 | Управление уязвимостями | 🟡 `pip-audit` в рутину |
-| Реагирование на инциденты | см. `incident_postmortem.md` |
+| Реагирование на инциденты | см. `incident_postmortem_guide.md` |
 
 ---
 
@@ -87,5 +87,5 @@
 
 - `DEPLOY.md` — TLS, секреты, хранение в РФ (прод-шаги).
 - `engineering_practices.md` — почему тесты блокируют, матрица SQLite+PG (FK), и пр.
-- `incident_postmortem.md` — реагирование на инциденты.
+- `incident_postmortem_guide.md` — реагирование на инциденты.
 - `requirements_guide.md` — требования с префиксом `SEC-` / `LEGAL-`.

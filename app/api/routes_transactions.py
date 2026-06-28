@@ -5,14 +5,22 @@ import io
 from datetime import datetime
 
 from fastapi import APIRouter, Depends, HTTPException, Response, status
+from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
 
 from app.database.crud import (
+    apply_category_rule,
+    category_id_for,
     create_transaction,
+    delete_category_rule,
     delete_transaction,
+    get_category_rules,
     get_transactions,
     restore_transaction,
+    set_transaction_category,
+    upsert_category_rule,
 )
+from app.core.categorization import MIN_MATCH_TOKEN_LEN, normalize_match_key
 from app.dependencies import get_current_user_id, get_db
 from app.schemas.transaction import TransactionCreate, TransactionResponse
 from app.services.event_logger import log_event
@@ -133,3 +141,105 @@ def restore_transaction_endpoint(
         )
     log_event("transaction_restored", {"transaction_id": transaction_id})
     return transaction
+
+
+# ── P2.7: обучение категоризации на правках пользователя ──────────────────
+class CategoryAssignRequest(BaseModel):
+    """Переназначение категории операции. По умолчанию запоминает правило и применяет его
+    к существующим совпадающим операциям (это и есть «обучение»). `match_token` можно сузить
+    вручную; если не задан — берётся описание операции."""
+
+    category: str = Field(min_length=1, max_length=255)
+    match_token: str | None = Field(default=None, max_length=255)
+    apply_to_matching: bool = True
+    learn: bool = True
+
+
+class CategoryRuleResponse(BaseModel):
+    id: int
+    match_token: str
+    category: str
+    type: str
+
+    model_config = {"from_attributes": True}
+
+
+class CategoryAssignResponse(BaseModel):
+    transaction: TransactionResponse
+    rule: CategoryRuleResponse | None = None
+    updated_count: int = 0
+
+
+@router.post(
+    "/transactions/{transaction_id}/category",
+    response_model=CategoryAssignResponse,
+    summary="Переназначить категорию операции (+обучение правилом)",
+)
+def set_transaction_category_endpoint(
+    transaction_id: int,
+    payload: CategoryAssignRequest,
+    db: Session = Depends(get_db),
+    user_id: str | None = Depends(get_current_user_id),
+) -> dict:
+    transaction = set_transaction_category(
+        db, transaction_id, payload.category, user_id=user_id
+    )
+    if transaction is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Транзакция не найдена."
+        )
+
+    rule = None
+    updated_count = 0
+    if payload.learn:
+        token = payload.match_token or transaction.description or payload.category
+        if len(normalize_match_key(token)) >= MIN_MATCH_TOKEN_LEN:
+            category_id = category_id_for(db, payload.category, transaction.type)
+            rule = upsert_category_rule(
+                db, user_id, token, payload.category, transaction.type, category_id=category_id
+            )
+            if payload.apply_to_matching:
+                updated_count = apply_category_rule(
+                    db,
+                    user_id,
+                    rule.match_token,
+                    payload.category,
+                    transaction.type,
+                    exclude_id=transaction.id,
+                )
+
+    log_event("transaction_recategorized", {
+        "transaction_id": transaction_id,
+        "category": payload.category,
+        "learned": rule is not None,
+        "updated_count": updated_count,
+    })
+    return {"transaction": transaction, "rule": rule, "updated_count": updated_count}
+
+
+@router.get(
+    "/category-rules",
+    response_model=list[CategoryRuleResponse],
+    summary="Список выученных правил категоризации",
+)
+def get_category_rules_endpoint(
+    db: Session = Depends(get_db),
+    user_id: str | None = Depends(get_current_user_id),
+) -> list[CategoryRuleResponse]:
+    return get_category_rules(db, user_id)
+
+
+@router.delete(
+    "/category-rules/{rule_id}",
+    summary="Удалить правило категоризации",
+)
+def delete_category_rule_endpoint(
+    rule_id: int,
+    db: Session = Depends(get_db),
+    user_id: str | None = Depends(get_current_user_id),
+) -> Response:
+    if not delete_category_rule(db, rule_id, user_id=user_id):
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Правило не найдено."
+        )
+    return Response(status_code=status.HTTP_204_NO_CONTENT)

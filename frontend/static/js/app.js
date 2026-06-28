@@ -58,6 +58,42 @@ async function api(url, opts = {}) {
     return d;
 }
 
+// ── A/B-эксперименты (P3.5): стабильный subject + получение варианта ──
+const fpExperiments = {
+    subjectId() {
+        try {
+            let id = localStorage.getItem('fp-anon-id');
+            if (!id) {
+                id = (window.crypto && crypto.randomUUID)
+                    ? crypto.randomUUID()
+                    : String(Date.now()) + Math.random().toString(16).slice(2);
+                localStorage.setItem('fp-anon-id', id);
+            }
+            return id;
+        } catch { return null; }  // localStorage недоступен → аноним без эксперимента
+    },
+    async variant(key) {
+        const sid = this.subjectId();
+        try {
+            const d = await api(`/api/experiments/${encodeURIComponent(key)}/variant?sid=${encodeURIComponent(sid || '')}`);
+            return d.variant || null;
+        } catch { return null; }
+    },
+};
+
+// Демо-эксперимент: копия подзаголовка сводки. Эксперимент заводит админ; нет running →
+// variant=null → дефолтная копия (graceful, ничего не ломается).
+const SUMMARY_SUBTITLE_VARIANTS = {
+    treatment: 'Введите доходы и расходы — и получите расчёт ключевых показателей за пару секунд.',
+};
+async function applySummarySubtitleExperiment() {
+    const el = document.getElementById('summary-subtitle');
+    if (!el) return;
+    const variant = await fpExperiments.variant('summary_subtitle_2026');
+    const copy = variant && SUMMARY_SUBTITLE_VARIANTS[variant];
+    if (copy) el.textContent = copy;
+}
+
 function openModal(m)  { if (m) { m.removeAttribute('inert'); m.setAttribute('aria-hidden', 'false'); } }
 function closeModal(m) { if (m) { m.setAttribute('inert', ''); m.setAttribute('aria-hidden', 'true'); } }
 
@@ -148,10 +184,10 @@ async function loadBudgets() {
         }
         box.innerHTML = items.map(b => {
             const pct = Math.min(b.pct, 100);
-            const color = b.over ? 'var(--c-red-text)' : b.pct > 80 ? 'var(--c-amber-text)' : 'var(--c-green-text)';
+            const color = b.over ? 'var(--c-red)' : b.pct > 80 ? 'var(--c-amber)' : 'var(--c-green)';
             return `<div style="margin-bottom:14px;">
                 <div style="display:flex; justify-content:space-between; font-size:.82rem; margin-bottom:4px;">
-                    <span>${escapeHtml(b.category)}${b.over ? ' <span style="color:var(--c-red-text); font-size:.72rem;">превышен</span>' : ''}</span>
+                    <span>${escapeHtml(b.category)}${b.over ? ' <span style="color:var(--c-red); font-size:.72rem;">превышен</span>' : ''}</span>
                     <span><strong>${fmt.cur(b.spent)}</strong> <span style="color:var(--c-text3);">/ ${fmt.cur(b.limit_amount)} · ${b.pct}%</span>
                         <button class="budget-del" data-budget-id="${b.id}" title="Удалить" aria-label="Удалить" style="background:none; border:none; color:var(--c-text3); cursor:pointer; padding:0 4px; font-size:.9rem;">✕</button>
                     </span>
@@ -229,6 +265,7 @@ document.addEventListener('DOMContentLoaded', () => {
     bindGlobalUI();
     bindPlanningUI();
     loadPage();
+    applySummarySubtitleExperiment();
 });
 
 // ── Активный тест-кейс: помним, какой портрет загружен ───────
@@ -467,6 +504,14 @@ function bindGlobalUI() {
 
     // Delete handlers (delegated)
     on($('#transactions-list'), 'click', async e => {
+        const recatBtn = e.target.closest('.recat-button');
+        if (recatBtn) {
+            const txn = state.transactions.find(
+                t => String(t.id) === String(recatBtn.dataset.transactionId)
+            );
+            if (txn) openRecatModal(txn);
+            return;
+        }
         const btn = e.target.closest('.delete-button');
         if (!btn) return;
         const txId = btn.dataset.transactionId;
@@ -500,6 +545,43 @@ function bindGlobalUI() {
             await loadPage();
             if (snap) showRestoreToast('Цель удалена', snap, '/api/goals');
         } catch(e) { window.showToast(e.message, {error:true}); btn.disabled = false; }
+    });
+
+    // P2.7: переназначение категории операции (+обучение правилом)
+    on($('#recat-form'), 'submit', async e => {
+        e.preventDefault();
+        const id = $('#recat-txn-id').value;
+        const category = $('#recat-category').value.trim();
+        const token = $('#recat-token').value.trim();
+        if (!category) return;
+        try {
+            const res = await api(`/api/transactions/${id}/category`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    category,
+                    match_token: token || null,
+                    apply_to_matching: $('#recat-apply').checked,
+                    learn: !!token,
+                }),
+            });
+            closeModal($('#recat-modal'));
+            const extra = res.updated_count ? ` (+${res.updated_count} похожих)` : '';
+            window.showToast(`Категория обновлена${extra}`);
+            await loadPage();
+            renderCategoryRules();
+        } catch(err) { window.showToast(err.message, { error: true }); }
+    });
+
+    // P2.7: удаление выученного правила
+    on($('#category-rules-list'), 'click', async e => {
+        const btn = e.target.closest('.rule-del');
+        if (!btn) return;
+        btn.disabled = true;
+        try {
+            await api(`/api/category-rules/${btn.dataset.ruleId}`, { method: 'DELETE' });
+            renderCategoryRules();
+        } catch(err) { window.showToast(err.message, { error: true }); btn.disabled = false; }
     });
 
     // Limit switcher
@@ -638,10 +720,10 @@ function bindGlobalUI() {
                     resultDiv.style.display = 'block';
                     resultDiv.innerHTML = `
                         <div style="background:var(--c-green-bg); border:1px solid rgba(34,197,94,.25); border-radius:var(--r-md); padding:20px;">
-                            <div style="font-weight:700; color:var(--c-green-text); margin-bottom:8px;">✓ ${esc(data.message)}</div>
+                            <div style="font-weight:700; color:var(--c-green); margin-bottom:8px;">✓ ${esc(data.message)}</div>
                             <div style="font-size:.85rem; color:var(--c-text2); display:flex; gap:24px;">
-                                <span>Доходов: <strong style="color:var(--c-green-text)">+${fmt.cur(data.total_income)}</strong></span>
-                                <span>Расходов: <strong style="color:var(--c-red-text)">−${fmt.cur(data.total_expense)}</strong></span>
+                                <span>Доходов: <strong style="color:var(--c-green)">+${fmt.cur(data.total_income)}</strong></span>
+                                <span>Расходов: <strong style="color:var(--c-red)">−${fmt.cur(data.total_expense)}</strong></span>
                             </div>
                         </div>`;
                 } else {
@@ -654,12 +736,12 @@ function bindGlobalUI() {
                     resultDiv.style.display = 'block';
                     resultDiv.innerHTML = `
                         <div style="background:var(--c-red-bg); border:1px solid rgba(244,63,94,.25); border-radius:var(--r-md); padding:20px;">
-                            <div style="font-weight:700; color:var(--c-red-text);">✗ ${esc(msg)}</div>
+                            <div style="font-weight:700; color:var(--c-red);">✗ ${esc(msg)}</div>
                         </div>`;
                 }
             } catch(err) {
                 resultDiv.style.display = 'block';
-                resultDiv.innerHTML = `<div style="color:var(--c-red-text);">Ошибка сети: ${esc(err.message)}. Проверьте соединение и попробуйте снова.</div>`;
+                resultDiv.innerHTML = `<div style="color:var(--c-red);">Ошибка сети: ${esc(err.message)}. Проверьте соединение и попробуйте снова.</div>`;
             } finally {
                 uploadBtn.disabled = false;
                 uploadBtn.textContent = 'Импортировать операции';
@@ -739,6 +821,7 @@ async function loadPage() {
         }
 
         if (tList) renderTransactions();
+        if (tList) renderCategoryRules();
         if (oList) renderObligations();
         if (gList) renderGoals();
         if (aList) renderLiquidAssets();
@@ -781,13 +864,13 @@ function renderTransactions() {
     } else {
         list.innerHTML = visible.map(t => {
             const isIncome = t.type === 'income';
-            const color = isIncome ? 'var(--c-green-text)' : 'var(--c-red-text)';
+            const color = isIncome ? 'var(--c-green)' : 'var(--c-red)';
             const sign = isIncome ? '+' : '−';
             const typePill = isIncome
                 ? '<span class="action-pill success-pill" style="pointer-events:none;font-size:.72rem;padding:4px 10px;">Доход</span>'
                 : '<span class="action-pill danger-pill" style="pointer-events:none;font-size:.72rem;padding:4px 10px;">Расход</span>';
             const source = t.is_synced
-                ? `<span style="color:var(--c-cyan-text);font-size:.78rem;font-weight:600;">● ${BANK_LABELS[t.bank] || 'Банк'}</span>`
+                ? `<span style="color:var(--c-cyan);font-size:.78rem;font-weight:600;">● ${BANK_LABELS[t.bank] || 'Банк'}</span>`
                 : '<span style="color:var(--c-text3);font-size:.78rem;">○ Ручной</span>';
 
             return `<div class="table-row">
@@ -797,7 +880,8 @@ function renderTransactions() {
                 <span>${typePill}</span>
                 <span class="text-right" style="color:${color};font-weight:600;">${sign}${fmt.cur(t.amount)}</span>
                 <span class="text-right">
-                    <button class="ghost-button delete-button" data-transaction-id="${t.id}" style="padding:4px 8px;color:var(--c-red-text);font-size:.85rem;" title="Удалить" aria-label="Удалить">✕</button>
+                    <button class="ghost-button recat-button" data-transaction-id="${t.id}" style="padding:4px 8px;color:var(--c-text3);font-size:.85rem;" title="Сменить категорию" aria-label="Сменить категорию">↻</button>
+                    <button class="ghost-button delete-button" data-transaction-id="${t.id}" style="padding:4px 8px;color:var(--c-red);font-size:.85rem;" title="Удалить" aria-label="Удалить">✕</button>
                 </span>
             </div>`;
         }).join('');
@@ -805,6 +889,34 @@ function renderTransactions() {
 
     renderTransactionsPagination(all.length, pages);
     renderOperationsStats(all);
+}
+
+// P2.7: открыть модалку переназначения, префилл из объекта операции
+function openRecatModal(txn) {
+    $('#recat-txn-id').value = txn.id;
+    $('#recat-txn-type').value = txn.type;
+    $('#recat-category').value = txn.category || '';
+    $('#recat-token').value = txn.description || '';
+    $('#recat-apply').checked = true;
+    openModal($('#recat-modal'));
+    $('#recat-category').focus();
+}
+
+// P2.7: список выученных правил с удалением
+async function renderCategoryRules() {
+    const box = $('#category-rules-list');
+    if (!box) return;
+    try {
+        const rules = await api('/api/category-rules');
+        if (!rules.length) {
+            box.innerHTML = `<div class="empty-row">Пока нет правил — переназначьте категорию любой операции (кнопка ↻), и правило появится здесь</div>`;
+            return;
+        }
+        box.innerHTML = rules.map(r => `<div class="table-row" style="display:flex; justify-content:space-between; align-items:center; gap:10px;">
+            <span style="font-size:.85rem;"><span style="color:var(--c-text3);">описание содержит</span> <strong>${esc(r.match_token)}</strong> <span style="color:var(--c-text3);">→</span> <strong>${esc(r.category)}</strong> <span style="color:var(--c-text3); font-size:.78rem;">(${r.type === 'income' ? 'доход' : 'расход'})</span></span>
+            <button class="ghost-button rule-del" data-rule-id="${r.id}" style="padding:4px 8px; color:var(--c-red); font-size:.85rem;" title="Удалить правило" aria-label="Удалить правило">✕</button>
+        </div>`).join('');
+    } catch (e) { /* блок необязательный — тихо игнорируем */ }
 }
 
 function renderTransactionsPagination(total, pages) {
@@ -1025,19 +1137,19 @@ function renderObligations() {
             </div>`;
 
         return `
-        <div class="obligation-card" style="position:relative;">
-            <button class="ghost-button delete-button" data-obligation-id="${o.id}" style="position:absolute;top:16px;right:18px;z-index:2;color:var(--c-red-text);font-size:.85rem;padding:6px 10px;" title="Удалить" aria-label="Удалить">✕</button>
-            <details class="stack-item" style="flex-direction:column; align-items:stretch; gap:0; cursor:pointer;">
-                <summary style="list-style:none; display:block; padding-right:40px;">
+        <details class="stack-item" style="flex-direction:column; align-items:stretch; gap:0; cursor:pointer;">
+            <summary style="list-style:none; display:block;">
+                <div style="display:flex; justify-content:space-between; align-items:flex-start;">
                     <div class="stack-item-title">${esc(o.name)}</div>
-                    <div class="stack-item-text">
-                        ${fmt.cur(payment)} / мес · Ставка ${ratePct.toFixed(ratePct % 1 ? 1 : 0)}% · Осталось ${remaining} мес${takenLine}
-                    </div>
-                    ${progressBlock}
-                </summary>
-                ${details}
-            </details>
-        </div>`;
+                    <button class="ghost-button delete-button" data-obligation-id="${o.id}" style="color:var(--c-red);font-size:.85rem;padding:6px 10px;" title="Удалить" aria-label="Удалить" onclick="event.preventDefault()">✕</button>
+                </div>
+                <div class="stack-item-text">
+                    ${fmt.cur(payment)} / мес · Ставка ${ratePct.toFixed(ratePct % 1 ? 1 : 0)}% · Осталось ${remaining} мес${takenLine}
+                </div>
+                ${progressBlock}
+            </summary>
+            ${details}
+        </details>`;
     }).join('');
 }
 
@@ -1082,7 +1194,7 @@ function renderGoals() {
     const totalAccum = state.goals.reduce((x, g) => x + effectiveGoal(g).current, 0);
     const accumLine = totalAccum > 0 ? `
         <div style="font-size:.78rem; color:var(--c-text3); padding:8px 0; margin-bottom:8px; border-bottom:1px solid var(--c-border);">
-            Всего накоплено по целям: <strong style="color:var(--c-green-text);">${fmt.cur(totalAccum)}</strong> — учитывается в плане распределения
+            Всего накоплено по целям: <strong style="color:var(--c-green);">${fmt.cur(totalAccum)}</strong> — учитывается в плане распределения
         </div>` : '';
     list.innerHTML = accumLine + state.goals.map(g => {
         const { current, rate, linkedName } = effectiveGoal(g);
@@ -1101,7 +1213,7 @@ function renderGoals() {
                     <div class="stack-item-text">${fmt.cur(current)} из ${fmt.cur(g.target_amount)} · до ${fmt.date(g.deadline)}${rateLine}</div>
                     ${linkLine}
                 </div>
-                <button class="ghost-button delete-button" data-goal-id="${g.id}" style="color:var(--c-red-text);font-size:.85rem;padding:6px 10px;" title="Удалить" aria-label="Удалить">✕</button>
+                <button class="ghost-button delete-button" data-goal-id="${g.id}" style="color:var(--c-red);font-size:.85rem;padding:6px 10px;" title="Удалить" aria-label="Удалить">✕</button>
             </div>
             <div class="indicator-track" style="height:5px;">
                 <div class="indicator-track-fill resource-fill" style="width:${pct}%"></div>
@@ -1145,7 +1257,7 @@ function renderLiquidAssets() {
                         ${a.comment ? `· ${esc(a.comment)}` : ''}
                     </div>
                 </div>
-                <button class="ghost-button delete-asset-button" data-asset-id="${a.id}" style="color:var(--c-red-text);font-size:.85rem;padding:6px 10px;" title="Удалить" aria-label="Удалить">✕</button>
+                <button class="ghost-button delete-asset-button" data-asset-id="${a.id}" style="color:var(--c-red);font-size:.85rem;padding:6px 10px;" title="Удалить" aria-label="Удалить">✕</button>
             </article>
         `).join('')}`;
 }
@@ -1173,10 +1285,10 @@ function metricExplainHTML(key, ind) {
             ? `Эти <b>${m(Rt)}</b> каждый месяц можно направлять на досрочное погашение, в резерв или на цели — именно эту сумму система распределяет в плане.`
             : `Свободных денег нет: траты и платежи превышают доход на <b>${m(Math.abs(Rt))}</b>. Сначала нужно сократить расходы или увеличить доход — распределять пока нечего.`;
         return block('Свободные деньги (Rt) — как посчитано',
-            row('Доходы за месяц', `<b style="color:var(--c-green-text);">+${m(It)}</b>`) +
-            row('− Обычные расходы', `<b style="color:var(--c-red-text);">−${m(Et)}</b>`) +
-            row('− Платежи по кредитам', `<b style="color:var(--c-red-text);">−${m(SigmaP)}</b>`) +
-            row('= Свободные деньги', `<b style="color:${Rt >= 0 ? 'var(--c-green-text)' : 'var(--c-red-text)'};">${m(Rt)}</b>`),
+            row('Доходы за месяц', `<b style="color:var(--c-green);">+${m(It)}</b>`) +
+            row('− Обычные расходы', `<b style="color:var(--c-red);">−${m(Et)}</b>`) +
+            row('− Платежи по кредитам', `<b style="color:var(--c-red);">−${m(SigmaP)}</b>`) +
+            row('= Свободные деньги', `<b style="color:${Rt >= 0 ? 'var(--c-green)' : 'var(--c-red)'};">${m(Rt)}</b>`),
             verdict);
     }
     if (key === 'lt') {
@@ -1230,7 +1342,7 @@ function renderDashboardCards(res, isSimulation = false) {
     const headerEl = $('#summary-header');
     if (headerEl) {
         if (isSimulation) {
-            headerEl.innerHTML = `<div style="background:rgba(251,191,36,.12); border:1px solid var(--c-amber); padding:8px 14px; border-radius:var(--r-sm); margin-bottom:14px; font-size:.78rem; color:var(--c-amber-text); display:flex; justify-content:space-between; align-items:center;">
+            headerEl.innerHTML = `<div style="background:rgba(251,191,36,.12); border:1px solid var(--c-amber); padding:8px 14px; border-radius:var(--r-sm); margin-bottom:14px; font-size:.78rem; color:var(--c-amber); display:flex; justify-content:space-between; align-items:center;">
                 <span><strong>Гипотетический режим симулятора</strong> — БД не изменена, показаны симулированные значения</span>
                 <button onclick="document.getElementById('restore-summary-button').click()" style="background:var(--c-amber); color:#000; border:none; padding:4px 12px; border-radius:var(--r-sm); cursor:pointer; font-weight:600; font-size:.74rem;">Вернуть факт</button>
             </div>`;
@@ -1244,7 +1356,7 @@ function renderDashboardCards(res, isSimulation = false) {
     const heroRt = $('#hero-rt-value');
     if (heroRt) {
         heroRt.textContent = fmt.cur(Rt);
-        heroRt.style.color = Rt >= 0 ? 'var(--c-green-text)' : 'var(--c-red-text)';
+        heroRt.style.color = Rt >= 0 ? 'var(--c-green)' : 'var(--c-red)';
     }
     setText('#lt-value', `${Number(Lt).toFixed(1)} мес`);
     setText('#dt-value', fmt.pct(Dt));
@@ -1257,15 +1369,15 @@ function renderDashboardCards(res, isSimulation = false) {
     const blrBadge = $('#blr-status-badge');
 
     // Rt: цвет по знаку
-    if (rtEl) rtEl.style.color = Rt >= 0 ? 'var(--c-green-text)' : 'var(--c-red-text)';
+    if (rtEl) rtEl.style.color = Rt >= 0 ? 'var(--c-green)' : 'var(--c-red)';
     // Lt: ликвидность — месяцы автономии, норма 2.5–6 (Greninger)
-    if (ltEl) ltEl.style.color = Lt >= 2.5 ? 'var(--c-green-text)' : Lt >= 1 ? 'var(--c-amber-text)' : 'var(--c-red-text)';
+    if (ltEl) ltEl.style.color = Lt >= 2.5 ? 'var(--c-green)' : Lt >= 1 ? 'var(--c-amber)' : 'var(--c-red)';
     // Dt: ПДН Банка России — ≤36% норма, 36–50% повышенный, >50% опасный
-    if (dtEl) dtEl.style.color = Dt <= 0.36 ? 'var(--c-green-text)' : Dt <= 0.5 ? 'var(--c-amber-text)' : 'var(--c-red-text)';
+    if (dtEl) dtEl.style.color = Dt <= 0.36 ? 'var(--c-green)' : Dt <= 0.5 ? 'var(--c-amber)' : 'var(--c-red)';
     // BLR: Greninger — <1 критично, 1–2.5 слабо, 2.5–6 норма, >6 избыток
     const blrLevel = BLR_status?.level || (blr < 1 ? 'critical' : blr < 2.5 ? 'weak' : blr < 6 ? 'normal' : 'surplus');
     const blrLabel = BLR_status?.label || (blr < 1 ? 'критично' : blr < 2.5 ? 'слабо' : blr < 6 ? 'норма' : 'избыток');
-    const blrColors = { critical: 'var(--c-red-text)', weak: 'var(--c-amber-text)', normal: 'var(--c-green-text)', surplus: 'var(--c-violet-text)' };
+    const blrColors = { critical: 'var(--c-red)', weak: 'var(--c-amber)', normal: 'var(--c-green)', surplus: 'var(--c-violet)' };
     if (blrEl) blrEl.style.color = blrColors[blrLevel] || 'var(--c-text)';
     if (blrBadge) {
         blrBadge.textContent = blrLabel;
@@ -1560,7 +1672,7 @@ function renderSpendingAdvice(data) {
     const total = data.total_potential_saving || 0;
     const summary = total > 0
         ? `<div style="font-size:.78rem; color:var(--c-text2); margin-top:8px; padding:10px 14px; background:var(--c-surface-up); border-radius:var(--r-sm); line-height:1.5;">
-               Если постепенно привести эти траты к норме, в перспективе можно высвобождать <strong style="color:var(--c-green-text);">до ${fmt.cur(total)}</strong> в месяц — на досрочку, подушку или цели.
+               Если постепенно привести эти траты к норме, в перспективе можно высвобождать <strong style="color:var(--c-green);">до ${fmt.cur(total)}</strong> в месяц — на досрочку, подушку или цели.
                <br><span style="color:var(--c-text3);">Это ориентир на будущее, а не мгновенный эффект: план выше посчитан по вашим текущим тратам. Привычки меняются постепенно — начните с одной категории.</span>
            </div>`
         : '';
@@ -1625,7 +1737,7 @@ function forecastChartSVG(data) {
     const line = pts.map((p, i) => `${xOf(i).toFixed(1)},${yOf(p.Rt).toFixed(1)}`).join(' ');
     const linePoly = `<polyline points="${line}" fill="none" stroke="var(--c-accent)" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>`;
     const dots = pts.map((p, i) => {
-        const col = p.Rt >= 0 ? 'var(--c-green-text)' : 'var(--c-red-text)';
+        const col = p.Rt >= 0 ? 'var(--c-green)' : 'var(--c-red)';
         return `<circle cx="${xOf(i).toFixed(1)}" cy="${yOf(p.Rt).toFixed(1)}" r="3.5" fill="${col}" stroke="var(--c-bg)" stroke-width="1.5"/>`;
     }).join('');
 
@@ -1661,29 +1773,29 @@ function renderForecast(data) {
     container.style.display = '';
 
     const TREND_LABEL = { stable: 'Стабильный', improving: 'Улучшение', deteriorating: 'Ухудшение' };
-    const TREND_COLOR = { stable: 'var(--c-text3)', improving: 'var(--c-green-text)', deteriorating: 'var(--c-red-text)' };
+    const TREND_COLOR = { stable: 'var(--c-text3)', improving: 'var(--c-green)', deteriorating: 'var(--c-red)' };
     const trend = data.trend || 'stable';
     const method = data.method || {};
 
     const rows = (data.forecast || []).map(p => {
         const ci = (p.Rt_p10 !== undefined && p.Rt_p90 !== undefined)
-            ? `<span style="color:var(--c-amber-text); font-family:var(--font-mono);">${fmt.num(p.Rt_p10)} … ${fmt.num(p.Rt_p90)}</span>`
+            ? `<span style="color:var(--c-amber); font-family:var(--font-mono);">${fmt.num(p.Rt_p10)} … ${fmt.num(p.Rt_p90)}</span>`
             : '—';
         return `
         <tr>
             <td style="padding:6px 10px; color:var(--c-text3);">+${p.period} мес.</td>
             <td style="padding:6px 10px; text-align:right; color:var(--c-text2);">${fmt.cur(p.Bt)}</td>
-            <td style="padding:6px 10px; text-align:right; font-weight:600; color:${p.Rt >= 0 ? 'var(--c-green-text)' : 'var(--c-red-text)'};">${fmt.cur(p.Rt)}</td>
+            <td style="padding:6px 10px; text-align:right; font-weight:600; color:${p.Rt >= 0 ? 'var(--c-green)' : 'var(--c-red)'};">${fmt.cur(p.Rt)}</td>
             <td style="padding:6px 10px; text-align:right; font-size:.76rem; background:rgba(251,191,36,.05);">${ci}</td>
-            <td style="padding:6px 10px; text-align:right; color:${p.Lt >= 2.5 ? 'var(--c-green-text)' : p.Lt >= 1.0 ? 'var(--c-amber-text)' : 'var(--c-red-text)'};">${p.Lt.toFixed(3)}</td>
-            <td style="padding:6px 10px; text-align:right; color:${p.Dt <= 0.36 ? 'var(--c-green-text)' : p.Dt <= 0.5 ? 'var(--c-amber-text)' : 'var(--c-red-text)'};">${(p.Dt * 100).toFixed(1)}%</td>
+            <td style="padding:6px 10px; text-align:right; color:${p.Lt >= 2.5 ? 'var(--c-green)' : p.Lt >= 1.0 ? 'var(--c-amber)' : 'var(--c-red)'};">${p.Lt.toFixed(3)}</td>
+            <td style="padding:6px 10px; text-align:right; color:${p.Dt <= 0.36 ? 'var(--c-green)' : p.Dt <= 0.5 ? 'var(--c-amber)' : 'var(--c-red)'};">${(p.Dt * 100).toFixed(1)}%</td>
         </tr>`;
     }).join('');
 
     const alert = data.deficit_alert;
     const alertHtml = alert ? `
         <div style="margin-bottom:14px; padding:12px 16px; border-radius:10px; background:rgba(239,68,68,.08); border:1px solid rgba(239,68,68,.3); font-size:.84rem; line-height:1.5;">
-            <strong style="color:var(--c-red-text);">${alert.pessimistic ? 'Риск нехватки денег' : 'Прогноз: денег может не хватить'}</strong><br/>
+            <strong style="color:var(--c-red);">${alert.pessimistic ? 'Риск нехватки денег' : 'Прогноз: денег может не хватить'}</strong><br/>
             Через <strong>${alert.period} мес.</strong> ${alert.pessimistic ? 'при неблагоприятном сценарии ' : ''}свободных денег может не хватить — разрыв около <strong>${fmt.cur(alert.gap)}</strong>. Стоит заранее снизить расходы или отложить крупные траты.
         </div>` : '';
 
@@ -1708,10 +1820,10 @@ function renderForecast(data) {
             return `<div style="display:flex; flex-wrap:wrap; gap:12px; margin-bottom:18px;">
                 ${card('Баланс через ' + h + ' мес', fmt.cur(last.Bt) + ' ₽',
                     (deltaBt >= 0 ? '▲ +' : '▼ ') + fmt.cur(Math.abs(deltaBt)) + ' ₽ к текущему',
-                    deltaBt >= 0 ? 'var(--c-green-text)' : 'var(--c-red-text)')}
+                    deltaBt >= 0 ? 'var(--c-green)' : 'var(--c-red)')}
                 ${card('Свободные деньги/мес', fmt.cur(last.Rt) + ' ₽', 'прогноз Rt на горизонте', 'var(--c-accent)')}
                 ${hasCI ? card('Диапазон (80%)', fmt.num(last.Rt_p10) + '…' + fmt.num(last.Rt_p90),
-                    'где окажется Rt с вероятностью 80%', 'var(--c-amber-text)') : ''}
+                    'где окажется Rt с вероятностью 80%', 'var(--c-amber)') : ''}
                 ${card('Тренд', TREND_LABEL[trend], 'динамика свободных денег', TREND_COLOR[trend])}
             </div>`;
         })()}
@@ -1756,7 +1868,7 @@ function renderForecast(data) {
                     <th style="padding:6px 10px; text-align:left; font-weight:600;">Период</th>
                     <th style="padding:6px 10px; text-align:right; font-weight:600;">Баланс B<sub>t</sub></th>
                     <th style="padding:6px 10px; text-align:right; font-weight:600;">Свободные R<sub>t</sub></th>
-                    <th style="padding:6px 10px; text-align:right; font-weight:600; color:var(--c-amber-text);">Вероятный диапазон (80%)</th>
+                    <th style="padding:6px 10px; text-align:right; font-weight:600; color:var(--c-amber);">Вероятный диапазон (80%)</th>
                     <th style="padding:6px 10px; text-align:right; font-weight:600;">Запас прочности L<sub>t</sub></th>
                     <th style="padding:6px 10px; text-align:right; font-weight:600;">Долговая нагрузка D<sub>t</sub></th>
                 </tr>
@@ -1769,7 +1881,7 @@ function renderForecast(data) {
 function deltaColor(val, invert = false) {
     if (val === 0) return 'var(--c-text3)';
     const positive = invert ? val < 0 : val > 0;
-    return positive ? 'var(--c-green-text)' : 'var(--c-red-text)';
+    return positive ? 'var(--c-green)' : 'var(--c-red)';
 }
 function deltaSign(val) { return val > 0 ? '+' : ''; }
 
@@ -1789,9 +1901,9 @@ function renderAllocationBar(xObl, xRes, xGoals, rt) {
             ${segments.join('')}
         </div>
         <div style="display:flex; gap:12px; font-size:.70rem; color:var(--c-text3);">
-            ${pObl  > 0 ? `<span style="color:var(--c-red-text);">Долг ${pObl}%</span>` : ''}
-            ${pRes  > 0 ? `<span style="color:var(--c-amber-text);">Резерв ${pRes}%</span>` : ''}
-            ${pGoal > 0 ? `<span style="color:var(--c-green-text);">Цели ${pGoal}%</span>` : ''}
+            ${pObl  > 0 ? `<span style="color:var(--c-red);">Долг ${pObl}%</span>` : ''}
+            ${pRes  > 0 ? `<span style="color:var(--c-amber);">Резерв ${pRes}%</span>` : ''}
+            ${pGoal > 0 ? `<span style="color:var(--c-green);">Цели ${pGoal}%</span>` : ''}
         </div>`;
 }
 
@@ -1809,7 +1921,7 @@ function renderAllocationDetails(a) {
         if (parseFloat(a.x_obl_effective || 0) <= 0 || !obl.length) return '';
         return `
         <div class="alt-detail-block">
-            <div class="alt-detail-title" style="color:var(--c-pink-text);">Куда идёт досрочное погашение</div>
+            <div class="alt-detail-title" style="color:#F472B6;">Куда идёт досрочное погашение</div>
             ${obl.map(o => {
                 const rate = (parseFloat(o.interest_rate || 0) * 100).toFixed(1);
                 return `
@@ -1828,7 +1940,7 @@ function renderAllocationDetails(a) {
     const goalIds = Object.keys(goal).filter(k => parseFloat(goal[k]) > 0);
     const goalBlock = goalIds.length ? `
         <div class="alt-detail-block">
-            <div class="alt-detail-title" style="color:var(--c-green-text);">Как делятся деньги между целями</div>
+            <div class="alt-detail-title" style="color:#4ADE80;">Как делятся деньги между целями</div>
             ${goalIds.map(id => `
                 <div class="alt-detail-item">
                     <span class="alt-arrow">→</span>
@@ -1847,7 +1959,7 @@ function renderTop3Card(a, rank, indicators, weights, rival) {
     const costs = (e.costs || []);
     const { Rt, Lt, Dt } = indicators;
 
-    const rankColors = ['var(--c-green-text)', 'var(--c-accent-hl)', 'var(--c-text2)'];
+    const rankColors = ['var(--c-green)', 'var(--c-accent-hl)', 'var(--c-text2)'];
     const rankLabels = ['Наилучшая', 'Альтернатива #2', 'Альтернатива #3'];
     const borderColors = [
         'rgba(34,197,94,.3)', 'rgba(99,102,241,.25)', 'rgba(255,255,255,.08)'
@@ -1893,10 +2005,10 @@ function renderTop3Card(a, rank, indicators, weights, rival) {
         ${gains.length ? `
         <div style="margin-top:12px;">
             <div style="font-size:.72rem; text-transform:uppercase; letter-spacing:.5px;
-                        color:var(--c-green-text); font-weight:700; margin-bottom:6px;">Что улучшается</div>
+                        color:var(--c-green); font-weight:700; margin-bottom:6px;">Что улучшается</div>
             ${gains.map(g => `
             <div style="display:flex; gap:8px; font-size:.81rem; color:var(--c-text1); margin-bottom:4px; line-height:1.5;">
-                <span style="color:var(--c-green-text); flex-shrink:0;">↑</span>
+                <span style="color:var(--c-green); flex-shrink:0;">↑</span>
                 <span>${esc(g)}</span>
             </div>`).join('')}
         </div>` : ''}
@@ -1905,10 +2017,10 @@ function renderTop3Card(a, rank, indicators, weights, rival) {
         ${costs.length ? `
         <div style="margin-top:10px;">
             <div style="font-size:.72rem; text-transform:uppercase; letter-spacing:.5px;
-                        color:var(--c-amber-text); font-weight:700; margin-bottom:6px;">Компромисс</div>
+                        color:var(--c-amber); font-weight:700; margin-bottom:6px;">Компромисс</div>
             ${costs.map(c => `
             <div style="display:flex; gap:8px; font-size:.81rem; color:var(--c-text3); margin-bottom:4px; line-height:1.5;">
-                <span style="color:var(--c-amber-text); flex-shrink:0;">~</span>
+                <span style="color:var(--c-amber); flex-shrink:0;">~</span>
                 <span>${esc(c)}</span>
             </div>`).join('')}
         </div>` : ''}
@@ -1964,7 +2076,7 @@ function renderCalcDetails(a, ind, weights, rival) {
             parts.push(`Досрочно гасим только кредиты со ставкой ≥ ${rb}% (ниже — деньгам выгоднее работать на накопительном счёте), в порядке убывания ставки:`);
             parts.push((av.passed || []).map(o => `
                 <div class="alt-detail-item"><span class="alt-arrow">→</span>
-                <span><strong>${esc(o.name)}</strong> (${(o.interest_rate * 100).toFixed(1)}%): влито ${m(o.paid_in)}${o.closed ? ' — <b style="color:var(--c-green-text);">кредит закрыт</b>' : ''}${o.payment_saved > 0 ? `, платёж ↓ на ${m(o.payment_saved)}/мес` : ''}</span></div>`).join(''));
+                <span><strong>${esc(o.name)}</strong> (${(o.interest_rate * 100).toFixed(1)}%): влито ${m(o.paid_in)}${o.closed ? ' — <b style="color:var(--c-green);">кредит закрыт</b>' : ''}${o.payment_saved > 0 ? `, платёж ↓ на ${m(o.payment_saved)}/мес` : ''}</span></div>`).join(''));
         }
         if ((av.skipped || []).length) {
             parts.push(`<div style="margin-top:4px;">Не гасим досрочно: ${(av.skipped || []).map(o => `<strong>${esc(o.name)}</strong> (${(o.interest_rate * 100).toFixed(1)}% &lt; ${rb}%)`).join(', ')} — дешевле бенчмарка.</div>`);
@@ -1973,7 +2085,7 @@ function renderCalcDetails(a, ind, weights, rival) {
             parts.push(`<div style="margin-top:4px;">Высвобожденные <b>${m(av.x_unused_to_goals)}</b> перенаправлены на цели.</div>`);
         }
         if (av.delta_payment > 0) {
-            parts.push(`<div style="margin-top:4px;">Итог: ежемесячные платежи снизятся на <b style="color:var(--c-green-text);">${m(av.delta_payment)}</b>.</div>`);
+            parts.push(`<div style="margin-top:4px;">Итог: ежемесячные платежи снизятся на <b style="color:var(--c-green);">${m(av.delta_payment)}</b>.</div>`);
         }
         if (parts.length) s3 = step(3, 'Какие кредиты гасим (стратегия Avalanche)', parts.join(''));
     }
@@ -2065,7 +2177,7 @@ function altBreakdownHTML(a, weights, best) {
     const isBest = a === best;
     let cmp = '';
     if (isBest) {
-        cmp = `<div style="margin-top:8px; font-size:.74rem; color:var(--c-green-text); line-height:1.5;">Это рекомендованный план — лучшая суммарная оценка по вашему профилю риска.</div>`;
+        cmp = `<div style="margin-top:8px; font-size:.74rem; color:var(--c-green); line-height:1.5;">Это рекомендованный план — лучшая суммарная оценка по вашему профилю риска.</div>`;
     } else if (best && best.scores && best.utility !== undefined) {
         let worst = null, worstLoss = -1;
         crit.forEach(c => {
@@ -2076,7 +2188,7 @@ function altBreakdownHTML(a, weights, best) {
         });
         const diff = best.utility - a.utility;
         cmp = `<div style="margin-top:8px; font-size:.74rem; color:var(--c-text2); line-height:1.5;">
-            Уступает рекомендованному плану на <b style="color:var(--c-amber-text);">${diff.toFixed(3)}</b> балла${worst ? ` — главным образом по критерию «${worst.label}»` : ''}.
+            Уступает рекомендованному плану на <b style="color:var(--c-amber);">${diff.toFixed(3)}</b> балла${worst ? ` — главным образом по критерию «${worst.label}»` : ''}.
         </div>`;
     }
 
@@ -2101,10 +2213,10 @@ function renderAltRow(a, idx, weights, best) {
         <summary style="display:grid; grid-template-columns:28px 1fr auto auto auto auto 16px; align-items:center;
                     gap:10px; padding:8px 12px; font-size:.8rem; cursor:pointer;${isBest ? ' background:rgba(34,197,94,.05);' : ''}">
             <span style="color:var(--c-text3); font-size:.72rem; text-align:center;">${idx + 1}</span>
-            <span>${esc(a.name)}${isBest ? ' <span style="color:var(--c-green-text); font-size:.68rem; font-weight:600;">рекомендованный</span>' : ''}</span>
-            <span style="color:var(--c-red-text);   text-align:right;">${a.x_obligations > 0 ? fmt.cur(a.x_obligations) : '—'}</span>
-            <span style="color:var(--c-amber-text); text-align:right;">${a.x_reserve    > 0 ? fmt.cur(a.x_reserve)    : '—'}</span>
-            <span style="color:var(--c-green-text); text-align:right;">${a.x_goals      > 0 ? fmt.cur(a.x_goals)      : '—'}</span>
+            <span>${esc(a.name)}${isBest ? ' <span style="color:var(--c-green); font-size:.68rem; font-weight:600;">рекомендованный</span>' : ''}</span>
+            <span style="color:var(--c-red);   text-align:right;">${a.x_obligations > 0 ? fmt.cur(a.x_obligations) : '—'}</span>
+            <span style="color:var(--c-amber); text-align:right;">${a.x_reserve    > 0 ? fmt.cur(a.x_reserve)    : '—'}</span>
+            <span style="color:var(--c-green); text-align:right;">${a.x_goals      > 0 ? fmt.cur(a.x_goals)      : '—'}</span>
             <span style="color:var(--c-accent-hl); font-weight:700; text-align:right;">${a.utility}</span>
             <span class="alt-row-chevron" style="color:var(--c-text3); font-size:.7rem; text-align:center;">▸</span>
         </summary>
@@ -2126,19 +2238,19 @@ function rejectedRowHTML(a) {
             <span style="color:var(--c-text1); font-weight:600;">${c.val}</span>
         </div>`).join('');
     const why = viol.length
-        ? viol.map(v => `<div style="display:flex; gap:8px; font-size:.76rem; color:var(--c-text2); margin-top:4px; line-height:1.5;"><span style="color:var(--c-red-text); flex-shrink:0;">•</span><span>${esc(v)}</span></div>`).join('')
+        ? viol.map(v => `<div style="display:flex; gap:8px; font-size:.76rem; color:var(--c-text2); margin-top:4px; line-height:1.5;"><span style="color:var(--c-red); flex-shrink:0;">•</span><span>${esc(v)}</span></div>`).join('')
         : '<div style="font-size:.76rem; color:var(--c-text3);">Не прошёл по ограничениям модели.</div>';
     return `
     <details class="alt-row" style="border-bottom:1px solid var(--c-border);">
         <summary style="display:grid; grid-template-columns:1fr auto 16px; align-items:center; gap:10px;
                     padding:7px 12px; font-size:.8rem; cursor:pointer; opacity:.78;">
             <span>${esc(a.name)}</span>
-            <span style="font-size:.72rem; color:var(--c-red-text); text-align:right; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${viol.length ? esc(viol[0]) : 'не прошёл ограничения'}</span>
+            <span style="font-size:.72rem; color:var(--c-red); text-align:right; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${viol.length ? esc(viol[0]) : 'не прошёл ограничения'}</span>
             <span class="alt-row-chevron" style="color:var(--c-text3); font-size:.7rem; text-align:center;">▸</span>
         </summary>
         <div style="padding:10px 14px 12px; background:rgba(244,63,94,.03);">
             <div style="font-size:.72rem; color:var(--c-text3); margin-bottom:8px;">Распределение: долг ${fmt.cur(a.x_obligations || 0)} · резерв ${fmt.cur(a.x_reserve || 0)} · цели ${fmt.cur(a.x_goals || 0)}</div>
-            <div style="font-size:.72rem; color:var(--c-red-text); font-weight:600; margin-bottom:2px;">Почему отклонён:</div>
+            <div style="font-size:.72rem; color:var(--c-red); font-weight:600; margin-bottom:2px;">Почему отклонён:</div>
             ${why}
             <div style="margin-top:8px; padding:8px 12px; background:rgba(255,255,255,.03); border-radius:8px;">${rows}</div>
         </div>
@@ -2197,9 +2309,9 @@ function renderPlanning(res) {
     const rtEl = $('#plan-rt');
     const ltEl = $('#plan-lt');
     const dtEl = $('#plan-dt');
-    if (rtEl) { rtEl.textContent = fmt.cur(Rt); rtEl.style.color = Rt >= 0 ? 'var(--c-green-text)' : 'var(--c-red-text)'; }
-    if (ltEl) { ltEl.textContent = `${Number(Lt).toFixed(1)} мес`; ltEl.style.color = Lt >= 2.5 ? 'var(--c-green-text)' : Lt >= 1 ? 'var(--c-amber-text)' : 'var(--c-red-text)'; }
-    if (dtEl) { dtEl.textContent = fmt.pct(Dt); dtEl.style.color = Dt <= 0.36 ? 'var(--c-green-text)' : Dt <= 0.5 ? 'var(--c-amber-text)' : 'var(--c-red-text)'; }
+    if (rtEl) { rtEl.textContent = fmt.cur(Rt); rtEl.style.color = Rt >= 0 ? 'var(--c-green)' : 'var(--c-red)'; }
+    if (ltEl) { ltEl.textContent = `${Number(Lt).toFixed(1)} мес`; ltEl.style.color = Lt >= 2.5 ? 'var(--c-green)' : Lt >= 1 ? 'var(--c-amber)' : 'var(--c-red)'; }
+    if (dtEl) { dtEl.textContent = fmt.pct(Dt); dtEl.style.color = Dt <= 0.36 ? 'var(--c-green)' : Dt <= 0.5 ? 'var(--c-amber)' : 'var(--c-red)'; }
 
     // Человекочитаемая расшифровка показателей (без формульной нотации)
     const rtForm = $('#plan-rt-formula');
@@ -2219,10 +2331,10 @@ function renderPlanning(res) {
             </div>
             <div class="rec-formula" style="margin:0;">
                 <div style="display:grid; grid-template-columns:auto 1fr auto; gap:2px 10px; font-size:.78rem;">
-                    <span style="color:var(--c-text3);">w₁ (Rt)</span><span>Ресурс</span><strong>${w.w_rt}</strong>
-                    <span style="color:var(--c-text3);">w₂ (Lt)</span><span>Ликвидность</span><strong>${w.w_lt}</strong>
-                    <span style="color:var(--c-text3);">w₃ (Dt)</span><span>Долговая нагрузка</span><strong>${w.w_dt}</strong>
-                    <span style="color:var(--c-text3);">w₄ (Si)</span><span>Обеспеченность целей</span><strong>${w.w_goals}</strong>
+                    <span style="opacity:.6;">w₁ (Rt)</span><span>Ресурс</span><strong>${w.w_rt}</strong>
+                    <span style="opacity:.6;">w₂ (Lt)</span><span>Ликвидность</span><strong>${w.w_lt}</strong>
+                    <span style="opacity:.6;">w₃ (Dt)</span><span>Долговая нагрузка</span><strong>${w.w_dt}</strong>
+                    <span style="opacity:.6;">w₄ (Si)</span><span>Обеспеченность целей</span><strong>${w.w_goals}</strong>
                 </div>
             </div>`;
     }
@@ -2231,21 +2343,21 @@ function renderPlanning(res) {
     const inp = $('#input-display');
     if (inp) {
         const s = res.input_summary || {};
-        const rowI = (label, val) => `<div style="display:flex; justify-content:space-between; gap:8px; padding:4px 0; flex-wrap:wrap;"><span style="color:var(--c-text3); min-width:0;">${label}</span><strong style="color:var(--c-green-text); text-align:right; margin-left:auto;">${val}</strong></div>`;
-        const rowE = (label, val) => `<div style="display:flex; justify-content:space-between; gap:8px; padding:4px 0; flex-wrap:wrap;"><span style="color:var(--c-text3); min-width:0;">${label}</span><strong style="color:var(--c-red-text); text-align:right; margin-left:auto;">${val}</strong></div>`;
+        const rowI = (label, val) => `<div style="display:flex; justify-content:space-between; gap:8px; padding:4px 0; flex-wrap:wrap;"><span style="color:var(--c-text3); min-width:0;">${label}</span><strong style="color:var(--c-green); text-align:right; margin-left:auto;">${val}</strong></div>`;
+        const rowE = (label, val) => `<div style="display:flex; justify-content:space-between; gap:8px; padding:4px 0; flex-wrap:wrap;"><span style="color:var(--c-text3); min-width:0;">${label}</span><strong style="color:var(--c-red); text-align:right; margin-left:auto;">${val}</strong></div>`;
         inp.innerHTML = `
             <div style="font-size:.68rem; color:var(--c-text3); margin-bottom:10px; padding:6px 10px; background:var(--c-surface2); border-radius:var(--r-sm); text-align:center;">
                 Источник данных: <strong style="color:var(--c-text2);">база данных пользователя</strong>
             </div>
             <div style="display:grid; grid-template-columns:1fr; gap:12px; font-size:.8rem;">
                 <div style="min-width:0; border:1px solid rgba(74,222,128,.35); border-radius:var(--r-sm); padding:10px 12px; background:rgba(74,222,128,.05);">
-                    <div style="font-size:.68rem; font-weight:700; letter-spacing:.06em; color:var(--c-green-text); margin-bottom:6px;">ПРИХОДИТ / ЕСТЬ</div>
+                    <div style="font-size:.68rem; font-weight:700; letter-spacing:.06em; color:var(--c-green); margin-bottom:6px;">ПРИХОДИТ / ЕСТЬ</div>
                     ${rowI('Доходы в месяц', fmt.cur(s.income))}
                     ${rowI('Накоплено на целях (Bt)', fmt.cur(Bt))}
                     ${rowI('Накопления (Bliq)', fmt.cur(Bliq))}
                 </div>
                 <div style="min-width:0; border:1px solid rgba(248,113,113,.35); border-radius:var(--r-sm); padding:10px 12px; background:rgba(248,113,113,.05);">
-                    <div style="font-size:.68rem; font-weight:700; letter-spacing:.06em; color:var(--c-red-text); margin-bottom:6px;">УХОДИТ</div>
+                    <div style="font-size:.68rem; font-weight:700; letter-spacing:.06em; color:var(--c-red); margin-bottom:6px;">УХОДИТ</div>
                     ${rowE('Расходы в месяц', fmt.cur(s.expense))}
                     ${rowE('Платежи по кредитам', fmt.cur(SigmaP))}
                 </div>
@@ -2264,7 +2376,7 @@ function renderPlanning(res) {
     if (bp && bp.closed_goals && bp.closed_goals.length) {
         const banner = `
             <div class="alt-detail-block" style="border-color:#60A5FA; margin-bottom:12px;">
-                <div class="alt-detail-title" style="color:var(--c-blue-text);">Близкие цели можно закрыть из накоплений</div>
+                <div class="alt-detail-title" style="color:#60A5FA;">Близкие цели можно закрыть из накоплений</div>
                 <div style="font-size:.82rem; color:var(--c-text); margin-bottom:8px;">
                     У вас есть накопления, которыми можно разом закрыть цели с близким сроком (до 3 месяцев) — на это уйдёт <strong>${fmt.cur(bp.bliq_used)}</strong>:
                 </div>
@@ -2297,7 +2409,7 @@ function renderPlanning(res) {
         } else {
             optC.innerHTML = `
                 <div class="glass-panel" style="border:1px solid rgba(244,63,94,.2); padding:20px 24px; text-align:center;">
-                    <div style="font-weight:700; color:var(--c-red-text); margin-bottom:6px;">Все альтернативы отклонены (структурный диагноз)</div>
+                    <div style="font-weight:700; color:var(--c-red); margin-bottom:6px;">Все альтернативы отклонены (структурный диагноз)</div>
                     <div style="font-size:.84rem; color:var(--c-text3);">
                         A_доп = ∅. Свободный поток Rt = ${fmt.cur(Rt)} ₽. Распределять нечего —
                         требуется пересмотр расходов или рефинансирование дорогих кредитов.
@@ -2320,9 +2432,9 @@ function renderPlanning(res) {
                                 padding:6px 12px; font-size:.68rem; text-transform:uppercase; letter-spacing:.4px;
                                 color:var(--c-text3); border-bottom:1px solid var(--c-border); font-weight:600;">
                         <span>#</span><span>Название</span>
-                        <span style="color:var(--c-red-text);">Долг</span>
-                        <span style="color:var(--c-amber-text);">Резерв</span>
-                        <span style="color:var(--c-green-text);">Цели</span>
+                        <span style="color:var(--c-red);">Долг</span>
+                        <span style="color:var(--c-amber);">Резерв</span>
+                        <span style="color:var(--c-green);">Цели</span>
                         <span>Оценка</span>
                         <span></span>
                     </div>

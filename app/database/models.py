@@ -5,7 +5,7 @@ from datetime import datetime
 from decimal import Decimal
 from typing import Optional
 
-from sqlalchemy import JSON, Boolean, DateTime, Float, ForeignKey, Integer, Numeric, String, Text
+from sqlalchemy import JSON, Boolean, DateTime, Float, ForeignKey, Integer, Numeric, String, Text, UniqueConstraint
 
 from app.database.types import EncryptedString
 from sqlalchemy.orm import Mapped, mapped_column
@@ -378,3 +378,81 @@ class PlanSnapshot(Base):
     note: Mapped[Optional[str]] = mapped_column(String(500), nullable=True)
     is_deleted: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False, index=True)
     deleted_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+
+
+class UserCategoryRule(Base):
+    """Пользовательское правило категоризации (P2.7, обучение на правках).
+
+    Когда пользователь вручную переназначает категорию операции, сохраняется правило
+    (match_token -> category) для его user_id. Правило применяется к будущим импортам и
+    ретроактивно к существующим совпадающим операциям. Детерминированно, без ML.
+    `match_token` хранится уже нормализованным (см. normalize_match_key).
+    """
+
+    __tablename__ = "user_category_rules"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    user_id: Mapped[Optional[str]] = mapped_column(
+        ForeignKey("users.id"), nullable=True, index=True
+    )
+    # Нормализованный токен-подстрока: операция матчится, если её описание его содержит.
+    match_token: Mapped[str] = mapped_column(String(255), nullable=False)
+    type: Mapped[str] = mapped_column(String(20), nullable=False, default="expense")
+    category: Mapped[str] = mapped_column(String(255), nullable=False)
+    category_id: Mapped[Optional[int]] = mapped_column(
+        ForeignKey("categories.id"), nullable=True
+    )
+    created_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
+
+    __table_args__ = (
+        UniqueConstraint("user_id", "match_token", "type", name="uq_user_category_rule"),
+    )
+
+
+class Experiment(Base):
+    """A/B-эксперимент (P3.5). Управляется через админ-API: создать → running → stopped.
+
+    Варианты хранятся JSON-списком `[{"name": str, "weight": int}, ...]`; назначение —
+    детерминированным хешем (см. core/experiments.py) с фиксацией в ExperimentAssignment.
+    `conversion_event` — тип события, по которому считается конверсия в результатах.
+    """
+
+    __tablename__ = "experiments"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    key: Mapped[str] = mapped_column(String(64), nullable=False, unique=True, index=True)
+    name: Mapped[str] = mapped_column(String(255), nullable=False, default="")
+    description: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    status: Mapped[str] = mapped_column(String(20), nullable=False, default="draft")
+    variants: Mapped[list] = mapped_column(JSON, nullable=False, default=list)
+    conversion_event: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
+
+
+class ExperimentAssignment(Base):
+    """Зафиксированное назначение subject → вариант (P3.5).
+
+    Лочит назначение при первом показе: даже если веса/варианты эксперимента потом изменят,
+    уже назначенный subject остаётся в своём варианте (ноль контаминации выборки).
+    subject_id — user_id (аутентифицирован) либо session_id (аноним).
+    """
+
+    __tablename__ = "experiment_assignments"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    experiment_id: Mapped[int] = mapped_column(
+        ForeignKey("experiments.id"), nullable=False, index=True
+    )
+    subject_id: Mapped[str] = mapped_column(String(64), nullable=False, index=True)
+    variant: Mapped[str] = mapped_column(String(64), nullable=False)
+    assigned_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=datetime.utcnow)
+
+    __table_args__ = (
+        UniqueConstraint("experiment_id", "subject_id", name="uq_experiment_assignment"),
+    )

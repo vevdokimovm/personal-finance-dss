@@ -138,8 +138,7 @@ E2E браузер-агностичны: `pytest -m e2e --browser chromium|firef
 со своего Azure-CDN (`cdn.playwright.dev`, `playwright.download.prss.microsoft.com`), который вне
 сетевого allowlist песочницы (403) — та же категория ограничения, что `cbr.ru`. Это проверено по
 всем каналам (GitHub releases — 404, npm-пакет бинарей не содержит, системный firefox несовместим
-с juggler-протоколом Playwright, apt даёт только либы); подробности — в разборе
-`FINPILOT_browsers_sandbox_investigation.md`. Поэтому:
+с juggler-протоколом Playwright, apt даёт только либы); подробности — в реестре расследований `docs/investigations_summary.md`. Поэтому:
 - быстрый прогон гоняет E2E-smoke на **chromium** (в песочнице и в CI);
 - полный тир гоняет **chromium + firefox + webkit** в CI, где CDN доступен.
 
@@ -149,7 +148,7 @@ E2E браузер-агностичны: `pytest -m e2e --browser chromium|firef
 
 ## 5. Грабли запуска в песочнице (кратко)
 
-Полностью — `FINPILOT_Claude_sandbox_runbook.md`. Главное: shell — dash (POSIX, не bash);
+Полностью — `docs/sandbox_runbook.md`. Главное: shell — dash (POSIX, не bash);
 вывод pytest — в ФАЙЛ, не в пайп; длинные прогоны — в фон через `setsid` + опрос файла-маркера
 (`returncode -1` с пустым выводом — это способ вызова, а не смерть песочницы); chromium — только
 с `--no-sandbox`.

@@ -12,7 +12,7 @@
 
 | Ситуация | Документ |
 |---|---|
-| Был сбой с влиянием на пользователей (даунтайм, потеря данных, деградация) | **Post-mortem** (`docs/incident_postmortem.md`) |
+| Был сбой с влиянием на пользователей (даунтайм, потеря данных, деградация) | **Post-mortem** (`docs/incident_postmortem_guide.md`) |
 | Near miss («чуть не упало», но обошлось) | **Post-mortem** (дешёвый урок) |
 | Долго/сложно разбирались, нашли причину, но бага в коде нет | **Investigation report** (этот файл) |
 | Нашли конкретный дефект кода | Карточка **BUG-XXX** (`docs/bug_report_template.md`) |
@@ -128,10 +128,9 @@
 Полный investigation report — **отдельным `.md`-файлом владельцу** (не в архиве кода, правило §12),
 имя вида `FINPILOT_<тема>_investigation.md`. В репозитории остаётся только **короткая сводка строкой**
 в `docs/investigations_summary.md` (парный реестр к `docs/incidents_summary.md`; для быстрого контекста
-разработчику/AI). Формат самого разбора — этот шаблон; формат post-mortem — `docs/incident_postmortem.md`;
-обзор обоих форматов — `docs/incident_postmortem.md` §1, §4.
+разработчику/AI). Формат самого разбора — этот шаблон; формат post-mortem — `docs/incident_postmortem_guide.md`;
+обзор всех типов разборов — `docs/report_types.md`.
 
-Реальный пример investigation report по этому проекту: `FINPILOT_browsers_sandbox_investigation.md`
-(почему firefox/webkit не запускаются в песочнице — оказалось ограничение сети, не дефект кода).
-Разбор `FINPILOT_mathmodel_falsealarm_*` («баг ядра» = гонка в E2E) — тоже по сути investigation
+Реальные примеры investigation report по этому проекту — в реестре `docs/investigations_summary.md`
+(напр. firefox/webkit в песочнице — сетевое ограничение, не дефект кода; «баг ядра» = гонка в E2E
 report: подозрение с математического ядра было снято доказательствами.
