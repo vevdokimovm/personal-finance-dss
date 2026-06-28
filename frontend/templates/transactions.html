@@ -63,7 +63,7 @@
         </section>
         <section class="glass-panel" style="padding:20px 22px;">
             <h3 style="font-size:.95rem; margin:0 0 4px;">Доходы и расходы по месяцам</h3>
-            <div style="font-size:.74rem; color:var(--c-text3); margin-bottom:14px;"><span style="color:var(--c-green);">■</span> доходы · <span style="color:var(--c-red);">■</span> расходы</div>
+            <div style="font-size:.74rem; color:var(--c-text3); margin-bottom:14px;"><span style="color:var(--c-green-text);">■</span> доходы · <span style="color:var(--c-red-text);">■</span> расходы</div>
             <div id="chart-months"><div class="empty-row">Нет данных</div></div>
         </section>
     </div>
@@ -81,19 +81,6 @@
             <div id="stats-by-merchant"><div class="empty-row">Нет данных</div></div>
         </section>
     </div>
-
-    <!-- ═══ Выученные правила категоризации (P2.7) ═══ -->
-    <section class="glass-panel w-full" style="margin-top:20px;">
-        <div class="section-head">
-            <div>
-                <h2 class="section-title">Выученные правила категоризации</h2>
-                <p class="section-subtitle">Когда вы переназначаете категорию операции, FINPILOT запоминает правило и применяет его к новым и похожим операциям. Ненужное можно удалить.</p>
-            </div>
-        </div>
-        <div style="padding:14px 28px;">
-            <div id="category-rules-list"><div class="empty-row">Пока нет правил — переназначьте категорию любой операции (кнопка ↻), и правило появится здесь</div></div>
-        </div>
-    </section>
 
     <!-- ═══ Импорт банковских выписок ═══ -->
     <section class="glass-panel w-full" style="margin-top:24px;">
@@ -164,36 +151,6 @@
             <div class="modal-actions mt-4">
                 <button class="primary-button" type="submit">Сохранить</button>
                 <button class="ghost-button" type="button" data-close-modal="transaction-modal">Отмена</button>
-            </div>
-        </form>
-    </div>
-</div>
-
-<div class="modal-backdrop" id="recat-modal" role="dialog" aria-modal="true" aria-hidden="true" inert>
-    <div class="modal-card glass-panel">
-        <div class="modal-head">
-            <h3 class="modal-title">Переназначить категорию</h3>
-            <button class="modal-close ghost-button" type="button" data-close-modal="recat-modal">✕</button>
-        </div>
-        <form id="recat-form" class="modal-form">
-            <input type="hidden" id="recat-txn-id">
-            <input type="hidden" id="recat-txn-type">
-            <div class="field">
-                <label for="recat-category">Категория</label>
-                <input id="recat-category" type="text" placeholder="Продукты, Кафе, Транспорт…" required>
-            </div>
-            <div class="field">
-                <label for="recat-token">Применять к операциям, где описание содержит</label>
-                <input id="recat-token" type="text" placeholder="например, pyaterochka">
-                <div style="font-size:.72rem; color:var(--c-text3); margin-top:4px;">Можно сократить до ключевого слова мерчанта (минимум 3 символа). Пусто — правило не запоминается.</div>
-            </div>
-            <label style="display:flex; align-items:center; gap:8px; font-size:.85rem; margin-top:10px; cursor:pointer;">
-                <input type="checkbox" id="recat-apply" checked>
-                Применить к существующим похожим операциям
-            </label>
-            <div class="modal-actions mt-4">
-                <button class="primary-button" type="submit">Сохранить и запомнить</button>
-                <button class="ghost-button" type="button" data-close-modal="recat-modal">Отмена</button>
             </div>
         </form>
     </div>

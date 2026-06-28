@@ -9,12 +9,7 @@ from typing import Optional
 from sqlalchemy import delete, func
 from sqlalchemy.orm import Session
 
-from app.core.categorization import (
-    MIN_MATCH_TOKEN_LEN,
-    classify_transaction,
-    classify_with_rules,
-    normalize_match_key,
-)
+from app.core.categorization import classify_transaction
 from app.core.money import to_money
 from app.database.models import (
     Budget,
@@ -29,7 +24,6 @@ from app.database.models import (
     Recommendation,
     Scenario,
     Transaction,
-    UserCategoryRule,
     UserPrefs,
 )
 
@@ -88,11 +82,7 @@ def create_transaction(
     user_id: Optional[str] = None,
     autocommit: bool = True,
 ) -> Transaction:
-    if category:
-        resolved_category = category
-    else:
-        rules = get_user_category_rules(db, user_id, type)
-        resolved_category = classify_with_rules(description, mcc, type, rules)
+    resolved_category = category or classify_transaction(description, mcc, type)
     transaction = Transaction(
         amount=to_money(amount),
         category=resolved_category,
@@ -146,9 +136,6 @@ def bulk_create_transactions(
     for r in rows:
         counts[(r.get("description"), r["type"])] += 1
 
-    # P2.7: пользовательские правила категоризации — один запрос на весь батч (без N+1).
-    rules_by_type = _user_rules_by_type(db, user_id)
-
     now = datetime.utcnow()
     mappings: list[dict] = []
     inserted = 0
@@ -169,7 +156,7 @@ def bulk_create_transactions(
             date = datetime.fromisoformat(date)
         mappings.append({
             "amount": to_money(r["amount"]),
-            "category": classify_with_rules(desc, r.get("mcc"), typ, rules_by_type.get(typ, ())),
+            "category": classify_transaction(desc, r.get("mcc"), typ),
             "type": typ,
             "date": date,
             "description": desc,
@@ -380,177 +367,6 @@ def restore_transaction(db: Session, transaction_id: int) -> Optional[Transactio
     db.commit()
     db.refresh(transaction)
     return transaction
-
-
-# ── Обучение категоризации: пользовательские правила (P2.7) ───────────────
-def get_user_category_rules(
-    db: Session, user_id: Optional[str], txn_type: Optional[str] = None
-) -> list[tuple[str, str]]:
-    """`[(match_token, category)]` правил пользователя для классификации (новые сверху).
-
-    Опционально фильтрует по типу операции. Возвращает лёгкие кортежи, а не ORM-объекты —
-    ровно то, что ждёт `classify_with_rules`.
-    """
-    query = _owner_filter(
-        db.query(UserCategoryRule.match_token, UserCategoryRule.category),
-        UserCategoryRule,
-        user_id,
-    )
-    if txn_type is not None:
-        query = query.filter(UserCategoryRule.type == txn_type)
-    query = query.order_by(UserCategoryRule.updated_at.desc())
-    return [(row.match_token, row.category) for row in query]
-
-
-def _user_rules_by_type(db: Session, user_id: Optional[str]) -> dict[str, list[tuple[str, str]]]:
-    """Все правила пользователя, сгруппированные по типу операции — для bulk-импорта без N+1."""
-    query = _owner_filter(
-        db.query(
-            UserCategoryRule.match_token,
-            UserCategoryRule.category,
-            UserCategoryRule.type,
-        ),
-        UserCategoryRule,
-        user_id,
-    ).order_by(UserCategoryRule.updated_at.desc())
-    grouped: dict[str, list[tuple[str, str]]] = {}
-    for token, category, typ in query:
-        grouped.setdefault(typ, []).append((token, category))
-    return grouped
-
-
-def get_category_rules(db: Session, user_id: Optional[str]) -> list[UserCategoryRule]:
-    """Полные ORM-объекты правил пользователя для API (список/удаление), новые сверху."""
-    return (
-        _owner_filter(db.query(UserCategoryRule), UserCategoryRule, user_id)
-        .order_by(UserCategoryRule.updated_at.desc())
-        .all()
-    )
-
-
-def upsert_category_rule(
-    db: Session,
-    user_id: Optional[str],
-    match_token: str,
-    category: str,
-    txn_type: str = "expense",
-    category_id: Optional[int] = None,
-) -> UserCategoryRule:
-    """Создаёт или обновляет правило по ключу `(user_id, normalized_token, type)`.
-
-    Токен нормализуется перед записью, поэтому UNIQUE-ограничение реально дедуплицирует
-    правила одного мерчанта вне зависимости от регистра/пробелов.
-    """
-    token = normalize_match_key(match_token)
-    rule = _owner_filter(
-        db.query(UserCategoryRule), UserCategoryRule, user_id
-    ).filter(
-        UserCategoryRule.match_token == token,
-        UserCategoryRule.type == txn_type,
-    ).first()
-    if rule is not None:
-        rule.category = category
-        rule.category_id = category_id
-        rule.updated_at = datetime.utcnow()
-    else:
-        rule = UserCategoryRule(
-            user_id=user_id,
-            match_token=token,
-            type=txn_type,
-            category=category,
-            category_id=category_id,
-        )
-        db.add(rule)
-    db.commit()
-    db.refresh(rule)
-    return rule
-
-
-def set_transaction_category(
-    db: Session,
-    transaction_id: int,
-    category: str,
-    user_id: Optional[str] = None,
-    category_id: Optional[int] = None,
-) -> Optional[Transaction]:
-    """Переназначает категорию конкретной операции (с проверкой владельца). None — если не найдена."""
-    transaction = _owner_filter(
-        db.query(Transaction), Transaction, user_id
-    ).filter(
-        Transaction.id == transaction_id,
-        Transaction.is_deleted == False,  # noqa: E712
-    ).first()
-    if transaction is None:
-        return None
-    transaction.category = category
-    transaction.category_id = (
-        category_id
-        if category_id is not None
-        else category_id_for(db, category, transaction.type)
-    )
-    db.commit()
-    db.refresh(transaction)
-    return transaction
-
-
-def apply_category_rule(
-    db: Session,
-    user_id: Optional[str],
-    match_token: str,
-    category: str,
-    txn_type: str = "expense",
-    exclude_id: Optional[int] = None,
-) -> int:
-    """Ретроактивно применяет правило ко всем совпадающим операциям пользователя.
-
-    Совпадение — нормализованный токен содержится в нормализованном описании операции (тот же
-    критерий, что в `classify_with_rules`). Подстроковый матч с нормализацией нельзя выразить
-    переносимо в SQL, поэтому грузим операции пользователя одним запросом и фильтруем в Python —
-    приемлемо даже для тысяч строк (один SELECT + батч UPDATE). Возвращает число изменённых.
-    """
-    token = normalize_match_key(match_token)
-    if len(token) < MIN_MATCH_TOKEN_LEN:
-        return 0
-    transactions = _owner_filter(
-        db.query(Transaction), Transaction, user_id
-    ).filter(
-        Transaction.is_deleted == False,  # noqa: E712
-        Transaction.type == txn_type,
-    ).all()
-    changed = 0
-    for transaction in transactions:
-        if transaction.id == exclude_id:
-            continue
-        if token in normalize_match_key(transaction.description) and transaction.category != category:
-            transaction.category = category
-            if category_id_value := category_id_for(db, category, txn_type):
-                transaction.category_id = category_id_value
-            changed += 1
-    if changed:
-        db.commit()
-    return changed
-
-
-def category_id_for(db: Session, category: str, txn_type: str) -> Optional[int]:
-    """id системной категории по имени+типу, если такая есть (для консистентности FK). Иначе None."""
-    row = (
-        db.query(Category.id)
-        .filter(Category.name == category, Category.type == txn_type)
-        .first()
-    )
-    return row.id if row is not None else None
-
-
-def delete_category_rule(db: Session, rule_id: int, user_id: Optional[str] = None) -> bool:
-    """Удаляет правило пользователя по id (с проверкой владельца). False — если не найдено."""
-    rule = _owner_filter(
-        db.query(UserCategoryRule), UserCategoryRule, user_id
-    ).filter(UserCategoryRule.id == rule_id).first()
-    if rule is None:
-        return False
-    db.delete(rule)
-    db.commit()
-    return True
 
 
 # ── Obligations ──────────────────────────────────────────────────────────
