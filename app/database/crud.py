@@ -58,6 +58,18 @@ def _household_ids_for(session, user_id) -> tuple:
     return cache[user_id]
 
 
+def resolve_household_id(db: Session, user_id: str | None, requested: int | None) -> int | None:
+    """Безопасно разрешить household_id для производной сущности (P3.7).
+
+    Возвращает requested, только если пользователь действительно член этого
+    household; иначе None (производное остаётся личным). Это не даёт подсунуть
+    чужой household_id и положить данные в чужую семью.
+    """
+    if requested is None or user_id is None:
+        return None
+    return requested if requested in _household_ids_for(db, user_id) else None
+
+
 def _owner_filter(query, model, user_id):
     """Фильтр изоляции: персональное владение + (опционально) household-скоуп (P3.7).
 
@@ -347,8 +359,14 @@ def save_scenario(
     parent_recommendation_id: Optional[int] = None,
     description: Optional[str] = None,
     user_id: Optional[str] = None,
+    household_id: Optional[int] = None,
 ) -> Scenario:
-    """Сохраняет снимок сценария что-если (LOG-06)."""
+    """Сохраняет снимок сценария что-если (LOG-06).
+
+    household_id (P3.7): если задан — сценарий общий для семьи (виден членам через
+    _owner_filter); None — личный. Вызывающий код должен предварительно прогнать его
+    через resolve_household_id для валидации членства.
+    """
     scenario = Scenario(
         name=name,
         description=description,
@@ -356,6 +374,7 @@ def save_scenario(
         result_json=result,
         parent_recommendation_id=parent_recommendation_id,
         user_id=user_id,
+        household_id=household_id,
     )
     db.add(scenario)
     db.commit()
@@ -1120,8 +1139,13 @@ def create_plan_snapshot(
     result: dict,
     user_id: Optional[str] = None,
     note: Optional[str] = None,
+    household_id: Optional[int] = None,
 ) -> PlanSnapshot:
-    """Сохраняет снапшот результата _compute_plan в историю."""
+    """Сохраняет снапшот результата _compute_plan в историю.
+
+    household_id (P3.7): если задан — снапшот общий для семьи (виден членам);
+    None — личный. Валидацию членства делает вызывающий код (resolve_household_id).
+    """
     ind = result.get("indicators", {}) or {}
     top3 = result.get("top3", []) or []
     best = top3[0] if top3 else {}
@@ -1146,6 +1170,7 @@ def create_plan_snapshot(
         utility=_f(best.get("utility")),
         top3=top3 or None,
         note=(note or None),
+        household_id=household_id,
     )
     db.add(snap)
     db.commit()
@@ -1156,10 +1181,12 @@ def create_plan_snapshot(
 def get_plan_snapshots(
     db: Session, user_id: Optional[str] = None, limit: int = 50
 ) -> list[PlanSnapshot]:
-    owner = PlanSnapshot.user_id == user_id if user_id else PlanSnapshot.user_id.is_(None)
+    # _owner_filter (P3.7): свои + общие снапшоты семьи. Раньше тут был ручной
+    # фильтр по user_id, игнорировавший household-ось — снапшот с household_id был
+    # невидим членам семьи. Теперь поведение единообразно с get_scenarios.
+    query = _owner_filter(db.query(PlanSnapshot), PlanSnapshot, user_id)
     return (
-        db.query(PlanSnapshot)
-        .filter(owner, PlanSnapshot.is_deleted == False)  # noqa: E712
+        query.filter(PlanSnapshot.is_deleted == False)  # noqa: E712
         .order_by(PlanSnapshot.created_at.desc(), PlanSnapshot.id.desc())
         .limit(limit)
         .all()

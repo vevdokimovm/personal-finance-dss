@@ -31,6 +31,7 @@ from app.database.crud import (
     get_scenarios,
     get_transactions,
     get_user_prefs,
+    resolve_household_id,
     save_scenario,
     soft_delete_plan_snapshot,
 )
@@ -112,6 +113,7 @@ class ScenarioSave(BaseModel):
     name: str = Field(..., min_length=1, max_length=255)
     parameters: dict[str, Any] = Field(default_factory=dict)
     result: dict[str, Any] = Field(default_factory=dict)
+    household_id: int | None = None  # P3.7: общий для семьи (если член household)
 
 
 router = APIRouter(prefix="/planning", tags=["Планирование"])
@@ -375,6 +377,7 @@ class PlanHistorySave(BaseModel):
     l_min: float | None = None
     r_bench: float | None = None
     note: str | None = Field(default=None, max_length=500)
+    household_id: int | None = None  # P3.7: общий для семьи (если член household)
 
 
 def _snapshot_summary(s: Any) -> dict[str, Any]:
@@ -410,7 +413,8 @@ def save_plan_history(
         risk_tolerance=payload.risk_tolerance, l_min=payload.l_min, r_bench=payload.r_bench
     )
     result = _compute_plan(req, db, user_id)
-    snap = create_plan_snapshot(db, result, user_id=user_id, note=payload.note)
+    hh = resolve_household_id(db, user_id, payload.household_id)
+    snap = create_plan_snapshot(db, result, user_id=user_id, note=payload.note, household_id=hh)
     log_event("plan_snapshot_saved", {"id": snap.id, "risk_profile": snap.risk_profile})
     return _snapshot_detail(snap)
 
@@ -502,9 +506,10 @@ def save_scenario_endpoint(
     db: Session = Depends(get_db),
     user_id: str | None = Depends(get_current_user_id),
 ) -> dict[str, Any]:
+    hh = resolve_household_id(db, user_id, payload.household_id)
     scenario = save_scenario(
         db, name=payload.name, parameters=payload.parameters, result=payload.result,
-        user_id=user_id,
+        user_id=user_id, household_id=hh,
     )
     log_event("scenario_saved", {"name": payload.name, "parameters": payload.parameters})
     return {
