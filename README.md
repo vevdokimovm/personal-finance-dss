@@ -1,7 +1,7 @@
 # FINPILOT — СППР для персональных финансов
 
 [![CI](https://github.com/vevdokimovm/personal-finance-dss/actions/workflows/ci.yml/badge.svg)](https://github.com/vevdokimovm/personal-finance-dss/actions/workflows/ci.yml)
-![version](https://img.shields.io/badge/version-4.16.31-blue)
+![version](https://img.shields.io/badge/version-4.18.1-blue)
 ![python](https://img.shields.io/badge/python-3.12-blue)
 ![coverage](https://img.shields.io/badge/coverage-91%25-brightgreen)
 ![license](https://img.shields.io/badge/license-MIT-green)
