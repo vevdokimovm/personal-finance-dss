@@ -48,31 +48,31 @@
     const CASES = [
         {
             key: 'anna', n: 1, name: 'Анна Петрова, 36', role: 'Маркетолог · Москва',
-            tag: 'Пограничный', color: 'var(--c-amber)',
+            tag: 'Пограничный', color: 'var(--c-amber-text)',
             situation: 'Доход 180 000 ₽, есть кредиты и несколько целей. Свободный поток положительный, но долговая нагрузка ощутимая.',
             expect: 'Алгоритм оптимизирует долг по стратегии Avalanche (гасит дорогие кредиты), удерживает ликвидность ≥ нормы и распределяет остаток на цели по их важности.'
         },
         {
             key: 'dmitriy', n: 2, name: 'Дмитрий, 41', role: 'Senior IT · Санкт-Петербург',
-            tag: 'Здоровый бюджет', color: 'var(--c-green)',
+            tag: 'Здоровый бюджет', color: 'var(--c-green-text)',
             situation: 'Высокий доход, низкая долговая нагрузка, заметные накопления. Подушка уже сформирована.',
             expect: 'Основной акцент смещается на цели и рост: ликвидность в норме, гасить дешёвый долг досрочно невыгодно — деньги работают на накопительных инструментах.'
         },
         {
             key: 'mikhail', n: 3, name: 'Михаил, 49', role: 'Своя мастерская · Казань',
-            tag: 'Критический', color: 'var(--c-red)',
+            tag: 'Критический', color: 'var(--c-red-text)',
             situation: 'Расходы и платежи по кредитам съедают почти весь доход. Свободного потока фактически нет.',
             expect: 'Срабатывает принцип fail-loud: вместо «красивой» рекомендации система выдаёт структурный диагноз — распределять нечего, нужен пересмотр расходов или рефинансирование.'
         },
         {
             key: 'igor', n: 4, name: 'Игорь, 26', role: 'Junior-разработчик · Нижний Новгород',
-            tag: 'Старт карьеры', color: 'var(--c-cyan)',
+            tag: 'Старт карьеры', color: 'var(--c-cyan-text)',
             situation: 'Невысокий доход, кредитов нет, накоплений почти нет. Начало финансового пути.',
             expect: 'Приоритет — формирование подушки безопасности (BLR ниже нормы), затем цели роста дохода (категория income_growth, вес 3.0).'
         },
         {
             key: 'olga', n: 5, name: 'Ольга, 44', role: 'Библиотекарь · Тула',
-            tag: 'Микс-стратегия', color: 'var(--c-violet)',
+            tag: 'Микс-стратегия', color: 'var(--c-violet-text)',
             situation: 'Умеренный доход, смешанная ситуация: есть и долг, и цели, и частичная подушка.',
             expect: 'Сбалансированное распределение между всеми тремя направлениями — ни один критерий не доминирует, выбирается компромиссная альтернатива.'
         },
@@ -130,7 +130,7 @@
             }).join('') : '<li style="color:var(--c-text3);">нет</li>';
             const assets = d.liquid_assets.length ? d.liquid_assets.map(a =>
                 `<li><strong>${a.name}</strong> — ${fmtRub(a.amount)}${a.interest_rate ? `, ${(a.interest_rate*100).toFixed(1)}% годовых` : ''}</li>`).join('') : '<li style="color:var(--c-text3);">нет</li>';
-            const rtColor = m.free_resource >= 0 ? 'var(--c-green)' : 'var(--c-red)';
+            const rtColor = m.free_resource >= 0 ? 'var(--c-green-text)' : 'var(--c-red-text)';
             return `
             <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px 16px; margin-bottom:12px; padding:10px 12px; background:rgba(99,102,241,.06); border-radius:var(--r-sm);">
                 <div>Доход: <strong>${fmtRub(m.income_total)}</strong></div>
@@ -158,7 +158,7 @@
                 const res = await fetch(`/api/demo/preview?case=${encodeURIComponent(det.dataset.case)}`);
                 body.innerHTML = renderPortrait(await res.json());
             } catch (err) {
-                body.innerHTML = '<div style="color:var(--c-red);">Не удалось загрузить портрет.</div>';
+                body.innerHTML = '<div style="color:var(--c-red-text);">Не удалось загрузить портрет.</div>';
                 det.dataset.loaded = '';
             }
         }, true);
