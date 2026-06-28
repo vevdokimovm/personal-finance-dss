@@ -11,7 +11,7 @@ from datetime import datetime, timedelta
 
 from sqlalchemy.orm import Session
 
-from app.database.crud import get_budget_status, get_goals, get_transactions
+from app.database.crud import create_notification, get_budget_status, get_goals, get_transactions
 from app.database.models import Goal, NotificationLog, User
 from app.services.email_service import email_service
 
@@ -110,6 +110,12 @@ def run_user_notifications(db: Session, user: User) -> dict[str, int]:
             float(goal.current_amount), float(goal.target_amount), user.display_name,
         )
         record_notification(db, user.id, "goal_deadline", key)
+        create_notification(
+            db, user_id=user.id, type="goal_deadline",
+            title="Дедлайн цели приближается",
+            body=f"До дедлайна цели «{goal.name}» осталось дней: {days_left}",
+            link="/goals",
+        )
         sent["goal_deadline"] += 1
 
     for budget in budgets_over(db, user.id):
@@ -121,6 +127,12 @@ def run_user_notifications(db: Session, user: User) -> dict[str, int]:
             float(budget["spent"]), float(budget["limit_amount"]), user.display_name,
         )
         record_notification(db, user.id, "budget_overrun", key)
+        create_notification(
+            db, user_id=user.id, type="budget_overrun",
+            title="Превышен бюджет",
+            body=f"Расходы по категории «{budget['category']}» превысили лимит",
+            link="/budgets",
+        )
         sent["budget_overrun"] += 1
 
     # Месячный дайджест за прошлый завершённый месяц (если были операции).
@@ -131,6 +143,15 @@ def run_user_notifications(db: Session, user: User) -> dict[str, int]:
         if digest["transactions"] > 0:
             email_service.send_digest(user.email, digest, user.display_name)
             record_notification(db, user.id, "digest", digest_key)
+            create_notification(
+                db, user_id=user.id, type="digest",
+                title="Месячный отчёт готов",
+                body=(
+                    f"Сводка за {prev}: доход {digest['income']:.0f}, "
+                    f"расход {digest['expense']:.0f}, чистыми {digest['net']:.0f}"
+                ),
+                link="/planning",
+            )
             sent["digest"] += 1
 
     return sent

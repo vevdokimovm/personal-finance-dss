@@ -2,6 +2,31 @@
 
 Формат: [Keep a Changelog](https://keepachangelog.com/ru/1.0.0/). Версионирование — [SemVer](https://semver.org/lang/ru/).
 
+## [4.19.0] — 2026-06-29 — P2.3: in-app уведомления (бэкенд) — лента «колокольчика» (MINOR)
+
+Первая кодовая задача вехи 4. Закрывает реальную дыру: раньше уведомления существовали только как
+письма (`NotificationLog` — дедуп-журнал отправленных писем), in-app ленты не было вовсе. Это снимает
+блокер для колокольчика на фронте (веха 6) — старый роадмап ошибочно считал P2.3 «только UI».
+
+- **Модель `Notification`** (`notifications`, миграция 0023) — само уведомление для показа в
+  интерфейсе: `type`/`title`/`body`/`link`/`is_read`/`created_at`. Персональное, без household-оси
+  (уведомления не расшариваются). Не путать с `NotificationLog` (служебный дедуп писем).
+- **CRUD** (`crud.py`): `create_notification`, `get_notifications` (новые сверху, фильтр `unread_only`),
+  `count_unread_notifications`, `mark_notification_read` (с owner-проверкой), `mark_all_notifications_read`.
+- **Эндпоинты** (`routes_notifications.py`, все под `require_user`): `GET /notifications/feed`
+  (лента + счётчик непрочитанных), `GET /notifications/unread-count` (бейдж), `POST /notifications/{id}/read`,
+  `POST /notifications/read-all`. Изоляция по пользователю: чужое уведомление неотличимо от
+  несуществующего (404).
+- **Хук в email-рассылку** (`services/notifications.py`): где `run_user_notifications` реально шлёт
+  письмо (goal_deadline / budget_overrun / digest) — рядом создаётся in-app уведомление. Дедупликация
+  наследуется автоматически (создание идёт после проверки `was_notified`), повторный прогон не плодит дубли.
+- **Схемы** (`schemas/notification.py`): `NotificationOut`, `NotificationFeed`.
+
+Тесты: `tests/test_notifications_feed.py` — 14 тестов (пустая лента, порядок, изоляция между
+пользователями, unread_only, отметка одного/всех, owner-проверка 404, auth, хук создаёт in-app +
+дедуп). Полный fast-набор зелёный (790 passed, было 776). Миграция 0023 реверсивна (upgrade →
+downgrade → upgrade — чистый цикл). Прогон через `--junitxml` + парсинг XML (правило WATCHLOG §5.10).
+
 ## [4.18.2] — 2026-06-29 — Новый роадмап (вехи 4-9) + тонкий WATCHLOG + ADR фронт-стека + вопросы юристу (docs, PATCH)
 
 Фаза планирования направления продукта. Кода не касается — только документация и процесс.

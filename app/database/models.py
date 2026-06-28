@@ -363,6 +363,27 @@ class NotificationLog(Base):
     sent_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=datetime.utcnow)
 
 
+class Notification(Base):
+    """In-app уведомление (P2.3) — то, что пользователь видит в интерфейсе (колокольчик).
+
+    Отличается от NotificationLog: тот — служебный дедуп-журнал отправленных ПИСЕМ,
+    а это — само уведомление для показа в приложении (заголовок, текст, ссылка,
+    флаг прочитано). Персональное (без household-оси): уведомления не расшариваются.
+    """
+    __tablename__ = "notifications"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    user_id: Mapped[str] = mapped_column(String(36), nullable=False, index=True)
+    type: Mapped[str] = mapped_column(String(50), nullable=False)
+    title: Mapped[str] = mapped_column(String(255), nullable=False)
+    body: Mapped[str] = mapped_column(Text, nullable=False)
+    link: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+    is_read: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False, index=True)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime, nullable=False, default=datetime.utcnow, index=True
+    )
+
+
 class PlanSnapshot(Base):
     """Снапшот рассчитанного плана распределения (P2.6 — история плана).
 

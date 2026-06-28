@@ -26,6 +26,7 @@ from app.database.models import (
     HouseholdInvite,
     HouseholdMembership,
     LiquidAsset,
+    Notification,
     Obligation,
     ObligationPayment,
     PlanSnapshot,
@@ -1440,3 +1441,69 @@ def accept_invite(
     db.commit()
     db.refresh(membership)
     return membership, None
+
+
+# ─────────────────────── In-app уведомления (P2.3) ───────────────────────
+# Лента «колокольчика». Персональные (без household-оси): фильтр строго по
+# user_id — уведомления не расшариваются между членами семьи.
+
+def create_notification(
+    db: Session,
+    user_id: str,
+    type: str,
+    title: str,
+    body: str,
+    link: str | None = None,
+) -> Notification:
+    """Создать in-app уведомление для пользователя."""
+    note = Notification(user_id=user_id, type=type, title=title, body=body, link=link)
+    db.add(note)
+    db.commit()
+    db.refresh(note)
+    return note
+
+
+def get_notifications(
+    db: Session, user_id: str, unread_only: bool = False, limit: int = 50
+) -> list[Notification]:
+    """Лента уведомлений пользователя, новые сверху. unread_only — только непрочитанные."""
+    query = db.query(Notification).filter(Notification.user_id == user_id)
+    if unread_only:
+        query = query.filter(Notification.is_read.is_(False))
+    return query.order_by(Notification.created_at.desc(), Notification.id.desc()).limit(limit).all()
+
+
+def count_unread_notifications(db: Session, user_id: str) -> int:
+    """Число непрочитанных уведомлений пользователя (для бейджа колокольчика)."""
+    return (
+        db.query(Notification)
+        .filter(Notification.user_id == user_id, Notification.is_read.is_(False))
+        .count()
+    )
+
+
+def mark_notification_read(db: Session, user_id: str, notification_id: int) -> bool:
+    """Отметить одно уведомление прочитанным. Возвращает False, если не найдено у
+    этого пользователя (чужое/несуществующее — неотличимы, изоляция)."""
+    note = (
+        db.query(Notification)
+        .filter(Notification.id == notification_id, Notification.user_id == user_id)
+        .first()
+    )
+    if note is None:
+        return False
+    if not note.is_read:
+        note.is_read = True
+        db.commit()
+    return True
+
+
+def mark_all_notifications_read(db: Session, user_id: str) -> int:
+    """Отметить все непрочитанные уведомления пользователя. Возвращает число отмеченных."""
+    marked = (
+        db.query(Notification)
+        .filter(Notification.user_id == user_id, Notification.is_read.is_(False))
+        .update({Notification.is_read: True}, synchronize_session=False)
+    )
+    db.commit()
+    return marked
