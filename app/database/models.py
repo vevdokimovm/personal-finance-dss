@@ -88,6 +88,10 @@ class Transaction(Base):
     user_id: Mapped[Optional[str]] = mapped_column(
         ForeignKey("users.id"), nullable=True, index=True
     )
+    # P3.7: общий скоуп. NULL = личная операция (дефолт). Задан → видна членам household.
+    household_id: Mapped[Optional[int]] = mapped_column(
+        ForeignKey("households.id", ondelete="SET NULL"), nullable=True, index=True
+    )
     currency: Mapped[str] = mapped_column(String(3), nullable=False, default="RUB")
     amount: Mapped[Decimal] = mapped_column(
         Numeric(14, 2), nullable=False)
@@ -119,6 +123,9 @@ class Obligation(Base):
     user_id: Mapped[Optional[str]] = mapped_column(
         ForeignKey("users.id"), nullable=True, index=True
     )
+    household_id: Mapped[Optional[int]] = mapped_column(
+        ForeignKey("households.id", ondelete="SET NULL"), nullable=True, index=True
+    )
     currency: Mapped[str] = mapped_column(String(3), nullable=False, default="RUB")
     name: Mapped[str] = mapped_column(String(255), nullable=False, index=True, default="Обязательство")
     amount: Mapped[Decimal] = mapped_column(
@@ -145,6 +152,9 @@ class Goal(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
     user_id: Mapped[Optional[str]] = mapped_column(
         ForeignKey("users.id"), nullable=True, index=True
+    )
+    household_id: Mapped[Optional[int]] = mapped_column(
+        ForeignKey("households.id", ondelete="SET NULL"), nullable=True, index=True
     )
     currency: Mapped[str] = mapped_column(String(3), nullable=False, default="RUB")
     name: Mapped[str] = mapped_column(String(255), nullable=False, index=True)
@@ -176,6 +186,9 @@ class Budget(Base):
     user_id: Mapped[Optional[str]] = mapped_column(
         ForeignKey("users.id"), nullable=True, index=True
     )
+    household_id: Mapped[Optional[int]] = mapped_column(
+        ForeignKey("households.id", ondelete="SET NULL"), nullable=True, index=True
+    )
     category: Mapped[str] = mapped_column(String(64), nullable=False, unique=True, index=True)
     limit_amount: Mapped[Decimal] = mapped_column(
         Numeric(14, 2), nullable=False)
@@ -188,6 +201,9 @@ class Scenario(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
     user_id: Mapped[Optional[str]] = mapped_column(
         ForeignKey("users.id"), nullable=True, index=True
+    )
+    household_id: Mapped[Optional[int]] = mapped_column(
+        ForeignKey("households.id", ondelete="SET NULL"), nullable=True, index=True
     )
     parent_recommendation_id: Mapped[Optional[int]] = mapped_column(
         ForeignKey("recommendations.id"), nullable=True, index=True
@@ -206,6 +222,9 @@ class LiquidAsset(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
     user_id: Mapped[Optional[str]] = mapped_column(
         ForeignKey("users.id"), nullable=True, index=True
+    )
+    household_id: Mapped[Optional[int]] = mapped_column(
+        ForeignKey("households.id", ondelete="SET NULL"), nullable=True, index=True
     )
     currency: Mapped[str] = mapped_column(String(3), nullable=False, default="RUB")
     name: Mapped[str] = mapped_column(String(255), nullable=False, default="Депозит")
@@ -358,6 +377,9 @@ class PlanSnapshot(Base):
     user_id: Mapped[Optional[str]] = mapped_column(
         ForeignKey("users.id"), nullable=True, index=True
     )
+    household_id: Mapped[Optional[int]] = mapped_column(
+        ForeignKey("households.id", ondelete="SET NULL"), nullable=True, index=True
+    )
     created_at: Mapped[datetime] = mapped_column(
         DateTime, nullable=False, default=datetime.utcnow, index=True
     )
@@ -456,3 +478,73 @@ class ExperimentAssignment(Base):
     __table_args__ = (
         UniqueConstraint("experiment_id", "subject_id", name="uq_experiment_assignment"),
     )
+
+
+# ── Household: совместный скоуп поверх персонального владения (P3.7) ───────
+#
+# Дизайн-инвариант: household — ДОПОЛНИТЕЛЬНЫЙ скоуп, а не замена user_id.
+# Каждая доменная строка по-прежнему принадлежит автору (user_id); household_id
+# опционален (NULL = личное, как до P3.7). Это держит FINPILOT персональным
+# по умолчанию и аддитивным по отношению к семейному функционалу.
+
+
+class Household(Base):
+    """Совместное пространство (семья). owner_id — создатель и единственный, кто
+    управляет членством/удалением на первой фазе."""
+
+    __tablename__ = "households"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    name: Mapped[str] = mapped_column(String(255), nullable=False, default="Семья")
+    owner_id: Mapped[str] = mapped_column(ForeignKey("users.id"), nullable=False, index=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=datetime.utcnow)
+
+
+class HouseholdMembership(Base):
+    """Членство пользователя в household с ролью. role: owner | member | viewer.
+
+    owner — полный контроль (управление членством, удаление household, r/w общих
+    данных); member — r/w общих данных, без управления членством; viewer —
+    только чтение общих данных. Личными данными (household_id NULL) владелец
+    распоряжается всегда сам, независимо от роли в household.
+    """
+
+    __tablename__ = "household_memberships"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    household_id: Mapped[int] = mapped_column(
+        ForeignKey("households.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    user_id: Mapped[str] = mapped_column(ForeignKey("users.id"), nullable=False, index=True)
+    role: Mapped[str] = mapped_column(String(20), nullable=False, default="member")
+    joined_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=datetime.utcnow)
+
+    __table_args__ = (
+        UniqueConstraint("household_id", "user_id", name="uq_household_member"),
+    )
+
+
+class HouseholdInvite(Base):
+    """Приглашение в household по токену. Живёт до accept/revoke/expiry.
+
+    status: pending | accepted | revoked. Протухание определяется по expires_at
+    (а не отдельным статусом), чтобы не требовать фонового джоба. Живая отправка
+    письма приглашения — на стороне VPS (как SMTP P0.2); здесь генерируется токен
+    и ссылка, само письмо в песочнице не уходит.
+    """
+
+    __tablename__ = "household_invites"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    household_id: Mapped[int] = mapped_column(
+        ForeignKey("households.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    token: Mapped[str] = mapped_column(String(64), nullable=False, unique=True, index=True)
+    email: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+    role: Mapped[str] = mapped_column(String(20), nullable=False, default="member")
+    status: Mapped[str] = mapped_column(String(20), nullable=False, default="pending", index=True)
+    created_by: Mapped[str] = mapped_column(ForeignKey("users.id"), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=datetime.utcnow)
+    expires_at: Mapped[datetime] = mapped_column(DateTime, nullable=False)
+    accepted_by: Mapped[Optional[str]] = mapped_column(ForeignKey("users.id"), nullable=True)
+    accepted_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)

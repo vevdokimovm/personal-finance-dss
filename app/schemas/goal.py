@@ -25,6 +25,8 @@ class GoalCreate(BaseModel):
     savings_rate: float = Field(default=0.0, ge=0)
     linked_asset_id: Optional[int] = None
     currency: str = "RUB"
+    # P3.7: положить цель в общий бюджет household. None = личная (дефолт).
+    household_id: Optional[int] = None
 
 
 class GoalResponse(BaseModel):

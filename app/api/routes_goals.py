@@ -3,7 +3,13 @@ from __future__ import annotations
 from fastapi import APIRouter, Depends, HTTPException, Response, status
 from sqlalchemy.orm import Session
 
-from app.database.crud import create_goal, delete_goal, get_goals, restore_goal
+from app.database.crud import (
+    can_write_household,
+    create_goal,
+    delete_goal,
+    get_goals,
+    restore_goal,
+)
 from app.dependencies import get_current_user_id, get_db
 from app.schemas.goal import GoalCreate, GoalResponse
 from app.services.event_logger import log_event
@@ -30,6 +36,12 @@ def create_goal_endpoint(
     db: Session = Depends(get_db),
     user_id: str | None = Depends(get_current_user_id),
 ) -> GoalResponse:
+    if payload.household_id is not None and not can_write_household(
+        db, payload.household_id, user_id
+    ):
+        raise HTTPException(
+            status_code=403, detail="Нет прав на запись в этот household"
+        )
     goal = create_goal(
         db,
         name=payload.name,
@@ -43,10 +55,12 @@ def create_goal_endpoint(
         linked_asset_id=payload.linked_asset_id,
         currency=payload.currency,
         user_id=user_id,
+        household_id=payload.household_id,
     )
     log_event("goal_created", {
         "category": payload.category.value,
         "target_amount": payload.target_amount,
+        "shared": payload.household_id is not None,
     })
     return goal
 

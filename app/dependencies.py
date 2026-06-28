@@ -1,17 +1,26 @@
 from typing import Optional
 
 import secrets
+from dataclasses import dataclass
 
 from fastapi import Depends, Header, HTTPException, Request, status
 from sqlalchemy.orm import Session
 
 from app.config import settings
-from app.database.crud import get_user_by_id
+from app.database.crud import get_user_by_id, get_user_household_ids
 from app.database.db import get_db
 from app.database.models import User
 from app.services.security import token_service
 
-__all__ = ["get_db", "get_current_user", "require_user", "get_current_user_id", "require_admin"]
+__all__ = [
+    "get_db",
+    "get_current_user",
+    "require_user",
+    "get_current_user_id",
+    "get_current_scope",
+    "RequestScope",
+    "require_admin",
+]
 
 
 def require_admin(x_admin_key: Optional[str] = Header(None, alias="X-Admin-Key")) -> None:
@@ -87,3 +96,27 @@ def get_current_user_id(
 ) -> Optional[str]:
     """Идентификатор владельца для фильтрации данных (None = анонимный режим)."""
     return user.id if user is not None else None
+
+
+@dataclass(frozen=True)
+class RequestScope:
+    """Скоуп текущего запроса: персональный владелец + его household-ы (P3.7).
+
+    Удобно для эндпоинтов, которым нужно одновременно знать user_id и состав
+    домохозяйств (например, чтобы решить, в чей котёл писать). Чтение доменных
+    данных household-скоуп подмешивает само (в crud._owner_filter), поэтому для
+    обычных list-эндпоинтов достаточно get_current_user_id.
+    """
+
+    user_id: Optional[str]
+    household_ids: tuple[int, ...]
+
+
+def get_current_scope(
+    user_id: Optional[str] = Depends(get_current_user_id),
+    db: Session = Depends(get_db),
+) -> RequestScope:
+    return RequestScope(
+        user_id=user_id,
+        household_ids=tuple(get_user_household_ids(db, user_id)),
+    )

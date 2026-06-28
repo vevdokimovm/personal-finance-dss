@@ -18,6 +18,7 @@ class ObligationCreate(BaseModel):
     type: str = "other"
     start_date: Optional[datetime] = None
     currency: str = "RUB"
+    household_id: Optional[int] = None
 
 
 class ObligationResponse(BaseModel):

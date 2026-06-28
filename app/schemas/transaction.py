@@ -14,6 +14,7 @@ class TransactionCreate(BaseModel):
     description: Optional[str] = None
     mcc: Optional[str] = None
     currency: str = "RUB"
+    household_id: Optional[int] = None
 
 
 class TransactionResponse(BaseModel):

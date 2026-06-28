@@ -22,6 +22,9 @@ from app.database.models import (
     Event,
     Goal,
     GoalContribution,
+    Household,
+    HouseholdInvite,
+    HouseholdMembership,
     LiquidAsset,
     Obligation,
     ObligationPayment,
@@ -34,18 +37,50 @@ from app.database.models import (
 )
 
 
-def _owner_filter(query, model, user_id):
-    """Фильтр изоляции по пользователю.
+def _household_ids_for(session, user_id) -> tuple:
+    """household_id всех домохозяйств пользователя.
 
-    user_id задан  → строки этого пользователя.
-    user_id=None   → строки без владельца (анонимный/legacy-режим). После того как
-                     первый зарегистрированный пользователь усыновил данные, аноним
-                     перестаёт видеть чужие строки — это закрывает доступ к данным
-                     других пользователей в multi-user-режиме.
+    Кешируется на время жизни сессии (= время HTTP-запроса, т.к. get_db выдаёт
+    сессию на запрос) в session.info, чтобы множественные вызовы _owner_filter в
+    одном запросе не порождали N+1 SELECT по household_memberships.
     """
-    if user_id is not None:
-        return query.filter(model.user_id == user_id)
-    return query.filter(model.user_id.is_(None))
+    if user_id is None:
+        return ()
+    cache = session.info.setdefault("_household_ids_cache", {})
+    if user_id not in cache:
+        rows = (
+            session.query(HouseholdMembership.household_id)
+            .filter(HouseholdMembership.user_id == user_id)
+            .all()
+        )
+        cache[user_id] = tuple(r[0] for r in rows)
+    return cache[user_id]
+
+
+def _owner_filter(query, model, user_id):
+    """Фильтр изоляции: персональное владение + (опционально) household-скоуп (P3.7).
+
+    user_id=None    → строки без владельца (анонимный/legacy-режим) — как раньше.
+    user_id задан:
+      • модель без household_id            → только свои строки (поведение до P3.7);
+      • модель с household_id, нет семей    → только свои строки (household-ось пуста,
+                                              дизъюнкция вырождается — байт-в-байт
+                                              прежнее поведение, ничего не сломано);
+      • модель с household_id, есть семьи   → свои строки ∪ общие строки его семей.
+
+    Личное (household_id IS NULL) видно только автору всегда: общее условие
+    `user_id == me` ловит свои личные строки, а `household_id IN (...)` — только
+    те, что явно положены в общий котёл.
+    """
+    if user_id is None:
+        return query.filter(model.user_id.is_(None))
+    if hasattr(model, "household_id"):
+        household_ids = _household_ids_for(query.session, user_id)
+        if household_ids:
+            return query.filter(
+                (model.user_id == user_id) | (model.household_id.in_(household_ids))
+            )
+    return query.filter(model.user_id == user_id)
 
 
 # ── Categories (DATA-04) ─────────────────────────────────────────────────
@@ -86,6 +121,7 @@ def create_transaction(
     bank: Optional[str] = None,
     currency: str = "RUB",
     user_id: Optional[str] = None,
+    household_id: Optional[int] = None,
     autocommit: bool = True,
 ) -> Transaction:
     if category:
@@ -106,6 +142,7 @@ def create_transaction(
         bank=bank,
         currency=currency,
         user_id=user_id,
+        household_id=household_id,
         is_recurring=_is_recurring(db, description, type),
     )
     db.add(transaction)
@@ -265,7 +302,11 @@ def get_budgets(db: Session, user_id: Optional[str] = None) -> list[Budget]:
 
 
 def create_budget(
-    db: Session, category: str, limit_amount: float, user_id: Optional[str] = None
+    db: Session,
+    category: str,
+    limit_amount: float,
+    user_id: Optional[str] = None,
+    household_id: Optional[int] = None,
 ) -> Budget:
     """Создаёт бюджет; при существующей категории у того же владельца — обновляет лимит (FR-22)."""
     existing = _owner_filter(
@@ -276,7 +317,12 @@ def create_budget(
         db.commit()
         db.refresh(existing)
         return existing
-    budget = Budget(category=category, limit_amount=to_money(limit_amount), user_id=user_id)
+    budget = Budget(
+        category=category,
+        limit_amount=to_money(limit_amount),
+        user_id=user_id,
+        household_id=household_id,
+    )
     db.add(budget)
     db.commit()
     db.refresh(budget)
@@ -568,6 +614,7 @@ def create_obligation(
     start_date: Optional[datetime] = None,
     currency: str = "RUB",
     user_id: Optional[str] = None,
+    household_id: Optional[int] = None,
 ) -> Obligation:
     obligation = Obligation(
         name=name,
@@ -583,6 +630,7 @@ def create_obligation(
         is_active=True,
         currency=currency,
         user_id=user_id,
+        household_id=household_id,
     )
     db.add(obligation)
     db.commit()
@@ -684,6 +732,7 @@ def create_goal(
     savings_rate: float = 0.0,
     linked_asset_id: Optional[int] = None,
     user_id: Optional[str] = None,
+    household_id: Optional[int] = None,
 ) -> Goal:
     goal = Goal(
         name=name,
@@ -698,6 +747,7 @@ def create_goal(
         is_active=True,
         currency=currency,
         user_id=user_id,
+        household_id=household_id,
     )
     db.add(goal)
     db.commit()
@@ -794,10 +844,11 @@ def create_liquid_asset(
     comment: Optional[str] = None,
     currency: str = "RUB",
     user_id: Optional[str] = None,
+    household_id: Optional[int] = None,
 ) -> LiquidAsset:
     asset = LiquidAsset(
         name=name, amount=to_money(amount), interest_rate=interest_rate, type=type,
-        comment=comment, currency=currency, user_id=user_id,
+        comment=comment, currency=currency, user_id=user_id, household_id=household_id,
     )
     db.add(asset)
     db.commit()
@@ -1137,3 +1188,255 @@ def soft_delete_plan_snapshot(
     snap.deleted_at = datetime.utcnow()
     db.commit()
     return True
+
+
+# ══════════════════════════════════════════════════════════════════════════
+# Household (P3.7) — совместный скоуп поверх персонального владения.
+#
+# Инвариант прав: owner — полный контроль (членство, удаление household, r/w
+# общих данных); member — r/w общих данных; viewer — только чтение общих данных.
+# Личные данные (household_id IS NULL) к ролям отношения не имеют — ими владелец
+# распоряжается сам через обычный user_id-скоуп.
+# ══════════════════════════════════════════════════════════════════════════
+
+HOUSEHOLD_ROLES = ("owner", "member", "viewer")
+_HOUSEHOLD_WRITE_ROLES = ("owner", "member")
+_INVITE_TTL_HOURS = 24 * 7
+
+
+def get_user_household_ids(db: Session, user_id: Optional[str]) -> list[int]:
+    """Список household_id, где пользователь состоит. Пусто для гостя/без семей."""
+    if user_id is None:
+        return []
+    rows = (
+        db.query(HouseholdMembership.household_id)
+        .filter(HouseholdMembership.user_id == user_id)
+        .all()
+    )
+    return [r[0] for r in rows]
+
+
+def get_membership(
+    db: Session, household_id: int, user_id: Optional[str]
+) -> Optional[HouseholdMembership]:
+    if user_id is None:
+        return None
+    return (
+        db.query(HouseholdMembership)
+        .filter(
+            HouseholdMembership.household_id == household_id,
+            HouseholdMembership.user_id == user_id,
+        )
+        .first()
+    )
+
+
+def get_household_role(db: Session, household_id: int, user_id: Optional[str]) -> Optional[str]:
+    membership = get_membership(db, household_id, user_id)
+    return membership.role if membership is not None else None
+
+
+def is_household_member(db: Session, household_id: int, user_id: Optional[str]) -> bool:
+    return get_membership(db, household_id, user_id) is not None
+
+
+def can_write_household(db: Session, household_id: int, user_id: Optional[str]) -> bool:
+    """Право записи общих данных: член household с ролью owner/member (не viewer)."""
+    role = get_household_role(db, household_id, user_id)
+    return role in _HOUSEHOLD_WRITE_ROLES
+
+
+def create_household(db: Session, user_id: str, name: str) -> Household:
+    """Создаёт household и делает создателя его owner-членом (одной транзакцией)."""
+    household = Household(name=name, owner_id=user_id)
+    db.add(household)
+    db.flush()  # нужен household.id для членства
+    db.add(HouseholdMembership(household_id=household.id, user_id=user_id, role="owner"))
+    db.commit()
+    db.refresh(household)
+    return household
+
+
+def get_household(db: Session, household_id: int) -> Optional[Household]:
+    return db.get(Household, household_id)
+
+
+def get_user_households(db: Session, user_id: Optional[str]) -> list[Household]:
+    if user_id is None:
+        return []
+    return (
+        db.query(Household)
+        .join(HouseholdMembership, HouseholdMembership.household_id == Household.id)
+        .filter(HouseholdMembership.user_id == user_id)
+        .order_by(Household.created_at.asc())
+        .all()
+    )
+
+
+def household_member_count(db: Session, household_id: int) -> int:
+    return (
+        db.query(func.count(HouseholdMembership.id))
+        .filter(HouseholdMembership.household_id == household_id)
+        .scalar()
+        or 0
+    )
+
+
+def get_household_members(db: Session, household_id: int) -> list[HouseholdMembership]:
+    return (
+        db.query(HouseholdMembership)
+        .filter(HouseholdMembership.household_id == household_id)
+        .order_by(HouseholdMembership.joined_at.asc())
+        .all()
+    )
+
+
+def rename_household(db: Session, household_id: int, name: str) -> Optional[Household]:
+    household = db.get(Household, household_id)
+    if household is None:
+        return None
+    household.name = name
+    db.commit()
+    db.refresh(household)
+    return household
+
+
+# Доменные таблицы, в которых строки возвращаются авторам при роспуске household.
+_HOUSEHOLD_SCOPED_MODELS = (
+    Transaction,
+    Obligation,
+    Goal,
+    Budget,
+    Scenario,
+    LiquidAsset,
+    PlanSnapshot,
+)
+
+
+def delete_household(db: Session, household_id: int) -> bool:
+    """Распускает household. Общие строки возвращаются авторам (household_id → NULL),
+    членства и приглашения удаляются. Данные не теряются и не повисают обезличенными
+    (152-ФЗ). Обнуление household_id делается явно — не полагаемся на FK ON DELETE
+    SET NULL, т.к. на SQLite enforcement FK по умолчанию выключен.
+    """
+    household = db.get(Household, household_id)
+    if household is None:
+        return False
+    for model in _HOUSEHOLD_SCOPED_MODELS:
+        db.query(model).filter(model.household_id == household_id).update(
+            {model.household_id: None}, synchronize_session=False
+        )
+    db.query(HouseholdInvite).filter(
+        HouseholdInvite.household_id == household_id
+    ).delete(synchronize_session=False)
+    db.query(HouseholdMembership).filter(
+        HouseholdMembership.household_id == household_id
+    ).delete(synchronize_session=False)
+    db.delete(household)
+    db.commit()
+    return True
+
+
+def remove_member(db: Session, household_id: int, user_id: str) -> bool:
+    """Удаляет члена из household. Owner так удалить нельзя (только распуск household)."""
+    membership = get_membership(db, household_id, user_id)
+    if membership is None or membership.role == "owner":
+        return False
+    db.delete(membership)
+    db.commit()
+    return True
+
+
+def leave_household(db: Session, household_id: int, user_id: str) -> bool:
+    """Выход члена из household. Owner выйти не может (нужно распустить household
+    или передать владение — передача вне первой фазы)."""
+    return remove_member(db, household_id, user_id)
+
+
+def create_invite(
+    db: Session,
+    household_id: int,
+    created_by: str,
+    role: str = "member",
+    email: Optional[str] = None,
+    ttl_hours: int = _INVITE_TTL_HOURS,
+) -> HouseholdInvite:
+    invite = HouseholdInvite(
+        household_id=household_id,
+        token=secrets.token_urlsafe(32),
+        email=email,
+        role=role,
+        status="pending",
+        created_by=created_by,
+        expires_at=datetime.utcnow() + timedelta(hours=ttl_hours),
+    )
+    db.add(invite)
+    db.commit()
+    db.refresh(invite)
+    return invite
+
+
+def get_household_invites(
+    db: Session, household_id: int, pending_only: bool = False
+) -> list[HouseholdInvite]:
+    query = db.query(HouseholdInvite).filter(HouseholdInvite.household_id == household_id)
+    if pending_only:
+        query = query.filter(HouseholdInvite.status == "pending")
+    return query.order_by(HouseholdInvite.created_at.desc()).all()
+
+
+def get_invite_by_id(db: Session, invite_id: int) -> Optional[HouseholdInvite]:
+    return db.get(HouseholdInvite, invite_id)
+
+
+def get_invite_by_token(db: Session, token: str) -> Optional[HouseholdInvite]:
+    return (
+        db.query(HouseholdInvite).filter(HouseholdInvite.token == token).first()
+    )
+
+
+def revoke_invite(db: Session, invite_id: int) -> Optional[HouseholdInvite]:
+    invite = db.get(HouseholdInvite, invite_id)
+    if invite is None:
+        return None
+    invite.status = "revoked"
+    db.commit()
+    db.refresh(invite)
+    return invite
+
+
+def accept_invite(
+    db: Session, token: str, user_id: str
+) -> tuple[Optional[HouseholdMembership], Optional[str]]:
+    """Принимает приглашение. Возвращает (membership, None) при успехе либо
+    (None, code) с кодом причины отказа: 'invalid' | 'expired'.
+
+    Идемпотентно для уже состоящего пользователя: помечает приглашение принятым и
+    возвращает существующее членство (без дублей — спасает UNIQUE).
+    """
+    invite = get_invite_by_token(db, token)
+    if invite is None or invite.status != "pending":
+        return None, "invalid"
+    if invite.expires_at < datetime.utcnow():
+        invite.status = "expired"
+        db.commit()
+        return None, "expired"
+
+    existing = get_membership(db, invite.household_id, user_id)
+    if existing is not None:
+        invite.status = "accepted"
+        invite.accepted_by = user_id
+        invite.accepted_at = datetime.utcnow()
+        db.commit()
+        return existing, None
+
+    membership = HouseholdMembership(
+        household_id=invite.household_id, user_id=user_id, role=invite.role
+    )
+    db.add(membership)
+    invite.status = "accepted"
+    invite.accepted_by = user_id
+    invite.accepted_at = datetime.utcnow()
+    db.commit()
+    db.refresh(membership)
+    return membership, None

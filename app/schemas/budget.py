@@ -7,6 +7,7 @@ from pydantic import BaseModel, ConfigDict, Field
 class BudgetCreate(BaseModel):
     category: str = Field(..., min_length=1, max_length=64)
     limit_amount: float = Field(..., gt=0)
+    household_id: Optional[int] = None
 
 
 class BudgetResponse(BaseModel):

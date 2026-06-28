@@ -68,6 +68,26 @@ def _clear_recommendation_cache():
     yield
 
 
+@pytest.fixture(autouse=True)
+def _reset_rate_limit():
+    """Сброс in-memory rate-limit между тестами.
+
+    Счётчик _hits живёт на инстансе RateLimitMiddleware (= на время жизни app),
+    поэтому серии регистраций/логинов в рамках одного прогона ложно упираются в
+    429 и «заражают» последующие тесты. Чистим до теста; внутри теста накопление
+    сохраняется, так что проверки самого срабатывания лимита не ломаются.
+    """
+    from app.middleware import RateLimitMiddleware
+
+    mw = getattr(app, "middleware_stack", None)
+    while mw is not None:
+        if isinstance(mw, RateLimitMiddleware):
+            mw._hits.clear()
+            break
+        mw = getattr(mw, "app", None)
+    yield
+
+
 def pytest_collection_modifyitems(config, items):
     """Авто-маркировка категории `fast` (CI-тиры fast/full/deep).
 

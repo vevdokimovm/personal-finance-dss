@@ -12,6 +12,7 @@ class LiquidAssetCreate(BaseModel):
     type: str = "deposit"  # deposit | savings_account | cash
     comment: Optional[str] = None
     currency: str = "RUB"
+    household_id: Optional[int] = None
 
 
 class LiquidAssetUpdate(BaseModel):
