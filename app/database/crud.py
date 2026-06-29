@@ -1567,3 +1567,34 @@ def unlink_telegram(db: Session, user_id: str) -> bool:
     user.telegram_chat_id = None
     db.commit()
     return True
+
+
+# ─────────────────────── Монетизация: тариф (каркас) ───────────────────────
+
+def set_plan(
+    db: Session, user_id: str, tier: str, expires_at: Optional[datetime] = None
+) -> Optional[User]:
+    """Установить тариф пользователю напрямую (для будущего платёжного вебхука/админки)."""
+    user = get_user_by_id(db, user_id)
+    if user is None:
+        return None
+    user.plan_tier = tier
+    user.plan_expires_at = expires_at
+    db.commit()
+    db.refresh(user)
+    return user
+
+
+def grant_premium_days(db: Session, user_id: str, days: int) -> Optional[User]:
+    """Продлить premium на N дней. Накопительно: если premium активен — от текущего
+    срока, иначе от now. Под будущую привязку к реферальным наградам и платежам."""
+    user = get_user_by_id(db, user_id)
+    if user is None:
+        return None
+    now = datetime.utcnow()
+    base = user.plan_expires_at if (user.plan_expires_at and user.plan_expires_at > now) else now
+    user.plan_tier = "premium"
+    user.plan_expires_at = base + timedelta(days=days)
+    db.commit()
+    db.refresh(user)
+    return user

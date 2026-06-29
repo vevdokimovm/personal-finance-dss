@@ -49,6 +49,10 @@ class User(Base):
     telegram_chat_id: Mapped[Optional[str]] = mapped_column(
         String(32), nullable=True, unique=True, index=True
     )
+    # Монетизация (каркас): тариф и срок его действия. free по умолчанию; premium с
+    # истёкшим plan_expires_at трактуется как free (см. services/subscription.py).
+    plan_tier: Mapped[str] = mapped_column(String(20), nullable=False, default="free")
+    plan_expires_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
 
 
 class FxRate(Base):

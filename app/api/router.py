@@ -22,6 +22,7 @@ from app.api.routes_notifications import router as notifications_router
 from app.api.routes_planning import router as planning_router
 from app.api.routes_recommendation import router as recommendation_router
 from app.api.routes_transactions import router as transactions_router
+from app.api.routes_subscription import router as subscription_router
 from app.api.routes_telegram import router as telegram_router
 from app.api.routes_user_prefs import router as user_prefs_router
 from app.config import settings
@@ -51,3 +52,4 @@ router.include_router(plaid_router)
 router.include_router(experiments_router)
 router.include_router(experiments_admin_router)
 router.include_router(telegram_router)
+router.include_router(subscription_router)

@@ -91,6 +91,20 @@ def require_user(user: Optional[User] = Depends(get_current_user)) -> User:
     return user
 
 
+def require_premium(user: User = Depends(require_user)) -> User:
+    """Защита платных эндпоинтов (каркас монетизации): 403, если тариф не premium.
+
+    Эффективный тариф учитывает срок — premium с истёкшим plan_expires_at = free."""
+    from app.services.subscription import is_premium
+
+    if not is_premium(user):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Функция доступна на тарифе Premium.",
+        )
+    return user
+
+
 def get_current_user_id(
     user: Optional[User] = Depends(get_current_user),
 ) -> Optional[str]:
