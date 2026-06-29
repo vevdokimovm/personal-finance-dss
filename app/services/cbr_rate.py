@@ -16,6 +16,7 @@ import logging
 import urllib.error
 import urllib.request
 from datetime import date, datetime, timedelta, timezone
+from typing import TypedDict
 from xml.etree import ElementTree as ET
 
 from sqlalchemy import select
@@ -24,6 +25,14 @@ from app.database.db import SessionLocal
 from app.database.models import CbrKeyRate
 
 _log = logging.getLogger(__name__)
+
+
+class CbrFetchResult(TypedDict):
+    ok: bool
+    rate: float | None
+    effective_date: date | None
+    detail: str
+
 
 _CBR_SOAP_URL = "https://www.cbr.ru/DailyInfoWebServ/DailyInfo.asmx"
 _SOAP_ACTION = "http://web.cbr.ru/KeyRate"
@@ -108,7 +117,7 @@ def _parse_latest_rate(xml_text: str) -> float | None:
     return _parse_latest(xml_text)[1]
 
 
-def _fetch_from_cbr() -> dict[str, object]:
+def _fetch_from_cbr() -> CbrFetchResult:
     """Один сетевой запрос ключевой ставки к cbr.ru (SOAP KeyRate).
 
     Возвращает {"ok": bool, "rate": float|None, "effective_date": date|None,
@@ -239,7 +248,8 @@ def get_key_rate(fallback: float = 0.16) -> dict[str, object]:
         return {"key_rate": _cache["rate"], "source": "cache", "as_of": today.isoformat()}
 
     # 2. Недавняя неудача — в сеть не идём, но отдаём БД-кэш, если он есть.
-    if _fail_until["ts"] is not None and now < _fail_until["ts"]:
+    fail_ts = _fail_until["ts"]
+    if isinstance(fail_ts, datetime) and now < fail_ts:
         cached = _db_lookup()
         if cached is not None:
             return cached
@@ -250,11 +260,12 @@ def get_key_rate(fallback: float = 0.16) -> dict[str, object]:
 
     # 3. Живой запрос к cbr.ru.
     res = _fetch_from_cbr()
-    if res["ok"]:
-        rate = float(res["rate"])
+    rate_value = res["rate"]
+    if res["ok"] and rate_value is not None:
+        rate = float(rate_value)
         _cache.update(rate=rate, source="cbr", fetched_on=today)
         _fail_until.update(ts=None, detail="")
-        _db_store(res["effective_date"], rate)  # type: ignore[arg-type]
+        _db_store(res["effective_date"], rate)
         eff = res["effective_date"]
         as_of = eff.isoformat() if isinstance(eff, date) else today.isoformat()
         return {"key_rate": rate, "source": "cbr", "as_of": as_of, "detail": ""}
@@ -279,9 +290,10 @@ def refresh_key_rate() -> dict[str, object]:
     cbr.ru доступен; на датацентровом IP cbr.ru даст 403 — прогревать с RU-IP)."""
     today = datetime.now(timezone.utc).date()
     res = _fetch_from_cbr()
-    if res["ok"]:
-        rate = float(res["rate"])
-        _db_store(res["effective_date"], rate)  # type: ignore[arg-type]
+    rate_value = res["rate"]
+    if res["ok"] and rate_value is not None:
+        rate = float(rate_value)
+        _db_store(res["effective_date"], rate)
         _cache.update(rate=rate, source="cbr", fetched_on=today)
         _fail_until.update(ts=None, detail="")
         eff = res["effective_date"]
@@ -309,7 +321,8 @@ def get_opportunity_cost_rate(fallback: float = 0.14, tax_rate: float = 0.13) ->
     """
     kr = get_key_rate()
     rate = kr.get("key_rate")
-    if kr.get("source") in ("cbr", "cache", "cache_db") and isinstance(rate, (int, float)) and 0 < rate < 1:
+    if kr.get("source") in ("cbr", "cache", "cache_db") and isinstance(
+            rate, (int, float)) and 0 < rate < 1:
         ocr = round(float(rate) * (1 - tax_rate), 4)
         return {
             "r_bench": ocr,

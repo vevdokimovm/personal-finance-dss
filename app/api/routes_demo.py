@@ -274,7 +274,8 @@ def load_demo(
             detail="Демо-портреты доступны только в гостевом режиме (без входа в аккаунт).",
         )
     if case not in CASES:
-        raise HTTPException(status_code=400, detail=f"Неизвестный кейс: {case}. Доступно: {list(CASES.keys())}")
+        raise HTTPException(
+            status_code=400, detail=f"Неизвестный кейс: {case}. Доступно: {list(CASES.keys())}")
 
     _clear_all(db, user_id=user_id)
     data = CASES[case]()
@@ -348,7 +349,8 @@ def preview_demo(case: str = "anna") -> dict[str, Any]:
             for g in data["goals"]
         ],
         "liquid_assets": [
-            {"name": a.name, "amount": float(a.amount), "interest_rate": float(a.interest_rate or 0)}
+            {"name": a.name, "amount": float(
+                a.amount), "interest_rate": float(a.interest_rate or 0)}
             for a in data["liquid_assets"]
         ],
         "metrics": {

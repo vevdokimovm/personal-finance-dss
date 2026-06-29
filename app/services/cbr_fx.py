@@ -81,7 +81,8 @@ def fetch_cbr_fx_rates(use_cache: bool = True) -> dict[str, float] | None:
     if use_cache and _cache["rates"] is not None and _cache["fetched_on"] == today:
         return _cache["rates"]  # type: ignore[return-value]
 
-    if use_cache and _fail_until["ts"] is not None and now < _fail_until["ts"]:  # type: ignore[operator]
+    fail_ts = _fail_until["ts"]
+    if use_cache and isinstance(fail_ts, datetime) and now < fail_ts:
         return None
 
     try:

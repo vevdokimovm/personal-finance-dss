@@ -86,7 +86,8 @@ def build_recommendation_text(
                     f"Покрыть дефицит можно из накоплений — у вас {savings:,.0f} ₽ "
                     f"(подушка и ликвидные средства), этого хватит примерно на {runway} мес. "
                     f"Но это временный буфер: за это время нужно сократить расходы, "
-                    f"увеличить доход или снизить нагрузку по кредитам, иначе накопления закончатся."
+                    f"увеличить доход или снизить нагрузку по кредитам, "
+                    f"иначе накопления закончатся."
                 )
             else:
                 msg += (
@@ -142,8 +143,9 @@ def explain_alternative(
         obl_lines = []
         for o in alt.get("obligation_allocation", []):
             if float(o.get("new_payment", 0)) < obligation_payments:
+                rate_pct = float(o.get('interest_rate', 0)) * 100
                 obl_lines.append(
-                    f"«{o.get('name', 'кредит')}» (ставка {float(o.get('interest_rate', 0))*100:.0f}%)"
+                    f"«{o.get('name', 'кредит')}» (ставка {rate_pct:.0f}%)"
                 )
         which = ", ".join(obl_lines) if obl_lines else "самый дорогой кредит"
         dt_now = dt * 100
@@ -196,6 +198,7 @@ def explain_alternative(
     # становятся понятными и отличаются друг от друга.
     goals_sum = sum(float(v) for v in (alt.get("goal_allocation", {}) or {}).values())
     eff_total = x_obl_eff + x_res + goals_sum
+
     def _pct(part: float) -> int:
         return round(part / eff_total * 100) if eff_total > 0 else 0
 
@@ -206,11 +209,13 @@ def explain_alternative(
         split_parts.append(f"{_pct(x_res)}% в подушку безопасности ({x_res:,.0f} ₽)")
     if goals_sum > 0:
         split_parts.append(f"{_pct(goals_sum)}% на цели ({goals_sum:,.0f} ₽)")
-    split_str = ", ".join(split_parts) if split_parts else "вся сумма остаётся свободной на следующий месяц"
+    split_str = ", ".join(
+        split_parts) if split_parts else "вся сумма остаётся свободной на следующий месяц"
 
     if alt.get("is_recommended"):
         compared = (
-            f"система сравнила {alternatives_count} вариантов распределения и этот набрал наивысшую оценку."
+            f"система сравнила {alternatives_count} вариантов распределения "
+            f"и этот набрал наивысшую оценку."
             if alternatives_count
             else "система сравнила все варианты распределения и этот набрал наивысшую оценку."
         )

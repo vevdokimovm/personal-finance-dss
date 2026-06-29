@@ -95,12 +95,14 @@ def forecast_indicators(
     deficit_alert = None
     for f in forecast:
         if f["Rt"] < 0:
-            deficit_alert = {"period": f["period"], "gap": round(abs(f["Rt"]), 2), "pessimistic": False}
+            deficit_alert = {"period": f["period"], "gap": round(
+                abs(f["Rt"]), 2), "pessimistic": False}
             break
     if deficit_alert is None:
         for f in forecast:
             if f.get("Rt_p10", 0) < 0:
-                deficit_alert = {"period": f["period"], "gap": round(abs(f["Rt_p10"]), 2), "pessimistic": True}
+                deficit_alert = {"period": f["period"], "gap": round(
+                    abs(f["Rt_p10"]), 2), "pessimistic": True}
                 break
 
     return {

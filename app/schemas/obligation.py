@@ -38,7 +38,7 @@ class ObligationResponse(BaseModel):
     is_active: bool = True
     closed_at: Optional[datetime] = None
 
-    @computed_field
+    @computed_field  # type: ignore[misc,prop-decorator]
     @property
     def months_elapsed(self) -> int:
         """Сколько месяцев уже выплачивается (от даты взятия, не больше общего срока)."""
@@ -49,7 +49,7 @@ class ObligationResponse(BaseModel):
         elapsed = (now.year - sd.year) * 12 + (now.month - sd.month)
         return max(0, min(self.term, elapsed))
 
-    @computed_field
+    @computed_field  # type: ignore[misc,prop-decorator]
     @property
     def months_remaining(self) -> int:
         """Сколько месяцев осталось платить (общий срок минус пройденное)."""

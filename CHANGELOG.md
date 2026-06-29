@@ -2,6 +2,32 @@
 
 Формат: [Keep a Changelog](https://keepachangelog.com/ru/1.0.0/). Версионирование — [SemVer](https://semver.org/lang/ru/).
 
+## [4.25.1] — 2026-06-29 — Техдолг 4.3: статанализ до нуля (PATCH)
+
+Первая половина раздела 4.3 (P1.4): mypy и flake8 по `app/` приведены к нулю. Чистка
+поведение не меняет — все 14 mypy-фиксов и 93 flake8-правки рефакторинговые; полный
+fast-suite зелёный (611 тестов), покрытие на месте.
+
+- **mypy: 14 → 0** (6 файлов). Большинство — реальные типовые неточности, не косметика:
+  - `bank_api.py`: каталог банков `BANKS` типизирован через `TypedDict` (`BankCatalog`) —
+    устранены 6 ошибок (`uniform(lo, hi)` на `str | int`, `dict-item` в выдаче банков).
+  - `cbr_rate.py`: возврат `_fetch_from_cbr` типизирован (`CbrFetchResult`); добавлена
+    defensive-проверка `rate is not None` перед `float()` (инвариант `ok ⟹ rate задан`);
+    сравнение `_fail_until["ts"]` сужено через `isinstance`.
+  - `cbr_fx.py`: то же сужение `isinstance` для `_fail_until["ts"]` — попутно снят `type: ignore`.
+  - `statement_parser.py`: проверка `amount in (None, 0)` заменена на явную (`is None or == 0`),
+    что даёт mypy сузить тип до `float` (потенциальный `None` был не виден анализатору).
+  - `plan_export.py`: устранён конфликт типов переменной `col` (int-цикл и str-цикл) переименованием.
+  - `spending_advice.py`: ordinal месяца приведён к `float` (list-инвариантность `tuple`).
+  - `obligation.py`: узкий `# type: ignore[misc,prop-decorator]` на `computed_field` над `property`
+    (известное ограничение mypy для Pydantic v2 — не дефект).
+- **flake8: 93 → 0**. 87 × E501 (длина строк) + E731/E30x. Точечно (`autopep8 --select`, не массовый
+  black — правило §2): длинные строки разбиты конкатенацией/переносом, два `lambda` → вложенные `def`.
+  Повторявшаяся HTML-обёртка писем вынесена в константу `_CARD_OPEN` (DRY, −6 E501).
+- **Регрессий нет**: 611 тестов fast-suite зелёные; mypy `Success: no issues in 100 files`; flake8 `0`.
+- **Осталось в 4.3**: `datetime.utcnow()` → `datetime.now(UTC)` (78 вхождений; есть развилка
+  naive/aware — отдельным батчем) и `ExpenseRecord` + поле `date`.
+
 ## [4.25.0] — 2026-06-29 — Наблюдаемость фоновой отправки писем (MINOR)
 
 Вторая задача раздела 4.2 (баги). Давняя заметка «письма не приходят, интерфейс пишет

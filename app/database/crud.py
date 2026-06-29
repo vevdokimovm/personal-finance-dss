@@ -97,7 +97,8 @@ def _owner_filter(query, model, user_id):
 
 
 # ── Categories (DATA-04) ─────────────────────────────────────────────────
-def create_category(db: Session, name: str, type: str = "expense", is_system: bool = False) -> Category:
+def create_category(db: Session, name: str, type: str = "expense",
+                    is_system: bool = False) -> Category:
     category = Category(name=name, type=type, is_system=is_system)
     db.add(category)
     db.commit()
@@ -539,7 +540,8 @@ def set_transaction_category(
     user_id: Optional[str] = None,
     category_id: Optional[int] = None,
 ) -> Optional[Transaction]:
-    """Переназначает категорию конкретной операции (с проверкой владельца). None — если не найдена."""
+    """Переназначает категорию конкретной операции (с проверкой владельца).
+    None — если не найдена."""
     transaction = _owner_filter(
         db.query(Transaction), Transaction, user_id
     ).filter(
@@ -587,7 +589,8 @@ def apply_category_rule(
     for transaction in transactions:
         if transaction.id == exclude_id:
             continue
-        if token in normalize_match_key(transaction.description) and transaction.category != category:
+        if token in normalize_match_key(
+                transaction.description) and transaction.category != category:
             transaction.category = category
             if category_id_value := category_id_for(db, category, txn_type):
                 transaction.category_id = category_id_value
@@ -598,7 +601,8 @@ def apply_category_rule(
 
 
 def category_id_for(db: Session, category: str, txn_type: str) -> Optional[int]:
-    """id системной категории по имени+типу, если такая есть (для консистентности FK). Иначе None."""
+    """id системной категории по имени+типу, если такая есть (для консистентности FK).
+    Иначе None."""
     row = (
         db.query(Category.id)
         .filter(Category.name == category, Category.type == txn_type)
@@ -1126,7 +1130,8 @@ def adopt_orphan_rows(db: Session, user_id: str) -> int:
             row.user_id = user_id
             affected += 1
     legacy_prefs = db.query(UserPrefs).filter(UserPrefs.user_id.is_(None)).first()
-    if legacy_prefs is not None and db.query(UserPrefs).filter(UserPrefs.user_id == user_id).first() is None:
+    if legacy_prefs is not None and db.query(UserPrefs).filter(
+            UserPrefs.user_id == user_id).first() is None:
         legacy_prefs.user_id = user_id
         affected += 1
     db.commit()

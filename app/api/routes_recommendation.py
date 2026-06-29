@@ -44,7 +44,8 @@ def _data_fingerprint(transactions, obligations, goals, liquid_assets, base_curr
             for o in obligations
         )),
         tuple(sorted(
-            (num(g, "current_amount"), num(g, "target_amount"), str(getattr(g, "deadline", ""))[:10])
+            (num(g, "current_amount"), num(g, "target_amount"),
+             str(getattr(g, "deadline", ""))[:10])
             for g in goals
         )),
         tuple(sorted(num(a, "amount") for a in liquid_assets)),
@@ -72,7 +73,9 @@ def create_recommendation(
     db: Session = Depends(get_db),
     user_id: str | None = Depends(get_current_user_id),
 ) -> RecommendationResponse:
-    if payload and (payload.transactions or payload.obligations or payload.goals or payload.liquid_assets):
+    if payload and (
+            payload.transactions or payload.obligations
+            or payload.goals or payload.liquid_assets):
         transactions = payload.transactions
         obligations = payload.obligations
         goals = payload.goals
@@ -97,7 +100,8 @@ def create_recommendation(
     ))
     cache_key = None
     if use_cache:
-        fingerprint = _data_fingerprint(transactions, obligations, goals, liquid_assets, base_currency)
+        fingerprint = _data_fingerprint(transactions, obligations,
+                                        goals, liquid_assets, base_currency)
         cache_key = f"rec:{user_id or 'guest'}:{fingerprint}"
         cached = _recommendation_cache.get(cache_key)
         if cached is not None:

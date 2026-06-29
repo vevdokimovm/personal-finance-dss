@@ -69,7 +69,8 @@ def build_financial_report_pdf(report: dict) -> bytes:
     )
     body = ParagraphStyle("Body", fontName=_FONT, fontSize=10, leading=15)
     h1 = ParagraphStyle("H1", fontName=_FONT_BOLD, fontSize=18, leading=22, textColor=_BRAND)
-    h2 = ParagraphStyle("H2", fontName=_FONT_BOLD, fontSize=13, leading=18, spaceBefore=12, spaceAfter=6)
+    h2 = ParagraphStyle("H2", fontName=_FONT_BOLD, fontSize=13,
+                        leading=18, spaceBefore=12, spaceAfter=6)
     small = ParagraphStyle("Small", fontName=_FONT, fontSize=8, textColor=colors.grey, leading=11)
 
     story: list = [
@@ -91,7 +92,8 @@ def build_financial_report_pdf(report: dict) -> bytes:
     if report["obligations"]:
         rows = [["Название", "Остаток", "Ставка", "Платёж"]]
         for obl in report["obligations"]:
-            rows.append([obl["name"], _money(obl["amount"]), f"{obl['rate']:.1f}%", _money(obl["payment"])])
+            rows.append([obl["name"], _money(obl["amount"]),
+                        f"{obl['rate']:.1f}%", _money(obl["payment"])])
         story.append(_table(rows))
     else:
         story.append(Paragraph("Обязательств нет.", body))
@@ -102,7 +104,8 @@ def build_financial_report_pdf(report: dict) -> bytes:
         rows = [["Цель", "Накоплено", "Целевая сумма", "Прогресс"]]
         for goal in report["goals"]:
             pct = (goal["current"] / goal["target"] * 100) if goal["target"] else 0
-            rows.append([goal["name"], _money(goal["current"]), _money(goal["target"]), f"{pct:.0f}%"])
+            rows.append([goal["name"], _money(goal["current"]),
+                        _money(goal["target"]), f"{pct:.0f}%"])
         story.append(_table(rows))
     else:
         story.append(Paragraph("Целей нет.", body))

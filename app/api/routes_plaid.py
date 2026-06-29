@@ -57,7 +57,8 @@ def exchange_token(
     client = _ensure_plaid_enabled()
     try:
         # SDK-метод обмена; обёрнут в RealPlaidClient на стороне реальной интеграции.
-        access_token = client.exchange_public_token(payload.public_token)  # type: ignore[attr-defined]
+        access_token = client.exchange_public_token(
+            payload.public_token)  # type: ignore[attr-defined]
     except AttributeError:
         raise HTTPException(
             status_code=status.HTTP_501_NOT_IMPLEMENTED,

@@ -78,7 +78,8 @@ def convert(payload: ConvertRequest, db: Session = Depends(get_db)) -> dict:
     }
 
 
-@router.post("/refresh", summary="Обновить курсы валют с ЦБ РФ (живой источник)", dependencies=[Depends(require_admin)])
+@router.post("/refresh", summary="Обновить курсы валют с ЦБ РФ (живой источник)",
+             dependencies=[Depends(require_admin)])
 def refresh_rates(db: Session = Depends(get_db)) -> dict:
     """Тянет актуальные курсы с cbr.ru и обновляет таблицу. При недоступности источника
     текущие курсы сохраняются (source=fallback). Защищено суточным кэшем от частых запросов."""

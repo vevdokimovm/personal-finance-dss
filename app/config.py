@@ -28,7 +28,7 @@ class Settings(BaseSettings):
         description="Название проекта.",
     )
     APP_VERSION: str = Field(
-        default="4.25.0",
+        default="4.25.1",
         description="Версия приложения (INFRA-13): код, UI-футер, git-тег.",
     )
     PROJECT_TAGLINE: str = Field(
@@ -57,7 +57,6 @@ class Settings(BaseSettings):
         default=60,
         description="Размер окна rate-limit в секундах (INFRA-12).",
     )
-
 
     # ── v3.0.0 International: auth (INFRA-06, NFR-05) ──────────────────
     JWT_SECRET: str = Field(
@@ -127,7 +126,8 @@ class Settings(BaseSettings):
     PLAID_ENV: str = Field(default="sandbox", description="Окружение Plaid: sandbox | production.")
     TOKEN_ENCRYPTION_KEY: str = Field(
         default="",
-        description="Fernet-ключ шифрования Plaid-токенов (INFRA-17). Пусто = derive из JWT_SECRET.",
+        description="Fernet-ключ шифрования Plaid-токенов (INFRA-17). "
+                    "Пусто = derive из JWT_SECRET.",
     )
 
     @property
@@ -157,10 +157,13 @@ class Settings(BaseSettings):
 
     # ── Telegram-бот (P3.6) ────────────────────────────────────────────
     # Пусто = бот выключен (no-op, как почта). Токен — от @BotFather.
-    TELEGRAM_BOT_TOKEN: str = Field(default="", description="Токен бота от @BotFather. Пусто = выключен.")
-    TELEGRAM_BOT_USERNAME: str = Field(default="", description="Username бота без @ (для deep link).")
+    TELEGRAM_BOT_TOKEN: str = Field(
+        default="", description="Токен бота от @BotFather. Пусто = выключен.")
+    TELEGRAM_BOT_USERNAME: str = Field(
+        default="", description="Username бота без @ (для deep link).")
     TELEGRAM_WEBHOOK_SECRET: str = Field(
-        default="", description="Secret для валидации webhook (заголовок X-Telegram-Bot-Api-Secret-Token)."
+        default="",
+        description="Secret для валидации webhook (заголовок X-Telegram-Bot-Api-Secret-Token).",
     )
 
     @property
@@ -250,9 +253,13 @@ def validate_production_security(s: Settings) -> list[str]:
 
     problems: list[str] = []
     if s.JWT_SECRET == _DEFAULT_JWT_SECRET or len(s.JWT_SECRET) < 32:
-        problems.append("JWT_SECRET не задан или дефолтный — задайте стойкий секрет (>=32 симв.) в .env")
+        problems.append(
+            "JWT_SECRET не задан или дефолтный — задайте стойкий секрет (>=32 симв.) в .env")
     if not s.COOKIE_SECURE:
-        problems.append("COOKIE_SECURE=false — в production cookie должна иметь флаг Secure (нужен HTTPS)")
+        problems.append(
+            "COOKIE_SECURE=false — в production cookie должна иметь флаг Secure (нужен HTTPS)")
     if not s.ADMIN_API_KEY or len(s.ADMIN_API_KEY) < 16:
-        problems.append("ADMIN_API_KEY не задан или слишком короткий — задайте стойкий ключ (>=16 симв.) в .env для защиты админ-эндпоинтов")
+        problems.append(
+            "ADMIN_API_KEY не задан или слишком короткий — задайте стойкий ключ "
+            "(>=16 симв.) в .env для защиты админ-эндпоинтов")
     return problems

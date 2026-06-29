@@ -49,11 +49,14 @@ def effective_goal_values(goal: Item, index: dict[int, Item]) -> tuple[float, fl
     aid = get_value(goal, "linked_asset_id", None)
     if aid and int(aid) in index:
         asset = index[int(aid)]
-        return to_float(get_value(asset, "amount", 0.0)), to_float(get_value(asset, "interest_rate", 0.0))
-    return to_float(get_value(goal, "current_amount", 0.0)), to_float(get_value(goal, "savings_rate", 0.0))
+        return to_float(get_value(asset, "amount", 0.0)), to_float(
+            get_value(asset, "interest_rate", 0.0))
+    return to_float(get_value(goal, "current_amount", 0.0)), to_float(
+        get_value(goal, "savings_rate", 0.0))
 
 
-def apply_envelopes(goals: list[Item], assets: list[Item]) -> tuple[list[dict[str, Any]], list[Item]]:
+def apply_envelopes(goals: list[Item], assets: list[Item]
+                    ) -> tuple[list[dict[str, Any]], list[Item]]:
     """Применяет логику конвертов.
 
     Возвращает (цели с эффективными current_amount/savings_rate, свободные активы).

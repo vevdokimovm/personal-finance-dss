@@ -101,8 +101,10 @@ class PlanningRequest(BaseModel):
     risk_tolerance: Optional[int] = Field(None, ge=1, le=5, description="Профиль риска (1–5)")
     l_min: Optional[float] = Field(None, ge=0.0, le=10.0, description="Lmin — мин. допустимая Lt'")
     r_bench: Optional[float] = Field(None, ge=0.0, le=1.0, description="OCR — порог Avalanche")
-    income_override: Optional[float] = Field(None, ge=0, description="Сценарий: доход вместо фактического")
-    expense_override: Optional[float] = Field(None, ge=0, description="Сценарий: расходы вместо фактических")
+    income_override: Optional[float] = Field(
+        None, ge=0, description="Сценарий: доход вместо фактического")
+    expense_override: Optional[float] = Field(
+        None, ge=0, description="Сценарий: расходы вместо фактических")
 
 
 class ForecastRequest(BaseModel):
@@ -180,7 +182,10 @@ def _compute_plan(
     user_id: str | None,
 ) -> dict[str, Any]:
     prefs = get_user_prefs(db, user_id=user_id)
-    risk_tolerance = payload.risk_tolerance if payload.risk_tolerance is not None else prefs.risk_tolerance
+    risk_tolerance = (
+        payload.risk_tolerance if payload.risk_tolerance is not None
+        else prefs.risk_tolerance
+    )
     l_min = payload.l_min if payload.l_min is not None else prefs.l_min
 
     base_currency = (prefs.base_currency or "RUB").upper()
@@ -206,7 +211,8 @@ def _compute_plan(
         r_bench = payload.r_bench
         r_bench_source = "request"
     else:
-        best_asset_rate = max((float(a.get("interest_rate") or 0.0) for a in all_assets), default=0.0)
+        best_asset_rate = max((float(a.get("interest_rate") or 0.0)
+                              for a in all_assets), default=0.0)
         if best_asset_rate > 0:
             r_bench = best_asset_rate
             r_bench_source = "best_asset_rate"

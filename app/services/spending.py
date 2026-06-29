@@ -24,7 +24,8 @@ def _min_period(months: int) -> str:
     return f"{year:04d}-{month + 1:02d}"
 
 
-def _goal_records(db: Session, user_id: str | None, months: int, min_period: str, now: datetime) -> list[GoalRecord]:
+def _goal_records(db: Session, user_id: str | None, months: int,
+                  min_period: str, now: datetime) -> list[GoalRecord]:
     """Активные недостигнутые цели → GoalRecord. Темп пополнения — средний за окно
     (сумма взносов в окне / months), дедлайн — канон goals_priority._months_left."""
     records: list[GoalRecord] = []

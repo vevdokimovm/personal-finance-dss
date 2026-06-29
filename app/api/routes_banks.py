@@ -57,7 +57,8 @@ async def upload_statement(
     if len(raw) > max_bytes:
         return {
             "status": "error",
-            "message": f"Файл больше {settings.MAX_UPLOAD_SIZE_MB} МБ — слишком большой для импорта.",
+            "message": f"Файл больше {settings.MAX_UPLOAD_SIZE_MB} МБ — "
+                       "слишком большой для импорта.",
         }
 
     # PDF-выписка — парсер по выбранному банку (Тинькофф / ВТБ / Сбер)
@@ -66,7 +67,8 @@ async def upload_statement(
         if not transactions:
             return {
                 "status": "error",
-                "message": "Не удалось распознать операции в PDF. Проверьте, что выбран правильный банк "
+                "message": "Не удалось распознать операции в PDF. "
+                           "Проверьте, что выбран правильный банк "
                            "(PDF поддерживаются для Тинькофф, ВТБ, Сбер).",
             }
     elif raw[:4] == b"PK\x03\x04":
@@ -75,7 +77,8 @@ async def upload_statement(
         if not transactions:
             return {
                 "status": "error",
-                "message": "Не удалось распознать операции в XLSX. Проверьте, что в файле есть таблица с датой и суммой.",
+                "message": "Не удалось распознать операции в XLSX. "
+                           "Проверьте, что в файле есть таблица с датой и суммой.",
             }
     else:
         # CSV: пробуем разные кодировки (Тинькофф часто использует cp1251)

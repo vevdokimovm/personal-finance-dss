@@ -66,7 +66,8 @@ class PlaidProvider:
 
     name = "plaid"
 
-    def __init__(self, client, token_store: EncryptedTokenStore, base_currency: str = "USD") -> None:
+    def __init__(self, client, token_store: EncryptedTokenStore,
+                 base_currency: str = "USD") -> None:
         self._client = client
         self._tokens = token_store
         self._base_currency = base_currency
@@ -95,7 +96,8 @@ class PlaidProvider:
         return Account(
             account_id=str(raw.get("account_id", "")),
             name=str(raw.get("name", "Account")),
-            balance=_dec(raw.get("balances", {}).get("available") or raw.get("balances", {}).get("current", 0)),
+            balance=_dec(raw.get("balances", {}).get("available")
+                         or raw.get("balances", {}).get("current", 0)),
             currency=str(raw.get("balances", {}).get("iso_currency_code") or self._base_currency),
             is_liquid=is_liquid,
         )

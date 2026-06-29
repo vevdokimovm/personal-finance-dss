@@ -123,8 +123,8 @@ def plan_to_xlsx(result: dict[str, Any]) -> bytes:
 
     ws.column_dimensions["A"].width = 34
     ws.column_dimensions["B"].width = 24
-    for col in ("C", "D", "E", "F"):
-        ws.column_dimensions[col].width = 13
+    for col_letter in ("C", "D", "E", "F"):
+        ws.column_dimensions[col_letter].width = 13
 
     bio = io.BytesIO()
     wb.save(bio)
@@ -143,7 +143,8 @@ def plan_to_pdf(result: dict[str, Any]) -> bytes:
         title="FINPILOT — план распределения",
     )
     h1 = ParagraphStyle("H1", fontName=_FONT_BOLD, fontSize=18, leading=22, textColor=_BRAND)
-    h2 = ParagraphStyle("H2", fontName=_FONT_BOLD, fontSize=13, leading=18, spaceBefore=12, spaceAfter=6)
+    h2 = ParagraphStyle("H2", fontName=_FONT_BOLD, fontSize=13,
+                        leading=18, spaceBefore=12, spaceAfter=6)
     small = ParagraphStyle("Small", fontName=_FONT, fontSize=8, textColor=colors.grey, leading=11)
 
     story: list = [

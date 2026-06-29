@@ -122,7 +122,8 @@ def register(
     log_event("user_registered", {"first_user": is_first_user}, user_id=user.id)
 
     # В dev (без SMTP) отдаём ссылку прямо в ответе — чтобы можно было подтвердить локально.
-    dev_link = verify_url if not settings.email_enabled else None  # без SMTP отдаём ссылку (self-hosted)
+    # без SMTP отдаём ссылку (self-hosted)
+    dev_link = verify_url if not settings.email_enabled else None
     return AuthResponse(
         access_token=token,
         user=UserResponse.model_validate(user),
@@ -199,7 +200,8 @@ def forgot_password(
     # В dev (без SMTP) отдаём ссылку прямо в ответе — чтобы можно было сбросить локально.
     dev_link = reset_url if (user is not None and not settings.email_enabled) else None
     return {
-        "detail": "Если аккаунт с таким email существует, на него отправлена ссылка для сброса пароля.",
+        "detail": "Если аккаунт с таким email существует, "
+                  "на него отправлена ссылка для сброса пароля.",
         "reset_url": dev_link,
     }
 
@@ -273,7 +275,8 @@ def resend_verification(
         to_email=user.email,
         user_id=user.id,
     )
-    dev_link = verify_url if not settings.email_enabled else None  # без SMTP отдаём ссылку (self-hosted)
+    # без SMTP отдаём ссылку (self-hosted)
+    dev_link = verify_url if not settings.email_enabled else None
     return {"detail": "Письмо отправлено.", "verification_url": dev_link}
 
 
@@ -299,7 +302,8 @@ def change_password(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Текущий пароль неверен.",
         )
-    update_user_password(db, user_id=user.id, password_hash=password_hasher.hash(payload.new_password))
+    update_user_password(db, user_id=user.id,
+                         password_hash=password_hasher.hash(payload.new_password))
     return {"detail": "Пароль обновлён."}
 
 

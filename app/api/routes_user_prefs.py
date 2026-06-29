@@ -10,7 +10,8 @@ from app.schemas.user_prefs import UserPrefsResponse, UserPrefsUpdate
 router = APIRouter(prefix="/user-prefs", tags=["Параметры пользователя"])
 
 
-@router.get("", response_model=UserPrefsResponse, summary="Параметры пользователя U (Lmin, R, H, r_bench, валюта)")
+@router.get("", response_model=UserPrefsResponse,
+            summary="Параметры пользователя U (Lmin, R, H, r_bench, валюта)")
 def read_prefs(
     db: Session = Depends(get_db),
     user_id: str | None = Depends(get_current_user_id),

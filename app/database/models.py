@@ -5,7 +5,10 @@ from datetime import date, datetime
 from decimal import Decimal
 from typing import Optional
 
-from sqlalchemy import JSON, Boolean, Date, DateTime, Float, ForeignKey, Integer, Numeric, String, Text, UniqueConstraint
+from sqlalchemy import (
+    JSON, Boolean, Date, DateTime, Float, ForeignKey, Integer, Numeric, String, Text,
+    UniqueConstraint,
+)
 
 from app.database.types import EncryptedString
 from sqlalchemy.orm import Mapped, mapped_column
@@ -135,7 +138,8 @@ class Obligation(Base):
         ForeignKey("households.id", ondelete="SET NULL"), nullable=True, index=True
     )
     currency: Mapped[str] = mapped_column(String(3), nullable=False, default="RUB")
-    name: Mapped[str] = mapped_column(String(255), nullable=False, index=True, default="Обязательство")
+    name: Mapped[str] = mapped_column(String(255), nullable=False,
+                                      index=True, default="Обязательство")
     amount: Mapped[Decimal] = mapped_column(
         Numeric(14, 2), nullable=False)
     interest_rate: Mapped[Decimal] = mapped_column(Numeric(6, 4), nullable=False, default=0.0)
@@ -171,7 +175,8 @@ class Goal(Base):
     current_amount: Mapped[Decimal] = mapped_column(
         Numeric(14, 2), nullable=False, default=0.0)
     deadline: Mapped[datetime] = mapped_column(DateTime, nullable=False, index=True)
-    category: Mapped[str] = mapped_column(String(32), nullable=False, default="material", index=True)
+    category: Mapped[str] = mapped_column(
+        String(32), nullable=False, default="material", index=True)
     # Ставка по инструменту, где копятся деньги цели (вклад/счёт), долей. 0 = без процентов.
     savings_rate: Mapped[Decimal] = mapped_column(Numeric(6, 4), nullable=False, default=0.0)
     # Конверты: ликвидный актив, где физически копятся деньги цели. NULL = не привязана.

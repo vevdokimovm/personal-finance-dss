@@ -7,7 +7,7 @@ from __future__ import annotations
 
 import random
 from datetime import datetime, timedelta
-from typing import Any
+from typing import Any, TypedDict
 from uuid import uuid4
 
 from sqlalchemy.orm import Session
@@ -15,8 +15,18 @@ from sqlalchemy.orm import Session
 from app.database.crud import create_transaction
 from app.services.event_logger import log_event
 
+
+class BankCatalog(TypedDict):
+    """Описание мок-банка: имя, цвет и каталоги операций (название, мин, макс)."""
+
+    name: str
+    color: str
+    expenses: list[tuple[str, float, float]]
+    incomes: list[tuple[str, float, float]]
+
+
 # ── Конфигурация банков ───────────────────────────────────────
-BANKS = {
+BANKS: dict[str, BankCatalog] = {
     "tinkoff": {
         "name": "Тинькофф Банк",
         "color": "#FFDD2D",

@@ -39,6 +39,7 @@ templates.env.globals["app_version"] = settings.APP_VERSION
 setup_logging(level=settings.LOG_LEVEL, json_format=settings.LOG_JSON)
 init_sentry(settings.SENTRY_DSN, environment=settings.ENVIRONMENT, release=settings.APP_VERSION)
 
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Трекинг ошибок: Sentry подключаем первым, чтобы ловить и сбои старта.
@@ -190,7 +191,8 @@ async def read_legal_privacy(ctx: dict = Depends(page_context)) -> HTMLResponse:
     )
 
 
-@app.get("/legal/terms", response_class=HTMLResponse, summary="Пользовательское соглашение (оферта)")
+@app.get("/legal/terms", response_class=HTMLResponse,
+         summary="Пользовательское соглашение (оферта)")
 async def read_legal_terms(ctx: dict = Depends(page_context)) -> HTMLResponse:
     return templates.TemplateResponse(request=ctx["request"], name="legal/terms.html", context=ctx)
 

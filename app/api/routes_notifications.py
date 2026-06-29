@@ -13,7 +13,8 @@ from app.schemas.notification import NotificationFeed, NotificationOut
 router = APIRouter(prefix="/notifications", tags=["Уведомления"])
 
 
-@router.post("/run", summary="Запустить рассылку уведомлений (для cron)", dependencies=[Depends(require_admin)])
+@router.post("/run", summary="Запустить рассылку уведомлений (для cron)",
+             dependencies=[Depends(require_admin)])
 def run_notifications(db: Session = Depends(get_db)) -> dict:
     """Проверяет дедлайны целей и превышения бюджета по всем пользователям и шлёт
     недостающие уведомления. Идемпотентно (дедуп по месяцу) — безопасно дёргать по cron."""
@@ -22,7 +23,8 @@ def run_notifications(db: Session = Depends(get_db)) -> dict:
     return run_all_notifications(db)
 
 
-@router.get("/feed", summary="Лента моих уведомлений (колокольчик)", response_model=NotificationFeed)
+@router.get("/feed", summary="Лента моих уведомлений (колокольчик)",
+            response_model=NotificationFeed)
 def notifications_feed(
     unread_only: bool = Query(False, description="Только непрочитанные"),
     limit: int = Query(50, ge=1, le=200),

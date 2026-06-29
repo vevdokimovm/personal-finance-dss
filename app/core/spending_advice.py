@@ -166,13 +166,16 @@ class SpendingAdvisor:
             return 0.0
         return MAD_SCALE * (value - center) / mad
 
-    def _resolve_current_period(self, records: list[ExpenseRecord], current_period: str | None) -> str | None:
+    def _resolve_current_period(
+        self, records: list[ExpenseRecord], current_period: str | None,
+    ) -> str | None:
         if current_period is not None:
             return current_period
         periods = {r.period for r in records}
         return max(periods) if periods else None
 
-    def analyze(self, records: list[ExpenseRecord], current_period: str | None = None) -> list[CategoryStats]:
+    def analyze(self, records: list[ExpenseRecord],
+                current_period: str | None = None) -> list[CategoryStats]:
         """Статистика по каждой категории: норма, разброс, аномальность, pain-score."""
         current_period = self._resolve_current_period(records, current_period)
         if current_period is None:
@@ -230,7 +233,8 @@ class SpendingAdvisor:
         stats.sort(key=lambda s: s.pain_score, reverse=True)
         return stats
 
-    def generate_advice(self, records: list[ExpenseRecord], current_period: str | None = None) -> list[SpendingAdvice]:
+    def generate_advice(self, records: list[ExpenseRecord],
+                        current_period: str | None = None) -> list[SpendingAdvice]:
         """Топ-K советов без шейминга: возврат к норме при перерасходе либо
         умеренное сокращение дискреционного."""
         stats = self.analyze(records, current_period)
@@ -360,7 +364,9 @@ class SpendingAdvisor:
             if len(past_periods) < self.min_months:
                 continue
 
-            points = [(self._month_ordinal(p), by_period[p]) for p in past_periods]
+            points: list[tuple[float, float]] = [
+                (float(self._month_ordinal(p)), by_period[p]) for p in past_periods
+            ]
             slope = self.theil_sen(points)
             baseline = float(median([by_period[p] for p in past_periods]))
             slope_pct = (slope / baseline * 100.0) if baseline else 0.0
@@ -385,7 +391,8 @@ class SpendingAdvisor:
         return patterns[:top_k]
 
     @staticmethod
-    def _format_trend(category: str, direction: str, slope_abs: float, slope_pct: float, baseline: float) -> str:
+    def _format_trend(category: str, direction: str, slope_abs: float,
+                      slope_pct: float, baseline: float) -> str:
         if direction == "rising":
             return (
                 f"Траты на «{category}» растут примерно на {abs(slope_pct):.0f}% в месяц "
@@ -467,7 +474,8 @@ class SpendingAdvisor:
         ).replace(",", " ")
 
     @staticmethod
-    def _format_message(category: str, saving: float, reason: str, current: float, baseline: float) -> str:
+    def _format_message(category: str, saving: float, reason: str,
+                        current: float, baseline: float) -> str:
         if reason == "overspend":
             return (
                 f"На категории «{category}» в этом месяце ушло {current:,.0f} ₽ — "

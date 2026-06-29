@@ -18,7 +18,8 @@ from app.core.goals_priority import calculate_goals_si, goals_allocation_breakdo
 
 
 def _alt_name(d: int, r: int, g: int, steps: int) -> str:
-    pct = lambda x: int(round(x / steps * 100))
+    def pct(x: float) -> int:
+        return int(round(x / steps * 100))
     pd, pr, pg = pct(d), pct(r), pct(g)
     if d == steps:
         return "Всё на погашение долга"
@@ -81,7 +82,9 @@ def generate_alternatives(
             x_goa = round(rt * g * step, 2)
 
             name = _alt_name(d, r, g, steps)
-            pct = lambda x: int(round(x / steps * 100))
+
+            def pct(x: float) -> int:
+                return int(round(x / steps * 100))
             pd, pr, pg = pct(d), pct(r), pct(g)
             desc_parts = []
             if x_obl > 0:
@@ -150,7 +153,9 @@ def evaluate_alternative(
                 "interest_rate": rate,
                 "paid_in": paid_in,
                 "closed": float(o.get("amount", 0)) <= 0,
-                "payment_saved": money(float(old.get("monthly_payment", 0)) - float(o.get("monthly_payment", 0))),
+                "payment_saved": money(
+                    float(old.get("monthly_payment", 0)) - float(o.get("monthly_payment", 0))
+                ),
             })
         else:
             _skipped.append({"name": old.get("name", ""), "interest_rate": rate})

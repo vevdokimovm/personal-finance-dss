@@ -15,7 +15,8 @@ from typing import Any
 # Профили риска R ∈ {1..5} → веса целевой функции (форм. 22 ВКР)
 RISK_PROFILES: dict[int, dict[str, Any]] = {
     1: {"w_rt": 0.20, "w_lt": 0.45, "w_dt": 0.25, "w_goals": 0.10, "label": "Консервативный"},
-    2: {"w_rt": 0.20, "w_lt": 0.35, "w_dt": 0.25, "w_goals": 0.20, "label": "Умеренно-консервативный"},
+    2: {"w_rt": 0.20, "w_lt": 0.35, "w_dt": 0.25, "w_goals": 0.20,
+        "label": "Умеренно-консервативный"},
     3: {"w_rt": 0.25, "w_lt": 0.30, "w_dt": 0.25, "w_goals": 0.20, "label": "Сбалансированный"},
     4: {"w_rt": 0.30, "w_lt": 0.20, "w_dt": 0.20, "w_goals": 0.30, "label": "Умеренно-агрессивный"},
     5: {"w_rt": 0.35, "w_lt": 0.10, "w_dt": 0.15, "w_goals": 0.40, "label": "Агрессивный"},
@@ -45,7 +46,9 @@ def rank_alternatives(
         return []
 
     profile = RISK_PROFILES.get(risk_tolerance, RISK_PROFILES[3])
-    w_rt, w_lt, w_dt, w_goals = profile["w_rt"], profile["w_lt"], profile["w_dt"], profile["w_goals"]
+    w_rt, w_lt, w_dt, w_goals = (
+        profile["w_rt"], profile["w_lt"], profile["w_dt"], profile["w_goals"]
+    )
 
     rt_values = [a["Rt_new"] for a in alternatives]
     lt_values = [a["Lt_new"] for a in alternatives]

@@ -187,7 +187,8 @@ def remove_member_endpoint(
     _require_owner(db, household_id, user)
     if not remove_member(db, household_id, member_user_id):
         raise HTTPException(
-            status_code=400, detail="Нельзя удалить владельца или пользователь не состоит в household"
+            status_code=400,
+            detail="Нельзя удалить владельца или пользователь не состоит в household",
         )
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
@@ -272,7 +273,10 @@ def list_invites_endpoint(
 ) -> list[HouseholdInviteResponse]:
     _require_owner(db, household_id, user)
     # token из списка намеренно не отдаём — только в ответе на создание
-    return [HouseholdInviteResponse.model_validate(inv) for inv in get_household_invites(db, household_id)]
+    return [
+        HouseholdInviteResponse.model_validate(inv)
+        for inv in get_household_invites(db, household_id)
+    ]
 
 
 @router.post("/{household_id}/invites/{invite_id}/revoke", summary="Отозвать приглашение")

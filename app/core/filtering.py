@@ -40,7 +40,8 @@ def filter_alternatives(
                 f"оставил бы подушку меньше требуемых {l_min:g} мес. автономии"
             )
         if alt.get("Dt_new", 0) > dt_max:
-            violations.append(f"долговая нагрузка осталась бы выше безопасного порога {dt_max*100:.0f}%")
+            violations.append(
+                f"долговая нагрузка осталась бы выше безопасного порога {dt_max*100:.0f}%")
 
         alt["violations"] = violations
         alt["is_admissible"] = len(violations) == 0

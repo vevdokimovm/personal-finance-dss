@@ -67,7 +67,10 @@ def parse_tinkoff_csv(content: str) -> list[dict[str, Any]]:
             t_date = _parse_date(date_str) if date_str else datetime.now()
             t_type, amount = _classify(amount)
 
-            merchant = (description.strip() if description else '') or category.strip() or 'Операция'
+            merchant = (
+                (description.strip() if description else '')
+                or category.strip() or 'Операция'
+            )
             transactions.append({
                 'amount': round(amount, 2),
                 'description': merchant[:255],
@@ -107,7 +110,10 @@ def parse_sber_csv(content: str) -> list[dict[str, Any]]:
             t_date = _parse_date(date_str) if date_str else datetime.now()
             t_type, amount = _classify(amount)
 
-            merchant = (description.strip() if description else '') or category.strip() or 'Операция'
+            merchant = (
+                (description.strip() if description else '')
+                or category.strip() or 'Операция'
+            )
             transactions.append({
                 'amount': round(amount, 2),
                 'description': merchant[:255],
@@ -438,7 +444,7 @@ def _raif_table_to_transactions(tables: list) -> list[dict[str, Any]]:
             debit = _num(row[3])
             credit = _num(row[4]) if len(row) > 4 else None
             amount = debit if debit not in (None, 0) else credit
-            if amount in (None, 0):
+            if amount is None or amount == 0:
                 continue
             desc = re.sub(r'\s+', ' ', str(row[5])).strip() if len(row) > 5 and row[5] else ''
             t_type, amount = _classify(amount)

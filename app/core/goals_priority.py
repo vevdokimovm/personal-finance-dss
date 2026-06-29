@@ -135,6 +135,7 @@ def preallocate_from_bliq(
 
     return bliq - total_near, near, far
 
+
 def goals_allocation_breakdown(
     x_goals: float,
     goals: list[dict[str, Any]],
