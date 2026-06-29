@@ -11,6 +11,7 @@ from __future__ import annotations
 
 from collections import defaultdict
 from dataclasses import dataclass
+from datetime import datetime
 from itertools import combinations
 from statistics import median
 
@@ -47,6 +48,15 @@ class ExpenseRecord:
     amount: float
     period: str  # "YYYY-MM"
     merchant: str | None = None
+    date: datetime | None = None  # точный момент операции; источник истины для period
+
+    def __post_init__(self) -> None:
+        # Когда задан точный момент операции — period выводится из него. Это даёт
+        # будущему слою внутримесячных / дни-недели паттернов точную дату и заодно
+        # исключает рассинхрон period↔date. Без date period остаётся как передан.
+        # dataclass frozen → производное поле пишем через object.__setattr__.
+        if self.date is not None:
+            object.__setattr__(self, "period", self.date.strftime("%Y-%m"))
 
 
 @dataclass

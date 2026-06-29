@@ -71,6 +71,7 @@ def get_spending_advice(
             amount=float(txn.amount),
             period=period,
             merchant=txn.description,
+            date=txn.date,
         ))
 
     current_period = utcnow().strftime("%Y-%m")

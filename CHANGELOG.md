@@ -2,6 +2,29 @@
 
 Формат: [Keep a Changelog](https://keepachangelog.com/ru/1.0.0/). Версионирование — [SemVer](https://semver.org/lang/ru/).
 
+## [4.25.4] — 2026-06-29 — Техдолг 4.3: ExpenseRecord + поле date (PATCH)
+
+Последняя задача раздела 4.3 — **техдолг по времени закрыт полностью**. `ExpenseRecord`
+(`core/spending_advice.py`) хранил только `period "YYYY-MM"`, что блокировало будущий слой
+внутримесячных паттернов и паттернов по дням недели (из «2026-01» нельзя восстановить день
+операции). Добавлена точная дата операции.
+
+- **Новое поле `date: datetime | None = None`** в `ExpenseRecord` (frozen dataclass). Опционально с
+  дефолтом → существующие конструкторы, включая позиционные (`ExpenseRecord("Покупки", 100, "2026-01")`),
+  не ломаются. `Transaction.date` в БД уже есть — **миграция не нужна**.
+- **`date` — источник истины для `period`**: `__post_init__` при заданной дате выводит
+  `period = date.strftime("%Y-%m")` (через `object.__setattr__`, т.к. dataclass frozen). Это даёт
+  будущему слою точную дату и исключает рассинхрон period↔date. Без даты `period` остаётся как передан.
+- **Проброс в `app/services/spending.py`**: `ExpenseRecord(..., date=txn.date)` при построении из
+  транзакций. Существующая месячная группировка (по `period`) не меняется.
+- **TDD:** новый `tests/test_expense_record_date.py` — 5 тестов (приём точной даты, опциональность/
+  обратная совместимость, вывод period из date, сохранение period без date, проброс `txn.date` →
+  `ExpenseRecord.date` через spy-advisor). Red→green.
+- **Регрессий нет**: весь fast-набор зелёный (889 passed, 0 failures, прогон 4 группами), flake8 = 0,
+  mypy Success (101 файл), миграций нет.
+- **Раздел 4.3 (техдолг) закрыт полностью** (mypy/flake8 + utcnow + datetime.now + ExpenseRecord +
+  деприкейшены тестов). Дальше — кибербез-харденинг 4.4.
+
 ## [4.25.3] — 2026-06-29 — Техдолг 4.3: унификация часов (datetime.now → utcnow) (PATCH)
 
 Хвост раздела 4.3 по времени. Релиз v4.25.2 закрыл deprecated `datetime.utcnow()`, но в коде
