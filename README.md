@@ -1,9 +1,9 @@
 # FINPILOT — СППР для персональных финансов
 
 [![CI](https://github.com/vevdokimovm/personal-finance-dss/actions/workflows/ci.yml/badge.svg)](https://github.com/vevdokimovm/personal-finance-dss/actions/workflows/ci.yml)
-![version](https://img.shields.io/badge/version-4.18.1-blue)
+![version](https://img.shields.io/badge/version-4.25.0-blue)
 ![python](https://img.shields.io/badge/python-3.12-blue)
-![coverage](https://img.shields.io/badge/coverage-91%25-brightgreen)
+![coverage](https://img.shields.io/badge/coverage-92%25-brightgreen)
 ![license](https://img.shields.io/badge/license-MIT-green)
 
 **FINPILOT** — система поддержки принятия решений (СППР), которая отвечает на один вопрос,
@@ -74,7 +74,7 @@ flowchart TD
         Planning["planning.py — оркестрация расчёта"]
         Spending["spending.py — советы по тратам"]
         Ingestion["ingestion/ — парсеры выписок<br/>CSV · XLSX · PDF · 1C"]
-        Infra["cache · currency · cbr_rate/fx ·<br/>event_logger · email_service · analytics"]
+        Infra["cache · currency · cbr_rate/fx ·<br/>event_logger · email_service · email_dispatch · analytics"]
     end
 
     subgraph CORE["app/core/ — математическое ядро (чистые функции)"]

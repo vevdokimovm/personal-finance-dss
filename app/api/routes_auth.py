@@ -8,6 +8,7 @@
 from __future__ import annotations
 
 from datetime import datetime
+from functools import partial
 
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Request, Response, status
 from fastapi.responses import RedirectResponse
@@ -38,6 +39,7 @@ from app.schemas.auth import (
     UpdateProfileRequest,
     UserResponse,
 )
+from app.services.email_dispatch import dispatch_email
 from app.services.email_service import email_service
 from app.services.event_logger import log_event
 from app.services.security import password_hasher, token_service
@@ -102,8 +104,13 @@ def register(
     verify_token = token_service.issue_verification(user.id, user.email)
     verify_url = str(request.base_url).rstrip("/") + f"/api/auth/verify?token={verify_token}"
     # Письмо с подтверждением — фоном, чтобы ответ не ждал SMTP и не падал при сбое.
+    # Результат отправки фиксируется событием (email_sent/skipped/failed) — наблюдаемость.
     background_tasks.add_task(
-        email_service.send_verification, user.email, verify_url, user.display_name
+        dispatch_email,
+        partial(email_service.send_verification, user.email, verify_url, user.display_name),
+        event_kind="verification",
+        to_email=user.email,
+        user_id=user.id,
     )
 
     # Гостевой режим постоянный: новый пользователь начинает с чистого аккаунта,
@@ -181,7 +188,11 @@ def forgot_password(
         )
         reset_url = str(request.base_url).rstrip("/") + f"/reset-password?token={token}"
         background_tasks.add_task(
-            email_service.send_password_reset, user.email, reset_url, user.display_name
+            dispatch_email,
+            partial(email_service.send_password_reset, user.email, reset_url, user.display_name),
+            event_kind="password_reset",
+            to_email=user.email,
+            user_id=user.id,
         )
         log_event("password_reset_requested", user_id=user.id)
 
@@ -234,7 +245,13 @@ def verify_email(
     if user:
         log_event("email_verified", {}, user_id=user.id)
         # Приветственное письмо — после подтверждения адреса, фоном.
-        background_tasks.add_task(email_service.send_welcome, user.email, user.display_name)
+        background_tasks.add_task(
+            dispatch_email,
+            partial(email_service.send_welcome, user.email, user.display_name),
+            event_kind="welcome",
+            to_email=user.email,
+            user_id=user.id,
+        )
         return RedirectResponse(url="/profile?verified=1", status_code=status.HTTP_303_SEE_OTHER)
     return RedirectResponse(url="/profile?verified=0", status_code=status.HTTP_303_SEE_OTHER)
 
@@ -250,7 +267,11 @@ def resend_verification(
     verify_token = token_service.issue_verification(user.id, user.email)
     verify_url = str(request.base_url).rstrip("/") + f"/api/auth/verify?token={verify_token}"
     background_tasks.add_task(
-        email_service.send_verification, user.email, verify_url, user.display_name
+        dispatch_email,
+        partial(email_service.send_verification, user.email, verify_url, user.display_name),
+        event_kind="verification",
+        to_email=user.email,
+        user_id=user.id,
     )
     dev_link = verify_url if not settings.email_enabled else None  # без SMTP отдаём ссылку (self-hosted)
     return {"detail": "Письмо отправлено.", "verification_url": dev_link}
