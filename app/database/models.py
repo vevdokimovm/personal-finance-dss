@@ -14,6 +14,7 @@ from app.database.types import EncryptedString
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.database.db import Base
+from app.utils.time import utcnow
 
 
 class Category(Base):
@@ -36,7 +37,7 @@ class User(Base):
     email: Mapped[str] = mapped_column(String(255), nullable=False, unique=True, index=True)
     password_hash: Mapped[str] = mapped_column(String(255), nullable=False)
     display_name: Mapped[Optional[str]] = mapped_column(EncryptedString, nullable=True)
-    created_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=datetime.utcnow)
+    created_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=utcnow)
     is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
     email_verified: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
     newsletter_opt_in: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
@@ -65,7 +66,7 @@ class FxRate(Base):
     currency: Mapped[str] = mapped_column(String(3), primary_key=True)
     rate_to_usd: Mapped[Decimal] = mapped_column(Numeric(18, 8), nullable=False)
     updated_at: Mapped[datetime] = mapped_column(
-        DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow
+        DateTime, nullable=False, default=utcnow, onupdate=utcnow
     )
 
 
@@ -77,7 +78,7 @@ class ManualSnapshot(Base):
     user_ref: Mapped[str] = mapped_column(String(64), nullable=False, unique=True, index=True)
     payload: Mapped[dict] = mapped_column(JSON, nullable=False, default=dict)
     updated_at: Mapped[datetime] = mapped_column(
-        DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow
+        DateTime, nullable=False, default=utcnow, onupdate=utcnow
     )
 
 
@@ -89,7 +90,7 @@ class PlaidToken(Base):
     user_id: Mapped[str] = mapped_column(ForeignKey("users.id"), nullable=False, index=True)
     item_id: Mapped[str] = mapped_column(String(128), nullable=False, index=True)
     token_encrypted: Mapped[str] = mapped_column(Text, nullable=False)
-    created_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=datetime.utcnow)
+    created_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=utcnow)
 
 
 class Transaction(Base):
@@ -122,7 +123,7 @@ class Transaction(Base):
     is_synced: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
     # Источник-банк импортированной операции (tinkoff/sber/...), NULL для ручных.
     bank: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)
-    created_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=datetime.utcnow)
+    created_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=utcnow)
     is_deleted: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False, index=True)
     deleted_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
 
@@ -205,7 +206,7 @@ class Budget(Base):
     category: Mapped[str] = mapped_column(String(64), nullable=False, unique=True, index=True)
     limit_amount: Mapped[Decimal] = mapped_column(
         Numeric(14, 2), nullable=False)
-    created_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=datetime.utcnow)
+    created_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=utcnow)
 
 
 class Scenario(Base):
@@ -225,7 +226,7 @@ class Scenario(Base):
     description: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     parameters_json: Mapped[dict] = mapped_column(JSON, nullable=False, default=dict)
     result_json: Mapped[dict] = mapped_column(JSON, nullable=False, default=dict)
-    created_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=datetime.utcnow)
+    created_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=utcnow)
 
 
 class LiquidAsset(Base):
@@ -262,7 +263,7 @@ class ObligationPayment(Base):
     amount: Mapped[Decimal] = mapped_column(
         Numeric(14, 2), nullable=False)
     payment_date: Mapped[datetime] = mapped_column(
-        DateTime, nullable=False, default=datetime.utcnow, index=True
+        DateTime, nullable=False, default=utcnow, index=True
     )
     is_early: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
     remaining_after: Mapped[Decimal] = mapped_column(
@@ -279,7 +280,7 @@ class GoalContribution(Base):
     amount: Mapped[Decimal] = mapped_column(
         Numeric(14, 2), nullable=False)
     contribution_date: Mapped[datetime] = mapped_column(
-        DateTime, nullable=False, default=datetime.utcnow, index=True
+        DateTime, nullable=False, default=utcnow, index=True
     )
     source: Mapped[str] = mapped_column(String(32), nullable=False, default="manual")
 
@@ -302,7 +303,7 @@ class UserPrefs(Base):
     r_bench: Mapped[Decimal] = mapped_column(Numeric(6, 4), nullable=False, default=Decimal("0.14"))
     base_currency: Mapped[str] = mapped_column(String(3), nullable=False, default="RUB")
     updated_at: Mapped[datetime] = mapped_column(
-        DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow
+        DateTime, nullable=False, default=utcnow, onupdate=utcnow
     )
 
 
@@ -321,7 +322,7 @@ class Event(Base):
     event_payload: Mapped[Optional[dict]] = mapped_column(JSON, nullable=True)
     app_version: Mapped[Optional[str]] = mapped_column(String(20), nullable=True)
     created_at: Mapped[datetime] = mapped_column(
-        DateTime, nullable=False, default=datetime.utcnow, index=True
+        DateTime, nullable=False, default=utcnow, index=True
     )
 
 
@@ -357,7 +358,7 @@ class Recommendation(Base):
     reasoning_text: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
 
     created_at: Mapped[datetime] = mapped_column(
-        DateTime, nullable=False, default=datetime.utcnow, index=True
+        DateTime, nullable=False, default=utcnow, index=True
     )
 
 
@@ -373,7 +374,7 @@ class NotificationLog(Base):
     user_id: Mapped[str] = mapped_column(String(36), nullable=False, index=True)
     notification_type: Mapped[str] = mapped_column(String(50), nullable=False)
     dedup_key: Mapped[str] = mapped_column(String(255), nullable=False, index=True)
-    sent_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=datetime.utcnow)
+    sent_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=utcnow)
 
 
 class Notification(Base):
@@ -393,7 +394,7 @@ class Notification(Base):
     link: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
     is_read: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False, index=True)
     created_at: Mapped[datetime] = mapped_column(
-        DateTime, nullable=False, default=datetime.utcnow, index=True
+        DateTime, nullable=False, default=utcnow, index=True
     )
 
 
@@ -415,7 +416,7 @@ class PlanSnapshot(Base):
         ForeignKey("households.id", ondelete="SET NULL"), nullable=True, index=True
     )
     created_at: Mapped[datetime] = mapped_column(
-        DateTime, nullable=False, default=datetime.utcnow, index=True
+        DateTime, nullable=False, default=utcnow, index=True
     )
     risk_profile: Mapped[str] = mapped_column(String(64), nullable=False, default="")
     # показатели на момент расчёта (Dt — доля, не проценты, как в каноне)
@@ -458,9 +459,9 @@ class UserCategoryRule(Base):
     category_id: Mapped[Optional[int]] = mapped_column(
         ForeignKey("categories.id"), nullable=True
     )
-    created_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=datetime.utcnow)
+    created_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=utcnow)
     updated_at: Mapped[datetime] = mapped_column(
-        DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow
+        DateTime, nullable=False, default=utcnow, onupdate=utcnow
     )
 
     __table_args__ = (
@@ -485,9 +486,9 @@ class Experiment(Base):
     status: Mapped[str] = mapped_column(String(20), nullable=False, default="draft")
     variants: Mapped[list] = mapped_column(JSON, nullable=False, default=list)
     conversion_event: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)
-    created_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=datetime.utcnow)
+    created_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=utcnow)
     updated_at: Mapped[datetime] = mapped_column(
-        DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow
+        DateTime, nullable=False, default=utcnow, onupdate=utcnow
     )
 
 
@@ -507,7 +508,7 @@ class ExperimentAssignment(Base):
     )
     subject_id: Mapped[str] = mapped_column(String(64), nullable=False, index=True)
     variant: Mapped[str] = mapped_column(String(64), nullable=False)
-    assigned_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=datetime.utcnow)
+    assigned_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=utcnow)
 
     __table_args__ = (
         UniqueConstraint("experiment_id", "subject_id", name="uq_experiment_assignment"),
@@ -531,7 +532,7 @@ class Household(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
     name: Mapped[str] = mapped_column(String(255), nullable=False, default="Семья")
     owner_id: Mapped[str] = mapped_column(ForeignKey("users.id"), nullable=False, index=True)
-    created_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=datetime.utcnow)
+    created_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=utcnow)
 
 
 class HouseholdMembership(Base):
@@ -551,7 +552,7 @@ class HouseholdMembership(Base):
     )
     user_id: Mapped[str] = mapped_column(ForeignKey("users.id"), nullable=False, index=True)
     role: Mapped[str] = mapped_column(String(20), nullable=False, default="member")
-    joined_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=datetime.utcnow)
+    joined_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=utcnow)
 
     __table_args__ = (
         UniqueConstraint("household_id", "user_id", name="uq_household_member"),
@@ -578,7 +579,7 @@ class HouseholdInvite(Base):
     role: Mapped[str] = mapped_column(String(20), nullable=False, default="member")
     status: Mapped[str] = mapped_column(String(20), nullable=False, default="pending", index=True)
     created_by: Mapped[str] = mapped_column(ForeignKey("users.id"), nullable=False)
-    created_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=datetime.utcnow)
+    created_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=utcnow)
     expires_at: Mapped[datetime] = mapped_column(DateTime, nullable=False)
     accepted_by: Mapped[Optional[str]] = mapped_column(ForeignKey("users.id"), nullable=True)
     accepted_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
@@ -602,4 +603,4 @@ class CbrKeyRate(Base):
     # Ставка в долях (16% → 0.16).
     rate: Mapped[float] = mapped_column(Float, nullable=False)
     # Когда мы в последний раз получили/обновили это значение (UTC).
-    fetched_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=datetime.utcnow)
+    fetched_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=utcnow)

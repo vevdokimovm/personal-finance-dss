@@ -19,6 +19,7 @@ from app.database.db import SessionLocal
 from app.database.models import User
 from app.services.security import token_service
 from app.services.telegram import process_update, telegram_service
+from app.utils.time import utcnow
 
 
 # ─────────────────────────── helpers ───────────────────────────
@@ -233,7 +234,7 @@ class TestTelegramNotificationHook:
     получает уведомление и туда — рядом с email и in-app."""
 
     def test_goal_deadline_sent_to_telegram(self, db_session, monkeypatch) -> None:
-        from datetime import datetime, timedelta
+        from datetime import timedelta
 
         from app.services import notifications as notif
 
@@ -241,7 +242,7 @@ class TestTelegramNotificationHook:
         u = crud.create_user(db, email="tg_hook@test.io", password_hash="x")
         crud.link_telegram(db, u.id, "hookchat-1")
         crud.create_goal(db, name="Отпуск", target_amount=100000, current_amount=10000,
-                         deadline=datetime.utcnow() + timedelta(days=4), user_id=u.id)
+                         deadline=utcnow() + timedelta(days=4), user_id=u.id)
 
         sent: list = []
         monkeypatch.setattr(notif.telegram_service, "send_message",
@@ -251,14 +252,14 @@ class TestTelegramNotificationHook:
         assert any(chat == "hookchat-1" for chat, _ in sent)
 
     def test_no_telegram_when_not_linked(self, db_session, monkeypatch) -> None:
-        from datetime import datetime, timedelta
+        from datetime import timedelta
 
         from app.services import notifications as notif
 
         db = db_session
         u = crud.create_user(db, email="tg_nohook@test.io", password_hash="x")  # без привязки
         crud.create_goal(db, name="Цель", target_amount=100000, current_amount=10000,
-                         deadline=datetime.utcnow() + timedelta(days=4), user_id=u.id)
+                         deadline=utcnow() + timedelta(days=4), user_id=u.id)
 
         sent: list = []
         monkeypatch.setattr(notif.telegram_service, "send_message",

@@ -13,7 +13,6 @@
 """
 from __future__ import annotations
 
-from datetime import datetime
 from decimal import Decimal
 from typing import Optional
 
@@ -26,6 +25,7 @@ from app.ingestion.models import (
 )
 from app.services.currency import CurrencyConverter
 from app.services.planning import run_planning
+from app.utils.time import utcnow
 
 
 class CoreFinanceEngine:
@@ -53,7 +53,7 @@ class CoreFinanceEngine:
             r_bench=float(snapshot.r_bench),
             risk_tolerance=int(profile),
             l_min=float(snapshot.l_min),
-            today=datetime.utcnow(),
+            today=utcnow(),
         )
 
         return self._to_recommendation(result, base)

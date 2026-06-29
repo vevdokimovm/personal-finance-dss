@@ -10,12 +10,13 @@
 """
 from __future__ import annotations
 
-from datetime import datetime, timedelta
+from datetime import timedelta
 
 from fastapi.testclient import TestClient
 
 from app.database import crud
 from app.database.models import User
+from app.utils.time import utcnow
 
 
 def _user(db, uid: str) -> str:
@@ -34,7 +35,7 @@ def _mk_obligation(db, uid):
 def _mk_goal(db, uid):
     return crud.create_goal(
         db, name="G", target_amount=1000.0, current_amount=0.0,
-        deadline=datetime.utcnow() + timedelta(days=30), user_id=uid,
+        deadline=utcnow() + timedelta(days=30), user_id=uid,
     )
 
 

@@ -16,7 +16,7 @@
 """
 from __future__ import annotations
 
-from datetime import datetime, timedelta
+from datetime import timedelta
 
 import pytest
 from fastapi import HTTPException
@@ -31,6 +31,7 @@ from app.services.subscription import (
     has_feature,
     is_premium,
 )
+from app.utils.time import utcnow
 
 
 # ─────────────────────────── helpers ───────────────────────────
@@ -69,13 +70,13 @@ class TestEffectiveTier:
 
     def test_premium_future_expiry(self, db_session) -> None:
         u = _user(db_session, "sub_future@test.io", tier="premium",
-                  expires=datetime.utcnow() + timedelta(days=10))
+                  expires=utcnow() + timedelta(days=10))
         assert is_premium(u) is True
 
     def test_premium_expired_is_free(self, db_session) -> None:
         # Premium с истёкшим сроком деградирует до free.
         u = _user(db_session, "sub_expired@test.io", tier="premium",
-                  expires=datetime.utcnow() - timedelta(days=1))
+                  expires=utcnow() - timedelta(days=1))
         assert effective_tier(u) == PlanTier.FREE
         assert is_premium(u) is False
 
@@ -110,7 +111,7 @@ class TestSetPlan:
     def test_set_plan(self, db_session) -> None:
         db = db_session
         u = _user(db, "setplan@test.io")
-        crud.set_plan(db, u.id, "premium", expires_at=datetime.utcnow() + timedelta(days=30))
+        crud.set_plan(db, u.id, "premium", expires_at=utcnow() + timedelta(days=30))
         db.refresh(u)
         assert u.plan_tier == "premium"
         assert is_premium(u) is True
@@ -121,17 +122,17 @@ class TestSetPlan:
         crud.grant_premium_days(db, u.id, 30)
         db.refresh(u)
         assert is_premium(u) is True
-        assert u.plan_expires_at > datetime.utcnow() + timedelta(days=29)
+        assert u.plan_expires_at > utcnow() + timedelta(days=29)
 
     def test_grant_premium_days_accumulates(self, db_session) -> None:
         # Повторное продление активного premium считается от текущего срока, не от now.
         db = db_session
         u = _user(db, "grant_acc@test.io", tier="premium",
-                  expires=datetime.utcnow() + timedelta(days=10))
+                  expires=utcnow() + timedelta(days=10))
         crud.grant_premium_days(db, u.id, 30)
         db.refresh(u)
         # Было ~10 дней, добавили 30 → около 40, не 30.
-        assert u.plan_expires_at > datetime.utcnow() + timedelta(days=35)
+        assert u.plan_expires_at > utcnow() + timedelta(days=35)
 
 
 # ─────────────────────── require_premium dependency ───────────────────────
@@ -182,7 +183,7 @@ class TestSubscriptionEndpoint:
         uid = self._uid("sub_me_prem@test.io")
         db = SessionLocal()
         try:
-            crud.set_plan(db, uid, "premium", expires_at=datetime.utcnow() + timedelta(days=30))
+            crud.set_plan(db, uid, "premium", expires_at=utcnow() + timedelta(days=30))
         finally:
             db.close()
         r = client.get("/api/subscription/me", headers={"Authorization": f"Bearer {token}"})

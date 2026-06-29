@@ -12,6 +12,7 @@ from app.database.db import get_db
 from app.dependencies import require_admin
 from app.database.models import FxRate
 from app.services.currency import CurrencyConverter
+from app.utils.time import utcnow
 
 router = APIRouter(prefix="/fx", tags=["Валюты"])
 
@@ -53,7 +54,7 @@ def upsert_rate(payload: FxRateUpsert, db: Session = Depends(get_db)) -> FxRateR
         db.add(row)
     else:
         row.rate_to_usd = Decimal(str(payload.rate_to_usd))
-        row.updated_at = datetime.utcnow()
+        row.updated_at = utcnow()
     db.commit()
     db.refresh(row)
     return FxRateResponse(

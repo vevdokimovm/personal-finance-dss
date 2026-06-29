@@ -26,6 +26,7 @@ from sqlalchemy.orm import Session
 
 from app.database.models import Goal, LiquidAsset, Obligation, Transaction
 from app.dependencies import get_current_user_id, get_db
+from app.utils.time import utcnow
 
 router = APIRouter(tags=["Демо-данные"])
 
@@ -44,14 +45,14 @@ def _clear_all(db: Session, user_id: str | None = None) -> None:
 def _make_income(amount: float, category: str, days_ago: int = 7) -> Transaction:
     return Transaction(
         amount=amount, category=category, type="income",
-        date=datetime.utcnow() - timedelta(days=days_ago),
+        date=utcnow() - timedelta(days=days_ago),
     )
 
 
 def _make_expense(amount: float, category: str, days_ago: int = 7) -> Transaction:
     return Transaction(
         amount=amount, category=category, type="expense",
-        date=datetime.utcnow() - timedelta(days=days_ago),
+        date=utcnow() - timedelta(days=days_ago),
     )
 
 
@@ -59,7 +60,7 @@ def _make_expense(amount: float, category: str, days_ago: int = 7) -> Transactio
 
 def case_anna() -> dict[str, list[Any]]:
     """Кейс 1 · Анна Петрова, 36, маркетолог, Москва (пограничный)."""
-    now = datetime.utcnow()
+    now = utcnow()
     return {
         "transactions": [
             _make_income(180000, "Заработная плата (маркетолог)", 14),
@@ -95,7 +96,7 @@ def case_anna() -> dict[str, list[Any]]:
 
 def case_dmitriy() -> dict[str, list[Any]]:
     """Кейс 2 · Дмитрий Соколов, 28, IT-разработчик, СПб (здоровый)."""
-    now = datetime.utcnow()
+    now = utcnow()
     return {
         "transactions": [
             _make_income(230000, "Заработная плата (senior backend)", 14),
@@ -125,7 +126,7 @@ def case_dmitriy() -> dict[str, list[Any]]:
 
 def case_mikhail() -> dict[str, list[Any]]:
     """Кейс 3 · Михаил Кузнецов, 45, владелец мастерской, Казань (критический)."""
-    now = datetime.utcnow()
+    now = utcnow()
     return {
         "transactions": [
             _make_income(150000, "Доход от мастерской", 14),
@@ -161,7 +162,7 @@ def case_mikhail() -> dict[str, list[Any]]:
 
 def case_igor() -> dict[str, list[Any]]:
     """Кейс 4 · Игорь Лебедев, 25, junior backend, Нижний Новгород (старт)."""
-    now = datetime.utcnow()
+    now = utcnow()
     return {
         "transactions": [
             _make_income(95000, "Заработная плата (junior backend)", 14),
@@ -186,7 +187,7 @@ def case_igor() -> dict[str, list[Any]]:
 
 def case_olga() -> dict[str, list[Any]]:
     """Кейс 5 · Ольга Морозова, 38, библиотекарь, мать-одиночка, Тула (микс)."""
-    now = datetime.utcnow()
+    now = utcnow()
     return {
         "transactions": [
             _make_income(75000, "Заработная плата (библиотекарь)", 14),
@@ -216,7 +217,7 @@ def case_olga() -> dict[str, list[Any]]:
 
 def case_viktor() -> dict[str, list[Any]]:
     """Кейс 6 · Виктор Соловьёв, 58, главный инженер, Екатеринбург (пред-пенсионный)."""
-    now = datetime.utcnow()
+    now = utcnow()
     return {
         "transactions": [
             _make_income(145000, "Заработная плата + надбавки", 14),
@@ -279,7 +280,7 @@ def load_demo(
 
     _clear_all(db, user_id=user_id)
     data = CASES[case]()
-    now = datetime.utcnow()
+    now = utcnow()
     # Для наглядности прогресса выплат: если дата взятия не задана, считаем, что
     # term в демо задан как остаток; превращаем в ОБЩИЙ срок кредита и ставим
     # реалистичную дату взятия. «Осталось» дальше считается динамически от даты.
@@ -305,7 +306,7 @@ def preview_demo(case: str = "anna") -> dict[str, Any]:
     if case not in CASES:
         raise HTTPException(status_code=400, detail=f"Неизвестный кейс: {case}.")
     data = CASES[case]()
-    now = datetime.utcnow()
+    now = utcnow()
 
     incomes = [t for t in data["transactions"] if t.type == "income"]
     expenses = [t for t in data["transactions"] if t.type == "expense"]

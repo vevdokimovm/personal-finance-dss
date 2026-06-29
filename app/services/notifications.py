@@ -15,6 +15,7 @@ from app.database.crud import create_notification, get_budget_status, get_goals,
 from app.database.models import Goal, NotificationLog, User
 from app.services.email_service import email_service
 from app.services.telegram import telegram_service
+from app.utils.time import utcnow
 
 
 def notify_telegram_if_linked(user: User, text: str) -> None:
@@ -28,7 +29,7 @@ def goals_near_deadline(
     db: Session, user_id: str | None, within_days: int = 7
 ) -> list[tuple[Goal, int]]:
     """Активные недостигнутые цели с дедлайном в пределах within_days дней."""
-    now = datetime.utcnow()
+    now = utcnow()
     result: list[tuple[Goal, int]] = []
     for goal in get_goals(db, active_only=True, user_id=user_id):
         if goal.deadline is None:
@@ -46,7 +47,7 @@ def budgets_over(db: Session, user_id: str | None) -> list[dict]:
 
 def _previous_month(today: datetime | None = None) -> str:
     """YYYY-MM предыдущего календарного месяца."""
-    today = today or datetime.utcnow()
+    today = today or utcnow()
     last_prev = today.replace(day=1) - timedelta(days=1)
     return last_prev.strftime("%Y-%m")
 
@@ -95,7 +96,7 @@ def record_notification(db: Session, user_id: str, notification_type: str, dedup
             user_id=user_id,
             notification_type=notification_type,
             dedup_key=dedup_key,
-            sent_at=datetime.utcnow(),
+            sent_at=utcnow(),
         )
     )
     db.commit()
@@ -106,7 +107,7 @@ def run_user_notifications(db: Session, user: User) -> dict[str, int]:
 
     Возвращает счётчики реально отправленного (без дублей).
     """
-    month = datetime.utcnow().strftime("%Y-%m")
+    month = utcnow().strftime("%Y-%m")
     sent = {"goal_deadline": 0, "budget_overrun": 0, "digest": 0}
 
     for goal, days_left in goals_near_deadline(db, user.id):

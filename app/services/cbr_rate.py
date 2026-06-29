@@ -23,6 +23,7 @@ from sqlalchemy import select
 
 from app.database.db import SessionLocal
 from app.database.models import CbrKeyRate
+from app.utils.time import utcnow
 
 _log = logging.getLogger(__name__)
 
@@ -216,7 +217,7 @@ def _db_store(effective_date: date | None, rate: float) -> None:
         ).scalar_one_or_none()
         if existing is not None:
             existing.rate = float(rate)
-            existing.fetched_at = datetime.utcnow()
+            existing.fetched_at = utcnow()
         else:
             db.add(CbrKeyRate(effective_date=effective_date, rate=float(rate)))
         db.commit()

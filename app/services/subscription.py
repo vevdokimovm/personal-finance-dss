@@ -12,10 +12,10 @@ free/premium определится при запуске монетизации
 """
 from __future__ import annotations
 
-from datetime import datetime
 from enum import Enum
 
 from app.database.models import User
+from app.utils.time import utcnow
 
 
 class PlanTier(str, Enum):
@@ -35,7 +35,7 @@ def effective_tier(user: User) -> PlanTier:
     """Текущий тариф пользователя с учётом срока. Premium с истёкшим сроком = free."""
     if user.plan_tier == PlanTier.PREMIUM.value:
         expires = user.plan_expires_at
-        if expires is None or expires > datetime.utcnow():
+        if expires is None or expires > utcnow():
             return PlanTier.PREMIUM
     return PlanTier.FREE
 

@@ -1,14 +1,14 @@
 """Продуктовая аналитика на событийном логе (P3.4)."""
 from __future__ import annotations
 
-from datetime import datetime
 
 from app.database.models import Event
 from app.services.analytics import active_users, analytics_overview, event_counts, funnel
+from app.utils.time import utcnow
 
 
 def _event(db, etype: str, user_id: str | None = None) -> None:
-    db.add(Event(event_type=etype, user_id=user_id, created_at=datetime.utcnow()))
+    db.add(Event(event_type=etype, user_id=user_id, created_at=utcnow()))
     db.commit()
 
 

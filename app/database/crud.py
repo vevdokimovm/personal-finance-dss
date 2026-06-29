@@ -36,6 +36,7 @@ from app.database.models import (
     UserCategoryRule,
     UserPrefs,
 )
+from app.utils.time import utcnow
 
 
 def _household_ids_for(session, user_id) -> tuple:
@@ -200,7 +201,7 @@ def bulk_create_transactions(
     # P2.7: пользовательские правила категоризации — один запрос на весь батч (без N+1).
     rules_by_type = _user_rules_by_type(db, user_id)
 
-    now = datetime.utcnow()
+    now = utcnow()
     mappings: list[dict] = []
     inserted = 0
 
@@ -431,7 +432,7 @@ def delete_transaction(
     if transaction is None or transaction.is_deleted or transaction.user_id != user_id:
         return None
     transaction.is_deleted = True
-    transaction.deleted_at = datetime.utcnow()
+    transaction.deleted_at = utcnow()
     db.commit()
     db.refresh(transaction)
     return transaction
@@ -518,7 +519,7 @@ def upsert_category_rule(
     if rule is not None:
         rule.category = category
         rule.category_id = category_id
-        rule.updated_at = datetime.utcnow()
+        rule.updated_at = utcnow()
     else:
         rule = UserCategoryRule(
             user_id=user_id,
@@ -650,7 +651,7 @@ def create_obligation(
         comment=comment,
         bank=bank,
         type=type,
-        start_date=start_date or datetime.utcnow(),
+        start_date=start_date or utcnow(),
         is_active=True,
         currency=currency,
         user_id=user_id,
@@ -681,7 +682,7 @@ def delete_obligation(
     if obligation is None or obligation.is_deleted or obligation.user_id != user_id:
         return None
     obligation.is_deleted = True
-    obligation.deleted_at = datetime.utcnow()
+    obligation.deleted_at = utcnow()
     db.commit()
     db.refresh(obligation)
     return obligation
@@ -706,7 +707,7 @@ def close_obligation(db: Session, obligation_id: int) -> Optional[Obligation]:
     if obligation is None:
         return None
     obligation.is_active = False
-    obligation.closed_at = datetime.utcnow()
+    obligation.closed_at = utcnow()
     db.commit()
     db.refresh(obligation)
     return obligation
@@ -725,7 +726,7 @@ def record_obligation_payment(
         amount=to_money(amount),
         is_early=is_early,
         remaining_after=to_money(remaining_after),
-        payment_date=payment_date or datetime.utcnow(),
+        payment_date=payment_date or utcnow(),
     )
     db.add(payment)
     db.commit()
@@ -801,7 +802,7 @@ def delete_goal(db: Session, goal_id: int, user_id: Optional[str] = None) -> Opt
     if goal is None or goal.is_deleted or goal.user_id != user_id:
         return None
     goal.is_deleted = True
-    goal.deleted_at = datetime.utcnow()
+    goal.deleted_at = utcnow()
     db.commit()
     db.refresh(goal)
     return goal
@@ -824,7 +825,7 @@ def achieve_goal(db: Session, goal_id: int) -> Optional[Goal]:
     if goal is None:
         return None
     goal.is_active = False
-    goal.achieved_at = datetime.utcnow()
+    goal.achieved_at = utcnow()
     db.commit()
     db.refresh(goal)
     return goal
@@ -841,7 +842,7 @@ def record_goal_contribution(
         goal_id=goal_id,
         amount=to_money(amount),
         source=source,
-        contribution_date=contribution_date or datetime.utcnow(),
+        contribution_date=contribution_date or utcnow(),
     )
     db.add(contribution)
     db.commit()
@@ -894,7 +895,7 @@ def delete_liquid_asset(
     if asset is None or asset.is_deleted or asset.user_id != user_id:
         return None
     asset.is_deleted = True
-    asset.deleted_at = datetime.utcnow()
+    asset.deleted_at = utcnow()
     db.commit()
     db.refresh(asset)
     return asset
@@ -1010,7 +1011,7 @@ def create_user(
         password_hash=password_hash,
         display_name=display_name,
         newsletter_opt_in=newsletter_opt_in,
-        consent_at=consent_at or datetime.utcnow(),
+        consent_at=consent_at or utcnow(),
         referral_code=generate_referral_code(db),
         referred_by_code=referred_by_code,
     )
@@ -1069,7 +1070,7 @@ def register_failed_login(
     аккаунт на lockout_minutes (P1.2, защита от перебора пароля)."""
     user.failed_login_attempts = (user.failed_login_attempts or 0) + 1
     if user.failed_login_attempts >= max_attempts:
-        user.locked_until = datetime.utcnow() + timedelta(minutes=lockout_minutes)
+        user.locked_until = utcnow() + timedelta(minutes=lockout_minutes)
     db.commit()
     db.refresh(user)
     return user
@@ -1218,7 +1219,7 @@ def soft_delete_plan_snapshot(
     if snap is None:
         return False
     snap.is_deleted = True
-    snap.deleted_at = datetime.utcnow()
+    snap.deleted_at = utcnow()
     db.commit()
     return True
 
@@ -1401,7 +1402,7 @@ def create_invite(
         role=role,
         status="pending",
         created_by=created_by,
-        expires_at=datetime.utcnow() + timedelta(hours=ttl_hours),
+        expires_at=utcnow() + timedelta(hours=ttl_hours),
     )
     db.add(invite)
     db.commit()
@@ -1450,7 +1451,7 @@ def accept_invite(
     invite = get_invite_by_token(db, token)
     if invite is None or invite.status != "pending":
         return None, "invalid"
-    if invite.expires_at < datetime.utcnow():
+    if invite.expires_at < utcnow():
         invite.status = "expired"
         db.commit()
         return None, "expired"
@@ -1459,7 +1460,7 @@ def accept_invite(
     if existing is not None:
         invite.status = "accepted"
         invite.accepted_by = user_id
-        invite.accepted_at = datetime.utcnow()
+        invite.accepted_at = utcnow()
         db.commit()
         return existing, None
 
@@ -1469,7 +1470,7 @@ def accept_invite(
     db.add(membership)
     invite.status = "accepted"
     invite.accepted_by = user_id
-    invite.accepted_at = datetime.utcnow()
+    invite.accepted_at = utcnow()
     db.commit()
     db.refresh(membership)
     return membership, None
@@ -1596,7 +1597,7 @@ def grant_premium_days(db: Session, user_id: str, days: int) -> Optional[User]:
     user = get_user_by_id(db, user_id)
     if user is None:
         return None
-    now = datetime.utcnow()
+    now = utcnow()
     base = user.plan_expires_at if (user.plan_expires_at and user.plan_expires_at > now) else now
     user.plan_tier = "premium"
     user.plan_expires_at = base + timedelta(days=days)

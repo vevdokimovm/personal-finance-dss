@@ -18,6 +18,7 @@ from xml.etree import ElementTree as ET
 from sqlalchemy.orm import Session
 
 from app.database.models import FxRate
+from app.utils.time import utcnow
 
 _log = logging.getLogger(__name__)
 
@@ -122,7 +123,7 @@ def update_fx_rates(db: Session) -> dict[str, object]:
         return {"updated": 0, "source": "fallback"}
 
     updated = 0
-    now = datetime.utcnow()
+    now = utcnow()
     for currency, rate in rates.items():
         row = db.query(FxRate).filter(FxRate.currency == currency).first()
         if row is None:

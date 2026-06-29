@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import csv
 import io
-from datetime import datetime
 
 from fastapi import APIRouter, Depends, HTTPException, Response, status
 from pydantic import BaseModel, Field
@@ -24,6 +23,7 @@ from app.core.categorization import MIN_MATCH_TOKEN_LEN, normalize_match_key
 from app.dependencies import get_current_user_id, get_db
 from app.schemas.transaction import TransactionCreate, TransactionResponse
 from app.services.event_logger import log_event
+from app.utils.time import utcnow
 
 router = APIRouter(tags=["Транзакции"])
 
@@ -54,7 +54,7 @@ def export_transactions_csv(
             "Банк" if getattr(t, "is_synced", False) else "Ручной",
         ])
 
-    filename = f"finpilot-operations-{datetime.utcnow():%Y-%m-%d}.csv"
+    filename = f"finpilot-operations-{utcnow():%Y-%m-%d}.csv"
     return Response(
         content="\ufeff" + buf.getvalue(),
         media_type="text/csv; charset=utf-8",

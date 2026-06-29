@@ -10,6 +10,7 @@ from datetime import datetime
 from app.database import crud
 from app.database.models import NotificationLog
 from app.services.notifications import build_monthly_digest, run_user_notifications
+from app.utils.time import utcnow
 
 
 def _user(db, email="digest@test.io"):
@@ -52,7 +53,7 @@ class TestDigestInRun:
         db = db_session
         u = _user(db, email="digestrun@test.io")
         # операция в прошлом месяце — чтобы дайджесту было что показать
-        now = datetime.utcnow()
+        now = utcnow()
         prev = (now.replace(day=1) - __import__("datetime").timedelta(days=1))
         crud.create_transaction(db, amount=50000, type="income", date=prev, user_id=u.id)
 

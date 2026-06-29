@@ -7,7 +7,6 @@
 """
 from __future__ import annotations
 
-from datetime import datetime
 from functools import partial
 
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Request, Response, status
@@ -43,6 +42,7 @@ from app.services.email_dispatch import dispatch_email
 from app.services.email_service import email_service
 from app.services.event_logger import log_event
 from app.services.security import password_hasher, token_service
+from app.utils.time import utcnow
 
 router = APIRouter(prefix="/auth", tags=["Аутентификация"])
 
@@ -136,8 +136,8 @@ def login(payload: LoginRequest, response: Response, db: Session = Depends(get_d
     user = get_user_by_email(db, payload.email)
 
     # Блокировка действует даже при верном пароле, пока не истечёт срок.
-    if user is not None and user.locked_until and user.locked_until > datetime.utcnow():
-        retry_min = max(1, int((user.locked_until - datetime.utcnow()).total_seconds() // 60) + 1)
+    if user is not None and user.locked_until and user.locked_until > utcnow():
+        retry_min = max(1, int((user.locked_until - utcnow()).total_seconds() // 60) + 1)
         log_event("login_locked", user_id=user.id)
         raise HTTPException(
             status_code=status.HTTP_429_TOO_MANY_REQUESTS,

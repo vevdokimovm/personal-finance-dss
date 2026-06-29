@@ -12,6 +12,7 @@
 from __future__ import annotations
 
 from datetime import datetime
+from app.utils.time import utcnow
 from typing import Any
 
 CATEGORY_WEIGHTS: dict[str, float] = {
@@ -55,7 +56,7 @@ def calculate_goals_si(
         Si: взвешенная обеспеченность в [0, 1]
         allocation: {goal_id: сколько направлено в эту цель}
     """
-    today = today or datetime.utcnow()
+    today = today or utcnow()
 
     if not goals or x_goals <= 0:
         return 0.0, {}
@@ -110,7 +111,7 @@ def preallocate_from_bliq(
         closed_goals: цели, закрытые единовременно (со списанием со счёта Bliq)
         active_goals: цели, остающиеся в оптимизации
     """
-    today = today or datetime.utcnow()
+    today = today or utcnow()
 
     if bliq <= 0 or not goals:
         return bliq, [], list(goals)
@@ -147,7 +148,7 @@ def goals_allocation_breakdown(
     Возвращает по каждой цели: имя, категорию, вес категории w_s,
     срочность u_s, приоритет w_s·u_s, долю и сумму.
     """
-    today = today or datetime.utcnow()
+    today = today or utcnow()
     if not goals or x_goals <= 0:
         return []
 

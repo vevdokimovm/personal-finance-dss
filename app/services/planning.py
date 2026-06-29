@@ -30,6 +30,7 @@ from app.core.metrics import (
 )
 from app.core.ranking import RISK_PROFILES, rank_alternatives
 from app.core.recommendation import explain_alternative
+from app.utils.time import utcnow
 
 
 def run_planning(
@@ -44,7 +45,7 @@ def run_planning(
     today: datetime | None = None,
 ) -> dict[str, Any]:
     """Полный цикл планирования СППР по ВКР (этапы 1–6)."""
-    today = today or datetime.utcnow()
+    today = today or utcnow()
     profile = RISK_PROFILES.get(risk_tolerance, RISK_PROFILES[3])
 
     # ── Этап 4.0: предобработка ликвидной позиции ──────────────────────

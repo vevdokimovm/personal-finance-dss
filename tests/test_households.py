@@ -16,12 +16,13 @@
 """
 from __future__ import annotations
 
-from datetime import datetime, timedelta
+from datetime import timedelta
 
 import pytest
 
 from app.database.db import SessionLocal
 from app.database.models import HouseholdInvite
+from app.utils.time import utcnow
 
 FUTURE = "2030-12-31T00:00:00"
 
@@ -186,7 +187,7 @@ class TestMembershipAndInvites:
         session = SessionLocal()
         try:
             inv = session.query(HouseholdInvite).filter(HouseholdInvite.token == token).one()
-            inv.expires_at = datetime.utcnow() - timedelta(hours=1)
+            inv.expires_at = utcnow() - timedelta(hours=1)
             session.commit()
         finally:
             session.close()

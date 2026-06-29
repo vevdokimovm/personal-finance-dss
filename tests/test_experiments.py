@@ -1,7 +1,6 @@
 """Интеграционные тесты A/B-экспериментов (P3.5): сервис, фиксация, измерение, эндпоинты."""
 from __future__ import annotations
 
-from datetime import datetime
 
 import pytest
 from fastapi.testclient import TestClient
@@ -10,6 +9,7 @@ from app.database import crud  # noqa: F401  (единый стиль импор
 from app.database.models import Event
 from app.services import experiments as svc
 from app.services.analytics import experiment_results
+from app.utils.time import utcnow
 
 FIFTY = [{"name": "control", "weight": 50}, {"name": "treatment", "weight": 50}]
 
@@ -104,9 +104,9 @@ class TestResults:
             svc.get_or_assign_variant(db_session, "m1", user_id=s)
         # двое конвертнулись (по user_id), один аноним по session_id
         for s in subjects[:2]:
-            db_session.add(Event(user_id=s, event_type="goal_created", created_at=datetime.utcnow()))
+            db_session.add(Event(user_id=s, event_type="goal_created", created_at=utcnow()))
         svc.get_or_assign_variant(db_session, "m1", session_id="anon-1")
-        db_session.add(Event(session_id="anon-1", event_type="goal_created", created_at=datetime.utcnow()))
+        db_session.add(Event(session_id="anon-1", event_type="goal_created", created_at=utcnow()))
         db_session.commit()
 
         res = experiment_results(db_session, "m1")

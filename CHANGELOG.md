@@ -2,6 +2,27 @@
 
 Формат: [Keep a Changelog](https://keepachangelog.com/ru/1.0.0/). Версионирование — [SemVer](https://semver.org/lang/ru/).
 
+## [4.25.2] — 2026-06-29 — Техдолг 4.3: utcnow → now(UTC) через helper (PATCH)
+
+Вторая задача раздела 4.3. `datetime.utcnow()` объявлен deprecated (удалят в будущих Python) —
+заменён единой обёрткой. **Выбран вариант A** (Василий): helper возвращает naive UTC, поведение
+идентично старому `utcnow()`, колонки моделей (`DateTime` без `timezone=True`) и миграции не трогаются,
+риск сравнений naive↔aware исключён. Полный переход на timezone-aware + миграция timestamp-колонок —
+отдельно, ближе к вехе деплоя (вариант B).
+
+- **Новый helper `app/utils/time.py`**: `utcnow() -> datetime` = `datetime.now(timezone.utc)
+  .replace(tzinfo=None)`. Единая точка: когда колонки переведут на aware, достаточно убрать
+  `.replace(tzinfo=None)` здесь — вызывающие места не трогаются. +4 теста (naive-контракт, близость к UTC,
+  совпадение с legacy-семантикой).
+- **Замена во всём `app/`**: 78 вхождений `datetime.utcnow` → `utcnow` в 17 файлах (вызовы + `default=`/
+  `onupdate=` в моделях). Осиротевшие импорты `datetime` (6 файлов, где он был только для utcnow) убраны.
+- **Замена в тестах**: 13 тест-файлов вычищены от deprecated `utcnow` (пункт роадмапа «деприкейшены
+  в тестах»). `test_time_utils.py` намеренно сверяется с legacy `datetime.utcnow()` (`# noqa: DTZ003`).
+- **Поведение не меняется**: naive UTC ↔ naive UTC. `app/` flake8 `0`, mypy `Success` (101 файл),
+  весь fast-suite зелёный (615 тестов + изменённые тесты перепроверены), DeprecationWarning по utcnow
+  устранён.
+- **Осталось в 4.3**: `ExpenseRecord` + поле `date` (последняя задача техдолга), затем кибербез 4.4.
+
 ## [4.25.1] — 2026-06-29 — Техдолг 4.3: статанализ до нуля (PATCH)
 
 Первая половина раздела 4.3 (P1.4): mypy и flake8 по `app/` приведены к нулю. Чистка

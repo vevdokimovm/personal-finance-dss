@@ -11,6 +11,7 @@ from sqlalchemy import func
 from sqlalchemy.orm import Session
 
 from app.database.models import Event, Experiment, ExperimentAssignment
+from app.utils.time import utcnow
 
 
 def event_counts(db: Session, since: datetime | None = None) -> dict[str, int]:
@@ -57,7 +58,7 @@ def funnel(db: Session, steps: list[str], since: datetime | None = None) -> list
 
 def analytics_overview(db: Session, days: int = 30) -> dict:
     """Сводка за период: всего событий, активные пользователи, разбивка по типам."""
-    since = datetime.utcnow() - timedelta(days=days)
+    since = utcnow() - timedelta(days=days)
     counts = event_counts(db, since=since)
     return {
         "period_days": days,

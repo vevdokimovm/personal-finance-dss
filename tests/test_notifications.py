@@ -5,7 +5,7 @@
 """
 from __future__ import annotations
 
-from datetime import datetime, timedelta
+from datetime import timedelta
 
 from app.database import crud
 from app.database.models import NotificationLog
@@ -16,6 +16,7 @@ from app.services.notifications import (
     run_user_notifications,
     was_notified,
 )
+from app.utils.time import utcnow
 
 
 def _user(db, email="notify@test.io"):
@@ -25,7 +26,7 @@ def _user(db, email="notify@test.io"):
 def _goal(db, days_from_now: int, name="Цель", user_id=None):
     return crud.create_goal(
         db, name=name, target_amount=100000, current_amount=10000,
-        deadline=datetime.utcnow() + timedelta(days=days_from_now), user_id=user_id,
+        deadline=utcnow() + timedelta(days=days_from_now), user_id=user_id,
     )
 
 
@@ -49,7 +50,7 @@ class TestBudgetOverruns:
     def test_over_budget_detected(self, db_session) -> None:
         db = db_session
         crud.create_budget(db, category="Кафе и рестораны", limit_amount=1000, user_id=None)
-        crud.create_transaction(db, amount=1500, type="expense", date=datetime.utcnow(),
+        crud.create_transaction(db, amount=1500, type="expense", date=utcnow(),
                                 category="Кафе и рестораны")
         over = budgets_over(db, user_id=None)
         assert any(b["category"] == "Кафе и рестораны" for b in over)
@@ -57,7 +58,7 @@ class TestBudgetOverruns:
     def test_within_budget_not_flagged(self, db_session) -> None:
         db = db_session
         crud.create_budget(db, category="Развлечения", limit_amount=5000, user_id=None)
-        crud.create_transaction(db, amount=1000, type="expense", date=datetime.utcnow(),
+        crud.create_transaction(db, amount=1000, type="expense", date=utcnow(),
                                 category="Развлечения")
         assert budgets_over(db, user_id=None) == []
 

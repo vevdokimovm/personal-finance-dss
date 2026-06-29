@@ -10,6 +10,7 @@ from datetime import datetime
 from app.database import crud
 from app.database.models import FxRate
 from app.services.currency import CurrencyConverter, to_base_currency
+from app.utils.time import utcnow
 
 
 def _seed_rates(db):
@@ -41,7 +42,7 @@ class TestRowsToBase:
         _seed_rates(db_session)
         user = crud.create_user(db_session, email="u1@test.io", password_hash="x")
         crud.create_transaction(
-            db_session, amount=100.0, type="income", date=datetime.utcnow(),
+            db_session, amount=100.0, type="income", date=utcnow(),
             category="Salary", currency="USD", user_id=user.id,
         )
         rows = crud.get_transactions(db_session, user_id=user.id)
@@ -54,11 +55,11 @@ class TestRowsToBase:
         _seed_rates(db_session)
         user = crud.create_user(db_session, email="u1@test.io", password_hash="x")
         crud.create_transaction(
-            db_session, amount=100.0, type="income", date=datetime.utcnow(),
+            db_session, amount=100.0, type="income", date=utcnow(),
             category="USD-income", currency="USD", user_id=user.id,
         )
         crud.create_transaction(
-            db_session, amount=5000.0, type="income", date=datetime.utcnow(),
+            db_session, amount=5000.0, type="income", date=utcnow(),
             category="RUB-income", currency="RUB", user_id=user.id,
         )
         rows = crud.get_transactions(db_session, user_id=user.id)

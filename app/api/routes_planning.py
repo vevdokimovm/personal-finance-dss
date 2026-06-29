@@ -5,7 +5,6 @@ import csv
 import hashlib
 import io
 import json
-from datetime import datetime
 from typing import Any, Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Response
@@ -43,6 +42,7 @@ from app.services.forecasting import forecast_indicators
 from app.services.currency import to_base_currency
 from app.services.plan_export import plan_to_pdf, plan_to_xlsx
 from app.services.planning import run_planning
+from app.utils.time import utcnow
 
 
 # ── Кэш расчёта плана (P1.2) ──────────────────────────────────────────────
@@ -332,7 +332,7 @@ def export_plan_csv(
 ) -> Response:
     payload = PlanningRequest(risk_tolerance=risk_tolerance, l_min=l_min, r_bench=r_bench)
     result = _compute_plan(payload, db, user_id)
-    filename = f"finpilot-plan-{datetime.utcnow():%Y-%m-%d}.csv"
+    filename = f"finpilot-plan-{utcnow():%Y-%m-%d}.csv"
     return Response(
         content="\ufeff" + _plan_to_csv(result),
         media_type="text/csv; charset=utf-8",
@@ -350,7 +350,7 @@ def export_plan_xlsx(
 ) -> Response:
     payload = PlanningRequest(risk_tolerance=risk_tolerance, l_min=l_min, r_bench=r_bench)
     result = _compute_plan(payload, db, user_id)
-    filename = f"finpilot-plan-{datetime.utcnow():%Y-%m-%d}.xlsx"
+    filename = f"finpilot-plan-{utcnow():%Y-%m-%d}.xlsx"
     return Response(
         content=plan_to_xlsx(result),
         media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
@@ -368,7 +368,7 @@ def export_plan_pdf(
 ) -> Response:
     payload = PlanningRequest(risk_tolerance=risk_tolerance, l_min=l_min, r_bench=r_bench)
     result = _compute_plan(payload, db, user_id)
-    filename = f"finpilot-plan-{datetime.utcnow():%Y-%m-%d}.pdf"
+    filename = f"finpilot-plan-{utcnow():%Y-%m-%d}.pdf"
     return Response(
         content=plan_to_pdf(result),
         media_type="application/pdf",

@@ -29,6 +29,7 @@ from app.ingestion.models import (
     TransactionType,
 )
 from app.services.security import TokenCipher
+from app.utils.time import utcnow
 
 
 class EncryptedTokenStore:
@@ -44,7 +45,7 @@ class EncryptedTokenStore:
             user_id=user_ref,
             item_id=item_id,
             token_encrypted=encrypted,
-            created_at=datetime.utcnow(),
+            created_at=utcnow(),
         )
         self._db.add(row)
         self._db.commit()
@@ -190,5 +191,5 @@ def _parse_date(value) -> datetime:
         try:
             return datetime.fromisoformat(value)
         except ValueError:
-            return datetime.utcnow()
-    return datetime.utcnow()
+            return utcnow()
+    return utcnow()

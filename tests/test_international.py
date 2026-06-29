@@ -1,7 +1,8 @@
 """Тесты v3.0.0: мультивалюта, ingestion-слой, шифрование, B2B (FR-18/19/23, INFRA-15/17)."""
 from __future__ import annotations
 
-from datetime import datetime, timedelta
+from datetime import timedelta
+from app.utils.time import utcnow
 from decimal import Decimal
 
 
@@ -59,8 +60,8 @@ def test_core_engine_avalanche_filters_cheap_debt():
     snap = FinancialSnapshot(
         base_currency="RUB",
         transactions=[
-            Transaction("t1", Decimal("180000"), TransactionType.INCOME, datetime.utcnow()),
-            Transaction("t2", Decimal("78000"), TransactionType.EXPENSE, datetime.utcnow()),
+            Transaction("t1", Decimal("180000"), TransactionType.INCOME, utcnow()),
+            Transaction("t2", Decimal("78000"), TransactionType.EXPENSE, utcnow()),
         ],
         debts=[Debt("d1", "Кредитка", Decimal("200000"), Decimal("25000"), Decimal("0.249"), 24)],
         r_bench=Decimal("0.14"),
@@ -81,7 +82,7 @@ def test_core_engine_multicurrency_conversion():
     conv = CurrencyConverter({"USD": Decimal("1"), "RUB": Decimal("0.0107")})
     snap = FinancialSnapshot(
         base_currency="RUB",
-        transactions=[Transaction("t1", Decimal("2000"), TransactionType.INCOME, datetime.utcnow(), "USD")],
+        transactions=[Transaction("t1", Decimal("2000"), TransactionType.INCOME, utcnow(), "USD")],
     )
     rec = CoreFinanceEngine(converter=conv).analyze(snap, RiskProfile.BALANCED)
     # 2000 USD ≈ 186916 RUB
@@ -142,7 +143,7 @@ def test_manual_snapshot_persistence(client):
             base_currency="RUB",
             risk_profile=RiskProfile.AGGRESSIVE,
             accounts=[Account("a1", "Депозит", Decimal("150000"), "RUB", is_liquid=True)],
-            goals=[Goal("g1", "Цель", Decimal("300000"), Decimal("50000"), datetime.utcnow() + timedelta(days=180))],
+            goals=[Goal("g1", "Цель", Decimal("300000"), Decimal("50000"), utcnow() + timedelta(days=180))],
             r_bench=Decimal("0.16"),
         )
         repo.save("user-x", snap)

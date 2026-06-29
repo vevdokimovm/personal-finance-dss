@@ -5,12 +5,12 @@
 """
 from __future__ import annotations
 
-from datetime import datetime
 
 import pytest
 
 from app.database import crud
 from app.database.models import User
+from app.utils.time import utcnow
 
 
 @pytest.fixture(autouse=True)
@@ -25,7 +25,7 @@ def _seed_users(db_session):
 
 def _txn(db, user_id, amount=100.0):
     return crud.create_transaction(
-        db, amount=amount, type="expense", date=datetime.utcnow(),
+        db, amount=amount, type="expense", date=utcnow(),
         category="Еда", user_id=user_id,
     )
 
@@ -86,7 +86,7 @@ class TestDeleteOwnership:
     def test_user_cannot_delete_foreign_goal(self, db_session):
         g = crud.create_goal(
             db_session, name="Отпуск", target_amount=100000, current_amount=0,
-            deadline=datetime.utcnow(), user_id="user-b",
+            deadline=utcnow(), user_id="user-b",
         )
         assert crud.delete_goal(db_session, g.id, user_id="user-a") is None
 

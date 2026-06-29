@@ -7,12 +7,13 @@
 """
 from __future__ import annotations
 
-from datetime import datetime, timedelta
+from datetime import timedelta
 
 import pytest
 
 from app.database import crud
 from app.database.models import Event, GoalContribution, ObligationPayment, Recommendation, User
+from app.utils.time import utcnow
 
 
 def _user(db, uid="u-del"):
@@ -25,7 +26,7 @@ def test_delete_goal_is_soft_and_keeps_contributions(db_session) -> None:
     uid = _user(db_session, "u-goal")
     goal = crud.create_goal(
         db_session, name="G", target_amount=1000.0, current_amount=0.0,
-        deadline=datetime.utcnow() + timedelta(days=30), user_id=uid,
+        deadline=utcnow() + timedelta(days=30), user_id=uid,
     )
     crud.record_goal_contribution(db_session, goal.id, amount=100.0)
     # P1.7: мягкое удаление — запись помечается, история взносов сохраняется для restore.
@@ -62,7 +63,7 @@ def test_delete_user_purges_all_personal_data(db_session) -> None:
     uid = _user(db_session, "u-full")
     goal = crud.create_goal(
         db_session, name="G", target_amount=1000.0, current_amount=0.0,
-        deadline=datetime.utcnow() + timedelta(days=30), user_id=uid,
+        deadline=utcnow() + timedelta(days=30), user_id=uid,
     )
     crud.record_goal_contribution(db_session, goal.id, amount=100.0)
     obl = crud.create_obligation(
