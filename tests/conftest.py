@@ -69,6 +69,21 @@ def _clear_recommendation_cache():
 
 
 @pytest.fixture(autouse=True)
+def _reset_cbr_key_rate_cache():
+    """Process-кэш ключевой ставки живёт на модуле cbr_rate. Любой тест, дёрнувший
+    живой fetch (сеть к cbr.ru в песочнице/CI закрыта → сбой), ставит 15-мин backoff
+    и кэширует неудачу. Без сброса это глушит сеть в последующих тестах и протекает
+    между ними. Чистим перед каждым тестом."""
+    try:
+        from app.services import cbr_rate
+        cbr_rate._cache.update(rate=None, source=None, fetched_on=None)
+        cbr_rate._fail_until.update(ts=None, detail="")
+    except Exception:
+        pass
+    yield
+
+
+@pytest.fixture(autouse=True)
 def _reset_rate_limit():
     """Сброс in-memory rate-limit между тестами.
 

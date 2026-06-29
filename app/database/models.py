@@ -1,11 +1,11 @@
 from __future__ import annotations
 
 import uuid
-from datetime import datetime
+from datetime import date, datetime
 from decimal import Decimal
 from typing import Optional
 
-from sqlalchemy import JSON, Boolean, DateTime, Float, ForeignKey, Integer, Numeric, String, Text, UniqueConstraint
+from sqlalchemy import JSON, Boolean, Date, DateTime, Float, ForeignKey, Integer, Numeric, String, Text, UniqueConstraint
 
 from app.database.types import EncryptedString
 from sqlalchemy.orm import Mapped, mapped_column
@@ -577,3 +577,24 @@ class HouseholdInvite(Base):
     expires_at: Mapped[datetime] = mapped_column(DateTime, nullable=False)
     accepted_by: Mapped[Optional[str]] = mapped_column(ForeignKey("users.id"), nullable=True)
     accepted_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+
+
+class CbrKeyRate(Base):
+    """Durable last-known-good кэш ключевой ставки ЦБ РФ (устойчивость источника).
+
+    cbr.ru бывает недоступен: на проде с датацентрового IP он отдаёт 403 (DDoS-защита),
+    плюс возможны кратковременные сбои. Каждый успешный fetch сохраняется здесь; когда
+    источник недоступен — отдаём последнее известное РЕАЛЬНОЕ значение вместо мёртвого
+    статического дефолта. Одна строка на дату вступления ставки в силу (effective_date) —
+    заодно лёгкий аудит-след изменений ставки. «Текущая» = строка с максимальной
+    effective_date.
+    """
+    __tablename__ = "cbr_key_rate_cache"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    # Дата, с которой ставка действует (из поля DT ответа KeyRate).
+    effective_date: Mapped[date] = mapped_column(Date, nullable=False, unique=True, index=True)
+    # Ставка в долях (16% → 0.16).
+    rate: Mapped[float] = mapped_column(Float, nullable=False)
+    # Когда мы в последний раз получили/обновили это значение (UTC).
+    fetched_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=datetime.utcnow)
