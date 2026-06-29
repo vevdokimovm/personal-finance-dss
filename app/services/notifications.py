@@ -14,6 +14,14 @@ from sqlalchemy.orm import Session
 from app.database.crud import create_notification, get_budget_status, get_goals, get_transactions
 from app.database.models import Goal, NotificationLog, User
 from app.services.email_service import email_service
+from app.services.telegram import telegram_service
+
+
+def notify_telegram_if_linked(user: User, text: str) -> None:
+    """Отправить текст в Telegram, если у пользователя привязан чат. Без токена бота —
+    no-op (telegram_service сам тихо пропустит). Ошибки доставки не валят рассылку."""
+    if getattr(user, "telegram_chat_id", None):
+        telegram_service.send_message(user.telegram_chat_id, text)
 
 
 def goals_near_deadline(
@@ -116,6 +124,9 @@ def run_user_notifications(db: Session, user: User) -> dict[str, int]:
             body=f"До дедлайна цели «{goal.name}» осталось дней: {days_left}",
             link="/goals",
         )
+        notify_telegram_if_linked(
+            user, f"Дедлайн цели «{goal.name}» через {days_left} дн."
+        )
         sent["goal_deadline"] += 1
 
     for budget in budgets_over(db, user.id):
@@ -132,6 +143,9 @@ def run_user_notifications(db: Session, user: User) -> dict[str, int]:
             title="Превышен бюджет",
             body=f"Расходы по категории «{budget['category']}» превысили лимит",
             link="/budgets",
+        )
+        notify_telegram_if_linked(
+            user, f"Превышен бюджет по категории «{budget['category']}»"
         )
         sent["budget_overrun"] += 1
 
@@ -151,6 +165,9 @@ def run_user_notifications(db: Session, user: User) -> dict[str, int]:
                     f"расход {digest['expense']:.0f}, чистыми {digest['net']:.0f}"
                 ),
                 link="/planning",
+            )
+            notify_telegram_if_linked(
+                user, f"Месячный отчёт за {prev} готов — загляните в FINPILOT."
             )
             sent["digest"] += 1
 

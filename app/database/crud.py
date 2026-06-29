@@ -1534,3 +1534,36 @@ def mark_all_notifications_read(db: Session, user_id: str) -> int:
     )
     db.commit()
     return marked
+
+
+# ─────────────────────── Telegram-привязка (P3.6) ───────────────────────
+
+def get_user_by_telegram_chat(db: Session, chat_id: str) -> Optional[User]:
+    """Пользователь, к чьему аккаунту привязан этот Telegram-чат (или None)."""
+    return db.query(User).filter(User.telegram_chat_id == chat_id).first()
+
+
+def link_telegram(db: Session, user_id: str, chat_id: str) -> Optional[User]:
+    """Привязать Telegram-чат к аккаунту. Один чат — один аккаунт: если чат уже был
+    привязан к другому пользователю, снимаем ту привязку (перепривязка)."""
+    for other in db.query(User).filter(User.telegram_chat_id == chat_id).all():
+        if other.id != user_id:
+            other.telegram_chat_id = None
+    db.flush()  # применить снятие старой привязки до установки новой (иначе UNIQUE-конфликт)
+    user = get_user_by_id(db, user_id)
+    if user is None:
+        return None
+    user.telegram_chat_id = chat_id
+    db.commit()
+    db.refresh(user)
+    return user
+
+
+def unlink_telegram(db: Session, user_id: str) -> bool:
+    """Отвязать Telegram от аккаунта. False, если не был привязан."""
+    user = get_user_by_id(db, user_id)
+    if user is None or user.telegram_chat_id is None:
+        return False
+    user.telegram_chat_id = None
+    db.commit()
+    return True

@@ -2,6 +2,33 @@
 
 Формат: [Keep a Changelog](https://keepachangelog.com/ru/1.0.0/). Версионирование — [SemVer](https://semver.org/lang/ru/).
 
+## [4.22.0] — 2026-06-29 — P3.6: Telegram-бот (каркас привязки и уведомлений) (MINOR)
+
+Четвёртая задача вехи 4. Каркас Telegram-бота: привязка аккаунта и доставка уведомлений в Telegram
+рядом с email/in-app. Реальная отправка и приём webhook работают на проде (публичный HTTPS + доступ к
+api.telegram.org, который из песочницы отдаёт 403); здесь — логика, протестированная с моком/no-op.
+
+- **Привязка аккаунта** через одноразовый link-токен (`TokenService.issue_telegram_link`, stateless
+  JWT с TTL — без таблицы), упакованный в deep link `https://t.me/<bot>?start=<token>`. Бот, получив
+  `/start <token>` или `/link <token>`, связывает chat_id с аккаунтом. Поле `telegram_chat_id` на User
+  (миграция 0024, уникальное — один чат на аккаунт; перепривязка снимает старую).
+- **Команды бота** (`app/services/telegram.py`, `process_update`): `/start [token]`, `/link <token>`,
+  `/unlink`, `/status`. `TelegramService.send_message` шлёт через Bot API, без токена — тихий no-op
+  (как email_service).
+- **Эндпоинты** (`routes_telegram.py`): `POST /telegram/webhook` (приём апдейтов; при заданном
+  `TELEGRAM_WEBHOOK_SECRET` проверяет заголовок `X-Telegram-Bot-Api-Secret-Token`, иначе 403),
+  `POST /telegram/link` (выдать код + deep link, require_user), `GET /telegram/status`,
+  `POST /telegram/unlink`.
+- **Хук в рассылку** (`services/notifications.py`): `notify_telegram_if_linked` — где `run_user_notifications`
+  шлёт письмо/in-app (goal_deadline / budget_overrun / digest), привязанный Telegram получает то же.
+- **Конфиг**: `TELEGRAM_BOT_TOKEN` / `TELEGRAM_BOT_USERNAME` / `TELEGRAM_WEBHOOK_SECRET` (пусто = выключен),
+  плейсхолдеры в `.env.example`. Реальный токен — только в локальном `.env`, не в репозитории.
+
+Тесты: `tests/test_telegram.py` — 21 тест (link-токен issue/decode + отсев чужого назначения, CRUD
+привязки/перепривязки, команды /start/link/unlink/status, webhook + secret-валидация, веб-эндпоинты,
+хук рассылки шлёт в Telegram только привязанным). Миграция 0024 реверсивна. Полный fast зелёный
+(833 passed, было 812).
+
 ## [4.21.0] — 2026-06-29 — P3.4: реферальные награды / каркас геймификации (MVP) (MINOR)
 
 Третья задача вехи 4. Каркас под будущую страницу рефералки на фронте (веха 6). Расширён

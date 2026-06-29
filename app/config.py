@@ -28,7 +28,7 @@ class Settings(BaseSettings):
         description="Название проекта.",
     )
     APP_VERSION: str = Field(
-        default="4.21.0",
+        default="4.22.0",
         description="Версия приложения (INFRA-13): код, UI-футер, git-тег.",
     )
     PROJECT_TAGLINE: str = Field(
@@ -154,6 +154,18 @@ class Settings(BaseSettings):
     @property
     def email_enabled(self) -> bool:
         return bool(self.SMTP_HOST and self.SMTP_USER and self.SMTP_PASSWORD)
+
+    # ── Telegram-бот (P3.6) ────────────────────────────────────────────
+    # Пусто = бот выключен (no-op, как почта). Токен — от @BotFather.
+    TELEGRAM_BOT_TOKEN: str = Field(default="", description="Токен бота от @BotFather. Пусто = выключен.")
+    TELEGRAM_BOT_USERNAME: str = Field(default="", description="Username бота без @ (для deep link).")
+    TELEGRAM_WEBHOOK_SECRET: str = Field(
+        default="", description="Secret для валидации webhook (заголовок X-Telegram-Bot-Api-Secret-Token)."
+    )
+
+    @property
+    def telegram_enabled(self) -> bool:
+        return bool(self.TELEGRAM_BOT_TOKEN)
 
     # ── Юридические реквизиты оператора (P1.1, 152-ФЗ) ─────────────────
     # Подставляются в опубликованные документы и footer из единого места.

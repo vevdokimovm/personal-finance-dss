@@ -105,6 +105,25 @@ class TokenService:
             return None
         return payload.get("sub")
 
+    def issue_telegram_link(self, user_id: str, email: str, ttl_hours: int = 1) -> str:
+        """Одноразовый токен привязки Telegram (deep link `?start=<token>`)."""
+        now = datetime.now(timezone.utc)
+        payload = {
+            "sub": user_id,
+            "email": email,
+            "purpose": "telegram_link",
+            "iat": now,
+            "exp": now + timedelta(hours=ttl_hours),
+        }
+        return jwt.encode(payload, self._secret, algorithm=self._algorithm)
+
+    def decode_telegram_link(self, token: str) -> Optional[str]:
+        """Возвращает user_id, если токен валиден и предназначен для привязки Telegram."""
+        payload = self.decode(token)
+        if not payload or payload.get("purpose") != "telegram_link":
+            return None
+        return payload.get("sub")
+
 
 class TokenCipher:
     """Симметричное шифрование Plaid-токенов (INFRA-17, NFR-06).

@@ -45,6 +45,10 @@ class User(Base):
         String(12), nullable=True, unique=True, index=True
     )
     referred_by_code: Mapped[Optional[str]] = mapped_column(String(12), nullable=True, index=True)
+    # Telegram-привязка (P3.6): chat_id привязанного бота, уникален (один чат — один аккаунт).
+    telegram_chat_id: Mapped[Optional[str]] = mapped_column(
+        String(32), nullable=True, unique=True, index=True
+    )
 
 
 class FxRate(Base):
