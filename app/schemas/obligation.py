@@ -5,6 +5,8 @@ from typing import Optional
 
 from pydantic import BaseModel, ConfigDict, Field, computed_field
 
+from app.utils.time import utcnow
+
 
 class ObligationCreate(BaseModel):
     name: str
@@ -44,7 +46,7 @@ class ObligationResponse(BaseModel):
         """Сколько месяцев уже выплачивается (от даты взятия, не больше общего срока)."""
         if not self.start_date or self.term <= 0:
             return 0
-        now = datetime.now()
+        now = utcnow()
         sd = self.start_date.replace(tzinfo=None) if self.start_date.tzinfo else self.start_date
         elapsed = (now.year - sd.year) * 12 + (now.month - sd.month)
         return max(0, min(self.term, elapsed))

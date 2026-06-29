@@ -2,6 +2,35 @@
 
 Формат: [Keep a Changelog](https://keepachangelog.com/ru/1.0.0/). Версионирование — [SemVer](https://semver.org/lang/ru/).
 
+## [4.25.3] — 2026-06-29 — Техдолг 4.3: унификация часов (datetime.now → utcnow) (PATCH)
+
+Хвост раздела 4.3 по времени. Релиз v4.25.2 закрыл deprecated `datetime.utcnow()`, но в коде
+остались прямые `datetime.now()` — это **локальное время сервера**, не UTC. В песочнице и CI оно
+совпадает с UTC, поэтому дефект невидим; на прод-VPS в РФ (обычно MSK, UTC+3) возникает стабильный
+сдвиг между «сейчас»-логикой и UTC-хранилищем. Карточка — **BUG-026** (Minor / P0). Найден при
+код-ревью до проявления на проде.
+
+- **13 вызовов `datetime.now()` → `utcnow()`** в 5 файлах: `app/services/spending.py` (×3),
+  `app/services/statement_parser.py` (×6), `app/services/bank_api.py` (×1), `app/schemas/obligation.py`
+  (×1), `app/database/crud.py` (×2). Контракт замены — naive↔naive (helper отдаёт naive UTC), риск
+  naive/aware TypeError исключён.
+- **Где болело:** месячный бакетинг трат (`spending.py`: `current_period`/`_min_period` по локальным
+  часам против UTC-`txn.date` → разъезд на стыке месяца); окна «последних N дней» (`crud.py`) сдвинуты
+  на оффсет; fallback-даты импорта (`statement_parser.py`, `bank_api.py`) писались в локальном времени
+  в naive-UTC колонки; расчёт «месяцев выплачено» (`obligation.py`) от локального «сейчас».
+- **Импорты:** `utcnow` добавлен в 4 модуля (в `crud.py` уже был); осиротевший `datetime` убран из
+  `bank_api.py` (остался только `timedelta`). Aware-вызовы `datetime.now(timezone.utc)` в `cbr_rate.py`/
+  `cbr_fx.py`/`security.py` — корректный UTC, **не тронуты**.
+- **Костыль `obligation.py` `start_date.replace(tzinfo=None)` оставлен намеренно**: он гасит aware-вход
+  из Pydantic (ISO с оффсетом), это отдельная история от унификации «сейчас». Снимется только при
+  будущем переходе на aware-везде (вариант B), если он вообще понадобится.
+- **TDD:** новый `tests/test_clock_unification.py` — 7 тестов (мок `utcnow` фиксированным моментом,
+  проверка привязки результата к нему, а не к системным часам): `_min_period`, `current_period`,
+  `_parse_date` (пустой + нераспарсиваемый fallback), `obligation.months_elapsed`, `sync_bank`-даты.
+  Red→green подтверждён.
+- **Регрессий нет**: весь fast-набор зелёный (884 passed, 0 failures, прогон 4 группами), миграций нет.
+- **Осталось в 4.3**: `ExpenseRecord` + поле `date` (последняя задача техдолга), затем кибербез 4.4.
+
 ## [4.25.2] — 2026-06-29 — Техдолг 4.3: utcnow → now(UTC) через helper (PATCH)
 
 Вторая задача раздела 4.3. `datetime.utcnow()` объявлен deprecated (удалят в будущих Python) —

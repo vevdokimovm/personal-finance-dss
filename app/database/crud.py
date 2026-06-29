@@ -260,7 +260,7 @@ def get_spending_by_category(
     db: Session, days: int = 30, top_n: int = 5, user_id: Optional[str] = None
 ) -> dict:
     """Разрез расходов по категориям и топ-мерчанты за период (FR-14)."""
-    since = datetime.now() - timedelta(days=days)
+    since = utcnow() - timedelta(days=days)
     owner = Transaction.user_id == user_id if user_id is not None else Transaction.user_id.is_(None)
     base_filter = (
         Transaction.type == "expense",
@@ -391,7 +391,7 @@ def get_scenarios(db: Session, limit: int = 20, user_id: Optional[str] = None) -
 
 def get_budget_status(db: Session, days: int = 30, user_id: Optional[str] = None) -> list[dict]:
     """План-факт по категорийным бюджетам за период (FR-22)."""
-    since = datetime.now() - timedelta(days=days)
+    since = utcnow() - timedelta(days=days)
     owner = Transaction.user_id == user_id if user_id is not None else Transaction.user_id.is_(None)
     statuses = []
     for b in _owner_filter(db.query(Budget), Budget, user_id).order_by(Budget.category).all():

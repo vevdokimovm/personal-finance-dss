@@ -17,6 +17,8 @@ import re
 from datetime import datetime
 from typing import Any
 
+from app.utils.time import utcnow
+
 try:
     import pdfplumber
 except ImportError:  # PDF-парсер опционален: без него работает всё, кроме импорта PDF
@@ -64,7 +66,7 @@ def parse_tinkoff_csv(content: str) -> list[dict[str, Any]]:
                 continue
 
             amount = float(amount_str.replace(' ', '').replace(',', '.').replace('\xa0', ''))
-            t_date = _parse_date(date_str) if date_str else datetime.now()
+            t_date = _parse_date(date_str) if date_str else utcnow()
             t_type, amount = _classify(amount)
 
             merchant = (
@@ -107,7 +109,7 @@ def parse_sber_csv(content: str) -> list[dict[str, Any]]:
                 continue
 
             amount = float(amount_str.replace(' ', '').replace(',', '.').replace('\xa0', ''))
-            t_date = _parse_date(date_str) if date_str else datetime.now()
+            t_date = _parse_date(date_str) if date_str else utcnow()
             t_type, amount = _classify(amount)
 
             merchant = (
@@ -227,7 +229,7 @@ def _rows_to_transactions(rows: list[dict]) -> list[dict[str, Any]]:
             description = _field(row, _H_DESC)
             mcc = _field(row, _H_MCC)
 
-            t_date = _parse_date(date_str) if date_str else datetime.now()
+            t_date = _parse_date(date_str) if date_str else utcnow()
             t_type, amount = _classify(amount)
             merchant = (description.strip() if description else '') or category.strip() or 'Импорт'
             transactions.append({
@@ -277,7 +279,7 @@ def _get_field(row: dict, candidates: list[str]) -> str | None:
 def _parse_date(s: str) -> datetime:
     """Парсит дату из различных форматов."""
     if not s:
-        return datetime.now()
+        return utcnow()
 
     s = s.strip()
     formats = [
@@ -298,7 +300,7 @@ def _parse_date(s: str) -> datetime:
         except ValueError:
             continue
 
-    return datetime.now()
+    return utcnow()
 
 
 # Маппинг банков → парсеров
@@ -547,7 +549,7 @@ def parse_1c_exchange(content: str) -> list[dict[str, Any]]:
             'description': desc[:255],
             'mcc': None,
             'type': t_type,
-            'date': _parse_date(date_s).isoformat() if date_s else datetime.now().isoformat(),
+            'date': _parse_date(date_s).isoformat() if date_s else utcnow().isoformat(),
             'is_synced': True,
         })
     return out

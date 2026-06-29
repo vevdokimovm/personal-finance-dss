@@ -14,11 +14,12 @@ from sqlalchemy.orm import Session
 from app.core.goals_priority import _months_left
 from app.core.spending_advice import ExpenseRecord, GoalRecord, SpendingAdvisor
 from app.database.crud import get_goal_contributions, get_goals, get_transactions
+from app.utils.time import utcnow
 
 
 def _min_period(months: int) -> str:
     """Нижняя граница окна в формате YYYY-MM (включительно), N месяцев назад."""
-    now = datetime.now()
+    now = utcnow()
     index = now.year * 12 + (now.month - 1) - max(0, months - 1)
     year, month = divmod(index, 12)
     return f"{year:04d}-{month + 1:02d}"
@@ -72,7 +73,7 @@ def get_spending_advice(
             merchant=txn.description,
         ))
 
-    current_period = datetime.now().strftime("%Y-%m")
+    current_period = utcnow().strftime("%Y-%m")
     periods = sorted({r.period for r in records})
     if current_period not in periods:
         current_period = periods[-1] if periods else current_period
@@ -83,7 +84,7 @@ def get_spending_advice(
     trends = advisor.analyze_trends(records, current_period)
 
     total_saving = round(sum(a.potential_saving for a in advice), 2)
-    goals = _goal_records(db, user_id, months, min_period, datetime.now())
+    goals = _goal_records(db, user_id, months, min_period, utcnow())
     goal_impact = advisor.analyze_goal_impact(total_saving, goals)
 
     return {

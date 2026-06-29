@@ -6,7 +6,7 @@
 from __future__ import annotations
 
 import random
-from datetime import datetime, timedelta
+from datetime import timedelta
 from typing import Any, TypedDict
 from uuid import uuid4
 
@@ -14,6 +14,7 @@ from sqlalchemy.orm import Session
 
 from app.database.crud import create_transaction
 from app.services.event_logger import log_event
+from app.utils.time import utcnow
 
 
 class BankCatalog(TypedDict):
@@ -116,7 +117,7 @@ def sync_bank(db: Session, bank_id: str, user_id: str | None = None) -> dict[str
         return {"status": "error", "message": f"Банк '{bank_id}' не найден."}
 
     bank = BANKS[bank_id]
-    now = datetime.now()
+    now = utcnow()
     num_transactions = random.randint(4, 10)
     added = 0
     total = 0.0
