@@ -19,6 +19,7 @@ from app.database.crud import (
     create_user,
     delete_user,
     get_user_by_email,
+    get_user_by_id,
     get_user_by_referral_code,
     mark_email_verified,
     register_failed_login,
@@ -27,6 +28,7 @@ from app.database.crud import (
     update_user_profile,
 )
 from app.database.models import User
+from app.database import mfa_store
 from app.database.revocation import bump_tokens_valid_since, purge_expired, revoke_token
 from app.dependencies import _extract_token, get_db, require_user
 from app.schemas.auth import (
@@ -34,11 +36,18 @@ from app.schemas.auth import (
     ChangePasswordRequest,
     ForgotPasswordRequest,
     LoginRequest,
+    MfaConfirmRequest,
+    MfaConfirmResponse,
+    MfaDisableRequest,
+    MfaEnrollResponse,
+    MfaStatusResponse,
+    MfaVerifyRequest,
     RegisterRequest,
     ResetPasswordRequest,
     UpdateProfileRequest,
     UserResponse,
 )
+from app.services import mfa as mfa_service
 from app.services.email_dispatch import dispatch_email
 from app.services.email_service import email_service
 from app.services.event_logger import log_event
@@ -161,6 +170,16 @@ def login(payload: LoginRequest, response: Response, db: Session = Depends(get_d
         )
 
     reset_failed_logins(db, user)
+    # MFA включён → пароль верен, но полная сессия выдаётся только после второго
+    # фактора. Возвращаем краткоживущий mfa_pending-токен (он не авторизует сам по
+    # себе) и не ставим cookie сессии.
+    if user.mfa_enabled:
+        mfa_token = token_service.issue_mfa_pending(user.id, user.email)
+        log_event("login_mfa_required", user_id=user.id)
+        return AuthResponse(
+            access_token="", mfa_required=True, mfa_token=mfa_token,
+            user=UserResponse.model_validate(user),
+        )
     token = token_service.issue(user.id, user.email)
     _set_auth_cookie(response, token)
     log_event("login_success", user_id=user.id)
@@ -383,3 +402,87 @@ def delete_account(
     delete_user(db, user_id=user.id)
     response.delete_cookie(key=settings.AUTH_COOKIE_NAME, path="/")
     return {"detail": "Аккаунт и все данные удалены."}
+
+
+# ── MFA / TOTP (раздел 4.4) ───────────────────────────────────────────────
+
+@router.post("/mfa/enroll", response_model=MfaEnrollResponse, summary="Начать включение MFA")
+def mfa_enroll(
+    user: User = Depends(require_user), db: Session = Depends(get_db)
+) -> MfaEnrollResponse:
+    if user.mfa_enabled:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="MFA уже включён.")
+    secret = mfa_service.generate_secret()
+    mfa_store.set_pending_secret(db, user, secret)
+    return MfaEnrollResponse(
+        secret=secret, provisioning_uri=mfa_service.provisioning_uri(secret, user.email)
+    )
+
+
+@router.post("/mfa/confirm", response_model=MfaConfirmResponse,
+             summary="Подтвердить кодом и активировать MFA")
+def mfa_confirm(
+    payload: MfaConfirmRequest,
+    user: User = Depends(require_user),
+    db: Session = Depends(get_db),
+) -> MfaConfirmResponse:
+    if user.mfa_enabled:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="MFA уже включён.")
+    if not user.mfa_secret:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
+                            detail="Сначала вызовите /mfa/enroll.")
+    if not mfa_service.verify_totp(user.mfa_secret, payload.code):
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Неверный код.")
+    # Активируем и выдаём recovery-коды (показываются ОДИН раз — хранятся хешированными).
+    codes = mfa_service.generate_recovery_codes()
+    hashes = [mfa_service.hash_recovery_code(c) for c in codes]
+    mfa_store.activate_mfa(db, user, hashes)
+    log_event("mfa_enabled", user_id=user.id)
+    return MfaConfirmResponse(recovery_codes=codes)
+
+
+@router.post("/mfa/verify", response_model=AuthResponse,
+             summary="Второй фактор: обменять mfa_token на сессию")
+def mfa_verify(
+    payload: MfaVerifyRequest, response: Response, db: Session = Depends(get_db)
+) -> AuthResponse:
+    user_id = token_service.decode_mfa_pending(payload.mfa_token)
+    if not user_id:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
+                            detail="Недействительный или истёкший MFA-токен.")
+    user = get_user_by_id(db, user_id)
+    if user is None or not user.mfa_enabled or not user.mfa_secret:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
+                            detail="MFA-проверка недоступна.")
+    # Принимаем TOTP-код ИЛИ одноразовый recovery-код.
+    ok = (mfa_service.verify_totp(user.mfa_secret, payload.code)
+          or mfa_store.consume_recovery_code(db, user, payload.code))
+    if not ok:
+        log_event("mfa_verify_failed", user_id=user.id)
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Неверный код.")
+    token = token_service.issue(user.id, user.email)
+    _set_auth_cookie(response, token)
+    log_event("mfa_verify_success", user_id=user.id)
+    return AuthResponse(access_token=token, user=UserResponse.model_validate(user))
+
+
+@router.post("/mfa/disable", summary="Выключить MFA")
+def mfa_disable(
+    payload: MfaDisableRequest,
+    user: User = Depends(require_user),
+    db: Session = Depends(get_db),
+) -> dict[str, str]:
+    if not user.mfa_enabled or not user.mfa_secret:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="MFA не включён.")
+    ok = (mfa_service.verify_totp(user.mfa_secret, payload.code)
+          or mfa_store.consume_recovery_code(db, user, payload.code))
+    if not ok:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Неверный код.")
+    mfa_store.disable_mfa(db, user)
+    log_event("mfa_disabled", user_id=user.id)
+    return {"detail": "MFA выключен."}
+
+
+@router.get("/mfa/status", response_model=MfaStatusResponse, summary="Статус MFA")
+def mfa_status(user: User = Depends(require_user)) -> MfaStatusResponse:
+    return MfaStatusResponse(enabled=user.mfa_enabled)

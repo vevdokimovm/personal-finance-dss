@@ -2,6 +2,34 @@
 
 Формат: [Keep a Changelog](https://keepachangelog.com/ru/1.0.0/). Версионирование — [SemVer](https://semver.org/lang/ru/).
 
+## [4.30.0] — 2026-06-30 — Раздел 4.4: двухфакторная аутентификация MFA/TOTP (MINOR)
+
+Пятая и **последняя бэкенд-задача раздела 4.4**. Второй фактор входа поверх пароля — стандарт для
+финпродукта. Реализован TOTP (совместим с Google Authenticator и др.) на `pyotp`.
+
+- **Поток включения.** `POST /auth/mfa/enroll` (залогинен) генерирует TOTP-секрет в состоянии pending
+  и отдаёт его + `otpauth://`-URI для QR. `POST /auth/mfa/confirm` с кодом из приложения активирует MFA
+  и выдаёт **10 одноразовых recovery-кодов** (показываются один раз).
+- **Логин с MFA.** При включённом MFA `POST /auth/login` после верного пароля НЕ выдаёт сессию —
+  возвращает `mfa_required=true` и краткоживущий `mfa_token` (purpose=`mfa_pending`, TTL 5 мин), cookie
+  сессии не ставится. `POST /auth/mfa/verify` принимает `mfa_token` + TOTP-код **или** recovery-код и
+  обменивает на полную сессию.
+- **Управление.** `POST /auth/mfa/disable` (TOTP/recovery-код) выключает MFA и удаляет секрет с
+  recovery-кодами. `GET /auth/mfa/status` — текущее состояние.
+- **Хранение.** Секрет TOTP — зашифрован (`EncryptedString`), recovery-коды — хешированы (bcrypt),
+  одноразовы (помечаются `used_at`). Поля `mfa_secret`/`mfa_enabled` на `users`, таблица
+  `mfa_recovery_codes` (каскад по пользователю). Миграция 0028.
+- **Закрыта дыра purpose-токенов.** `get_current_user` теперь отвергает любой токен с claim `purpose`
+  (mfa_pending, email_verify, password_reset, telegram_link) — раньше такой токен с валидной подписью
+  мог авторизовать как полная сессия. Полная сессия — единственный токен без `purpose`. Покрыто тестами.
+- **Новое:** `app/services/mfa.py` (TOTP + recovery), `app/database/mfa_store.py` (состояние),
+  `pyotp==2.9.0` в зависимостях.
+- **TDD:** новый `tests/test_mfa.py` — 10 тестов (enroll, confirm верный/неверный код, login→pending,
+  verify TOTP, verify recovery одноразовый, verify неверный код, disable, mfa_pending/reset-токен не
+  дают сессии). Red→green.
+- **Регрессий нет**: полный fast зелёный (**956 passed**, 0 fail/0 err, 6 групп), flake8 `app/`+tests = 0,
+  mypy Success (105 файлов).
+
 ## [4.29.0] — 2026-06-30 — Раздел 4.4: security-регрессии + старт-гард ключа шифрования (MINOR)
 
 Четвёртая (завершающая бэкенд-часть) задача раздела 4.4. Харденинг был, но без защитной сетки тестов:

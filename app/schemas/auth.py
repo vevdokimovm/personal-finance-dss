@@ -58,3 +58,34 @@ class AuthResponse(BaseModel):
     token_type: str = "bearer"
     user: UserResponse
     verification_url: Optional[str] = None
+    # MFA (раздел 4.4): при включённом втором факторе login возвращает mfa_required=True
+    # и краткоживущий mfa_token (для /auth/mfa/verify) вместо полной сессии; access_token
+    # тогда пуст.
+    mfa_required: bool = False
+    mfa_token: Optional[str] = None
+
+
+class MfaEnrollResponse(BaseModel):
+    secret: str
+    provisioning_uri: str
+
+
+class MfaConfirmRequest(BaseModel):
+    code: str = Field(min_length=4, max_length=10)
+
+
+class MfaConfirmResponse(BaseModel):
+    recovery_codes: list[str]
+
+
+class MfaVerifyRequest(BaseModel):
+    mfa_token: str = Field(min_length=1)
+    code: str = Field(min_length=4, max_length=16)
+
+
+class MfaDisableRequest(BaseModel):
+    code: str = Field(min_length=4, max_length=16)
+
+
+class MfaStatusResponse(BaseModel):
+    enabled: bool

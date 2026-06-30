@@ -75,6 +75,11 @@ def get_current_user(
     payload = token_service.decode(token)
     if not payload:
         return None
+    # Только полный сессионный токен аутентифицирует. Purpose-токены (mfa_pending,
+    # email_verify, password_reset, telegram_link) имеют claim `purpose` и сессией
+    # не являются — иначе промежуточный/одноразовый токен давал бы полный доступ.
+    if payload.get("purpose"):
+        return None
     user_id = payload.get("sub")
     if not user_id:
         return None

@@ -44,6 +44,7 @@ bcrypt-хеширование паролей, блокировка после н
 | **TLS/HTTPS** — за reverse-proxy в продакшене; HSTS включается автоматически | `SecurityHeadersMiddleware(hsts=is_production)` | перехват трафика (NFR-07) |
 | **Аудит security-событий** — `csrf_blocked`, `rate_limit_exceeded` пишутся в журнал | `app/middleware.py` → `event_logger` (таблица `events`) | расследование инцидентов (INFRA-08) |
 | **Отзыв сессий** — logout гасит токен по `jti`, logout-all и смена/сброс пароля сдвигают рубеж `tokens_valid_since` | `app/database/revocation.py`, `app/dependencies.py`, `app/api/routes_auth.py` | угон/утечка токена, смена учётных данных (раздел 4.4) |
+| **Двухфакторная аутентификация (TOTP)** — опциональный второй фактор; recovery-коды (хеш); промежуточный токен между паролем и кодом не даёт сессии | `app/services/mfa.py`, `app/database/mfa_store.py`, `app/api/routes_auth.py` | компрометация пароля (раздел 4.4) |
 
 ---
 
@@ -87,7 +88,10 @@ bcrypt-хеширование паролей, блокировка после н
   (21 тест): заголовки безопасности на всех типах ответов (включая CSRF-403), HSTS только при включении,
   CSRF-блок на всех изменяющих методах, старт-гард. Дополнительно: `validate_production_security` теперь
   требует явный `TOKEN_ENCRYPTION_KEY(S)` в production (разделение ключей, возможность ротации).
-- [ ] **MFA/2FA (TOTP)** — второй фактор входа. Крупная отдельная фича бэка.
+- [x] **MFA/2FA (TOTP)** — **сделано (v4.30.0).** Второй фактор входа (pyotp). enroll → confirm
+  (активация + recovery-коды) → при логине промежуточный `mfa_pending`-токен → verify (TOTP или
+  recovery-код) обменивает на сессию. disable/status. Секрет зашифрован, recovery-коды хешированы
+  (bcrypt). `get_current_user` отвергает purpose-токены (промежуточный/одноразовый не дают сессии).
 - [ ] **Rate-limit на общий стор (Redis)** — _веха деплоя:_ сейчас in-memory (на одном инстансе
   достаточно), общий стор нужен перед мультиинстансным масштабированием.
 - [ ] **CSP без `'unsafe-inline'`** — _с фронтом:_ переход на nonce-CSP, согласовать с фронтендом.

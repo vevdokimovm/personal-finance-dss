@@ -127,6 +127,29 @@ class TokenService:
             return None
         return payload.get("sub")
 
+    def issue_mfa_pending(self, user_id: str, email: str, ttl_minutes: int = 5) -> str:
+        """Промежуточный токен между паролем и вторым фактором (MFA, раздел 4.4).
+
+        Выдаётся, когда пароль верен, но у пользователя включён MFA. Короткоживущий,
+        с purpose='mfa_pending' — НЕ является сессией (`get_current_user` отвергает
+        purpose-токены), годен только для `/auth/mfa/verify`."""
+        now = datetime.now(timezone.utc)
+        payload = {
+            "sub": user_id,
+            "email": email,
+            "purpose": "mfa_pending",
+            "iat": now,
+            "exp": now + timedelta(minutes=ttl_minutes),
+        }
+        return jwt.encode(payload, self._secret, algorithm=self._algorithm)
+
+    def decode_mfa_pending(self, token: str) -> Optional[str]:
+        """Возвращает user_id, если токен валиден и это mfa_pending-токен."""
+        payload = self.decode(token)
+        if not payload or payload.get("purpose") != "mfa_pending":
+            return None
+        return payload.get("sub")
+
 
 class TokenCipher:
     """Симметричное шифрование «в покое» (INFRA-17, NFR-06): Plaid-токены и поля

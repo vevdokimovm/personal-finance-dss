@@ -61,6 +61,10 @@ class User(Base):
     # токены недействительны. NULL = отзыва не было. Хранится с точностью до секунды
     # (iat в JWT — целые секунды). Ставится /auth/logout-all (см. services/...revocation).
     tokens_valid_since: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+    # MFA/TOTP (раздел 4.4). Секрет TOTP хранится зашифрованно (EncryptedString);
+    # mfa_enabled=False при заведённом секрете = «pending» (ещё не подтверждён кодом).
+    mfa_secret: Mapped[Optional[str]] = mapped_column(EncryptedString, nullable=True)
+    mfa_enabled: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
 
 
 class RevokedToken(Base):
@@ -76,6 +80,24 @@ class RevokedToken(Base):
     jti: Mapped[str] = mapped_column(String(36), primary_key=True)
     expires_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, index=True)
     revoked_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=utcnow)
+
+
+class MfaRecoveryCode(Base):
+    """Одноразовый recovery-код MFA (раздел 4.4).
+
+    Запасной вход, если устройство с TOTP недоступно. Код хранится ХЕШИРОВАННЫМ
+    (bcrypt, как пароль) — в открытом виде показывается пользователю один раз при
+    подтверждении MFA. Использованный код помечается `used_at` и больше не годен.
+    """
+    __tablename__ = "mfa_recovery_codes"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    user_id: Mapped[str] = mapped_column(
+        String(36), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    code_hash: Mapped[str] = mapped_column(String(255), nullable=False)
+    used_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=utcnow)
 
 
 class FxRate(Base):
