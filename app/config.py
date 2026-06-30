@@ -28,7 +28,7 @@ class Settings(BaseSettings):
         description="Название проекта.",
     )
     APP_VERSION: str = Field(
-        default="4.28.0",
+        default="4.29.0",
         description="Версия приложения (INFRA-13): код, UI-футер, git-тег.",
     )
     PROJECT_TAGLINE: str = Field(
@@ -279,4 +279,9 @@ def validate_production_security(s: Settings) -> list[str]:
         problems.append(
             "ADMIN_API_KEY не задан или слишком короткий — задайте стойкий ключ "
             "(>=16 симв.) в .env для защиты админ-эндпоинтов")
+    if not (s.TOKEN_ENCRYPTION_KEYS.strip() or s.TOKEN_ENCRYPTION_KEY.strip()):
+        problems.append(
+            "TOKEN_ENCRYPTION_KEY(S) не задан — в production ключ шифрования «в покое» "
+            "должен быть явным; иначе он деривится из JWT_SECRET (нет разделения ключей "
+            "по назначению, ротация ключа шифрования невозможна). Задайте Fernet-ключ в .env")
     return problems
