@@ -13,11 +13,11 @@ import base64
 import hashlib
 import uuid
 from datetime import datetime, timedelta, timezone
-from typing import Any, Optional
+from typing import Any, Optional, Sequence
 
 import bcrypt
 import jwt
-from cryptography.fernet import Fernet, InvalidToken
+from cryptography.fernet import Fernet, InvalidToken, MultiFernet
 
 from app.config import settings
 
@@ -129,30 +129,49 @@ class TokenService:
 
 
 class TokenCipher:
-    """Симметричное шифрование Plaid-токенов (INFRA-17, NFR-06).
+    """Симметричное шифрование «в покое» (INFRA-17, NFR-06): Plaid-токены и поля
+    EncryptedString.
 
-    Ключ: TOKEN_ENCRYPTION_KEY из .env (валидный Fernet-ключ) либо детерминированно
-    производится из JWT_SECRET — так dev работает без отдельного ключа, а прод
-    обязан задать собственный.
+    Ключи: набор из TOKEN_ENCRYPTION_KEYS (PRIMARY первым) для ротации; иначе один
+    TOKEN_ENCRYPTION_KEY; иначе детерминированно производится из JWT_SECRET (dev
+    работает без отдельного ключа, прод обязан задать собственный).
+
+    Ротация (SEC-4.4): под капотом MultiFernet — primary шифрует, остальные ключи
+    только читают. Чтобы сменить ключ без потери данных: новый ключ ставится первым
+    в набор, прогоняется `reencrypt_all`, затем старый ключ убирается.
     """
 
-    def __init__(self, key: Optional[str] = None) -> None:
-        self._fernet = Fernet(self._resolve_key(key))
+    def __init__(self, keys: Optional[Sequence[str]] = None) -> None:
+        resolved = self._resolve_keys(keys)
+        self._mf = MultiFernet([Fernet(k.encode("utf-8")) for k in resolved])
 
     @staticmethod
-    def _resolve_key(key: Optional[str]) -> bytes:
-        explicit = key or settings.TOKEN_ENCRYPTION_KEY
-        if explicit:
-            return explicit.encode("utf-8")
+    def _resolve_keys(keys: Optional[Sequence[str]]) -> list[str]:
+        if keys:
+            return list(keys)
+        configured = settings.token_encryption_keys_list
+        if configured:
+            return configured
         derived = hashlib.sha256(settings.JWT_SECRET.encode("utf-8")).digest()
-        return base64.urlsafe_b64encode(derived)
+        return [base64.urlsafe_b64encode(derived).decode("utf-8")]
 
     def encrypt(self, plaintext: str) -> str:
-        return self._fernet.encrypt(plaintext.encode("utf-8")).decode("utf-8")
+        """Шифрует PRIMARY-ключом (первый в наборе)."""
+        return self._mf.encrypt(plaintext.encode("utf-8")).decode("utf-8")
 
     def decrypt(self, ciphertext: str) -> Optional[str]:
+        """Расшифровывает, перебирая все ключи набора. None — если ни один не подошёл
+        (чужой/повреждённый токен либо старое незашифрованное значение)."""
         try:
-            return self._fernet.decrypt(ciphertext.encode("utf-8")).decode("utf-8")
+            return self._mf.decrypt(ciphertext.encode("utf-8")).decode("utf-8")
+        except (InvalidToken, ValueError):
+            return None
+
+    def rotate(self, ciphertext: str) -> Optional[str]:
+        """Перешифровывает токен PRIMARY-ключом (для ротации). None — если значение
+        не является валидным Fernet-токеном (legacy-plaintext шифруется через encrypt)."""
+        try:
+            return self._mf.rotate(ciphertext.encode("utf-8")).decode("utf-8")
         except (InvalidToken, ValueError):
             return None
 

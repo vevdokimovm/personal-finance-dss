@@ -28,7 +28,7 @@ class Settings(BaseSettings):
         description="Название проекта.",
     )
     APP_VERSION: str = Field(
-        default="4.27.0",
+        default="4.28.0",
         description="Версия приложения (INFRA-13): код, UI-футер, git-тег.",
     )
     PROJECT_TAGLINE: str = Field(
@@ -129,6 +129,23 @@ class Settings(BaseSettings):
         description="Fernet-ключ шифрования Plaid-токенов (INFRA-17). "
                     "Пусто = derive из JWT_SECRET.",
     )
+    TOKEN_ENCRYPTION_KEYS: str = Field(
+        default="",
+        description="Набор Fernet-ключей через запятую для ротации, PRIMARY первым "
+                    "(SEC-4.4). Primary шифрует, остальные читают. Пусто → "
+                    "TOKEN_ENCRYPTION_KEY → derive из JWT_SECRET.",
+    )
+
+    @property
+    def token_encryption_keys_list(self) -> list[str]:
+        """Ключи шифрования «в покое», PRIMARY первым. Приоритет источников:
+        TOKEN_ENCRYPTION_KEYS (набор) → TOKEN_ENCRYPTION_KEY (один). Пусто →
+        TokenCipher делает derive из JWT_SECRET."""
+        multi = [k.strip() for k in self.TOKEN_ENCRYPTION_KEYS.split(",") if k.strip()]
+        if multi:
+            return multi
+        single = self.TOKEN_ENCRYPTION_KEY.strip()
+        return [single] if single else []
 
     @property
     def b2b_api_keys_list(self) -> list[str]:
