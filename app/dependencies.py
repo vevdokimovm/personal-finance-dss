@@ -10,6 +10,7 @@ from app.config import settings
 from app.database.crud import get_user_by_id, get_user_household_ids
 from app.database.db import get_db
 from app.database.models import User
+from app.database.revocation import is_token_revoked, tokens_invalidated_for
 from app.services.security import token_service
 
 __all__ = [
@@ -77,7 +78,17 @@ def get_current_user(
     user_id = payload.get("sub")
     if not user_id:
         return None
-    return get_user_by_id(db, user_id)
+    # Рубеж A — точечный отзыв токена по jti (logout текущей сессии).
+    if is_token_revoked(db, payload.get("jti")):
+        return None
+    user = get_user_by_id(db, user_id)
+    if user is None:
+        return None
+    # Рубеж B — массовый отзыв: токен выпущен до отсечки tokens_valid_since
+    # (logout-all, смена пароля). Легаси-токены без iat сюда не попадают.
+    if tokens_invalidated_for(user, payload.get("iat")):
+        return None
+    return user
 
 
 def require_user(user: Optional[User] = Depends(get_current_user)) -> User:

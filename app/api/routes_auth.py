@@ -27,7 +27,8 @@ from app.database.crud import (
     update_user_profile,
 )
 from app.database.models import User
-from app.dependencies import get_db, require_user
+from app.database.revocation import bump_tokens_valid_since, purge_expired, revoke_token
+from app.dependencies import _extract_token, get_db, require_user
 from app.schemas.auth import (
     AuthResponse,
     ChangePasswordRequest,
@@ -166,10 +167,59 @@ def login(payload: LoginRequest, response: Response, db: Session = Depends(get_d
     return AuthResponse(access_token=token, user=UserResponse.model_validate(user))
 
 
+def _revoke_request_token(request: Request, db: Session) -> None:
+    """Точечно (по jti) отозвать токен, которым сделан текущий запрос.
+
+    Без валидного токена (нет Bearer/cookie или не декодируется) — no-op: операция
+    выхода остаётся безопасной. `exp` отдаём сырым — нормализацию в naive-UTC делает
+    сам `revoke_token` (см. `revocation.epoch_to_naive_utc`).
+    """
+    token = _extract_token(request)
+    if not token:
+        return
+    payload = token_service.decode(token)
+    if not payload:
+        return
+    jti, exp = payload.get("jti"), payload.get("exp")
+    if jti and exp is not None:
+        revoke_token(db, jti, exp)
+
+
 @router.post("/logout", summary="Выход")
-def logout(response: Response) -> dict[str, str]:
+def logout(
+    request: Request, response: Response, db: Session = Depends(get_db)
+) -> dict[str, str]:
+    """Завершает ТЕКУЩУЮ сессию: реально отзывает предъявленный токен по jti.
+
+    Не просто чистит cookie — даже если токен утёк/сохранён Bearer'ом, после logout
+    он мёртв. Заодно подчищаем истёкшие записи блок-листа, чтобы он не рос.
+    """
+    _revoke_request_token(request, db)
+    purge_expired(db)
     response.delete_cookie(key=settings.AUTH_COOKIE_NAME, path="/")
     return {"detail": "Сессия завершена."}
+
+
+@router.post("/logout-all", summary="Выход на всех устройствах")
+def logout_all(
+    request: Request,
+    response: Response,
+    user: User = Depends(require_user),
+    db: Session = Depends(get_db),
+) -> dict[str, str]:
+    """Завершает ВСЕ сессии пользователя (logout-all, смена устройства, угроза).
+
+    Сдвигает рубеж `tokens_valid_since` — все ранее выданные токены недействительны
+    одним движением. Текущий токен гасим ещё и точечно по jti: рубеж секундной
+    гранулярности, а jti даёт точную границу на ту же секунду (немедленный re-login
+    при этом проходит — у нового токена iat ≥ рубежа).
+    """
+    bump_tokens_valid_since(db, user)
+    _revoke_request_token(request, db)
+    purge_expired(db)
+    response.delete_cookie(key=settings.AUTH_COOKIE_NAME, path="/")
+    log_event("logout_all", user_id=user.id)
+    return {"detail": "Выход выполнен на всех устройствах."}
 
 
 @router.post("/forgot-password", summary="Запрос сброса пароля")

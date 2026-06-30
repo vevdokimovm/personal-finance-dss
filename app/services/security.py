@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import base64
 import hashlib
+import uuid
 from datetime import datetime, timedelta, timezone
 from typing import Any, Optional
 
@@ -58,6 +59,8 @@ class TokenService:
             "email": email,
             "iat": now,
             "exp": now + timedelta(hours=self._ttl_hours),
+            # Уникальный идентификатор токена — якорь для точечного отзыва (блок-лист).
+            "jti": uuid.uuid4().hex,
         }
         return jwt.encode(payload, self._secret, algorithm=self._algorithm)
 

@@ -57,6 +57,25 @@ class User(Base):
     # истёкшим plan_expires_at трактуется как free (см. services/subscription.py).
     plan_tier: Mapped[str] = mapped_column(String(20), nullable=False, default="free")
     plan_expires_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+    # Глобальный отзыв JWT (раздел 4.4): отсечка, раньше которой все ранее выпущенные
+    # токены недействительны. NULL = отзыва не было. Хранится с точностью до секунды
+    # (iat в JWT — целые секунды). Ставится /auth/logout-all (см. services/...revocation).
+    tokens_valid_since: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+
+
+class RevokedToken(Base):
+    """Блок-лист отозванных JWT по `jti` (раздел 4.4).
+
+    Точечный отзыв конкретного токена (выход с устройства). Stateless-JWT сам по
+    себе нельзя «погасить» до истечения exp; здесь храним jti тех, что отозваны
+    досрочно. Запись живёт до `expires_at` (= exp токена) и затем подчищается
+    `purge_expired` — блок-лист не растёт дольше, чем живёт сам токен.
+    """
+    __tablename__ = "revoked_tokens"
+
+    jti: Mapped[str] = mapped_column(String(36), primary_key=True)
+    expires_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, index=True)
+    revoked_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=utcnow)
 
 
 class FxRate(Base):
