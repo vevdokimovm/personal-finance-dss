@@ -276,6 +276,10 @@ def reset_password(
 
     # Сброс пароля снимает блокировку аккаунта — пользователь восстановил доступ.
     reset_failed_logins(db, user)
+    # Смена креденшелов гасит все ранее выданные токены (другие устройства/утёкшие
+    # сессии): рубеж tokens_valid_since двигается на «сейчас». Вход новым паролем
+    # проходит сразу — рубеж секундной гранулярности не задевает свежий токен.
+    bump_tokens_valid_since(db, user)
     log_event("password_reset_completed", user_id=user.id)
     return {"detail": "Пароль обновлён. Теперь вы можете войти с новым паролем."}
 
@@ -344,6 +348,8 @@ def update_profile(
 @router.post("/change-password", summary="Сменить пароль")
 def change_password(
     payload: ChangePasswordRequest,
+    request: Request,
+    response: Response,
     user: User = Depends(require_user),
     db: Session = Depends(get_db),
 ) -> dict[str, str]:
@@ -354,7 +360,18 @@ def change_password(
         )
     update_user_password(db, user_id=user.id,
                          password_hash=password_hasher.hash(payload.new_password))
-    return {"detail": "Пароль обновлён."}
+    # Финпродукт, банковская планка: смена пароля гасит ВСЕ сессии, включая текущую
+    # (Option A — как у банков, а не «оставить текущую» у Google/GitHub). Рубеж
+    # tokens_valid_since валит другие устройства; текущий токен ещё и точечно по jti
+    # (рубеж секундной гранулярности мог бы пропустить токен той же секунды). Cookie
+    # чистим — клиент уходит в logged-out начисто и переавторизуется новым паролем,
+    # без координации с фронтом (он пока Jinja+vanilla JS).
+    bump_tokens_valid_since(db, user)
+    _revoke_request_token(request, db)
+    purge_expired(db)
+    response.delete_cookie(key=settings.AUTH_COOKIE_NAME, path="/")
+    log_event("password_changed", user_id=user.id)
+    return {"detail": "Пароль обновлён. Войдите заново с новым паролем."}
 
 
 @router.delete("/me", summary="Удалить аккаунт со всеми данными")
