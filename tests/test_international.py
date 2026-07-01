@@ -10,7 +10,8 @@ from decimal import Decimal
 def test_currency_converter_via_usd_pivot():
     from app.services.currency import CurrencyConverter
 
-    conv = CurrencyConverter({"USD": Decimal("1"), "RUB": Decimal("0.0107"), "EUR": Decimal("1.09")})
+    conv = CurrencyConverter(
+        {"USD": Decimal("1"), "RUB": Decimal("0.0107"), "EUR": Decimal("1.09")})
     # 1000 USD → RUB: 1000 * 1 / 0.0107
     assert conv.convert(1000, "USD", "RUB") == Decimal("93457.94")
     # Идемпотентность
@@ -143,7 +144,8 @@ def test_manual_snapshot_persistence(client):
             base_currency="RUB",
             risk_profile=RiskProfile.AGGRESSIVE,
             accounts=[Account("a1", "Депозит", Decimal("150000"), "RUB", is_liquid=True)],
-            goals=[Goal("g1", "Цель", Decimal("300000"), Decimal("50000"), utcnow() + timedelta(days=180))],
+            goals=[Goal("g1", "Цель", Decimal("300000"), Decimal(
+                "50000"), utcnow() + timedelta(days=180))],
             r_bench=Decimal("0.16"),
         )
         repo.save("user-x", snap)

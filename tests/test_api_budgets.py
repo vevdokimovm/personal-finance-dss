@@ -5,7 +5,8 @@ from fastapi.testclient import TestClient
 
 
 def test_budget_create_list_delete(client: TestClient) -> None:
-    created = client.post("/api/budgets", json={"category": "Кафе и рестораны", "limit_amount": 8000})
+    created = client.post(
+        "/api/budgets", json={"category": "Кафе и рестораны", "limit_amount": 8000})
     assert created.status_code == 201
     bid = created.json()["id"]
 

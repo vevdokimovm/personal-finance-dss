@@ -23,8 +23,10 @@ SCENARIOS = [
         "expensive_debt_balanced",
         dict(
             income_total=120000, expense_total=70000,
-            obligations=[{"id": 1, "amount": 300000, "interest_rate": 0.20, "monthly_payment": 15000, "term": 24}],
-            goals=[{"id": 1, "target_amount": 300000, "current_amount": 50000, "category": "safety", "deadline": datetime(2027, 6, 1), "name": "Подушка"}],
+            obligations=[{"id": 1, "amount": 300000, "interest_rate": 0.20,
+                          "monthly_payment": 15000, "term": 24}],
+            goals=[{"id": 1, "target_amount": 300000, "current_amount": 50000,
+                    "category": "safety", "deadline": datetime(2027, 6, 1), "name": "Подушка"}],
             bliq=40000, risk_tolerance=3,
         ),
         dict(
@@ -32,7 +34,8 @@ SCENARIOS = [
             x=(35000.0, 0.0, 0.0),
             utility=0.5,
             ind_rt_lt_dt=(35000.0, 0.5714, 0.125),
-            top3=["Всё на погашение долга", "Акцент: обязательства (90/10/0)", "Акцент: обязательства (90/0/10)"],
+            top3=["Всё на погашение долга",
+                  "Акцент: обязательства (90/10/0)", "Акцент: обязательства (90/0/10)"],
         ),
     ),
     (
@@ -40,7 +43,8 @@ SCENARIOS = [
         dict(
             income_total=100000, expense_total=50000,
             obligations=[],
-            goals=[{"id": 1, "target_amount": 500000, "current_amount": 0, "category": "income_growth", "deadline": datetime(2028, 1, 1), "name": "Обучение"}],
+            goals=[{"id": 1, "target_amount": 500000, "current_amount": 0,
+                    "category": "income_growth", "deadline": datetime(2028, 1, 1), "name": "Обучение"}],  # noqa: E501
             bliq=20000, risk_tolerance=5,
         ),
         dict(
@@ -55,8 +59,10 @@ SCENARIOS = [
         "cheap_debt_redirect",
         dict(
             income_total=150000, expense_total=80000,
-            obligations=[{"id": 1, "amount": 2000000, "interest_rate": 0.085, "monthly_payment": 25000, "term": 120}],
-            goals=[{"id": 1, "target_amount": 400000, "current_amount": 100000, "category": "material", "deadline": datetime(2027, 12, 1), "name": "Машина"}],
+            obligations=[{"id": 1, "amount": 2000000, "interest_rate": 0.085,
+                          "monthly_payment": 25000, "term": 120}],
+            goals=[{"id": 1, "target_amount": 400000, "current_amount": 100000,
+                    "category": "material", "deadline": datetime(2027, 12, 1), "name": "Машина"}],
             bliq=60000, risk_tolerance=3,
         ),
         dict(
@@ -71,8 +77,10 @@ SCENARIOS = [
         "conservative_debt",
         dict(
             income_total=90000, expense_total=55000,
-            obligations=[{"id": 1, "amount": 400000, "interest_rate": 0.18, "monthly_payment": 12000, "term": 36}],
-            goals=[{"id": 1, "target_amount": 200000, "current_amount": 20000, "category": "safety", "deadline": datetime(2027, 3, 1), "name": "Резерв"}],
+            obligations=[{"id": 1, "amount": 400000, "interest_rate": 0.18,
+                          "monthly_payment": 12000, "term": 36}],
+            goals=[{"id": 1, "target_amount": 200000, "current_amount": 20000,
+                    "category": "safety", "deadline": datetime(2027, 3, 1), "name": "Резерв"}],
             bliq=15000, risk_tolerance=1,
         ),
         dict(
@@ -80,15 +88,18 @@ SCENARIOS = [
             x=(20700.0, 2300.0, 0.0),
             utility=0.452,
             ind_rt_lt_dt=(23000.0, 0.2727, 0.1333),
-            top3=["Акцент: обязательства (90/10/0)", "Акцент: обязательства (60/40/0)", "Акцент: резерв (30/70/0)"],
+            top3=["Акцент: обязательства (90/10/0)",
+                  "Акцент: обязательства (60/40/0)", "Акцент: резерв (30/70/0)"],
         ),
     ),
     (
         "high_dti",
         dict(
             income_total=100000, expense_total=45000,
-            obligations=[{"id": 1, "amount": 800000, "interest_rate": 0.22, "monthly_payment": 35000, "term": 30}],
-            goals=[{"id": 1, "target_amount": 150000, "current_amount": 10000, "category": "emotional", "deadline": datetime(2027, 9, 1), "name": "Отпуск"}],
+            obligations=[{"id": 1, "amount": 800000, "interest_rate": 0.22,
+                          "monthly_payment": 35000, "term": 30}],
+            goals=[{"id": 1, "target_amount": 150000, "current_amount": 10000,
+                    "category": "emotional", "deadline": datetime(2027, 9, 1), "name": "Отпуск"}],
             bliq=10000, risk_tolerance=3,
         ),
         dict(
@@ -96,7 +107,8 @@ SCENARIOS = [
             x=(20000.0, 0.0, 0.0),
             utility=0.5,
             ind_rt_lt_dt=(20000.0, 0.2222, 0.35),
-            top3=["Всё на погашение долга", "Акцент: обязательства (90/10/0)", "Акцент: обязательства (90/0/10)"],
+            top3=["Всё на погашение долга",
+                  "Акцент: обязательства (90/10/0)", "Акцент: обязательства (90/0/10)"],
         ),
     ),
 ]

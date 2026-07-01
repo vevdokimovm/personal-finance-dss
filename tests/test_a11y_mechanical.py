@@ -112,7 +112,7 @@ def test_hidden_containers_have_no_focus_trap(client, path: str) -> None:
             continue
         if any(_is_focusable(d) for d in el.find_all(True)):
             offenders.append(el.get("id") or str(el)[:60])
-    assert not offenders, f"{path}: aria-hidden=true с фокусируемыми потомками без inert: {offenders}"
+    assert not offenders, f"{path}: aria-hidden=true с фокусируемыми потомками без inert: {offenders}"  # noqa: E501
 
 
 @pytest.mark.parametrize("path", PAGES)

@@ -17,7 +17,7 @@ def _seed_income_expense(client: TestClient) -> None:
 
 def test_linked_asset_excluded_from_bliq(client: TestClient) -> None:
     linked = client.post("/api/liquid-assets", json={
-        "name": "Накопительный", "amount": 50000, "interest_rate": 0.16, "type": "savings_account"}).json()
+        "name": "Накопительный", "amount": 50000, "interest_rate": 0.16, "type": "savings_account"}).json()  # noqa: E501
     client.post("/api/liquid-assets", json={
         "name": "Резерв", "amount": 30000, "interest_rate": 0.14, "type": "deposit"})
 
@@ -57,7 +57,8 @@ def test_goal_stores_linked_asset_id(client: TestClient) -> None:
 
 def test_dashboard_bliq_excludes_linked(client: TestClient) -> None:
     # дашборд (/api/recommendation) консистентен с планированием: Bliq без привязанных
-    linked = client.post("/api/liquid-assets", json={"amount": 50000, "type": "savings_account"}).json()
+    linked = client.post("/api/liquid-assets",
+                         json={"amount": 50000, "type": "savings_account"}).json()
     client.post("/api/liquid-assets", json={"amount": 30000, "type": "deposit"})
     client.post("/api/goals", json={
         "name": "Отпуск", "target_amount": 180000, "current_amount": 0,

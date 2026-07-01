@@ -51,7 +51,8 @@ def test_bulk_recurring_flag_set_for_repeats(db_session):
 
 
 def test_bulk_single_occurrence_not_recurring(db_session):
-    rows = [{"amount": 999, "type": "expense", "date": datetime(2026, 5, 1), "description": "Разовое"}]
+    rows = [{"amount": 999, "type": "expense", "date": datetime(
+        2026, 5, 1), "description": "Разовое"}]
     bulk_create_transactions(db_session, rows)
     t = db_session.query(Transaction).filter(Transaction.description == "Разовое").one()
     assert t.is_recurring is False
@@ -59,12 +60,13 @@ def test_bulk_single_occurrence_not_recurring(db_session):
 
 def test_bulk_recurring_counts_existing(db_session):
     # одна уже в БД + одна входящая с тем же описанием → обе должны стать повторяющимися
-    base = {"amount": 100, "type": "expense", "date": datetime(2026, 5, 1), "description": "Подписка"}
+    base = {"amount": 100, "type": "expense", "date": datetime(
+        2026, 5, 1), "description": "Подписка"}
     bulk_create_transactions(db_session, [base])
     bulk_create_transactions(db_session, [{**base, "date": datetime(2026, 6, 1)}])
     txns = db_session.query(Transaction).filter(Transaction.description == "Подписка").all()
     assert len(txns) == 2
-    # вторая партия видит первую → ставит recurring; первая остаётся как была (разовой на момент вставки)
+    # вторая партия видит первую → ставит recurring; первая остаётся как была (разовой на момент вставки)  # noqa: E501
     assert any(t.is_recurring for t in txns)
 
 

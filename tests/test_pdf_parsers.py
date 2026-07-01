@@ -37,19 +37,21 @@ class TestVtbTable:
         return [dt, "02.06.2026", amount, None, None, "0.00", desc]
 
     def test_expense_negative(self):
-        txns = _vtb_table_to_transactions([[self._row("30.05.2026\n19:56:44", "-741.74 RUB", "PYATEROCHKA *6667")]])
+        txns = _vtb_table_to_transactions(
+            [[self._row("30.05.2026\n19:56:44", "-741.74 RUB", "PYATEROCHKA *6667")]])
         assert len(txns) == 1
         assert txns[0]["type"] == "expense"
         assert txns[0]["amount"] == 741.74
 
     def test_income_positive_en_thousands(self):
-        txns = _vtb_table_to_transactions([[self._row("29.05.2026\n11:27:02", "3,000.00 RUB", "Перевод СБП")]])
+        txns = _vtb_table_to_transactions(
+            [[self._row("29.05.2026\n11:27:02", "3,000.00 RUB", "Перевод СБП")]])
         assert txns[0]["type"] == "income"
         assert txns[0]["amount"] == 3000.0
 
     def test_header_rows_skipped(self):
         rows = [[
-            ["Дата и время\nоперации", "Дата обработки", "Сумма", None, None, "Комиссия", "Описание"],
+            ["Дата и время\nоперации", "Дата обработки", "Сумма", None, None, "Комиссия", "Описание"],  # noqa: E501
             [None, None, None, "Приход", "Расход", None, None],
             self._row("30.05.2026", "-100.00 RUB", "X"),
         ]]
@@ -64,7 +66,8 @@ class TestVtbTable:
         assert txns[0]["date"].startswith("2026-05-30")
 
     def test_description_whitespace_collapsed(self):
-        txns = _vtb_table_to_transactions([[self._row("30.05.2026", "-50.00 RUB", "Оплата\nтоваров   *6667")]])
+        txns = _vtb_table_to_transactions(
+            [[self._row("30.05.2026", "-50.00 RUB", "Оплата\nтоваров   *6667")]])
         assert txns[0]["description"] == "Оплата товаров *6667"
 
 
@@ -123,7 +126,7 @@ class TestRaiffeisenTable:
 
     def test_header_and_service_rows_skipped(self):
         rows = [[
-            ["№ P/P", "Posting date", "Document number", "Debit", "Credit", "Payment details", "Card"],
+            ["№ P/P", "Posting date", "Document number", "Debit", "Credit", "Payment details", "Card"],  # noqa: E501
             [None, "Executed by the bank", None, None, None, None, None],
             self._row("1", "26.09.2024 20:04\n2", "- 89,00 ₽", "", "Продукты"),
         ]]

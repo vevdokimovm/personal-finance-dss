@@ -110,8 +110,10 @@ def test_obligation_payment_history(client: TestClient) -> None:
     }).json()
 
     with Session(engine) as session:
-        record_obligation_payment(session, obligation["id"], amount=25000, is_early=False, remaining_after=775000)
-        record_obligation_payment(session, obligation["id"], amount=100000, is_early=True, remaining_after=675000)
+        record_obligation_payment(
+            session, obligation["id"], amount=25000, is_early=False, remaining_after=775000)
+        record_obligation_payment(
+            session, obligation["id"], amount=100000, is_early=True, remaining_after=675000)
         payments = get_obligation_payments(session, obligation["id"])
 
     assert len(payments) == 2

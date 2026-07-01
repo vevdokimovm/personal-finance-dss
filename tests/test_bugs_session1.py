@@ -68,7 +68,7 @@ def test_bug04_zero_income_with_obligation_returns_422_on_analysis(client: TestC
     assert client.get("/api/analysis").status_code == 422
 
 
-def test_bug04_zero_income_with_obligation_returns_422_on_recommendation(client: TestClient) -> None:
+def test_bug04_zero_income_with_obligation_returns_422_on_recommendation(client: TestClient) -> None:  # noqa: E501
     _obligation(client, payment=20000)
     assert client.post("/api/recommendation", json={}).status_code == 422
 

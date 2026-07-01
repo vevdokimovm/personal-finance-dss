@@ -132,7 +132,7 @@ def test_stress_deficit_is_single(s: dict):
 @stress_settings
 @given(s=scenario())
 def test_stress_derived_metrics_react(s: dict):
-    """Под стрессом: Rt'≥Rt, Dt'≤Dt, Lt'≥base — досрочка/резерв двигают метрики в нужную сторону (§5)."""
+    """Под стрессом: Rt'≥Rt, Dt'≤Dt, Lt'≥base — досрочка/резерв двигают метрики в нужную сторону (§5)."""  # noqa: E501
     base_lt = s["bliq"] / s["expense_total"]
     base_dt = s["obligation_payments"] / s["income_total"]
     for alt in _evaluate_all(s):

@@ -32,7 +32,7 @@ def _block(css: str, pattern: str) -> str:
 
 
 def _parse(block: str) -> dict[str, str]:
-    return {name: value.strip() for name, value in re.findall(r"(--c-[\w-]+)\s*:\s*([^;]+);", block)}
+    return {name: value.strip() for name, value in re.findall(r"(--c-[\w-]+)\s*:\s*([^;]+);", block)}  # noqa: E501
 
 
 def _themes(css: str) -> dict[str, dict[str, str]]:

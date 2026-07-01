@@ -161,7 +161,8 @@ class TestSetAndApply:
     def test_apply_rule_respects_type(self, db_session):
         uid = _user(db_session, "u-type")
         exp = _txn(db_session, description="ACME", category="Прочее", ttype=EXPENSE, user_id=uid)
-        inc = _txn(db_session, description="ACME", category="Прочий доход", ttype=INCOME, user_id=uid)
+        inc = _txn(db_session, description="ACME",
+                   category="Прочий доход", ttype=INCOME, user_id=uid)
         crud.apply_category_rule(db_session, uid, "acme", "Покупки", EXPENSE)
         db_session.refresh(exp)
         db_session.refresh(inc)
@@ -203,9 +204,12 @@ class TestImportRespectsRules:
         uid = _user(db_session, "u-bulk")
         crud.upsert_category_rule(db_session, uid, "xyzmart", "Покупки", EXPENSE)
         rows = [
-            {"amount": 100, "type": EXPENSE, "date": datetime(2026, 6, 2), "description": "XYZMART 1"},
-            {"amount": 200, "type": EXPENSE, "date": datetime(2026, 6, 3), "description": "оплата xyzmart 2"},
-            {"amount": 300, "type": EXPENSE, "date": datetime(2026, 6, 4), "description": "Неизвестно ZZZ"},
+            {"amount": 100, "type": EXPENSE, "date": datetime(
+                2026, 6, 2), "description": "XYZMART 1"},
+            {"amount": 200, "type": EXPENSE, "date": datetime(
+                2026, 6, 3), "description": "оплата xyzmart 2"},
+            {"amount": 300, "type": EXPENSE, "date": datetime(
+                2026, 6, 4), "description": "Неизвестно ZZZ"},
         ]
         assert crud.bulk_create_transactions(db_session, rows, user_id=uid) == 3
         cats = {t.description: t.category for t in crud.get_transactions(db_session, user_id=uid)}

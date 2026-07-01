@@ -211,12 +211,15 @@ class FinpilotAuthenticatedUser(_Tolerant429Mixin, HttpUser):
 
     @task(2)
     def my_history(self) -> None:
-        self._get(f"{API}/planning/history", name="GET /api/planning/history [auth]", headers=self.headers)
+        self._get(f"{API}/planning/history",
+                  name="GET /api/planning/history [auth]", headers=self.headers)
 
     @task(3)
     def my_recommendation(self) -> None:
-        self._post(f"{API}/recommendation", name="POST /api/recommendation [auth]", headers=self.headers)
+        self._post(f"{API}/recommendation",
+                   name="POST /api/recommendation [auth]", headers=self.headers)
 
     @task(1)
     def my_calculate(self) -> None:
-        self._post(f"{API}/planning/calculate", name="POST /api/planning/calculate [auth]", headers=self.headers)
+        self._post(f"{API}/planning/calculate",
+                   name="POST /api/planning/calculate [auth]", headers=self.headers)

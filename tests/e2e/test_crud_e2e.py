@@ -109,7 +109,7 @@ def test_obligation_delete_and_restore(page, base_url) -> None:
     assert name not in page.locator("#obligations-list").inner_text()
     _restore(page)  # undo — тот самый недавно добавленный путь
     page.wait_for_function(
-        "(n)=>document.getElementById('obligations-list').textContent.includes(n)", arg=name, timeout=8000
+        "(n)=>document.getElementById('obligations-list').textContent.includes(n)", arg=name, timeout=8000  # noqa: E501
     )
     assert name in page.locator("#obligations-list").inner_text()
 
@@ -157,6 +157,6 @@ def test_transaction_delete_and_restore(page, base_url) -> None:
     assert cat not in page.locator("#transactions-list").inner_text()
     _restore(page)
     page.wait_for_function(
-        "(n)=>document.getElementById('transactions-list').textContent.includes(n)", arg=cat, timeout=8000
+        "(n)=>document.getElementById('transactions-list').textContent.includes(n)", arg=cat, timeout=8000  # noqa: E501
     )
     assert cat in page.locator("#transactions-list").inner_text()

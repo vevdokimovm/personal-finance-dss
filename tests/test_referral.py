@@ -57,7 +57,8 @@ class TestRegisterEndpoint:
     def test_referral_me_endpoint(self, client, db_session) -> None:
         _register(client, "owner@test.io")
         # логинимся, чтобы получить сессию
-        login = client.post("/api/auth/login", json={"email": "owner@test.io", "password": "password123"})
+        login = client.post("/api/auth/login",
+                            json={"email": "owner@test.io", "password": "password123"})
         assert login.status_code == 200
         r = client.get("/api/referral/me")
         assert r.status_code == 200

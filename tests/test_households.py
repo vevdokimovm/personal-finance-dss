@@ -61,7 +61,7 @@ def _accept(client, token: str, invite_token: str):
     return client.post(f"/api/households/invites/{invite_token}/accept", headers=_h(token))
 
 
-def _add_member(client, owner_token: str, hid: int, member_token: str, role: str = "member") -> None:
+def _add_member(client, owner_token: str, hid: int, member_token: str, role: str = "member") -> None:  # noqa: E501
     """Полный цикл «пригласить → принять» для удобства настройки тестов."""
     inv = _invite(client, owner_token, hid, role=role)
     r = _accept(client, member_token, inv)
@@ -121,8 +121,10 @@ class TestHouseholdCRUD:
         hid = _create_household(client, a)
         _add_member(client, a, hid, b, role="member")
 
-        assert client.patch(f"/api/households/{hid}", json={"name": "Новое"}, headers=_h(a)).status_code == 200
-        assert client.patch(f"/api/households/{hid}", json={"name": "Нельзя"}, headers=_h(b)).status_code == 403
+        assert client.patch(
+            f"/api/households/{hid}", json={"name": "Новое"}, headers=_h(a)).status_code == 200
+        assert client.patch(
+            f"/api/households/{hid}", json={"name": "Нельзя"}, headers=_h(b)).status_code == 403
 
     def test_delete_owner_only(self, client):
         a = _register(client, "a4@test.io")
@@ -206,7 +208,8 @@ class TestMembershipAndInvites:
         # узнаём id приглашения и отзываем
         invites = client.get(f"/api/households/{hid}/invites", headers=_h(a)).json()
         iid = invites[0]["id"]
-        assert client.post(f"/api/households/{hid}/invites/{iid}/revoke", headers=_h(a)).status_code in (200, 204)
+        assert client.post(f"/api/households/{hid}/invites/{iid}/revoke",
+                           headers=_h(a)).status_code in (200, 204)
 
         r = _accept(client, b, token)
         assert r.status_code in (400, 410)
@@ -231,11 +234,12 @@ class TestMembershipAndInvites:
         _add_member(client, a, hid, c)
 
         # b (member) не может удалить c
-        b_id = client.get("/api/auth/me", headers=_h(b)).json()["id"]
         c_id = client.get("/api/auth/me", headers=_h(c)).json()["id"]
-        assert client.delete(f"/api/households/{hid}/members/{c_id}", headers=_h(b)).status_code == 403
+        assert client.delete(
+            f"/api/households/{hid}/members/{c_id}", headers=_h(b)).status_code == 403
         # owner может
-        assert client.delete(f"/api/households/{hid}/members/{c_id}", headers=_h(a)).status_code == 204
+        assert client.delete(
+            f"/api/households/{hid}/members/{c_id}", headers=_h(a)).status_code == 204
         # c больше не член
         assert hid not in [h["id"] for h in client.get("/api/households", headers=_h(c)).json()]
 
@@ -244,7 +248,8 @@ class TestMembershipAndInvites:
         hid = _create_household(client, a)
         a_id = client.get("/api/auth/me", headers=_h(a)).json()["id"]
         # owner нельзя удалить как обычного члена
-        assert client.delete(f"/api/households/{hid}/members/{a_id}", headers=_h(a)).status_code == 400
+        assert client.delete(
+            f"/api/households/{hid}/members/{a_id}", headers=_h(a)).status_code == 400
 
     def test_member_can_leave(self, client):
         a = _register(client, "al@test.io")
@@ -305,7 +310,7 @@ class TestSharedDataScope:
         a = _register(client, "ch1@test.io")
         b = _register(client, "ch2@test.io")
         hid1 = _create_household(client, a, "Семья-1")
-        hid2 = _create_household(client, b, "Семья-2")
+        _create_household(client, b, "Семья-2")
 
         _create_goal(client, a, "Цель семьи 1", household_id=hid1)
         # b — член только семьи 2, не должен видеть цель семьи 1

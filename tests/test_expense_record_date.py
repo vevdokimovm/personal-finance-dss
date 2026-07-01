@@ -12,10 +12,11 @@
 """
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from app.core.spending_advice import ExpenseRecord, SpendingAdvisor
 from app.database.crud import create_transaction
+from app.utils.time import utcnow
 from app.services.spending import get_spending_advice
 
 
@@ -59,7 +60,9 @@ class _SpyAdvisor(SpendingAdvisor):
 
 
 def test_spending_advice_populates_exact_date_from_transaction(db_session) -> None:
-    d = datetime(2026, 1, 10, 9, 0)
+    # Дата — относительно текущего момента, чтобы всегда попадать в окно months=6
+    # (хардкод 2026-01 выпадал из окна по мере ухода календаря — BUG-028).
+    d = (utcnow() - timedelta(days=5)).replace(microsecond=0)
     create_transaction(
         db_session, amount=250.0, type="expense",
         date=d, category="Еда", description="завтрак",
@@ -69,4 +72,4 @@ def test_spending_advice_populates_exact_date_from_transaction(db_session) -> No
     assert spy.seen_records, "advisor должен получить хотя бы одну запись"
     rec = spy.seen_records[0]
     assert rec.date == d
-    assert rec.period == "2026-01"
+    assert rec.period == d.strftime("%Y-%m")

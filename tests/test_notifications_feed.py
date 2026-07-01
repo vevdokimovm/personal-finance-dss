@@ -58,7 +58,8 @@ def _make_notification(user_id: str, title: str = "Цель близко", ntype
     """Создать in-app уведомление напрямую (имитируем системную генерацию)."""
     db = SessionLocal()
     try:
-        n = crud.create_notification(db, user_id=user_id, type=ntype, title=title, body=body, link=link)
+        n = crud.create_notification(db, user_id=user_id, type=ntype,
+                                     title=title, body=body, link=link)
         db.commit()
         return n.id
     finally:
@@ -168,7 +169,8 @@ class TestMarkRead:
         r = client.post(f"/api/notifications/{nid}/read", headers=_h(token))
         assert r.status_code == 200, r.text
 
-        cnt = client.get("/api/notifications/unread-count", headers=_h(token)).json()["unread_count"]
+        cnt = client.get("/api/notifications/unread-count",
+                         headers=_h(token)).json()["unread_count"]
         assert cnt == 1
 
         # is_read отражается в ленте.
@@ -187,7 +189,8 @@ class TestMarkRead:
         assert r.status_code == 200, r.text
         assert r.json()["marked"] == 3
 
-        cnt = client.get("/api/notifications/unread-count", headers=_h(token)).json()["unread_count"]
+        cnt = client.get("/api/notifications/unread-count",
+                         headers=_h(token)).json()["unread_count"]
         assert cnt == 0
 
     def test_mark_nonexistent_404(self, client) -> None:

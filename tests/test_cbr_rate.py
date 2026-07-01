@@ -49,7 +49,8 @@ class TestOpportunityCostRate:
         # cbr недоступен (зарубежный IP) → отдаём fallback, не вычисляем из фейка
         monkeypatch.setattr(
             cbr_rate, "get_key_rate",
-            lambda *a, **k: {"key_rate": 0.16, "source": "fallback", "as_of": "2026-06-18", "detail": "403"},
+            lambda *a, **k: {"key_rate": 0.16, "source": "fallback",
+                             "as_of": "2026-06-18", "detail": "403"},
         )
         result = cbr_rate.get_opportunity_cost_rate(fallback=0.14)
         assert result["source"] == "fallback"
@@ -68,7 +69,8 @@ class TestSoapBody:
     def test_uses_capital_todate(self):
         # Регрессия корня инцидента: cbr.ru ждёт <ToDate> с заглавной (как <fromDate>).
         # Строчная <toDate> игнорировалась ASMX → ToDate=MinValue → пустой диапазон.
-        body = cbr_rate._build_soap_body(_dt.date(2026, 1, 1), _dt.date(2026, 6, 22)).decode("utf-8")
+        body = cbr_rate._build_soap_body(
+            _dt.date(2026, 1, 1), _dt.date(2026, 6, 22)).decode("utf-8")
         assert "<fromDate>2026-01-01</fromDate>" in body
         assert "<ToDate>2026-06-22</ToDate>" in body
         assert "<toDate>" not in body

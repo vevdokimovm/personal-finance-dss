@@ -14,8 +14,9 @@ _RESULT = {
     "risk_profile": "3 Сбалансированный",
     "indicators": {"Rt": 39500, "Lt": 0.405, "Dt": 0.347, "BLR": 1.2},
     "top3": [
-        {"name": "Всё в резерв", "x_obligations": 0, "x_reserve": 39500, "x_goals": 0, "utility": 0.805},
-        {"name": "Долг+резерв", "x_obligations": 10000, "x_reserve": 29500, "x_goals": 0, "utility": 0.78},
+        {"name": "Всё в резерв", "x_obligations": 0, "x_reserve": 39500, "x_goals": 0, "utility": 0.805},  # noqa: E501
+        {"name": "Долг+резерв", "x_obligations": 10000,
+            "x_reserve": 29500, "x_goals": 0, "utility": 0.78},
     ],
 }
 

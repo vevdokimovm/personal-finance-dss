@@ -28,7 +28,7 @@ class TestExperimentCrud:
         assert svc.get_experiment(db_session, "e1").key == "e1"
         assert any(e.key == "e1" for e in svc.list_experiments(db_session))
 
-    @pytest.mark.parametrize("bad", [[], "notlist", [{"name": "x", "weight": 0}], [{"name": "", "weight": 5}], [{"weight": 5}]])
+    @pytest.mark.parametrize("bad", [[], "notlist", [{"name": "x", "weight": 0}], [{"name": "", "weight": 5}], [{"weight": 5}]])  # noqa: E501
     def test_validate_variants_rejects_bad(self, bad):
         with pytest.raises(ValueError):
             svc.validate_variants(bad)
@@ -146,7 +146,8 @@ class TestEndpoints:
         patched = client.patch("/api/admin/experiments/lifecycle", json={"status": "running"})
         assert patched.status_code == 200 and patched.json()["status"] == "running"
         assert client.delete("/api/admin/experiments/lifecycle").status_code == 204
-        assert client.patch("/api/admin/experiments/lifecycle", json={"status": "stopped"}).status_code == 404
+        assert client.patch("/api/admin/experiments/lifecycle",
+                            json={"status": "stopped"}).status_code == 404
 
     def test_results_404_for_missing(self, client: TestClient):
         assert client.get("/api/admin/experiments/ghost/results").status_code == 404

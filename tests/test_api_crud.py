@@ -31,7 +31,7 @@ class TestTransactionsCRUD:
 
     def test_export_csv(self, client: TestClient) -> None:
         client.post("/api/transactions", json={
-            "amount": 1000, "category": "Продукты", "type": "expense", "date": "2026-06-01T00:00:00"})
+            "amount": 1000, "category": "Продукты", "type": "expense", "date": "2026-06-01T00:00:00"})  # noqa: E501
         resp = client.get("/api/transactions/export.csv")
         assert resp.status_code == 200
         assert "text/csv" in resp.headers.get("content-type", "")

@@ -30,11 +30,13 @@ class TestTransactionLifecycle:
         assert crud.restore_transaction(db_session, 999999) is None
 
     def test_restore_not_deleted_returns_none(self, db_session) -> None:
-        tx = crud.create_transaction(db_session, amount=500, type="income", date=datetime(2026, 6, 1))
+        tx = crud.create_transaction(db_session, amount=500,
+                                     type="income", date=datetime(2026, 6, 1))
         assert crud.restore_transaction(db_session, tx.id) is None
 
     def test_delete_wrong_owner_returns_none(self, db_session) -> None:
-        tx = crud.create_transaction(db_session, amount=500, type="income", date=datetime(2026, 6, 1))
+        tx = crud.create_transaction(db_session, amount=500,
+                                     type="income", date=datetime(2026, 6, 1))
         assert crud.delete_transaction(db_session, tx.id, user_id="someone-else") is None
 
 
@@ -52,7 +54,8 @@ class TestObligationGoalState:
         assert crud.close_obligation(db_session, 999999) is None
 
     def test_achieve_goal(self, db_session) -> None:
-        g = crud.create_goal(db_session, name="Цель", target_amount=50000, current_amount=0, deadline=datetime(2027, 1, 1))
+        g = crud.create_goal(db_session, name="Цель", target_amount=50000,
+                             current_amount=0, deadline=datetime(2027, 1, 1))
         achieved = crud.achieve_goal(db_session, g.id)
         assert achieved is not None and achieved.is_active is False
         assert achieved.achieved_at is not None
@@ -94,7 +97,8 @@ class TestAdoptOrphanRows:
         db = db_session
         # гостевые строки (user_id IS NULL)
         crud.create_transaction(db, amount=1000, type="expense", date=datetime(2026, 6, 1))
-        crud.create_goal(db, name="Гостевая цель", target_amount=10000, current_amount=0, deadline=datetime(2027, 1, 1))
+        crud.create_goal(db, name="Гостевая цель", target_amount=10000,
+                         current_amount=0, deadline=datetime(2027, 1, 1))
         u = _user(db, email="adopt@test.io")
 
         affected = crud.adopt_orphan_rows(db, u.id)
