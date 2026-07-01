@@ -196,10 +196,23 @@ def upgrade() -> None:
 
 
 def downgrade() -> None:
+    # PostgreSQL не кастует varchar→integer без явного USING (SQLite — динамическая
+    # типизация, молчит). На чистой/пустой таблице (типичный сценарий downgrade base
+    # в CI/тестах цепочки) каст — no-op и проходит. BUG-027.
     with op.batch_alter_table("recommendations") as b:
-        b.alter_column("user_id", type_=sa.Integer(), existing_type=sa.String(36))
+        b.alter_column(
+            "user_id",
+            type_=sa.Integer(),
+            existing_type=sa.String(36),
+            postgresql_using="user_id::integer",
+        )
     with op.batch_alter_table("events") as b:
-        b.alter_column("user_id", type_=sa.Integer(), existing_type=sa.String(36))
+        b.alter_column(
+            "user_id",
+            type_=sa.Integer(),
+            existing_type=sa.String(36),
+            postgresql_using="user_id::integer",
+        )
 
     op.drop_index("ix_user_prefs_user_id", table_name="user_prefs")
     with op.batch_alter_table("user_prefs") as b:
