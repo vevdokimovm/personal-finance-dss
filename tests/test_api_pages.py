@@ -10,8 +10,7 @@ from __future__ import annotations
 import pytest
 from fastapi.testclient import TestClient
 
-PAGES = ["/", "/planning", "/transactions", "/obligations",
-         "/goals", "/banks", "/validation", "/profile"]
+PAGES = ["/", "/planning", "/transactions", "/obligations", "/goals", "/banks", "/validation", "/profile"]  # noqa: E501
 
 
 @pytest.mark.parametrize("path", PAGES)

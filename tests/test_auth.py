@@ -76,14 +76,12 @@ def test_data_isolation_between_users(client):
 
     client.post(
         "/api/transactions",
-        json={"amount": 100000, "type": "income",
-              "date": "2026-06-02T00:00:00", "category": "A-income"},
+        json={"amount": 100000, "type": "income", "date": "2026-06-02T00:00:00", "category": "A-income"},  # noqa: E501
         headers=header_a,
     )
     client.post(
         "/api/transactions",
-        json={"amount": 77000, "type": "income",
-              "date": "2026-06-03T00:00:00", "category": "B-income"},
+        json={"amount": 77000, "type": "income", "date": "2026-06-03T00:00:00", "category": "B-income"},  # noqa: E501
         headers=header_b,
     )
 
@@ -111,10 +109,8 @@ def test_anonymous_cannot_see_user_data(client):
 def test_prefs_isolated_per_user(client):
     header_a = _auth_header(client, "pref_a@fp.io")
     header_b = _auth_header(client, "pref_b@fp.io")
-    client.patch("/api/user-prefs", json={"risk_tolerance": 5,
-                 "base_currency": "USD"}, headers=header_a)
-    client.patch("/api/user-prefs", json={"risk_tolerance": 1,
-                 "base_currency": "EUR"}, headers=header_b)
+    client.patch("/api/user-prefs", json={"risk_tolerance": 5, "base_currency": "USD"}, headers=header_a)  # noqa: E501
+    client.patch("/api/user-prefs", json={"risk_tolerance": 1, "base_currency": "EUR"}, headers=header_b)  # noqa: E501
     pa = client.get("/api/user-prefs", headers=header_a).json()
     pb = client.get("/api/user-prefs", headers=header_b).json()
     assert pa["risk_tolerance"] == 5 and pa["base_currency"] == "USD"

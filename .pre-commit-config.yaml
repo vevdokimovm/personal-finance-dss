@@ -1,9 +1,6 @@
 repos:
-  - repo: https://github.com/psf/black
-    rev: 23.3.0
-    hooks:
-      - id: black
-
+  # black НАМЕРЕННО не используется: правило проекта §2 — массовый реформат ломает
+  # merge между аккаунтами. Форматирование только точечное (autopep8 --select), не black.
   - repo: https://github.com/pre-commit/mirrors-mypy
     rev: v1.3.0
     hooks:

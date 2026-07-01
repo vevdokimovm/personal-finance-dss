@@ -310,7 +310,7 @@ class TestSharedDataScope:
         a = _register(client, "ch1@test.io")
         b = _register(client, "ch2@test.io")
         hid1 = _create_household(client, a, "Семья-1")
-        _create_household(client, b, "Семья-2")
+        _create_household(client, b, "Семья-2")  # b — член семьи-2 (side-effect для изоляции)
 
         _create_goal(client, a, "Цель семьи 1", household_id=hid1)
         # b — член только семьи 2, не должен видеть цель семьи 1

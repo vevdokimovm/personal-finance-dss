@@ -16,15 +16,14 @@ import pytest
 from app.services.cbr_fx import fetch_cbr_fx_rates, parse_cbr_fx_xml, update_fx_rates
 
 # Фрагмент формата ЦБ XML_daily.asp: рубли за Nominal единиц валюты.
-_CBR_XML = """<?xml version="1.0" encoding="windows-1251"?>
-<ValCurs Date="20.06.2026" name="Foreign Currency Market">
-<Valute ID="R01235"><NumCode>840</NumCode><CharCode>USD</CharCode>
-<Nominal>1</Nominal><Name>Доллар США</Name><Value>90,00</Value></Valute>
-<Valute ID="R01239"><NumCode>978</NumCode><CharCode>EUR</CharCode>
-<Nominal>1</Nominal><Name>Евро</Name><Value>100,00</Value></Valute>
-<Valute ID="R01375"><NumCode>156</NumCode><CharCode>CNY</CharCode>
-<Nominal>10</Nominal><Name>Юань</Name><Value>120,00</Value></Valute>
-</ValCurs>"""
+_CBR_XML = (
+    '<?xml version="1.0" encoding="windows-1251"?>\n'
+    '<ValCurs Date="20.06.2026" name="Foreign Currency Market">\n'
+    '<Valute ID="R01235"><NumCode>840</NumCode><CharCode>USD</CharCode><Nominal>1</Nominal><Name>Доллар США</Name><Value>90,00</Value></Valute>\n'  # noqa: E501
+    '<Valute ID="R01239"><NumCode>978</NumCode><CharCode>EUR</CharCode><Nominal>1</Nominal><Name>Евро</Name><Value>100,00</Value></Valute>\n'  # noqa: E501
+    '<Valute ID="R01375"><NumCode>156</NumCode><CharCode>CNY</CharCode><Nominal>10</Nominal><Name>Юань</Name><Value>120,00</Value></Valute>\n'  # noqa: E501
+    "</ValCurs>"
+)
 
 
 class TestParseCbrXml:
