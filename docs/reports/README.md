@@ -9,6 +9,10 @@
 - **incidents/** — инциденты: дефекты продукта с влиянием на пользователя, post-mortem'ы.
 - **investigations/** — расследования: неочевидная причина без дефекта в коде.
 - **merges/** — merge-манифесты и отчёты о слияниях параллельных веток + гайд по форку/мёржу.
+- **security/** — отчёты security-аудита (+ шаблон). Текущий: `finpilot_security_audit.md`.
+- **releases/** — release-отчёты по вехам (+ шаблон). Текущий: `milestone_4_release_report.md`.
+- **requirements/** — заполненные спецификации требований (SRS). Текущий: `srs_finpilot.md`.
+- **testing/** — тест-отчёты: стратегия, нагрузка (+ шаблон). Текущий: `test_strategy_report.md`.
 
 ## Реестры и методология (корень reports/)
 - `incidents_summary.md`, `investigations_summary.md` — сводные реестры.

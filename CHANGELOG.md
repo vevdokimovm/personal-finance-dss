@@ -2,6 +2,33 @@
 
 Формат: [Keep a Changelog](https://keepachangelog.com/ru/1.0.0/). Версионирование — [SemVer](https://semver.org/lang/ru/).
 
+## [5.4.0] — 2026-07-01 — Веха 5: недостающие виды отчётов — шаблоны + наполненные экземпляры (MINOR)
+
+Закрыт п.5: для видов отчётов, которые существуют в процессе/методичках, но не имели ни одного
+экземпляра под проект, созданы папки, шаблоны и **наполненные реальными данными** отчёты.
+
+- **`docs/reports/security/`** — `security_audit_template.md` + `finpilot_security_audit.md` (итог
+  раздела 4.4: JWT-revocation, гашение сессий, MultiFernet, старт-гард, MFA; ПДн/152-ФЗ; открытые
+  инфра-пункты — Redis rate limiting, CSP nonce).
+- **`docs/reports/releases/`** — `release_report_template.md` + `milestone_4_release_report.md`
+  (разбор вехи 4 по версиям v4.26–v4.30.2, итог и хвосты).
+- **`docs/reports/requirements/`** — `srs_finpilot.md` (заполненный SRS по мат-модели v3.0.0:
+  FR/инварианты/НФТ/ограничения РФ; шаблон — `guides/templates/srs_guide.md`).
+- **`docs/reports/testing/`** — `test_report_template.md` + `test_strategy_report.md` (гейты,
+  уровни тестов, Hypothesis, Playwright, Locust-нагрузка, CI-тиры).
+- Диспетчер `reporting_policy.md` и `docs/reports/README.md` дополнены разделом сводных/периодических отчётов.
+- Код приложения и гейты не тронуты.
+
+## [5.3.0] — 2026-07-01 — ADR по расположению движка + протокол непрерывности сделан заметным (MINOR)
+
+- **ADR-005** (`docs/reports/adr/adr_005_engine_location.md`): движок остаётся в `app/ingestion/`
+  (`CoreFinanceEngine` + протокол `FinanceEngine`) и `app/core/`; отдельная папка `engine/` не вводится.
+  Зафиксировано по итогам расследования.
+- **Протокол непрерывности сделан невозможным для пропуска.** `docs/session_continuity.md` вынесен
+  критическим баннером в самый верх `docs/WATCHLOG.md` (первым, до §0), продублирован первым пунктом
+  §0 и усилен в §5.16. Цель — чтобы ни один Клод на вахте не начал работу, не увидев правило «рано и
+  часто скидывай архив».
+
 ## [5.2.0] — 2026-07-01 — Веха 5: диаграммы, диспетчер отчётов, конвенция имён, протокол непрерывности (MINOR)
 
 - **Диаграммы внесены.** `docs/diagrams/` — технические (пайплайн, avalanche, C4, sequence, ER, UML,
