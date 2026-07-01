@@ -1,0 +1,135 @@
+<mxfile host="app.diagrams.net" type="device">
+  <diagram name="Главный pipeline СППР (ГОСТ 19.701-90)" id="main-pipeline">
+    <mxGraphModel dx="1100" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1700" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- НАЧАЛО -->
+        <mxCell id="start" value="Начало" style="rounded=1;whiteSpace=wrap;html=1;arcSize=50;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=13;" vertex="1" parent="1">
+          <mxGeometry x="340" y="20" width="160" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- ВВОД -->
+        <mxCell id="input" value="Ввод: транзакции It, Ej,&#10;обязательства O, цели G,&#10;ликвидность Bliq, профиль R" style="shape=parallelogram;perimeter=parallelogramPerimeter;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="310" y="100" width="220" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- ЭТАП 1: ПРЕДОБРАБОТКА -->
+        <mxCell id="prep" value="Этап 1. Предобработка данных&#10;(нормализация, фильтр активных целей)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="295" y="190" width="250" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- ЭТАП 2: МЕТРИКИ -->
+        <mxCell id="metrics" value="Этап 2. Расчёт базовых показателей&#10;CFt, Rt, Lt, Dt, BLR, Si" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="295" y="270" width="250" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- РЕШЕНИЕ: Rt > 0 -->
+        <mxCell id="dec_rt" value="Rt &gt; 0 ?" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="350" y="350" width="140" height="80" as="geometry" />
+        </mxCell>
+
+        <!-- ВЕТКА НЕТ: дефицит -->
+        <mxCell id="deficit" value="Дефицитный бюджет:&#10;вернуть структурный диагноз&#10;(Fail-loud)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="600" y="355" width="200" height="70" as="geometry" />
+        </mxCell>
+
+        <!-- ЭТАП 4.0: предраспределение Bliq -->
+        <mxCell id="prealloc" value="Этап 4.0. Разовое закрытие близких&#10;целей из Bliq (если Σ_близкие ≤ 0.5·Bliq)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="295" y="460" width="250" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- ЭТАП 4: генерация альтернатив -->
+        <mxCell id="gen" value="Этап 4. Генерация 21 альтернативы&#10;stars-and-bars, шаг 20%" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="295" y="540" width="250" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- ЦИКЛ по альтернативам (подготовка/шестиугольник) -->
+        <mxCell id="loop" value="Для каждой альтернативы a ∈ A" style="shape=hexagon;perimeter=hexagonPerimeter2;whiteSpace=wrap;html=1;fixedSize=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="305" y="620" width="230" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- ЭТАП 4b: предопределённый процесс Avalanche -->
+        <mxCell id="avalanche" value="Этап 4b. Avalanche + OCR-фильтр&#10;(см. отдельную схему)" style="shape=process;whiteSpace=wrap;html=1;backgroundOutline=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="295" y="710" width="250" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- ЭТАП 4b: предопределённый процесс Si -->
+        <mxCell id="si" value="Взвешенная обеспеченность Si&#10;(см. отдельную схему)" style="shape=process;whiteSpace=wrap;html=1;backgroundOutline=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="295" y="790" width="250" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- Пересчёт показателей -->
+        <mxCell id="recalc" value="Пересчёт Rt', Lt', Dt' для альтернативы" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="295" y="870" width="250" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- Конец цикла -->
+        <mxCell id="endloop" value="Альтернативы кончились?" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="350" y="950" width="140" height="80" as="geometry" />
+        </mxCell>
+
+        <!-- ЭТАП 5: фильтрация -->
+        <mxCell id="filter" value="Этап 5. Фильтрация по ограничениям&#10;Rt' ≥ 0, Lt' ≥ Lmin, Dt' ≤ Dmax" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="295" y="1060" width="250" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- Решение: есть допустимые? -->
+        <mxCell id="dec_adm" value="A' ≠ ∅ ?" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="350" y="1140" width="140" height="80" as="geometry" />
+        </mxCell>
+
+        <!-- Нет допустимых -->
+        <mxCell id="noadm" value="Нет допустимых:&#10;ослабить ограничения&#10;или пересмотр бюджета" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="600" y="1145" width="200" height="70" as="geometry" />
+        </mxCell>
+
+        <!-- ЭТАП 6: нормализация + SAW -->
+        <mxCell id="saw" value="Этап 6. Min-max нормализация +&#10;свёртка U(a) = Σ wk·критерий (SAW)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="295" y="1250" width="250" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- Выбор оптимума -->
+        <mxCell id="argmax" value="a* = argmax U(a)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=12;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="295" y="1330" width="250" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- ВЫВОД -->
+        <mxCell id="output" value="Вывод: a*, top-3 + объяснения" style="shape=parallelogram;perimeter=parallelogramPerimeter;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="310" y="1410" width="220" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- КОНЕЦ -->
+        <mxCell id="end" value="Конец" style="rounded=1;whiteSpace=wrap;html=1;arcSize=50;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=13;" vertex="1" parent="1">
+          <mxGeometry x="340" y="1500" width="160" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- СТРЕЛКИ -->
+        <mxCell id="e1" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=block;" edge="1" parent="1" source="start" target="input"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e2" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=block;" edge="1" parent="1" source="input" target="prep"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e3" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=block;" edge="1" parent="1" source="prep" target="metrics"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e4" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=block;" edge="1" parent="1" source="metrics" target="dec_rt"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e5" value="Нет" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=block;fontSize=11;" edge="1" parent="1" source="dec_rt" target="deficit"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e5b" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=block;" edge="1" parent="1" source="deficit" target="end"><mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="700" y="1525" /></Array></mxGeometry></mxCell>
+        <mxCell id="e6" value="Да" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=block;fontSize=11;" edge="1" parent="1" source="dec_rt" target="prealloc"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e7" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=block;" edge="1" parent="1" source="prealloc" target="gen"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e8" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=block;" edge="1" parent="1" source="gen" target="loop"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e9" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=block;" edge="1" parent="1" source="loop" target="avalanche"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e10" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=block;" edge="1" parent="1" source="avalanche" target="si"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e11" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=block;" edge="1" parent="1" source="si" target="recalc"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e12" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=block;" edge="1" parent="1" source="recalc" target="endloop"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e13" value="Нет (следующая)" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=block;fontSize=11;" edge="1" parent="1" source="endloop" target="loop"><mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="250" y="990" /><mxPoint x="250" y="650" /></Array></mxGeometry></mxCell>
+        <mxCell id="e14" value="Да" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=block;fontSize=11;" edge="1" parent="1" source="endloop" target="filter"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e15" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=block;" edge="1" parent="1" source="filter" target="dec_adm"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e16" value="Нет" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=block;fontSize=11;" edge="1" parent="1" source="dec_adm" target="noadm"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e16b" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=block;" edge="1" parent="1" source="noadm" target="end"><mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="700" y="1525" /></Array></mxGeometry></mxCell>
+        <mxCell id="e17" value="Да" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=block;fontSize=11;" edge="1" parent="1" source="dec_adm" target="saw"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e18" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=block;" edge="1" parent="1" source="saw" target="argmax"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e19" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=block;" edge="1" parent="1" source="argmax" target="output"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e20" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=block;" edge="1" parent="1" source="output" target="end"><mxGeometry relative="1" as="geometry" /></mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

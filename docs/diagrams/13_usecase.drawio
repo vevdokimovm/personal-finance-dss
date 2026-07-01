@@ -1,0 +1,95 @@
+<mxfile host="app.diagrams.net" type="device">
+  <diagram name="Use Case" id="usecase">
+    <mxGraphModel dx="1000" dy="700" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1000" pageHeight="780" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <mxCell id="title" value="FINPILOT — Варианты использования (UML Use Case)" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=15;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="280" y="15" width="450" height="30" as="geometry" />
+        </mxCell>
+
+        <!-- Актор Пользователь -->
+        <mxCell id="user" value="Пользователь" style="shape=umlActor;verticalLabelPosition=bottom;labelBackgroundColor=#ffffff;verticalAlign=top;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="70" y="320" width="40" height="80" as="geometry" />
+        </mxCell>
+
+        <!-- Актор Банк -->
+        <mxCell id="bank" value="Банк&#10;(CSV/API)" style="shape=umlActor;verticalLabelPosition=bottom;labelBackgroundColor=#ffffff;verticalAlign=top;html=1;fillColor=#999999;strokeColor=#666666;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="890" y="180" width="40" height="80" as="geometry" />
+        </mxCell>
+
+        <!-- Граница системы -->
+        <mxCell id="sys" value="FINPILOT" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#333333;verticalAlign=top;fontSize=13;fontStyle=1;align=center;spacingTop=8;arcSize=3;" vertex="1" parent="1">
+          <mxGeometry x="220" y="70" width="600" height="640" as="geometry" />
+        </mxCell>
+
+        <!-- Use cases пользователя -->
+        <mxCell id="uc1" value="Вести транзакции" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="260" y="100" width="160" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="uc2" value="Вести обязательства" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="260" y="165" width="160" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="uc3" value="Вести цели накопления" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="260" y="230" width="160" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="uc4" value="Вести ликвидные активы" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="260" y="295" width="160" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="uc5" value="Настроить профиль&#10;риска и пороги" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="260" y="360" width="160" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="uc6" value="Импортировать выписку" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="260" y="425" width="160" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="uc7" value="Получить рекомендацию&#10;(полный цикл СППР)" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="260" y="500" width="180" height="55" as="geometry" />
+        </mxCell>
+        <mxCell id="uc8" value="Посмотреть дашборд&#10;показателей" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="260" y="575" width="160" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="uc9" value="Построить прогноз&#10;Rt/Lt/Dt" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="260" y="640" width="160" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- Включаемые use cases (правая колонка) -->
+        <mxCell id="uc10" value="Рассчитать базовые&#10;показатели" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="600" y="430" width="170" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="uc11" value="Применить Avalanche&#10;+ OCR-фильтр" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="600" y="510" width="170" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="uc12" value="Ранжировать по SAW" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="600" y="590" width="170" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- Связи актор-пользователь -->
+        <mxCell id="ua1" style="endArrow=none;html=1;" edge="1" parent="1" source="user" target="uc1"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="ua2" style="endArrow=none;html=1;" edge="1" parent="1" source="user" target="uc2"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="ua3" style="endArrow=none;html=1;" edge="1" parent="1" source="user" target="uc3"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="ua4" style="endArrow=none;html=1;" edge="1" parent="1" source="user" target="uc4"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="ua5" style="endArrow=none;html=1;" edge="1" parent="1" source="user" target="uc5"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="ua6" style="endArrow=none;html=1;" edge="1" parent="1" source="user" target="uc6"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="ua7" style="endArrow=none;html=1;" edge="1" parent="1" source="user" target="uc7"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="ua8" style="endArrow=none;html=1;" edge="1" parent="1" source="user" target="uc8"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="ua9" style="endArrow=none;html=1;" edge="1" parent="1" source="user" target="uc9"><mxGeometry relative="1" as="geometry" /></mxCell>
+
+        <!-- Банк -> импорт -->
+        <mxCell id="ub" value="" style="endArrow=none;html=1;" edge="1" parent="1" source="bank" target="uc6"><mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="500" y="220" /><mxPoint x="500" y="450" /></Array></mxGeometry></mxCell>
+
+        <!-- include связи -->
+        <mxCell id="i1" value="«include»" style="endArrow=open;endFill=0;html=1;dashed=1;fontSize=10;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="uc7" target="uc10"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="i2" value="«include»" style="endArrow=open;endFill=0;html=1;dashed=1;fontSize=10;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="uc7" target="uc11"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="i3" value="«include»" style="endArrow=open;endFill=0;html=1;dashed=1;fontSize=10;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="uc7" target="uc12"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="i4" value="«include»" style="endArrow=open;endFill=0;html=1;dashed=1;fontSize=10;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="uc8" target="uc10"><mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="540" y="600" /><mxPoint x="540" y="455" /></Array></mxGeometry></mxCell>
+        <mxCell id="i5" value="«include»" style="endArrow=open;endFill=0;html=1;dashed=1;fontSize=10;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="uc9" target="uc10"><mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="560" y="665" /><mxPoint x="560" y="455" /></Array></mxGeometry></mxCell>
+        <mxCell id="i6" value="«extend»" style="endArrow=open;endFill=0;html=1;dashed=1;fontSize=10;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="uc9" target="uc7"><mxGeometry relative="1" as="geometry" /></mxCell>
+
+        <!-- bank -> uc6 include -->
+        <mxCell id="i7" value="«include»" style="endArrow=open;endFill=0;html=1;dashed=1;fontSize=10;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="uc6" target="bank"><mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="700" y="450" /><mxPoint x="700" y="220" /></Array></mxGeometry></mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

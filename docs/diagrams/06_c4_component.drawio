@@ -1,0 +1,100 @@
+<mxfile host="app.diagrams.net" type="device">
+  <diagram name="C4 L3 — Components" id="c4-component">
+    <mxGraphModel dx="1000" dy="700" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1100" pageHeight="900" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <mxCell id="title" value="FINPILOT — Компоненты ядра (C4 Level 3)" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;fontSize=16;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="350" y="15" width="400" height="30" as="geometry" />
+        </mxCell>
+
+        <!-- ===== Слой API ===== -->
+        <mxCell id="lay_api" value="app/api — REST-слой" style="rounded=1;whiteSpace=wrap;html=1;dashed=1;dashPattern=6 6;strokeColor=#6c8ebf;fillColor=#f5f8fc;verticalAlign=top;fontSize=12;fontStyle=2;fontColor=#6c8ebf;align=left;spacingLeft=12;spacingTop=8;arcSize=4;" vertex="1" parent="1">
+          <mxGeometry x="60" y="70" width="380" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="c_rp" value="routes_planning&#10;[Component]" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#85BBF0;strokeColor=#78A8D8;fontColor=#000000;fontSize=11;align=center;arcSize=10;" vertex="1" parent="1">
+          <mxGeometry x="85" y="110" width="150" height="55" as="geometry" />
+        </mxCell>
+        <mxCell id="c_rr" value="routes_recommendation&#10;[Component]" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#85BBF0;strokeColor=#78A8D8;fontColor=#000000;fontSize=11;align=center;arcSize=10;" vertex="1" parent="1">
+          <mxGeometry x="260" y="110" width="160" height="55" as="geometry" />
+        </mxCell>
+
+        <!-- ===== Слой Services ===== -->
+        <mxCell id="lay_svc" value="app/services — оркестрация" style="rounded=1;whiteSpace=wrap;html=1;dashed=1;dashPattern=6 6;strokeColor=#82b366;fillColor=#f6faf4;verticalAlign=top;fontSize=12;fontStyle=2;fontColor=#82b366;align=left;spacingLeft=12;spacingTop=8;arcSize=4;" vertex="1" parent="1">
+          <mxGeometry x="60" y="220" width="380" height="190" as="geometry" />
+        </mxCell>
+        <mxCell id="c_plan" value="planning.py&#10;run_planning()" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#9DD49D;strokeColor=#82b366;fontColor=#000000;fontSize=11;align=center;arcSize=10;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="85" y="255" width="150" height="55" as="geometry" />
+        </mxCell>
+        <mxCell id="c_pipe" value="pipeline.py&#10;run_pipeline()" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#9DD49D;strokeColor=#82b366;fontColor=#000000;fontSize=11;align=center;arcSize=10;" vertex="1" parent="1">
+          <mxGeometry x="260" y="255" width="160" height="55" as="geometry" />
+        </mxCell>
+        <mxCell id="c_fcst" value="forecasting.py&#10;forecast_indicators()" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#9DD49D;strokeColor=#82b366;fontColor=#000000;fontSize=11;align=center;arcSize=10;" vertex="1" parent="1">
+          <mxGeometry x="85" y="330" width="150" height="55" as="geometry" />
+        </mxCell>
+        <mxCell id="c_parse" value="statement_parser.py&#10;+ bank_api.py" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#9DD49D;strokeColor=#82b366;fontColor=#000000;fontSize=11;align=center;arcSize=10;" vertex="1" parent="1">
+          <mxGeometry x="260" y="330" width="160" height="55" as="geometry" />
+        </mxCell>
+
+        <!-- ===== Слой Core ===== -->
+        <mxCell id="lay_core" value="app/core — алгоритмическое ядро" style="rounded=1;whiteSpace=wrap;html=1;dashed=1;dashPattern=6 6;strokeColor=#d6b656;fillColor=#fffdf5;verticalAlign=top;fontSize=12;fontStyle=2;fontColor=#b89530;align=left;spacingLeft=12;spacingTop=8;arcSize=4;" vertex="1" parent="1">
+          <mxGeometry x="520" y="70" width="540" height="500" as="geometry" />
+        </mxCell>
+        <mxCell id="c_prep" value="preprocessing.py&#10;нормализация данных" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFE599;strokeColor=#d6b656;fontColor=#000000;fontSize=11;align=center;arcSize=10;" vertex="1" parent="1">
+          <mxGeometry x="545" y="110" width="220" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="c_met" value="metrics.py&#10;Rt, Lt, Dt, BLR, CFt" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFE599;strokeColor=#d6b656;fontColor=#000000;fontSize=11;align=center;arcSize=10;" vertex="1" parent="1">
+          <mxGeometry x="800" y="110" width="220" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="c_alt" value="alternatives.py&#10;generate + evaluate" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFE599;strokeColor=#d6b656;fontColor=#000000;fontSize=11;align=center;arcSize=10;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="545" y="190" width="220" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="c_ava" value="avalanche.py&#10;OCR-фильтр досрочки" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFE599;strokeColor=#d6b656;fontColor=#000000;fontSize=11;align=center;arcSize=10;" vertex="1" parent="1">
+          <mxGeometry x="800" y="190" width="220" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="c_goal" value="goals_priority.py&#10;Si + prealloc Bliq" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFE599;strokeColor=#d6b656;fontColor=#000000;fontSize=11;align=center;arcSize=10;" vertex="1" parent="1">
+          <mxGeometry x="545" y="270" width="220" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="c_filt" value="filtering.py&#10;ограничения допустимости" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFE599;strokeColor=#d6b656;fontColor=#000000;fontSize=11;align=center;arcSize=10;" vertex="1" parent="1">
+          <mxGeometry x="800" y="270" width="220" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="c_rank" value="ranking.py&#10;SAW + профили риска" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFE599;strokeColor=#d6b656;fontColor=#000000;fontSize=11;align=center;arcSize=10;" vertex="1" parent="1">
+          <mxGeometry x="545" y="350" width="220" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="c_rec" value="recommendation.py&#10;NLG-объяснения" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFE599;strokeColor=#d6b656;fontColor=#000000;fontSize=11;align=center;arcSize=10;" vertex="1" parent="1">
+          <mxGeometry x="800" y="350" width="220" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="c_fc" value="forecast.py&#10;SES + Monte-Carlo" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFE599;strokeColor=#d6b656;fontColor=#000000;fontSize=11;align=center;arcSize=10;" vertex="1" parent="1">
+          <mxGeometry x="670" y="430" width="220" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- ===== Слой DB ===== -->
+        <mxCell id="lay_db" value="app/database" style="rounded=1;whiteSpace=wrap;html=1;dashed=1;dashPattern=6 6;strokeColor=#b85450;fillColor=#fdf6f5;verticalAlign=top;fontSize=12;fontStyle=2;fontColor=#b85450;align=left;spacingLeft=12;spacingTop=8;arcSize=4;" vertex="1" parent="1">
+          <mxGeometry x="60" y="450" width="380" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="c_crud" value="crud.py" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F5A9A4;strokeColor=#b85450;fontColor=#000000;fontSize=11;align=center;arcSize=10;" vertex="1" parent="1">
+          <mxGeometry x="85" y="490" width="150" height="55" as="geometry" />
+        </mxCell>
+        <mxCell id="c_models" value="models.py&#10;ORM-модели" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F5A9A4;strokeColor=#b85450;fontColor=#000000;fontSize=11;align=center;arcSize=10;" vertex="1" parent="1">
+          <mxGeometry x="260" y="490" width="160" height="55" as="geometry" />
+        </mxCell>
+
+        <!-- ===== Связи ===== -->
+        <mxCell id="x1" style="endArrow=block;html=1;edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#404040;" edge="1" parent="1" source="c_rp" target="c_plan"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="x2" style="endArrow=block;html=1;edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#404040;" edge="1" parent="1" source="c_rp" target="c_fcst"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="x3" style="endArrow=block;html=1;edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#404040;" edge="1" parent="1" source="c_rr" target="c_pipe"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="x4" value="использует" style="endArrow=block;html=1;edgeStyle=orthogonalEdgeStyle;rounded=0;fontSize=10;strokeColor=#404040;fontColor=#404040;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="c_plan" target="c_alt"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="x5" style="endArrow=block;html=1;edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#404040;" edge="1" parent="1" source="c_plan" target="c_met"><mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="490" y="282" /><mxPoint x="490" y="135" /></Array></mxGeometry></mxCell>
+        <mxCell id="x6" style="endArrow=block;html=1;edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#404040;" edge="1" parent="1" source="c_alt" target="c_ava"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="x7" style="endArrow=block;html=1;edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#404040;" edge="1" parent="1" source="c_alt" target="c_goal"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="x8" style="endArrow=block;html=1;edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#404040;" edge="1" parent="1" source="c_plan" target="c_filt"><mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="475" y="282" /><mxPoint x="475" y="295" /></Array></mxGeometry></mxCell>
+        <mxCell id="x9" style="endArrow=block;html=1;edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#404040;" edge="1" parent="1" source="c_plan" target="c_rank"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="x10" style="endArrow=block;html=1;edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#404040;" edge="1" parent="1" source="c_fcst" target="c_fc"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="x11" value="читает/пишет" style="endArrow=block;html=1;edgeStyle=orthogonalEdgeStyle;rounded=0;fontSize=10;strokeColor=#404040;fontColor=#404040;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="c_plan" target="c_crud"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="x12" style="endArrow=block;html=1;edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#404040;" edge="1" parent="1" source="c_crud" target="c_models"><mxGeometry relative="1" as="geometry" /></mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

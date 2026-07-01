@@ -1,0 +1,103 @@
+<mxfile host="app.diagrams.net" type="device">
+  <diagram name="BPMN — получение рекомендации" id="bpmn">
+    <mxGraphModel dx="1000" dy="700" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1400" pageHeight="650" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <mxCell id="title" value="FINPILOT — Получение финансовой рекомендации (BPMN 2.0)" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=15;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="450" y="10" width="500" height="30" as="geometry" />
+        </mxCell>
+
+        <!-- Pool -->
+        <mxCell id="pool" value="FINPILOT" style="shape=table;startSize=30;container=1;collapsible=0;childLayout=tableLayout;horizontal=0;fontSize=13;fontStyle=1;fillColor=none;strokeColor=#333333;" vertex="1" parent="1">
+          <mxGeometry x="40" y="60" width="1320" height="540" as="geometry" />
+        </mxCell>
+
+        <!-- Lane: Пользователь -->
+        <mxCell id="lane_u" value="Пользователь" style="shape=tableRow;horizontal=0;startSize=30;swimlaneHead=1;swimlaneBody=1;fillColor=none;collapsible=0;dropTarget=0;fontSize=12;strokeColor=#333333;" vertex="1" parent="pool">
+          <mxGeometry y="30" width="1320" height="150" as="geometry" />
+        </mxCell>
+        <mxCell id="lane_u_c" value="" style="connectable=0;fillColor=none;strokeColor=#333333;" vertex="1" parent="lane_u"><mxGeometry x="30" width="1290" height="150" as="geometry" /></mxCell>
+
+        <!-- Lane: API -->
+        <mxCell id="lane_a" value="Backend API" style="shape=tableRow;horizontal=0;startSize=30;swimlaneHead=1;swimlaneBody=1;fillColor=none;collapsible=0;dropTarget=0;fontSize=12;strokeColor=#333333;" vertex="1" parent="pool">
+          <mxGeometry y="180" width="1320" height="150" as="geometry" />
+        </mxCell>
+        <mxCell id="lane_a_c" value="" style="connectable=0;fillColor=none;strokeColor=#333333;" vertex="1" parent="lane_a"><mxGeometry x="30" width="1290" height="150" as="geometry" /></mxCell>
+
+        <!-- Lane: Core -->
+        <mxCell id="lane_c" value="Ядро СППР" style="shape=tableRow;horizontal=0;startSize=30;swimlaneHead=1;swimlaneBody=1;fillColor=none;collapsible=0;dropTarget=0;fontSize=12;strokeColor=#333333;" vertex="1" parent="pool">
+          <mxGeometry y="330" width="1320" height="180" as="geometry" />
+        </mxCell>
+        <mxCell id="lane_c_c" value="" style="connectable=0;fillColor=none;strokeColor=#333333;" vertex="1" parent="lane_c"><mxGeometry x="30" width="1290" height="180" as="geometry" /></mxCell>
+
+        <!-- ===== Lane Пользователь ===== -->
+        <mxCell id="start" value="" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="100" y="115" width="40" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="start_l" value="Нужна&#10;рекомендация" style="text;html=1;align=center;fontSize=10;fillColor=none;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="80" y="155" width="80" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="u1" value="Заполнить данные:&#10;цели, долги, активы" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;arcSize=12;" vertex="1" parent="1">
+          <mxGeometry x="200" y="105" width="140" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="u2" value="Задать профиль&#10;риска и пороги" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;arcSize=12;" vertex="1" parent="1">
+          <mxGeometry x="380" y="105" width="140" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="u3" value="Получить и изучить&#10;Top-3 + объяснения" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;arcSize=12;" vertex="1" parent="1">
+          <mxGeometry x="1140" y="105" width="150" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="end" value="" style="ellipse;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;strokeWidth=3;" vertex="1" parent="1">
+          <mxGeometry x="1310" y="115" width="40" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- ===== Lane API ===== -->
+        <mxCell id="a1" value="Принять запрос&#10;/planning/calculate" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=11;arcSize=12;" vertex="1" parent="1">
+          <mxGeometry x="380" y="255" width="140" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="a2" value="Собрать данные&#10;из БД (crud)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=11;arcSize=12;" vertex="1" parent="1">
+          <mxGeometry x="560" y="255" width="140" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="a3" value="Сформировать&#10;JSON-ответ" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=11;arcSize=12;" vertex="1" parent="1">
+          <mxGeometry x="1140" y="255" width="140" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- ===== Lane Core ===== -->
+        <mxCell id="c1" value="Рассчитать&#10;показатели Rt/Lt/Dt" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;arcSize=12;" vertex="1" parent="1">
+          <mxGeometry x="560" y="410" width="140" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="c2" value="Сгенерировать&#10;21 альтернативу" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;arcSize=12;" vertex="1" parent="1">
+          <mxGeometry x="730" y="410" width="130" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="gw" value="" style="rhombus;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="890" y="415" width="50" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="gw_l" value="фильтр&#10;допустимости" style="text;html=1;align=center;fontSize=9;fillColor=none;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="875" y="465" width="80" height="25" as="geometry" />
+        </mxCell>
+        <mxCell id="c3" value="Ранжировать&#10;по SAW, выбрать a*" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;arcSize=12;" vertex="1" parent="1">
+          <mxGeometry x="970" y="410" width="140" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="c4" value="Отбросить" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=10;arcSize=12;" vertex="1" parent="1">
+          <mxGeometry x="890" y="340" width="50" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- ===== sequence flow ===== -->
+        <mxCell id="f1" style="endArrow=block;html=1;rounded=0;" edge="1" parent="1" source="start" target="u1"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="f2" style="endArrow=block;html=1;rounded=0;" edge="1" parent="1" source="u1" target="u2"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="f3" style="endArrow=block;html=1;rounded=0;edgeStyle=orthogonalEdgeStyle;" edge="1" parent="1" source="u2" target="a1"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="f4" style="endArrow=block;html=1;rounded=0;" edge="1" parent="1" source="a1" target="a2"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="f5" style="endArrow=block;html=1;rounded=0;edgeStyle=orthogonalEdgeStyle;" edge="1" parent="1" source="a2" target="c1"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="f6" style="endArrow=block;html=1;rounded=0;" edge="1" parent="1" source="c1" target="c2"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="f7" style="endArrow=block;html=1;rounded=0;" edge="1" parent="1" source="c2" target="gw"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="f8" value="проходит" style="endArrow=block;html=1;rounded=0;fontSize=9;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="gw" target="c3"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="f9" value="нет" style="endArrow=block;html=1;rounded=0;fontSize=9;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="gw" target="c4"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="f10" style="endArrow=block;html=1;rounded=0;edgeStyle=orthogonalEdgeStyle;" edge="1" parent="1" source="c3" target="a3"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="f11" style="endArrow=block;html=1;rounded=0;edgeStyle=orthogonalEdgeStyle;" edge="1" parent="1" source="a3" target="u3"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="f12" style="endArrow=block;html=1;rounded=0;" edge="1" parent="1" source="u3" target="end"><mxGeometry relative="1" as="geometry" /></mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

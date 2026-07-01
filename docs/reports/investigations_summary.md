@@ -11,6 +11,9 @@
 
 ---
 
+- **Папка `engine/` — не нужна.** Подозрение: в материалах путь `engine/core.py` намекал на отдельную папку. Проверено: `engine/` на верхнем уровне нет; движок — `app/ingestion/engine.py` (`CoreFinanceEngine`) + протокол `app/ingestion/contracts.py` + `app/core/`, покрыт `tests/test_international.py`. Корень — концептуальный псевдо-путь в `knowledge/business/international_expansion_logic.md:188`. Что дальше: при желании поправить псевдо-путь на фактический. Полный разбор — `docs/reports/investigations/engine_folder_investigation.md`.
+
+
 ### INV-BROWSERS-SANDBOX — firefox/webkit не запускаются в песочнице
 
 - **Подозрение:** сломана E2E-инфраструктура (`tests/e2e/conftest.py`, флаги Playwright, мультибраузерный прогон настроен криво).

@@ -1,0 +1,57 @@
+<mxfile host="app.diagrams.net" type="device">
+  <diagram name="C4 L1 — System Context" id="c4-context">
+    <mxGraphModel dx="1000" dy="700" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="900" pageHeight="650" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <mxCell id="title" value="FINPILOT — Контекст системы (C4 Level 1)" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=16;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="250" y="20" width="400" height="30" as="geometry" />
+        </mxCell>
+
+        <!-- Person: Пользователь -->
+        <mxCell id="user" value="Пользователь&#10;&#10;[Человек]&#10;&#10;Физлицо, планирующее личные финансы" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#08427B;strokeColor=#073B6F;fontColor=#ffffff;fontSize=13;fontStyle=1;align=center;verticalAlign=middle;arcSize=12;" vertex="1" parent="1">
+          <mxGeometry x="120" y="120" width="200" height="120" as="geometry" />
+        </mxCell>
+
+        <!-- System: FINPILOT -->
+        <mxCell id="finpilot" value="FINPILOT&#10;&#10;[Программная система]&#10;&#10;СППР: распределение свободного денежного потока между погашением долга, резервом и целями" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1168BD;strokeColor=#0E5BA6;fontColor=#ffffff;fontSize=13;fontStyle=1;align=center;verticalAlign=middle;arcSize=12;" vertex="1" parent="1">
+          <mxGeometry x="560" y="120" width="220" height="120" as="geometry" />
+        </mxCell>
+
+        <!-- External System: Банковская выписка -->
+        <mxCell id="bank" value="Банковская выписка&#10;&#10;[Внешняя система]&#10;&#10;CSV/Excel из Тинькофф, Сбер, Альфа, ВТБ и др." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#999999;strokeColor=#8A8A8A;fontColor=#ffffff;fontSize=13;fontStyle=1;align=center;verticalAlign=middle;arcSize=12;" vertex="1" parent="1">
+          <mxGeometry x="120" y="430" width="200" height="120" as="geometry" />
+        </mxCell>
+
+        <!-- Связь: user -> finpilot -->
+        <mxCell id="r1" value="Вводит данные, получает&#10;рекомендации [HTTPS]" style="endArrow=block;html=1;fontSize=11;startArrow=none;rounded=0;edgeStyle=none;fontColor=#404040;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="user" target="finpilot">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="340" y="160" as="sourcePoint" />
+            <mxPoint x="540" y="160" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <!-- Связь: user -> bank -->
+        <mxCell id="r2" value="Выгружает выписку" style="endArrow=block;html=1;fontSize=11;startArrow=none;rounded=0;edgeStyle=none;fontColor=#404040;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="user" target="bank">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="220" y="250" as="sourcePoint" />
+            <mxPoint x="220" y="420" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <!-- Связь: bank -> finpilot -->
+        <mxCell id="r3" value="Импорт транзакций&#10;[CSV upload]" style="endArrow=block;html=1;fontSize=11;startArrow=none;rounded=0;edgeStyle=none;fontColor=#404040;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="bank" target="finpilot">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="330" y="490" as="sourcePoint" />
+            <mxPoint x="650" y="250" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="670" y="490" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

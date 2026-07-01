@@ -1,0 +1,81 @@
+<mxfile host="app.diagrams.net" type="device">
+  <diagram name="IDEF0 — контекст A0" id="idef0">
+    <mxGraphModel dx="1000" dy="700" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="950" pageHeight="650" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <mxCell id="title" value="FINPILOT — Функциональный контекст (IDEF0, диаграмма A-0)" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=15;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="220" y="15" width="520" height="30" as="geometry" />
+        </mxCell>
+
+        <!-- Центральный функциональный блок A0 -->
+        <mxCell id="a0" value="A0&#10;&#10;Поддержать принятие&#10;финансового решения&#10;&#10;(сгенерировать и ранжировать&#10;альтернативы распределения Rt)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=13;fontStyle=1;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="350" y="250" width="260" height="160" as="geometry" />
+        </mxCell>
+
+        <!-- INPUTS (слева) -->
+        <mxCell id="in1" value="Транзакции It, Ej" style="text;html=1;align=right;verticalAlign=middle;fontSize=11;fillColor=#f5f5f5;strokeColor=#999999;rounded=1;" vertex="1" parent="1">
+          <mxGeometry x="80" y="270" width="140" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="in2" value="Обязательства O, цели G" style="text;html=1;align=right;verticalAlign=middle;fontSize=11;fillColor=#f5f5f5;strokeColor=#999999;rounded=1;" vertex="1" parent="1">
+          <mxGeometry x="60" y="315" width="160" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="in3" value="Ликвидная позиция Bliq" style="text;html=1;align=right;verticalAlign=middle;fontSize=11;fillColor=#f5f5f5;strokeColor=#999999;rounded=1;" vertex="1" parent="1">
+          <mxGeometry x="60" y="360" width="160" height="30" as="geometry" />
+        </mxCell>
+
+        <mxCell id="ein1" value="Вход" style="endArrow=block;html=1;fontSize=9;fontColor=#666666;" edge="1" parent="1" source="in1" target="a0"><mxGeometry relative="1" as="geometry"><mxPoint x="220" y="285" as="sourcePoint" /><mxPoint x="350" y="285" as="targetPoint" /></mxGeometry></mxCell>
+        <mxCell id="ein2" value="" style="endArrow=block;html=1;" edge="1" parent="1" source="in2" target="a0"><mxGeometry relative="1" as="geometry"><mxPoint x="220" y="330" as="sourcePoint" /><mxPoint x="350" y="330" as="targetPoint" /></mxGeometry></mxCell>
+        <mxCell id="ein3" value="" style="endArrow=block;html=1;" edge="1" parent="1" source="in3" target="a0"><mxGeometry relative="1" as="geometry"><mxPoint x="220" y="375" as="sourcePoint" /><mxPoint x="350" y="375" as="targetPoint" /></mxGeometry></mxCell>
+
+        <!-- CONTROLS (сверху) -->
+        <mxCell id="c1" value="Профиль риска R (веса U)" style="text;html=1;align=center;verticalAlign=middle;fontSize=11;fillColor=#ffe6cc;strokeColor=#d79b00;rounded=1;" vertex="1" parent="1">
+          <mxGeometry x="300" y="90" width="160" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="c2" value="Пороги: Lmin, Dmax, r_bench" style="text;html=1;align=center;verticalAlign=middle;fontSize=11;fillColor=#ffe6cc;strokeColor=#d79b00;rounded=1;" vertex="1" parent="1">
+          <mxGeometry x="490" y="90" width="170" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="c3" value="Нормы: Greninger, ЦБ РФ" style="text;html=1;align=center;verticalAlign=middle;fontSize=11;fillColor=#ffe6cc;strokeColor=#d79b00;rounded=1;" vertex="1" parent="1">
+          <mxGeometry x="300" y="150" width="160" height="30" as="geometry" />
+        </mxCell>
+
+        <mxCell id="ec1" value="Управление" style="endArrow=block;html=1;fontSize=9;fontColor=#666666;" edge="1" parent="1" source="c1" target="a0"><mxGeometry relative="1" as="geometry"><mxPoint x="400" y="120" as="sourcePoint" /><mxPoint x="430" y="250" as="targetPoint" /></mxGeometry></mxCell>
+        <mxCell id="ec2" value="" style="endArrow=block;html=1;" edge="1" parent="1" source="c2" target="a0"><mxGeometry relative="1" as="geometry"><mxPoint x="560" y="120" as="sourcePoint" /><mxPoint x="540" y="250" as="targetPoint" /></mxGeometry></mxCell>
+        <mxCell id="ec3" value="" style="endArrow=block;html=1;" edge="1" parent="1" source="c3" target="a0"><mxGeometry relative="1" as="geometry"><mxPoint x="400" y="180" as="sourcePoint" /><mxPoint x="480" y="250" as="targetPoint" /></mxGeometry></mxCell>
+
+        <!-- OUTPUTS (справа) -->
+        <mxCell id="o1" value="Оптимальная альтернатива a*" style="text;html=1;align=left;verticalAlign=middle;fontSize=11;fillColor=#d5e8d4;strokeColor=#82b366;rounded=1;" vertex="1" parent="1">
+          <mxGeometry x="730" y="270" width="170" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="o2" value="Top-3 + объяснения" style="text;html=1;align=left;verticalAlign=middle;fontSize=11;fillColor=#d5e8d4;strokeColor=#82b366;rounded=1;" vertex="1" parent="1">
+          <mxGeometry x="730" y="315" width="170" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="o3" value="Показатели Rt, Lt, Dt, BLR" style="text;html=1;align=left;verticalAlign=middle;fontSize=11;fillColor=#d5e8d4;strokeColor=#82b366;rounded=1;" vertex="1" parent="1">
+          <mxGeometry x="730" y="360" width="170" height="30" as="geometry" />
+        </mxCell>
+
+        <mxCell id="eo1" value="Выход" style="endArrow=block;html=1;fontSize=9;fontColor=#666666;" edge="1" parent="1" source="a0" target="o1"><mxGeometry relative="1" as="geometry"><mxPoint x="610" y="285" as="sourcePoint" /><mxPoint x="730" y="285" as="targetPoint" /></mxGeometry></mxCell>
+        <mxCell id="eo2" value="" style="endArrow=block;html=1;" edge="1" parent="1" source="a0" target="o2"><mxGeometry relative="1" as="geometry"><mxPoint x="610" y="330" as="sourcePoint" /><mxPoint x="730" y="330" as="targetPoint" /></mxGeometry></mxCell>
+        <mxCell id="eo3" value="" style="endArrow=block;html=1;" edge="1" parent="1" source="a0" target="o3"><mxGeometry relative="1" as="geometry"><mxPoint x="610" y="375" as="sourcePoint" /><mxPoint x="730" y="375" as="targetPoint" /></mxGeometry></mxCell>
+
+        <!-- MECHANISMS (снизу) -->
+        <mxCell id="m1" value="Алгоритм SAW + Avalanche" style="text;html=1;align=center;verticalAlign=middle;fontSize=11;fillColor=#e1d5e7;strokeColor=#9673a6;rounded=1;" vertex="1" parent="1">
+          <mxGeometry x="300" y="490" width="170" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="m2" value="FastAPI + SQLAlchemy" style="text;html=1;align=center;verticalAlign=middle;fontSize=11;fillColor=#e1d5e7;strokeColor=#9673a6;rounded=1;" vertex="1" parent="1">
+          <mxGeometry x="500" y="490" width="170" height="30" as="geometry" />
+        </mxCell>
+
+        <mxCell id="em1" value="Механизм" style="endArrow=block;html=1;fontSize=9;fontColor=#666666;" edge="1" parent="1" source="m1" target="a0"><mxGeometry relative="1" as="geometry"><mxPoint x="400" y="490" as="sourcePoint" /><mxPoint x="430" y="410" as="targetPoint" /></mxGeometry></mxCell>
+        <mxCell id="em2" value="" style="endArrow=block;html=1;" edge="1" parent="1" source="m2" target="a0"><mxGeometry relative="1" as="geometry"><mxPoint x="560" y="490" as="sourcePoint" /><mxPoint x="540" y="410" as="targetPoint" /></mxGeometry></mxCell>
+
+        <!-- легенда ICOM -->
+        <mxCell id="leg" value="ICOM: Input (слева) · Control (сверху) · Output (справа) · Mechanism (снизу)" style="text;html=1;align=left;verticalAlign=middle;fontSize=10;fontColor=#666666;fillColor=none;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="80" y="560" width="600" height="20" as="geometry" />
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

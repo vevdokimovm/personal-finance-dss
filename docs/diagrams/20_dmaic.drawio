@@ -1,0 +1,85 @@
+<mxfile host="app.diagrams.net" type="device">
+  <diagram name="DMAIC — Six Sigma" id="dmaic">
+    <mxGraphModel dx="1000" dy="700" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1300" pageHeight="560" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <mxCell id="title" value="FINPILOT — Методология DMAIC (Six Sigma) применительно к финансовому здоровью" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=15;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="280" y="20" width="740" height="30" as="geometry" />
+        </mxCell>
+
+        <!-- D -->
+        <mxCell id="d" value="" style="shape=mxgraph.arrows2.arrow;dy=0.6;dx=40;notch=0;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="60" y="120" width="240" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="d_t" value="DEFINE" style="text;html=1;align=left;verticalAlign=middle;fontSize=14;fontStyle=1;fillColor=none;strokeColor=none;fontColor=#1a3a5c;" vertex="1" parent="1">
+          <mxGeometry x="85" y="135" width="160" height="25" as="geometry" />
+        </mxCell>
+        <mxCell id="d_d" value="Определить проблему:&#10;высокая долговая нагрузка,&#10;нет резерва, цели не движутся" style="text;html=1;align=left;verticalAlign=middle;fontSize=10;fillColor=none;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="85" y="220" width="220" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- M -->
+        <mxCell id="m" value="" style="shape=mxgraph.arrows2.arrow;dy=0.6;dx=40;notch=40;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="290" y="120" width="240" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="m_t" value="MEASURE" style="text;html=1;align=left;verticalAlign=middle;fontSize=14;fontStyle=1;fillColor=none;strokeColor=none;fontColor=#2d5016;" vertex="1" parent="1">
+          <mxGeometry x="335" y="135" width="160" height="25" as="geometry" />
+        </mxCell>
+        <mxCell id="m_d" value="Измерить показатели:&#10;Rt, Lt (ликвидность),&#10;Dt (долг/доход), BLR, CFt" style="text;html=1;align=left;verticalAlign=middle;fontSize=10;fillColor=none;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="335" y="220" width="220" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- A -->
+        <mxCell id="a" value="" style="shape=mxgraph.arrows2.arrow;dy=0.6;dx=40;notch=40;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="520" y="120" width="240" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="a_t" value="ANALYZE" style="text;html=1;align=left;verticalAlign=middle;fontSize=14;fontStyle=1;fillColor=none;strokeColor=none;fontColor=#7a6516;" vertex="1" parent="1">
+          <mxGeometry x="565" y="135" width="160" height="25" as="geometry" />
+        </mxCell>
+        <mxCell id="a_d" value="Анализ альтернатив:&#10;21 вариант распределения,&#10;Avalanche по дорогим долгам" style="text;html=1;align=left;verticalAlign=middle;fontSize=10;fillColor=none;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="565" y="220" width="220" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- I -->
+        <mxCell id="i" value="" style="shape=mxgraph.arrows2.arrow;dy=0.6;dx=40;notch=40;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="1">
+          <mxGeometry x="750" y="120" width="240" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="i_t" value="IMPROVE" style="text;html=1;align=left;verticalAlign=middle;fontSize=14;fontStyle=1;fillColor=none;strokeColor=none;fontColor=#8a5a00;" vertex="1" parent="1">
+          <mxGeometry x="795" y="135" width="160" height="25" as="geometry" />
+        </mxCell>
+        <mxCell id="i_d" value="Внедрить лучшую a*:&#10;ранжирование по SAW,&#10;исполнить распределение Rt" style="text;html=1;align=left;verticalAlign=middle;fontSize=10;fillColor=none;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="795" y="220" width="220" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- C -->
+        <mxCell id="c" value="" style="shape=mxgraph.arrows2.arrow;dy=0.6;dx=40;notch=40;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+          <mxGeometry x="980" y="120" width="260" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="c_t" value="CONTROL" style="text;html=1;align=left;verticalAlign=middle;fontSize=14;fontStyle=1;fillColor=none;strokeColor=none;fontColor=#7a2622;" vertex="1" parent="1">
+          <mxGeometry x="1025" y="135" width="160" height="25" as="geometry" />
+        </mxCell>
+        <mxCell id="c_d" value="Контроль во времени:&#10;импорт выписок, прогноз&#10;SES + Monte-Carlo, дашборд" style="text;html=1;align=left;verticalAlign=middle;fontSize=10;fillColor=none;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="1025" y="220" width="230" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- цикл обратной связи -->
+        <mxCell id="loop" value="петля улучшения: новые данные → повторный цикл" style="endArrow=block;startArrow=none;html=1;rounded=1;dashed=1;edgeStyle=orthogonalEdgeStyle;strokeColor=#666666;fontSize=10;fontColor=#666666;labelBackgroundColor=#ffffff;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1100" y="320" as="sourcePoint" />
+            <mxPoint x="180" y="320" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="1100" y="360" />
+              <mxPoint x="180" y="360" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="loop_up" style="endArrow=block;html=1;edgeStyle=orthogonalEdgeStyle;strokeColor=#666666;dashed=1;" edge="1" parent="1" source="loop" target="d">
+          <mxGeometry relative="1" as="geometry"><mxPoint x="180" y="360" as="sourcePoint" /><mxPoint x="180" y="200" as="targetPoint" /></mxGeometry>
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

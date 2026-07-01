@@ -1,0 +1,26 @@
+<mxfile host="app.diagrams.net" type="device">
+  <diagram name="SWOT-анализ" id="swot">
+    <mxGraphModel dx="1100" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1220" pageHeight="530" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <mxCell id="t" value="FINPILOT — SWOT-анализ" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=15;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="350" y="15" width="540" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="s" value="Сильные стороны (Strengths)&#10;&#10;• Объяснимость рекомендаций — ключевое отличие&#10;• Строгая математическая модель (SAW, Avalanche, MC)&#10;• Соответствие нормам ЦБ (ПДН)&#10;• Прозрачность вместо «чёрного ящика»&#10;• Гибкие профили риска" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;align=center;verticalAlign=middle;arcSize=8;" vertex="1" parent="1">
+          <mxGeometry x="60" y="70" width="540" height="200" as="geometry" />
+        </mxCell>
+        <mxCell id="w" value="Слабые стороны (Weaknesses)&#10;&#10;• Ручной импорт выписок (нет прямой банк-интеграции)&#10;• Один разработчик, ограниченный ресурс&#10;• Нет бренда и узнаваемости&#10;• Mock-данные вместо реальной агрегации&#10;• Категоризация пока на правилах (Фаза 1)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=11;align=center;verticalAlign=middle;arcSize=8;" vertex="1" parent="1">
+          <mxGeometry x="620" y="70" width="540" height="200" as="geometry" />
+        </mxCell>
+        <mxCell id="o" value="Возможности (Opportunities)&#10;&#10;• Open Banking в РФ (планы ЦБ) — реальная интеграция&#10;• Рост спроса на фин. грамотность&#10;• Фаза 2: обучаемые правила категоризации&#10;• Мобильное приложение&#10;• Партнёрства с финтех-сервисами" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;align=center;verticalAlign=middle;arcSize=8;" vertex="1" parent="1">
+          <mxGeometry x="60" y="290" width="540" height="200" as="geometry" />
+        </mxCell>
+        <mxCell id="th" value="Угрозы (Threats)&#10;&#10;• Насыщенный рынок: Seeneco, ПланФакт, Финолог, Adesk&#10;• Встроенные инструменты банков и 1С&#10;• Регуляторные барьеры (доступ к банк. данным)&#10;• Низкая готовность платить за финсоветы&#10;• Требования к безопасности перс. данных" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=11;align=center;verticalAlign=middle;arcSize=8;" vertex="1" parent="1">
+          <mxGeometry x="620" y="290" width="540" height="200" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

@@ -1,0 +1,86 @@
+<mxfile host="app.diagrams.net" type="device">
+  <diagram name="EPC — событийная цепочка" id="epc">
+    <mxGraphModel dx="1000" dy="700" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="750" pageHeight="1350" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <mxCell id="title" value="FINPILOT — Событийная цепочка процессов (EPC)" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=15;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="130" y="15" width="500" height="30" as="geometry" />
+        </mxCell>
+
+        <mxCell id="legend" value="Шестиугольник — событие · Скруглённый прямоугольник — функция · Круг — логический оператор" style="text;html=1;align=left;fontSize=10;fontColor=#666666;fillColor=none;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="60" y="48" width="640" height="20" as="geometry" />
+        </mxCell>
+
+        <!-- E1 -->
+        <mxCell id="e1" value="Данные пользователя&#10;обновлены" style="shape=hexagon;perimeter=hexagonPerimeter2;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="290" y="80" width="200" height="60" as="geometry" />
+        </mxCell>
+        <!-- F1 -->
+        <mxCell id="f1" value="Запустить расчёт плана&#10;(run_planning)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;arcSize=15;" vertex="1" parent="1">
+          <mxGeometry x="290" y="180" width="200" height="55" as="geometry" />
+        </mxCell>
+        <!-- E2 -->
+        <mxCell id="e2" value="Показатели Rt, Lt, Dt&#10;рассчитаны" style="shape=hexagon;perimeter=hexagonPerimeter2;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="290" y="275" width="200" height="60" as="geometry" />
+        </mxCell>
+        <!-- F2 -->
+        <mxCell id="f2" value="Сгенерировать&#10;альтернативы (stars-and-bars)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;arcSize=15;" vertex="1" parent="1">
+          <mxGeometry x="290" y="375" width="200" height="55" as="geometry" />
+        </mxCell>
+        <!-- E3 -->
+        <mxCell id="e3" value="21 альтернатива&#10;сформирована" style="shape=hexagon;perimeter=hexagonPerimeter2;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="290" y="470" width="200" height="60" as="geometry" />
+        </mxCell>
+        <!-- F3 -->
+        <mxCell id="f3" value="Оценить каждую:&#10;Avalanche + Si + пересчёт" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;arcSize=15;" vertex="1" parent="1">
+          <mxGeometry x="290" y="570" width="200" height="55" as="geometry" />
+        </mxCell>
+        <!-- XOR -->
+        <mxCell id="xor" value="XOR" style="ellipse;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=11;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="365" y="660" width="50" height="50" as="geometry" />
+        </mxCell>
+        <!-- E4a -->
+        <mxCell id="e4a" value="Альтернатива&#10;допустима" style="shape=hexagon;perimeter=hexagonPerimeter2;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="170" y="745" width="180" height="55" as="geometry" />
+        </mxCell>
+        <!-- E4b -->
+        <mxCell id="e4b" value="Альтернатива&#10;отклонена" style="shape=hexagon;perimeter=hexagonPerimeter2;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="430" y="745" width="180" height="55" as="geometry" />
+        </mxCell>
+        <!-- F4 -->
+        <mxCell id="f4" value="Ранжировать допустимые&#10;по SAW (U → max)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;arcSize=15;" vertex="1" parent="1">
+          <mxGeometry x="150" y="840" width="220" height="55" as="geometry" />
+        </mxCell>
+        <!-- E5 -->
+        <mxCell id="e5" value="Оптимальная a*&#10;определена" style="shape=hexagon;perimeter=hexagonPerimeter2;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="170" y="935" width="180" height="55" as="geometry" />
+        </mxCell>
+        <!-- F5 -->
+        <mxCell id="f5" value="Сформировать&#10;NLG-объяснения Top-3" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;arcSize=15;" vertex="1" parent="1">
+          <mxGeometry x="150" y="1030" width="220" height="55" as="geometry" />
+        </mxCell>
+        <!-- E6 -->
+        <mxCell id="e6" value="Рекомендация&#10;готова и показана" style="shape=hexagon;perimeter=hexagonPerimeter2;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="170" y="1125" width="180" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- связи -->
+        <mxCell id="c1" style="endArrow=block;html=1;rounded=0;" edge="1" parent="1" source="e1" target="f1"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="c2" style="endArrow=block;html=1;rounded=0;" edge="1" parent="1" source="f1" target="e2"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="c3" style="endArrow=block;html=1;rounded=0;" edge="1" parent="1" source="e2" target="f2"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="c4" style="endArrow=block;html=1;rounded=0;" edge="1" parent="1" source="f2" target="e3"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="c5" style="endArrow=block;html=1;rounded=0;" edge="1" parent="1" source="e3" target="f3"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="c6" style="endArrow=block;html=1;rounded=0;" edge="1" parent="1" source="f3" target="xor"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="c7" style="endArrow=block;html=1;rounded=0;edgeStyle=orthogonalEdgeStyle;" edge="1" parent="1" source="xor" target="e4a"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="c8" style="endArrow=block;html=1;rounded=0;edgeStyle=orthogonalEdgeStyle;" edge="1" parent="1" source="xor" target="e4b"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="c9" style="endArrow=block;html=1;rounded=0;" edge="1" parent="1" source="e4a" target="f4"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="c10" style="endArrow=block;html=1;rounded=0;" edge="1" parent="1" source="f4" target="e5"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="c11" style="endArrow=block;html=1;rounded=0;" edge="1" parent="1" source="e5" target="f5"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="c12" style="endArrow=block;html=1;rounded=0;" edge="1" parent="1" source="f5" target="e6"><mxGeometry relative="1" as="geometry" /></mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

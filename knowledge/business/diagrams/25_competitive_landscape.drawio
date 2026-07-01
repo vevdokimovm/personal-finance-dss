@@ -1,0 +1,62 @@
+<mxfile host="app.diagrams.net" type="device">
+  <diagram name="Конкурентное позиционирование" id="competitors">
+    <mxGraphModel dx="1100" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1180" pageHeight="690" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <mxCell id="t" value="FINPILOT — Конкурентное позиционирование" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=15;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="300" y="15" width="640" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="q" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#333333;" vertex="1" parent="1">
+          <mxGeometry x="120" y="70" width="1000" height="500" as="geometry" />
+        </mxCell>
+        <mxCell id="xax" value="Автоматизация данных  →  (ручной ввод → авто-агрегация)" style="text;html=1;align=center;fontSize=12;fontStyle=1;fillColor=none;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="120" y="575" width="1000" height="25" as="geometry" />
+        </mxCell>
+        <mxCell id="yax" value="Фокус продукта" style="text;html=1;align=center;fontSize=12;fontStyle=1;fillColor=none;strokeColor=none;rotation=-90;" vertex="1" parent="1">
+          <mxGeometry x="-180" y="300" width="400" height="25" as="geometry" />
+        </mxCell>
+        <mxCell id="yt" value="B2B / учёт бизнеса" style="text;html=1;align=left;fontSize=10;fillColor=none;strokeColor=none;fontStyle=2;" vertex="1" parent="1">
+          <mxGeometry x="130" y="75" width="160" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="yb" value="B2C / личные финансы" style="text;html=1;align=left;fontSize=10;fillColor=none;strokeColor=none;fontStyle=2;" vertex="1" parent="1">
+          <mxGeometry x="130" y="545" width="160" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="vmidline" style="line;strokeWidth=1;html=1;strokeColor=#cccccc;" vertex="1" parent="1">
+          <mxGeometry x="620" y="70" width="1" height="500" as="geometry" />
+        </mxCell>
+        <mxCell id="hmidline" style="line;strokeWidth=1;html=1;strokeColor=#cccccc;direction=north;" vertex="1" parent="1">
+          <mxGeometry x="120" y="320" width="1000" height="1" as="geometry" />
+        </mxCell>
+        <mxCell id="finpilot" value="FINPILOT&#10;(объяснимый B2C-СППР)" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=10;fontStyle=1;align=center;" vertex="1" parent="1">
+          <mxGeometry x="230" y="420" width="140" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="seeneco" value="Seeneco" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=10;fontStyle=1;align=center;" vertex="1" parent="1">
+          <mxGeometry x="780" y="180" width="140" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="planfact" value="ПланФакт" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=10;fontStyle=1;align=center;" vertex="1" parent="1">
+          <mxGeometry x="920" y="230" width="140" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="finolog" value="Финолог" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=10;fontStyle=1;align=center;" vertex="1" parent="1">
+          <mxGeometry x="740" y="380" width="140" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="adesk" value="Adesk" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=10;fontStyle=1;align=center;" vertex="1" parent="1">
+          <mxGeometry x="930" y="440" width="140" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="1c" value="1С / банк. учёт" style="ellipse;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontSize=10;fontStyle=1;align=center;" vertex="1" parent="1">
+          <mxGeometry x="800" y="110" width="140" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="bankapp" value="Встроенные&#10;инструменты банков" style="ellipse;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=10;fontStyle=1;align=center;" vertex="1" parent="1">
+          <mxGeometry x="450" y="200" width="140" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="manual" value="Excel /&#10;ручной учёт" style="ellipse;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=10;fontStyle=1;align=center;" vertex="1" parent="1">
+          <mxGeometry x="180" y="250" width="140" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="note" value="Ниша FINPILOT: левый-нижний квадрант — личные финансы (B2C) с акцентом на объяснимость рекомендаций,&#10;а не на авто-агрегацию или бизнес-учёт. Конкуренты в основном смещены в B2B и автоматизацию." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontSize=11;align=center;verticalAlign=middle;arcSize=8;" vertex="1" parent="1">
+          <mxGeometry x="120" y="600" width="1000" height="55" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

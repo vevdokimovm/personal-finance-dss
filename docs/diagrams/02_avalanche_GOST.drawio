@@ -1,0 +1,94 @@
+<mxfile host="app.diagrams.net" type="device">
+  <diagram name="Avalanche + OCR-фильтр (ГОСТ 19.701-90)" id="avalanche">
+    <mxGraphModel dx="1100" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1250" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <mxCell id="start" value="Начало&#10;allocate_obligations_avalanche" style="rounded=1;whiteSpace=wrap;html=1;arcSize=40;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="300" y="20" width="240" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="input" value="Ввод: сумма досрочки x_obl,&#10;список обязательств O, порог r_bench" style="shape=parallelogram;perimeter=parallelogramPerimeter;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="290" y="100" width="260" height="60" as="geometry" />
+        </mxCell>
+
+        <mxCell id="dec_zero" value="x_obl ≤ 0 или&#10;O пуст ?" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="345" y="190" width="150" height="90" as="geometry" />
+        </mxCell>
+
+        <mxCell id="ret_all" value="Вернуть: x_eff = 0,&#10;x_unused = x_obl" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="600" y="200" width="200" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- OCR-фильтр -->
+        <mxCell id="filter" value="OCR-фильтр: targets = { k ∈ O : rk ≥ r_bench }" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="280" y="310" width="280" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="dec_empty" value="targets пуст ?" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="345" y="390" width="150" height="90" as="geometry" />
+        </mxCell>
+
+        <mxCell id="npv" value="Все долги дешевле бенчмарка:&#10;досрочка невыгодна (NPV-правило).&#10;x_eff = 0, x_unused = x_obl → в цели" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="600" y="395" width="230" height="80" as="geometry" />
+        </mxCell>
+
+        <!-- Сортировка -->
+        <mxCell id="sort" value="Сортировать targets по убыванию ставки rk" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="280" y="510" width="280" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="init" value="remaining = x_obl" style="shape=hexagon;perimeter=hexagonPerimeter2;whiteSpace=wrap;html=1;fixedSize=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="320" y="590" width="200" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- Цикл -->
+        <mxCell id="loop" value="Для каждого кредита loan в targets" style="shape=hexagon;perimeter=hexagonPerimeter2;whiteSpace=wrap;html=1;fixedSize=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="305" y="670" width="230" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="dec_rem" value="remaining ≤ 0 ?" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="345" y="750" width="150" height="80" as="geometry" />
+        </mxCell>
+
+        <mxCell id="apply" value="apply = min(remaining, остаток долга)&#10;new_amount = остаток − apply&#10;new_payment = old_payment · (new_amount / остаток)&#10;remaining −= apply" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="270" y="870" width="300" height="80" as="geometry" />
+        </mxCell>
+
+        <mxCell id="endloop" value="Кредиты кончились?" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="345" y="980" width="150" height="80" as="geometry" />
+        </mxCell>
+
+        <mxCell id="result" value="x_eff = x_obl − remaining&#10;x_unused = remaining" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=12;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="300" y="1090" width="240" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="end" value="Конец → (x_eff, new_obls, x_unused)" style="rounded=1;whiteSpace=wrap;html=1;arcSize=40;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="300" y="1170" width="240" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- Стрелки -->
+        <mxCell id="a1" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=block;" edge="1" parent="1" source="start" target="input"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="a2" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=block;" edge="1" parent="1" source="input" target="dec_zero"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="a3" value="Да" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=block;fontSize=11;" edge="1" parent="1" source="dec_zero" target="ret_all"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="a3b" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=block;" edge="1" parent="1" source="ret_all" target="end"><mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="700" y="1195" /></Array></mxGeometry></mxCell>
+        <mxCell id="a4" value="Нет" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=block;fontSize=11;" edge="1" parent="1" source="dec_zero" target="filter"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="a5" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=block;" edge="1" parent="1" source="filter" target="dec_empty"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="a6" value="Да" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=block;fontSize=11;" edge="1" parent="1" source="dec_empty" target="npv"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="a6b" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=block;" edge="1" parent="1" source="npv" target="end"><mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="700" y="1195" /></Array></mxGeometry></mxCell>
+        <mxCell id="a7" value="Нет" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=block;fontSize=11;" edge="1" parent="1" source="dec_empty" target="sort"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="a8" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=block;" edge="1" parent="1" source="sort" target="init"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="a9" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=block;" edge="1" parent="1" source="init" target="loop"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="a10" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=block;" edge="1" parent="1" source="loop" target="dec_rem"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="a11" value="Да (стоп)" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=block;fontSize=11;" edge="1" parent="1" source="dec_rem" target="result"><mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="610" y="790" /><mxPoint x="610" y="1115" /></Array></mxGeometry></mxCell>
+        <mxCell id="a12" value="Нет" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=block;fontSize=11;" edge="1" parent="1" source="dec_rem" target="apply"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="a13" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=block;" edge="1" parent="1" source="apply" target="endloop"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="a14" value="Нет (следующий)" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=block;fontSize=11;" edge="1" parent="1" source="endloop" target="loop"><mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="230" y="1020" /><mxPoint x="230" y="695" /></Array></mxGeometry></mxCell>
+        <mxCell id="a15" value="Да" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=block;fontSize=11;" edge="1" parent="1" source="endloop" target="result"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="a16" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=block;" edge="1" parent="1" source="result" target="end"><mxGeometry relative="1" as="geometry" /></mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

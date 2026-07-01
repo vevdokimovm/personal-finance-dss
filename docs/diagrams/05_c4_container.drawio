@@ -1,0 +1,67 @@
+<mxfile host="app.diagrams.net" type="device">
+  <diagram name="C4 L2 — Containers" id="c4-container">
+    <mxGraphModel dx="1000" dy="700" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="950" pageHeight="850" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <mxCell id="title" value="FINPILOT — Контейнеры (C4 Level 2)" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=16;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="280" y="20" width="400" height="30" as="geometry" />
+        </mxCell>
+
+        <!-- Person -->
+        <mxCell id="user" value="Пользователь&#10;&#10;[Человек]" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#08427B;strokeColor=#073B6F;fontColor=#ffffff;fontSize=13;fontStyle=1;align=center;verticalAlign=middle;arcSize=12;" vertex="1" parent="1">
+          <mxGeometry x="100" y="90" width="180" height="80" as="geometry" />
+        </mxCell>
+
+        <!-- External: Bank -->
+        <mxCell id="bank" value="Банк CSV/Excel&#10;&#10;[Внешняя система]" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#999999;strokeColor=#8A8A8A;fontColor=#ffffff;fontSize=13;fontStyle=1;align=center;verticalAlign=middle;arcSize=12;" vertex="1" parent="1">
+          <mxGeometry x="680" y="90" width="180" height="80" as="geometry" />
+        </mxCell>
+
+        <!-- Boundary -->
+        <mxCell id="boundary" value="FINPILOT" style="rounded=1;whiteSpace=wrap;html=1;dashed=1;dashPattern=8 8;strokeColor=#666666;fillColor=none;verticalAlign=top;fontSize=14;fontStyle=2;fontColor=#666666;align=left;spacingLeft=15;spacingTop=10;arcSize=4;" vertex="1" parent="1">
+          <mxGeometry x="80" y="250" width="800" height="540" as="geometry" />
+        </mxCell>
+
+        <!-- Web frontend -->
+        <mxCell id="web" value="Web-фронтенд&#10;&#10;[Jinja2 + ванильный JS]&#10;&#10;7 страниц: dashboard, planning, transactions, obligations, goals, banks" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#438DD5;strokeColor=#3C7FC0;fontColor=#ffffff;fontSize=12;fontStyle=1;align=center;verticalAlign=middle;arcSize=10;" vertex="1" parent="1">
+          <mxGeometry x="130" y="320" width="220" height="120" as="geometry" />
+        </mxCell>
+
+        <!-- Backend API -->
+        <mxCell id="api" value="Backend API&#10;&#10;[Python 3, FastAPI, Uvicorn]&#10;&#10;REST API: /api/* — роутеры по сущностям + /planning/calculate" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#438DD5;strokeColor=#3C7FC0;fontColor=#ffffff;fontSize=12;fontStyle=1;align=center;verticalAlign=middle;arcSize=10;" vertex="1" parent="1">
+          <mxGeometry x="610" y="320" width="220" height="120" as="geometry" />
+        </mxCell>
+
+        <!-- Core -->
+        <mxCell id="core" value="Ядро алгоритма&#10;&#10;[Python: app/core, app/services]&#10;&#10;6-этапный pipeline СППР" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#438DD5;strokeColor=#3C7FC0;fontColor=#ffffff;fontSize=12;fontStyle=1;align=center;verticalAlign=middle;arcSize=10;" vertex="1" parent="1">
+          <mxGeometry x="130" y="600" width="220" height="120" as="geometry" />
+        </mxCell>
+
+        <!-- DB (cylinder) -->
+        <mxCell id="db" value="База данных&#10;&#10;[SQLite / PostgreSQL, SQLAlchemy 2.0]&#10;&#10;5 таблиц: transactions, obligations, goals, liquid_assets, user_prefs" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#438DD5;strokeColor=#3C7FC0;fontColor=#ffffff;fontSize=12;fontStyle=1;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="610" y="590" width="220" height="140" as="geometry" />
+        </mxCell>
+
+        <!-- Связи -->
+        <mxCell id="e1" value="Использует [HTTPS]" style="endArrow=block;html=1;fontSize=11;edgeStyle=orthogonalEdgeStyle;fontColor=#404040;labelBackgroundColor=#ffffff;rounded=0;" edge="1" parent="1" source="user" target="web">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e2" value="Импорт выписки&#10;[multipart/form-data]" style="endArrow=block;html=1;fontSize=11;edgeStyle=orthogonalEdgeStyle;fontColor=#404040;labelBackgroundColor=#ffffff;rounded=0;" edge="1" parent="1" source="bank" target="api">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e3" value="Вызывает&#10;[JSON/REST]" style="endArrow=block;html=1;fontSize=11;edgeStyle=orthogonalEdgeStyle;fontColor=#404040;labelBackgroundColor=#ffffff;rounded=0;" edge="1" parent="1" source="web" target="api">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e4" value="Делегирует расчёт" style="endArrow=block;html=1;fontSize=11;edgeStyle=orthogonalEdgeStyle;fontColor=#404040;labelBackgroundColor=#ffffff;rounded=0;" edge="1" parent="1" source="api" target="core">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e5" value="Читает/пишет&#10;[SQLAlchemy ORM]" style="endArrow=block;html=1;fontSize=11;edgeStyle=orthogonalEdgeStyle;fontColor=#404040;labelBackgroundColor=#ffffff;rounded=0;" edge="1" parent="1" source="api" target="db">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

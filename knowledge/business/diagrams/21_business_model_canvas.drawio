@@ -1,0 +1,41 @@
+<mxfile host="app.diagrams.net" type="device">
+  <diagram name="Бизнес-модель (BMC)" id="bmc">
+    <mxGraphModel dx="1100" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1230" pageHeight="580" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <mxCell id="t" value="FINPILOT — Бизнес-модель (Business Model Canvas)" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=15;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="300" y="15" width="640" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="kp" value="Ключевые партнёры&#10;(Key Partners)&#10;&#10;• Банки (CSV-выписки, в будущем Open Banking API)&#10;• Эквайринг / платёжный провайдер (для подписок)&#10;• Облачный хостинг&#10;• Поставщики рыночных данных (ставки ЦБ, ОФЗ)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=12;fontStyle=1;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="60" y="60" width="210" height="360" as="geometry" />
+        </mxCell>
+        <mxCell id="ka" value="Ключевые активности&#10;(Key Activities)&#10;&#10;• Разработка алгоритма СППР&#10;• Поддержка парсеров банков&#10;• Обновление бенчмарков и правил&#10;• Маркетинг и поддержка" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=12;fontStyle=1;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="280" y="60" width="210" height="175" as="geometry" />
+        </mxCell>
+        <mxCell id="kr" value="Ключевые ресурсы&#10;(Key Resources)&#10;&#10;• Алгоритмическое ядро (SAW + Avalanche + прогноз)&#10;• Кодовая база FastAPI&#10;• Доменная экспертиза в перс. финансах" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=12;fontStyle=1;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="280" y="245" width="210" height="175" as="geometry" />
+        </mxCell>
+        <mxCell id="vp" value="Ценностное предложение&#10;(Value Proposition)&#10;&#10;• Объяснимые финансовые рекомендации&#10;• Куда направить свободные деньги: долг / резерв / цели&#10;• Прозрачная математика, не «чёрный ящик»&#10;• Прогноз с доверительным интервалом&#10;• Учёт долговой нагрузки по нормам ЦБ" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=12;fontStyle=1;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="500" y="60" width="210" height="360" as="geometry" />
+        </mxCell>
+        <mxCell id="cr" value="Отношения с клиентами&#10;(Customer Relationships)&#10;&#10;• Self-service веб-приложение&#10;• Автоматизированные рекомендации&#10;• Обучающий онбординг" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=12;fontStyle=1;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="720" y="60" width="210" height="175" as="geometry" />
+        </mxCell>
+        <mxCell id="ch" value="Каналы&#10;(Channels)&#10;&#10;• Веб-приложение&#10;• Контент-маркетинг (фин. грамотность)&#10;• App Store / Google Play (в будущем)&#10;• Сообщества по личным финансам" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=12;fontStyle=1;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="720" y="245" width="210" height="175" as="geometry" />
+        </mxCell>
+        <mxCell id="cs" value="Сегменты клиентов&#10;(Customer Segments)&#10;&#10;• Физлица 25-45, трудоспособные&#10;• С доходом, долгами и целями&#10;• Средняя фин. грамотность&#10;• Хотят контроль, но не эксперты&#10;• (Отложено: B2B — фин. консультанты)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=12;fontStyle=1;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="940" y="60" width="210" height="360" as="geometry" />
+        </mxCell>
+        <mxCell id="co" value="Структура издержек (Cost Structure)&#10;&#10;• Разработка и поддержка (ФОТ)  • Хостинг и инфраструктура  • Эквайринг-комиссии  • Маркетинг и привлечение (CAC)  • Поддержка банковских интеграций" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=12;fontStyle=1;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="60" y="430" width="650" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="rev" value="Потоки доходов (Revenue Streams)&#10;&#10;• Freemium → Pro-подписка (мес/год)  • Premium-функции (расширенный прогноз, экспорт)  • B2B-лицензии (в будущем)  • Партнёрские (рефералы на фин. продукты)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=12;fontStyle=1;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="720" y="430" width="430" height="110" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

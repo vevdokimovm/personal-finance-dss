@@ -1,0 +1,71 @@
+<mxfile host="app.diagrams.net" type="device">
+  <diagram name="Sequence — импорт выписки" id="seq-import">
+    <mxGraphModel dx="1000" dy="700" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1050" pageHeight="780" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <mxCell id="title" value="FINPILOT — Импорт банковской выписки (POST /api/banks/import)" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=15;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="250" y="10" width="560" height="30" as="geometry" />
+        </mxCell>
+
+        <!-- Lifeline heads -->
+        <mxCell id="h_user" value="Пользователь" style="shape=umlActor;verticalLabelPosition=bottom;labelBackgroundColor=#ffffff;verticalAlign=top;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="70" y="60" width="30" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="h_api" value="routes_banks" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="220" y="65" width="120" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="h_sp" value="statement_parser" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="450" y="65" width="140" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="h_p" value="parse_bank_statement" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="680" y="65" width="170" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="h_db" value="crud" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="920" y="65" width="90" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- Lifelines -->
+        <mxCell id="l_user" style="endArrow=none;dashed=1;html=1;strokeColor=#999999;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="85" y="120" as="sourcePoint" /><mxPoint x="85" y="720" as="targetPoint" /></mxGeometry></mxCell>
+        <mxCell id="l_api" style="endArrow=none;dashed=1;html=1;strokeColor=#999999;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="280" y="105" as="sourcePoint" /><mxPoint x="280" y="720" as="targetPoint" /></mxGeometry></mxCell>
+        <mxCell id="l_sp" style="endArrow=none;dashed=1;html=1;strokeColor=#999999;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="520" y="105" as="sourcePoint" /><mxPoint x="520" y="720" as="targetPoint" /></mxGeometry></mxCell>
+        <mxCell id="l_p" style="endArrow=none;dashed=1;html=1;strokeColor=#999999;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="765" y="105" as="sourcePoint" /><mxPoint x="765" y="720" as="targetPoint" /></mxGeometry></mxCell>
+        <mxCell id="l_db" style="endArrow=none;dashed=1;html=1;strokeColor=#999999;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="965" y="105" as="sourcePoint" /><mxPoint x="965" y="720" as="targetPoint" /></mxGeometry></mxCell>
+
+        <!-- Messages -->
+        <mxCell id="m1" value="POST /banks/import {file, bank_id}" style="endArrow=block;html=1;fontSize=11;labelBackgroundColor=#ffffff;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="85" y="150" as="sourcePoint" /><mxPoint x="280" y="150" as="targetPoint" /></mxGeometry></mxCell>
+        <mxCell id="m2" value="parse_bank_statement(content, bank_id)" style="endArrow=block;html=1;fontSize=11;labelBackgroundColor=#ffffff;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="280" y="190" as="sourcePoint" /><mxPoint x="520" y="190" as="targetPoint" /></mxGeometry></mxCell>
+        <mxCell id="m3" value="выбор парсера по bank_id (tinkoff/sber/universal)" style="endArrow=block;html=1;fontSize=11;labelBackgroundColor=#ffffff;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="520" y="230" as="sourcePoint" /><mxPoint x="765" y="230" as="targetPoint" /></mxGeometry></mxCell>
+
+        <!-- loop CSV -->
+        <mxCell id="loop1" value="loop  [по строкам CSV]" style="shape=umlFrame;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#9673a6;fontSize=11;fontStyle=2;align=left;verticalAlign=top;width=80;height=30;" vertex="1" parent="1">
+          <mxGeometry x="600" y="255" width="330" height="160" as="geometry" />
+        </mxCell>
+        <mxCell id="ms1" value="_get_field(row, candidates)" style="endArrow=block;html=1;fontSize=11;rounded=0;labelBackgroundColor=#ffffff;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="765" y="295" as="sourcePoint" /><mxPoint x="880" y="295" as="targetPoint" /><Array as="points"><mxPoint x="880" y="295" /></Array></mxGeometry></mxCell>
+        <mxCell id="ms1r" style="endArrow=open;html=1;dashed=1;rounded=0;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="880" y="315" as="sourcePoint" /><mxPoint x="765" y="315" as="targetPoint" /></mxGeometry></mxCell>
+        <mxCell id="ms2" value="_parse_date() + нормализация суммы" style="endArrow=block;html=1;fontSize=11;rounded=0;labelBackgroundColor=#ffffff;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="765" y="345" as="sourcePoint" /><mxPoint x="880" y="345" as="targetPoint" /></mxGeometry></mxCell>
+        <mxCell id="ms2r" style="endArrow=open;html=1;dashed=1;rounded=0;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="880" y="365" as="sourcePoint" /><mxPoint x="765" y="365" as="targetPoint" /></mxGeometry></mxCell>
+        <mxCell id="ms3" value="тип = expense если сумма &lt; 0, иначе income" style="endArrow=block;html=1;fontSize=11;rounded=0;labelBackgroundColor=#ffffff;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="765" y="395" as="sourcePoint" /><mxPoint x="880" y="395" as="targetPoint" /></mxGeometry></mxCell>
+
+        <!-- return list -->
+        <mxCell id="m4" value="list[transaction dict]" style="endArrow=open;html=1;dashed=1;fontSize=11;labelBackgroundColor=#ffffff;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="765" y="445" as="sourcePoint" /><mxPoint x="520" y="445" as="targetPoint" /></mxGeometry></mxCell>
+        <mxCell id="m5" value="распарсенные транзакции" style="endArrow=open;html=1;dashed=1;fontSize=11;labelBackgroundColor=#ffffff;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="520" y="480" as="sourcePoint" /><mxPoint x="280" y="480" as="targetPoint" /></mxGeometry></mxCell>
+
+        <!-- loop save -->
+        <mxCell id="loop2" value="loop  [для каждой транзакции]" style="shape=umlFrame;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#9673a6;fontSize=11;fontStyle=2;align=left;verticalAlign=top;width=80;height=30;" vertex="1" parent="1">
+          <mxGeometry x="260" y="505" width="720" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="m6" value="create_transaction(is_synced=True)" style="endArrow=block;html=1;fontSize=11;labelBackgroundColor=#ffffff;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="280" y="550" as="sourcePoint" /><mxPoint x="965" y="550" as="targetPoint" /></mxGeometry></mxCell>
+        <mxCell id="m7" value="сохранено" style="endArrow=open;html=1;dashed=1;fontSize=11;labelBackgroundColor=#ffffff;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="965" y="580" as="sourcePoint" /><mxPoint x="280" y="580" as="targetPoint" /></mxGeometry></mxCell>
+
+        <mxCell id="m8" value="{imported: N, transactions}" style="endArrow=open;html=1;dashed=1;fontSize=11;labelBackgroundColor=#ffffff;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="280" y="625" as="sourcePoint" /><mxPoint x="85" y="625" as="targetPoint" /></mxGeometry></mxCell>
+
+        <mxCell id="f_user" value="Пользователь" style="shape=umlActor;verticalLabelPosition=bottom;labelBackgroundColor=#ffffff;verticalAlign=top;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="70" y="650" width="30" height="60" as="geometry" />
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
