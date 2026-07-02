@@ -355,6 +355,7 @@ class HypothesisTester:
 
     def _wtp_ordinal(self) -> pd.Series:
         order = {"до 200": 1, "200–500": 2, "500–1000": 3}
+
         def f(v: object) -> float:
             if pd.isna(v):
                 return np.nan

@@ -135,7 +135,6 @@ class ReportBuilder:
                 f'<div class="k">{key}</div></div>')
 
     def build(self) -> str:
-        r = self.r
         body = "".join([
             self._hero(), self._toc(), self._summary(), self._method(),
             self._audience(), self._landscape(), self._hypotheses(),
@@ -374,7 +373,8 @@ class ReportBuilder:
   <p>На словах <strong>46%</strong> «считают вручную, что выгоднее». Но когда тем же
      людям дали конкретную ситуацию (доход 80 000 ₽, есть кредит, есть цель — как
      поступить с 30 000 ₽), на расчёт выгоды опёрлись лишь
-     <strong>{cb['calc_share']*100:.0f}%</strong>, а <strong>{cb['emotional_share']*100:.0f}%</strong>
+     <strong>{cb['calc_share']*100:.0f}%</strong>, а
+     <strong>{cb['emotional_share']*100:.0f}%</strong>
      решали от ощущения комфорта или тревоги о худшем сценарии. Это и есть
      <em class="hl">intention–action gap</em>: разрыв между рациональным
      самообразом и реальным, эмоциональным поведением.</p>
@@ -514,7 +514,7 @@ class ReportBuilder:
 </div></section>"""
 
     def _limitations(self) -> str:
-        return f"""
+        return """
 <section id="limitations"><div class="wrap">
   <div class="sec-head"><div class="sec-num">11</div><h2>Ограничения</h2></div>
   <p class="lead">Честный список того, чего эти данные не могут — чтобы выводами
@@ -538,7 +538,7 @@ class ReportBuilder:
 </div></section>"""
 
     def _bridge(self) -> str:
-        return f"""
+        return """
 <section id="bridge"><div class="wrap">
   <div class="sec-head"><div class="sec-num">12</div><h2>Что это значит для FINPILOT</h2></div>
   <p class="lead">Короткий мост от данных к продукту. Полный, приоритизированный план

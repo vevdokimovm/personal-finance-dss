@@ -54,5 +54,29 @@ pytest --cov=app/core --cov-report=term  # с покрытием (целевое
 1. Smoke зелёный.
 2. Sanity по эталонным профилям совпадает.
 3. `pytest` зелёный, покрытие ядра ≥ 80%.
-4. `ruff check app/ tests/` без ошибок.
+4. `flake8 .` (весь проект — тем же скоупом, что CI; PIT-007) и `mypy app/` без ошибок.
 5. `pip-audit -r requirements.txt` без известных уязвимостей.
+
+## Даты в тестах (после BUG-028)
+
+- Фикстуры, проходящие через окна/бакеты от `utcnow()` (spending, digest, окна «N дней» crud,
+  сроки обязательств), — только **относительные** (`utcnow() ± timedelta`) или под
+  **замороженными часами** (мок `utcnow`, паттерн `test_clock_unification`).
+- Календарные константы (`datetime(2026, 1, 17)`) допустимы лишь в чистых unit-проверках без
+  обращения к часам (парсинг, инварианты dataclass).
+- `datetime.now()` в тестах запрещён так же, как в `app/` (ADR-002): часы теста = часы
+  приложения = `app.utils.time.utcnow`.
+
+## Варп-приёмка (раз в веху и при добавлении оконной логики)
+
+Детектор календарных мин — `tools/timewarp/warp.py` (сдвигает `utcnow` на `WARP_DAYS` вперёд
+до импорта приложения):
+
+```sh
+env SECRET_KEY=test PYTHONPATH=tools/timewarp WARP_DAYS=370 \
+  ./.venv/bin/python -m pytest <файлы оконного домена> -p warp -m fast -p no:warnings -q \
+  --junitxml=/tmp/warp.xml
+```
+
+Auth/JWT/MFA-домен варпу не подвергать: `iat`/`exp` токенов живут на реальных часах — сдвиг
+одной точки времени даёт ложные падения by design.

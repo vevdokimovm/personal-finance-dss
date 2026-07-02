@@ -88,9 +88,9 @@ class BehavioralValidator:
         if len(paired) < 5:
             return {"n": len(paired), "available": False}
         try:
-            stat_w, p = stats.wilcoxon(paired["c"], paired["h"])
+            _, p = stats.wilcoxon(paired["c"], paired["h"])
         except ValueError:
-            stat_w, p = float("nan"), float("nan")
+            p = float("nan")
         return {
             "n": len(paired), "available": True,
             "confidence_mean": round(float(paired["c"].mean()), 2),
@@ -182,7 +182,6 @@ class BusinessAnalyzer:
     def _feature_priority(self) -> list[dict]:
         """RICE-подобный рейтинг фич: Reach = доля выбравших в q13."""
         wants = self.d.multiselect_freq("must_have")
-        n = wants.attrs["n"]
         # Impact/Effort заданы экспертно по связи с ядром модели FINPILOT
         impact = {"free_money": 3, "advice_why": 3, "all_in_one": 2,
                   "what_if": 2, "warning": 3}

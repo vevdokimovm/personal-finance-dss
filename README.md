@@ -1,7 +1,7 @@
 # FINPILOT — СППР для персональных финансов
 
 [![CI](https://github.com/vevdokimovm/personal-finance-dss/actions/workflows/ci.yml/badge.svg)](https://github.com/vevdokimovm/personal-finance-dss/actions/workflows/ci.yml)
-![version](https://img.shields.io/badge/version-5.10.0-blue)
+![version](https://img.shields.io/badge/version-5.11.0-blue)
 ![python](https://img.shields.io/badge/python-3.12-blue)
 ![coverage](https://img.shields.io/badge/coverage-92%25-brightgreen)
 ![license](https://img.shields.io/badge/license-MIT-green)
@@ -416,8 +416,8 @@ Dockerfile, docker-compose.yml, gunicorn_conf.py
 |---|---|
 | [`docs/RELEASES.md`](docs/RELEASES.md) | Читаемая история развития продукта по вехам (эпохи v1→v4) |
 | [`docs/pitfalls.md`](docs/pitfalls.md) | Реестр частых ошибок воркфлоу (третий тип рядом с инцидентами/расследованиями) |
-| [`docs/report_types.md`](docs/report_types.md) | Роутер: какой тип разбора писать (инцидент / расследование / баг / pitfall) |
-| [`docs/incident_postmortem_guide.md`](docs/incident_postmortem_guide.md) | Практический шаблон/метод инцидента (post-mortem, SEV, RCA) |
+| [`docs/reports/report_types.md`](docs/reports/report_types.md) | Роутер: какой тип разбора писать (инцидент / расследование / баг / pitfall) |
+| [`docs/reports/incident_postmortem_guide.md`](docs/reports/incident_postmortem_guide.md) | Практический шаблон/метод инцидента (post-mortem, SEV, RCA) |
 | [`docs/documentation_methodology.md`](docs/documentation_methodology.md) | Общая теория документирования: blameless, RCA, runbook, ADR/RFC, SLO/error budget |
 | [`docs/math_model_v3_0_0.md`](docs/math_model_v3_0_0.md) | Каноническая математическая модель (источник истины по параметрам) |
 | [`docs/algorithm_stack.md`](docs/algorithm_stack.md) | Девятишаговый конвейер ядра по шагам в коде |
@@ -427,7 +427,7 @@ Dockerfile, docker-compose.yml, gunicorn_conf.py
 | [`docs/DEPLOY.md`](docs/DEPLOY.md) | Пошаговый деплой на VPS |
 | [`docs/CONTRIBUTING.md`](docs/CONTRIBUTING.md) | Процесс: TDD-цикл, PG для схемы, Definition of Done |
 | [`docs/GLOSSARY.md`](docs/GLOSSARY.md) | Термины и обозначения (Rt, Lt, Dt, BLR, Sn…) |
-| [`docs/incidents_summary.md`](docs/incidents_summary.md) · [`docs/investigations_summary.md`](docs/investigations_summary.md) | Реестры инцидентов и расследований |
+| [`docs/reports/incidents_summary.md`](docs/reports/incidents_summary.md) · [`docs/reports/investigations_summary.md`](docs/reports/investigations_summary.md) | Реестры инцидентов и расследований |
 
 ---
 

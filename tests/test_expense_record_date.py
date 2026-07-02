@@ -12,11 +12,12 @@
 """
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from app.core.spending_advice import ExpenseRecord, SpendingAdvisor
 from app.database.crud import create_transaction
 from app.services.spending import get_spending_advice
+from app.utils.time import utcnow
 
 
 def test_expense_record_accepts_exact_date() -> None:
@@ -59,7 +60,11 @@ class _SpyAdvisor(SpendingAdvisor):
 
 
 def test_spending_advice_populates_exact_date_from_transaction(db_session) -> None:
-    d = datetime(2026, 1, 10, 9, 0)
+    # BUG-028: дата фикстуры — ОТНОСИТЕЛЬНАЯ (utcnow − 5 дней), не календарная константа.
+    # Хардкод (2026-01-10) против окна «последние 6 месяцев» от реальных часов был миной:
+    # тест зеленел до 2026-07-01 и покраснел, когда январь выпал из окна выборки.
+    # Правило: даты фикстур, проходящие через окна от utcnow(), — только относительные.
+    d = (utcnow() - timedelta(days=5)).replace(microsecond=0)
     create_transaction(
         db_session, amount=250.0, type="expense",
         date=d, category="Еда", description="завтрак",
@@ -69,4 +74,4 @@ def test_spending_advice_populates_exact_date_from_transaction(db_session) -> No
     assert spy.seen_records, "advisor должен получить хотя бы одну запись"
     rec = spy.seen_records[0]
     assert rec.date == d
-    assert rec.period == "2026-01"
+    assert rec.period == d.strftime("%Y-%m")

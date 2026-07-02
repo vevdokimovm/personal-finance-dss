@@ -25,6 +25,7 @@
 |---|---|---|---|
 | Закрытие вехи / эпохи | **Release-отчёт** | `releases/release_report_template.md` | `docs/reports/releases/` |
 | Аудит безопасности (закрытие security-вехи, по запросу) | **Security-аудит** | `security/security_audit_template.md` | `docs/reports/security/` |
+| Плановая ревизия репозитория (закрытие вехи / задача владельца) | **Ревизия** | по образцу `audits/repo_revision_2026_07.md` | `docs/reports/audits/` |
 | Существенное изменение требований | **SRS** | `../../knowledge/guides/templates/srs_guide.md` | `docs/reports/requirements/` |
 | Прогон/обзор тестов (нагрузка, стратегия) | **Тест-отчёт** | `testing/test_report_template.md` | `docs/reports/testing/` |
 

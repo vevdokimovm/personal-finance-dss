@@ -6,14 +6,16 @@ term трактуется как ОБЩИЙ срок кредита; «оста�
 """
 from __future__ import annotations
 
-from datetime import datetime, timedelta
+from datetime import timedelta
 
 from fastapi.testclient import TestClient
+
+from app.utils.time import utcnow
 
 
 def test_obligation_remaining_is_computed_from_start(client: TestClient) -> None:
     # Общий срок 60 мес, взят ~20 месяцев назад → выплачено ~20, осталось ~40.
-    start = (datetime.now() - timedelta(days=30 * 20)).isoformat()
+    start = (utcnow() - timedelta(days=30 * 20)).isoformat()
     created = client.post("/api/obligations", json={
         "name": "Автокредит", "amount": 600000, "term": 60,
         "monthly_payment": 15000, "interest_rate": 0.12, "start_date": start,
@@ -27,7 +29,7 @@ def test_obligation_remaining_is_computed_from_start(client: TestClient) -> None
 
 def test_obligation_remaining_capped_when_overdue(client: TestClient) -> None:
     # Взят раньше, чем весь срок (общий 12, прошло ~20) → остаток не уходит в минус.
-    start = (datetime.now() - timedelta(days=30 * 20)).isoformat()
+    start = (utcnow() - timedelta(days=30 * 20)).isoformat()
     created = client.post("/api/obligations", json={
         "name": "Старый", "amount": 0, "term": 12,
         "monthly_payment": 5000, "interest_rate": 0.1, "start_date": start,

@@ -8,9 +8,9 @@ import os
 from typing import Any
 
 import matplotlib
-matplotlib.use("Agg")
-import matplotlib.pyplot as plt
-from matplotlib import rcParams
+matplotlib.use("Agg")  # backend до импорта pyplot — намеренно
+import matplotlib.pyplot as plt  # noqa: E402
+from matplotlib import rcParams  # noqa: E402
 
 INK = "#1e293b"
 PRIMARY = "#2563eb"
@@ -152,8 +152,8 @@ class ChartMaker:
         labels = list(dist.keys())[::-1]
         vals = list(dist.values())[::-1]
         n = stated["n"]
-        colors = [PRIMARY if "вручную" in l else AMBER if ("ощущению" in l or "лежат" in l)
-                  else GREY for l in labels]
+        colors = [PRIMARY if "вручную" in lbl else AMBER if ("ощущению" in lbl or "лежат" in lbl)
+                  else GREY for lbl in labels]
         ax.barh(labels, vals, color=colors)
         for i, v in enumerate(vals):
             ax.text(v + 1, i, f"{v} ({v/n*100:.0f}%)", va="center", fontsize=9, color=INK)
@@ -182,8 +182,8 @@ class ChartMaker:
         # справа — на что реально опирались
         labels = list(basis.keys())[::-1]
         vals = list(basis.values())[::-1]
-        colors = [TEAL if "Расчёт" in l else RED if ("тревога" in l or "комфорт" in l)
-                  else GREY for l in labels]
+        colors = [TEAL if "Расчёт" in lbl else RED if ("тревога" in lbl or "комфорт" in lbl)
+                  else GREY for lbl in labels]
         ax2.barh(labels, vals, color=colors)
         ax2.set_title(f"На что опирались в кейсе (N={beh['case_basis']['n']}, предв.)",
                       fontweight="bold", color=INK, fontsize=10)
@@ -298,8 +298,8 @@ class ChartMaker:
         fig, ax = plt.subplots(figsize=(6.4, 2.9))
         labels = list(themes.keys())[::-1]
         vals = list(themes.values())[::-1]
-        colors = [RED if l in ("Не вижу пользы", "Только статистика") else GREY
-                  for l in labels]
+        colors = [RED if lbl in ("Не вижу пользы", "Только статистика") else GREY
+                  for lbl in labels]
         ax.barh(labels, vals, color=colors)
         for i, v in enumerate(vals):
             ax.text(v + 1, i, str(v), va="center", fontsize=9, color=INK)
