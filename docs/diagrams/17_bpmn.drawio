@@ -67,7 +67,7 @@
         <mxCell id="c1" value="Рассчитать&#10;показатели Rt/Lt/Dt" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;arcSize=12;" vertex="1" parent="1">
           <mxGeometry x="560" y="410" width="140" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="c2" value="Сгенерировать&#10;21 альтернативу" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;arcSize=12;" vertex="1" parent="1">
+        <mxCell id="c2" value="Сгенерировать&#10;66 альтернатив" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;arcSize=12;" vertex="1" parent="1">
           <mxGeometry x="730" y="410" width="130" height="60" as="geometry" />
         </mxCell>
         <mxCell id="gw" value="" style="rhombus;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=10;" vertex="1" parent="1">

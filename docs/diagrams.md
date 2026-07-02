@@ -6,7 +6,7 @@
 > `math_model_v3_0_0.md` (v3.0.0), структура сущностей и слоёв устоялась.
 > Диаграммы построены **по коду** (`app/`), а не по намерению. Формат — Mermaid (рендерится
 > в GitHub и большинстве IDE). При изменении кода, влияющего на схему, диаграмму обновляем
-> в том же батче.
+> в том же батче. **Синхронизировано с кодом: v5.12.0 (2026-07-02) — 28 таблиц, MFA, ingestion-пакет, cbr.ru.**
 >
 > Содержание: [1. Архитектура слоёв](#1-архитектура-слоёв) ·
 > [2. Модель данных (ER)](#2-модель-данных-er) ·
@@ -21,24 +21,31 @@
 
 ## 1. Архитектура слоёв
 
-Однонаправленная зависимость: HTTP → сервисы → ядро/БД. Ядро (`app/core/`) не знает о
-вебе и не ходит в БД — чистые функции над переданными данными (это и делает его
-тестируемым и переиспользуемым).
+Однонаправленная зависимость: HTTP -> сервисы -> ядро/БД. Ядро (`app/core/`) не знает о
+вебе и не ходит в БД - чистые функции над переданными данными (это и делает его
+тестируемым и переиспользуемым). Импорт выписок вынесен в отдельный пакет `app/ingestion/`
+(ADR-005), а не в сервисы.
 
 ```mermaid
 flowchart TD
     Client["Браузер / API-клиент"]
 
     subgraph HTTP["app/api/ — HTTP-слой (FastAPI)"]
-        Routes["routes_*.py<br/>auth · transactions · planning · goals ·<br/>obligations · liquid_assets · banks · b2b · analytics"]
+        Routes["routes_*.py<br/>auth · transactions · planning · goals · obligations ·<br/>liquid_assets · banks · b2b · analytics · subscription · fx · demo"]
         MW["middleware.py · _guards.py<br/>CSRF · rate-limit · security-заголовки"]
     end
 
     subgraph SVC["app/services/ — прикладные сервисы"]
-        Planning["planning.py — оркестрация расчёта"]
+        Planning["planning.py · pipeline.py — оркестрация расчёта"]
         Spending["spending.py — советы по тратам"]
-        Ingestion["ingestion/ — парсеры выписок<br/>CSV · XLSX · PDF · 1C"]
-        Infra["cache · currency · cbr_rate/fx ·<br/>event_logger · email_service · analytics"]
+        AuthSvc["mfa.py · security.py<br/>MFA/TOTP · ревокация JWT"]
+        Notif["notifications.py · telegram.py ·<br/>email_dispatch.py — уведомления"]
+        Money["subscription.py · referral.py ·<br/>plan_export.py · report_pdf.py"]
+        Infra["cache · currency · cbr_rate/cbr_fx ·<br/>event_logger · analytics · experiments · forecasting"]
+    end
+
+    subgraph ING["app/ingestion/ — импорт выписок (отдельный пакет, ADR-005)"]
+        Parsers["statement_parser + семейные парсеры<br/>CSV · XLSX · PDF · 1C"]
     end
 
     subgraph CORE["app/core/ — математическое ядро (чистые функции)"]
@@ -49,7 +56,7 @@ flowchart TD
 
     subgraph DATA["app/database/ — данные"]
         CRUD["crud.py"]
-        Models["models.py (SQLAlchemy 2.0)"]
+        Models["models.py (SQLAlchemy 2.0) — 28 таблиц"]
         DB[("PostgreSQL / SQLite")]
     end
 
@@ -59,100 +66,244 @@ flowchart TD
     Routes --> Schemas
     Routes --> Planning
     Routes --> Spending
-    Routes --> Ingestion
+    Routes --> AuthSvc
+    Routes --> ING
     Routes --> CRUD
     Planning --> Pipeline
     Planning --> CRUD
     Planning --> Infra
     Spending --> Support
+    ING --> CRUD
     CRUD --> Models --> DB
 ```
 
 ---
 
-## 2. Модель данных (ER)
+## 2. Модель данных (ER) — 28 таблиц
 
-Финансовое ядро. `User` — корень владения (почти у всех таблиц есть `user_id`; гостевой
-режим = `user_id IS NULL`). `Transaction`, `Obligation`, `Goal`, `LiquidAsset` несут
-soft-delete (`is_deleted` / `deleted_at`). Историю несут дочерние `ObligationPayment` и
-`GoalContribution`. `Recommendation` — снимки выданных планов, `Event` — аналитика воронки.
+Полная схема (все 28 таблиц из `app/database/models.py`). Два хаба владения: `users`
+(почти у всех таблиц `user_id`; гость = `user_id IS NULL`) и `households` (семейные бюджеты,
+общий `household_id`). `transactions`/`obligations`/`goals`/`liquid_assets` несут soft-delete.
+Историю несут `obligation_payments`/`goal_contributions`. Инфраструктурные таблицы
+(`fx_rates`, `cbr_key_rate_cache`, `revoked_tokens`, `events`, `notifications*`) — без FK,
+живут сами по себе.
 
 ```mermaid
 erDiagram
-    User ||--o{ Transaction : "владеет"
-    User ||--o{ Obligation : "владеет"
-    User ||--o{ Goal : "владеет"
-    User ||--o{ LiquidAsset : "владеет"
-    User ||--o| UserPrefs : "настройки"
-    User ||--o{ Recommendation : "история планов"
-    User ||--o{ Event : "аналитика"
-    User ||--o{ Scenario : "сценарии"
+    %% --- владение: users ---
+    users ||--o{ transactions : "владеет"
+    users ||--o{ obligations : "владеет"
+    users ||--o{ goals : "владеет"
+    users ||--o{ liquid_assets : "владеет"
+    users ||--o{ budgets : "бюджеты"
+    users ||--o{ scenarios : "сценарии"
+    users ||--o| user_prefs : "настройки"
+    users ||--o{ plan_snapshots : "история планов"
+    users ||--o{ recommendations : "рекомендации"
+    users ||--o{ user_category_rules : "правила"
+    users ||--o{ mfa_recovery_codes : "MFA-коды"
+    users ||--o{ plaid_tokens : "Open Banking"
+    users ||--o{ households : "владеет (owner)"
+    users ||--o{ household_memberships : "участие"
 
-    Category ||--o{ Transaction : "категоризует"
-    Obligation ||--o{ ObligationPayment : "платежи"
-    Goal ||--o{ GoalContribution : "взносы"
-    LiquidAsset |o--o{ Goal : "конверт (linked_asset, SET NULL)"
-    Recommendation ||--o{ Scenario : "what-if"
+    %% --- семья: households ---
+    households ||--o{ household_memberships : "состав"
+    households ||--o{ household_invites : "приглашения"
+    households |o--o{ transactions : "семейн."
+    households |o--o{ obligations : "семейн."
+    households |o--o{ goals : "семейн."
+    households |o--o{ liquid_assets : "семейн."
+    households |o--o{ budgets : "семейн."
+    households |o--o{ scenarios : "семейн."
+    households |o--o{ plan_snapshots : "семейн."
 
-    User {
+    %% --- локальные родители ---
+    categories ||--o{ transactions : "категоризует"
+    categories ||--o{ user_category_rules : "правило"
+    liquid_assets |o--o{ goals : "конверт (linked_asset, SET NULL)"
+    obligations ||--o{ obligation_payments : "платежи"
+    goals ||--o{ goal_contributions : "взносы"
+    recommendations ||--o{ scenarios : "what-if"
+    experiments ||--o{ experiment_assignments : "A/B"
+
+    users {
         string id PK
-        string email
+        string email UK
         string password_hash
+        bool is_verified
+        bool mfa_enabled
     }
-    Transaction {
+    households {
+        int id PK
+        string owner_id FK
+        string name
+    }
+    household_memberships {
+        int id PK
+        int household_id FK
+        string user_id FK
+        string role
+    }
+    household_invites {
+        int id PK
+        int household_id FK
+        string created_by FK
+        string accepted_by FK
+        string token UK
+    }
+    transactions {
         int id PK
         string user_id FK
+        int household_id FK
         int category_id FK
         float amount
         bool is_deleted
-        datetime deleted_at
     }
-    Obligation {
+    obligations {
         int id PK
         string user_id FK
+        int household_id FK
         float amount
         float interest_rate
         float monthly_payment
-        bool is_deleted
     }
-    Goal {
-        int id PK
-        string user_id FK
-        int linked_asset_id FK
-        float target_amount
-        float current_amount
-        bool is_deleted
-    }
-    LiquidAsset {
-        int id PK
-        string user_id FK
-        float amount
-        float interest_rate
-        bool is_deleted
-    }
-    ObligationPayment {
+    obligation_payments {
         int id PK
         int obligation_id FK
         float amount
+        date paid_at
     }
-    GoalContribution {
+    goals {
+        int id PK
+        string user_id FK
+        int household_id FK
+        int linked_asset_id FK
+        float target_amount
+        float current_amount
+    }
+    goal_contributions {
         int id PK
         int goal_id FK
         float amount
+        date contributed_at
     }
-    Recommendation {
+    liquid_assets {
         int id PK
         string user_id FK
+        int household_id FK
+        float amount
+        float interest_rate
     }
-    Scenario {
+    budgets {
         int id PK
         string user_id FK
+        int household_id FK
+        int category_id FK
+        float limit_amount
+    }
+    scenarios {
+        int id PK
+        string user_id FK
+        int household_id FK
         int recommendation_id FK
+        json overrides
+    }
+    recommendations {
+        int id PK
+        string user_id FK
+        json allocation
+        datetime created_at
+    }
+    plan_snapshots {
+        int id PK
+        string user_id FK
+        int household_id FK
+        json plan
+        datetime created_at
+    }
+    categories {
+        int id PK
+        string name
+        string kind
+    }
+    user_category_rules {
+        int id PK
+        string user_id FK
+        int category_id FK
+        string pattern
+    }
+    user_prefs {
+        int id PK
+        string user_id FK
+        int risk_profile
+        string base_currency
+    }
+    manual_snapshots {
+        int id PK
+        string user_id FK
+        json data
+    }
+    plaid_tokens {
+        int id PK
+        string user_id FK
+        string access_token
+    }
+    mfa_recovery_codes {
+        int id PK
+        string user_id FK
+        string code_hash
+        bool used
+    }
+    revoked_tokens {
+        int id PK
+        string jti UK
+        datetime revoked_at
+    }
+    notifications {
+        int id PK
+        string user_id
+        string type
+        bool is_read
+    }
+    notification_log {
+        int id PK
+        string user_id
+        string channel
+        datetime sent_at
+    }
+    events {
+        int id PK
+        string name
+        string user_id
+        datetime created_at
+    }
+    experiments {
+        int id PK
+        string key UK
+        bool active
+    }
+    experiment_assignments {
+        int id PK
+        int experiment_id FK
+        string user_id
+        string variant
+    }
+    fx_rates {
+        int id PK
+        string pair
+        float rate
+        date as_of
+    }
+    cbr_key_rate_cache {
+        int id PK
+        float rate
+        date as_of
     }
 ```
 
-> Второстепенные таблицы (вне ядра планирования) на схеме опущены для читаемости:
-> `Budget`, `FxRate`, `PlaidToken`, `ManualSnapshot`, `NotificationLog`, `Category`-справочник.
+> ER построена по `app/database/models.py` (28 `__tablename__`). Доменные dataclass'ы
+> `app/ingestion/models.py` (Account, Debt, Goal, Snapshot...) — это DTO пайплайна импорта,
+> НЕ таблицы, поэтому на ER их нет.
 
 ---
 
@@ -220,9 +371,10 @@ sequenceDiagram
 
 ## 5. Развёртывание и компоненты
 
-Как части системы связаны в проде. Сервер — единый процесс FastAPI под uvicorn (SSR-шаблоны
+Как части системы связаны в проде. Сервер - единый процесс FastAPI под uvicorn (SSR-шаблоны
 + статика + API в одном приложении). Внешние зависимости немногочисленны и заменяемы; их
-недоступность не роняет приложение (ставка ЦБ имеет фолбэк, письма/мониторинг — опциональны).
+недоступность не роняет приложение (ставка ЦБ имеет фолбэк и кэш в БД, письма/уведомления/
+мониторинг - опциональны).
 
 ```mermaid
 flowchart LR
@@ -233,7 +385,7 @@ flowchart LR
     subgraph Server["Сервер — uvicorn · FastAPI (один процесс)"]
         MW["Middleware-цепочка"]
         Routes["Роуты: страницы (HTML) · /api/* · /v1/analyze (B2B)"]
-        Svc["Сервисы + ядро (app/core)"]
+        Svc["Сервисы + ядро (app/core) + ingestion"]
     end
 
     subgraph Data["Хранилище"]
@@ -241,16 +393,18 @@ flowchart LR
     end
 
     subgraph Ext["Внешние сервисы (заменяемы, с деградацией)"]
-        CBR["cbr-xml-daily.ru<br/>ставка ЦБ → r_bench<br/>(фолбэк 0.14)"]
+        CBR["cbr.ru<br/>ключевая ставка (ASMX) + курсы (XML)<br/>-> r_bench (фолбэк 0.14), кэш в БД"]
+        TG["Telegram Bot API<br/>уведомления (колокольчик)"]
         SMTP["SMTP<br/>письма: verify, сброс пароля"]
-        Sentry["Sentry<br/>мониторинг ошибок"]
+        Sentry["Sentry<br/>мониторинг ошибок (опц.)"]
     end
 
     UI -->|"HTTPS: HTML + JSON API<br/>Authorization: Bearer"| MW
     MW --> Routes --> Svc
     Svc --> DB
-    Svc -. "ставка (с кэшем)" .-> CBR
-    Svc -. "уведомления" .-> SMTP
+    Svc -. "ставка+курсы (кэш в БД)" .-> CBR
+    Svc -. "уведомления" .-> TG
+    Svc -. "письма" .-> SMTP
     Server -. "события ошибок" .-> Sentry
 ```
 
@@ -281,9 +435,11 @@ flowchart TD
 
 ## 7. Аутентификация и сессия
 
-Гостевой режим — первоклассный: без токена приложение работает с данными `user_id IS NULL`.
-Регистрация и вход возвращают Bearer-токен сразу; подтверждение email — фоновое (письмо через
-SMTP) и вход не блокирует. Токен хранится в localStorage и подставляется в `Authorization`.
+Гостевой режим - первоклассный: без токена приложение работает с данными `user_id IS NULL`.
+Регистрация возвращает Bearer сразу; вход - **двухшаговый при включённом MFA** (пароль ->
+TOTP-челлендж). Токены отзываемы на сервере: у каждого JWT есть `jti`, при выходе он попадает в
+`revoked_tokens`; смена/сброс пароля отзывает ВСЕ токены пользователя (mass-ревокация). Токен
+хранится в localStorage и подставляется в `Authorization`.
 
 ```mermaid
 sequenceDiagram
@@ -291,6 +447,7 @@ sequenceDiagram
     participant U as Браузер (auth.js)
     participant API as /api/auth
     participant DB as БД
+    participant Rev as revoked_tokens
     participant Mail as SMTP
 
     Note over U,API: Гость — без токена, данные user_id = NULL
@@ -299,23 +456,38 @@ sequenceDiagram
     Note over U: Регистрация
     U->>API: POST /register {email, password, consent}
     API->>DB: создать пользователя
-    API-->>U: access_token (Bearer) — сразу
+    API-->>U: access_token (Bearer, с jti) — сразу
     API-)Mail: письмо подтверждения (фоном, не блокирует)
     end
 
     rect rgb(232, 240, 245)
-    Note over U: Вход
+    Note over U: Вход (двухшаговый при MFA)
     U->>API: POST /login {email, password}
-    API->>DB: проверить пароль
-    API-->>U: access_token
+    API->>DB: проверить пароль + mfa_enabled?
+    alt MFA включён
+        API-->>U: mfa_required (промежуточный токен)
+        U->>API: POST /login/mfa {code TOTP}
+        API->>DB: проверить TOTP / recovery-код
+        API-->>U: access_token (с jti)
+    else MFA выключен
+        API-->>U: access_token (с jti)
+    end
     end
 
     Note over U: токен → localStorage
 
     U->>API: GET /me (Authorization: Bearer)
-    API-->>U: профиль → шапка показывает email + «Выход»
+    API->>Rev: jti в отозванных?
+    API-->>U: профиль (если токен валиден и не отозван)
 
-    U->>API: POST /logout → токен очищается, снова гость
+    rect rgb(245, 238, 232)
+    Note over U: Выход / смена пароля
+    U->>API: POST /logout
+    API->>Rev: внести jti (point-ревокация)
+    U->>API: POST /password/change
+    API->>Rev: отозвать ВСЕ токены пользователя (mass)
+    API-->>U: снова гость
+    end
 ```
 
 ---

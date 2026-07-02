@@ -41,7 +41,7 @@
         </mxCell>
 
         <!-- ЭТАП 4: генерация альтернатив -->
-        <mxCell id="gen" value="Этап 4. Генерация 21 альтернативы&#10;stars-and-bars, шаг 20%" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;fontSize=12;" vertex="1" parent="1">
+        <mxCell id="gen" value="Этап 4. Генерация 66 альтернатив&#10;stars-and-bars, шаг 10%" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;fontSize=12;" vertex="1" parent="1">
           <mxGeometry x="295" y="540" width="250" height="50" as="geometry" />
         </mxCell>
 

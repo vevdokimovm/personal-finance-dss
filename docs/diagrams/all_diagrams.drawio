@@ -26,7 +26,7 @@
         <mxCell id="d01_prealloc" value="Этап 4.0. Разовое закрытие близких&#10;целей из Bliq (если Σ_близкие ≤ 0.5·Bliq)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;fontSize=12;" vertex="1" parent="1">
           <mxGeometry x="295" y="460" width="250" height="50" as="geometry" />
         </mxCell>
-        <mxCell id="d01_gen" value="Этап 4. Генерация 21 альтернативы&#10;stars-and-bars, шаг 20%" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;fontSize=12;" vertex="1" parent="1">
+        <mxCell id="d01_gen" value="Этап 4. Генерация 66 альтернатив&#10;stars-and-bars, шаг 10%" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;fontSize=12;" vertex="1" parent="1">
           <mxGeometry x="295" y="540" width="250" height="50" as="geometry" />
         </mxCell>
         <mxCell id="d01_loop" value="Для каждой альтернативы a из A" style="shape=hexagon;perimeter=hexagonPerimeter2;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=12;" vertex="1" parent="1">
@@ -440,12 +440,12 @@
         </mxCell>
 
         
-        <mxCell id="d05_core" value="Ядро алгоритма&#10;&#10;[Python: app/core, app/services]&#10;&#10;6-этапный pipeline СППР" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#438DD5;strokeColor=#3C7FC0;fontColor=#ffffff;fontSize=12;fontStyle=1;align=center;verticalAlign=middle;arcSize=10;" vertex="1" parent="1">
+        <mxCell id="d05_core" value="Ядро алгоритма&#10;&#10;[Python: app/core, app/services]&#10;&#10;9-шаговый pipeline СППР" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#438DD5;strokeColor=#3C7FC0;fontColor=#ffffff;fontSize=12;fontStyle=1;align=center;verticalAlign=middle;arcSize=10;" vertex="1" parent="1">
           <mxGeometry x="130" y="600" width="220" height="120" as="geometry" />
         </mxCell>
 
         
-        <mxCell id="d05_db" value="База данных&#10;&#10;[SQLite / PostgreSQL, SQLAlchemy 2.0]&#10;&#10;5 таблиц: transactions, obligations, goals, liquid_assets, user_prefs" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#438DD5;strokeColor=#3C7FC0;fontColor=#ffffff;fontSize=12;fontStyle=1;align=center;verticalAlign=middle;" vertex="1" parent="1">
+        <mxCell id="d05_db" value="База данных&#10;&#10;[SQLite / PostgreSQL, SQLAlchemy 2.0]&#10;&#10;28 таблиц: users, households, transactions, obligations, goals, liquid_assets, budgets, scenarios, ... (полная ER — docs/diagrams.md §2)" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#438DD5;strokeColor=#3C7FC0;fontColor=#ffffff;fontSize=12;fontStyle=1;align=center;verticalAlign=middle;" vertex="1" parent="1">
           <mxGeometry x="610" y="590" width="220" height="140" as="geometry" />
         </mxCell>
 
@@ -621,7 +621,7 @@
         <mxCell id="d07_m5" value="preallocate_from_bliq(bliq, goals)" style="endArrow=block;html=1;fontSize=11;labelBackgroundColor=#ffffff;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="530" y="290" as="sourcePoint" /><mxPoint x="1005" y="290" as="targetPoint" /></mxGeometry></mxCell>
         <mxCell id="d07_m6" value="bliq_after, closed_goals, active_goals" style="endArrow=open;html=1;dashed=1;fontSize=11;labelBackgroundColor=#ffffff;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="1005" y="320" as="sourcePoint" /><mxPoint x="530" y="320" as="targetPoint" /></mxGeometry></mxCell>
         <mxCell id="d07_m7" value="generate_alternatives(Rt+, ...)" style="endArrow=block;html=1;fontSize=11;labelBackgroundColor=#ffffff;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="530" y="355" as="sourcePoint" /><mxPoint x="695" y="355" as="targetPoint" /></mxGeometry></mxCell>
-        <mxCell id="d07_m8" value="21 альтернатива" style="endArrow=open;html=1;dashed=1;fontSize=11;labelBackgroundColor=#ffffff;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="695" y="385" as="sourcePoint" /><mxPoint x="530" y="385" as="targetPoint" /></mxGeometry></mxCell>
+        <mxCell id="d07_m8" value="66 альтернатив" style="endArrow=open;html=1;dashed=1;fontSize=11;labelBackgroundColor=#ffffff;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="695" y="385" as="sourcePoint" /><mxPoint x="530" y="385" as="targetPoint" /></mxGeometry></mxCell>
 
         
         <mxCell id="d07_loop" value="loop  [для каждой альтернативы]" style="shape=umlFrame;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#9673a6;fontSize=11;fontStyle=2;align=left;verticalAlign=top;width=80;height=30;" vertex="1" parent="1">
@@ -1513,7 +1513,7 @@
         <mxCell id="d17_c1" value="Рассчитать&#10;показатели Rt/Lt/Dt" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;arcSize=12;" vertex="1" parent="1">
           <mxGeometry x="560" y="410" width="140" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="d17_c2" value="Сгенерировать&#10;21 альтернативу" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;arcSize=12;" vertex="1" parent="1">
+        <mxCell id="d17_c2" value="Сгенерировать&#10;66 альтернатив" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;arcSize=12;" vertex="1" parent="1">
           <mxGeometry x="730" y="410" width="130" height="60" as="geometry" />
         </mxCell>
         <mxCell id="d17_gw" style="rhombus;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=10;" vertex="1" parent="1">
@@ -1577,7 +1577,7 @@
           <mxGeometry x="290" y="375" width="200" height="55" as="geometry" />
         </mxCell>
         
-        <mxCell id="d18_e3" value="21 альтернатива&#10;сформирована" style="shape=hexagon;perimeter=hexagonPerimeter2;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=11;" vertex="1" parent="1">
+        <mxCell id="d18_e3" value="66 альтернатив&#10;сформировано" style="shape=hexagon;perimeter=hexagonPerimeter2;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=11;" vertex="1" parent="1">
           <mxGeometry x="290" y="470" width="200" height="60" as="geometry" />
         </mxCell>
         
@@ -1756,7 +1756,7 @@
         <mxCell id="d20_a_t" value="ANALYZE" style="text;html=1;align=left;verticalAlign=middle;fontSize=14;fontStyle=1;fillColor=none;strokeColor=none;fontColor=#7a6516;" vertex="1" parent="1">
           <mxGeometry x="565" y="135" width="160" height="25" as="geometry" />
         </mxCell>
-        <mxCell id="d20_a_d" value="Анализ альтернатив:&#10;21 вариант распределения,&#10;Avalanche по дорогим долгам" style="text;html=1;align=left;verticalAlign=middle;fontSize=10;fillColor=none;strokeColor=none;" vertex="1" parent="1">
+        <mxCell id="d20_a_d" value="Анализ альтернатив:&#10;66 вариантов распределения,&#10;Avalanche по дорогим долгам" style="text;html=1;align=left;verticalAlign=middle;fontSize=10;fillColor=none;strokeColor=none;" vertex="1" parent="1">
           <mxGeometry x="565" y="220" width="220" height="60" as="geometry" />
         </mxCell>
 

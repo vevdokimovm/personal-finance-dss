@@ -35,12 +35,12 @@
         </mxCell>
 
         <!-- Core -->
-        <mxCell id="core" value="Ядро алгоритма&#10;&#10;[Python: app/core, app/services]&#10;&#10;6-этапный pipeline СППР" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#438DD5;strokeColor=#3C7FC0;fontColor=#ffffff;fontSize=12;fontStyle=1;align=center;verticalAlign=middle;arcSize=10;" vertex="1" parent="1">
+        <mxCell id="core" value="Ядро алгоритма&#10;&#10;[Python: app/core, app/services]&#10;&#10;9-шаговый pipeline СППР" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#438DD5;strokeColor=#3C7FC0;fontColor=#ffffff;fontSize=12;fontStyle=1;align=center;verticalAlign=middle;arcSize=10;" vertex="1" parent="1">
           <mxGeometry x="130" y="600" width="220" height="120" as="geometry" />
         </mxCell>
 
         <!-- DB (cylinder) -->
-        <mxCell id="db" value="База данных&#10;&#10;[SQLite / PostgreSQL, SQLAlchemy 2.0]&#10;&#10;5 таблиц: transactions, obligations, goals, liquid_assets, user_prefs" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#438DD5;strokeColor=#3C7FC0;fontColor=#ffffff;fontSize=12;fontStyle=1;align=center;verticalAlign=middle;" vertex="1" parent="1">
+        <mxCell id="db" value="База данных&#10;&#10;[SQLite / PostgreSQL, SQLAlchemy 2.0]&#10;&#10;28 таблиц: users, households, transactions, obligations, goals, liquid_assets, budgets, scenarios, ... (полная ER — docs/diagrams.md §2)" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#438DD5;strokeColor=#3C7FC0;fontColor=#ffffff;fontSize=12;fontStyle=1;align=center;verticalAlign=middle;" vertex="1" parent="1">
           <mxGeometry x="610" y="590" width="220" height="140" as="geometry" />
         </mxCell>
 
