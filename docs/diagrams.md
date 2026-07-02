@@ -529,3 +529,40 @@ flowchart TD
     Base --> Legal
     Base -.-> JS
 ```
+
+## 9. Физическое развёртывание (целевое, веха 9)
+
+Один VPS РФ-юрисдикции (152-ФЗ: локализация ПДн + бэкапы в РФ). nginx терминирует TLS и раздаёт
+статику, uvicorn-workers за ним, PostgreSQL локально, ночные дампы + офсайт-копия. Подробности
+процедур — `docs/DEPLOY.md`, `docs/backup_restore.md`; SLO — `docs/slo.md`.
+
+```mermaid
+flowchart TD
+    U["Пользователь (браузер)"] -->|HTTPS 443| N
+
+    subgraph VPS["VPS (РФ-юрисдикция)"]
+        N["nginx<br/>TLS-терминация · статика · gzip ·<br/>лимиты соединений"]
+        A["uvicorn × N воркеров<br/>FastAPI-приложение"]
+        PG[("PostgreSQL<br/>28 таблиц + кэш ставки ЦБ")]
+        CRON["cron<br/>ночной pg_dump 03:00 ·<br/>ротация retention"]
+        N -->|proxy_pass| A
+        A --> PG
+        CRON --> PG
+    end
+
+    subgraph OFF["Офсайт (РФ)"]
+        S3["S3-совместимое хранилище<br/>шифрованные дампы (age)"]
+    end
+    CRON -->|"dump.age"| S3
+
+    subgraph EXT["Внешние сервисы"]
+        CBR["cbr.ru (ставка/курсы)"]
+        TG["Telegram Bot API"]
+        MAIL["SMTP"]
+        SEN["Sentry"]
+    end
+    A -. "исходящие" .-> CBR
+    A -. " " .-> TG
+    A -. " " .-> MAIL
+    A -. "события ошибок" .-> SEN
+```
