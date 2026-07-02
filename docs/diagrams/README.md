@@ -10,8 +10,8 @@
 - Данные: `10_er_database`, `11_uml_class`, `14_dependency_graph`.
 - Процессы/нотации: `12_idef0`, `16_pdca`, `17_bpmn`, `18_epc`, `19_vsm`, `20_dmaic`.
 
-Описания к диаграммам (историческая ВКР-редакция, модель v2.0.2 — **legacy**, каноничная модель
-проекта — v3.0.0): `diagrams_vkr_v2_0_2.md`, `diagrams_full_set_v2_0_2.md`.
+Историческая ВКР-редакция описаний диаграмм (модель v2.0.2) удалена как **legacy** — каноничная
+модель проекта v3.0.0. Исходники диаграмм — `all_diagrams.drawio`, рендеры — `*.drawio.png` в этой папке.
 
 > Бизнес-диаграммы (canvas, journey, SWOT, monetization, roadmap) — отдельно в
 > `knowledge/business/diagrams/`.

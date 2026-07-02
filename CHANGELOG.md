@@ -2,6 +2,26 @@
 
 Формат: [Keep a Changelog](https://keepachangelog.com/ru/1.0.0/). Версионирование — [SemVer](https://semver.org/lang/ru/).
 
+## [5.7.0] — 2026-07-01 — Чистка веса архива + консолидация security-доков (MINOR)
+
+- **Вес репозитория: ~39 МБ → ~16 МБ.** Удалены самые тяжёлые не-кодовые артефакты:
+  - `knowledge/product/app_launch.docx` и `app_launch_from_scratch.docx` (~11.8 МБ) — тяжёлые
+    dev-инструкции запуска со встроенными скриншотами, в репо не нужны.
+  - Референс-логотипы: оставлен один эталон `knowledge/brand/logo_reference_hq.png`; удалены
+    черновые концепты `logo_reference_concept_1/2.png` и доп-варианты `logo_reference_source.jpeg`,
+    `logo_reference_variant.jpg` (~11 МБ). Рабочий логотип приложения (`frontend/static/images/`) не тронут.
+- **Легаси удалено:** `docs/diagrams/diagrams_vkr_v2_0_2.md` и `diagrams_full_set_v2_0_2.md` —
+  ВКР-редакция диаграмм на модели v2.0.2 (канон — v3.0.0; история версий в `CHANGELOG.md`/`RELEASES.md`).
+- **Security-доки консолидированы (без потери инфы):**
+  - `knowledge/guides/cybersecurity_methodology.md` — теория/референс, оставлен на месте.
+  - `cybersecurity_finpilot_checklist.md` — прикладной чек-лист, перенесён `knowledge/guides/` → `docs/`.
+  - `docs/security.md` удалён; его уникальный контент (регуляторный контекст 152-ФЗ/ГОСТ/OWASP, таблица
+    «домены проверки при ревью», список «осталось до прода») вмёржен в корневой `SECURITY.md`. Устаревшие
+    статусы поправлены (MFA — реализован, v4.30.0). `SECURITY.md` теперь единый security-документ (§1–§7).
+- Обновлены перекрёстные ссылки на перемещённые/удалённые файлы (README, ROADMAP, legal, audit-отчёт,
+  `docs/diagrams/README.md`).
+- Код приложения, тесты и гейты не тронуты (docs+asset-батч).
+
 ## [5.6.0] — 2026-07-01 — Философия: моральный контракт + актуализация до v3.0.0; pptx убраны; галки роадмапа (MINOR)
 
 - **Философия продукта актуализирована** (`knowledge/business/product_philosophy.md`):

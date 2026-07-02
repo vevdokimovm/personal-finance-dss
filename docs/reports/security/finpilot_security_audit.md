@@ -3,7 +3,7 @@
 - **Дата / версия:** 2026-07-01, срез на `v4.30.2` (закрытие вехи 4).
 - **Скоуп:** бэкенд-безопасность — аутентификация, сессии, шифрование, ПДн; раздел ROADMAP §4.4.
 - **Метод:** обзор кода + история релизов (`CHANGELOG.md`, WATCHLOG §3) + `bandit`, `pip-audit`;
-  чек-лист — `knowledge/guides/cybersecurity_finpilot_checklist.md`.
+  чек-лист — `docs/cybersecurity_finpilot_checklist.md`.
 
 ## 1. Резюме
 Раздел 4.4 (cybersecurity hardening) **закрыт полностью**. Реализованы: инвалидация JWT (точечная и

@@ -1,7 +1,7 @@
 # FINPILOT — СППР для персональных финансов
 
 [![CI](https://github.com/vevdokimovm/personal-finance-dss/actions/workflows/ci.yml/badge.svg)](https://github.com/vevdokimovm/personal-finance-dss/actions/workflows/ci.yml)
-![version](https://img.shields.io/badge/version-5.6.0-blue)
+![version](https://img.shields.io/badge/version-5.7.0-blue)
 ![python](https://img.shields.io/badge/python-3.12-blue)
 ![coverage](https://img.shields.io/badge/coverage-92%25-brightgreen)
 ![license](https://img.shields.io/badge/license-MIT-green)
@@ -380,7 +380,7 @@ Pydantic, CSRF-защита, security-заголовки, rate-limit на чув
 блокировка аккаунта после неудачных входов, bcrypt-хеши паролей, Fernet-шифрование
 чувствительных полей в покое, fail-loud старт при дефолтных секретах в проде.
 
-Подробности — [`SECURITY.md`](SECURITY.md) и [`docs/security.md`](docs/security.md).
+Подробности — [`SECURITY.md`](SECURITY.md).
 
 ---
 
@@ -423,7 +423,7 @@ Dockerfile, docker-compose.yml, gunicorn_conf.py
 | [`docs/algorithm_stack.md`](docs/algorithm_stack.md) | Девятишаговый конвейер ядра по шагам в коде |
 | [`docs/diagrams.md`](docs/diagrams.md) | 8 диаграмм: слои, ER, конвейер, потоки, развёртывание, auth, фронт |
 | [`docs/testing_infrastructure.md`](docs/testing_infrastructure.md) | Карта тестов: уровни, три категории, PG-матрица, E2E |
-| [`docs/security.md`](docs/security.md) | Срез безопасности по реальному коду |
+| [`SECURITY.md`](SECURITY.md) | Единый security-док: меры (ссылки на код), что осталось, домены ревью, план реагирования |
 | [`docs/DEPLOY.md`](docs/DEPLOY.md) | Пошаговый деплой на VPS |
 | [`docs/CONTRIBUTING.md`](docs/CONTRIBUTING.md) | Процесс: TDD-цикл, PG для схемы, Definition of Done |
 | [`docs/GLOSSARY.md`](docs/GLOSSARY.md) | Термины и обозначения (Rt, Lt, Dt, BLR, Sn…) |
