@@ -46,7 +46,7 @@
         </mxCell>
 
         <!-- ЦИКЛ по альтернативам (подготовка/шестиугольник) -->
-        <mxCell id="loop" value="Для каждой альтернативы a ∈ A" style="shape=hexagon;perimeter=hexagonPerimeter2;whiteSpace=wrap;html=1;fixedSize=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=12;" vertex="1" parent="1">
+        <mxCell id="loop" value="Для каждой альтернативы a из A" style="shape=hexagon;perimeter=hexagonPerimeter2;whiteSpace=wrap;html=1;fixedSize=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=12;" vertex="1" parent="1">
           <mxGeometry x="305" y="620" width="230" height="60" as="geometry" />
         </mxCell>
 
@@ -76,7 +76,7 @@
         </mxCell>
 
         <!-- Решение: есть допустимые? -->
-        <mxCell id="dec_adm" value="A' ≠ ∅ ?" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=12;" vertex="1" parent="1">
+        <mxCell id="dec_adm" value="A' не пусто?" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=12;" vertex="1" parent="1">
           <mxGeometry x="350" y="1140" width="140" height="80" as="geometry" />
         </mxCell>
 

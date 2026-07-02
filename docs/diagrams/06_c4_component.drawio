@@ -94,6 +94,14 @@
         <mxCell id="x11" value="читает/пишет" style="endArrow=block;html=1;edgeStyle=orthogonalEdgeStyle;rounded=0;fontSize=10;strokeColor=#404040;fontColor=#404040;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="c_plan" target="c_crud"><mxGeometry relative="1" as="geometry" /></mxCell>
         <mxCell id="x12" style="endArrow=block;html=1;edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#404040;" edge="1" parent="1" source="c_crud" target="c_models"><mxGeometry relative="1" as="geometry" /></mxCell>
 
+      
+        <mxCell id="g_ing" value="app/ingestion — движок выписок (ADR-005)" style="rounded=1;whiteSpace=wrap;html=1;dashed=1;dashPattern=6 6;strokeColor=#6c8ebf;fillColor=#f2f7fc;verticalAlign=top;fontSize=12;fontStyle=2;fontColor=#6c8ebf;align=left;spacingLeft=12;spacingTop=8;arcSize=4;" vertex="1" parent="1"><mxGeometry x="60" y="600" width="440" height="115" as="geometry" /></mxCell>
+        <mxCell id="c_ing_engine" value="engine.py&#10;оркестрация импорта" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#A9C4EB;strokeColor=#6c8ebf;fontColor=#000000;fontSize=11;align=center;arcSize=10;" vertex="1" parent="1"><mxGeometry x="85" y="638" width="180" height="58" as="geometry" /></mxCell>
+        <mxCell id="c_ing_prov" value="providers/ + contracts&#10;CSV · XLSX · PDF · 1C" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#A9C4EB;strokeColor=#6c8ebf;fontColor=#000000;fontSize=11;align=center;arcSize=10;" vertex="1" parent="1"><mxGeometry x="285" y="638" width="195" height="58" as="geometry" /></mxCell>
+        <mxCell id="l_mfa" value="app/services (доп.)" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=9;fontStyle=2;fontColor=#82b366;" vertex="1" parent="1"><mxGeometry x="530" y="608" width="190" height="20" as="geometry" /></mxCell>
+        <mxCell id="c_mfa" value="mfa.py&#10;TOTP + recovery-коды" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#9DD49D;strokeColor=#82b366;fontColor=#000000;fontSize=11;align=center;arcSize=10;" vertex="1" parent="1"><mxGeometry x="530" y="638" width="190" height="58" as="geometry" /></mxCell>
+        <mxCell id="x_ing1" value="делегирует" style="endArrow=block;html=1;edgeStyle=orthogonalEdgeStyle;rounded=0;fontSize=10;strokeColor=#404040;fontColor=#404040;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="c_parse" target="c_ing_engine"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="x_ing2" style="endArrow=block;html=1;edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#404040;" edge="1" parent="1" source="c_ing_engine" target="c_ing_prov"><mxGeometry relative="1" as="geometry" /></mxCell>
       </root>
     </mxGraphModel>
   </diagram>

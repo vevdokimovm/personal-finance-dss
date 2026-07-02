@@ -22,7 +22,7 @@
         </mxCell>
 
         <!-- OCR-фильтр -->
-        <mxCell id="filter" value="OCR-фильтр: targets = { k ∈ O : rk ≥ r_bench }" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;fontSize=12;" vertex="1" parent="1">
+        <mxCell id="filter" value="OCR-фильтр: targets = { k из O : rk ≥ r_bench }" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;fontSize=12;" vertex="1" parent="1">
           <mxGeometry x="280" y="310" width="280" height="50" as="geometry" />
         </mxCell>
 
