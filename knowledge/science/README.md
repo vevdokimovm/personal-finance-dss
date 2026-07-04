@@ -26,12 +26,11 @@
 
 `publications_status.md` (+ `_v1_decisions`) · `kim_submission_checklist.md` — статус и подача ·
 `guides/` — методички (ГОСТ-статья, Scopus/WoS, РИНЦ/ВАК, учёные степени ×2, научный метод,
-бутстрап-промпт чата) · `drafts/` — черновик статьи A (опрос) · `articles/submitted/` —
-финальные рукописи и сопроводительное · `articles/kim/` — пакет КИМ (`kim_ru.pdf`/`kim_en.pdf`, 6 фигур,
-`replication_package/` — скрипты+результаты распакованы; docx-исходники у владельца и в release assets) · `articles/other/` — Article0 (версия для БИ), Explainable Hybrid,
-соавторская ветка с Бондаренко, дерево функций · `articles/journal_responses/` — ответы редакций
-(БИ отказ — pdf; e-Informatica и «Программирование» — суть в `notes.md`), пруф вёрстки и авторское соглашение e-Informatica ·
-`articles/published_rinc/` — справка о принятии.
+бутстрап-промпт чата) · `drafts/` — черновик статьи A (опрос) · `articles/` — только .pdf
+(правило диеты v5.18.0): пакет КИМ (RU/EN pdf + replication_package.zip), вёрстка EISEJ,
+справка МНТК (`published_rinc/`), авторское соглашение e-Informatica; .docx-исходники — у
+владельца, маппинг в `articles/manuscripts_index.md`; ответы редакций — выжимка
+`articles/journal_responses/responses_digest.md`.
 
 ## Что НЕ вошло (осталось в источнике `Наука.zip` у владельца)
 
@@ -41,5 +40,5 @@
 Scopus/WoS — Claude» · ORCID-страница · ident_instruction · контейнеры-дубли (Archive.zip,
 Материалы.zip) · учебные методички по предметам (Методички/*.docx: физика, химия, логика…).
 
-Вес папки: **~8.5 МБ, 42 файла** (sha-дедуп при переносе; переименования — англ. snake_case
+Вес папки после диеты v5.18.0: **~3.1 МБ** (было 8.5 МБ / 42 файла) (sha-дедуп при переносе; переименования — англ. snake_case
 для наших доков, имена рукописей-артефактов сохранены).

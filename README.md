@@ -1,7 +1,7 @@
 # FINPILOT — СППР для персональных финансов
 
 [![CI](https://github.com/vevdokimovm/personal-finance-dss/actions/workflows/ci.yml/badge.svg)](https://github.com/vevdokimovm/personal-finance-dss/actions/workflows/ci.yml)
-![version](https://img.shields.io/badge/version-5.18.0-blue)
+![version](https://img.shields.io/badge/version-5.13.0-blue)
 ![python](https://img.shields.io/badge/python-3.12-blue)
 ![coverage](https://img.shields.io/badge/coverage-92%25-brightgreen)
 ![license](https://img.shields.io/badge/license-MIT-green)
@@ -424,7 +424,6 @@ Dockerfile, docker-compose.yml, gunicorn_conf.py
 | [`docs/diagrams.md`](docs/diagrams.md) | 8 диаграмм: слои, ER, конвейер, потоки, развёртывание, auth, фронт |
 | [`docs/testing_infrastructure.md`](docs/testing_infrastructure.md) | Карта тестов: уровни, три категории, PG-матрица, E2E |
 | [`SECURITY.md`](SECURITY.md) | Единый security-док: меры (ссылки на код), что осталось, домены ревью, план реагирования |
-| [`LEGAL.md`](LEGAL.md) | Юридическая карта: статус продукта, 152-ФЗ, артефакты, юр-требования к фронту |
 | [`docs/DEPLOY.md`](docs/DEPLOY.md) | Пошаговый деплой на VPS |
 | [`docs/CONTRIBUTING.md`](docs/CONTRIBUTING.md) | Процесс: TDD-цикл, PG для схемы, Definition of Done |
 | [`docs/GLOSSARY.md`](docs/GLOSSARY.md) | Термины и обозначения (Rt, Lt, Dt, BLR, Sn…) |

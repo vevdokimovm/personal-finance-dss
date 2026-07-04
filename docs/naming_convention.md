@@ -45,7 +45,7 @@
 | Стандарт | `<тема>_standard.md` | `software_lifecycle_standard.md` |
 | Шаблон артефакта | `<артефакт>_template.md` / `<артефакт>_guide.md` | `bug_report_template.md`, `srs_guide.md` |
 | Юр-документ (RU) | `<документ>_ru.docx` + `<документ>.md` | `privacy_policy_ru.docx`, `privacy_policy.md` |
-| Эталон лого | `logo_reference_<что>.<ext>` | `logo_reference_hq.png` |
+| Эталон лого | `logo_reference[_<что>].<ext>` | `logo_reference.png` (800px; HQ-исходник у владельца) |
 | Диаграмма | `<NN>_<тема>[_GOST].drawio` | `04_c4_context.drawio` |
 
 ---
