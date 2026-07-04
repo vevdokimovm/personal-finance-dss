@@ -27,10 +27,10 @@
 `publications_status.md` (+ `_v1_decisions`) · `kim_submission_checklist.md` — статус и подача ·
 `guides/` — методички (ГОСТ-статья, Scopus/WoS, РИНЦ/ВАК, учёные степени ×2, научный метод,
 бутстрап-промпт чата) · `drafts/` — черновик статьи A (опрос) · `articles/submitted/` —
-финальные рукописи и сопроводительное · `articles/kim/` — пакет КИМ (RU/EN docx+pdf, 6 фигур,
-replication_package.zip) · `articles/other/` — Article0 (версия для БИ), Explainable Hybrid,
+финальные рукописи и сопроводительное · `articles/kim/` — пакет КИМ (`kim_ru.pdf`/`kim_en.pdf`, 6 фигур,
+`replication_package/` — скрипты+результаты распакованы; docx-исходники у владельца и в release assets) · `articles/other/` — Article0 (версия для БИ), Explainable Hybrid,
 соавторская ветка с Бондаренко, дерево функций · `articles/journal_responses/` — ответы редакций
-(БИ отказ, e-Informatica, Программирование), пруф вёрстки и авторское соглашение e-Informatica ·
+(БИ отказ — pdf; e-Informatica и «Программирование» — суть в `notes.md`), пруф вёрстки и авторское соглашение e-Informatica ·
 `articles/published_rinc/` — справка о принятии.
 
 ## Что НЕ вошло (осталось в источнике `Наука.zip` у владельца)

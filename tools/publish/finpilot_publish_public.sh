@@ -45,6 +45,7 @@ DU=/usr/bin/du
 WC=/usr/bin/wc
 SORT=/usr/bin/sort
 MKTEMP=/usr/bin/mktemp
+SED=/usr/bin/sed
 # git бывает и в /usr/bin, и в /usr/local/bin (brew) — резолвим:
 GIT="$(command -v git || echo /usr/bin/git)"
 
@@ -231,6 +232,30 @@ build_tree() {
   for doc in "${OPTIONAL_DOCS[@]}"; do
     [ -f "$SOURCE_REPO/docs/$doc" ] && "$CP" -p "$SOURCE_REPO/docs/$doc" "$dest/docs/$doc"
   done
+
+  sanitize_tree "$dest"
+}
+
+# ── Санитайзер: публичная поверхность без личных имён и приватных ссылок ─────
+# Найдено ревизией v5.18.0: имя в футере README и LICENSE, CI-бейдж на приватный
+# репо, clone-URL приватного репо в DEPLOY.md. Правило ROADMAP «безымянность в
+# публичных артефактах» — применяем к зеркалу механически. Решение владельца
+# может вернуть имя в LICENSE — тогда убрать одну замену ниже + строку имя-гарда.
+sanitize_tree() {
+  local dest="$1"
+  log "Санитайзер публичной поверхности..."
+  # README: бейдж CI приватного репо -> публичного; футер копирайта обезличен
+  if [ -f "$dest/README.md" ]; then
+    "$SED" -i ''       -e 's#github.com/vevdokimovm/personal-finance-dss/actions/workflows/ci.yml#github.com/vevdokimovm/finpilot/actions/workflows/ci.yml#g'       -e 's#© 2025 Vasilii Evdokimov#© 2025 FINPILOT#g'       "$dest/README.md"
+  fi
+  # LICENSE: правообладатель обезличен (см. манифест, решение Q1 за владельцем)
+  if [ -f "$dest/LICENSE" ]; then
+    "$SED" -i '' -e 's#Copyright (c) 2025 Vasilii Evdokimov#Copyright (c) 2025 FINPILOT#g' "$dest/LICENSE"
+  fi
+  # DEPLOY: инструкция клонит публичное зеркало, не приватный монорепо
+  if [ -f "$dest/docs/DEPLOY.md" ]; then
+    "$SED" -i '' -e 's#vevdokimovm/personal-finance-dss.git#vevdokimovm/finpilot.git#g' "$dest/docs/DEPLOY.md"
+  fi
 }
 
 # ── Guard: имена из deny-list + секрет-паттерны. Любое совпадение → FAIL ──────
@@ -259,8 +284,18 @@ run_guard() {
     fi
   done
 
+  log "GUARD 3/3: скан на личные имена (правило безымянности)..."
+  for pat in 'Vasilii Evdokimov' 'Василий Евдокимов' 'Евдокимов В' 'Evdokimov V'; do
+    hit="$("$GREP" -rI "$pat" "$dir" 2>/dev/null || true)"
+    if [ -n "$hit" ]; then
+      warn "ЛИЧНОЕ ИМЯ найдено (/$pat/):"
+      /bin/echo "$hit" | /usr/bin/head -10 >&2
+      failed=1
+    fi
+  done
+
   [ "$failed" -eq 0 ] || die "GUARD ПРОВАЛЕН — публикация остановлена. Разберись выше."
-  log "GUARD пройден: запрещённых файлов и секретов не найдено."
+  log "GUARD пройден: запрещённых файлов, секретов и личных имён не найдено."
 }
 
 # ── Манифест: что реально уходит наружу ──────────────────────────────────────

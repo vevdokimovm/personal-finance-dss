@@ -211,3 +211,19 @@ cat /tmp/p3.txt | tr ' ' '\n' | grep -v '^$' | tail -7 | tr '\n' ' ' > /tmp/p3b.
 stdout (итоговая строка pytest в файл-редирект не флашится надёжно — §2); `timeout` на группу
 гарантирует возврат управления; синхронность убирает зависимость от живучести фонового процесса.
 Эталон счётчика по группам сверять с прошлым прогоном (рост = новые тесты, падение = регресс/пропуск).
+
+---
+
+## Сборка чистого архива (канонический exclude-лист)
+
+Утечка `.mypy_cache` в v5.17.0 показала: список исключений жил «в голове». Канон:
+
+```bash
+cd /home/claude/work && zip -qr finpilot_vX_Y_Z_intl.zip finpilot_vX_Y_Z_intl \
+  -x "*/.venv/*" "*/.git/*" "*__pycache__*" "*.pyc" "*.db" "*.DS_Store" \
+     "*__screenshots__*" "*.pytest_cache*" "*.hypothesis*" "*.mypy_cache*" \
+     "*node_modules*" "*.coverage"
+```
+
+Перед отдачей: `unzip -l archive.zip | grep -E "cache|venv|__pycache__"` — должно
+быть пусто; вес — `ls -la`. Новые кэш-директории добавлять сюда сразу.
