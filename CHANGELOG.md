@@ -2,6 +2,41 @@
 
 Формат: [Keep a Changelog](https://keepachangelog.com/ru/1.0.0/). Версионирование — [SemVer](https://semver.org/lang/ru/).
 
+## [5.18.2] — 2026-07-04 — Консолидация вахт M+J за веху 5 (PATCH, merge)
+
+Слияние двух независимых реализаций закрытия вехи 5: база — линия M (v5.18.1, каноничная нумерация
+вех и механизм закрытия), в неё влито ценное из линии J (v5.18.0). Код `app/` не тронут — деревья
+`app/`/`tests/`/`alembic/`/`templates/` были байт-в-байт идентичны у обоих аккаунтов; расхождение
+только в `docs/`/`knowledge/`. Полный отчёт — `docs/reports/merges/merge_report_v5_18_2.md`.
+
+- **Восстановлены из линии J .md-исходники науки** (диета M их снесла, оставив только .pdf + индекс):
+  `articles/submitted/{article1_eisej_final,article2_informatics_automation_final,article3_programming_final,manuscript_ru,manuscript_en,cover_letter}.md`,
+  вся `articles/other/**` (Article0-БИ, Hybrid EN, ветка Бондаренко ×2, `fig_function_tree_en.png`),
+  `guides/scientific_method.docx`. Markdown-исходник в репо — diff-friendly и greppable;
+  `manuscripts_index.md` обновлён (новая колонка «Исходник .md (в репо)»).
+- **Оригиналы ответов редакций восстановлены рядом с дайджестом** (было: диета свела в
+  `responses_digest.md`): `journal_responses/{business_informatics_hse_response.pdf,e_informatica_draft_proof.pdf,notes.md}`.
+  Дайджест оставлен как читаемая сводка, оригиналы — как первичные документы.
+- **Пакет репликации КИМ — и zip, и распакованное**: `kim/replication_package.zip` (замороженный
+  сабмишен-артефакт от M) + распакованные `kim/replication_package/**` и `kim/figures/**` (browsable
+  рабочая копия от J). Наука private-only → +0.9 МБ между аккаунтами роли не играют.
+- **Питч: восстановлены RU-PDF и .md-исходники** из линии J рядом с курсом M:
+  `pitch/{pitch_ru.pdf,pitch_intl_ru.pdf,eventify_channel_analysis.md,solution_factory_methodology.md}`.
+- **Лого-эталон — версия J** (объективно лучше по обеим осям): `logo_reference.png` теперь
+  1200×1112 / 124 КБ (палитра 256) вместо 800×741 / 502 КБ RGB. HQ-мастер по-прежнему у владельца.
+- **`docs/public_mirror_manifest.md`** восстановлен из линии J (ЖДЁТ подтверждения владельца);
+  ссылка `roadmap_registry.md` → `roadmap_archive/` (канон M).
+- **Чистка нумерации вех в ROADMAP** (тело противоречило собственной таблице 6/7/8): 6 ссылок
+  «фронт → веха 6» исправлены на **веха 8** (CSP, Cookie/CSRF, glossary, adr_001, ui_visual_design_brief,
+  колокольчик), 2 ссылки «юрист → веха 8» на **веха 7**, мат-модель «веха 7» → **веха 6**.
+- **`.flake8`: `knowledge` добавлен в `exclude`.** Восстановление распакованных research-скриптов
+  `replication_package/*.py` (не PEP8 намеренно — точное воспроизведение статьи) вернуло 102 нарушения,
+  которые у M были спрятаны внутри zip. `knowledge/` — база знаний, не app-исходники; линтеру там не место.
+  После правки flake8 репо = 0. app-код (`app/`/`tools/`/`tests/`) линтуется как прежде.
+- **НЕ восстановлено намеренно**: `roadmap_registry.md` (заменён `roadmap_archive/` вахты M — старая
+  нумерация 6↔7), дубли-имена PDF `kim_en/kim_ru/eisej_submission.pdf` (байт-в-байт равны
+  переименованным `Evdokimov_KIM_*` / `Article_EISEJ_*` — оставлены имена M, трассируемые к .docx-источникам).
+
 ## [5.18.1] — 2026-07-03 — Merge-манифест вахты M (PATCH)
 
 - `docs/reports/merges/merge_manifest_v5_18_1.md`: батчи v5.12.0→v5.18.1, опасные зоны
