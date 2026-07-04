@@ -18,7 +18,7 @@
 | An Explainable Hybrid DSS (EN-ветка) | — | `other/explainable_hybrid_dss.md` | `Статьи/An Explainable Hybrid Decision Support System for Personal Finance.docx` |
 | Соавторская ветка (Бондаренко) ×2 | — | `other/coauthored_bondarenko/…` | `Статьи/В соавторстве с Бондаренко/…` |
 | Cover letter (EISEJ) | — | `submitted/cover_letter.md` | `Статьи/Соло от организации/Cover_letter_Evdokimov.docx` |
-| Научный метод (методичка) | суть в `../guides/` | `../guides/scientific_method.docx` (docx-методичка J) | `Научный_метод.docx` |
+| Научный метод (методичка) | суть в `../guides/*.md` | — | `Научный_метод.docx` |
 
 Фигуры статьи КИМ (6 png): канонично живут внутри `kim/replication_package.zip` (10 fig-вхождений,
 распаковывается при подаче) **и** дополнительно распакованы в `kim/figures/` + `kim/replication_package/`

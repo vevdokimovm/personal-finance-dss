@@ -2,6 +2,24 @@
 
 Формат: [Keep a Changelog](https://keepachangelog.com/ru/1.0.0/). Версионирование — [SemVer](https://semver.org/lang/ru/).
 
+## [5.18.3] — 2026-07-04 — Диета-уточнение по приказу владельца: .docx вон, генерируемое вон (PATCH)
+
+Пост-мёрж чистка (приказ владельца после v5.18.2). Код `app/` не тронут.
+
+- **Все `.docx` убраны из репо** (правило владельца: `.docx` — экспортные артефакты, живут у владельца;
+  в репо канон — `.md`). Убрано 7: 4 юр-документа (`consent_financial_data_ru`, `consent_personal_data_ru`,
+  `privacy_policy_ru`, `terms_of_service_ru` — у каждого уже был `.md`-двойник, потерь нет),
+  `science/guides/scientific_method.docx`, `survey_auditory/results/survey_wave2.docx`.
+  `product/user_manual_simple.docx` **сконвертирован в `user_manual_simple.md`** (двойника не было — контент сохранён).
+- **Генерируемые тяжёлые артефакты убраны** (источник + регенерация вместо коммита выхлопа):
+  - Питч-PDF `pitch_ru.pdf` + `pitch_intl_ru.pdf` (~1.2 МБ) — регенерируются `tools/post_render/p013_render.py`
+    из `.md`-скриптов (скрипты остаются в репо).
+  - Survey `results/`: убран только `.docx`; графики (14 PNG) + `finpilot_report.html` + `results.json` ОСТАВЛЕНЫ (владелец: смотреть глазами в репе). Регенератор
+    `tools/survey_analysis` из `raw/survey_responses_385.xlsx`. Остались ручные `README.md` + `finpilot_recommendations.md`.
+- **`naming_convention.md`:** правило 5 и таблица приведены к политике «`.docx` — у владельца, в репо `.md`»;
+  строка эталона лого поправлена 800px → 1200px (актуально после v5.18.2).
+- Ссылки на удалённое почищены (`manuscripts_index.md` — `scientific_method.docx`).
+
 ## [5.18.2] — 2026-07-04 — Консолидация вахт M+J за веху 5 (PATCH, merge)
 
 Слияние двух независимых реализаций закрытия вехи 5: база — линия M (v5.18.1, каноничная нумерация
