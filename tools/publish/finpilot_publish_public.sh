@@ -89,24 +89,13 @@ ALLOW_FILES=(
   .env.prod.example
 )
 
-# ── ALLOW-LIST: docs (только нейтральная тех-документация) ───────────────────
+# ── ALLOW-LIST: docs (МИНИМУМ — только нужное для запуска; правило v5.18.4) ───
+# Внутренняя кухня разработки (процесс/CONTRIBUTING, баг-репорты, ADR, глоссарий,
+# гайды, реестры инцидентов) НЕ публикуется — это конфиденциальная информация
+# компании. IP-доки (мат-модель, диаграммы, UI-стандарт) закрыты (OPTIONAL ниже).
 ALLOW_DOCS=(
-  README.md
-  CONTRIBUTING.md
-  GLOSSARY.md
-  QA.md
   DEPLOY.md
   RELEASES.md
-  engineering_practices.md
-  adr_001_frontend_stack.md
-  adr_002_datetime_storage.md
-  adr_template.md
-  bug_report_template.md
-  incident_postmortem_guide.md
-  investigation_report_guide.md
-  requirements_guide.md
-  ui_requirements_guide.md
-  report_types.md
 )
 
 # ── OPTIONAL docs: раскрывают IP / стратегию. Раскомментируй осознанно ────────
@@ -231,6 +220,48 @@ build_tree() {
   for doc in "${OPTIONAL_DOCS[@]}"; do
     [ -f "$SOURCE_REPO/docs/$doc" ] && "$CP" -p "$SOURCE_REPO/docs/$doc" "$dest/docs/$doc"
   done
+
+  sanitize_tree "$dest"
+}
+
+# ── Санитайзер: обезличивание + публичная лицензия + актуальная версия ────────
+# Приватный репо держит MIT и реальное имя владельца в README/LICENSE/фикстурах.
+# Наружу это уходить НЕ должно. Функция гоняется в конце сборки, ДО guard.
+# BSD/macOS sed → синтаксис `sed -i ''`.
+sanitize_tree() {
+  local dest="$1"
+  local ver; ver="$(resolve_version || echo 0.0.0)"
+  log "SANITIZE: обезличивание + PolyForm-лицензия + версия ${ver}..."
+
+  # 1. LICENSE: MIT (приват) → PolyForm Noncommercial (source-available наружу).
+  #    Текст живёт в файле рядом со скриптом, чтобы не хардкодить в sh.
+  if [ -f "$SOURCE_REPO/tools/publish/LICENSE_public_polyform.txt" ]; then
+    "$CP" -p "$SOURCE_REPO/tools/publish/LICENSE_public_polyform.txt" "$dest/LICENSE"
+  else
+    warn "нет tools/publish/LICENSE_public_polyform.txt — LICENSE НЕ заменён на PolyForm!"
+  fi
+
+  # 2. README: приватный репо→finpilot, имя→FINPILOT, лицензия MIT→PolyForm, версия-бейдж.
+  if [ -f "$dest/README.md" ]; then
+    /usr/bin/sed -i '' \
+      -e 's|vevdokimovm/personal-finance-dss|vevdokimovm/finpilot|g' \
+      -e 's|© 2025 Vasilii Evdokimov|© 2025 FINPILOT|g' \
+      -e 's|\[MIT\](LICENSE)|[PolyForm Noncommercial 1.0.0](LICENSE)|g' \
+      -e 's|badge/license-MIT-green|badge/license-PolyForm%20Noncommercial-orange|g' \
+      -e "s|badge/version-[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*|badge/version-${ver}|g" \
+      "$dest/README.md"
+  fi
+
+  # 3. DEPLOY: приватный clone-URL → публичный.
+  [ -f "$dest/docs/DEPLOY.md" ] && \
+    /usr/bin/sed -i '' 's|vevdokimovm/personal-finance-dss|vevdokimovm/finpilot|g' "$dest/docs/DEPLOY.md"
+
+  # 4. Тест-фикстуры: реальное имя в примерах выписок → нейтральное.
+  "$GREP" -rIl 'Василий Максимович' "$dest" 2>/dev/null | while IFS= read -r f; do
+    /usr/bin/sed -i '' 's|Е\. Василий Максимович|И. Иван Иванович|g' "$f"
+  done
+
+  log "SANITIZE ок (LICENSE=PolyForm, имя/приватный-репо обезличены, версия=${ver})."
 }
 
 # ── Guard: имена из deny-list + секрет-паттерны. Любое совпадение → FAIL ──────
@@ -259,8 +290,20 @@ run_guard() {
     fi
   done
 
+  log "GUARD 3/3: скан на личные имена и приватный репо (правило безымянности)..."
+  # Реальное имя владельца (латиница+кириллица) и ссылка на приватный монорепо
+  # НЕ должны утечь. Ловим ПОСЛЕ санитайзера — если что-то осталось, роняем сборку.
+  # ВАЖНО: `vevdokimovm` в одиночку не флагаем — это публичный логин (github.com/vevdokimovm/finpilot).
+  local NAME_RE='Vasilii|Evdokimov|Василий|Василия|Евдокимов|personal-finance-dss'
+  hit="$("$GREP" -rIE "$NAME_RE" "$dir" 2>/dev/null || true)"
+  if [ -n "$hit" ]; then
+    warn "ЛИЧНОЕ ИМЯ / ПРИВАТНЫЙ РЕПО в дереве — санитайзер пропустил, добавь правило:"
+    /bin/echo "$hit" | /usr/bin/head -20 >&2
+    failed=1
+  fi
+
   [ "$failed" -eq 0 ] || die "GUARD ПРОВАЛЕН — публикация остановлена. Разберись выше."
-  log "GUARD пройден: запрещённых файлов и секретов не найдено."
+  log "GUARD пройден: запрещённых файлов, секретов, имён — не найдено."
 }
 
 # ── Манифест: что реально уходит наружу ──────────────────────────────────────
