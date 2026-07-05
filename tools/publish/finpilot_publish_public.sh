@@ -1,26 +1,46 @@
 #!/usr/bin/env bash
 # =============================================================================
-# finpilot_publish_public.sh
+# finpilot_publish_public.sh — v2 (тег + релиз + описание)
 #
-# Сборка ПУБЛИЧНОГО зеркала (репо vevdokimovm/finpilot) из ПРИВАТНОГО
-# монорепо (vevdokimovm/personal-finance-dss).
+# Сборка и публикация ПУБЛИЧНОГО зеркала (репо vevdokimovm/finpilot) из
+# ПРИВАТНОГО монорепо (vevdokimovm/personal-finance-dss).
 #
 # Философия: whitelist / deny-by-default. Наружу уходит ТОЛЬКО то, что явно
 # перечислено ниже. Всё остальное (WATCHLOG, мёрж-манифесты, реестры
 # инцидентов, юр-вопросы, бизнес-анализ, опросы, секреты) не публикуется
 # по определению — оно просто не входит в allow-list.
 #
-# Второй слой защиты: guard-сканер прогоняет собранное дерево на паттерны
-# ключей / приватных данных и падает, если что-то нашёл.
+# Слои защиты:
+#   sanitize_tree — обезличивание + PolyForm-лицензия + версия (перед guard);
+#   GUARD 1/3 — запрещённые имена файлов; 2/3 — секрет-паттерны;
+#   3/3 — личные имена и приватный репо в контенте;
+#   guard_notes — тот же скан для ТЕКСТА релиза перед его публикацией.
+#
+# v2 (по аналогии с приватным finpilot_publish.sh): после push зеркало
+# получает git-тег vX.Y.Z и оформленный GitHub Release с заголовком и
+# описанием. Источник описания: tools/publish/public_release_notes.md
+# (секции `## [X.Y.Z]`, написанные ДЛЯ публики) → при отсутствии секции
+# генерируется нейтральная заготовка. CHANGELOG/WATCHLOG приватного репо
+# НЕ используются: там внутренняя кухня (вахты, аккаунты, процесс).
+#
+# [!] АССЕТЫ К ПУБЛИЧНЫМ РЕЛИЗАМ НЕ ПРИКЛАДЫВАЮТСЯ. Архив finpilot_v*_intl.zip
+#     содержит ПОЛНОЕ ПРИВАТНОЕ дерево (knowledge/, docs/, tools/) — прикрепить
+#     его к публичному релизу = слить всё разом. Исходники зеркала GitHub
+#     прикладывает к релизу сам (Source code zip/tar.gz).
 #
 # Запуск (из Downloads, как принято в проекте):
 #   zsh ~/Downloads/finpilot_publish_public.sh            # dry-run (по умолчанию)
 #   zsh ~/Downloads/finpilot_publish_public.sh build      # собрать staging, без push
-#   zsh ~/Downloads/finpilot_publish_public.sh push       # собрать + commit + push
+#   zsh ~/Downloads/finpilot_publish_public.sh push       # сборка + commit + push + тег + релиз
+#   zsh ~/Downloads/finpilot_publish_public.sh release    # только тег + релиз для версии в staging
+#                                                         # (если push уже был, а релиз не оформился)
 #
 # Переопределение путей без правки скрипта:
 #   FINPILOT_SRC=/path/to/private FINPILOT_STAGE=/path/to/stage \
 #     zsh ~/Downloads/finpilot_publish_public.sh build
+#
+# Требования: git; для фазы релиза — gh (brew install gh && gh auth login).
+# Без gh push/тег пройдут, релиз-фаза даст команду для ручного оформления.
 # =============================================================================
 
 set -euo pipefail
@@ -30,9 +50,12 @@ set -euo pipefail
 SOURCE_REPO="${FINPILOT_SRC:-$HOME/PycharmProjects/personal-finance-dss}"
 # Рабочая папка публичного зеркала (git-клон finpilot):
 STAGING_DIR="${FINPILOT_STAGE:-$HOME/dev/finpilot-public}"
-# Remote публичной репы:
-PUBLIC_REMOTE="${FINPILOT_REMOTE:-git@github.com:vevdokimovm/finpilot.git}"
+# Remote публичной репы. Практика проекта — HTTPS + токен (см.
+# docs/mirror_publishing_guide.md §2.1); SSH из РФ требует порт 443.
+PUBLIC_REMOTE="${FINPILOT_REMOTE:-https://github.com/vevdokimovm/finpilot.git}"
 PUBLIC_BRANCH="${FINPILOT_BRANCH:-main}"
+# Слаг репы для gh CLI (оформление релизов):
+PUBLIC_REPO_SLUG="${FINPILOT_SLUG:-vevdokimovm/finpilot}"
 
 # ── Абсолютные пути к утилитам (правило 4: без опоры на PATH) ─────────────────
 RM=/bin/rm
@@ -45,8 +68,20 @@ DU=/usr/bin/du
 WC=/usr/bin/wc
 SORT=/usr/bin/sort
 MKTEMP=/usr/bin/mktemp
+SED=/usr/bin/sed
+HEAD=/usr/bin/head
+BASENAME=/usr/bin/basename
+DIRNAME=/usr/bin/dirname
+TR=/usr/bin/tr
+CUT=/usr/bin/cut
+PY3="$(command -v python3 || echo /usr/bin/python3)"
 # git бывает и в /usr/bin, и в /usr/local/bin (brew) — резолвим:
 GIT="$(command -v git || echo /usr/bin/git)"
+# gh может отсутствовать — тогда релиз-фаза деградирует с подсказкой:
+GH="$(command -v gh || true)"
+
+TITLE_TMP="/tmp/fp_pub_public_title.txt"
+NOTES_TMP="/tmp/fp_pub_public_notes.md"
 
 # ── ALLOW-LIST: директории (копируются целиком, минус кэши) ───────────────────
 ALLOW_DIRS=(
@@ -112,6 +147,12 @@ OPTIONAL_DOCS=(
   # documentation_methodology.md
 )
 
+# ── MIRROR-EXTRAS: файлы ТОЛЬКО для зеркала (в приватном репо не работают) ────
+# Пример: CodeQL бесплатен на публичных репо, на приватном без Advanced
+# Security воркфлоу просто падал бы. Дерево extras накладывается поверх
+# собранного зеркала ДО санитайзера (guard его тоже сканирует).
+MIRROR_EXTRAS_DIR="$SOURCE_REPO/tools/publish/mirror_extras"
+
 # ── DENY-LIST: паттерны имён, которые НИКОГДА не должны утечь (двойная сетка) ──
 # Даже если случайно попадут в allow — guard поймает по имени и уронит сборку.
 DENY_NAME_PATTERNS=(
@@ -131,6 +172,7 @@ DENY_NAME_PATTERNS=(
   '*.sqlite'
   '*.sqlite3'
   'finpilot_publish_public.sh'
+  'public_release_notes.md'
 )
 
 # ── Секрет-паттерны (ERE, BSD-grep совместимо). Найдено → FAIL ────────────────
@@ -142,6 +184,14 @@ SECRET_PATTERNS=(
   'ghp_[A-Za-z0-9]{30,}'                      # GitHub personal token
   'eb2988ac-e9ba|bc43a107-d24a|a583ff32-acec' # твои Anthropic org id (M/J/S)
 )
+
+# ── Контент-паттерн приватности (GUARD 3/3 дерева И guard_notes релиза) ───────
+# Реальное имя владельца (латиница+кириллица) и приватный монорепо не должны
+# утечь. `vevdokimovm` в одиночку не флагаем — публичный логин.
+NAME_RE='Vasilii|Evdokimov|Василий|Василия|Евдокимов|personal-finance-dss'
+# Для ТЕКСТА релиза сетка шире: внутренняя кухня процесса (вахты, аккаунты,
+# журнал, Claude) в публичном описании неуместна → FAIL, перепиши секцию.
+NOTES_RE="$NAME_RE"'|WATCHLOG|вахт|аккаунт|Claude|клод'
 
 # ── rsync excludes: мусор и локальные артефакты ──────────────────────────────
 RSYNC_EXCLUDES=(
@@ -165,9 +215,15 @@ warn() { /bin/echo "!! $*" >&2; }
 die()  { /bin/echo "XX $*" >&2; exit 1; }
 
 resolve_version() {
-  # Достаём APP_VERSION из app/config.py для сообщения коммита
+  # Достаём APP_VERSION из app/config.py для коммита/тега/релиза
   "$GREP" -Eo 'default="[0-9]+\.[0-9]+\.[0-9]+"' "$SOURCE_REPO/app/config.py" \
-    | "$GREP" -Eo '[0-9]+\.[0-9]+\.[0-9]+' | /usr/bin/head -1
+    | "$GREP" -Eo '[0-9]+\.[0-9]+\.[0-9]+' | "$HEAD" -1
+}
+
+staging_version() {
+  # Версия дерева, реально лежащего в staging (для режима release)
+  "$GREP" -Eo 'default="[0-9]+\.[0-9]+\.[0-9]+"' "$STAGING_DIR/app/config.py" \
+    | "$GREP" -Eo '[0-9]+\.[0-9]+\.[0-9]+' | "$HEAD" -1
 }
 
 git_retry() {
@@ -177,6 +233,16 @@ git_retry() {
     n=$((n + 1))
     [ "$n" -ge 3 ] && die "git $* — не удалось после 3 попыток"
     warn "git $* — попытка $n не прошла, повтор через 5с..."
+    /bin/sleep 5
+  done
+}
+
+gh_retry() {
+  local n=0
+  until "$GH" "$@"; do
+    n=$((n + 1))
+    [ "$n" -ge 3 ] && return 1
+    warn "gh $* — попытка $n не прошла, повтор через 5с..."
     /bin/sleep 5
   done
 }
@@ -221,6 +287,11 @@ build_tree() {
     [ -f "$SOURCE_REPO/docs/$doc" ] && "$CP" -p "$SOURCE_REPO/docs/$doc" "$dest/docs/$doc"
   done
 
+  if [ -d "$MIRROR_EXTRAS_DIR" ]; then
+    log "Накладываю mirror-extras (файлы только для зеркала: CodeQL и т.п.)..."
+    "$RSYNC" -a "${RSYNC_EXCLUDES[@]}" "$MIRROR_EXTRAS_DIR/" "$dest/"
+  fi
+
   sanitize_tree "$dest"
 }
 
@@ -243,7 +314,7 @@ sanitize_tree() {
 
   # 2. README: приватный репо→finpilot, имя→FINPILOT, лицензия MIT→PolyForm, версия-бейдж.
   if [ -f "$dest/README.md" ]; then
-    /usr/bin/sed -i '' \
+    "$SED" -i '' \
       -e 's|vevdokimovm/personal-finance-dss|vevdokimovm/finpilot|g' \
       -e 's|© 2025 Vasilii Evdokimov|© 2025 FINPILOT|g' \
       -e 's|\[MIT\](LICENSE)|[PolyForm Noncommercial 1.0.0](LICENSE)|g' \
@@ -254,11 +325,11 @@ sanitize_tree() {
 
   # 3. DEPLOY: приватный clone-URL → публичный.
   [ -f "$dest/docs/DEPLOY.md" ] && \
-    /usr/bin/sed -i '' 's|vevdokimovm/personal-finance-dss|vevdokimovm/finpilot|g' "$dest/docs/DEPLOY.md"
+    "$SED" -i '' 's|vevdokimovm/personal-finance-dss|vevdokimovm/finpilot|g' "$dest/docs/DEPLOY.md"
 
   # 4. Тест-фикстуры: реальное имя в примерах выписок → нейтральное.
   "$GREP" -rIl 'Василий Максимович' "$dest" 2>/dev/null | while IFS= read -r f; do
-    /usr/bin/sed -i '' 's|Е\. Василий Максимович|И. Иван Иванович|g' "$f"
+    "$SED" -i '' 's|Е\. Василий Максимович|И. Иван Иванович|g' "$f"
   done
 
   log "SANITIZE ок (LICENSE=PolyForm, имя/приватный-репо обезличены, версия=${ver})."
@@ -269,7 +340,7 @@ run_guard() {
   local dir="$1"
   local failed=0
 
-  log "GUARD 1/2: проверка запрещённых имён..."
+  log "GUARD 1/3: проверка запрещённых имён..."
   local pat hit
   for pat in "${DENY_NAME_PATTERNS[@]}"; do
     hit="$("$FIND" "$dir" -type f -name "$pat" 2>/dev/null || true)"
@@ -280,30 +351,126 @@ run_guard() {
     fi
   done
 
-  log "GUARD 2/2: скан на секреты..."
+  log "GUARD 2/3: скан на секреты..."
   for pat in "${SECRET_PATTERNS[@]}"; do
     hit="$("$GREP" -rIE "$pat" "$dir" 2>/dev/null || true)"
     if [ -n "$hit" ]; then
       warn "СЕКРЕТ-ПАТТЕРН найден (/$pat/):"
-      /bin/echo "$hit" | /usr/bin/head -20 >&2
+      /bin/echo "$hit" | "$HEAD" -20 >&2
       failed=1
     fi
   done
 
   log "GUARD 3/3: скан на личные имена и приватный репо (правило безымянности)..."
-  # Реальное имя владельца (латиница+кириллица) и ссылка на приватный монорепо
-  # НЕ должны утечь. Ловим ПОСЛЕ санитайзера — если что-то осталось, роняем сборку.
-  # ВАЖНО: `vevdokimovm` в одиночку не флагаем — это публичный логин (github.com/vevdokimovm/finpilot).
-  local NAME_RE='Vasilii|Evdokimov|Василий|Василия|Евдокимов|personal-finance-dss'
   hit="$("$GREP" -rIE "$NAME_RE" "$dir" 2>/dev/null || true)"
   if [ -n "$hit" ]; then
     warn "ЛИЧНОЕ ИМЯ / ПРИВАТНЫЙ РЕПО в дереве — санитайзер пропустил, добавь правило:"
-    /bin/echo "$hit" | /usr/bin/head -20 >&2
+    /bin/echo "$hit" | "$HEAD" -20 >&2
     failed=1
   fi
 
   [ "$failed" -eq 0 ] || die "GUARD ПРОВАЛЕН — публикация остановлена. Разберись выше."
   log "GUARD пройден: запрещённых файлов, секретов, имён — не найдено."
+}
+
+# ── Описание релиза: public_release_notes.md → генерируемая заготовка ─────────
+# Пишет заголовок в $TITLE_TMP, тело в $NOTES_TMP. Никогда не берёт текст из
+# приватных CHANGELOG/WATCHLOG — только из файла, написанного ДЛЯ публики.
+extract_public_notes() {
+  local ver="$1"
+  local notes_src="$SOURCE_REPO/tools/publish/public_release_notes.md"
+  "$PY3" - "$ver" "$notes_src" "$TITLE_TMP" "$NOTES_TMP" <<'PY'
+import re, sys, datetime
+
+ver, src, ft, fn = sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4]
+
+title, body = None, None
+try:
+    txt = open(src, encoding="utf-8").read()
+    m = re.search(r"^## \[" + re.escape(ver) + r"\][^\n]*$", txt, re.M)
+    if m:
+        header = m.group(0)
+        hdr = re.sub(r"^## \[[^\]]*\]", "", header).strip()
+        parts = [p.strip() for p in re.split(r"\s+[\u2014\u2013-]\s+", hdr) if p.strip()]
+        title = parts[-1] if parts else ""
+        nxt = re.search(r"^## \[", txt[m.end():], re.M)
+        body = (txt[m.end():m.end() + nxt.start()] if nxt else txt[m.end():]).strip("\n")
+except OSError:
+    pass
+
+if not body:
+    # Заготовка по умолчанию: нейтрально, безымянно, без внутренней кухни.
+    title = "public mirror sync"
+    today = datetime.date.today().isoformat()
+    body = (
+        f"## {today}\n\n"
+        "Синхронизация публичного зеркала с основной линией разработки.\n\n"
+        "В составе: движок рекомендаций (SAW, Debt Avalanche, SES + Monte-Carlo),\n"
+        "FastAPI-бэкенд, тесты четырёх уровней (fast/full/deep/e2e), миграции Alembic,\n"
+        "Docker-инфраструктура и трёхуровневый CI.\n\n"
+        "История версий продукта: `docs/RELEASES.md`. "
+        "Лицензия: PolyForm Noncommercial 1.0.0."
+    )
+
+open(ft, "w", encoding="utf-8").write(f"FINPILOT v{ver} \u2014 {title}".strip(" \u2014"))
+open(fn, "w", encoding="utf-8").write(body + "\n")
+PY
+}
+
+guard_notes() {
+  # Текст релиза публичен так же, как дерево — гоняем через ту же сетку + шире.
+  local hit
+  hit="$("$GREP" -IE "$NOTES_RE" "$NOTES_TMP" "$TITLE_TMP" 2>/dev/null || true)"
+  if [ -n "$hit" ]; then
+    warn "ОПИСАНИЕ РЕЛИЗА содержит приватное (имя/кухня процесса):"
+    /bin/echo "$hit" | "$HEAD" -10 >&2
+    die "Перепиши секцию в tools/publish/public_release_notes.md без внутренней кухни."
+  fi
+  log "guard_notes пройден: описание релиза чистое."
+}
+
+# ── Тег + GitHub Release для версии (идемпотентно) ────────────────────────────
+publish_release() {
+  local ver="$1" tag="v$1"
+  cd "$STAGING_DIR"
+
+  # 1. Тег. Существующий не перетираем (история зеркала неприкасаема).
+  if "$GIT" rev-parse "$tag" >/dev/null 2>&1; then
+    log "Тег $tag уже есть — пропуск тегирования."
+  else
+    "$GIT" tag "$tag"
+    git_retry push origin "$tag"
+    log "Тег $tag создан и запушен."
+  fi
+
+  # 2. Релиз через gh. Нет gh — даём ручную команду и выходим без ошибки.
+  if [ -z "$GH" ]; then
+    warn "gh не установлен — релиз не оформлен. Вручную:"
+    warn "  brew install gh && gh auth login"
+    warn "  gh release create $tag -R $PUBLIC_REPO_SLUG --title '...' --notes-file notes.md --latest"
+    return 0
+  fi
+  "$GH" auth status >/dev/null 2>&1 || {
+    warn "gh не авторизован (gh auth login) — релиз не оформлен, тег уже на месте."
+    return 0
+  }
+
+  extract_public_notes "$ver"
+  guard_notes
+  local title; title="$(/bin/cat "$TITLE_TMP")"
+
+  # [!] Никаких `gh release upload` здесь быть не должно — см. шапку про ассеты.
+  if "$GH" release view "$tag" -R "$PUBLIC_REPO_SLUG" >/dev/null 2>&1; then
+    gh_retry release edit "$tag" -R "$PUBLIC_REPO_SLUG" \
+        --title "$title" --notes-file "$NOTES_TMP" --latest >/dev/null \
+      && log "Релиз $tag обновлён: $title" \
+      || warn "Релиз $tag не обновился (таймаут РФ?) — запусти режим release ещё раз."
+  else
+    gh_retry release create "$tag" -R "$PUBLIC_REPO_SLUG" \
+        --title "$title" --notes-file "$NOTES_TMP" --latest >/dev/null \
+      && log "Релиз $tag создан: $title" \
+      || warn "Релиз $tag не создался (таймаут РФ?) — запусти режим release ещё раз."
+  fi
 }
 
 # ── Манифест: что реально уходит наружу ──────────────────────────────────────
@@ -313,13 +480,13 @@ print_manifest() {
   /bin/echo "──────────── ЧТО УЙДЁТ В ПУБЛИЧНУЮ РЕПУ ────────────"
   /bin/echo "Корень:"
   "$FIND" "$dir" -maxdepth 1 -mindepth 1 -not -name '.git' \
-    -exec /usr/bin/basename {} \; | "$SORT" | /usr/bin/sed 's/^/  /'
+    -exec "$BASENAME" {} \; | "$SORT" | "$SED" 's/^/  /'
   /bin/echo "docs/:"
-  "$FIND" "$dir/docs" -maxdepth 1 -type f -exec /usr/bin/basename {} \; \
-    2>/dev/null | "$SORT" | /usr/bin/sed 's/^/  /'
+  "$FIND" "$dir/docs" -maxdepth 1 -type f -exec "$BASENAME" {} \; \
+    2>/dev/null | "$SORT" | "$SED" 's/^/  /'
   local files size
-  files="$("$FIND" "$dir" -type f -not -path '*/.git/*' | "$WC" -l | /usr/bin/tr -d ' ')"
-  size="$("$DU" -sh "$dir" 2>/dev/null | /usr/bin/cut -f1)"
+  files="$("$FIND" "$dir" -type f -not -path '*/.git/*' | "$WC" -l | "$TR" -d ' ')"
+  size="$("$DU" -sh "$dir" 2>/dev/null | "$CUT" -f1)"
   /bin/echo "────────────────────────────────────────────────────"
   /bin/echo "Файлов: $files | Размер: $size"
   /bin/echo ""
@@ -335,6 +502,10 @@ mode_check() {
   build_tree "$tmp"
   run_guard "$tmp"
   print_manifest "$tmp"
+  local ver; ver="$(resolve_version || echo unknown)"
+  extract_public_notes "$ver"
+  guard_notes
+  log "Заголовок релиза будет: $(/bin/cat "$TITLE_TMP")"
   log "Dry-run ок. Реальная сборка: 'build', публикация: 'push'."
 }
 
@@ -342,9 +513,9 @@ prepare_staging() {
   # Клонируем публичную репу один раз, дальше — обновляем рабочее дерево
   if [ ! -d "$STAGING_DIR/.git" ]; then
     log "Первый запуск: клонирую $PUBLIC_REMOTE → $STAGING_DIR"
-    "$MKDIR" -p "$(/usr/bin/dirname "$STAGING_DIR")"
+    "$MKDIR" -p "$("$DIRNAME" "$STAGING_DIR")"
     git_retry clone "$PUBLIC_REMOTE" "$STAGING_DIR" || \
-      die "Клон не удался. Создай репу finpilot на GitHub и проверь SSH-доступ."
+      die "Клон не удался. Создай репу finpilot на GitHub и проверь доступ (токен)."
   fi
   # Чистим рабочее дерево (кроме .git) — гарантия что удалённые файлы уйдут
   log "Очищаю рабочее дерево staging (кроме .git)..."
@@ -359,50 +530,68 @@ mode_build() {
   run_guard "$STAGING_DIR"
   print_manifest "$STAGING_DIR"
   log "Staging готов: $STAGING_DIR"
-  log "Проверь глазами, затем: cd '$STAGING_DIR' && git add -A && git commit && git push"
+  log "Проверь глазами, затем: zsh ~/Downloads/finpilot_publish_public.sh push"
 }
 
 mode_push() {
-  log "РЕЖИМ: push (сборка + commit + push в $PUBLIC_REMOTE)"
+  log "РЕЖИМ: push (сборка + commit + push + тег + релиз в $PUBLIC_REMOTE)"
   prepare_staging
   build_tree "$STAGING_DIR"
   run_guard "$STAGING_DIR"
   print_manifest "$STAGING_DIR"
 
+  local ver
+  ver="$(resolve_version || echo unknown)"
+
   cd "$STAGING_DIR"
   "$GIT" add -A
   if "$GIT" diff --cached --quiet; then
-    log "Изменений нет — публиковать нечего."
+    log "Изменений нет — коммитить нечего. Проверяю тег/релиз для v${ver}..."
+    publish_release "$ver"
     exit 0
   fi
   "$GIT" status --short
 
   /bin/echo ""
-  /bin/echo -n "Публикую это в ПУБЛИЧНУЮ репу finpilot. Продолжить? [y/N] "
+  /bin/echo -n "Публикую это в ПУБЛИЧНУЮ репу finpilot (+тег v${ver} и релиз). Продолжить? [y/N] "
   local ans
   read -r ans
   [ "$ans" = "y" ] || [ "$ans" = "Y" ] || die "Отменено пользователем."
 
-  local ver
-  ver="$(resolve_version || echo unknown)"
   "$GIT" commit -m "Public mirror sync — v${ver}"
   git_retry push origin "HEAD:${PUBLIC_BRANCH}"
   log "Опубликовано: v${ver} → $PUBLIC_REMOTE ($PUBLIC_BRANCH)"
+
+  publish_release "$ver"
+}
+
+mode_release() {
+  # Дооформление: тег + релиз для версии, УЖЕ лежащей в staging (без пересборки).
+  # Кейс: push прошёл, а релиз упал на таймауте / gh не был установлен.
+  log "РЕЖИМ: release (только тег + релиз, без пересборки)"
+  [ -d "$STAGING_DIR/.git" ] || die "Staging не найден: $STAGING_DIR — сначала 'push'."
+  local ver
+  ver="$(staging_version || true)"
+  [ -n "$ver" ] || die "Не смог прочитать версию из $STAGING_DIR/app/config.py"
+  log "Версия в staging: v${ver}"
+  publish_release "$ver"
 }
 
 # ── main ─────────────────────────────────────────────────────────────────────
 main() {
   local mode="${1:-check}"
-  /bin/echo "FINPILOT public publisher"
+  /bin/echo "FINPILOT public publisher v2"
   /bin/echo "  источник: $SOURCE_REPO"
   /bin/echo "  staging : $STAGING_DIR"
   /bin/echo "  remote  : $PUBLIC_REMOTE"
+  /bin/echo "  репа gh : $PUBLIC_REPO_SLUG"
   /bin/echo ""
   case "$mode" in
-    check) mode_check ;;
-    build) mode_build ;;
-    push)  mode_push  ;;
-    *) die "Неизвестный режим '$mode'. Используй: check | build | push" ;;
+    check)   mode_check   ;;
+    build)   mode_build   ;;
+    push)    mode_push    ;;
+    release) mode_release ;;
+    *) die "Неизвестный режим '$mode'. Используй: check | build | push | release" ;;
   esac
 }
 
