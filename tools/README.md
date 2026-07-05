@@ -11,3 +11,9 @@ Dev-tooling проекта. Не часть приложения (`app/`), в п
   `knowledge/guides/claude_infrastructure_methodology.md`).
 - **cost_tracker/** — сводка расхода Claude по аккаунтам через Admin API.
 - **survey_analysis/** — пайплайн анализа опросов аудитории (генерация отчёта из данных).
+- **revision/** — гейт ревизии `revision_check.py`: статические проверки docs↔code (битые ссылки
+  живые vs замороженные, утечка legacy мат-модели, счётчики структуры). Запуск
+  `python -m tools.revision.revision_check`; как тест — `tests/test_repo_revision.py` (в fast-тире и CI).
+  Процесс — `knowledge/guides/repo_revision_methodology.md`.
+- **timewarp/** — детектор календарных мин `warp.py` (сдвиг `utcnow` на `WARP_DAYS`, ось 3 ревизии;
+  запуск — `docs/QA.md` / методичка ревизии).
