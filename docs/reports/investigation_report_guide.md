@@ -4,7 +4,7 @@
 > в коде не оказалось**. Это парный формат к post-mortem: post-mortem пишут, когда что-то
 > сломалось с влиянием; investigation report — когда долго и тяжело разбирались, нашли причину,
 > но баг в продуктовом коде не подтвердился. Конкретный дефект кода оформляется отдельной
-> карточкой BUG-XXX (`docs/bug_report_template.md`).
+> карточкой BUG-XXX (`docs/reports/bug_report_template.md`).
 
 ---
 
@@ -12,10 +12,10 @@
 
 | Ситуация | Документ |
 |---|---|
-| Был сбой с влиянием на пользователей (даунтайм, потеря данных, деградация) | **Post-mortem** (`docs/incident_postmortem_guide.md`) |
+| Был сбой с влиянием на пользователей (даунтайм, потеря данных, деградация) | **Post-mortem** (`docs/reports/incident_postmortem_guide.md`) |
 | Near miss («чуть не упало», но обошлось) | **Post-mortem** (дешёвый урок) |
 | Долго/сложно разбирались, нашли причину, но бага в коде нет | **Investigation report** (этот файл) |
-| Нашли конкретный дефект кода | Карточка **BUG-XXX** (`docs/bug_report_template.md`) |
+| Нашли конкретный дефект кода | Карточка **BUG-XXX** (`docs/reports/bug_report_template.md`) |
 | Тривиальная опечатка без влияния | Ничего, просто фикс |
 
 Документы комбинируются: investigation report может закончиться ссылкой на BUG-XXX (если по ходу
@@ -103,7 +103,7 @@
 - [ ] Явно перечислено, что **снято с подозрения** (раздел «Что это НЕ»).
 - [ ] Если причина внешняя — названа граница «от нас не зависит».
 - [ ] Если остался хвост — перечислены каналы, которые ещё стоит попробовать (правило §11).
-- [ ] Короткая строка добавлена в `docs/investigations_summary.md`; полный разбор — отдельным
+- [ ] Короткая строка добавлена в `docs/reports/investigations_summary.md`; полный разбор — отдельным
       файлом владельцу (правило §12).
 
 ---
@@ -127,10 +127,10 @@
 
 Полный investigation report — **отдельным `.md`-файлом владельцу** (не в архиве кода, правило §12),
 имя вида `FINPILOT_<тема>_investigation.md`. В репозитории остаётся только **короткая сводка строкой**
-в `docs/investigations_summary.md` (парный реестр к `docs/incidents_summary.md`; для быстрого контекста
-разработчику/AI). Формат самого разбора — этот шаблон; формат post-mortem — `docs/incident_postmortem_guide.md`;
-обзор всех типов разборов — `docs/report_types.md`.
+в `docs/reports/investigations_summary.md` (парный реестр к `docs/reports/incidents_summary.md`; для быстрого контекста
+разработчику/AI). Формат самого разбора — этот шаблон; формат post-mortem — `docs/reports/incident_postmortem_guide.md`;
+обзор всех типов разборов — `docs/reports/report_types.md`.
 
-Реальные примеры investigation report по этому проекту — в реестре `docs/investigations_summary.md`
+Реальные примеры investigation report по этому проекту — в реестре `docs/reports/investigations_summary.md`
 (напр. firefox/webkit в песочнице — сетевое ограничение, не дефект кода; «баг ядра» = гонка в E2E
 report: подозрение с математического ядра было снято доказательствами.

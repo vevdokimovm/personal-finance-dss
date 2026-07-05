@@ -8,9 +8,9 @@
 
 | Тип | Когда | Практический гайд | Реестр |
 |---|---|---|---|
-| **Post-mortem (инцидент)** | был сбой с влиянием / near miss | `docs/incident_postmortem_guide.md` | `docs/incidents_summary.md` |
-| **Investigation report (расследование)** | долго разбирались, причину нашли, но дефекта в коде НЕТ | `docs/investigation_report_guide.md` | `docs/investigations_summary.md` |
-| **Bug card (карточка дефекта)** | найден конкретный дефект кода | `docs/bug_report_template.md` | — (в трекере/CHANGELOG) |
+| **Post-mortem (инцидент)** | был сбой с влиянием / near miss | `docs/reports/incident_postmortem_guide.md` | `docs/reports/incidents_summary.md` |
+| **Investigation report (расследование)** | долго разбирались, причину нашли, но дефекта в коде НЕТ | `docs/reports/investigation_report_guide.md` | `docs/reports/investigations_summary.md` |
+| **Bug card (карточка дефекта)** | найден конкретный дефект кода | `docs/reports/bug_report_template.md` | — (в трекере/CHANGELOG) |
 | **Pitfall (частая ошибка воркфлоу)** | повторяющаяся ошибка процесса, причина известна сразу | — (строка-урок) | `docs/pitfalls.md` |
 
 Общая теория (культура blameless, RCA-методы, runbook, ADR/RFC, SLO/error budget) — отдельно
