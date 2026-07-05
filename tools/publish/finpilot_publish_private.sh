@@ -12,8 +12,8 @@
 # Идемпотентный: уже оформленное пропускает. Гоняй сколько угодно. Ретраи против РФ-таймаутов.
 # Описание: CHANGELOG.md → git show vX:CHANGELOG.md → docs/WATCHLOG.md.
 #
-# Запуск:          zsh ~/Downloads/finpilot_publish.sh
-# Переоформить всё: zsh ~/Downloads/finpilot_publish.sh --verify-all
+# Запуск:          zsh ~/Downloads/finpilot_publish_private.sh
+# Переоформить всё: zsh ~/Downloads/finpilot_publish_private.sh --verify-all
 # Требования: brew install gh && gh auth login
 # ============================================================================
 

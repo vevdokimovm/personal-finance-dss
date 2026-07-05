@@ -6,7 +6,7 @@
 - Репозиторий: `vevdokimovm/personal-finance-dss`
 - Клон: `~/Downloads/personal-finance-dss`
 - Архивы версий: `~/Downloads/finpilot_vX_Y_Z_intl.zip`
-- Главный скрипт: **`finpilot_publish.sh`** (отдельный файл)
+- Главный скрипт: **`finpilot_publish_private.sh`** (отдельный файл)
 
 ---
 
@@ -14,7 +14,7 @@
 
 Накопились новые версии в `~/Downloads` (архивы `finpilot_v*_intl.zip`)? Запусти:
 ```
-zsh ~/Downloads/finpilot_publish.sh
+zsh ~/Downloads/finpilot_publish_private.sh
 ```
 Скрипт сам найдёт незалитые версии, нарастит `main` коммитами, поставит теги, запушит и
 оформит Releases с правильными описаниями и архивами. Готовое пропустит. Всё.
@@ -33,7 +33,7 @@ zsh ~/Downloads/finpilot_publish.sh
 
 ---
 
-## 2. Главный инструмент: `finpilot_publish.sh`
+## 2. Главный инструмент: `finpilot_publish_private.sh`
 
 Единый скрипт «запустил и забыл». Идемпотентный — гоняй сколько угодно.
 
@@ -51,8 +51,8 @@ zsh ~/Downloads/finpilot_publish.sh
 
 | Команда | Действие |
 |---|---|
-| `zsh ~/Downloads/finpilot_publish.sh` | Залить всё незалитое + оформить релизы. Обычный режим. |
-| `zsh ~/Downloads/finpilot_publish.sh --verify-all` | Пройти по ВСЕМ тегам и пере-применить формат+ассеты (если надо причесать существующие). |
+| `zsh ~/Downloads/finpilot_publish_private.sh` | Залить всё незалитое + оформить релизы. Обычный режим. |
+| `zsh ~/Downloads/finpilot_publish_private.sh --verify-all` | Пройти по ВСЕМ тегам и пере-применить формат+ассеты (если надо причесать существующие). |
 
 **Источник описаний (по приоритету):**
 1. `CHANGELOG.md` (текущий) — полная секция.
@@ -132,7 +132,7 @@ grep -E '^## \[' CHANGELOG.md              # какие версии описа�
 3. Дописать секцию в `CHANGELOG.md` (формат — раздел 3). Обновить `docs/WATCHLOG.md`.
 4. Собрать архив `finpilot_vX_Y_Z_intl.zip` в `~/Downloads`.
 5. Закоммитить: `git add -A && git commit -m "vX.Y.Z: краткое описание"`.
-6. `zsh ~/Downloads/finpilot_publish.sh` — тег, push, Release, ассет, Latest — автоматом.
+6. `zsh ~/Downloads/finpilot_publish_private.sh` — тег, push, Release, ассет, Latest — автоматом.
 
 > Шаг 5 не обязателен, если работаешь через архивы: тогда `publish.sh` сам сделает
 > forward-build из архива. Но если код уже в `main` — просто закоммить и запусти скрипт.
@@ -158,11 +158,11 @@ grep -E '^## \[' CHANGELOG.md              # какие версии описа�
 3. `command not found` на утилитах → зашумлённый PATH; запускай файлом.
 4. `TLS handshake timeout` / `EOF` → перезапусти скрипт (идемпотентный).
 5. «Рабочее дерево не чистое» → закоммить/убери изменения, потом запусти снова.
-6. Релиз без даты/ассета у существующей версии → `zsh finpilot_publish.sh --verify-all`.
+6. Релиз без даты/ассета у существующей версии → `zsh finpilot_publish_private.sh --verify-all`.
 7. Версия не подхватилась → проверь имя архива (`finpilot_vX_Y_Z_intl.zip`) и секцию в CHANGELOG.
 
 ---
 
 **Одной строкой:** сложил архивы в `~/Downloads`, обновил `CHANGELOG.md`/`WATCHLOG.md` →
-`zsh ~/Downloads/finpilot_publish.sh`. Остальное (forward-build, теги, push, релизы,
+`zsh ~/Downloads/finpilot_publish_private.sh`. Остальное (forward-build, теги, push, релизы,
 формат, ассеты, Latest) скрипт делает сам, идемпотентно.

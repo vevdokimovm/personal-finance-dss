@@ -2,7 +2,7 @@
 
 Dev-tooling проекта. Не часть приложения (`app/`), в публичное зеркало не публикуется.
 
-- **publish/** — публикация релизов на GitHub (`finpilot_publish.sh`) и публичное зеркало:
+- **publish/** — публикация релизов на GitHub (`finpilot_publish_private.sh`) и публичное зеркало:
   `finpilot_publish_public.sh` (whitelist-сборка + guard + push + тег + Release),
   `public_release_notes.md` (тексты публичных релизов, private-only),
   `mirror_extras/` (файлы только для зеркала, напр. CodeQL-воркфлоу).
