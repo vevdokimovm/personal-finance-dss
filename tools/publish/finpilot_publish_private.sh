@@ -17,7 +17,7 @@
 # Требования: brew install gh && gh auth login
 # ============================================================================
 
-export PATH="/usr/bin:/bin:/usr/sbin:/sbin:/opt/homebrew/bin:/usr/local/bin:$PATH"
+export PATH="/opt/homebrew/bin:/usr/local/bin:$PATH:/usr/bin:/bin:/usr/sbin:/sbin"
 export LANG=ru_RU.UTF-8 LC_ALL=ru_RU.UTF-8 2>/dev/null
 
 REPO="$HOME/Downloads/personal-finance-dss"
@@ -35,7 +35,12 @@ VERIFY_ALL="no"; [ "$1" = "--verify-all" ] && VERIFY_ALL="yes"
 cd "$REPO" || { echo "Нет репозитория: $REPO"; exit 1; }
 command -v git     >/dev/null || { echo "git не найден"; exit 1; }
 command -v gh      >/dev/null || { echo "gh не установлен. brew install gh && gh auth login"; exit 1; }
-command -v python3 >/dev/null || { echo "python3 не найден"; exit 1; }
+PYBIN=""
+for _c in python3 /opt/homebrew/bin/python3 /usr/local/bin/python3 /usr/bin/python3 python; do
+  command -v "$_c" >/dev/null 2>&1 || continue
+  "$_c" -c 'import re,sys' >/dev/null 2>&1 && { PYBIN="$_c"; break; }
+done
+[ -n "$PYBIN" ] || { echo "рабочий python3 не найден (в /usr/bin — заглушка Xcode?). Поставь: xcode-select --install  или  brew install python"; exit 1; }
 command -v rsync   >/dev/null || { echo "rsync не найден"; exit 1; }
 gh auth status >/dev/null 2>&1 || { echo "gh не авторизован. gh auth login"; exit 1; }
 
@@ -67,7 +72,7 @@ version_gt () {   # $1 > $2 ?
 
 # extract VER -> H1 в $TITLE_TMP, тело (с датой) в $NOTES_TMP. Код 1 если описания нет.
 extract () {
-  python3 - "$1" "$TITLE_TMP" "$NOTES_TMP" <<'PY'
+  "$PYBIN" - "$1" "$TITLE_TMP" "$NOTES_TMP" <<'PY'
 import re, sys, subprocess
 ver, ft, fn = sys.argv[1], sys.argv[2], sys.argv[3]
 
@@ -169,10 +174,30 @@ else
     echo ">>> $ver — forward-build"
     if [ ! -f "$zip" ]; then echo "    ! архив не найден: $zip, пропуск"; continue; fi
     /bin/rm -rf "$WORK"; /bin/mkdir -p "$WORK"
-    /usr/bin/unzip -q "$zip" -d "$WORK"
-    src="$WORK/finpilot_v${under}_intl"
-    [ -d "$src" ] || src=$(/usr/bin/find "$WORK" -maxdepth 1 -mindepth 1 -type d | head -1)
-    [ -d "$src" ] || { echo "    ! корень в архиве не найден, пропуск"; continue; }
+    # -o: перезапись без промпта; </dev/null: unzip НЕ читает stdin цикла ($TO_BUILD).
+    # Без этого промпт перезаписи съедал оставшиеся версии как «ответы» → цикл рвался
+    # после первой версии (заливка «по одному»). См. INC-FWD-BUILD-WIPEOUT.
+    /usr/bin/unzip -q -o "$zip" -d "$WORK" </dev/null
+    # Надёжный поиск корня репо в распакованном архиве. КРИТИЧНО: rsync ниже идёт с
+    # --delete, поэтому корень ОБЯЗАН содержать маркеры репо (app/ + CHANGELOG.md).
+    # Иначе — FAIL-LOUD и пропуск: лучше не залить версию, чем снести весь репозиторий
+    # (историческая авария — head -1 выхватывал случайную папку deploy/ → репо=6 файлов).
+    is_repo_root () { [ -d "$1/app" ] && [ -f "$1/CHANGELOG.md" ]; }
+    src=""
+    # 1) ожидаемая обёртка finpilot_vX_Y_Z_intl/ ; 2) содержимое прямо в корне архива (без обёртки)
+    for cand in "$WORK/finpilot_v${under}_intl" "$WORK"; do
+      is_repo_root "$cand" && { src="$cand"; break; }
+    done
+    # 3) ровно одна папка верхнего уровня и она — корень репо (любое имя обёртки)
+    if [ -z "$src" ]; then
+      dirs=$(/usr/bin/find "$WORK" -maxdepth 1 -mindepth 1 -type d)
+      if [ "$(printf '%s\n' "$dirs" | grep -c .)" = "1" ] && is_repo_root "$dirs"; then src="$dirs"; fi
+    fi
+    if [ -z "$src" ]; then
+      echo "    ! СТОП: корень репо в архиве не найден (нет app/ + CHANGELOG.md)."
+      echo "      Пропускаю v$ver — репозиторий НЕ тронут. Проверь структуру архива."
+      continue
+    fi
     /usr/bin/rsync -a --delete --exclude='.git' --exclude='.DS_Store' "$src/" "$REPO/"
     /usr/bin/find "$REPO" -name '.DS_Store' -delete 2>/dev/null
     /usr/bin/find "$REPO" -name '__pycache__' -type d -exec /bin/rm -rf {} + 2>/dev/null
@@ -207,8 +232,11 @@ while IFS= read -r ver; do
     ok=$((ok + 1)); continue
   fi
 
-  if ! extract "$ver" >/dev/null 2>&1; then
-    [ $has_rel -eq 0 ] && echo ">>> $tag — описания нет нигде, пропуск"
+  if ! extract "$ver" >/dev/null 2>/tmp/fp_pub_err; then
+    if [ $has_rel -eq 0 ]; then
+      echo ">>> $tag — описание не извлеклось, пропуск"
+      [ -s /tmp/fp_pub_err ] && sed 's/^/      py: /' /tmp/fp_pub_err
+    fi
     continue
   fi
   title=$(cat "$TITLE_TMP")
