@@ -187,3 +187,4 @@
 1 день) → push `sync/vX.Y.Z` → владелец `git fetch` → revoke токена. Tor Browser гонит трафик
 через Tor даже при включённом системном VPN — для скачивания использовать обычный браузер + VPN. Загрузки владельца в начале сессии проверять `ls`-ом фактического наличия
 (не верить списку в сообщении). Разбор: `docs/reports/incidents/inc_chat_file_delivery_dead_stub.md`.
+- **Упаковка архива — ВСЕГДА с корневой обёрткой** `finpilot_vX_Y_Z_intl/` (имя обёртки = имя zip без `.zip`): `mv <дерево> finpilot_vX_Y_Z_intl && zip -r finpilot_vX_Y_Z_intl.zip finpilot_vX_Y_Z_intl`. НИКОГДА `zip archive.zip .` (содержимое без обёртки) — публикатор ждёт обёртку, при её отсутствии старый fallback выхватывал случайную папку и `rsync --delete` сносил весь репозиторий. Дополнительно: любой `rsync --delete` — только после проверки маркеров корня (`app/`+`CHANGELOG.md`), иначе fail-loud. Разбор: `docs/reports/incidents/forward_build_wipeout_incident.md` (INC-FWD-BUILD-WIPEOUT).

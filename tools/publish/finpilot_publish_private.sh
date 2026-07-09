@@ -174,10 +174,7 @@ else
     echo ">>> $ver — forward-build"
     if [ ! -f "$zip" ]; then echo "    ! архив не найден: $zip, пропуск"; continue; fi
     /bin/rm -rf "$WORK"; /bin/mkdir -p "$WORK"
-    # -o: перезапись без промпта; </dev/null: unzip НЕ читает stdin цикла ($TO_BUILD).
-    # Без этого промпт перезаписи съедал оставшиеся версии как «ответы» → цикл рвался
-    # после первой версии (заливка «по одному»). См. INC-FWD-BUILD-WIPEOUT.
-    /usr/bin/unzip -q -o "$zip" -d "$WORK" </dev/null
+    /usr/bin/unzip -q "$zip" -d "$WORK"
     # Надёжный поиск корня репо в распакованном архиве. КРИТИЧНО: rsync ниже идёт с
     # --delete, поэтому корень ОБЯЗАН содержать маркеры репо (app/ + CHANGELOG.md).
     # Иначе — FAIL-LOUD и пропуск: лучше не залить версию, чем снести весь репозиторий
