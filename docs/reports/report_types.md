@@ -12,6 +12,7 @@
 | **Investigation report (расследование)** | долго разбирались, причину нашли, но дефекта в коде НЕТ | `docs/reports/investigation_report_guide.md` | `docs/reports/investigations_summary.md` |
 | **Bug card (карточка дефекта)** | найден конкретный дефект кода | `docs/reports/bug_report_template.md` | — (в трекере/CHANGELOG) |
 | **Pitfall (частая ошибка воркфлоу)** | повторяющаяся ошибка процесса, причина известна сразу | — (строка-урок) | `docs/pitfalls.md` |
+| **Retrospective (ретроспектива процесса)** | завершён значимый процесс/цикл (экспертиза, калибровка, миграция): фиксируем хронологию, методологию, уроки и открытые хвосты | свободная форма: контекст → хронология → что сработало → что нет → цифры → хвосты | `docs/reports/retrospectives/` |
 
 Общая теория (культура blameless, RCA-методы, runbook, ADR/RFC, SLO/error budget) — отдельно
 в `docs/documentation_methodology.md`.

@@ -35,9 +35,22 @@ python -m tools.model_validation.expert_agreement \
 платёжеспособных портретах. История: v3.0.0 — 51.9%; v3.1.0 — **87.4%**
 (коридор согласия самих экспертов между собой: 85.6–95.6%).
 
-## Схема колонок
+## Схема колонок joined.csv.gz
 
 `id, kind, risk` — портрет; `model_*` — статус/показатели/сплит/доминанта
 модели v3.0.0; `{v,m,j,s}_{status,dom,res,debt,goal,inv,lump}` — статус,
 доминанта и распределение каждого эксперта (res/debt/goal/inv — месячный
 поток по бакетам, lump — разовые ходы из запаса).
+
+## Материализованные датасеты (v6.1.0)
+
+| Файл | Схема |
+|---|---|
+| `portraits_v1_seed20260702.jsonl.gz` | Портреты эталона (вход): 1 JSON/строка — id (SP-XXXXX), kind, income_total, expense_total, obligations[], goals[] (даты ISO), bliq, r_bench, risk_tolerance, l_min |
+| `portraits_v2_seed20260702.jsonl.gz` | То же для калиброванного генератора v2 — датасет второй сертификации |
+| `model_outcomes_v3_1_0_on_v1.csv.gz` | Ответ модели v3.1.0 на портретах v1: id, kind, risk, status, rt, lt, dt, xo, xr, xg, invest, dom, dt_alert, crisis_severity, crisis_actions. Колонки xg и invest независимы (goals+ = xg + invest) |
+| `model_outcomes_v3_1_0_on_v2.csv.gz` | То же на портретах v2 — половина будущего joined второй сертификации |
+
+Регенерация любого файла: `tools/model_validation/dataset_export.py`
+(portraits / outcomes, детерминировано по seed+version). История версий модели
+и генератора — `docs/model/README.md`.

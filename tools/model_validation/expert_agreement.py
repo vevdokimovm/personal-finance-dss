@@ -78,7 +78,7 @@ def model_outcome(portrait: dict[str, Any]) -> dict[str, Any]:
     else:
         status = "ok"
 
-    xo = xr = xg = 0.0
+    xo = xr = xg = invest = 0.0
     dom = "none"
     if status == "ok" and best is not None:
         xo = float(best.get("x_obl_effective", best.get("x_obligations", 0)))
@@ -103,6 +103,7 @@ def model_outcome(portrait: dict[str, Any]) -> dict[str, Any]:
         "xo": xo,
         "xr": xr,
         "xg": xg,
+        "invest": invest,
         "dom": dom,
         "dt_alert": bool(result["indicators"].get("Dt_alert", False)),
         "crisis_actions": len((crisis or {}).get("actions", [])),
