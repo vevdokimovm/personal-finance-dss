@@ -1,5 +1,5 @@
 """Тесты min-max нормализации и SAW-ранжирования (формулы ВКР §7-8)."""
-from app.core.ranking import normalize_value, rank_alternatives
+from app.core.ranking import RISK_PROFILES, normalize_value, rank_alternatives
 
 
 class TestNormalize:
@@ -81,3 +81,89 @@ class TestRanking:
         aggressive = rank_alternatives([dict(a) for a in alts], risk_tolerance=5)
         assert conservative[0]["name"] == "liquidity"
         assert aggressive[0]["name"] == "goals"
+
+
+class TestReserveSaturation:
+    """G1 (модель v3.1.0): полезность резерва насыщается на целевом Lt*(risk).
+
+    Выше целевой подушки прирост ликвидности не даёт полезности — модель
+    перестаёт бесконечно копить резерв и финансирует цели, как консенсус
+    четырёх независимых экспертов (коридор 3–6 месяцев)."""
+
+    def test_lt_targets_present_and_in_corridor(self):
+        for r, p in RISK_PROFILES.items():
+            assert 3.0 <= p["lt_target"] <= 6.0, r
+
+    def test_lt_targets_non_increasing_with_risk(self):
+        vals = [RISK_PROFILES[r]["lt_target"] for r in sorted(RISK_PROFILES)]
+        assert vals == sorted(vals, reverse=True)
+        assert vals[0] == 6.0 and vals[-1] == 3.0
+
+    def test_above_target_liquidity_is_neutral(self):
+        # Подушка уже 11 мес (кейс SP-00002): «ещё в резерв» и «в цели» дают
+        # одинаковый насыщенный Lt → выигрывают цели, а не бесконечная подушка.
+        alts = [
+            {"name": "more_reserve", "Rt_new": 0, "Lt_new": 12.6, "Dt_new": 0.0, "Si": 0.0},
+            {"name": "fund_goals", "Rt_new": 0, "Lt_new": 11.4, "Dt_new": 0.0, "Si": 0.7},
+        ]
+        ranked = rank_alternatives(alts, risk_tolerance=3)
+        assert ranked[0]["name"] == "fund_goals"
+
+    def test_conservative_also_saturates(self):
+        # даже профиль 1 (w_lt=0.45) не копит выше своей цели 6 мес
+        alts = [
+            {"name": "more_reserve", "Rt_new": 0, "Lt_new": 9.0, "Dt_new": 0.0, "Si": 0.0},
+            {"name": "fund_goals", "Rt_new": 0, "Lt_new": 7.0, "Dt_new": 0.0, "Si": 0.5},
+        ]
+        ranked = rank_alternatives(alts, risk_tolerance=1)
+        assert ranked[0]["name"] == "fund_goals"
+
+    def test_below_target_liquidity_still_discriminates(self):
+        # ниже цели прежняя механика сохраняется: консерватор строит подушку
+        alts = [
+            {"name": "reserve", "Rt_new": 0, "Lt_new": 3.0, "Dt_new": 0.0, "Si": 0.0},
+            {"name": "goals", "Rt_new": 0, "Lt_new": 1.2, "Dt_new": 0.0, "Si": 0.6},
+        ]
+        ranked = rank_alternatives(alts, risk_tolerance=1)
+        assert ranked[0]["name"] == "reserve"
+
+
+class TestReserveFloor:
+    """G6 (модель v3.1.0): стартовый месяц ликвидности не отменяется риск-профилем.
+
+    Кейс SP-00299: риск 5, Lt=0.32 — модель клала всё в цель при консенсусе
+    «сначала резерв». Floor = 1 месяц burn лексикографически приоритетнее SAW."""
+
+    def test_floor_beats_goals_even_for_aggressive(self):
+        alts = [
+            {"name": "all_goals", "Rt_new": 0, "Lt_new": 0.32, "Dt_new": 0.0, "Si": 1.0},
+            {"name": "fill_floor", "Rt_new": 0, "Lt_new": 1.1, "Dt_new": 0.0, "Si": 0.2},
+        ]
+        ranked = rank_alternatives(alts, risk_tolerance=5)
+        assert ranked[0]["name"] == "fill_floor"
+
+    def test_partial_fill_preferred_when_floor_unreachable(self):
+        # если до 1 месяца не дотянуться, приоритет — максимально близкий к floor
+        alts = [
+            {"name": "zero", "Rt_new": 0, "Lt_new": 0.1, "Dt_new": 0.0, "Si": 1.0},
+            {"name": "closer", "Rt_new": 0, "Lt_new": 0.6, "Dt_new": 0.0, "Si": 0.3},
+        ]
+        ranked = rank_alternatives(alts, risk_tolerance=5)
+        assert ranked[0]["name"] == "closer"
+
+    def test_above_floor_saw_decides(self):
+        # оба варианта дают >= 1 мес — floor удовлетворён, решает SAW (агрессор → цели)
+        alts = [
+            {"name": "reserve", "Rt_new": 0, "Lt_new": 2.5, "Dt_new": 0.0, "Si": 0.1},
+            {"name": "goals", "Rt_new": 0, "Lt_new": 1.4, "Dt_new": 0.0, "Si": 0.9},
+        ]
+        ranked = rank_alternatives(alts, risk_tolerance=5)
+        assert ranked[0]["name"] == "goals"
+
+    def test_utility_field_stays_in_unit_range(self):
+        alts = [
+            {"name": "a", "Rt_new": 0, "Lt_new": 0.2, "Dt_new": 0.0, "Si": 0.9},
+            {"name": "b", "Rt_new": 0, "Lt_new": 1.5, "Dt_new": 0.0, "Si": 0.1},
+        ]
+        ranked = rank_alternatives(alts, risk_tolerance=4)
+        assert all(0.0 <= a["utility"] <= 1.0 for a in ranked)

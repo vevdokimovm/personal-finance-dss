@@ -167,8 +167,29 @@ def explain_alternative(
             f"раньше срока. Поэтому сумма перенаправлена в ваши цели."
         )
 
-    # ── Подушка безопасности (резерв) ─────────────────────────────────
-    if x_res > 0:
+    # ── Подушка безопасности (резерв) и инвестиционный транш ──────────
+    tranche = alt.get("investment_tranche")
+    if tranche and float(tranche.get("amount", 0)) > 0:
+        cushion_part = float(tranche.get("cushion_part", 0))
+        if cushion_part > 0:
+            gains.append(
+                f"В подушку безопасности добираем {cushion_part:,.0f} ₽ — "
+                f"до целевого запаса на случай потери дохода."
+            )
+        split = tranche.get("split", {})
+        shelf = []
+        if float(split.get("deposits", 0)) > 0:
+            shelf.append(f"{split['deposits']:,.0f} ₽ — депозит или накопительный счёт")
+        if float(split.get("bonds", 0)) > 0:
+            shelf.append(f"{split['bonds']:,.0f} ₽ — облигации (например, ОФЗ)")
+        if float(split.get("equity", 0)) > 0:
+            shelf.append(f"{split['equity']:,.0f} ₽ — акции (индексный портфель)")
+        gains.append(
+            f"Подушка уже на целевом уровне, поэтому {tranche['amount']:,.0f} ₽ "
+            f"работают как инвестиции: " + "; ".join(shelf) + ". "
+            + str(tranche.get("note", ""))
+        )
+    elif x_res > 0:
         months_cover = x_res / expense_total if expense_total > 0 else 0
         gains.append(
             f"В подушку безопасности откладываем {x_res:,.0f} ₽ — это примерно "

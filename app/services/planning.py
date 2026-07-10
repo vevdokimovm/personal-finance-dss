@@ -18,8 +18,10 @@ from typing import Any
 
 from app.core.money import money
 from app.core.alternatives import evaluate_alternative, generate_alternatives
+from app.core.crisis import build_crisis_plan
 from app.core.filtering import B_MIN, DT_MAX, L_MIN, filter_alternatives
 from app.core.goals_priority import preallocate_from_bliq
+from app.core.investment import annotate_investment_tranche
 from app.core.metrics import (
     calculate_blr,
     calculate_bt,
@@ -48,17 +50,34 @@ def run_planning(
     today = today or utcnow()
     profile = RISK_PROFILES.get(risk_tolerance, RISK_PROFILES[3])
 
-    # ── Этап 4.0: предобработка ликвидной позиции ──────────────────────
-    bliq_after, closed_goals, active_goals = preallocate_from_bliq(bliq, goals, today)
-
     # ── Базовые показатели (для отображения и фильтрации) ──────────────
     cash_flow = income_total - expense_total
     obligation_payments = sum(float(o.get("monthly_payment", 0)) for o in obligations)
     rt = calculate_rt(cash_flow=cash_flow, obligation_payments=obligation_payments)
+
+    # ── Этап 4.0: предобработка ликвидной позиции ──────────────────────
+    # Только при неотрицательном потоке (v3.1.0): в дефиците цели заморожены,
+    # и подушка не тратится на разовое закрытие близких целей — она нужна
+    # как запас хода и ресурс балансового хода кризисного модуля.
+    if rt >= 0:
+        bliq_after, closed_goals, active_goals = preallocate_from_bliq(bliq, goals, today)
+    else:
+        bliq_after, closed_goals, active_goals = bliq, [], list(goals)
+
     lt = calculate_lt(liquid_reserve=bliq_after, expense_total=expense_total)
     dt = calculate_dt(obligation_payments=obligation_payments, income_total=income_total)
     bt = calculate_bt(goals)
     blr = calculate_blr(balance=bt, liquid_assets=bliq_after, expense_total=expense_total)
+
+    # ── Кризисный модуль (v3.1.0, G2): план действий при Rt < 0 ────────
+    crisis_plan = build_crisis_plan(
+        income_total=income_total,
+        expense_total=expense_total,
+        obligations=obligations,
+        goals=goals,
+        bliq=bliq,
+        today=today,
+    ) if rt < 0 else None
 
     # ── Этап 4: генерация альтернатив ──────────────────────────────────
     goals_total = sum(
@@ -85,12 +104,26 @@ def run_planning(
         )
 
     # ── Этап 5: фильтрация ─────────────────────────────────────────────
+    # dt_current (G3, v3.1.0): гейт «план не увеличивает ПДН» — пользователь
+    # с перегруженным ПДН всё равно получает план, а не пустой экран.
     admissible, rejected = filter_alternatives(
-        alternatives, b_min=B_MIN, l_min=l_min, dt_max=DT_MAX
+        alternatives, b_min=B_MIN, l_min=l_min, dt_max=DT_MAX, dt_current=dt
     )
 
     # ── Ранжирование ───────────────────────────────────────────────────
     ranked = rank_alternatives(admissible, risk_tolerance)
+
+    # ── Инвестиционный транш (v3.1.0, G5): терминальный сток резерва ────
+    # Резервный поток сверх целевой подушки Lt* размечается как инвестиции
+    # с инструментальной полкой по профилю (депозит / облигации / акции).
+    for alt in ranked:
+        annotate_investment_tranche(
+            alt,
+            bliq=bliq_after,
+            expense_total=expense_total,
+            lt_target=float(profile["lt_target"]),
+            risk_tolerance=risk_tolerance,
+        )
 
     # Дедупликация по ФАКТИЧЕСКОМУ распределению: если досрочка перенаправлена
     # в цели (кредиты дешевле бенчмарка), варианты, отличающиеся только долей
@@ -140,6 +173,9 @@ def run_planning(
             "Bliq": money(bliq_after),
             "BLR": money(blr),
             "BLR_status": classify_blr(blr),
+            # Флаг перегруженного ПДН (v3.1.0): план выдаётся, но пользователю
+            # показывается предупреждение + рекомендация рефинансирования.
+            "Dt_alert": dt > DT_MAX,
         },
         "bliq_preallocation": {
             "closed_goals": [
@@ -159,7 +195,9 @@ def run_planning(
             "w_lt": profile["w_lt"],
             "w_dt": profile["w_dt"],
             "w_goals": profile["w_goals"],
+            "lt_target": profile["lt_target"],
         },
+        "crisis_plan": crisis_plan,
         "alternatives_total": len(alternatives),
         "admissible_count": len(admissible),
         "rejected_count": len(rejected),

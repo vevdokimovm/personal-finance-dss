@@ -44,11 +44,14 @@ def run_one(portrait: dict[str, Any]) -> dict[str, Any]:
 class SweepRunner:
     """Прогон N портретов с проверкой инвариантов и выборочным детерминизмом."""
 
-    def __init__(self, n: int, seed: int, determinism_every: int = 50) -> None:
+    def __init__(
+        self, n: int, seed: int, determinism_every: int = 50, gen_version: int = 2
+    ) -> None:
         self.n = n
         self.seed = seed
         self.determinism_every = determinism_every
-        self.generator = PortraitGenerator(seed)
+        self.gen_version = gen_version
+        self.generator = PortraitGenerator(seed, version=gen_version)
 
     def run(self) -> dict[str, Any]:
         started = time.monotonic()
@@ -89,6 +92,7 @@ class SweepRunner:
         return {
             "n": self.n,
             "seed": self.seed,
+            "gen_version": self.gen_version,
             "elapsed_sec": round(time.monotonic() - started, 2),
             "by_kind": dict(by_kind),
             "violations": violations,
@@ -100,9 +104,10 @@ class SweepRunner:
 def write_report(stats: dict[str, Any], path: Path) -> None:
     ok = not stats["violations"] and not stats["crashes"]
     lines = [
-        "# Портретный свип мат-модели v3.0.0 — отчёт",
+        "# Портретный свип мат-модели v3.1.0 — отчёт",
         "",
-        f"> Дата: 2026-07-02 · Портретов: **{stats['n']}** · seed: {stats['seed']} · "
+        f"> Дата: 2026-07-10 · Портретов: **{stats['n']}** · seed: {stats['seed']} · "
+        f"генератор: v{stats.get('gen_version', 2)} · "
         f"время: {stats['elapsed_sec']} с · Вердикт: "
         f"{'**ЧИСТО** — нарушений инвариантов нет' if ok else '**ЕСТЬ НАРУШЕНИЯ**'}",
         "",
@@ -113,7 +118,9 @@ def write_report(stats: dict[str, Any], path: Path) -> None:
         "I5 согласованность best/fail-loud · I6 веса профилей (суммы=1, нестрогая "
         "монотонность, плато 2–3) · I7 Avalanche (>= r_bench, убывание ставки) · "
         "I8 детерминизм · I9 SES + Monte-Carlo (p10<=p50<=p90, seed-детерминизм) · "
-        "I10 сверка формул Lt (stock-based) и Dt · I11 конечность чисел.",
+        "I10 сверка формул Lt (stock-based) и Dt · I11 конечность чисел · "
+        "I12 кризисный охват (Rt<0 => план с действиями, v3.1.0) · "
+        "I13 floor-оптимальность best (стартовый месяц ликвидности).",
         "",
         "## Распределение портретов по типам",
         "",
@@ -162,9 +169,10 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--n", type=int, default=2000)
     parser.add_argument("--seed", type=int, default=20260702)
     parser.add_argument("--report", type=Path, default=None)
+    parser.add_argument("--gen-version", type=int, default=2, choices=(1, 2))
     args = parser.parse_args(argv)
 
-    stats = SweepRunner(args.n, args.seed).run()
+    stats = SweepRunner(args.n, args.seed, gen_version=args.gen_version).run()
     print(json.dumps({k: v for k, v in stats.items() if k not in ("violations", "crashes")},
                      ensure_ascii=False))
     print(f"violations={len(stats['violations'])} crashes={len(stats['crashes'])}")

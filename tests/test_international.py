@@ -48,9 +48,14 @@ def test_core_engine_satisfies_protocol():
 
 
 def test_core_engine_avalanche_filters_cheap_debt():
-    """Дорогой долг (>r_bench) → досрочка; KEEP-01 сохранён через адаптер."""
+    """Дорогой долг (>r_bench) → досрочка; KEEP-01 сохранён через адаптер.
+
+    v3.1.0: подушка в фикстуре >= 1 мес расходов — floor-резерв удовлетворён,
+    иначе стартовый месяц ликвидности лексикографически приоритетнее лавины.
+    """
     from app.ingestion.engine import CoreFinanceEngine
     from app.ingestion.models import (
+        Account,
         Debt,
         FinancialSnapshot,
         RiskProfile,
@@ -60,6 +65,7 @@ def test_core_engine_avalanche_filters_cheap_debt():
 
     snap = FinancialSnapshot(
         base_currency="RUB",
+        accounts=[Account("a1", "Накопительный", Decimal("100000"), is_liquid=True)],
         transactions=[
             Transaction("t1", Decimal("180000"), TransactionType.INCOME, utcnow()),
             Transaction("t2", Decimal("78000"), TransactionType.EXPENSE, utcnow()),

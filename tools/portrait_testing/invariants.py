@@ -1,7 +1,16 @@
-"""Инварианты мат-модели v3.0.0 — исполняемая спецификация для свипа.
+"""Инварианты мат-модели v3.1.0 — исполняемая спецификация для свипа.
 
 Каждая проверка возвращает список нарушений вида "I<n>: ...". Пустой список = чисто.
-Канон: docs/math_model_v3_0_0.md + app/core (filtering, ranking, alternatives, forecast).
+Канон: docs/math_model_v3_1_0.md + app/core (filtering, ranking, alternatives,
+crisis, forecast).
+
+Изменения v3.1.0 (по независимой экспертизе, 12 000 портретов × 4 эксперта):
+  I3  — гейт ПДН: Dt' <= max(0.40, Dt_до) — план не увеличивает нагрузку (G3);
+  I5  — best = ranked[0] при лексикографическом порядке (floor_level, utility);
+  I6  — + lt_target профилей в коридоре 3–6 мес, нестрого убывает с риском (G1);
+  I12 — кризисный охват: Rt < 0 => план с действиями, дефицит сходится (G2);
+  I13 — floor-оптимальность: best заполняет стартовый месяц ликвидности
+        не хуже любой допустимой альтернативы (G6).
 """
 from __future__ import annotations
 
@@ -35,6 +44,11 @@ def check_static_profiles() -> list[str]:
             ok = all(b <= a for a, b in zip(vals, vals[1:]))
         if not ok:
             v.append(f"I6: {key} не монотонен (нестрого) по профилям: {vals}")
+    targets = [RISK_PROFILES[r]["lt_target"] for r in order]
+    if any(not (3.0 <= t <= 6.0) for t in targets):
+        v.append(f"I6: lt_target вне коридора 3–6 мес: {targets}")
+    if any(b > a for a, b in zip(targets, targets[1:])):
+        v.append(f"I6: lt_target не убывает (нестрого) с риском: {targets}")
     return v
 
 
@@ -92,6 +106,8 @@ def check_result(
     if result["admissible_count"] + result["rejected_count"] != total:
         v.append("I2: admissible + rejected != |A|")
 
+    dt_before = payments / income if income > 0 else 0.0
+    dt_limit = max(DT_MAX, dt_before)
     ranked = result.get("ranked", [])
     rejected = result.get("rejected", [])
     for alt in ranked:
@@ -99,9 +115,10 @@ def check_result(
             v.append(
                 f"I3: допустимая альтернатива с Rt_new={alt['Rt_new']} < 0 ({alt.get('name')})"
             )
-        if alt["Dt_new"] > DT_MAX + 5e-5:
+        if alt["Dt_new"] > dt_limit + 5e-5:
             v.append(
-                f"I3: допустимая альтернатива с Dt_new={alt['Dt_new']} > 0.40 ({alt.get('name')})"
+                f"I3: допустимая альтернатива с Dt_new={alt['Dt_new']} > "
+                f"max(0.40, Dt_до={dt_before:.4f}) ({alt.get('name')})"
             )
     for alt in ranked + rejected:
         if total > 1:
@@ -119,8 +136,24 @@ def check_result(
     if best is not None:
         if not best.get("is_admissible"):
             v.append("I5: best не является допустимой альтернативой")
-        if ranked and abs(best["utility"] - ranked[0]["utility"]) > 1e-9:
-            v.append("I5: best.utility != max utility ранжирования")
+        if ranked:
+            best_key = (best.get("floor_level", 0.0), best["utility"])
+            top_key = max(
+                (a.get("floor_level", 0.0), a["utility"]) for a in ranked
+            )
+            if (abs(best_key[0] - top_key[0]) > 1e-9
+                    or abs(best_key[1] - top_key[1]) > 1e-9):
+                v.append(
+                    f"I5: best {best_key} != max по порядку (floor_level, utility) {top_key}"
+                )
+            # I13: floor-оптимальность — стартовый месяц ликвидности заполнен
+            # не хуже любой допустимой альтернативы (G6)
+            max_floor = max(a.get("floor_level", 0.0) for a in ranked)
+            if best.get("floor_level", 0.0) < max_floor - 1e-9:
+                v.append(
+                    f"I13: best.floor_level={best.get('floor_level')} < "
+                    f"достижимого {max_floor}"
+                )
         detail = best.get("avalanche_detail") or {}
         r_bench = detail.get("r_bench", portrait["r_bench"])
         passed = detail.get("passed", [])
@@ -152,7 +185,40 @@ def check_result(
         if abs(ind["Lt"] - lt_ind) > 0.002:
             v.append(f"I10: indicators.Lt={ind['Lt']} != Bliq/Et={lt_ind:.4f} (stock-based)")
 
-    _finite_scan({"indicators": ind, "best": best}, "result", v)
+    # I12: кризисный охват (G2) — в дефиците модель обязана давать план действий
+    crisis = result.get("crisis_plan")
+    if rt_expected < -EPS_MONEY:
+        if crisis is None:
+            v.append("I12: Rt < 0, но crisis_plan отсутствует (молчание в дефиците)")
+        else:
+            if abs(crisis["deficit"] - (-rt_expected)) > EPS_MONEY:
+                v.append(
+                    f"I12: crisis.deficit={crisis['deficit']} != |Rt|={-rt_expected:.2f}"
+                )
+            if not crisis.get("actions"):
+                v.append("I12: кризисный план без единого действия")
+            if crisis.get("severity") not in (
+                "recoverable_from_liquidity", "cut_required", "critical"
+            ):
+                v.append(f"I12: неизвестная severity: {crisis.get('severity')}")
+            closure = next(
+                (a for a in crisis.get("actions", [])
+                 if a["type"] == "close_debts_from_liquidity"), None,
+            )
+            if closure is not None:
+                if closure["new_rt"] < -EPS_MONEY:
+                    v.append(f"I12: балансовый ход не развернул поток: {closure['new_rt']}")
+                if closure["bliq_used"] > portrait["bliq"] + EPS_MONEY:
+                    v.append("I12: балансовый ход тратит больше подушки, чем есть")
+                if expenses > 0 and closure["bliq_remaining"] < expenses - EPS_MONEY:
+                    v.append(
+                        f"I12: после хода подушка {closure['bliq_remaining']} "
+                        f"ниже floor (1 мес = {expenses})"
+                    )
+    elif crisis is not None:
+        v.append("I12: crisis_plan присутствует при Rt >= 0")
+
+    _finite_scan({"indicators": ind, "best": best, "crisis_plan": crisis}, "result", v)
     return v
 
 

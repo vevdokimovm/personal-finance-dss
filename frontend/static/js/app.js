@@ -2371,6 +2371,69 @@ function renderPlanning(res) {
             </div>`;
     }
 
+    // Кризисный план (модель v3.1.0): при Rt < 0 — действия вместо молчания
+    const cpEl = $('#crisis-plan');
+    if (cpEl) {
+        const cp = res.crisis_plan;
+        if (cp) {
+            const sevLabel = {
+                recoverable_from_liquidity: 'Исправимо из накоплений',
+                cut_required: 'Нужно сократить расходы',
+                critical: 'Критическая ситуация',
+            }[cp.severity] || 'Дефицит';
+            const sevColor = cp.severity === 'recoverable_from_liquidity'
+                ? 'var(--c-amber-text)' : 'var(--c-red-text)';
+            const actionHtml = (a) => {
+                if (a.type === 'close_debts_from_liquidity') {
+                    return `<div class="alt-detail-item"><span class="alt-arrow">→</span><span>
+                        <strong>Закрыть кредит из накоплений:</strong> ${a.steps.map(s =>
+                            `«${esc(s.name)}» — ${fmt.cur(s.paid_in)}${s.closed ? ' (полностью)' : ' (частично)'}`).join('; ')}.
+                        Платежи снизятся, поток станет положительным (+${fmt.cur(a.new_rt)} ₽/мес).
+                        Накоплений останется ${fmt.cur(a.bliq_remaining)}.</span></div>`;
+                }
+                if (a.type === 'cut_expenses') {
+                    return `<div class="alt-detail-item"><span class="alt-arrow">→</span><span>
+                        <strong>Сократить расходы</strong> минимум на ${fmt.cur(a.amount)} ₽/мес.
+                        На жизнь сейчас можно тратить не больше <strong>${fmt.cur(a.max_affordable_expenses)}</strong> ₽/мес.</span></div>`;
+                }
+                if (a.type === 'freeze_goals') {
+                    return `<div class="alt-detail-item"><span class="alt-arrow">→</span><span>
+                        <strong>Заморозить взносы в цели</strong> до выхода из дефицита: ${a.goals.map(esc).join(', ')}.</span></div>`;
+                }
+                if (a.type === 'restructure_debt') {
+                    return `<div class="alt-detail-item"><span class="alt-arrow">→</span><span>
+                        <strong>Снизить платёж по самому дорогому кредиту</strong> «${esc(a.loan)}»
+                        (ставка ${(a.interest_rate * 100).toFixed(0)}%, платёж ${fmt.cur(a.monthly_payment)} ₽/мес):
+                        ${a.options.join(' / ')}.</span></div>`;
+                }
+                return '';
+            };
+            cpEl.innerHTML = `
+                <div class="alt-detail-block" style="border-color:${sevColor}; margin-bottom:12px;">
+                    <div class="alt-detail-title" style="color:${sevColor};">Бюджет в минусе: ${sevLabel}</div>
+                    <div style="font-size:.82rem; color:var(--c-text); margin-bottom:8px;">
+                        Дефицит <strong>${fmt.cur(cp.deficit)}</strong> ₽/мес${cp.runway_months != null
+                            ? ` · накоплений хватит примерно на <strong>${cp.runway_months}</strong> мес.` : ''}
+                    </div>
+                    ${(cp.actions || []).map(actionHtml).join('')}
+                    <div class="alt-meta" style="margin-top:6px;">${esc(cp.summary || '')}</div>
+                </div>`;
+        } else {
+            cpEl.innerHTML = '';
+        }
+        // Флаг перегруженного ПДН: план не наращивает платежи + рефинансирование
+        if (!res.crisis_plan && ind.Dt_alert) {
+            cpEl.innerHTML = `
+                <div class="alt-detail-block" style="border-color:var(--c-amber-text); margin-bottom:12px;">
+                    <div class="alt-detail-title" style="color:var(--c-amber-text);">Долговая нагрузка выше безопасных 40%</div>
+                    <div style="font-size:.82rem; color:var(--c-text);">
+                        План построен так, чтобы <strong>не наращивать платежи</strong> — досрочное погашение
+                        снижает нагрузку. Параллельно стоит рассмотреть рефинансирование самого дорогого кредита.
+                    </div>
+                </div>`;
+        }
+    }
+
     // Bliq preallocation block (если сработала предобработка)
     const bp = res.bliq_preallocation;
     if (bp && bp.closed_goals && bp.closed_goals.length) {
@@ -2409,10 +2472,11 @@ function renderPlanning(res) {
         } else {
             optC.innerHTML = `
                 <div class="glass-panel" style="border:1px solid rgba(244,63,94,.2); padding:20px 24px; text-align:center;">
-                    <div style="font-weight:700; color:var(--c-red-text); margin-bottom:6px;">Все альтернативы отклонены (структурный диагноз)</div>
+                    <div style="font-weight:700; color:var(--c-red-text); margin-bottom:6px;">Свободного потока для распределения нет</div>
                     <div style="font-size:.84rem; color:var(--c-text3);">
-                        A_доп = ∅. Свободный поток Rt = ${fmt.cur(Rt)} ₽. Распределять нечего —
-                        требуется пересмотр расходов или рефинансирование дорогих кредитов.
+                        Свободный поток ${fmt.cur(Rt)} ₽ в месяц — распределять нечего.
+                        ${res.crisis_plan ? 'План действий по выходу из дефицита — в блоке выше.' :
+                        'Требуется пересмотр расходов или рефинансирование дорогих кредитов.'}
                     </div>
                 </div>`;
         }

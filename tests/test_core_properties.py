@@ -349,13 +349,26 @@ class TestRankingInvariants:
 
     @core_settings
     @given(s=scenario(), risk=risk_profile)
-    def test_recommended_is_argmax(self, s: dict, risk: int):
-        """Рекомендованная альтернатива = argmax U(a) (§8)."""
+    def test_recommended_is_lexicographic_argmax(self, s: dict, risk: int):
+        """Рекомендация = argmax по (floor_level, U) — v3.1.0, §8 канона.
+
+        Сначала заполнение стартового месяца ликвидности (G6), среди
+        floor-оптимальных — максимум SAW-полезности. best.utility может быть
+        НЕ глобальным максимумом по списку — это норма нового порядка.
+        """
         ranked = rank_alternatives(_evaluate_all(s), risk)
         recommended = [a for a in ranked if a.get("is_recommended")]
         assert len(recommended) == 1
-        best_utility = max(a["utility"] for a in ranked)
-        assert recommended[0]["utility"] == pytest.approx(best_utility)
+        best_key = (recommended[0]["floor_level"], recommended[0]["utility"])
+        top_key = max((a["floor_level"], a["utility"]) for a in ranked)
+        assert best_key[0] == pytest.approx(top_key[0])
+        assert best_key[1] == pytest.approx(top_key[1])
+        # среди альтернатив с тем же floor-уровнем utility рекомендации — максимум
+        same_floor = [
+            a["utility"] for a in ranked
+            if abs(a["floor_level"] - best_key[0]) <= 1e-9
+        ]
+        assert recommended[0]["utility"] == pytest.approx(max(same_floor))
 
     @core_settings
     @given(

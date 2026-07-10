@@ -1,5 +1,5 @@
 """
-Ранжирование альтернатив через интегральную функцию полезности (этап 6 ВКР).
+Ранжирование альтернатив через интегральную функцию полезности (этап 6).
 
 Метод — Simple Additive Weighting (Fishburn, 1967):
     U(ai) = w1·R̂i + w2·L̂i + w3·(1 − D̂i) + w4·Ŝi,   Σwk = 1
@@ -7,20 +7,47 @@
 
 Веса w1..w4 задаются профилем риска (5 профилей). Веса R, L, D, Si
 для каждой альтернативы нормированы min-max к [0, 1].
+
+Модель v3.1.0 — две правки по независимой экспертизе (12 000 портретов
+против консенсуса 4 экспертных движков):
+
+  G1. Насыщающая полезность резерва. Критерий ликвидности считается по
+      Lt, ограниченному сверху целевым Lt*(risk) из коридора 3–6 месяцев:
+      выше цели прирост подушки полезности не даёт (альтернативная
+      стоимость положительна — деньги должны работать в целях). Без этого
+      модель копила резерв бесконечно (76% всех расхождений с консенсусом).
+
+  G6. Floor резерва: стартовый месяц ликвидности (1 мес расходов) не
+      отменяется риск-профилем. Альтернативы упорядочиваются
+      лексикографически: сначала заполнение floor, затем SAW. Без floor
+      любой сбой дохода у агрессивного профиля конвертируется в новый долг.
 """
 from __future__ import annotations
 
 from typing import Any
 
-# Профили риска R ∈ {1..5} → веса целевой функции (форм. 22 ВКР)
+# Профили риска R ∈ {1..5} → веса целевой функции + целевая подушка Lt* (мес)
+# Коридор Lt* = 3–6 месяцев — консенсус независимой экспертизы и норматив
+# Greninger et al. (1996): 2.5–6 месяцев расходов.
 RISK_PROFILES: dict[int, dict[str, Any]] = {
-    1: {"w_rt": 0.20, "w_lt": 0.45, "w_dt": 0.25, "w_goals": 0.10, "label": "Консервативный"},
+    1: {"w_rt": 0.20, "w_lt": 0.45, "w_dt": 0.25, "w_goals": 0.10,
+        "lt_target": 6.0, "label": "Консервативный"},
     2: {"w_rt": 0.20, "w_lt": 0.35, "w_dt": 0.25, "w_goals": 0.20,
-        "label": "Умеренно-консервативный"},
-    3: {"w_rt": 0.25, "w_lt": 0.30, "w_dt": 0.25, "w_goals": 0.20, "label": "Сбалансированный"},
-    4: {"w_rt": 0.30, "w_lt": 0.20, "w_dt": 0.20, "w_goals": 0.30, "label": "Умеренно-агрессивный"},
-    5: {"w_rt": 0.35, "w_lt": 0.10, "w_dt": 0.15, "w_goals": 0.40, "label": "Агрессивный"},
+        "lt_target": 5.0, "label": "Умеренно-консервативный"},
+    3: {"w_rt": 0.25, "w_lt": 0.30, "w_dt": 0.25, "w_goals": 0.20,
+        "lt_target": 4.5, "label": "Сбалансированный"},
+    4: {"w_rt": 0.30, "w_lt": 0.20, "w_dt": 0.20, "w_goals": 0.30,
+        "lt_target": 3.5, "label": "Умеренно-агрессивный"},
+    5: {"w_rt": 0.35, "w_lt": 0.10, "w_dt": 0.15, "w_goals": 0.40,
+        "lt_target": 3.0, "label": "Агрессивный"},
 }
+
+# Floor резерва: минимальный стартовый запас ликвидности в месяцах расходов.
+# Не зависит от профиля риска (риск-аппетит управляет целевым размером
+# подушки и инвест-миксом, но не отменяет страховку от сбоя дохода).
+RESERVE_FLOOR_MONTHS = 1.0
+
+_FLOOR_EPS = 1e-9
 
 
 def normalize_value(value: float, v_min: float, v_max: float, minimize: bool = False) -> float:
@@ -41,6 +68,12 @@ def rank_alternatives(
 ) -> list[dict[str, Any]]:
     """
     Ранжирование через U(a). Лучшая альтернатива получает is_recommended=True.
+
+    Порядок — лексикографический (floor_level, utility):
+      1) floor_level = min(Lt', 1.0) — насколько план заполняет стартовый
+         месяц ликвидности (G6);
+      2) utility — SAW-свёртка с насыщением критерия ликвидности на Lt* (G1).
+    Поле utility остаётся в [0, 1] (для отображения и объяснений).
     """
     if not alternatives:
         return []
@@ -49,33 +82,42 @@ def rank_alternatives(
     w_rt, w_lt, w_dt, w_goals = (
         profile["w_rt"], profile["w_lt"], profile["w_dt"], profile["w_goals"]
     )
+    lt_target = float(profile["lt_target"])
 
     rt_values = [a["Rt_new"] for a in alternatives]
-    lt_values = [a["Lt_new"] for a in alternatives]
+    # G1: насыщение — выше целевой подушки прирост Lt полезности не даёт
+    lt_capped = [min(float(a["Lt_new"]), lt_target) for a in alternatives]
     dt_values = [a["Dt_new"] for a in alternatives]
     si_values = [a.get("Si", 0) for a in alternatives]
 
     rt_min, rt_max = min(rt_values), max(rt_values)
-    lt_min, lt_max = min(lt_values), max(lt_values)
+    lt_min, lt_max = min(lt_capped), max(lt_capped)
     dt_min, dt_max = min(dt_values), max(dt_values)
     si_min, si_max = min(si_values), max(si_values)
 
-    for alt in alternatives:
+    for alt, lt_eff in zip(alternatives, lt_capped):
         rt_norm = normalize_value(alt["Rt_new"], rt_min, rt_max, minimize=False)
-        lt_norm = normalize_value(alt["Lt_new"], lt_min, lt_max, minimize=False)
+        lt_norm = normalize_value(lt_eff, lt_min, lt_max, minimize=False)
         dt_norm = normalize_value(alt["Dt_new"], dt_min, dt_max, minimize=True)
         si_norm = normalize_value(alt.get("Si", 0), si_min, si_max, minimize=False)
 
         utility = w_rt * rt_norm + w_lt * lt_norm + w_dt * dt_norm + w_goals * si_norm
         alt["utility"] = round(utility, 4)
+        # G6: уровень заполнения стартового месяца ликвидности
+        alt["floor_level"] = round(
+            min(float(alt["Lt_new"]), RESERVE_FLOOR_MONTHS), 6
+        )
         alt["scores"] = {
             "Rt_norm": round(rt_norm, 3),
             "Lt_norm": round(lt_norm, 3),
             "Dt_norm": round(dt_norm, 3),
             "Si_norm": round(si_norm, 3),
+            "Lt_capped": round(lt_eff, 4),
         }
 
-    alternatives.sort(key=lambda a: a["utility"], reverse=True)
+    alternatives.sort(
+        key=lambda a: (a["floor_level"], a["utility"]), reverse=True
+    )
     if alternatives:
         alternatives[0]["is_recommended"] = True
 
