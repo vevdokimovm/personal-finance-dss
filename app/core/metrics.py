@@ -98,8 +98,14 @@ def calculate_dt(obligation_payments: float, income_total: float) -> float:
     """
     Dt = ΣPl,t / It  (форм. 13 ВКР).
     Долговая нагрузка — совпадает с ПДН Банка России (Указ. № 4892-У).
+
+    G7 (v3.2.0): при нулевом доходе и живых платежах Dt = 1.0 (максимальная
+    нагрузка), а не 0 — прежний ноль показывал безработному должнику «зелёный»
+    ПДН. Без платежей и дохода нагрузка честно нулевая.
     """
-    return obligation_payments / income_total if income_total > 0 else 0.0
+    if income_total > 0:
+        return obligation_payments / income_total
+    return 1.0 if obligation_payments > 0 else 0.0
 
 
 def calculate_blr(balance: float, liquid_assets: float, expense_total: float) -> float:

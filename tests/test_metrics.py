@@ -74,7 +74,10 @@ class TestDebt:
         assert calculate_dt(200, 1000) == pytest.approx(0.2)
 
     def test_dt_zero_income(self):
-        assert calculate_dt(200, 0) == 0.0
+        # G7 (v3.2.0): нулевой доход при живых платежах — максимальная
+        # нагрузка, а не «зелёный» ноль
+        assert calculate_dt(200, 0) == 1.0
+        assert calculate_dt(0, 0) == 0.0
 
 
 class TestBLR:

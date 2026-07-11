@@ -36,6 +36,35 @@ DEPOSIT_INSURANCE_NOTE = (
     "суммы сверх лимита имеет смысл разложить по разным банкам."
 )
 
+# Полный G5 (v3.2.0): инструмент зависит от горизонта. Короткий горизонт не
+# терпит просадок — акции исключаются независимо от риск-профиля.
+HORIZON_SHORT_MONTHS = 12.0
+HORIZON_MID_MONTHS = 36.0
+
+
+def instrument_for_horizon(months_left: float | None) -> str:
+    """Полка инструмента для накопления под конкретный срок (G5, v3.2.0)."""
+    if months_left is not None and months_left < HORIZON_SHORT_MONTHS:
+        return "депозит / накопительный счёт (горизонт меньше года — без просадок)"
+    if months_left is not None and months_left < HORIZON_MID_MONTHS:
+        return "депозит и облигации (ОФЗ) поровну (горизонт 1–3 года)"
+    return "профильный микс: депозит / облигации / акции (горизонт от 3 лет)"
+
+
+def build_shelf_split(amount: float, risk_tolerance: int) -> dict[str, float]:
+    """Разбивка суммы по профильной полке: депозит / облигации / акции.
+
+    Сумма компонентов сходится с amount до копейки (остаток — в облигации).
+    """
+    equity_share = EQUITY_SHARE_BY_PROFILE.get(
+        risk_tolerance, EQUITY_SHARE_BY_PROFILE[3]
+    )
+    equity = money(amount * equity_share)
+    non_equity = amount - equity
+    deposits = money(non_equity / 2)
+    bonds = money(amount - equity - deposits)
+    return {"deposits": deposits, "bonds": bonds, "equity": equity}
+
 
 def annotate_investment_tranche(
     alt: dict[str, Any],
@@ -64,19 +93,12 @@ def annotate_investment_tranche(
     equity_share = EQUITY_SHARE_BY_PROFILE.get(
         risk_tolerance, EQUITY_SHARE_BY_PROFILE[3]
     )
-    equity = money(invest * equity_share)
-    non_equity = invest - equity
-    deposits = money(non_equity / 2)
-    bonds = money(invest - equity - deposits)  # остаток — чтобы сумма сошлась
+    split = build_shelf_split(invest, risk_tolerance)
 
     alt["investment_tranche"] = {
         "amount": invest,
         "cushion_part": money(x_res - invest),
-        "split": {
-            "deposits": deposits,   # депозит / накопительный счёт
-            "bonds": bonds,         # ОФЗ / облигации
-            "equity": equity,       # акции (индексный портфель)
-        },
+        "split": split,
         "equity_share": equity_share,
         "note": DEPOSIT_INSURANCE_NOTE,
     }

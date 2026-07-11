@@ -1,7 +1,7 @@
-"""Инварианты мат-модели v3.1.0 — исполняемая спецификация для свипа.
+"""Инварианты мат-модели v3.2.0 — исполняемая спецификация для свипа.
 
 Каждая проверка возвращает список нарушений вида "I<n>: ...". Пустой список = чисто.
-Канон: docs/math_model_v3_1_0.md + app/core (filtering, ranking, alternatives,
+Канон: docs/math_model_v3_2_0.md + app/core (filtering, ranking, alternatives,
 crisis, forecast).
 
 Изменения v3.1.0 (по независимой экспертизе, 12 000 портретов × 4 эксперта):
@@ -11,6 +11,12 @@ crisis, forecast).
   I12 — кризисный охват: Rt < 0 => план с действиями, дефицит сходится (G2);
   I13 — floor-оптимальность: best заполняет стартовый месяц ликвидности
         не хуже любой допустимой альтернативы (G6).
+
+Изменения v3.2.0 (продолжение калибровки, G4/G5/G7):
+  I10 — + ПДН при нулевом доходе с платежами = 1.0 (G7);
+  I14 — слой запаса: при излишке сверх Lt*·Σe план разовых ходов существует,
+        целевая подушка не нарушается, излишек разворачивается целиком (G4);
+        при Rt < 0 слой выключен (запасом владеет кризисный модуль).
 """
 from __future__ import annotations
 
@@ -180,6 +186,8 @@ def check_result(
     ind = result["indicators"]
     if income > 0 and abs(ind["Dt"] - payments / income) > 1e-3:
         v.append(f"I10: indicators.Dt={ind['Dt']} != SigmaP/It={payments / income:.4f}")
+    elif income <= 0 and payments > 0 and abs(ind["Dt"] - 1.0) > 1e-9:
+        v.append(f"I10: при нулевом доходе с платежами Dt={ind['Dt']} != 1.0 (G7)")
     if expenses > 0:
         lt_ind = ind["Bliq"] / expenses
         if abs(ind["Lt"] - lt_ind) > 0.002:
@@ -218,7 +226,31 @@ def check_result(
     elif crisis is not None:
         v.append("I12: crisis_plan присутствует при Rt >= 0")
 
-    _finite_scan({"indicators": ind, "best": best, "crisis_plan": crisis}, "result", v)
+    # I14: слой запаса (G4, v3.2.0)
+    surplus = result.get("surplus_plan")
+    if rt_expected < -EPS_MONEY:
+        if surplus is not None:
+            v.append("I14: surplus_plan присутствует при Rt < 0 (запасом владеет кризис)")
+    elif surplus is not None:
+        if surplus["bliq_after"] < surplus["reserve_target"] - EPS_MONEY:
+            v.append(
+                f"I14: разовые ходы пробили целевую подушку: bliq_after="
+                f"{surplus['bliq_after']} < target={surplus['reserve_target']}"
+            )
+        deployed = sum(m["amount"] for m in surplus.get("moves", []))
+        if abs(deployed - surplus["deployable"]) > EPS_MONEY:
+            v.append(
+                f"I14: излишек развёрнут не целиком: {deployed} != {surplus['deployable']}"
+            )
+        for m in surplus.get("moves", []):
+            if m["amount"] < -EPS_MONEY:
+                v.append(f"I14: отрицательный ход {m}")
+
+    _finite_scan(
+        {"indicators": ind, "best": best, "crisis_plan": crisis,
+         "surplus_plan": surplus},
+        "result", v,
+    )
     return v
 
 

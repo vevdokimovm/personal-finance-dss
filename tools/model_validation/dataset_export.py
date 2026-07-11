@@ -102,16 +102,132 @@ def export_model_outcomes(out: Path, n: int, seed: int, version: int) -> int:
     return written
 
 
+EXPERT_FIELDS = (
+    "id", "income_total", "expense_total", "obligations", "goals",
+    "bliq", "r_bench", "risk_tolerance",
+)
+
+
+def export_expert_pack(
+    out_dir: Path,
+    n: int,
+    seed: int,
+    version: int,
+    chunk_size: int = 3000,
+) -> list[Path]:
+    """Пакет для внешних экспертных движков: СУХИЕ входы, чанками.
+
+    Правило чистоты (портретный протокол вехи 6): никаких подсказок —
+    ни типа портрета (kind), ни вычисленных метрик, ни внутренних параметров
+    модели (l_min). Только то, что знал бы живой консультант со слов клиента.
+    Чанки по chunk_size строк — чтобы раздавать экспертам порциями.
+    """
+    gen = PortraitGenerator(seed, version=version)
+    out_dir.mkdir(parents=True, exist_ok=True)
+    files: list[Path] = []
+    fh = None
+    try:
+        for i in range(n):
+            if i % chunk_size == 0:
+                if fh is not None:
+                    fh.close()
+                part = i // chunk_size + 1
+                path = out_dir / f"expert_portraits_v{version}_part{part}.jsonl.gz"
+                fh = gzip.open(path, "wt", encoding="utf-8")
+                files.append(path)
+            portrait = _jsonable(gen.generate(i))
+            portrait["id"] = f"SP-{i:05d}"
+            row = {k: portrait[k] for k in EXPERT_FIELDS}
+            fh.write(json.dumps(row, ensure_ascii=False) + "\n")
+    finally:
+        if fh is not None:
+            fh.close()
+    return files
+
+
+def _fmt_money(v: float) -> str:
+    return f"{v:,.2f}".replace(",", " ")
+
+
+def export_markdown(out: Path, n: int, seed: int, version: int) -> int:
+    """Человекочитаемые СУХИЕ карточки портретов одним .md (для владельца).
+
+    Те же правила чистоты, что и в экспертном пакете: без типа портрета и без
+    вычисленных метрик. Регенерируемый артефакт — в архиве кода не хранится,
+    выдаётся по запросу.
+    """
+    gen = PortraitGenerator(seed, version=version)
+    out.parent.mkdir(parents=True, exist_ok=True)
+    risk_labels = {1: "консервативный", 2: "умеренно-консервативный",
+                   3: "сбалансированный", 4: "умеренно-агрессивный",
+                   5: "агрессивный"}
+    with open(out, "w", encoding="utf-8") as fh:
+        fh.write(
+            f"# Портреты датасета v{version} — {n} шт. (seed {seed})\n\n"
+            "> Сухие входные данные без подсказок: тип портрета и расчётные "
+            "показатели намеренно не приводятся. Регенерация: "
+            "`python -m tools.model_validation.dataset_export markdown ...`\n"
+        )
+        for i in range(n):
+            p = gen.generate(i)
+            risk = p["risk_tolerance"]
+            fh.write(
+                f"\n### SP-{i:05d} · риск {risk} ({risk_labels[risk]}) · "
+                f"безрисковая ставка {p['r_bench'] * 100:.2f}%\n"
+            )
+            fh.write(
+                f"Доход {_fmt_money(p['income_total'])} ₽/мес · "
+                f"Расходы {_fmt_money(p['expense_total'])} ₽/мес · "
+                f"Накопления {_fmt_money(p['bliq'])} ₽\n"
+            )
+            if p["obligations"]:
+                items = "; ".join(
+                    f"«{o['name']}» — остаток {_fmt_money(o['amount'])} ₽, "
+                    f"ставка {o['interest_rate'] * 100:.1f}%, "
+                    f"платёж {_fmt_money(o['monthly_payment'])} ₽/мес"
+                    for o in p["obligations"]
+                )
+                fh.write(f"Кредиты: {items}\n")
+            else:
+                fh.write("Кредиты: нет\n")
+            if p["goals"]:
+                items = "; ".join(
+                    f"«{g['name']}» — {_fmt_money(g['target_amount'])} ₽ "
+                    f"(накоплено {_fmt_money(g['current_amount'])})"
+                    + (f", дедлайн {g['deadline'].isoformat()}"
+                       if g.get("deadline") else ", без дедлайна")
+                    for g in p["goals"]
+                )
+                fh.write(f"Цели: {items}\n")
+            else:
+                fh.write("Цели: нет\n")
+    return n
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Экспорт датасетов валидации")
-    parser.add_argument("what", choices=("portraits", "outcomes"))
+    parser.add_argument(
+        "what", choices=("portraits", "outcomes", "expert-pack", "markdown")
+    )
     parser.add_argument("--out", type=Path, required=True)
     parser.add_argument("--n", type=int, default=12000)
     parser.add_argument("--seed", type=int, default=20260702)
     parser.add_argument("--version", type=int, default=2, choices=(1, 2))
+    parser.add_argument("--chunk-size", type=int, default=3000)
     args = parser.parse_args(argv)
 
-    fn = export_portraits if args.what == "portraits" else export_model_outcomes
+    if args.what == "expert-pack":
+        files = export_expert_pack(
+            args.out, n=args.n, seed=args.seed,
+            version=args.version, chunk_size=args.chunk_size,
+        )
+        print(f"expert-pack: {args.n} строк -> {len(files)} файлов в {args.out}")
+        return 0
+    fn = {
+        "portraits": export_portraits,
+        "outcomes": export_model_outcomes,
+        "markdown": export_markdown,
+    }[args.what]
     written = fn(args.out, n=args.n, seed=args.seed, version=args.version)
     print(f"{args.what}: {written} строк -> {args.out}")
     return 0

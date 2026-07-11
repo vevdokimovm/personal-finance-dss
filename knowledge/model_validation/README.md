@@ -52,5 +52,7 @@ python -m tools.model_validation.expert_agreement \
 | `model_outcomes_v3_1_0_on_v2.csv.gz` | То же на портретах v2 — половина будущего joined второй сертификации |
 
 Регенерация любого файла: `tools/model_validation/dataset_export.py`
-(portraits / outcomes, детерминировано по seed+version). История версий модели
+(portraits / outcomes / expert-pack / markdown, детерминировано по seed+version).
+Экспертный пакет (сухие чанки без подсказок + бриф `docs/model/expert_brief_v2.md`)
+и полный markdown-каталог — регенерируемые артефакты, в архиве не хранятся. История версий модели
 и генератора — `docs/model/README.md`.

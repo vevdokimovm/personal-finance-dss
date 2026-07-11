@@ -2432,6 +2432,40 @@ function renderPlanning(res) {
                     </div>
                 </div>`;
         }
+        // Слой запаса (v3.2.0, G4): излишек сверх целевой подушки — разовые ходы
+        const sp = res.surplus_plan;
+        if (sp && sp.moves && sp.moves.length) {
+            const moveHtml = (m) => {
+                if (m.type === 'repay_debt') {
+                    return `<div class="alt-detail-item"><span class="alt-arrow">→</span><span>
+                        <strong>${m.closed ? 'Разово закрыть' : 'Разово погасить'}</strong> «${esc(m.name)}»
+                        на ${fmt.cur(m.amount)} ₽ — выгода ~${fmt.cur(m.opportunity_gain_yearly)} ₽/год,
+                        платежи −${fmt.cur(m.payment_freed)} ₽/мес.</span></div>`;
+                }
+                if (m.type === 'fund_goal') {
+                    return `<div class="alt-detail-item"><span class="alt-arrow">→</span><span>
+                        <strong>${m.closed ? 'Разово закрыть цель' : 'Разово пополнить цель'}</strong>
+                        «${esc(m.name)}» на ${fmt.cur(m.amount)} ₽ (до дедлайна ~${m.months_left} мес;
+                        копить: ${esc(m.instrument)}).</span></div>`;
+                }
+                if (m.type === 'invest_lump') {
+                    const s = m.split || {};
+                    return `<div class="alt-detail-item"><span class="alt-arrow">→</span><span>
+                        <strong>Разместить остаток ${fmt.cur(m.amount)} ₽ как инвестиции:</strong>
+                        ${fmt.cur(s.deposits)} — депозит/накопительный; ${fmt.cur(s.bonds)} — облигации (ОФЗ);
+                        ${fmt.cur(s.equity)} — акции (индексный портфель).</span></div>`;
+                }
+                return '';
+            };
+            cpEl.innerHTML += `
+                <div class="alt-detail-block" style="border-color:var(--c-green-text); margin-bottom:12px;">
+                    <div class="alt-detail-title" style="color:var(--c-green-text);">Накопления могут работать: ${fmt.cur(sp.deployable)} ₽ сверх целевой подушки</div>
+                    <div style="font-size:.82rem; color:var(--c-text); margin-bottom:8px;">
+                        Целевая подушка (${fmt.cur(sp.reserve_target)} ₽) остаётся нетронутой — разовые ходы только из излишка.
+                    </div>
+                    ${sp.moves.map(moveHtml).join('')}
+                </div>`;
+        }
     }
 
     // Bliq preallocation block (если сработала предобработка)

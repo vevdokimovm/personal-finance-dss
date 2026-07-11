@@ -22,6 +22,7 @@ from app.core.crisis import build_crisis_plan
 from app.core.filtering import B_MIN, DT_MAX, L_MIN, filter_alternatives
 from app.core.goals_priority import preallocate_from_bliq
 from app.core.investment import annotate_investment_tranche
+from app.core.surplus import build_surplus_plan
 from app.core.metrics import (
     calculate_blr,
     calculate_bt,
@@ -78,6 +79,20 @@ def run_planning(
         bliq=bliq,
         today=today,
     ) if rt < 0 else None
+
+    # ── Слой запаса (v3.2.0, G4): разовые ходы из излишка сверх подушки ──
+    # Только при неотрицательном потоке: в дефиците запасом распоряжается
+    # кризисный модуль. Считается ПОСЛЕ этапа 4.0 (на остатке bliq_after).
+    surplus_plan = build_surplus_plan(
+        bliq=bliq_after,
+        expense_total=expense_total,
+        obligations=obligations,
+        goals=active_goals,
+        r_bench=r_bench,
+        risk_tolerance=risk_tolerance,
+        lt_target=float(profile["lt_target"]),
+        today=today,
+    ) if rt >= 0 else None
 
     # ── Этап 4: генерация альтернатив ──────────────────────────────────
     goals_total = sum(
@@ -198,6 +213,7 @@ def run_planning(
             "lt_target": profile["lt_target"],
         },
         "crisis_plan": crisis_plan,
+        "surplus_plan": surplus_plan,
         "alternatives_total": len(alternatives),
         "admissible_count": len(admissible),
         "rejected_count": len(rejected),
