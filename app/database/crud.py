@@ -749,7 +749,7 @@ def create_goal(
     name: str,
     target_amount: float,
     current_amount: float,
-    deadline: datetime,
+    deadline: Optional[datetime] = None,  # None = бессрочная цель (ROADMAP §6.3)
     category: str = "material",
     comment: Optional[str] = None,
     priority: int = 0,
@@ -793,7 +793,9 @@ def get_goals(
     if active_only:
         query = query.filter(Goal.is_active.is_(True))
     query = _owner_filter(query, Goal, user_id)
-    return query.order_by(Goal.deadline.asc()).all()
+    # NULLS LAST явно: бессрочные цели — в конце списка. Без этого SQLite ставит
+    # NULL первыми, а PostgreSQL — последними (матрица СУБД разъезжается).
+    return query.order_by(Goal.deadline.asc().nullslast()).all()
 
 
 def delete_goal(db: Session, goal_id: int, user_id: Optional[str] = None) -> Optional[Goal]:

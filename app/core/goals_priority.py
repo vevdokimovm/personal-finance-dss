@@ -26,16 +26,42 @@ CATEGORY_WEIGHTS: dict[str, float] = {
 BLIQ_USAGE_THRESHOLD = 0.5      # доля Bliq, доступная для разового закрытия близких целей
 NEAR_GOAL_HORIZON_MONTHS = 3    # горизонт «близкой» цели
 
+# Бессрочная цель (deadline = None): срока нет, ускорять нечего — срочность
+# нейтральная. Численно равна цели с горизонтом 12 мес (12/12 = 1), но задана
+# явно, а не как побочный эффект фолбэка (ROADMAP §6.3).
+URGENCY_OPEN_ENDED = 1.0
+FALLBACK_MONTHS = 12.0          # защитный фолбэк для нераспознанного значения дедлайна
+
+
+def months_left_or_none(deadline: Any, today: datetime) -> float | None:
+    """Месяцев до дедлайна; None — цель бессрочная (deadline не задан)."""
+    if deadline is None:
+        return None
+    return _months_left(deadline, today)
+
+
+def urgency_of(deadline: Any, today: datetime) -> float:
+    """Срочность u_s: 12 / месяцев до срока, минимум 1. Бессрочная цель → 1.0."""
+    months = months_left_or_none(deadline, today)
+    if months is None:
+        return URGENCY_OPEN_ENDED
+    return max(1.0, 12.0 / months)
+
 
 def _months_left(deadline: Any, today: datetime) -> float:
-    """Сколько месяцев осталось до дедлайна (минимум 1, чтобы не делить на ноль)."""
+    """Сколько месяцев осталось до дедлайна (минимум 1, чтобы не делить на ноль).
+
+    Бессрочная цель (None) здесь трактуется как нейтральный горизонт 12 мес —
+    для мест, которым нужно число. Где важно различать «без срока» и «через год»,
+    зовите `months_left_or_none`.
+    """
     if isinstance(deadline, str):
         try:
             deadline = datetime.fromisoformat(deadline)
         except ValueError:
-            return 12.0
+            return FALLBACK_MONTHS
     if not isinstance(deadline, datetime):
-        return 12.0
+        return FALLBACK_MONTHS
     delta_days = max(1, (deadline - today).days)
     return max(1.0, delta_days / 30.0)
 
@@ -66,7 +92,7 @@ def calculate_goals_si(
         remaining = max(0.0, float(g.get("target_amount", 0)) - float(g.get("current_amount", 0)))
         if remaining <= 0:
             continue
-        urgency = max(1.0, 12.0 / _months_left(g.get("deadline"), today))
+        urgency = urgency_of(g.get("deadline"), today)
         weight = CATEGORY_WEIGHTS.get(str(g.get("category", "material")), 1.0)
         enriched.append({
             **g,
@@ -122,8 +148,8 @@ def preallocate_from_bliq(
         if remaining <= 0:
             far.append(g)
             continue
-        months = _months_left(g.get("deadline"), today)
-        if months <= NEAR_GOAL_HORIZON_MONTHS:
+        months = months_left_or_none(g.get("deadline"), today)
+        if months is not None and months <= NEAR_GOAL_HORIZON_MONTHS:
             near.append({**g, "_remaining": remaining})
         else:
             far.append(g)
@@ -157,8 +183,8 @@ def goals_allocation_breakdown(
         remaining = max(0.0, float(g.get("target_amount", 0)) - float(g.get("current_amount", 0)))
         if remaining <= 0:
             continue
-        months = _months_left(g.get("deadline"), today)
-        urgency = max(1.0, 12.0 / months)
+        months = months_left_or_none(g.get("deadline"), today)
+        urgency = urgency_of(g.get("deadline"), today)
         weight = CATEGORY_WEIGHTS.get(str(g.get("category", "material")), 1.0)
         enriched.append({
             "id": g.get("id"),
@@ -166,7 +192,7 @@ def goals_allocation_breakdown(
             "category": str(g.get("category", "material")),
             "weight": round(weight, 2),
             "urgency": round(urgency, 2),
-            "months_left": round(months, 1),
+            "months_left": round(months, 1) if months is not None else None,
             "priority": weight * urgency,
             "remaining": round(remaining, 2),
         })

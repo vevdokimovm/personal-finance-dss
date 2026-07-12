@@ -11,7 +11,7 @@ from datetime import datetime
 
 from sqlalchemy.orm import Session
 
-from app.core.goals_priority import _months_left
+from app.core.goals_priority import months_left_or_none
 from app.core.spending_advice import ExpenseRecord, GoalRecord, SpendingAdvisor
 from app.database.crud import get_goal_contributions, get_goals, get_transactions
 from app.utils.time import utcnow
@@ -43,7 +43,7 @@ def _goal_records(db: Session, user_id: str | None, months: int,
             name=goal.name,
             target_amount=float(goal.target_amount),
             current_amount=float(goal.current_amount),
-            months_to_deadline=_months_left(goal.deadline, now),
+            months_to_deadline=months_left_or_none(goal.deadline, now),
             monthly_contribution=monthly,
             priority=goal.priority,
         ))

@@ -70,7 +70,7 @@ class GoalDTO(BaseModel):
     name: str
     target_amount: float
     current_amount: float
-    deadline: datetime
+    deadline: Optional[datetime] = None  # None = бессрочная цель (ROADMAP §6.3)
     category: str = "material"
     currency: str = "RUB"
 

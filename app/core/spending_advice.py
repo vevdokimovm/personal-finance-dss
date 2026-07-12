@@ -122,7 +122,7 @@ class GoalRecord:
     name: str
     target_amount: float
     current_amount: float
-    months_to_deadline: float
+    months_to_deadline: float | None  # None = бессрочная цель (ROADMAP §6.3)
     monthly_contribution: float  # наблюдаемый темп пополнения, ₽/мес
     priority: int = 0
 
@@ -132,7 +132,7 @@ class GoalImpact:
     """Layer 3-B: эффект освобождённой экономии на цель (информационно)."""
     goal_name: str
     remaining: float
-    months_to_deadline: float
+    months_to_deadline: float | None  # None = бессрочная цель
     current_monthly: float       # текущий темп пополнения, ₽/мес
     redirected_saving: float     # освобождённая экономия, направляемая на цель
     eta_now: float | None        # мес до цели при текущем темпе (None — не пополняется)
@@ -441,12 +441,19 @@ class SpendingAdvisor:
             eta_now = remaining / rate if rate > 0 else None
             eta_boosted = remaining / (rate + saving)
             months_earlier = (eta_now - eta_boosted) if eta_now is not None else None
-            on_track = eta_now is not None and eta_now <= g.months_to_deadline
+            if g.months_to_deadline is None:
+                # Бессрочная цель: успевать некуда — «в графике», пока есть темп.
+                on_track = eta_now is not None
+            else:
+                on_track = eta_now is not None and eta_now <= g.months_to_deadline
 
             impacts.append(GoalImpact(
                 goal_name=g.name,
                 remaining=round(remaining, 2),
-                months_to_deadline=round(g.months_to_deadline, 1),
+                months_to_deadline=(
+                    round(g.months_to_deadline, 1)
+                    if g.months_to_deadline is not None else None
+                ),
                 current_monthly=round(rate, 2),
                 redirected_saving=round(saving, 2),
                 eta_now=round(eta_now, 1) if eta_now is not None else None,
@@ -459,7 +466,10 @@ class SpendingAdvisor:
                 ),
             ))
 
-        impacts.sort(key=lambda i: (-self._priority_of(i.goal_name, goals), i.months_to_deadline))
+        impacts.sort(key=lambda i: (
+            -self._priority_of(i.goal_name, goals),
+            i.months_to_deadline if i.months_to_deadline is not None else float("inf"),
+        ))
         return impacts[:top_k]
 
     @staticmethod

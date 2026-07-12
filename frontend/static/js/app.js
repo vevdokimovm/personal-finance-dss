@@ -440,7 +440,7 @@ function bindGlobalUI() {
 
     // Goal modal
     on($('#open-goal-modal'), 'click', () => {
-        $('#goal-deadline').value = fmt.today();
+        $('#goal-deadline').value = '';  // пусто = бессрочная цель
         populateGoalAssetSelect();
         openModal($('#goal-modal'));
     });
@@ -455,7 +455,9 @@ function bindGlobalUI() {
                     name: $('#goal-name').value.trim(),
                     target_amount: pn($('#goal-target-amount').value),
                     current_amount: pn($('#goal-current-amount').value),
-                    deadline: new Date($('#goal-deadline').value).toISOString(),
+                    deadline: $('#goal-deadline').value
+                        ? new Date($('#goal-deadline').value).toISOString()
+                        : null,
                     category: $('#goal-category')?.value || 'material',
                     savings_rate: pn($('#goal-savings-rate')?.value || 0) / 100,
                     linked_asset_id: linkedRaw ? Number(linkedRaw) : null,
@@ -1210,7 +1212,7 @@ function renderGoals() {
                     <div class="stack-item-title">${esc(g.name)}
                         <span class="goal-category-badge goal-category-${esc(cat)}" style="margin-left:8px;">${catLabel}</span>
                     </div>
-                    <div class="stack-item-text">${fmt.cur(current)} из ${fmt.cur(g.target_amount)} · до ${fmt.date(g.deadline)}${rateLine}</div>
+                    <div class="stack-item-text">${fmt.cur(current)} из ${fmt.cur(g.target_amount)} · ${g.deadline ? `до ${fmt.date(g.deadline)}` : 'бессрочная'}${rateLine}</div>
                     ${linkLine}
                 </div>
                 <button class="ghost-button delete-button" data-goal-id="${g.id}" style="color:var(--c-red-text);font-size:.85rem;padding:6px 10px;" title="Удалить" aria-label="Удалить">✕</button>

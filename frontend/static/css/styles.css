@@ -474,6 +474,7 @@ button, .btn { font-family: inherit; cursor: pointer; border: none; outline: non
 .form-grid.vertical { grid-template-columns: 1fr; }
 .field { display: flex; flex-direction: column; gap: 7px; margin-bottom: 14px; }
 .field label { font-size: .82rem; font-weight: 600; color: var(--c-text2); text-transform: uppercase; letter-spacing: .5px; }
+.field-hint { font-weight: 400; color: var(--c-text3); text-transform: none; letter-spacing: 0; }
 
 input, .glass-input {
     width: 100%;

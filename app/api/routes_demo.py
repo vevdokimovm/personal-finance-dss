@@ -361,9 +361,10 @@ def case_natalya() -> dict[str, list[Any]]:
                  deadline=now + timedelta(days=30), category="safety"),
             Goal(name="Поездка к морю с внуками", target_amount=150000, current_amount=20000,
                  deadline=now + timedelta(days=210), category="emotional"),
-            Goal(name="Наследство внукам (долгосрочно)",
+            # Бессрочная цель: срока нет — копится фоном (deadline = None).
+            Goal(name="Наследство внукам (бессрочно)",
                  target_amount=1000000, current_amount=400000,
-                 deadline=now + timedelta(days=3650), category="material"),
+                 deadline=None, category="material"),
         ],
         "liquid_assets": [
             LiquidAsset(name="Вклад в Сбере", amount=1250000, interest_rate=0.185,

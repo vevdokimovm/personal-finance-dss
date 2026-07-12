@@ -80,7 +80,7 @@ LEGACY_CONTEXT_MARKERS = (
     "прежн", "раньше", "было", "историч", "legacy", "переход", "заменен",
 )
 
-EXPECTED_COUNTS = {"tables": 28, "migrations": 28, "openapi_paths": 106}
+EXPECTED_COUNTS = {"tables": 28, "migrations": 29, "openapi_paths": 106}
 
 
 @dataclass(frozen=True)

@@ -18,7 +18,8 @@ class GoalCreate(BaseModel):
     name: str
     target_amount: float = Field(ge=0)
     current_amount: float = Field(default=0.0, ge=0)
-    deadline: datetime
+    # None = бессрочная цель: копим фоном, срочность нейтральная (канон §6.3).
+    deadline: Optional[datetime] = None
     category: GoalCategory = GoalCategory.material
     comment: Optional[str] = None
     priority: int = 0
@@ -36,7 +37,7 @@ class GoalResponse(BaseModel):
     name: str
     target_amount: float
     current_amount: float
-    deadline: datetime
+    deadline: Optional[datetime] = None
     category: str
     comment: Optional[str] = None
     priority: int = 0

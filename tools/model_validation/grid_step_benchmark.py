@@ -100,13 +100,10 @@ def main() -> None:
 
     # 1–3. Размер сетки + латентность
     print(f"\n{C}Шаг    |A|=C(1/step+2,2)   full run_planning        только сетка O(|A|){X}")
-    base_med = None
     for step in STEPS:
         a_count = comb(round(1 / step) + 2, 2)
         med, p95 = _median_p95_ms(lambda s=step: run_planning(**PORTRAIT, step=s), N_RUNS)
         grid_med = _grid_only_ms(step, N_RUNS)
-        if step == 0.10:
-            base_med = med
         print(f"  {int(step*100):>3}%  {a_count:>6}            "
               f"медиана {med:>7.3f} мс (p95 {p95:>7.3f})   {grid_med:>7.3f} мс")
 
