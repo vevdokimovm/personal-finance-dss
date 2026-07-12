@@ -14,6 +14,7 @@ from __future__ import annotations
 import csv
 import io
 import re
+from dataclasses import dataclass
 from datetime import datetime
 from typing import Any
 
@@ -561,3 +562,168 @@ def parse_bank_statement(content: str, bank_id: str = 'universal') -> list[dict[
         return parse_1c_exchange(content)
     parser = BANK_PARSERS.get(bank_id, parse_universal_csv)
     return parser(content)
+
+
+# ── Слой 0: детекция формата по СОДЕРЖИМОМУ + единая точка входа ───────────
+# Стратегия — docs/universal_statement_parser_strategy.md §3-4. Формат выписки
+# определяется по magic-байтам и сигнатуре, а НЕ по bank_id: это снимает
+# требование «знать банк заранее» и включает universal-путь по умолчанию.
+# bank_id остаётся ПОДСКАЗКОЙ (выбор выделенного парсера там, где он есть),
+# но детекция и деградация от него не зависят.
+
+_ENCODINGS = ("utf-8-sig", "utf-8", "cp1251", "windows-1251", "latin-1")
+
+_MT940_TAG = re.compile(r"^:\d{2}[A-Z]?:", re.MULTILINE)
+
+
+def _decode_text(raw: bytes) -> str | None:
+    """Байты выписки → текст с фолбэком кодировок (Тинькофф часто cp1251)."""
+    for enc in _ENCODINGS:
+        try:
+            return raw.decode(enc)
+        except (UnicodeDecodeError, UnicodeError):
+            continue
+    return None
+
+
+def _looks_like_delimited_table(text: str) -> bool:
+    """Похоже на CSV: либо распознаётся строка-заголовок (дата+сумма), либо минимум
+    две строки дают >= 2 непустых поля по ; или ,.
+
+    Одна строка с запятой («Hello, world») или проза — не таблица (→ unknown): нет
+    ни заголовка, ни второй строки. Заголовок-только файл («Date,Amount») — CSV
+    (операций нет → статус empty на разборе).
+    """
+    for delimiter in (";", ","):
+        rows_with_fields = 0
+        for line in text.splitlines():
+            cells = line.split(delimiter)
+            if _is_header_row(cells):
+                return True
+            if len([c for c in cells if c.strip()]) >= 2:
+                rows_with_fields += 1
+                if rows_with_fields >= 2:
+                    return True
+    return False
+
+
+def detect_format(raw: bytes) -> str:
+    """Семейство формата по содержимому: xlsx | pdf | 1c | mt940 | csv | unknown.
+
+    Порядок важен: 1C-префикс проверяется до CSV (в 1C есть '=' и ','), чтобы
+    обмен «банк-клиент» не уходил в CSV-парсер.
+    """
+    if not raw:
+        return "unknown"
+    if raw[:4] == b"PK\x03\x04":      # ZIP-контейнер → XLSX
+        return "xlsx"
+    if raw[:4] == b"%PDF":            # PDF magic
+        return "pdf"
+
+    text = _decode_text(raw)
+    if text is None:
+        return "unknown"
+    if text.lstrip().startswith("1CClientBankExchange"):
+        return "1c"
+    tags = _MT940_TAG.findall(text)
+    if ":61:" in text and (":20:" in text or ":86:" in text) and len(tags) >= 3:
+        return "mt940"
+    if _looks_like_delimited_table(text):
+        return "csv"
+    return "unknown"
+
+
+def _pdf_has_text_layer(raw: bytes) -> bool:
+    """Есть ли в PDF извлекаемый текстовый слой (иначе — скан, нужен OCR).
+
+    pdfplumber недоступен или чтение упало — отдаём True (не путаем ошибку
+    разбора со сканом; пусть решает парсер).
+    """
+    if pdfplumber is None:
+        return True
+    try:
+        with pdfplumber.open(io.BytesIO(raw)) as pdf:
+            for page in pdf.pages[:3]:
+                if (page.extract_text() or "").strip():
+                    return True
+        return False
+    except Exception:  # noqa: BLE001 — любая ошибка чтения PDF не равна «скан»
+        return True
+
+
+@dataclass(frozen=True)
+class StatementParseResult:
+    """Итог разбора выписки: операции + распознанный формат + статус + сообщение.
+
+    status: ok (есть операции) | empty (формат распознан, операций нет) |
+            needs_ocr (скан-PDF) | unsupported (формат не распознан / не реализован).
+    message — user-facing (RU) для не-ok статусов (Слой 5, вежливая деградация).
+    """
+    transactions: list[dict[str, Any]]
+    format: str
+    status: str
+    message: str = ""
+
+
+_MSG_NEEDS_OCR = (
+    "Похоже, это скан-выписка (PDF без текстового слоя). Распознавание сканов пока "
+    "не поддерживается — выгрузите выписку в CSV, XLSX, 1C или PDF с текстовым слоем."
+)
+_MSG_UNKNOWN = (
+    "Не удалось определить формат выписки. Поддерживаются CSV, XLSX, PDF "
+    "(Тинькофф/ВТБ/Сбер/Райффайзен) и 1C. Проще всего выгрузить CSV или XLSX."
+)
+_MSG_MT940 = (
+    "Формат MT940 (SWIFT) пока не поддерживается. Выгрузите выписку в CSV, XLSX или 1C."
+)
+_MSG_EMPTY = {
+    "csv": "Формат распознан (CSV), но операции не найдены — проверьте, что в файле "
+           "есть таблица с датой и суммой.",
+    "xlsx": "Формат распознан (XLSX), но операции не найдены — проверьте, что в файле "
+            "есть таблица с датой и суммой.",
+    "pdf": "Формат распознан (PDF с текстом), но операции не распознаны — возможно, банк "
+           "не поддержан или сменил раскладку. Попробуйте выгрузить CSV или XLSX.",
+    "1c": "Формат распознан (1C), но операции не найдены в файле обмена.",
+}
+
+
+def parse_statement(raw: bytes, bank_id: str | None = None) -> StatementParseResult:
+    """Единая точка входа: детекция формата по содержимому → разбор → результат.
+
+    bank_id — только подсказка для выбора выделенного парсера (PDF/CSV гигантов);
+    определение формата и деградация от него не зависят.
+    """
+    fmt = detect_format(raw)
+
+    if fmt == "unknown":
+        return StatementParseResult([], fmt, "unsupported", _MSG_UNKNOWN)
+    if fmt == "mt940":
+        return StatementParseResult([], fmt, "unsupported", _MSG_MT940)
+
+    txns: list[dict[str, Any]] = []
+    if fmt == "xlsx":
+        try:
+            txns = parse_xlsx(raw, bank_id or "universal")
+        except ValueError as exc:
+            return StatementParseResult([], fmt, "unsupported", str(exc))
+    elif fmt == "pdf":
+        if not _pdf_has_text_layer(raw):
+            return StatementParseResult([], fmt, "needs_ocr", _MSG_NEEDS_OCR)
+        try:
+            txns = parse_bank_pdf(raw, bank_id or "tinkoff")
+        except ValueError as exc:
+            return StatementParseResult([], fmt, "unsupported", str(exc))
+    else:  # 1c / csv
+        content = _decode_text(raw)
+        if content is None:
+            return StatementParseResult(
+                [], fmt, "unsupported", "Не удалось определить кодировку файла."
+            )
+        if fmt == "1c":
+            txns = parse_1c_exchange(content)
+        else:
+            txns = parse_bank_statement(content, bank_id or "universal")
+
+    if txns:
+        return StatementParseResult(txns, fmt, "ok")
+    return StatementParseResult([], fmt, "empty", _MSG_EMPTY.get(fmt, _MSG_UNKNOWN))

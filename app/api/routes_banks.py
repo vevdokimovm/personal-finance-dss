@@ -12,7 +12,7 @@ from app.database.models import Transaction
 from app.dependencies import get_current_user_id, get_db
 from app.services.bank_api import get_available_banks, sync_all_banks, sync_bank
 from app.services.event_logger import log_event
-from app.services.statement_parser import parse_bank_pdf, parse_bank_statement, parse_xlsx
+from app.services.statement_parser import parse_statement
 
 router = APIRouter(prefix="/banks", tags=["Банки"])
 
@@ -61,46 +61,19 @@ async def upload_statement(
                        "слишком большой для импорта.",
         }
 
-    # PDF-выписка — парсер по выбранному банку (Тинькофф / ВТБ / Сбер)
-    if raw[:5] == b"%PDF-":
-        transactions = parse_bank_pdf(raw, bank_id)
-        if not transactions:
-            return {
-                "status": "error",
-                "message": "Не удалось распознать операции в PDF. "
-                           "Проверьте, что выбран правильный банк "
-                           "(PDF поддерживаются для Тинькофф, ВТБ, Сбер).",
-            }
-    elif raw[:4] == b"PK\x03\x04":
-        # XLSX — zip-контейнер; парсим теми же эвристиками, что и универсальный CSV
-        transactions = parse_xlsx(raw, bank_id)
-        if not transactions:
-            return {
-                "status": "error",
-                "message": "Не удалось распознать операции в XLSX. "
-                           "Проверьте, что в файле есть таблица с датой и суммой.",
-            }
-    else:
-        # CSV: пробуем разные кодировки (Тинькофф часто использует cp1251)
-        content = None
-        for encoding in ['utf-8-sig', 'utf-8', 'cp1251', 'windows-1251', 'latin-1']:
-            try:
-                content = raw.decode(encoding)
-                break
-            except (UnicodeDecodeError, UnicodeError):
-                continue
-
-        if content is None:
-            return {"status": "error", "message": "Не удалось определить кодировку файла."}
-
-        # Парсим
-        transactions = parse_bank_statement(content, bank_id)
-
-    if not transactions:
+    # Слой 0: формат определяется по СОДЕРЖИМОМУ (не по bank_id). bank_id — подсказка
+    # для выделенных парсеров. Единая точка входа + вежливая деградация (скан-PDF →
+    # «нужен OCR», неизвестный/MT940 → подсказка выгрузить CSV/XLSX/1C).
+    result = parse_statement(raw, bank_id)
+    if result.status != "ok":
         return {
             "status": "error",
-            "message": "Не удалось распознать транзакции. Проверьте формат файла и выбранный банк.",
+            "message": result.message
+            or "Не удалось распознать транзакции. Проверьте формат файла.",
+            "format": result.format,
+            "detail": result.status,
         }
+    transactions = result.transactions
 
     # Дедупликация: ключи уже сохранённых операций пользователя — защита от повторного
     # импорта той же выписки. Загружаем один раз, проверяем в памяти (O(1) на строку).
