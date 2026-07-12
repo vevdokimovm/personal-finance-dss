@@ -148,7 +148,10 @@ def run_planning(
     # уникальный эффективный сплит — чтобы топ-3 были реально разными планами.
     def _effective_signature(alt: dict) -> tuple[int, int, int]:
         x_obl_eff = round(float(alt.get("x_obl_effective", alt.get("x_obligations", 0))))
-        x_res = round(float(alt.get("x_reserve", 0)))
+        # Эффективный резерв (номинальный + переток остатка целей, ADR-009): два
+        # варианта с насыщенными целями, отличающиеся только номинальным сплитом
+        # резерв/цели, дают одинаковый фактический план — дедупим по истинному эффекту.
+        x_res = round(float(alt.get("x_reserve_effective", alt.get("x_reserve", 0))))
         goals_sum = round(sum(float(v) for v in (alt.get("goal_allocation", {}) or {}).values()))
         return (x_obl_eff, x_res, goals_sum)
 

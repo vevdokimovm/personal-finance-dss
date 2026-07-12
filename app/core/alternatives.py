@@ -199,16 +199,27 @@ def evaluate_alternative(
     # 2. Взвешенная обеспеченность целей
     si, goal_allocation = calculate_goals_si(x_goals_total, goals, today)
 
+    # Остаток целевого бакета → резерв (G7-остаток, ADR-009). Цели кэпятся по
+    # потребности (calculate_goals_si: min(доля, _remaining)); при насыщении целей
+    # часть x_goals не осваивается. Каскад освоения — долг → цели → резерв: этот
+    # остаток не теряется, а поднимает ликвидную подушку (Lt'). Резерв — конечный
+    # сток (в него всегда есть куда влить). До ADR-009 остаток испарялся из плана.
+    x_goals_deployed = sum(float(v) for v in goal_allocation.values())
+    x_goals_unused = max(0.0, x_goals_total - x_goals_deployed)
+
     # 3. Базовые показатели после применения альтернативы (refined model v3.0)
     x_res = float(alt.get("x_reserve", 0))
+    x_res_effective = x_res + x_goals_unused
     new_rt = income_total - expense_total - new_obligation_payments
-    # Lt' — месяцы автономии на ликвидной подушке + новый резерв (stock-based).
-    # Ортогонально Rt: реагирует на x_reserve, а не на досрочку.
-    new_lt = (bliq + x_res) / expense_total if expense_total > 0 else 0.0
+    # Lt' — месяцы автономии на ликвидной подушке + эффективный резерв (stock-based).
+    # Ортогонально Rt: реагирует на резерв (номинальный + переток целей), а не на досрочку.
+    new_lt = (bliq + x_res_effective) / expense_total if expense_total > 0 else 0.0
     new_dt = new_obligation_payments / income_total if income_total > 0 else 0
 
     alt["x_obl_effective"] = round(x_obl_eff, 2)
     alt["x_obl_unused"] = round(x_obl_unused, 2)
+    alt["x_goals_unused"] = round(x_goals_unused, 2)
+    alt["x_reserve_effective"] = round(x_res_effective, 2)
     alt["obligation_allocation"] = [
         {
             "id": o.get("id"),

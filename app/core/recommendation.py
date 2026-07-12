@@ -130,9 +130,13 @@ def explain_alternative(
     delta_dt = alt.get("Dt_new", dt) - dt
 
     x_obl = float(alt.get("x_obligations", 0))
-    x_res = float(alt.get("x_reserve", 0))
+    # Резерв эффективный: номинальный + переток нераспределённого остатка целей
+    # (G7-остаток, ADR-009). На экран идёт фактическая сумма в подушке — так сплит
+    # в «главном выводе» сходится к 100% свободного ресурса (сохранение денег).
+    x_res = float(alt.get("x_reserve_effective", alt.get("x_reserve", 0)))
     x_obl_eff = float(alt.get("x_obl_effective", x_obl))
     x_obl_unused = float(alt.get("x_obl_unused", 0))
+    x_goals_unused = float(alt.get("x_goals_unused", 0))
 
     gains: list[str] = []
     costs: list[str] = []
@@ -165,6 +169,13 @@ def explain_alternative(
             f"{x_obl_unused:,.0f} ₽ не пошли на досрочное погашение: оставшиеся кредиты "
             f"дешёвые, и держать эти деньги на накопительном счёте выгоднее, чем гасить их "
             f"раньше срока. Поэтому сумма перенаправлена в ваши цели."
+        )
+
+    if x_goals_unused > 0:
+        costs.append(
+            f"{x_goals_unused:,.0f} ₽ не пошли в цели: они уже профинансированы на нужную "
+            f"сумму. Поэтому деньги перенаправлены в подушку безопасности — она всегда "
+            f"пригодится на случай потери дохода."
         )
 
     # ── Подушка безопасности (резерв) и инвестиционный транш ──────────

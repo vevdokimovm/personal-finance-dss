@@ -179,9 +179,13 @@ def check_result(
             v.append("I7: порядок Avalanche нарушен (не по убыванию ставки)")
         if expenses > 0:
             bliq_after = result["indicators"]["Bliq"]
-            lt_expected = (bliq_after + best.get("x_reserve", 0)) / expenses
+            # Резерв эффективный = номинальный + переток нераспределённого остатка
+            # целей (G7-остаток, ADR-009). Lt' обязан отражать деньги, ушедшие в
+            # подушку из-за насыщения целей; иначе они бы «испарились» из плана.
+            x_res_eff = best.get("x_reserve_effective", best.get("x_reserve", 0))
+            lt_expected = (bliq_after + x_res_eff) / expenses
             if abs(best["Lt_new"] - lt_expected) > 0.002:
-                v.append(f"I10: Lt_new={best['Lt_new']} != (Bliq+x_res)/Et={lt_expected:.4f}")
+                v.append(f"I10: Lt_new={best['Lt_new']} != (Bliq+x_res_eff)/Et={lt_expected:.4f}")
 
     ind = result["indicators"]
     if income > 0 and abs(ind["Dt"] - payments / income) > 1e-3:
