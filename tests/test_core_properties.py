@@ -248,9 +248,12 @@ class TestMetricsInvariants:
 
     @core_settings
     @given(payments=nonneg_money)
-    def test_zero_income_is_safe(self, payments: float):
-        """It = 0 → Dt возвращает 0.0, без деления на ноль (§7 защита)."""
-        assert calculate_dt(payments, 0.0) == 0.0
+    def test_zero_income_dt_semantics(self, payments: float):
+        """It = 0 без деления на ноль (§7 защита) + канон G7 (v3.2.0, §3):
+        при живых платежах нагрузка максимальна (1.0), без платежей — честный 0.0.
+        Прежний безусловный 0.0 показывал безработному должнику «зелёный» ПДН."""
+        expected = 1.0 if payments > 0 else 0.0
+        assert calculate_dt(payments, 0.0) == expected
 
 
 # ── §5: производные показатели альтернативы ──────────────────────────────────

@@ -46,6 +46,7 @@ def run_planning(
     risk_tolerance: int = 3,
     l_min: float = L_MIN,
     today: datetime | None = None,
+    step: float = 0.10,
 ) -> dict[str, Any]:
     """Полный цикл планирования СППР по ВКР (этапы 1–6)."""
     today = today or utcnow()
@@ -103,6 +104,7 @@ def run_planning(
         rt=max(rt, 0),  # R+_t = max(Rt, 0)
         obligation_payments=obligation_payments,
         goals_total=goals_total,
+        step=step,  # §6.3: knob сетки (0.10 → 66; 0.05 → 231) для стенд-замера
     )
 
     # ── Этап 4b: пересчёт показателей под каждую альтернативу ──────────

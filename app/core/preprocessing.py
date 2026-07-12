@@ -1,6 +1,7 @@
 """Подготовка входных данных алгоритма СППР (этап 1 pipeline ВКР)."""
 from __future__ import annotations
 
+from datetime import timedelta
 from typing import Any, Union
 
 Item = Union[dict[str, Any], Any]
@@ -73,12 +74,43 @@ def is_active_goal(item: Item) -> bool:
     return target > current
 
 
+def _tx_within_period(t: Item, cutoff, now) -> bool:
+    """Транзакция в пределах окна [cutoff, now]. Записи без валидной даты НЕ
+    отбрасываются (обратная совместимость с тестами, где дата не задаётся)."""
+    d = t.get("date") if isinstance(t, dict) else getattr(t, "date", None)
+    if d is None:
+        return True
+    try:
+        if getattr(d, "tzinfo", None) is not None and getattr(cutoff, "tzinfo", None) is None:
+            cutoff = cutoff.replace(tzinfo=d.tzinfo)
+        elif getattr(d, "tzinfo", None) is None and getattr(cutoff, "tzinfo", None) is not None:
+            d = d.replace(tzinfo=cutoff.tzinfo)
+        return d >= cutoff
+    except Exception:
+        return True
+
+
 def prepare_data(
     transactions: list[Item],
     obligations: list[Item],
     goals: list[Item],
     liquid_assets: list[Item] | None = None,
+    period_days: int | None = 30,
+    now=None,
 ) -> dict[str, list[Item]]:
+    """Нормализация данных для расчёта.
+
+    period_days фильтрует транзакции до последних N дней — «месячные» показатели
+    (доход/расход) считаются за текущий месяц, а не за всю историю (иначе доход
+    накопленный за годы схлопывался бы в один месяц). None — без фильтра.
+    Историю для прогноза строить отдельно из ПОЛНОГО списка (build_monthly_history).
+    """
+    if period_days is not None:
+        from app.utils.time import utcnow
+        now = now or utcnow()
+        cutoff = now - timedelta(days=period_days)
+        transactions = [t for t in transactions if _tx_within_period(t, cutoff, now)]
+
     prepared_transactions = [_normalize_transaction(t) for t in transactions]
     prepared_obligations = [_normalize_obligation(o) for o in obligations]
     prepared_goals = [_normalize_goal(g) for g in goals]

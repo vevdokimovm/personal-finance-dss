@@ -38,7 +38,7 @@ from app.dependencies import get_current_user_id, get_db
 from app.services.cbr_rate import get_opportunity_cost_rate
 from app.services.cache import TTLCache
 from app.services.event_logger import log_event, log_recommendation
-from app.services.forecasting import forecast_indicators
+from app.services.forecasting import build_monthly_history, forecast_indicators
 from app.services.currency import to_base_currency
 from app.services.plan_export import plan_to_pdf, plan_to_xlsx
 from app.services.planning import run_planning
@@ -492,6 +492,10 @@ def get_forecast(
     lt = rt / (expense + obl_payments) if (expense + obl_payments) > 0 else 0.0
     dt = obl_payments / income if income > 0 else 0.0
 
+    # v3.3.0: реальная помесячная история (полный список транзакций, окно 8 мес)
+    # → тренд по данным (Holt). Тоталы выше уже за текущий месяц (prepare_data).
+    hist = build_monthly_history(transactions, months=8)
+
     return forecast_indicators(
         balance=balance,
         rt=rt,
@@ -501,8 +505,11 @@ def get_forecast(
         expense_total=expense,
         obligation_payments=obl_payments,
         horizon=payload.horizon,
+        income_history=hist["income"] or None,
+        expense_history=hist["expense"] or None,
         recurring_income=recurring_income,
         recurring_expense=recurring_expense,
+        r_bench=float(get_opportunity_cost_rate(fallback=0.14)["r_bench"]),
     )
 
 

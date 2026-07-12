@@ -23,8 +23,15 @@ MC_CI_LOWER = 0.10
 MC_CI_UPPER = 0.90
 
 
+HOLT_ALPHA = 0.4
+HOLT_BETA = 0.3
+HOLT_PHI = 0.9  # демпфирование тренда (Gardner & McKenzie 1985) — гасит разгон экстраполяции
+
+
 def ses_forecast(history: List[float], alpha: float = SES_ALPHA, horizon: int = 1) -> List[float]:
-    """Простое экспоненциальное сглаживание (Brown 1956; Hyndman et al. 2002)."""
+    """Простое экспоненциальное сглаживание (Brown 1956; Hyndman et al. 2002).
+    Точечный прогноз ПЛОСКИЙ (нет компоненты тренда) — используется как фолбэк для
+    короткой/безтрендовой истории."""
     if not history:
         return [0.0] * horizon
     if len(history) == 1:
@@ -34,6 +41,59 @@ def ses_forecast(history: List[float], alpha: float = SES_ALPHA, horizon: int = 
     for x in history[1:]:
         s = alpha * x + (1 - alpha) * s
     return [s] * horizon
+
+
+def holt_forecast(
+    history: List[float],
+    alpha: float = HOLT_ALPHA,
+    beta: float = HOLT_BETA,
+    phi: float = HOLT_PHI,
+    horizon: int = 1,
+    non_negative: bool = True,
+) -> List[float]:
+    """Демпфированное двойное экспоненциальное сглаживание (Holt 1957; Gardner &
+    McKenzie 1985): уровень + затухающий тренд. Прогноз ŷ(t+h) = level + (φ+…+φ^h)·trend.
+
+    В отличие от SES, прогноз НАКЛОНЁН по данным истории: растущая история даёт
+    растущий прогноз, падающая — падающий. Демпфирование φ<1 не даёт тренду
+    «улетать» на длинном горизонте. non_negative клампит денежные величины ≥ 0.
+    """
+    if not history:
+        return [0.0] * horizon
+    if len(history) < 2:
+        v = max(history[0], 0.0) if non_negative else history[0]
+        return [v] * horizon
+
+    level = history[0]
+    trend = history[1] - history[0]
+    for x in history[1:]:
+        prev_level = level
+        level = alpha * x + (1 - alpha) * (level + phi * trend)
+        trend = beta * (level - prev_level) + (1 - beta) * phi * trend
+
+    out: List[float] = []
+    damp = 0.0
+    for h in range(1, horizon + 1):
+        damp += phi ** h
+        y = level + damp * trend
+        out.append(max(y, 0.0) if non_negative else y)
+    return out
+
+
+def choose_point_forecast(history: List[float], horizon: int = 1) -> List[float]:
+    """Выбор метода точечного прогноза: демпфированный Holt при ≥3 наблюдениях
+    (ловит тренд реальной истории), иначе SES (плоский фолбэк)."""
+    if history is not None and len(history) >= 3:
+        return holt_forecast(history, horizon=horizon)
+    return ses_forecast(history, horizon=horizon)
+
+
+def monthly_rate(annual_rate: float) -> float:
+    """Эффективная месячная ставка из годовой: (1+r)^(1/12) − 1.
+    Используется для капитализации накоплений в прогнозе баланса (форм. 35 v3.3.0)."""
+    if annual_rate <= -1.0:
+        return 0.0
+    return (1.0 + annual_rate) ** (1.0 / 12.0) - 1.0
 
 
 def monte_carlo_intervals(

@@ -8,7 +8,8 @@ from __future__ import annotations
 import pytest
 from fastapi.testclient import TestClient
 
-CASES = ["anna", "dmitriy", "mikhail", "igor", "olga", "viktor"]
+CASES = ["anna", "dmitriy", "mikhail", "igor", "olga", "viktor",
+         "ekaterina", "artyom", "natalya", "pavel"]
 
 
 @pytest.mark.parametrize("case", CASES)
@@ -41,7 +42,32 @@ def test_demo_unknown_case_rejected(client: TestClient) -> None:
 def test_demo_cases_list(client: TestClient) -> None:
     resp = client.get("/api/demo/cases")
     assert resp.status_code == 200
-    assert set(resp.json()["cases"]) == set(CASES)
+    body = resp.json()
+    assert set(body["keys"]) == set(CASES)
+    assert {c["key"] for c in body["cases"]} == set(CASES)
+
+
+def test_demo_monthly_total_excludes_history(client: TestClient) -> None:
+    """Месячный доход = текущий месяц, а не сумма всей многомесячной истории в БД."""
+    client.post("/api/demo/clear")
+    client.post("/api/demo/load?case=anna")
+    n_tx = len(client.get("/api/transactions").json())
+    assert n_tx > 7  # в БД лежит многомесячная история операций
+    calc = client.post("/api/planning/calculate", json={"risk_tolerance": 3})
+    assert calc.status_code == 200
+    it = calc.json()["indicators"]["It"]
+    value = it["value"] if isinstance(it, dict) else it
+    assert abs(float(value) - 180000) < 1  # ровно доход текущего месяца Анны
+
+
+def test_demo_forecast_is_not_constant(client: TestClient) -> None:
+    """Прогноз свободного ресурса не должен быть прямой с одинаковой дельтой."""
+    client.post("/api/demo/clear")
+    client.post("/api/demo/load?case=dmitriy")
+    fc = client.post("/api/planning/forecast", json={"horizon": 6}).json()
+    rt = [f["Rt"] for f in fc["forecast"]]
+    deltas = [round(rt[i + 1] - rt[i]) for i in range(len(rt) - 1)]
+    assert len(set(deltas)) > 1  # дельты различаются
 
 
 def test_demo_preview_does_not_persist(client: TestClient) -> None:
