@@ -38,6 +38,21 @@ def _alt_name(d: int, r: int, g: int, steps: int) -> str:
     return f"Распределение {pd}/{pr}/{pg}"
 
 
+def _alternative_id(d: int, r: int, g: int, steps: int) -> str:
+    """Идентификатор альтернативы по индексам решётки.
+
+    На канонной сетке (шаг >= 10%, `steps <= 10`) формат исторический — `a{d}{r}{g}` без
+    разделителя; он зафиксирован в golden-снапшотах и API-ответах, менять его нельзя.
+    При более мелком шаге индексы становятся двузначными, и конкатенация теряет
+    однозначность: (0, 1, 19) и (0, 11, 9) дают один и тот же `a0119` — 29 коллизий из 231
+    на шаге 5%. Поэтому мелкая сетка получает разделители. Уникальность на любом шаге
+    проверяет `tests/test_grid_step.py`; решение по шагу — ADR-008 (канон остался 10%).
+    """
+    if steps <= 10:
+        return f"a{d}{r}{g}"
+    return f"a{d}-{r}-{g}"
+
+
 def generate_alternatives(
     rt: float,
     obligation_payments: float,
@@ -67,6 +82,7 @@ def generate_alternatives(
 
     steps = round(1.0 / step)  # = 10 при step=0.10 → 66 альтернатив
     alternatives = []
+    seen_ids: set[str] = set()
 
     for d in range(steps + 1):
         for r in range(steps + 1 - d):
@@ -94,8 +110,16 @@ def generate_alternatives(
             if x_goa > 0:
                 desc_parts.append(f"цели {pg}% ({x_goa:,.0f} ₽)")
 
+            alt_id = _alternative_id(d, r, g, steps)
+            if alt_id in seen_ids:  # fail-loud: молча потерять альтернативу нельзя
+                raise ValueError(
+                    f"коллизия id альтернативы: {alt_id} при steps={steps} "
+                    f"(d={d}, r={r}, g={g}) — формат id сломан"
+                )
+            seen_ids.add(alt_id)
+
             alternatives.append({
-                "id": f"a{d}{r}{g}",
+                "id": alt_id,
                 "name": name,
                 "description": "; ".join(desc_parts) or "Все средства остаются в наличии.",
                 "x_obligations": x_obl,
