@@ -85,3 +85,38 @@ def test_demo_clear_removes_data(client: TestClient) -> None:
     assert resp.status_code == 200
     assert len(client.get("/api/transactions").json()) == 0
     assert len(client.get("/api/obligations").json()) == 0
+
+
+def test_demo_forecast_direction_matches_history(client: TestClient) -> None:
+    """Прогноз идёт в сторону истории: растущий портрет — вверх, падающий — вниз.
+    Проверка через РЕАЛЬНЫЙ роут /planning/forecast, а не юнит-математику."""
+    def forecast_income(case: str) -> list[float]:
+        client.post("/api/demo/clear")
+        client.post(f"/api/demo/load?case={case}")
+        fc = client.post("/api/planning/forecast", json={"horizon": 6}).json()
+        return [f["income"] for f in fc["forecast"]]
+
+    up = forecast_income("dmitriy")      # история дохода растёт
+    assert up[-1] > up[0], "растущая история должна давать растущий прогноз"
+    down = forecast_income("mikhail")    # история дохода падает
+    assert down[-1] < down[0], "падающая история должна давать падающий прогноз"
+
+
+def test_demo_preview_matches_planning_forecast(client: TestClient) -> None:
+    """Витрина «Валидация» и реальное /planning дают прогноз ОДНОЙ формы — нет расхождения,
+    из-за которого раньше был костыль (синтетическая история). Оба трендовые, одно направление."""
+    case = "dmitriy"
+    client.post("/api/demo/clear")
+    client.post(f"/api/demo/load?case={case}")
+    planning = [f["Rt"] for f in
+                client.post("/api/planning/forecast", json={"horizon": 6}).json()["forecast"]]
+    preview = [f["Rt"] for f in
+               client.get(f"/api/demo/preview?case={case}").json()["forecast"]["forecast"]]
+
+    def deltas(seq: list[float]) -> set[int]:
+        return {round(seq[i + 1] - seq[i]) for i in range(len(seq) - 1)}
+
+    assert len(deltas(preview)) > 1, "прогноз витрины не должен быть прямой с одной дельтой"
+    assert len(deltas(planning)) > 1, "прогноз планирования не должен быть прямой с одной дельтой"
+    assert (preview[-1] - preview[0]) * (planning[-1] - planning[0]) > 0, \
+        "витрина и планирование должны показывать прогноз в одну сторону"

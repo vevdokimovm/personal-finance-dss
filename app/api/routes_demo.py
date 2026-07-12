@@ -31,6 +31,7 @@ from sqlalchemy.orm import Session
 
 from app.database.models import Goal, LiquidAsset, Obligation, Transaction
 from app.dependencies import get_current_user_id, get_db
+from app.services.cbr_rate import get_opportunity_cost_rate
 from app.services.forecasting import build_monthly_history, forecast_indicators
 from app.services.planning import run_planning
 from app.utils.time import utcnow
@@ -572,7 +573,9 @@ def _analyze_portrait(
     expense_total = sum(float(e["amount"]) for e in expense_items)
     payments_total = sum(float(o.get("monthly_payment", 0)) for o in obligations)
     bliq = sum(float(a.get("amount", 0)) for a in liquid_assets)
-    r_bench = max((float(a.get("interest_rate") or 0) for a in liquid_assets), default=0.0) or 0.16
+    # r_bench — канонная ставка (ключевая ЦБ × (1−НДФЛ), фолбэк 0.14), ТА ЖЕ, что в
+    # /planning: витрина «Валидация» и реальный расчёт компаундят баланс одинаково.
+    r_bench = float(get_opportunity_cost_rate(fallback=0.14)["r_bench"])
     balance = sum(float(g.get("current_amount", 0)) for g in goals)
 
     cf = income_total - expense_total
