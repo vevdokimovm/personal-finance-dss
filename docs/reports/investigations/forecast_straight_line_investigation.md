@@ -6,7 +6,7 @@
 
 Связанные документы:
 - `INV-MATHMODEL-FALSEALARM` — тот же принцип «не винить ядро, пока не прогнал на стенде тремя уровнями».
-- `docs/math_model_v3_2_0.md` §14/§35 (этап 3, прогнозирование) — канон метода.
+- `docs/math_model_v3_3_0.md` §14/§35 (этап 3, прогнозирование) — канон метода.
 - Контракт-тесты: `tests/test_forecast_linearity.py`. Стенд-зонд: `tools/model_validation/forecast_linearity_probe.py`.
 
 ---
