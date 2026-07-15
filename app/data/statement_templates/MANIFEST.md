@@ -14,7 +14,7 @@
 | `tinkoff.pdf` | PDF (текст) | `parse_tinkoff_pdf` | tinkoff | 2 |
 | `sber.pdf` | PDF (текст, описание на след. строке) | `parse_sber_pdf` | sber | 2 |
 | `vtb.pdf` | PDF (таблица, знаковая сумма) | `parse_vtb_pdf` | vtb | 2 |
-| `raiffeisen.pdf` | PDF (таблица, split Debit/Credit) | `parse_raiffeisen_pdf` | raiffeisen | 2 |
+| `raiffeisen.pdf` | PDF таблица (Поступления/Расходы) | `parse_raiffeisen_pdf` | raiffeisen | 2 |
 | `sberbank_1c.txt` | 1CClientBankExchange | `parse_1c_exchange` | — | 2 |
 
 Стратегия покрытия ~200 банков — `docs/universal_statement_parser_strategy.md`:

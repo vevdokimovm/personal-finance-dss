@@ -14,6 +14,7 @@ from __future__ import annotations
 import csv
 import io
 import re
+import unicodedata
 from datetime import datetime
 from typing import Any
 
@@ -145,8 +146,14 @@ _H_MCC = ['mcc']
 
 
 def _norm(value: Any) -> str:
-    """Нормализует заголовок/ячейку для матчинга: неразрывный пробел, ё→е, регистр."""
-    return re.sub(r'\s+', ' ', str(value).replace('\xa0', ' ').replace('ё', 'е')).strip().lower()
+    """Нормализует заголовок/ячейку для матчинга: NFC, неразрывный пробел, ё→е, регистр.
+
+    NFC обязателен: macOS отдаёт имена файлов (а иногда и текст PDF) в NFD, где «й» —
+    это «и» + U+0306. Подстрочный матчинг по «райффайзен» или замена «ё» на «е» в NFD
+    молча не срабатывают, и файл уходит не в тот парсер.
+    """
+    text = unicodedata.normalize('NFC', str(value))
+    return re.sub(r'\s+', ' ', text.replace('\xa0', ' ').replace('ё', 'е')).strip().lower()
 
 
 def _field(row: dict, candidates: list[str]) -> str | None:
@@ -474,6 +481,18 @@ _SBER_OP = re.compile(
 )
 
 
+# Изменение кредитного лимита — НЕ движение денег. В выписке по кредитной карте оно
+# проходит обычной строкой операции («Прочие операции +110 000,00»), и без фильтра
+# модель получала 220 000 ₽ фиктивного дохода на реальной выписке: для СППР это
+# отравленный вход (завышенный доход → завышенный свободный поток).
+_SBER_NON_CASH = (
+    'установка кредитного лимита',
+    'увеличение кредитного лимита',
+    'уменьшение кредитного лимита',
+    'изменение кредитного лимита',
+)
+
+
 def _sber_text_to_transactions(lines: list[str]) -> list[dict[str, Any]]:
     out: list[dict[str, Any]] = []
     for i, line in enumerate(lines):
@@ -490,6 +509,8 @@ def _sber_text_to_transactions(lines: list[str]) -> list[dict[str, Any]]:
             nxt = re.match(r'^\d{2}\.\d{2}\.\d{4}\s+\S+\s+(.+)$', lines[i + 1].strip())
             if nxt:
                 description = nxt.group(1).strip()
+        if any(marker in _norm(description) for marker in _SBER_NON_CASH):
+            continue  # изменение лимита, а не операция по счёту
         out.append({
             'amount': round(abs(amount), 2),
             'description': (description or category or 'Операция')[:255],
@@ -512,34 +533,98 @@ def parse_sber_pdf(raw: bytes) -> list[dict[str, Any]]:
     return _sber_text_to_transactions(lines)
 
 
-# ── PDF-выписка Райффайзенбанка (табличная сетка, split Debit/Credit) ──────
+# ── PDF-выписка Райффайзенбанка (табличная сетка) ─────────────────────────
+# Три реальных шаблона, колонки не совпадают ни по смыслу, ни по количеству:
+#   RU:     [№ П/П, Дата операции, Номер документа, Поступления, Расходы, Детали, Карта]
+#   EN:     [№ P/P, Posting date, Номер документа, Debit, Credit, Payment details, Card]
+#   без №:  [Дата операции, Номер документа, Сумма в валюте операции, Сумма в валюте
+#            счёта, Детали операции, Номер карты]
+# RU и EN ЗЕРКАЛЬНЫ: на месте англоязычного «Debit» в русском шаблоне стоит
+# «Поступления». Спасали только знаки ± внутри ячеек. А шаблон без колонки «№» парсер
+# отбрасывал целиком (требовал номер в первой ячейке) — 0 операций на живом файле.
+# Поэтому колонки — по шапке, строка данных — по колонке даты, знак — из семантики
+# колонки (приход/расход), а не из знака в ячейке.
+_RAIF_ROLES = (
+    ('credit', ('поступлени', 'credit')),
+    ('debit', ('расход', 'debit')),
+    ('account', ('в валюте счета', 'currency of account')),
+    ('operation', ('в валюте операции', 'currency of operation')),
+    ('desc', ('детали', 'payment details', 'назначение', 'описание', 'description')),
+    ('date', ('дата', 'date')),
+)
+_RAIF_LEGACY_MAP = {'date': 1, 'debit': 3, 'credit': 4, 'desc': 5}
+
+
+def _raif_column_map(table: list) -> dict[str, int]:
+    """Индексы колонок Райффайзена по шапке. Пусто, если шапки в таблице нет."""
+    header: dict[int, str] = {}
+    for row in table:
+        if not row:
+            continue
+        if any(c and re.match(r'\d{2}\.\d{2}\.\d{4}', str(c).strip()) for c in row[:2]):
+            break  # начались строки операций
+        for i, cell in enumerate(row):
+            if cell:
+                header[i] = f"{header.get(i, '')} {_norm(cell)}".strip()
+    roles: dict[str, int] = {}
+    for i, text in header.items():
+        for role, markers in _RAIF_ROLES:
+            if role not in roles and any(mk in text for mk in markers):
+                roles[role] = i
+                break
+    return roles
+
+
+def _raif_row_to_transaction(row: list, cmap: dict[str, int]) -> dict[str, Any] | None:
+    """Строка таблицы Райффайзена → транзакция (или None: шапка/итоги/нет движения)."""
+    def num(role: str) -> float:
+        i = cmap.get(role)
+        return (_num(row[i]) or 0.0) if i is not None and i < len(row) else 0.0
+
+    def text(role: str) -> str:
+        i = cmap.get(role)
+        if i is None or i >= len(row) or not row[i]:
+            return ''
+        return re.sub(r'\s+', ' ', str(row[i])).strip()
+
+    date_i = cmap.get('date', 1)
+    cell = str(row[date_i]) if date_i < len(row) and row[date_i] else ''
+    m = re.match(r'(\d{2}\.\d{2}\.\d{4})', cell.strip())
+    if not m:  # шапка, «Выполнена банком», строка «Количество операций»
+        return None
+    credit, debit = num('credit'), num('debit')
+    if credit:      # колонка прихода: знак — из смысла колонки, а не из ячейки
+        amount = abs(credit)
+    elif debit:
+        amount = -abs(debit)
+    else:           # шаблон без Поступлений/Расходов: знаковая сумма в валюте счёта
+        amount = num('account') or num('operation')
+    if amount == 0:
+        return None
+    t_type, amount = _classify(amount)
+    return {
+        'amount': round(amount, 2),
+        'description': (text('desc') or 'Операция')[:255],
+        'mcc': None,
+        'type': t_type,
+        'date': _parse_date(m.group(1)).isoformat(),
+        'is_synced': True,
+    }
+
+
 def _raif_table_to_transactions(tables: list) -> list[dict[str, Any]]:
-    """Таблицы pdfplumber Райффайзена → транзакции. Колонки: [№, дата+время, документ,
-    Debit, Credit, назначение, карта]. Debit (−) → расход, Credit (+) → приход.
-    По позициям колонок — поэтому EN- и RU-шапка обрабатываются одинаково."""
+    """Таблицы pdfplumber Райффайзена → транзакции. Колонки — по шапке (три шаблона);
+    если шапки нет, берём карту предыдущей таблицы, иначе позиционный фолбэк."""
     out: list[dict[str, Any]] = []
+    cmap: dict[str, int] = {}
     for table in tables:
+        cmap = _raif_column_map(table) or cmap or dict(_RAIF_LEGACY_MAP)
         for row in table:
-            if not row or len(row) < 5 or not row[0] or not str(row[0]).strip().isdigit():
-                continue  # данные — строки с номером № P/P; заголовки/служебные пропускаем
-            m = re.match(r'(\d{2}\.\d{2}\.\d{4})', str(row[1]) if row[1] else '')
-            if not m:
+            if not row or len(row) < 4:
                 continue
-            debit = _num(row[3])
-            credit = _num(row[4]) if len(row) > 4 else None
-            amount = debit if debit not in (None, 0) else credit
-            if amount is None or amount == 0:
-                continue
-            desc = re.sub(r'\s+', ' ', str(row[5])).strip() if len(row) > 5 and row[5] else ''
-            t_type, amount = _classify(amount)
-            out.append({
-                'amount': round(amount, 2),
-                'description': (desc or 'Операция')[:255],
-                'mcc': None,
-                'type': t_type,
-                'date': _parse_date(m.group(1)).isoformat(),
-                'is_synced': True,
-            })
+            txn = _raif_row_to_transaction(row, cmap)
+            if txn:
+                out.append(txn)
     return out
 
 
@@ -637,6 +722,46 @@ def parse_1c_exchange(content: str) -> list[dict[str, Any]]:
     return out
 
 
+# ── Определение банка по СОДЕРЖИМОМУ ──────────────────────────────────────
+# Ни имя файла, ни выбор в форме не являются показателем: на реальном наборе угадывание
+# по имени трижды отправило выписку не в тот парсер и дало ложный ноль (macOS пишет имена
+# в NFD, поэтому «райф» в «Райф 1.pdf» даже не находится). Реквизиты банка в выписке —
+# единственный надёжный признак.
+_BANK_MARKERS = (
+    ('vtb', ('банк втб', 'втб (пао)', 'vtb bank', 'банка втб')),
+    ('raiffeisen', ('райффайзен', 'raiffeisen')),
+    # У Тинькоффа в тексте PDF имени банка нет вовсе (логотип — картинка), поэтому
+    # добавлен структурный признак его выписки.
+    ('tinkoff', ('тинькофф', 'т-банк', 'тбанк', 'tinkoff', 'tbank', 'выписка по договору')),
+    ('alfa', ('альфа-банк', 'альфа банк', 'alfa-bank', 'alfabank')),
+    ('gazprom', ('газпромбанк', 'gazprombank')),
+    ('sber', ('сбербанк', 'sberbank')),
+)
+
+
+def detect_bank(text: str) -> str | None:
+    """Банк по содержимому выписки (реквизиты в шапке/подвале), иначе None."""
+    low = _norm(text)
+    for bank, markers in _BANK_MARKERS:
+        if any(marker in low for marker in markers):
+            return bank
+    return None
+
+
+def detect_pdf_bank(raw: bytes) -> str | None:
+    """Банк по тексту PDF. Читаем первые и последние страницы: у ВТБ реквизиты банка
+    только в подвале последней страницы, шапка — картинка-логотип."""
+    if pdfplumber is None:
+        return None
+    try:
+        with pdfplumber.open(io.BytesIO(raw)) as pdf:
+            pages = pdf.pages[:2] + pdf.pages[-2:] if len(pdf.pages) > 2 else pdf.pages
+            text = "\n".join((page.extract_text() or "") for page in pages)
+    except Exception:
+        return None
+    return detect_bank(text)
+
+
 def parse_bank_statement(content: str, bank_id: str = 'universal') -> list[dict[str, Any]]:
     """Выбирает парсер по содержимому/bank_id и парсит выписку."""
     if content.lstrip().startswith('1CClientBankExchange'):
@@ -668,18 +793,28 @@ _NON_STATEMENT_MARKERS = (
     ('справка о доступном остатке', 'справка о доступном остатке'),
     ('справка о состоянии вклада', 'справка о состоянии вклада'),
     ('справка о задолженности', 'справка о задолженности'),
+    ('справка по арестам и взысканиям', 'справка по арестам и взысканиям'),
     ('справка о наличии', 'справка о наличии счетов'),
+    ('сведения о наличии счетов', 'сведения о наличии счетов'),
     ('справка о видах и размерах', 'справка о выплатах/пенсиях'),
-    ('реквизиты счёта', 'реквизиты счёта'),
     ('реквизиты счета', 'реквизиты счёта'),
+    ('имеет открытый счет', 'справка о наличии счёта'),
+    ('для предоставления по месту требования', 'справка банка'),
+    ('certificate', 'справка банка (англ.)'),
 )
 
 
 def classify_non_statement(text: str) -> str | None:
-    """Если текст PDF — справка/реквизиты, а не выписка операций, вернуть причину; иначе None."""
-    low = text.lower()
+    """Если текст PDF — справка/реквизиты, а не выписка операций, вернуть причину; иначе None.
+
+    Матчинг через `_norm` (NFC + ё→е, иначе маркеры молча не срабатывают на NFD-тексте)
+    и дополнительно по тексту без пробелов: Альфа-Банк отдаёт «имеетоткрытыйсчёт» слитно,
+    Газпромбанк печатает заголовок вразрядку («С П Р А В К А»).
+    """
+    low = _norm(text)
+    low_nospace = low.replace(' ', '')
     for marker, label in _NON_STATEMENT_MARKERS:
-        if marker in low:
+        if marker in low or marker.replace(' ', '') in low_nospace:
             return label
     return None
 

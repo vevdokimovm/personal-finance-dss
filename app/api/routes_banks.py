@@ -14,11 +14,13 @@ from app.services.bank_api import get_available_banks, sync_all_banks, sync_bank
 from app.services.event_logger import log_event
 from app.services.statement_parser import (
     decode_statement_bytes,
+    detect_pdf_bank,
     parse_bank_pdf,
     parse_bank_statement,
     parse_xlsx,
     pdf_non_statement_reason,
 )
+from app.services.statement_reconcile import reconcile_statement
 
 router = APIRouter(prefix="/banks", tags=["Банки"])
 
@@ -67,9 +69,17 @@ async def upload_statement(
                        "слишком большой для импорта.",
         }
 
-    # PDF-выписка — парсер по выбранному банку (Тинькофф / ВТБ / Сбер)
+    # PDF-выписка. Банк определяем по СОДЕРЖИМОМУ файла, а выбор в форме оставляем
+    # запасным вариантом: ошибка в выпадающем списке отправляла выписку не в тот парсер
+    # и давала пустой результат на совершенно исправном файле.
+    reconciliation: dict[str, Any] | None = None
+    detected_bank: str | None = None
     if raw[:5] == b"%PDF-":
-        transactions = parse_bank_pdf(raw, bank_id)
+        detected_bank = detect_pdf_bank(raw)
+        effective_bank = detected_bank or bank_id
+        transactions = parse_bank_pdf(raw, effective_bank)
+        if transactions:
+            reconciliation = reconcile_statement(raw, effective_bank, transactions)
         if not transactions:
             reason = pdf_non_statement_reason(raw)
             if reason:
@@ -139,20 +149,26 @@ async def upload_statement(
         else:
             total_expense += t['amount']
 
-    added = bulk_create_transactions(db, deduped, user_id=user_id, bank=bank_id)
+    added = bulk_create_transactions(db, deduped, user_id=user_id,
+                                     bank=detected_bank or bank_id)
 
     log_event("statement_imported", {
         "source": file.filename,
         "added_count": added,
         "total_income": round(total_income, 2),
         "total_expense": round(total_expense, 2),
+        "bank_detected": detected_bank,
+        "reconciliation": reconciliation["status"] if reconciliation else None,
     })
     msg = f"Импортировано {added} операций из {file.filename}"
     if skipped_duplicates:
         msg += f", пропущено дублей: {skipped_duplicates}"
+    if detected_bank and detected_bank != bank_id:
+        msg += f". Банк определён по файлу: {detected_bank}"
     return {
         "status": "success",
         "message": msg,
+        "reconciliation": reconciliation,
         "added_count": added,
         "skipped_duplicates": skipped_duplicates,
         "total_income": round(total_income, 2),

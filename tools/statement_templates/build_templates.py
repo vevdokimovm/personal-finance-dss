@@ -26,7 +26,8 @@ from reportlab.lib.pagesizes import A4, landscape
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.pdfgen import canvas
-from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
+from reportlab.lib.styles import ParagraphStyle
+from reportlab.platypus import Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle
 
 OUT = Path("app/data/statement_templates")
 FONT_PATH = "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"
@@ -146,16 +147,24 @@ def build_sber_pdf() -> None:
     (OUT / "sber.pdf").write_bytes(buf.getvalue())
 
 
-def _table_pdf(name: str, title: str, data: list[list[str]]) -> None:
+def _table_pdf(name: str, title: str, data: list[list[str]],
+               intro: list[str] | None = None) -> None:
+    """Табличный PDF. `intro` — строки над таблицей: реальные выписки несут там
+    контрольные итоги (период, поступления, расходы), по которым импорт себя сверяет."""
     _ensure_font()
     buf = io.BytesIO()
     doc = SimpleDocTemplate(buf, pagesize=landscape(A4))
+    style = ParagraphStyle("intro", fontName=FONT, fontSize=9, leading=13)
+    flow: list = [Paragraph(line, style) for line in (intro or [])]
+    if flow:
+        flow.append(Spacer(1, 12))
     table = Table(data)
     table.setStyle(TableStyle([
         ("FONT", (0, 0), (-1, -1), FONT, 8),
         ("GRID", (0, 0), (-1, -1), 0.5, colors.black),
     ]))
-    doc.build([table])
+    flow.append(table)
+    doc.build(flow)
     (OUT / name).write_bytes(buf.getvalue())
 
 
@@ -166,17 +175,33 @@ def build_vtb_pdf() -> None:
         ["12.01.2026 10:00", "12.01.2026", "-1 500,00", "", "1 500,00", "0,00", "Ozon"],
         ["13.01.2026 11:00", "13.01.2026", "25 000,00", "25 000,00", "", "0,00", "Перевод"],
     ]
-    _table_pdf("vtb.pdf", "Выписка ВТБ", data)
+    # Контрольные итоги в шапке — по ним импорт сверяет сам себя (см.
+    # app/services/statement_reconcile.py): приход 25 000, расход 1 500.
+    _table_pdf("vtb.pdf", "Выписка ВТБ", data, intro=[
+        "Банк ВТБ (ПАО). Выписка по счёту",
+        "Период выписки 01.01.2026 - 31.01.2026",
+        "Баланс на начало периода 10000.00 RUB Поступления 25000.00 RUB",
+        "Баланс на конец периода 33500.00 RUB Расходные операции 1500.00 RUB",
+    ])
 
 
 def build_raiffeisen_pdf() -> None:
-    # Табличная выписка Райффайзена: split Debit/Credit по позициям колонок.
+    # Реальный РУССКИЙ шаблон Райффайзена: колонки «Поступления»/«Расходы» (в английском
+    # шаблоне на их местах зеркально стоят Debit/Credit), значения — со знаком, служебная
+    # строка «Выполнена банком» между шапкой и данными.
     data = [
-        ["№", "Дата", "Документ", "Debit", "Credit", "Назначение", "Карта"],
-        ["1", "14.01.2026 08:00", "DOC1", "-780,00", "", "Аптека Ригла", "*5678"],
-        ["2", "15.01.2026 09:00", "DOC2", "", "3 000,00", "Кэшбэк", "*5678"],
+        ["№ П/П", "Дата операции", "Номер документа", "Поступления", "Расходы",
+         "Детали операции", "Номер карты"],
+        ["", "Выполнена банком", "", "", "", "", ""],
+        ["1", "14.01.2026 08:00", "DOC1", "", "- 780,00 ₽", "Аптека Ригла", "*5678"],
+        ["2", "15.01.2026 09:00", "DOC2", "+ 3 000,00 ₽", "", "Кэшбэк", "*5678"],
     ]
-    _table_pdf("raiffeisen.pdf", "Выписка Райффайзен", data)
+    # «Обороты» — контрольные итоги: сначала приход, затем расход (порядок повторяет
+    # порядок колонок шаблона, по нему сверка и определяет, где что).
+    _table_pdf("raiffeisen.pdf", "Выписка Райффайзен", data, intro=[
+        "АО «Райффайзенбанк». Выписка по счёту",
+        "Обороты 3 000,00 780,00",
+    ])
 
 
 def build_1c() -> None:
@@ -224,7 +249,7 @@ MANIFEST = """# Эталонные шаблоны банковских выпи�
 | `tinkoff.pdf` | PDF (текст) | `parse_tinkoff_pdf` | tinkoff | 2 |
 | `sber.pdf` | PDF (текст, описание на след. строке) | `parse_sber_pdf` | sber | 2 |
 | `vtb.pdf` | PDF (таблица, знаковая сумма) | `parse_vtb_pdf` | vtb | 2 |
-| `raiffeisen.pdf` | PDF (таблица, split Debit/Credit) | `parse_raiffeisen_pdf` | raiffeisen | 2 |
+| `raiffeisen.pdf` | PDF таблица (Поступления/Расходы) | `parse_raiffeisen_pdf` | raiffeisen | 2 |
 | `sberbank_1c.txt` | 1CClientBankExchange | `parse_1c_exchange` | — | 2 |
 
 Стратегия покрытия ~200 банков — `docs/universal_statement_parser_strategy.md`:

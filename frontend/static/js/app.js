@@ -719,6 +719,23 @@ function bindGlobalUI() {
                 try { data = await res.json(); } catch { data = null; }
 
                 if (res.ok && data && data.status === 'success') {
+                    // Сверка с контрольными итогами самой выписки: сошлось — зелёный
+                    // бейдж (импорту можно верить), разошлось — жёлтое предупреждение.
+                    // Операции при расхождении всё равно импортированы: блокировать
+                    // человека из-за нашей же ошибки чтения итогов хуже, чем предупредить.
+                    const rec = data.reconciliation;
+                    let recHtml = '';
+                    if (rec && rec.status === 'ok') {
+                        recHtml = `
+                            <div style="margin-top:12px; font-size:.85rem; color:var(--c-green-text);">
+                                ✓ ${esc(rec.message)}
+                            </div>`;
+                    } else if (rec && rec.status === 'mismatch') {
+                        recHtml = `
+                            <div style="margin-top:12px; background:var(--c-amber-bg); border:1px solid rgba(245,158,11,.25); border-radius:var(--r-md); padding:12px; font-size:.85rem; color:var(--c-amber-text);">
+                                ⚠ ${esc(rec.message)}
+                            </div>`;
+                    }
                     resultDiv.style.display = 'block';
                     resultDiv.innerHTML = `
                         <div style="background:var(--c-green-bg); border:1px solid rgba(34,197,94,.25); border-radius:var(--r-md); padding:20px;">
@@ -727,6 +744,7 @@ function bindGlobalUI() {
                                 <span>Доходов: <strong style="color:var(--c-green-text)">+${fmt.cur(data.total_income)}</strong></span>
                                 <span>Расходов: <strong style="color:var(--c-red-text)">−${fmt.cur(data.total_expense)}</strong></span>
                             </div>
+                            ${recHtml}
                         </div>`;
                 } else {
                     // 413/502/504 или обрезанное/не-JSON тело — почти всегда «файл большой,
