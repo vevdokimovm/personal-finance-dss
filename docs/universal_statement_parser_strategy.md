@@ -174,3 +174,17 @@
 
 _Стратегия зафиксирована в вехе 5.5 (v5.9.0). Реализация и тесты — веха 6. Опора — фактический код
 `app/services/statement_parser.py` на v5.8.0; при доработке сверять с актуальным кодом._
+
+---
+
+## 6. Проверка и независимый аудит
+
+- Как измеряется точность на конкретном файле — сверка с контрольными итогами самой выписки:
+  `app/services/statement_reconcile.py`, CLI `tools/statement_audit/reconcile.py`.
+- Хроника проверки парсера на реальных данных, найденные дефекты, дыры и ограничения метода —
+  `docs/reports/retrospectives/statement_parser_process.md`.
+- Как проверить парсер **чужими руками**, честно и воспроизводимо (holdout, ручной ground truth,
+  метрика «тихие ошибки = 0») — `docs/statement_parser_audit_protocol.md`.
+- Property-тесты (`tests/test_statement_property.py`) доказывают устойчивость ВНУТРИ известных
+  шаблонов, но не покрытие банков: генератор `tools/statement_templates/synth.py` знает ровно те же
+  форматы, что и парсер.
