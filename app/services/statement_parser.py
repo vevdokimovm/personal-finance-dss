@@ -467,24 +467,44 @@ def _vtb_is_credit(description: str) -> bool:
     return any(word in low for word in _VTB_CREDIT_WORDS)
 
 
-def _vtb_column_map(table: list) -> dict[str, int]:
-    """Индексы колонок ВТБ по тексту (двухрядной) шапки. Пусто, если шапки в таблице нет."""
+# ── Общий движок табличных выписок ────────────────────────────────────────
+# Раскладка колонок у ОДНОГО банка меняется от шаблона к шаблону: у ВТБ их три, у
+# Райффайзена три, и русский с английским бывают зеркальны (на месте «Debit» стоит
+# «Поступления»). Привязка к индексам ломается на каждом новом шаблоне — оба раза это
+# стоило нам молчаливой потери данных. Поэтому роль колонки определяется по её заголовку,
+# а поддержка нового банка сводится к словарю ролей, а не к новому парсеру.
+# Как добавить банк — см. docs/universal_statement_parser_strategy.md.
+def _column_map(table: list, roles_spec: tuple, date_cells: int = 1) -> dict[str, int]:
+    """Индексы колонок по тексту (возможно, двухрядной) шапки таблицы.
+
+    `roles_spec` — кортеж пар «роль → маркеры заголовка», порядок значим: роль, стоящая
+    раньше, забирает колонку первой (поэтому «приход» проверяется до «суммы», иначе
+    заголовок «Сумма операции в валюте счёта/карты · Приход» уедет не в ту роль).
+    `date_cells` — сколько первых ячеек проверять на дату, чтобы понять, что шапка
+    кончилась и пошли операции: у ВТБ дата в первой ячейке, у Райффайзена во второй,
+    когда есть колонка «№ П/П».
+    """
     header: dict[int, str] = {}
     for row in table:
         if not row:
             continue
-        if row[0] and re.match(r'\d{2}\.\d{2}\.\d{4}', str(row[0])):
+        if any(c and re.match(r'\d{2}\.\d{2}\.\d{4}', str(c).strip()) for c in row[:date_cells]):
             break  # начались строки операций
         for i, cell in enumerate(row):
             if cell:
                 header[i] = f"{header.get(i, '')} {_norm(cell)}".strip()
     roles: dict[str, int] = {}
     for i, text in header.items():
-        for role, markers in _VTB_ROLES:
+        for role, markers in roles_spec:
             if role not in roles and any(mk in text for mk in markers):
                 roles[role] = i
                 break
     return roles
+
+
+def _vtb_column_map(table: list) -> dict[str, int]:
+    """Колонки ВТБ по шапке (три реальных шаблона). Пусто, если шапки в таблице нет."""
+    return _column_map(table, _VTB_ROLES, date_cells=1)
 
 
 def _vtb_row_to_transaction(row: list, cmap: dict[str, int], date_s: str) -> dict[str, Any] | None:
@@ -640,23 +660,8 @@ _RAIF_LEGACY_MAP = {'date': 1, 'debit': 3, 'credit': 4, 'desc': 5}
 
 
 def _raif_column_map(table: list) -> dict[str, int]:
-    """Индексы колонок Райффайзена по шапке. Пусто, если шапки в таблице нет."""
-    header: dict[int, str] = {}
-    for row in table:
-        if not row:
-            continue
-        if any(c and re.match(r'\d{2}\.\d{2}\.\d{4}', str(c).strip()) for c in row[:2]):
-            break  # начались строки операций
-        for i, cell in enumerate(row):
-            if cell:
-                header[i] = f"{header.get(i, '')} {_norm(cell)}".strip()
-    roles: dict[str, int] = {}
-    for i, text in header.items():
-        for role, markers in _RAIF_ROLES:
-            if role not in roles and any(mk in text for mk in markers):
-                roles[role] = i
-                break
-    return roles
+    """Колонки Райффайзена по шапке (три реальных шаблона, RU и EN зеркальны)."""
+    return _column_map(table, _RAIF_ROLES, date_cells=2)
 
 
 def _raif_row_to_transaction(row: list, cmap: dict[str, int]) -> dict[str, Any] | None:
