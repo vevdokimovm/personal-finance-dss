@@ -14,7 +14,10 @@ import pytest
 
 from app.services.statement_parser import parse_raiffeisen_pdf, parse_vtb_pdf
 from app.services.statement_reconcile import (
+    _balance_delta,
     _raif_declared,
+    _raif_declared_count,
+    _sber_declared,
     _tinkoff_declared,
     _verdict,
     _vtb_declared,
@@ -161,3 +164,83 @@ class TestReconcileStatement:
         result = reconcile_statement(b"not a pdf", bank, [_txn(10.0, 'income'),
                                                           _txn(4.0, 'expense')])
         assert result['parsed'] == {'income': 10.0, 'expense': 4.0}
+
+
+class TestSberDeclared:
+    """Сбер печатает итоги в блоке «ИТОГО ПО ОПЕРАЦИЯМ ЗА ПЕРИОД», но в извлечённом
+    тексте они разнесены по строкам с реквизитами счёта — искать надо по метке."""
+
+    def test_popolnenie_and_spisanie(self):
+        text = ("ИТОГО ПО ОПЕРАЦИЯМ ЗА ПЕРИОД:\n"
+                "Номер счёта 40817 810 0 4010 2386464 Пополнение 1 649,00\n"
+                "Валюта Российский рубль Списание 1 649,00")
+        assert _sber_declared(text) == {'income': 1649.00, 'expense': 1649.00}
+
+    def test_absent_totals(self):
+        assert _sber_declared("Выписка по счёту") == {'income': None, 'expense': None}
+
+
+class TestRaifTotalsFromTables:
+    """Шаблон без колонки «№» строку «Обороты» не печатает, но кладёт итоги в таблицу."""
+
+    def test_totals_from_table_rows_ru(self):
+        tables = [[["Всего поступлений", "+ 14 281,50 ₽"],
+                   ["Всего расходов", "- 14 281,50 ₽"]]]
+        assert _raif_declared("Выписка без оборотов", tables) == {
+            'income': 14281.50, 'expense': 14281.50}
+
+    def test_totals_from_table_rows_en(self):
+        tables = [[["Total income", "+ 14 281,50 ₽"], ["Total expenses", "- 14 281,50 ₽"]]]
+        assert _raif_declared("Statement", tables) == {'income': 14281.50, 'expense': 14281.50}
+
+    def test_turnover_line_wins_over_tables(self):
+        tables = [[["№ П/П", "Дата операции", "x", "Поступления", "Расходы", "y", "z"]]]
+        assert _raif_declared("Обороты 13 670,12 13 842,50", tables) == {
+            'income': 13670.12, 'expense': 13842.50}
+
+
+class TestRaifOperationCount:
+    """«Количество операций 3 4» ловит пропуск строки даже там, где суммы сошлись."""
+
+    def test_count_is_sum_of_both_columns(self):
+        tables = [[["", "Количество операций", "", "3", "4", "", ""]]]
+        assert _raif_declared_count(tables) == 7
+
+    def test_absent_count(self):
+        assert _raif_declared_count([[["Дата операции", "Сумма"]]]) is None
+
+
+class TestBalanceDelta:
+    """Изменение остатка — свидетель, независимый от заявленных сумм."""
+
+    def test_vtb_balance_delta(self):
+        text = ("Баланс на начало периода 3234.85 RUB Поступления 100624.00 RUB\n"
+                "Баланс на конец периода 2573.76 RUB Расходные операции 101285.09 RUB")
+        assert _balance_delta(text, 'vtb') == pytest.approx(-661.09)
+
+    def test_tinkoff_two_balance_lines(self):
+        text = "Баланс на 24.04.26 1 065.44 ₽\nБаланс на 23.05.26 8 050.36 ₽"
+        assert _balance_delta(text, 'tinkoff') == pytest.approx(6984.92)
+
+    def test_sber_balance_not_used(self):
+        # У Сбера тождество не сходится у самого банка (реальная выписка: остаток −150 → 0
+        # при нулевом нетто операций) — свидетель осознанно не подключён.
+        assert _balance_delta("Остаток на 01.06.2024 -150,00", 'sber') is None
+
+    def test_absent_balances(self):
+        assert _balance_delta("Выписка", 'vtb') is None
+
+
+class TestMultipleWitnesses:
+    def test_extra_witness_can_fail_alone(self):
+        # Суммы сошлись, а остаток — нет: это всё равно расхождение.
+        result = _verdict({'income': 100.0, 'expense': 50.0}, {'income': 100.0, 'expense': 50.0},
+                          [('изменение остатка', 999.0, 50.0)])
+        assert result['status'] == 'mismatch'
+        assert 'изменение остатка' in result['message']
+
+    def test_checked_witnesses_listed(self):
+        result = _verdict({'income': 100.0, 'expense': 50.0}, {'income': 100.0, 'expense': 50.0},
+                          [('изменение остатка', 50.0, 50.0)])
+        assert result['status'] == 'ok'
+        assert result['checked'] == ['приход', 'расход', 'изменение остатка']

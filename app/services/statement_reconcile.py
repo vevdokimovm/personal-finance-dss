@@ -24,6 +24,7 @@ from datetime import datetime
 from typing import Any
 
 from app.services.statement_parser import (
+    _norm,
     _num,
     _raif_column_map,
     _vtb_column_map,
@@ -47,6 +48,13 @@ _RE_RAIF_TURNOVER = re.compile(
     r"(?:Обороты|Turnover)\s+([\d\s\u00a0]+,\d{2})\s+([\d\s\u00a0]+,\d{2})")
 
 
+_RE_SBER_INCOME = re.compile(r'Пополнение\s+([\d\s\u00a0.,]+)')
+_RE_SBER_EXPENSE = re.compile(r'Списание\s+([\d\s\u00a0.,]+)')
+_RE_VTB_BAL_START = re.compile(r'Баланс на начало периода\s+(-?[\d\s\u00a0.,]+?)\s*RUB')
+_RE_VTB_BAL_END = re.compile(r'Баланс на конец периода\s+(-?[\d\s\u00a0.,]+?)\s*RUB')
+_RE_TINKOFF_BALANCE = re.compile(r'Баланс на \d{2}\.\d{2}\.\d{2}\s+(-?[\d\s\u00a0.,]+?)\s*₽')
+
+
 def _sums(transactions: list[dict[str, Any]]) -> dict[str, float]:
     income = sum(t['amount'] for t in transactions if t['type'] == 'income')
     expense = sum(t['amount'] for t in transactions if t['type'] == 'expense')
@@ -55,6 +63,74 @@ def _sums(transactions: list[dict[str, Any]]) -> dict[str, float]:
 
 def _money(value: float) -> str:
     return f"{value:,.2f}".replace(',', ' ')
+
+
+def _sber_declared(text: str) -> dict[str, float | None]:
+    """Итоги Сбера: блок «ИТОГО ПО ОПЕРАЦИЯМ ЗА ПЕРИОД» → «Пополнение X» / «Списание Y».
+    В извлечённом тексте они разнесены по строкам с реквизитами счёта, поэтому ищем по
+    метке, а не по позиции."""
+    income = _RE_SBER_INCOME.search(text)
+    expense = _RE_SBER_EXPENSE.search(text)
+    return {
+        'income': _num(income.group(1)) if income else None,
+        'expense': _num(expense.group(1)) if expense else None,
+    }
+
+
+def _raif_totals_from_tables(tables: list) -> dict[str, float | None]:
+    """Шаблон Райффайзена без колонки «№» не печатает строку «Обороты», но кладёт итоги
+    в таблицу: «Всего поступлений + 14 281,50 ₽» / «Total income»."""
+    income = expense = None
+    for table in tables:
+        for row in table:
+            cells = [str(c) for c in row if c]
+            if len(cells) < 2:
+                continue
+            label, value = _norm(cells[0]), _num(cells[1])
+            if value is None:
+                continue
+            if 'всего поступлений' in label or 'total income' in label:
+                income = abs(value)
+            elif 'всего расходов' in label or 'total expenses' in label:
+                expense = abs(value)
+    return {'income': income, 'expense': expense}
+
+
+def _raif_declared_count(tables: list) -> int | None:
+    """«Количество операций 3 4» — счётчик приходов и расходов. Проверяет полноту набора:
+    ловит пропуск или задвоение строки даже там, где суммы случайно сошлись."""
+    for table in tables:
+        for row in table:
+            cells = [str(c) for c in row if c]
+            if len(cells) >= 3 and 'количество операций' in _norm(cells[0]):
+                first, second = _num(cells[1]), _num(cells[2])
+                if first is not None and second is not None:
+                    return int(first + second)
+    return None
+
+
+def _balance_delta(text: str, bank_id: str) -> float | None:
+    """Изменение остатка: остаток_конец − остаток_начало. Свидетель, независимый от
+    заявленных сумм.
+
+    Только для ВТБ и Тинькоффа, где тождество эмпирически замыкается. У Сбера оно НЕ
+    сходится у самого банка (в реальной выписке остаток шёл −150 → 0 при нулевом нетто
+    операций), поэтому вешать на него вердикт там нельзя: получили бы ложную тревогу на
+    полностью исправном парсе.
+    """
+    if bank_id == 'vtb':
+        start, end = _RE_VTB_BAL_START.search(text), _RE_VTB_BAL_END.search(text)
+        if start and end:
+            first, last = _num(start.group(1)), _num(end.group(1))
+            if first is not None and last is not None:
+                return round(last - first, 2)
+    if bank_id == 'tinkoff':
+        found = _RE_TINKOFF_BALANCE.findall(text)
+        if len(found) >= 2:
+            first, last = _num(found[0]), _num(found[1])
+            if first is not None and last is not None:
+                return round(last - first, 2)
+    return None
 
 
 def _vtb_declared(text: str) -> dict[str, float | None]:
@@ -89,7 +165,7 @@ def _raif_declared(text: str, tables: list) -> dict[str, float | None]:
     русском шаблоне первой идёт колонка «Поступления», в английском — «Debit»."""
     match = _RE_RAIF_TURNOVER.search(text)
     if not match:
-        return {'income': None, 'expense': None}
+        return _raif_totals_from_tables(tables)
     first, second = _num(match.group(1)), _num(match.group(2))
     credit_first = True
     for table in tables:
@@ -135,34 +211,45 @@ def _read_pdf(raw: bytes) -> tuple[str, list]:
     return text, tables
 
 
-def _verdict(declared: dict, parsed: dict) -> dict[str, Any]:
-    pairs = [(name, declared.get(name), parsed[name]) for name in ('income', 'expense')]
+def _verdict(declared: dict, parsed: dict,
+             extras: list[tuple[str, Any, Any]] | None = None) -> dict[str, Any]:
+    """Вердикт по нескольким независимым свидетелям: заявленные суммы плюс, где есть,
+    изменение остатка и количество операций. Чем больше свидетелей сошлось, тем сильнее
+    доказательство: суммы могут совпасть при взаимно погасившихся ошибках, счётчик
+    операций ловит пропуск строки, а остаток проверяет нетто независимо от сумм."""
+    pairs = [('приход', declared.get('income'), parsed['income']),
+             ('расход', declared.get('expense'), parsed['expense'])]
+    pairs += list(extras or [])
     checked = [(name, want, got) for name, want, got in pairs if want is not None]
     if not checked:
         return {
             'status': 'unavailable',
             'declared': declared,
             'parsed': parsed,
+            'checked': [],
             'message': '',
         }
     bad = [(name, want, got) for name, want, got in checked if abs(got - want) >= TOLERANCE]
     if not bad:
+        witnesses = ", ".join(name for name, _, _ in checked)
         return {
             'status': 'ok',
             'declared': declared,
             'parsed': parsed,
+            'checked': [name for name, _, _ in checked],
             'message': (f"Сверено с итогами банка: приход {_money(parsed['income'])} ₽, "
-                        f"расход {_money(parsed['expense'])} ₽ — сходится."),
+                        f"расход {_money(parsed['expense'])} ₽ — сходится "
+                        f"(проверено: {witnesses})."),
         }
-    label = {'income': 'приход', 'expense': 'расход'}
     details = "; ".join(
-        f"{label[name]}: распознано {_money(got)} ₽, банк заявляет {_money(want)} ₽"
+        f"{name}: распознано {_money(got)} ₽, банк заявляет {_money(want)} ₽"
         for name, want, got in bad
     )
     return {
         'status': 'mismatch',
         'declared': declared,
         'parsed': parsed,
+        'checked': [name for name, _, _ in checked],
         'message': (f"Расхождение с итогами банка ({details}). Операции импортированы, "
                     f"но выписку стоит проверить."),
     }
@@ -190,9 +277,25 @@ def reconcile_statement(raw: bytes, bank_id: str,
         return _verdict(empty, parsed)
 
     if bank_id == 'vtb':
-        return _verdict(_vtb_declared(text), _vtb_parsed_by_processing_date(tables, text))
+        totals = _vtb_parsed_by_processing_date(tables, text)
+        return _verdict(_vtb_declared(text), totals, _balance_extras(text, 'vtb', totals))
     if bank_id == 'raiffeisen':
-        return _verdict(_raif_declared(text, tables), parsed)
+        extras: list[tuple[str, Any, Any]] = []
+        count = _raif_declared_count(tables)
+        if count is not None:
+            extras.append(('количество операций', float(count), float(len(transactions))))
+        return _verdict(_raif_declared(text, tables), parsed, extras)
     if bank_id == 'tinkoff':
-        return _verdict(_tinkoff_declared(text), parsed)
+        return _verdict(_tinkoff_declared(text), parsed, _balance_extras(text, 'tinkoff', parsed))
+    if bank_id == 'sber':
+        return _verdict(_sber_declared(text), parsed)
     return _verdict(empty, parsed)
+
+
+def _balance_extras(text: str, bank_id: str,
+                    totals: dict[str, float]) -> list[tuple[str, Any, Any]]:
+    """Изменение остатка как дополнительный свидетель (там, где тождество замыкается)."""
+    delta = _balance_delta(text, bank_id)
+    if delta is None:
+        return []
+    return [('изменение остатка', delta, round(totals['income'] - totals['expense'], 2))]
