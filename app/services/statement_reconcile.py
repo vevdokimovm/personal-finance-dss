@@ -18,17 +18,22 @@
 """
 from __future__ import annotations
 
+import csv
 import io
 import re
 from datetime import datetime
 from typing import Any
 
 from app.services.statement_parser import (
+    SKIP_SERVICE,
+    SKIP_STATUS,
+    SKIP_ZERO,
     _norm,
     _num,
     _raif_column_map,
     _vtb_column_map,
     _vtb_row_to_transaction,
+    decode_statement_bytes,
 )
 
 try:
@@ -53,6 +58,70 @@ _RE_SBER_EXPENSE = re.compile(r'Списание\s+([\d\s\u00a0.,]+)')
 _RE_VTB_BAL_START = re.compile(r'Баланс на начало периода\s+(-?[\d\s\u00a0.,]+?)\s*RUB')
 _RE_VTB_BAL_END = re.compile(r'Баланс на конец периода\s+(-?[\d\s\u00a0.,]+?)\s*RUB')
 _RE_TINKOFF_BALANCE = re.compile(r'Баланс на \d{2}\.\d{2}\.\d{2}\s+(-?[\d\s\u00a0.,]+?)\s*₽')
+
+
+# Контрольные итоги в CSV. Считалось, что CSV сверить нечем — на реальной выписке
+# Альфа-Банка они лежат в метаданных над таблицей отдельными ячейками:
+# «Поступления», "", "", "224 805,37 RUR». Регулярка по сырому тексту здесь бесполезна
+# (между меткой и значением — пустые ячейки в кавычках), поэтому читаем именно ячейки.
+_CSV_TOTAL_LABELS = {
+    'income': ('поступления', 'поступление', 'пополнение', 'всего поступлений'),
+    'expense': ('расходы', 'расход', 'списание', 'всего расходов'),
+}
+
+# Пропуски, которые НЕ являются потерей данных: банк сам отклонил операцию, строка —
+# оформление документа, либо движения нет. Всё остальное — наш промах, и о нём надо
+# сказать вслух: на файле в 12 788 строк потеря полусотни иначе незаметна.
+_EXPLAINED_SKIPS = (SKIP_STATUS, SKIP_SERVICE, SKIP_ZERO)
+
+
+def csv_declared(text: str) -> dict[str, float | None]:
+    """Контрольные итоги из метаданных CSV, если банк их печатает.
+
+    Метка сверяется ТОЧНО, а не по подстроке: «Поступления»/«Расходы» — это ещё и названия
+    колонок таблицы, и подстрочный матч принял бы шапку за итоги. В строке-шапке справа от
+    метки чисел нет, поэтому ложного срабатывания не возникает.
+    """
+    head = text[:4000]
+    delimiter = ';' if head.count(';') > head.count(',') else ','
+    result: dict[str, float | None] = {'income': None, 'expense': None}
+    for row in csv.reader(io.StringIO(text), delimiter=delimiter):
+        cells = [str(c) for c in row]
+        for i, cell in enumerate(cells):
+            label = _norm(cell)
+            for role, labels in _CSV_TOTAL_LABELS.items():
+                if result[role] is not None or label not in labels:
+                    continue
+                value = next((_num(c) for c in cells[i + 1:] if _num(c) is not None), None)
+                if value is not None:
+                    result[role] = abs(value)
+    return result
+
+
+def completeness_verdict(report: dict, parsed: dict) -> dict[str, Any]:
+    """Вердикт по полноте разбора: все ли строки файла превратились в операции.
+
+    Для CSV это часто единственная доступная проверка — контрольных сумм в нём обычно нет.
+    Она отвечает не на вопрос «верны ли суммы», а на вопрос «не потеряли ли мы строки
+    молча», и именно так был найден дефект, из-за которого у выписки Райффайзена терялись
+    ВСЕ приходы (14 строк → 8 операций).
+    """
+    rows = report.get('rows', 0)
+    skipped = report.get('skipped', {}) or {}
+    explained = sum(n for reason, n in skipped.items() if reason in _EXPLAINED_SKIPS)
+    lost = {reason: n for reason, n in skipped.items() if reason not in _EXPLAINED_SKIPS}
+    base = {'declared': {'income': None, 'expense': None}, 'parsed': parsed,
+            'checked': ['полнота разбора']}
+    if lost:
+        details = ", ".join(f"{reason}: {n}" for reason, n in lost.items())
+        return {**base, 'status': 'mismatch',
+                'message': (f"Из {rows} строк файла не разобрано {sum(lost.values())} "
+                            f"({details}). Операции импортированы, но часть данных потеряна.")}
+    note = f", {explained} пропущено по причине банка/оформления" if explained else ""
+    return {**base, 'status': 'ok',
+            'message': (f"Разобраны все строки файла: {report.get('parsed', 0)} операций из "
+                        f"{rows}{note}. Контрольных сумм файл не содержит — сверены не суммы, "
+                        f"а полнота разбора.")}
 
 
 def _sums(transactions: list[dict[str, Any]]) -> dict[str, float]:
@@ -256,7 +325,8 @@ def _verdict(declared: dict, parsed: dict,
 
 
 def reconcile_statement(raw: bytes, bank_id: str,
-                        transactions: list[dict[str, Any]]) -> dict[str, Any]:
+                        transactions: list[dict[str, Any]],
+                        report: dict | None = None) -> dict[str, Any]:
     """Сверяет распознанные операции с контрольными итогами выписки.
 
     Возвращает `{status, declared, parsed, message}`, где status:
@@ -269,7 +339,18 @@ def reconcile_statement(raw: bytes, bank_id: str,
     """
     parsed = _sums(transactions)
     empty = {'income': None, 'expense': None}
-    if pdfplumber is None or raw[:5] != b'%PDF-':
+    if raw[:5] != b'%PDF-':
+        # Текстовая выписка. Контрольные итоги в CSV — редкость, но встречаются
+        # (Альфа-Банк печатает их в метаданных над таблицей); если их нет, проверяем
+        # хотя бы полноту разбора.
+        text = decode_statement_bytes(raw)
+        declared = csv_declared(text)
+        if declared['income'] is not None or declared['expense'] is not None:
+            return _verdict(declared, parsed)
+        if report:
+            return completeness_verdict(report, parsed)
+        return _verdict(empty, parsed)
+    if pdfplumber is None:
         return _verdict(empty, parsed)
     try:
         text, tables = _read_pdf(raw)

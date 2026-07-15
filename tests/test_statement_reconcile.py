@@ -13,12 +13,15 @@ from pathlib import Path
 import pytest
 
 from app.services.statement_parser import parse_raiffeisen_pdf, parse_vtb_pdf
+from app.services.statement_parser import SKIP_SERVICE, SKIP_STATUS
 from app.services.statement_reconcile import (
     _balance_delta,
     _raif_declared,
     _raif_declared_count,
     _sber_declared,
     _tinkoff_declared,
+    completeness_verdict,
+    csv_declared,
     _verdict,
     _vtb_declared,
     reconcile_statement,
@@ -244,3 +247,55 @@ class TestMultipleWitnesses:
                           [('изменение остатка', 50.0, 50.0)])
         assert result['status'] == 'ok'
         assert result['checked'] == ['приход', 'расход', 'изменение остатка']
+
+
+class TestCsvDeclared:
+    """Считалось, что CSV сверить нечем. На реальной выписке Альфа-Банка контрольные итоги
+    лежат в метаданных отдельными ячейками — и парс сходится с ними до копейки."""
+
+    ALFA = ('"Дата открытия счета","","24.12.2018","","","","","","","",'
+            '"Поступления","","","224\u00a0805,37 RUR"\n'
+            '"Валюта счета","","RUR","","","","","","","",'
+            '"Расходы","","","221\u00a0195,56 RUR"\n')
+
+    def test_totals_from_metadata_cells(self):
+        assert csv_declared(self.ALFA) == {'income': 224805.37, 'expense': 221195.56}
+
+    def test_table_header_is_not_mistaken_for_totals(self):
+        # «Поступления»/«Расходы» — ещё и названия колонок. Справа от них в шапке чисел
+        # нет, поэтому точный матч метки не даёт ложного срабатывания.
+        header = ('"Дата операции";"Номер документа";"Поступления";"Расходы";"Валюта"\n'
+                  '"17.01.2025";"ZP001";"";"2 670,12";"RUB"\n')
+        assert csv_declared(header) == {'income': None, 'expense': None}
+
+    def test_no_totals(self):
+        assert csv_declared("Дата;Сумма\n01.01.2026;-100") == {'income': None, 'expense': None}
+
+
+class TestCompletenessVerdict:
+    """Полнота разбора — единственная проверка для CSV без контрольных сумм. Отвечает не на
+    вопрос «верны ли суммы», а на «не потеряли ли мы строки молча»."""
+
+    def test_all_rows_parsed(self):
+        report = {'rows': 14, 'parsed': 14, 'skipped': {}}
+        result = completeness_verdict(report, {'income': 1.0, 'expense': 2.0})
+        assert result['status'] == 'ok'
+        assert result['checked'] == ['полнота разбора']
+
+    def test_explained_skips_are_ok(self):
+        # Отклонённые банком операции и подвал документа — законные пропуски.
+        report = {'rows': 12788, 'parsed': 12614,
+                  'skipped': {SKIP_STATUS: 174, SKIP_SERVICE: 0}}
+        assert completeness_verdict(report, {'income': 0.0, 'expense': 0.0})['status'] == 'ok'
+
+    def test_silent_loss_is_mismatch(self):
+        # Ровно этот случай был реальным: у выписки Райффайзена терялись ВСЕ приходы.
+        report = {'rows': 14, 'parsed': 8, 'skipped': {'сумма не распознана': 6}}
+        result = completeness_verdict(report, {'income': 0.0, 'expense': 100.0})
+        assert result['status'] == 'mismatch'
+        assert 'не разобрано 6' in result['message']
+
+    def test_message_names_what_was_proven(self):
+        report = {'rows': 5, 'parsed': 5, 'skipped': {}}
+        message = completeness_verdict(report, {'income': 0.0, 'expense': 0.0})['message']
+        assert 'сверены не суммы' in message

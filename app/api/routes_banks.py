@@ -104,9 +104,14 @@ async def upload_statement(
                            "Проверьте, что в файле есть таблица с датой и суммой.",
             }
     else:
-        # CSV/1C: декодер сам форсит cp1251 для 1C и перебирает кодировки для CSV
+        # CSV/1C: декодер сам форсит cp1251 для 1C и перебирает кодировки для CSV.
+        # `report` собирает статистику разбора: у CSV контрольных сумм обычно нет, и
+        # единственная доступная проверка — не потеряли ли мы строки молча.
         content = decode_statement_bytes(raw)
-        transactions = parse_bank_statement(content, bank_id)
+        parse_report: dict = {}
+        transactions = parse_bank_statement(content, bank_id, parse_report)
+        if transactions:
+            reconciliation = reconcile_statement(raw, bank_id, transactions, parse_report)
 
     if not transactions:
         return {

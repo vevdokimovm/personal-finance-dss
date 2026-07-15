@@ -30,6 +30,8 @@ from app.services.statement_parser import (
     detect_pdf_bank,
     parse_1c_exchange,
     parse_bank_statement,
+    parse_tinkoff_csv,
+    parse_universal_csv,
     pdf_non_statement_reason,
 )
 
@@ -387,3 +389,88 @@ class TestNonStatementDetection:
         # Настоящая выписка операций не должна опознаваться как справка.
         text = "Выписка по платёжному счёту\n02.07.2025 13:28 Перевод 550,00 0,00"
         assert classify_non_statement(text) is None
+
+
+class TestUniversalCsvRealDefects:
+    """Дефекты универсального CSV-парсера, найденные контролем полноты разбора на живых
+    файлах. Каждый был невидим: количество операций выглядело правдоподобно."""
+
+    def test_postupleniya_column_is_income(self):
+        # «поступление» — НЕ подстрока «Поступления» (последняя буква другая). Из-за этого
+        # на реальной выписке Райффайзена терялись ВСЕ приходы: 14 строк → 8 операций,
+        # и в модель попадал человек без единого дохода.
+        content = (
+            "Дата операции;Выполнено банком;Номер документа;Поступления;Расходы;Валюта\n"
+            "17.01.2025 17:30;17.01.2025;ZP001;;2 670,12;RUB\n"
+            "17.01.2025 17:29;17.01.2025;ZP002;2 670,12;;RUB\n"
+        )
+        parsed = parse_universal_csv(content)
+        assert [t["type"] for t in parsed] == ["expense", "income"]
+
+    def test_amount_candidate_excludes_credit_debit_columns(self):
+        # «Amount in operation currency (credit)» ловится и кандидатом «amount», и «credit».
+        # Побеждал «amount» — и вся выписка читалась как доход (расход = 0).
+        content = (
+            "Transaction date;Amount in operation currency (credit);"
+            "Amount in operation currency (debit);Operation details\n"
+            "17.01.2025;;2 670,12;Оплата\n"
+            "18.01.2025;8 000,00;;Перевод\n"
+        )
+        parsed = parse_universal_csv(content)
+        assert [t["type"] for t in parsed] == ["expense", "income"]
+
+    def test_metadata_pair_is_not_a_header(self):
+        # Банк печатает над таблицей пары «метка — значение». Строка
+        # «Дата открытия счета | 24.12.2018 | Поступления | 224 805,37» содержит и «дату»,
+        # и «поступления» — и принималась за шапку: разбор давал 0 операций.
+        content = (
+            "Выписка по счету\n"
+            "Дата открытия счета;24.12.2018;Поступления;224 805,37 RUR\n"
+            "Валюта счета;RUR;Расходы;221 195,56 RUR\n"
+            "\n"
+            "Дата операции;Категория;Сумма в валюте счета;Описание\n"
+            "05.05.2026;Кафе;-450,00;Кофейня\n"
+            "06.05.2026;Доход;30 000,00;Зарплата\n"
+        )
+        parsed = parse_universal_csv(content)
+        assert len(parsed) == 2
+        assert parsed[0]["type"] == "expense" and parsed[0]["description"] == "Кофейня"
+        assert parsed[1]["type"] == "income"
+
+    def test_report_counts_rows_and_reasons(self):
+        content = (
+            "Дата операции;Категория;Сумма;Описание\n"
+            "05.05.2026;Кафе;-450,00;Кофейня\n"
+            "Страница 1 из 1;;;\n"
+        )
+        report: dict = {}
+        parse_universal_csv(content, report)
+        assert report["rows"] == 2 and report["parsed"] == 1
+        assert report["skipped"] == {"служебная строка (не операция)": 1}
+
+
+class TestTinkoffCsvReport:
+    def test_failed_rows_counted_as_bank_rejection(self):
+        content = (
+            "Дата операции;Дата платежа;Номер карты;Статус;Сумма операции;Валюта операции;"
+            "Сумма платежа;Валюта платежа;Кэшбэк;Категория;MCC;Описание\n"
+            "15.01.2026 12:30:00;15.01.2026;*1;OK;-100.00;RUB;-100.00;RUB;0;Еда;5411;Магнит\n"
+            "16.01.2026 12:30:00;16.01.2026;*1;FAILED;-500.00;RUB;-500.00;RUB;0;Прочее;;Отмена\n"
+        )
+        report: dict = {}
+        parsed = parse_tinkoff_csv(content, report)
+        assert len(parsed) == 1
+        assert report["skipped"] == {"операция отклонена банком": 1}
+
+    def test_en_thousands_format_not_lost(self):
+        # Наивный float() ломался на «1,234.56» и ронял строку в except — операция
+        # исчезала молча. Теперь сумма читается через `_num`.
+        content = (
+            "Дата операции;Статус;Сумма платежа;Описание\n"
+            "15.01.2026 12:30:00;OK;-1,234.56;Покупка\n"
+        )
+        report: dict = {}
+        parsed = parse_tinkoff_csv(content, report)
+        assert len(parsed) == 1
+        assert parsed[0]["amount"] == pytest.approx(1234.56)
+        assert report["skipped"] == {}

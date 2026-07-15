@@ -38,7 +38,34 @@ def _classify(amount: float) -> tuple[str, float]:
     return "income", amount
 
 
-def parse_tinkoff_csv(content: str) -> list[dict[str, Any]]:
+# ── Учёт пропущенных строк ────────────────────────────────────────────────
+# CSV не несёт контрольных сумм, поэтому сверить его с банком нечем. Но главный риск CSV —
+# не неверная сумма, а МОЛЧАЛИВАЯ ПОТЕРЯ строки: на реальном файле в 12 788 строк пропажа
+# полусотни незаметна. Поэтому каждая точка `continue` обязана назвать причину, а
+# `statement_reconcile` отделяет законные пропуски (банк сам отклонил операцию) от наших
+# промахов (сумму не разобрали).
+SKIP_STATUS = 'операция отклонена банком'
+SKIP_NO_AMOUNT = 'сумма не указана'
+SKIP_BAD_AMOUNT = 'сумма не распознана'
+SKIP_NO_DATE = 'дата не распознана'
+SKIP_ZERO = 'нулевая сумма'
+SKIP_SERVICE = 'служебная строка (не операция)'
+SKIP_UNPARSED = 'строка не разобрана'
+
+
+def _skip(stats: dict[str, int], reason: str) -> None:
+    stats[reason] = stats.get(reason, 0) + 1
+
+
+def _fill_report(report: dict | None, rows: int, parsed: int, skipped: dict[str, int]) -> None:
+    if report is not None:
+        report['rows'] = rows
+        report['parsed'] = parsed
+        report['skipped'] = skipped
+
+
+def parse_tinkoff_csv(content: str,
+                      report: dict | None = None) -> list[dict[str, Any]]:
     """
     Парсит CSV-выписку из Тинькофф Банка.
 
@@ -47,12 +74,17 @@ def parse_tinkoff_csv(content: str) -> list[dict[str, Any]]:
     Валюта операции;Сумма платежа;Валюта платежа;Кэшбэк;Категория;MCC;Описание
     """
     transactions = []
+    skipped: dict[str, int] = {}
+    rows = 0
     delimiter = ';' if ';' in content[:500] else ','
     reader = csv.DictReader(io.StringIO(content), delimiter=delimiter)
     if reader.fieldnames:
         reader.fieldnames = [f.strip().lstrip('\ufeff') for f in reader.fieldnames]
 
     for row in reader:
+        if not any((value or '').strip() for value in row.values()):
+            continue  # пустая строка-разделитель, не операция
+        rows += 1
         try:
             date_str = _get_field(row, ['Дата операции', 'Дата платежа', 'date'])
             amount_str = _get_field(row, ['Сумма платежа', 'Сумма операции', 'amount'])
@@ -62,11 +94,19 @@ def parse_tinkoff_csv(content: str) -> list[dict[str, Any]]:
             status = _get_field(row, ['Статус', 'status']) or ''
 
             if status and status.upper() not in ('OK', 'COMPLETED', ''):
+                _skip(skipped, SKIP_STATUS)   # банк сам отклонил — законный пропуск
                 continue
             if not amount_str:
+                _skip(skipped, SKIP_NO_AMOUNT)
                 continue
 
-            amount = float(amount_str.replace(' ', '').replace(',', '.').replace('\xa0', ''))
+            # Через `_num`, а не через наивный float: он держит и RU («1 234,56»), и EN
+            # («1,234.56») форматы. Наивная замена ломалась на EN-разделителе тысяч и
+            # роняла строку в `except` — то есть теряла операцию молча.
+            amount = _num(amount_str)
+            if amount is None:
+                _skip(skipped, SKIP_BAD_AMOUNT)
+                continue
             t_date = _parse_date(date_str) if date_str else utcnow()
             t_type, amount = _classify(amount)
 
@@ -83,8 +123,10 @@ def parse_tinkoff_csv(content: str) -> list[dict[str, Any]]:
                 'is_synced': True,
             })
         except (ValueError, KeyError, TypeError):
+            _skip(skipped, SKIP_UNPARSED)
             continue
 
+    _fill_report(report, rows, len(transactions), skipped)
     return transactions
 
 
@@ -138,8 +180,11 @@ _H_DATE = ['дата операции', 'дата проводки', 'дата �
            'дата', 'transaction date', 'date']
 _H_AMOUNT = ['сумма в валюте счета', 'сумма операции', 'сумма платежа', 'сумма',
              'amount', 'sum']
-_H_CREDIT = ['приход', 'поступление', 'зачисление', 'кредит', 'credit']
-_H_DEBIT = ['расход', 'списание', 'дебет', 'debit']
+# ВАЖНО: только ОСНОВЫ слов. «поступление» не подстрока «Поступления» (последняя буква
+# другая), и на реальной выписке Райффайзена из-за этого молча терялись ВСЕ приходы:
+# 14 строк → 8 операций, и в модель попадал человек без единого дохода.
+_H_CREDIT = ['приход', 'поступлени', 'зачислени', 'кредит', 'credit']
+_H_DEBIT = ['расход', 'списани', 'дебет', 'debit']
 _H_CATEGORY = ['категория', 'category']
 _H_DESC = ['назначение платежа', 'назначение', 'описание', 'description', 'merchant']
 _H_MCC = ['mcc']
@@ -156,12 +201,19 @@ def _norm(value: Any) -> str:
     return re.sub(r'\s+', ' ', text.replace('\xa0', ' ').replace('ё', 'е')).strip().lower()
 
 
-def _field(row: dict, candidates: list[str]) -> str | None:
-    """Значение колонки по списку синонимов заголовка (нормализованный матч по подстроке)."""
+def _field(row: dict, candidates: list[str], exclude: list[str] | None = None) -> str | None:
+    """Значение колонки по списку синонимов заголовка (нормализованный матч по подстроке).
+
+    `exclude` отсекает заголовки, которые совпали с кандидатом, но принадлежат другой роли:
+    «Amount in operation currency (credit)» ловится и кандидатом «amount», и «credit».
+    """
     norm_row = [(_norm(k), v) for k, v in row.items() if k is not None]
+    blocked = [_norm(e) for e in (exclude or [])]
     for cand in candidates:
         nc = _norm(cand)
         for nk, value in norm_row:
+            if any(b in nk for b in blocked):
+                continue
             if (nc == nk or nc in nk) and value is not None and str(value).strip():
                 return str(value)
     return None
@@ -190,9 +242,23 @@ def _num(value: str | None) -> float | None:
         return None
 
 
+def _looks_like_value(text: str) -> bool:
+    """Ячейка похожа на ЗНАЧЕНИЕ (дата или число), а не на название колонки."""
+    return bool(re.search(r'\d{2}\.\d{2}\.\d{4}', text)) or _num(text) is not None
+
+
 def _is_header_row(cells: list[Any]) -> bool:
-    """Строка-заголовок: есть колонка даты И колонка суммы (или приход/расход)."""
+    """Строка-заголовок: есть колонка даты И колонка суммы (или приход/расход), и при этом
+    НИ ОДНА ячейка не является значением.
+
+    Проверка на значения обязательна: над таблицей банки печатают метаданные парами
+    «метка — значение», и такая пара легко имитирует заголовок. Реальный случай:
+    строка «Дата открытия счета | 24.12.2018 | Поступления | 224 805,37 RUR» содержит и
+    «дату», и «поступления» — и принималась за шапку, после чего разбор давал 0 операций.
+    """
     norm = [_norm(c) for c in cells if c is not None and str(c).strip()]
+    if any(_looks_like_value(n) for n in norm):
+        return False
     has_date = any(any(h == n or h in n for h in _H_DATE) for n in norm)
     has_amount = any(
         any(h == n or h in n for h in (_H_AMOUNT + _H_CREDIT + _H_DEBIT)) for n in norm
@@ -217,21 +283,37 @@ def _table_rows(cells_rows: list[list[Any]]) -> list[dict]:
     return out
 
 
-def _rows_to_transactions(rows: list[dict]) -> list[dict[str, Any]]:
-    """Единая логика извлечения транзакций из строк-словарей (CSV и XLSX)."""
+def _rows_to_transactions(rows: list[dict], report: dict | None = None) -> list[dict[str, Any]]:
+    """Единая логика извлечения транзакций из строк-словарей (CSV и XLSX).
+
+    Каждый пропуск строки называет причину: CSV сверить с итогами банка нечем, поэтому
+    единственная доступная проверка — полнота разбора (см. `statement_reconcile`).
+    """
     transactions = []
+    skipped: dict[str, int] = {}
     for row in rows:
         try:
-            amount = _num(_field(row, _H_AMOUNT))
+            # Кандидат «amount» обязан исключать колонки прихода/расхода: заголовок
+            # «Amount in operation currency (credit)» ловится и тем, и другим, и на
+            # реальной выписке Райффайзена вся она читалась как доход (расход = 0).
+            amount = _num(_field(row, _H_AMOUNT, exclude=_H_CREDIT + _H_DEBIT))
             if amount is None:  # split-колонки Приход/Расход (ВТБ и пр.)
                 credit = _num(_field(row, _H_CREDIT)) or 0.0
                 debit = _num(_field(row, _H_DEBIT)) or 0.0
                 if credit or debit:
                     amount = credit - abs(debit)
-            if amount is None or amount == 0:
+            date_str = _field(row, _H_DATE)
+            has_date = bool(date_str) and bool(re.search(r'\d{2}\.\d{2}\.\d{4}', str(date_str)))
+            if amount is None:
+                # Подвал документа («Страница 1 из 1», «(подпись сотрудника)») — законная
+                # не-операция. Отличаем по дате: без разобранной даты это не строка
+                # операции, а оформление. Иначе получим ложную тревогу о потере данных.
+                _skip(skipped, SKIP_BAD_AMOUNT if has_date else SKIP_SERVICE)
+                continue
+            if amount == 0:
+                _skip(skipped, SKIP_ZERO)
                 continue
 
-            date_str = _field(row, _H_DATE)
             category = _field(row, _H_CATEGORY) or 'Импорт'
             description = _field(row, _H_DESC)
             mcc = _field(row, _H_MCC)
@@ -248,11 +330,13 @@ def _rows_to_transactions(rows: list[dict]) -> list[dict[str, Any]]:
                 'is_synced': True,
             })
         except (ValueError, KeyError, TypeError):
+            _skip(skipped, SKIP_UNPARSED)
             continue
+    _fill_report(report, len(rows), len(transactions), skipped)
     return transactions
 
 
-def parse_universal_csv(content: str) -> list[dict[str, Any]]:
+def parse_universal_csv(content: str, report: dict | None = None) -> list[dict[str, Any]]:
     """Универсальный CSV-парсер: сам находит строку-заголовок и колонки даты/суммы.
 
     Работает с любым банком, где в CSV есть дата и сумма (одной знаковой колонкой
@@ -261,7 +345,7 @@ def parse_universal_csv(content: str) -> list[dict[str, Any]]:
     head = content[:2000]
     delimiter = ';' if head.count(';') > head.count(',') else ','
     cells_rows = list(csv.reader(io.StringIO(content), delimiter=delimiter))
-    return _rows_to_transactions(_table_rows(cells_rows))
+    return _rows_to_transactions(_table_rows(cells_rows), report)
 
 
 def parse_xlsx(raw: bytes, bank_id: str = 'universal') -> list[dict[str, Any]]:
@@ -762,11 +846,19 @@ def detect_pdf_bank(raw: bytes) -> str | None:
     return detect_bank(text)
 
 
-def parse_bank_statement(content: str, bank_id: str = 'universal') -> list[dict[str, Any]]:
-    """Выбирает парсер по содержимому/bank_id и парсит выписку."""
+def parse_bank_statement(content: str, bank_id: str = 'universal',
+                         report: dict | None = None) -> list[dict[str, Any]]:
+    """Выбирает парсер по содержимому/bank_id и парсит выписку.
+
+    `report` (опционально) заполняется статистикой разбора: сколько строк было, сколько
+    операций распознано и сколько пропущено с какими причинами. Для CSV это единственная
+    доступная проверка: контрольных сумм CSV не несёт.
+    """
     if content.lstrip().startswith('1CClientBankExchange'):
         return parse_1c_exchange(content)
     parser = BANK_PARSERS.get(bank_id, parse_universal_csv)
+    if parser in (parse_tinkoff_csv, parse_universal_csv):
+        return parser(content, report)
     return parser(content)
 
 
