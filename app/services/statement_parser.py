@@ -14,7 +14,6 @@ from __future__ import annotations
 import csv
 import io
 import re
-from dataclasses import dataclass
 from datetime import datetime
 from typing import Any
 
@@ -345,31 +344,113 @@ def parse_tinkoff_pdf(raw: bytes) -> list[dict[str, Any]]:
 
 
 # ── PDF-выписка ВТБ (табличная сетка → extract_tables) ────────────────────
+# У ВТБ несколько шаблонов выписки, и колонки в них СДВИНУТЫ друг относительно друга:
+#   A) [дата, дата обработки, сумма в валюте операции, Приход, Расход, Комиссия, Описание]
+#   B) [дата, дата обработки, сумма в валюте операции, Приход, Расход, Описание,
+#       Наименование получателя/отправителя]
+# В шаблоне B индекс 5 — ОПИСАНИЕ, а не комиссия. Жёсткая привязка к индексам читала текст
+# описания как число (`_num('Перевод 1500') = 1500.0` — молчаливая порча суммы) и брала
+# описание из колонки контрагента. Поэтому колонки определяются по шапке; позиционная
+# раскладка A — фолбэк, если шапки в таблице нет.
+_VTB_ROLES = (
+    ('prihod', ('приход',)),
+    ('rashod', ('расход',)),
+    ('komis', ('комисси',)),
+    ('desc', ('описание',)),
+    ('party', ('наименование', 'получател', 'отправител')),
+    ('signed', ('сумма',)),
+)
+_VTB_LEGACY_MAP = {'signed': 2, 'prihod': 3, 'rashod': 4, 'komis': 5, 'desc': 6}
+
+# В колонку «Комиссия» ВТБ кладёт и списания (комиссия за обслуживание счёта), и
+# ЗАЧИСЛЕНИЯ (кешбэк по программе лояльности) — при нулевых Приход/Расход/сумме.
+# Направление кодируется только в описании: на реальной выписке кешбэк 656 ₽ уходил в
+# расход, и приход недосчитывался ровно на эту сумму (сверка с итогами банка).
+_VTB_CREDIT_WORDS = ('зачислен', 'кешбэк', 'кэшбэк', 'возврат', 'начислен',
+                     'процент', 'пополнен', 'поступлен')
+
+
+def _vtb_is_credit(description: str) -> bool:
+    """Зачисление ли это, если сумма стоит в колонке «Комиссия» (кешбэк/возврат/проценты)."""
+    low = _norm(description)
+    return any(word in low for word in _VTB_CREDIT_WORDS)
+
+
+def _vtb_column_map(table: list) -> dict[str, int]:
+    """Индексы колонок ВТБ по тексту (двухрядной) шапки. Пусто, если шапки в таблице нет."""
+    header: dict[int, str] = {}
+    for row in table:
+        if not row:
+            continue
+        if row[0] and re.match(r'\d{2}\.\d{2}\.\d{4}', str(row[0])):
+            break  # начались строки операций
+        for i, cell in enumerate(row):
+            if cell:
+                header[i] = f"{header.get(i, '')} {_norm(cell)}".strip()
+    roles: dict[str, int] = {}
+    for i, text in header.items():
+        for role, markers in _VTB_ROLES:
+            if role not in roles and any(mk in text for mk in markers):
+                roles[role] = i
+                break
+    return roles
+
+
+def _vtb_row_to_transaction(row: list, cmap: dict[str, int], date_s: str) -> dict[str, Any] | None:
+    """Строка таблицы ВТБ → транзакция по карте колонок (или None, если движения нет)."""
+    def num(role: str) -> float:
+        i = cmap.get(role)
+        return (_num(row[i]) or 0.0) if i is not None and i < len(row) else 0.0
+
+    def text(role: str) -> str:
+        i = cmap.get(role)
+        if i is None or i >= len(row) or not row[i]:
+            return ''
+        return re.sub(r'\s+', ' ', str(row[i])).strip()
+
+    prihod, rashod, komis, signed = num('prihod'), num('rashod'), num('komis'), num('signed')
+    if prihod or rashod:      # движение в раздельных колонках (Расход бывает и со знаком)
+        amount = prihod - abs(rashod) - abs(komis)
+    elif signed:              # знаковая сумма одной колонкой
+        amount = signed - abs(komis)
+    elif komis:               # движение только в колонке «Комиссия»: знак — из описания
+        amount = abs(komis) if _vtb_is_credit(text('desc')) else -abs(komis)
+    else:
+        amount = 0.0
+    if amount == 0:
+        return None
+    desc, party = text('desc'), text('party')
+    if party and party not in desc:  # контрагент — сырьё для merchant-аналитики (FR-14)
+        desc = f"{desc} {party}".strip()
+    t_type, amount = _classify(amount)
+    return {
+        'amount': round(amount, 2),
+        'description': (desc or 'Операция')[:255],
+        'mcc': None,
+        'type': t_type,
+        'date': _parse_date(date_s).isoformat(),
+        'is_synced': True,
+    }
+
+
 def _vtb_table_to_transactions(tables: list) -> list[dict[str, Any]]:
-    """Таблицы pdfplumber ВТБ → транзакции. Колонки: [дата+время, дата обработки,
-    ЗНАКОВАЯ сумма в валюте операции, Приход, Расход, Комиссия, Описание].
-    Берём знаковую колонку (минус → расход), даёт и приход, и расход одной логикой."""
+    """Таблицы pdfplumber ВТБ → транзакции. Колонки — по шапке (шаблоны A и B), нетто по
+    счёту = Приход − Расход − Комиссия. Знаковая колонка «в валюте операции» у рублёвой
+    комиссии равна 0, поэтому опираться только на неё нельзя (давало 0 операций на живом
+    файле). Шапка повторяется на каждой странице; если её нет — берём карту предыдущей."""
     out: list[dict[str, Any]] = []
+    cmap: dict[str, int] = {}
     for table in tables:
+        cmap = _vtb_column_map(table) or cmap or dict(_VTB_LEGACY_MAP)
         for row in table:
             if not row or not row[0]:
                 continue
             m = re.match(r'(\d{2}\.\d{2}\.\d{4})', str(row[0]))
-            if not m:  # строки-заголовки таблицы
+            if not m:  # строки шапки таблицы
                 continue
-            amount = _num(row[2]) if len(row) > 2 else None
-            if amount is None or amount == 0:
-                continue
-            desc = re.sub(r'\s+', ' ', str(row[6])).strip() if len(row) > 6 and row[6] else ''
-            t_type, amount = _classify(amount)
-            out.append({
-                'amount': round(amount, 2),
-                'description': (desc or 'Операция')[:255],
-                'mcc': None,
-                'type': t_type,
-                'date': _parse_date(m.group(1)).isoformat(),
-                'is_synced': True,
-            })
+            txn = _vtb_row_to_transaction(row, cmap, m.group(1))
+            if txn:
+                out.append(txn)
     return out
 
 
@@ -564,166 +645,52 @@ def parse_bank_statement(content: str, bank_id: str = 'universal') -> list[dict[
     return parser(content)
 
 
-# ── Слой 0: детекция формата по СОДЕРЖИМОМУ + единая точка входа ───────────
-# Стратегия — docs/universal_statement_parser_strategy.md §3-4. Формат выписки
-# определяется по magic-байтам и сигнатуре, а НЕ по bank_id: это снимает
-# требование «знать банк заранее» и включает universal-путь по умолчанию.
-# bank_id остаётся ПОДСКАЗКОЙ (выбор выделенного парсера там, где он есть),
-# но детекция и деградация от него не зависят.
-
-_ENCODINGS = ("utf-8-sig", "utf-8", "cp1251", "windows-1251", "latin-1")
-
-_MT940_TAG = re.compile(r"^:\d{2}[A-Z]?:", re.MULTILINE)
-
-
-def _decode_text(raw: bytes) -> str | None:
-    """Байты выписки → текст с фолбэком кодировок (Тинькофф часто cp1251)."""
-    for enc in _ENCODINGS:
+# ── Декодирование сырых байтов выписки (CSV/1C) ────────────────────────────
+# cp1251 однобайтовая и НИКОГДА не падает, поэтому её нельзя пробовать первой —
+# utf-8-файл раскодируется в кашу. Правильный порядок: utf-8 (strict) первым; на
+# реальном cp1251 (кириллица = невалидный utf-8) он падает → фолбэк cp1251. Так
+# 1C от банков РФ (windows-1251, `Кодировка=Windows`) читается корректно.
+def decode_statement_bytes(raw: bytes) -> str:
+    """Байты текстовой выписки (CSV/1C) → строка. Перебор кодировок: utf-8 → cp1251."""
+    for enc in ('utf-8-sig', 'utf-8', 'cp1251', 'windows-1251', 'latin-1'):
         try:
             return raw.decode(enc)
-        except (UnicodeDecodeError, UnicodeError):
+        except UnicodeDecodeError:
             continue
+    return raw.decode('utf-8', errors='replace')
+
+
+# ── Детекция «это не выписка операций» (справки/реквизиты) ──────────────────
+# Банки в одном окне «выписки» отдают и справки об остатке, реквизиты, справки о
+# задолженности/вкладе/пенсиях. Операций там нет — парсер вернёт 0, и приложение
+# НЕ должно принять это за пустую выписку. Возвращаем человекочитаемую причину.
+_NON_STATEMENT_MARKERS = (
+    ('справка о доступном остатке', 'справка о доступном остатке'),
+    ('справка о состоянии вклада', 'справка о состоянии вклада'),
+    ('справка о задолженности', 'справка о задолженности'),
+    ('справка о наличии', 'справка о наличии счетов'),
+    ('справка о видах и размерах', 'справка о выплатах/пенсиях'),
+    ('реквизиты счёта', 'реквизиты счёта'),
+    ('реквизиты счета', 'реквизиты счёта'),
+)
+
+
+def classify_non_statement(text: str) -> str | None:
+    """Если текст PDF — справка/реквизиты, а не выписка операций, вернуть причину; иначе None."""
+    low = text.lower()
+    for marker, label in _NON_STATEMENT_MARKERS:
+        if marker in low:
+            return label
     return None
 
 
-def _looks_like_delimited_table(text: str) -> bool:
-    """Похоже на CSV: либо распознаётся строка-заголовок (дата+сумма), либо минимум
-    две строки дают >= 2 непустых поля по ; или ,.
-
-    Одна строка с запятой («Hello, world») или проза — не таблица (→ unknown): нет
-    ни заголовка, ни второй строки. Заголовок-только файл («Date,Amount») — CSV
-    (операций нет → статус empty на разборе).
-    """
-    for delimiter in (";", ","):
-        rows_with_fields = 0
-        for line in text.splitlines():
-            cells = line.split(delimiter)
-            if _is_header_row(cells):
-                return True
-            if len([c for c in cells if c.strip()]) >= 2:
-                rows_with_fields += 1
-                if rows_with_fields >= 2:
-                    return True
-    return False
-
-
-def detect_format(raw: bytes) -> str:
-    """Семейство формата по содержимому: xlsx | pdf | 1c | mt940 | csv | unknown.
-
-    Порядок важен: 1C-префикс проверяется до CSV (в 1C есть '=' и ','), чтобы
-    обмен «банк-клиент» не уходил в CSV-парсер.
-    """
-    if not raw:
-        return "unknown"
-    if raw[:4] == b"PK\x03\x04":      # ZIP-контейнер → XLSX
-        return "xlsx"
-    if raw[:4] == b"%PDF":            # PDF magic
-        return "pdf"
-
-    text = _decode_text(raw)
-    if text is None:
-        return "unknown"
-    if text.lstrip().startswith("1CClientBankExchange"):
-        return "1c"
-    tags = _MT940_TAG.findall(text)
-    if ":61:" in text and (":20:" in text or ":86:" in text) and len(tags) >= 3:
-        return "mt940"
-    if _looks_like_delimited_table(text):
-        return "csv"
-    return "unknown"
-
-
-def _pdf_has_text_layer(raw: bytes) -> bool:
-    """Есть ли в PDF извлекаемый текстовый слой (иначе — скан, нужен OCR).
-
-    pdfplumber недоступен или чтение упало — отдаём True (не путаем ошибку
-    разбора со сканом; пусть решает парсер).
-    """
+def pdf_non_statement_reason(raw: bytes) -> str | None:
+    """Причина, по которой PDF — не выписка операций (справка/реквизиты), или None."""
     if pdfplumber is None:
-        return True
+        return None
     try:
         with pdfplumber.open(io.BytesIO(raw)) as pdf:
-            for page in pdf.pages[:3]:
-                if (page.extract_text() or "").strip():
-                    return True
-        return False
-    except Exception:  # noqa: BLE001 — любая ошибка чтения PDF не равна «скан»
-        return True
-
-
-@dataclass(frozen=True)
-class StatementParseResult:
-    """Итог разбора выписки: операции + распознанный формат + статус + сообщение.
-
-    status: ok (есть операции) | empty (формат распознан, операций нет) |
-            needs_ocr (скан-PDF) | unsupported (формат не распознан / не реализован).
-    message — user-facing (RU) для не-ok статусов (Слой 5, вежливая деградация).
-    """
-    transactions: list[dict[str, Any]]
-    format: str
-    status: str
-    message: str = ""
-
-
-_MSG_NEEDS_OCR = (
-    "Похоже, это скан-выписка (PDF без текстового слоя). Распознавание сканов пока "
-    "не поддерживается — выгрузите выписку в CSV, XLSX, 1C или PDF с текстовым слоем."
-)
-_MSG_UNKNOWN = (
-    "Не удалось определить формат выписки. Поддерживаются CSV, XLSX, PDF "
-    "(Тинькофф/ВТБ/Сбер/Райффайзен) и 1C. Проще всего выгрузить CSV или XLSX."
-)
-_MSG_MT940 = (
-    "Формат MT940 (SWIFT) пока не поддерживается. Выгрузите выписку в CSV, XLSX или 1C."
-)
-_MSG_EMPTY = {
-    "csv": "Формат распознан (CSV), но операции не найдены — проверьте, что в файле "
-           "есть таблица с датой и суммой.",
-    "xlsx": "Формат распознан (XLSX), но операции не найдены — проверьте, что в файле "
-            "есть таблица с датой и суммой.",
-    "pdf": "Формат распознан (PDF с текстом), но операции не распознаны — возможно, банк "
-           "не поддержан или сменил раскладку. Попробуйте выгрузить CSV или XLSX.",
-    "1c": "Формат распознан (1C), но операции не найдены в файле обмена.",
-}
-
-
-def parse_statement(raw: bytes, bank_id: str | None = None) -> StatementParseResult:
-    """Единая точка входа: детекция формата по содержимому → разбор → результат.
-
-    bank_id — только подсказка для выбора выделенного парсера (PDF/CSV гигантов);
-    определение формата и деградация от него не зависят.
-    """
-    fmt = detect_format(raw)
-
-    if fmt == "unknown":
-        return StatementParseResult([], fmt, "unsupported", _MSG_UNKNOWN)
-    if fmt == "mt940":
-        return StatementParseResult([], fmt, "unsupported", _MSG_MT940)
-
-    txns: list[dict[str, Any]] = []
-    if fmt == "xlsx":
-        try:
-            txns = parse_xlsx(raw, bank_id or "universal")
-        except ValueError as exc:
-            return StatementParseResult([], fmt, "unsupported", str(exc))
-    elif fmt == "pdf":
-        if not _pdf_has_text_layer(raw):
-            return StatementParseResult([], fmt, "needs_ocr", _MSG_NEEDS_OCR)
-        try:
-            txns = parse_bank_pdf(raw, bank_id or "tinkoff")
-        except ValueError as exc:
-            return StatementParseResult([], fmt, "unsupported", str(exc))
-    else:  # 1c / csv
-        content = _decode_text(raw)
-        if content is None:
-            return StatementParseResult(
-                [], fmt, "unsupported", "Не удалось определить кодировку файла."
-            )
-        if fmt == "1c":
-            txns = parse_1c_exchange(content)
-        else:
-            txns = parse_bank_statement(content, bank_id or "universal")
-
-    if txns:
-        return StatementParseResult(txns, fmt, "ok")
-    return StatementParseResult([], fmt, "empty", _MSG_EMPTY.get(fmt, _MSG_UNKNOWN))
+            text = "\n".join((pg.extract_text() or "") for pg in pdf.pages[:2])
+    except Exception:
+        return None
+    return classify_non_statement(text)
