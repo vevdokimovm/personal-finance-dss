@@ -1,0 +1,11 @@
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I"]
+ignore = ["E731", "E501"]
+
+[tool.ruff.lint.per-file-ignores]
+# env-переменные выставляются до импорта приложения (паттерн тестовой БД)
+"tests/conftest.py" = ["E402"]

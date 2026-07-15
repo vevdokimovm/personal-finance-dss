@@ -1,0 +1,280 @@
+"""Инварианты мат-модели v3.3.0 — исполняемая спецификация для свипа.
+
+Каждая проверка возвращает список нарушений вида "I<n>: ...". Пустой список = чисто.
+Канон: docs/math_model_v3_3_0.md + app/core (filtering, ranking, alternatives,
+crisis, forecast).
+
+Изменения v3.1.0 (по независимой экспертизе, 12 000 портретов × 4 эксперта):
+  I3  — гейт ПДН: Dt' <= max(0.40, Dt_до) — план не увеличивает нагрузку (G3);
+  I5  — best = ranked[0] при лексикографическом порядке (floor_level, utility);
+  I6  — + lt_target профилей в коридоре 3–6 мес, нестрого убывает с риском (G1);
+  I12 — кризисный охват: Rt < 0 => план с действиями, дефицит сходится (G2);
+  I13 — floor-оптимальность: best заполняет стартовый месяц ликвидности
+        не хуже любой допустимой альтернативы (G6).
+
+Изменения v3.2.0 (продолжение калибровки, G4/G5/G7):
+  I10 — + ПДН при нулевом доходе с платежами = 1.0 (G7);
+  I14 — слой запаса: при излишке сверх Lt*·Σe план разовых ходов существует,
+        целевая подушка не нарушается, излишек разворачивается целиком (G4);
+        при Rt < 0 слой выключен (запасом владеет кризисный модуль).
+"""
+from __future__ import annotations
+
+import math
+from typing import Any
+
+from datetime import datetime
+
+from app.core.forecast import monte_carlo_intervals, ses_forecast
+from app.core.goals_priority import preallocate_from_bliq
+from app.core.ranking import RISK_PROFILES
+
+EPS_MONEY = 0.05
+EPS_SHARE = 0.05
+DT_MAX = 0.40
+
+
+def check_static_profiles() -> list[str]:
+    """I6: веса профилей — суммы = 1, нестрогая монотонность (плато 2–3 по w_goals)."""
+    v: list[str] = []
+    for r, p in RISK_PROFILES.items():
+        s = p["w_rt"] + p["w_lt"] + p["w_dt"] + p["w_goals"]
+        if abs(s - 1.0) > 1e-9:
+            v.append(f"I6: профиль {r} — сумма весов {s} != 1")
+    order = sorted(RISK_PROFILES)
+    for key, increasing in (("w_goals", True), ("w_rt", True), ("w_lt", False), ("w_dt", False)):
+        vals = [RISK_PROFILES[r][key] for r in order]
+        if increasing:
+            ok = all(b >= a for a, b in zip(vals, vals[1:]))
+        else:
+            ok = all(b <= a for a, b in zip(vals, vals[1:]))
+        if not ok:
+            v.append(f"I6: {key} не монотонен (нестрого) по профилям: {vals}")
+    targets = [RISK_PROFILES[r]["lt_target"] for r in order]
+    if any(not (3.0 <= t <= 6.0) for t in targets):
+        v.append(f"I6: lt_target вне коридора 3–6 мес: {targets}")
+    if any(b > a for a, b in zip(targets, targets[1:])):
+        v.append(f"I6: lt_target не убывает (нестрого) с риском: {targets}")
+    return v
+
+
+def _finite_scan(node: Any, path: str, out: list[str]) -> None:
+    if isinstance(node, float) and not math.isfinite(node):
+        out.append(f"I11: не-конечное число в {path}: {node}")
+    elif isinstance(node, dict):
+        for k, x in node.items():
+            _finite_scan(x, f"{path}.{k}", out)
+    elif isinstance(node, list):
+        for i, x in enumerate(node[:80]):
+            _finite_scan(x, f"{path}[{i}]", out)
+
+
+def expected_grid_size(portrait: dict[str, Any], today: datetime) -> int:
+    """Спецификация |A|: 66 — полная решётка (обе оси активны); вырожденная
+    ось схлопывает до 11; обе мертвы — 1 («всё в резерв»); Rt<=0 — 1 (fail-loud).
+    Ось целей считается ПОСЛЕ преаллокации подушки (она может закрыть цели)."""
+    payments = sum(o["monthly_payment"] for o in portrait["obligations"])
+    rt = portrait["income_total"] - portrait["expense_total"] - payments
+    if rt <= 1e-9:
+        return 1
+    _, _, active_goals = preallocate_from_bliq(
+        portrait["bliq"], portrait["goals"], today
+    )
+    goals_total = sum(
+        max(0.0, float(g.get("target_amount", 0)) - float(g.get("current_amount", 0)))
+        for g in active_goals
+    )
+    debt_axis = payments > 0
+    goal_axis = goals_total > 0
+    if debt_axis and goal_axis:
+        return 66
+    if debt_axis or goal_axis:
+        return 11
+    return 1
+
+
+def check_result(
+    portrait: dict[str, Any],
+    result: dict[str, Any],
+    today: datetime = datetime(2026, 7, 2, 12, 0, 0),
+) -> list[str]:
+    v: list[str] = []
+    income = portrait["income_total"]
+    expenses = portrait["expense_total"]
+    payments = sum(o["monthly_payment"] for o in portrait["obligations"])
+    rt_expected = income - expenses - payments
+
+    total = result["alternatives_total"]
+    expected_total = expected_grid_size(portrait, today)
+    if total != expected_total:
+        v.append(f"I1: |A| = {total}, ожидалось {expected_total} (rt={rt_expected:.2f})")
+
+    if result["admissible_count"] + result["rejected_count"] != total:
+        v.append("I2: admissible + rejected != |A|")
+
+    dt_before = payments / income if income > 0 else 0.0
+    dt_limit = max(DT_MAX, dt_before)
+    ranked = result.get("ranked", [])
+    rejected = result.get("rejected", [])
+    for alt in ranked:
+        if alt["Rt_new"] < -EPS_MONEY:
+            v.append(
+                f"I3: допустимая альтернатива с Rt_new={alt['Rt_new']} < 0 ({alt.get('name')})"
+            )
+        if alt["Dt_new"] > dt_limit + 5e-5:
+            v.append(
+                f"I3: допустимая альтернатива с Dt_new={alt['Dt_new']} > "
+                f"max(0.40, Dt_до={dt_before:.4f}) ({alt.get('name')})"
+            )
+    for alt in ranked + rejected:
+        if total > 1:
+            share_sum = (alt.get("x_obligations", 0) + alt.get("x_reserve", 0)
+                         + alt.get("x_goals", 0))
+            if abs(share_sum - max(rt_expected, 0.0)) > EPS_SHARE:
+                v.append(
+                    f"I4: сумма долей {share_sum:.2f} != R+ "
+                    f"{max(rt_expected, 0):.2f} ({alt.get('name')})"
+                )
+
+    best = result.get("best")
+    if (result["admissible_count"] == 0) != (best is None):
+        v.append("I5: best is None не согласован с admissible_count == 0 (fail-loud)")
+    if best is not None:
+        if not best.get("is_admissible"):
+            v.append("I5: best не является допустимой альтернативой")
+        if ranked:
+            best_key = (best.get("floor_level", 0.0), best["utility"])
+            top_key = max(
+                (a.get("floor_level", 0.0), a["utility"]) for a in ranked
+            )
+            if (abs(best_key[0] - top_key[0]) > 1e-9
+                    or abs(best_key[1] - top_key[1]) > 1e-9):
+                v.append(
+                    f"I5: best {best_key} != max по порядку (floor_level, utility) {top_key}"
+                )
+            # I13: floor-оптимальность — стартовый месяц ликвидности заполнен
+            # не хуже любой допустимой альтернативы (G6)
+            max_floor = max(a.get("floor_level", 0.0) for a in ranked)
+            if best.get("floor_level", 0.0) < max_floor - 1e-9:
+                v.append(
+                    f"I13: best.floor_level={best.get('floor_level')} < "
+                    f"достижимого {max_floor}"
+                )
+        detail = best.get("avalanche_detail") or {}
+        r_bench = detail.get("r_bench", portrait["r_bench"])
+        passed = detail.get("passed", [])
+        skipped = detail.get("skipped", [])
+        for o in passed:
+            if o["interest_rate"] < r_bench - 1e-9:
+                v.append(
+                    f"I7: досрочка по ставке {o['interest_rate']} < r_bench {r_bench}"
+                )
+        for o in skipped:
+            if o["interest_rate"] >= r_bench - 1e-9:
+                v.append(
+                    f"I7: пропуск долга со ставкой {o['interest_rate']} >= r_bench {r_bench}"
+                )
+        rates = [o["interest_rate"] for o in passed]
+        if rates != sorted(rates, reverse=True):
+            v.append("I7: порядок Avalanche нарушен (не по убыванию ставки)")
+        if expenses > 0:
+            bliq_after = result["indicators"]["Bliq"]
+            # Резерв эффективный = номинальный + переток нераспределённого остатка
+            # целей (G7-остаток, ADR-009). Lt' обязан отражать деньги, ушедшие в
+            # подушку из-за насыщения целей; иначе они бы «испарились» из плана.
+            x_res_eff = best.get("x_reserve_effective", best.get("x_reserve", 0))
+            lt_expected = (bliq_after + x_res_eff) / expenses
+            if abs(best["Lt_new"] - lt_expected) > 0.002:
+                v.append(f"I10: Lt_new={best['Lt_new']} != (Bliq+x_res_eff)/Et={lt_expected:.4f}")
+
+    ind = result["indicators"]
+    if income > 0 and abs(ind["Dt"] - payments / income) > 1e-3:
+        v.append(f"I10: indicators.Dt={ind['Dt']} != SigmaP/It={payments / income:.4f}")
+    elif income <= 0 and payments > 0 and abs(ind["Dt"] - 1.0) > 1e-9:
+        v.append(f"I10: при нулевом доходе с платежами Dt={ind['Dt']} != 1.0 (G7)")
+    if expenses > 0:
+        lt_ind = ind["Bliq"] / expenses
+        if abs(ind["Lt"] - lt_ind) > 0.002:
+            v.append(f"I10: indicators.Lt={ind['Lt']} != Bliq/Et={lt_ind:.4f} (stock-based)")
+
+    # I12: кризисный охват (G2) — в дефиците модель обязана давать план действий
+    crisis = result.get("crisis_plan")
+    if rt_expected < -EPS_MONEY:
+        if crisis is None:
+            v.append("I12: Rt < 0, но crisis_plan отсутствует (молчание в дефиците)")
+        else:
+            if abs(crisis["deficit"] - (-rt_expected)) > EPS_MONEY:
+                v.append(
+                    f"I12: crisis.deficit={crisis['deficit']} != |Rt|={-rt_expected:.2f}"
+                )
+            if not crisis.get("actions"):
+                v.append("I12: кризисный план без единого действия")
+            if crisis.get("severity") not in (
+                "recoverable_from_liquidity", "cut_required", "critical"
+            ):
+                v.append(f"I12: неизвестная severity: {crisis.get('severity')}")
+            closure = next(
+                (a for a in crisis.get("actions", [])
+                 if a["type"] == "close_debts_from_liquidity"), None,
+            )
+            if closure is not None:
+                if closure["new_rt"] < -EPS_MONEY:
+                    v.append(f"I12: балансовый ход не развернул поток: {closure['new_rt']}")
+                if closure["bliq_used"] > portrait["bliq"] + EPS_MONEY:
+                    v.append("I12: балансовый ход тратит больше подушки, чем есть")
+                if expenses > 0 and closure["bliq_remaining"] < expenses - EPS_MONEY:
+                    v.append(
+                        f"I12: после хода подушка {closure['bliq_remaining']} "
+                        f"ниже floor (1 мес = {expenses})"
+                    )
+    elif crisis is not None:
+        v.append("I12: crisis_plan присутствует при Rt >= 0")
+
+    # I14: слой запаса (G4, v3.2.0)
+    surplus = result.get("surplus_plan")
+    if rt_expected < -EPS_MONEY:
+        if surplus is not None:
+            v.append("I14: surplus_plan присутствует при Rt < 0 (запасом владеет кризис)")
+    elif surplus is not None:
+        if surplus["bliq_after"] < surplus["reserve_target"] - EPS_MONEY:
+            v.append(
+                f"I14: разовые ходы пробили целевую подушку: bliq_after="
+                f"{surplus['bliq_after']} < target={surplus['reserve_target']}"
+            )
+        deployed = sum(m["amount"] for m in surplus.get("moves", []))
+        if abs(deployed - surplus["deployable"]) > EPS_MONEY:
+            v.append(
+                f"I14: излишек развёрнут не целиком: {deployed} != {surplus['deployable']}"
+            )
+        for m in surplus.get("moves", []):
+            if m["amount"] < -EPS_MONEY:
+                v.append(f"I14: отрицательный ход {m}")
+
+    _finite_scan(
+        {"indicators": ind, "best": best, "crisis_plan": crisis,
+         "surplus_plan": surplus},
+        "result", v,
+    )
+    return v
+
+
+def check_forecast_functions() -> list[str]:
+    """I9: SES + Monte-Carlo — длины, порядок перцентилей, детерминизм при seed."""
+    v: list[str] = []
+    hist = [100.0, 120.0, 90.0, 110.0, 105.0, 130.0]
+    for horizon in (1, 3, 6):
+        pts = ses_forecast(hist, horizon=horizon)
+        if len(pts) != horizon:
+            v.append(f"I9: ses_forecast горизонт {horizon} вернул {len(pts)} точек")
+        ivs = monte_carlo_intervals(pts, horizon=horizon, seed=42)
+        if len(ivs) != horizon:
+            v.append(f"I9: monte_carlo горизонт {horizon} вернул {len(ivs)} интервалов")
+        for h, iv in enumerate(ivs, start=1):
+            if not (iv["p10"] <= iv["p50"] <= iv["p90"]):
+                v.append(f"I9: нарушен порядок p10<=p50<=p90 на h={h}: {iv}")
+        if ivs != monte_carlo_intervals(pts, horizon=horizon, seed=42):
+            v.append(f"I9: monte_carlo недетерминирован при фиксированном seed (h={horizon})")
+    flat = ses_forecast([50.0] * 8, horizon=3)
+    if any(abs(x - 50.0) > 1e-6 for x in flat):
+        v.append(f"I9: SES на константной истории дал {flat}, ожидалась константа")
+    return v

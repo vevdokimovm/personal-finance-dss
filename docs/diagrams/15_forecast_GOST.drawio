@@ -1,0 +1,95 @@
+<mxfile host="app.diagrams.net" type="device">
+  <diagram name="ГОСТ — прогноз SES + Monte-Carlo" id="forecast-gost">
+    <mxGraphModel dx="1000" dy="700" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="800" pageHeight="1250" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <mxCell id="title" value="FINPILOT — Прогнозирование показателей (SES + Monte-Carlo), ГОСТ 19.701-90" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=14;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="120" y="15" width="560" height="30" as="geometry" />
+        </mxCell>
+
+        <!-- start -->
+        <mxCell id="s" value="Начало: forecast_indicator(history, h)" style="rounded=1;whiteSpace=wrap;html=1;arcSize=40;fillColor=#f5f5f5;strokeColor=#666666;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="280" y="60" width="240" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- input -->
+        <mxCell id="in" value="Ввод: ряд history,&#10;горизонт h, α = 0.3, N = 1000" style="shape=parallelogram;perimeter=parallelogramPerimeter;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="270" y="145" width="260" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- decision: достаточно истории? -->
+        <mxCell id="d1" value="len(history) ≥ 2?" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="310" y="240" width="180" height="100" as="geometry" />
+        </mxCell>
+
+        <!-- fallback -->
+        <mxCell id="fb" value="Возврат: плоский прогноз&#10;(последнее значение × h)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="560" y="255" width="200" height="70" as="geometry" />
+        </mxCell>
+
+        <!-- process: SES -->
+        <mxCell id="p1" value="Этап 1. Сглаживание (Brown SES):&#10;Lₜ = α·yₜ + (1−α)·Lₜ₋₁&#10;уровень ряда на каждом шаге" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="290" y="380" width="220" height="80" as="geometry" />
+        </mxCell>
+
+        <!-- process: trend -->
+        <mxCell id="p2" value="Этап 2. Оценка тренда b&#10;по сглаженным уровням&#10;(линейная аппроксимация)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="290" y="490" width="220" height="80" as="geometry" />
+        </mxCell>
+
+        <!-- process: point forecast -->
+        <mxCell id="p3" value="Этап 3. Точечный прогноз&#10;ŷₜ₊ₕ = Lₜ + b·h&#10;для h шагов вперёд" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="290" y="600" width="220" height="80" as="geometry" />
+        </mxCell>
+
+        <!-- prep: sigma -->
+        <mxCell id="prep" value="Подготовка: σ₀ = std(остатки),&#10;σ(h) = σ₀·√(1 + 0.5·h)" style="shape=hexagon;perimeter=hexagonPerimeter2;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="285" y="710" width="230" height="70" as="geometry" />
+        </mxCell>
+
+        <!-- predefined process: Monte-Carlo loop -->
+        <mxCell id="mc" value="Этап 4. Monte-Carlo (N = 1000):&#10;для каждой симуляции добавить шум&#10;εₕ ~ N(0, σ(h)²) к точечному прогнозу" style="shape=process;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="280" y="810" width="240" height="80" as="geometry" />
+        </mxCell>
+
+        <!-- process: percentiles -->
+        <mxCell id="pc" value="Этап 5. Перцентили по ансамблю:&#10;p10, p50 (медиана), p90&#10;= доверительный интервал" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="290" y="920" width="220" height="80" as="geometry" />
+        </mxCell>
+
+        <!-- output -->
+        <mxCell id="out" value="Вывод: {point: ŷ, lower: p10,&#10;median: p50, upper: p90}" style="shape=parallelogram;perimeter=parallelogramPerimeter;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="280" y="1030" width="240" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- end -->
+        <mxCell id="e" value="Конец" style="rounded=1;whiteSpace=wrap;html=1;arcSize=40;fillColor=#f5f5f5;strokeColor=#666666;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="340" y="1130" width="120" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- объединение веток -->
+        <mxCell id="merge" value="" style="ellipse;whiteSpace=wrap;html=1;fillColor=#666666;strokeColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="394" y="1145" width="12" height="12" as="geometry" />
+        </mxCell>
+
+        <!-- ===== связи ===== -->
+        <mxCell id="a1" style="endArrow=block;html=1;rounded=0;" edge="1" parent="1" source="s" target="in"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="a2" style="endArrow=block;html=1;rounded=0;" edge="1" parent="1" source="in" target="d1"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="a3" value="Нет" style="endArrow=block;html=1;rounded=0;fontSize=11;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="d1" target="fb"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="a4" value="Да" style="endArrow=block;html=1;rounded=0;fontSize=11;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="d1" target="p1"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="a5" style="endArrow=block;html=1;rounded=0;" edge="1" parent="1" source="p1" target="p2"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="a6" style="endArrow=block;html=1;rounded=0;" edge="1" parent="1" source="p2" target="p3"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="a7" style="endArrow=block;html=1;rounded=0;" edge="1" parent="1" source="p3" target="prep"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="a8" style="endArrow=block;html=1;rounded=0;" edge="1" parent="1" source="prep" target="mc"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="a9" style="endArrow=block;html=1;rounded=0;" edge="1" parent="1" source="mc" target="pc"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="a10" style="endArrow=block;html=1;rounded=0;" edge="1" parent="1" source="pc" target="out"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="a11" style="endArrow=block;html=1;rounded=0;" edge="1" parent="1" source="out" target="e"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <!-- fallback -> merge -> end -->
+        <mxCell id="a12" style="endArrow=none;html=1;rounded=0;" edge="1" parent="1" source="fb" target="merge"><mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="660" y="1151" /></Array></mxGeometry></mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

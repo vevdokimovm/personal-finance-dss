@@ -1,0 +1,89 @@
+<mxfile host="app.diagrams.net" type="device">
+  <diagram name="VSM — поток создания ценности" id="vsm">
+    <mxGraphModel dx="1000" dy="700" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1300" pageHeight="700" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <mxCell id="title" value="FINPILOT — Карта потока создания ценности (VSM): от данных до решения" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=15;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="350" y="15" width="600" height="30" as="geometry" />
+        </mxCell>
+
+        <!-- Источник -->
+        <mxCell id="src" value="Пользователь&#10;(вход)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="60" y="120" width="120" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- Процессы (process boxes) -->
+        <mxCell id="p1" value="Ввод / импорт&#10;данных" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="240" y="120" width="130" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="p2" value="Расчёт&#10;показателей" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="440" y="120" width="130" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="p3" value="Генерация +&#10;оценка альтернатив" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="640" y="120" width="130" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="p4" value="Фильтрация +&#10;ранжирование" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="840" y="120" width="130" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="p5" value="Объяснение&#10;(NLG)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="1040" y="120" width="130" height="70" as="geometry" />
+        </mxCell>
+
+        <!-- Потребитель -->
+        <mxCell id="dst" value="Решение&#10;(выход)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1230" y="120" width="60" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- Data boxes под процессами -->
+        <mxCell id="db1" value="ручной ввод:&#10;может занять&#10;дни/недели&#10;(вне системы)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="240" y="220" width="130" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="db2" value="VA: ~5 мс&#10;метрики из&#10;транзакций" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="440" y="220" width="130" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="db3" value="VA: ~50 мс&#10;21 альт. ×&#10;Avalanche+Si" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="640" y="220" width="130" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="db4" value="VA: ~5 мс&#10;SAW по&#10;допустимым" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="840" y="220" width="130" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="db5" value="VA: ~2 мс&#10;шаблоны&#10;Top-3" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="1040" y="220" width="130" height="80" as="geometry" />
+        </mxCell>
+
+        <!-- material flow (push arrows) -->
+        <mxCell id="m0" style="endArrow=block;html=1;rounded=0;strokeWidth=2;" edge="1" parent="1" source="src" target="p1"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="m1" style="endArrow=block;html=1;rounded=0;strokeWidth=2;" edge="1" parent="1" source="p1" target="p2"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="m2" style="endArrow=block;html=1;rounded=0;strokeWidth=2;" edge="1" parent="1" source="p2" target="p3"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="m3" style="endArrow=block;html=1;rounded=0;strokeWidth=2;" edge="1" parent="1" source="p3" target="p4"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="m4" style="endArrow=block;html=1;rounded=0;strokeWidth=2;" edge="1" parent="1" source="p4" target="p5"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="m5" style="endArrow=block;html=1;rounded=0;strokeWidth=2;" edge="1" parent="1" source="p5" target="dst"><mxGeometry relative="1" as="geometry" /></mxCell>
+
+        <!-- Timeline (lead time / VA ladder) -->
+        <mxCell id="tl_label" value="Timeline" style="text;html=1;align=right;fontSize=11;fontStyle=1;fillColor=none;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="120" y="400" width="100" height="20" as="geometry" />
+        </mxCell>
+
+        <!-- ступенька: верх = ожидание (NVA), низ = обработка (VA) -->
+        <mxCell id="ladder" value="" style="shape=step;perimeter=stepPerimeter;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#333333;" vertex="1" parent="1">
+          <mxGeometry x="240" y="410" width="930" height="40" as="geometry" />
+        </mxCell>
+
+        <mxCell id="nva" value="Lead Time ≈ дни (ручной сбор данных пользователем — главные потери, вне ПО)" style="text;html=1;align=center;fontSize=10;fontColor=#b85450;fillColor=none;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="240" y="455" width="600" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="va" value="Processing Time (VA) ≈ 62 мс — полный расчётный цикл СППР после нажатия кнопки" style="text;html=1;align=center;fontSize=10;fontColor=#82b366;fontStyle=1;fillColor=none;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="240" y="490" width="600" height="20" as="geometry" />
+        </mxCell>
+
+        <!-- вывод -->
+        <mxCell id="concl" value="Вывод VSM: вычислительная ценность создаётся за десятки миллисекунд; основное «время потока» — ручной ввод данных.&#10;Точка улучшения — автоматизация импорта (банковские выписки), что и реализовано через statement_parser." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontSize=11;align=left;verticalAlign=middle;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="240" y="540" width="930" height="80" as="geometry" />
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

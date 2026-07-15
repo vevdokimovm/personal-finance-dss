@@ -1,0 +1,81 @@
+<mxfile host="app.diagrams.net" type="device">
+  <diagram name="State Machine — жизненный цикл альтернативы" id="state-machine">
+    <mxGraphModel dx="1000" dy="700" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="950" pageHeight="850" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <mxCell id="title" value="FINPILOT — Жизненный цикл альтернативы (UML State Machine)" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=15;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="230" y="15" width="500" height="30" as="geometry" />
+        </mxCell>
+
+        <!-- initial -->
+        <mxCell id="init" value="" style="ellipse;html=1;fillColor=#000000;strokeColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="445" y="70" width="24" height="24" as="geometry" />
+        </mxCell>
+
+        <!-- Generated -->
+        <mxCell id="s_gen" value="Generated" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=13;fontStyle=1;arcSize=30;" vertex="1" parent="1">
+          <mxGeometry x="385" y="130" width="150" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- Evaluated -->
+        <mxCell id="s_eval" value="Evaluated" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=13;fontStyle=1;arcSize=30;" vertex="1" parent="1">
+          <mxGeometry x="385" y="240" width="150" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- Admissible -->
+        <mxCell id="s_adm" value="Admissible" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=13;fontStyle=1;arcSize=30;" vertex="1" parent="1">
+          <mxGeometry x="385" y="360" width="150" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- Rejected -->
+        <mxCell id="s_rej" value="Rejected" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=13;fontStyle=1;arcSize=30;" vertex="1" parent="1">
+          <mxGeometry x="680" y="240" width="150" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- Ranked -->
+        <mxCell id="s_rank" value="Ranked" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=13;fontStyle=1;arcSize=30;" vertex="1" parent="1">
+          <mxGeometry x="385" y="480" width="150" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- Recommended -->
+        <mxCell id="s_rec" value="Recommended" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=13;fontStyle=1;arcSize=30;" vertex="1" parent="1">
+          <mxGeometry x="250" y="590" width="150" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- NotSelected -->
+        <mxCell id="s_not" value="NotSelected" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=13;fontStyle=1;arcSize=30;" vertex="1" parent="1">
+          <mxGeometry x="520" y="590" width="150" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- Explained -->
+        <mxCell id="s_exp" value="Explained" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=13;fontStyle=1;arcSize=30;" vertex="1" parent="1">
+          <mxGeometry x="250" y="690" width="150" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- final -->
+        <mxCell id="final" value="" style="ellipse;html=1;fillColor=#ffffff;strokeColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="448" y="780" width="28" height="28" as="geometry" />
+        </mxCell>
+        <mxCell id="final_inner" value="" style="ellipse;html=1;fillColor=#000000;strokeColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="454" y="786" width="16" height="16" as="geometry" />
+        </mxCell>
+
+        <!-- ===== Переходы ===== -->
+        <mxCell id="t0" style="endArrow=block;html=1;edgeStyle=orthogonalEdgeStyle;rounded=0;" edge="1" parent="1" source="init" target="s_gen"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="t1" value="evaluate_alternative()&#10;Avalanche + Si + пересчёт Rt'/Lt'/Dt'" style="endArrow=block;html=1;edgeStyle=orthogonalEdgeStyle;rounded=0;fontSize=10;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="s_gen" target="s_eval"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="t2" value="проходит фильтр&#10;Rt'≥0 ∧ Lt'≥Lmin ∧ Dt'≤Dmax" style="endArrow=block;html=1;edgeStyle=orthogonalEdgeStyle;rounded=0;fontSize=10;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="s_eval" target="s_adm"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="t3" value="нарушено&#10;ограничение" style="endArrow=block;html=1;edgeStyle=orthogonalEdgeStyle;rounded=0;fontSize=10;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="s_eval" target="s_rej"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="t4" value="rank_alternatives()&#10;расчёт U(a) по SAW" style="endArrow=block;html=1;edgeStyle=orthogonalEdgeStyle;rounded=0;fontSize=10;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="s_adm" target="s_rank"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="t5" value="U(a) максимальна&#10;(a* первая)" style="endArrow=block;html=1;edgeStyle=orthogonalEdgeStyle;rounded=0;fontSize=10;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="s_rank" target="s_rec"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="t6" value="U(a) не&#10;максимальна" style="endArrow=block;html=1;edgeStyle=orthogonalEdgeStyle;rounded=0;fontSize=10;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="s_rank" target="s_not"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="t7" value="explain_alternative()&#10;gains / costs / insight" style="endArrow=block;html=1;edgeStyle=orthogonalEdgeStyle;rounded=0;fontSize=10;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="s_rec" target="s_exp"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="t8" style="endArrow=block;html=1;edgeStyle=orthogonalEdgeStyle;rounded=0;" edge="1" parent="1" source="s_exp" target="final"><mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="325" y="794" /></Array></mxGeometry></mxCell>
+        <mxCell id="t9" style="endArrow=block;html=1;edgeStyle=orthogonalEdgeStyle;rounded=0;" edge="1" parent="1" source="s_not" target="final"><mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="595" y="794" /></Array></mxGeometry></mxCell>
+        <mxCell id="t10" style="endArrow=block;html=1;edgeStyle=orthogonalEdgeStyle;rounded=0;" edge="1" parent="1" source="s_rej" target="final"><mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="880" y="794" /><mxPoint x="476" y="794" /></Array></mxGeometry></mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

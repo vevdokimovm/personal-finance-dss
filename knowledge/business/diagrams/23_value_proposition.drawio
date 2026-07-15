@@ -1,0 +1,45 @@
+<mxfile host="app.diagrams.net" type="device">
+  <diagram name="Value Proposition Canvas" id="vpc">
+    <mxGraphModel dx="1100" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1220" pageHeight="510" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <mxCell id="t" value="FINPILOT — Канва ценностного предложения (Value Proposition Canvas)" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=15;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="250" y="15" width="740" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="vmap" value="Карта ценности (Value Map)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=12;fontStyle=1;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="80" y="70" width="420" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="prod" value="Продукты и услуги&#10;&#10;• Веб-СППР по личным финансам&#10;• Рекомендация распределения денег&#10;• Прогноз баланса (SES + Monte-Carlo)&#10;• Дашборд показателей Rt/Lt/Dt/BLR" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;align=center;verticalAlign=middle;arcSize=8;" vertex="1" parent="1">
+          <mxGeometry x="80" y="120" width="420" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="gain_c" value="Создатели выгод (Gain Creators)&#10;&#10;• Прозрачное объяснение каждого совета&#10;• Учёт долговой нагрузки по нормам ЦБ&#10;• Приоритизация целей по важности и срочности" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;align=center;verticalAlign=middle;arcSize=8;" vertex="1" parent="1">
+          <mxGeometry x="80" y="240" width="420" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="pain_r" value="Обезболивающие (Pain Relievers)&#10;&#10;• Убирает «не знаю, куда деть деньги»&#10;• Не требует фин. образования&#10;• Avalanche экономит на дорогих долгах&#10;• Заменяет хаотичные решения системой" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;align=center;verticalAlign=middle;arcSize=8;" vertex="1" parent="1">
+          <mxGeometry x="80" y="360" width="420" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="cprof" value="Профиль клиента (Customer Profile)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=12;fontStyle=1;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="720" y="70" width="420" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="jobs" value="Задачи клиента (Customer Jobs)&#10;&#10;• Распределить зарплату с умом&#10;• Погасить кредиты оптимально&#10;• Накопить на цели&#10;• Не уйти в кассовый разрыв" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;align=center;verticalAlign=middle;arcSize=8;" vertex="1" parent="1">
+          <mxGeometry x="720" y="120" width="420" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="gains" value="Выгоды (Gains)&#10;&#10;• Спокойствие за финансы&#10;• Видеть прогресс к целям&#10;• Уверенность в решениях&#10;• Контроль без рутины" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;align=center;verticalAlign=middle;arcSize=8;" vertex="1" parent="1">
+          <mxGeometry x="720" y="240" width="420" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="pains" value="Боли (Pains)&#10;&#10;• Страх ошибиться с деньгами&#10;• Непонятно, гасить долг или копить&#10;• Финсоветы — «чёрный ящик»&#10;• Нет времени считать вручную" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;align=center;verticalAlign=middle;arcSize=8;" vertex="1" parent="1">
+          <mxGeometry x="720" y="360" width="420" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="fit" value="Fit / соответствие" style="endArrow=block;startArrow=block;html=1;strokeWidth=2;strokeColor=#82b366;dashed=1;" edge="1" parent="1" source="vmap" target="cprof">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="610" y="90" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

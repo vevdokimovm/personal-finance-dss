@@ -1,0 +1,59 @@
+<mxfile host="app.diagrams.net" type="device">
+  <diagram name="Модель монетизации" id="monetization">
+    <mxGraphModel dx="1100" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1180" pageHeight="650" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <mxCell id="t" value="FINPILOT — Модель монетизации (Freemium-воронка)" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=15;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="300" y="15" width="640" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="f1" value="Посетители сайта&#10;(контент, реклама, SEO)" style="trapezoid;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=12;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="250" y="80" width="500" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="f2" value="Зарегистрированные&#10;(бесплатный план)" style="trapezoid;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=12;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="310" y="170" width="380" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="f3" value="Активные пользователи&#10;(регулярно используют)" style="trapezoid;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=12;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="360" y="260" width="280" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="f4" value="Pro-подписка&#10;(платят за premium)" style="trapezoid;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=12;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="410" y="350" width="180" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="ff1" style="endArrow=block;html=1;" edge="1" parent="1" source="f1" target="f2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ff2" style="endArrow=block;html=1;" edge="1" parent="1" source="f2" target="f3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ff3" style="endArrow=block;html=1;" edge="1" parent="1" source="f3" target="f4">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="free_box" value="Бесплатно (Free)&#10;&#10;• Базовые рекомендации&#10;• Ручной ввод данных&#10;• Дашборд показателей&#10;• 1 расчёт-план" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;align=center;verticalAlign=middle;arcSize=8;" vertex="1" parent="1">
+          <mxGeometry x="760" y="170" width="380" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="pro_box" value="Pro (подписка мес/год)&#10;&#10;• Импорт банковских выписок&#10;• Расширенный прогноз (Monte-Carlo)&#10;• Экспорт отчётов&#10;• История планов, неограниченные цели&#10;• Приоритетная поддержка" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=11;align=center;verticalAlign=middle;arcSize=8;" vertex="1" parent="1">
+          <mxGeometry x="760" y="300" width="380" height="140" as="geometry" />
+        </mxCell>
+        <mxCell id="b2b_box" value="B2B (в будущем, отложено)&#10;&#10;• Лицензия для фин. консультантов&#10;• Мульти-клиентский режим&#10;• White-label&#10;• API-доступ" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontSize=11;align=center;verticalAlign=middle;arcSize=8;" vertex="1" parent="1">
+          <mxGeometry x="760" y="450" width="380" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="rev_title" value="Источники дохода" style="text;html=1;align=left;fontSize=12;fontStyle=1;fillColor=none;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="250" y="450" width="300" height="25" as="geometry" />
+        </mxCell>
+        <mxCell id="r1" value="Подписки Pro&#10;(основной доход)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;align=center;verticalAlign=middle;arcSize=8;" vertex="1" parent="1">
+          <mxGeometry x="250" y="480" width="200" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="r2" value="Партнёрские&#10;(рефералы фин. продуктов)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=11;align=center;verticalAlign=middle;arcSize=8;" vertex="1" parent="1">
+          <mxGeometry x="470" y="480" width="200" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="r3" value="B2B-лицензии&#10;(перспектива)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontSize=11;align=center;verticalAlign=middle;arcSize=8;" vertex="1" parent="1">
+          <mxGeometry x="250" y="560" width="200" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="r4" value="Premium-функции&#10;(разовые покупки)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=11;align=center;verticalAlign=middle;arcSize=8;" vertex="1" parent="1">
+          <mxGeometry x="470" y="560" width="200" height="60" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

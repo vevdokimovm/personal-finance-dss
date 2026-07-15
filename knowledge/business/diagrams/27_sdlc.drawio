@@ -1,0 +1,74 @@
+<mxfile host="app.diagrams.net" type="device">
+  <diagram name="Процесс разработки (SDLC)" id="sdlc">
+    <mxGraphModel dx="1100" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1320" pageHeight="500" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <mxCell id="t" value="FINPILOT — Процесс разработки продукта (SDLC)" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=15;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="300" y="15" width="640" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="st1" value="1. Идея / гипотеза&#10;&#10;Проблема пользователя,&#10;гипотеза ценности" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;align=center;verticalAlign=middle;arcSize=8;" vertex="1" parent="1">
+          <mxGeometry x="60" y="80" width="230" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="st2" value="2. Валидация рынка&#10;&#10;Анализ конкурентов,&#10;опрос (385 респондентов)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;align=center;verticalAlign=middle;arcSize=8;" vertex="1" parent="1">
+          <mxGeometry x="350" y="80" width="230" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="st3" value="3. Требования&#10;&#10;SRS, user stories,&#10;функц. требования" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;align=center;verticalAlign=middle;arcSize=8;" vertex="1" parent="1">
+          <mxGeometry x="640" y="80" width="230" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="st4" value="4. Архитектура&#10;&#10;Проектирование модулей,&#10;алгоритм СППР, БД" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;align=center;verticalAlign=middle;arcSize=8;" vertex="1" parent="1">
+          <mxGeometry x="930" y="80" width="230" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="st5" value="5. Реализация&#10;&#10;Код FastAPI,&#10;документация (.md с диффами)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=11;align=center;verticalAlign=middle;arcSize=8;" vertex="1" parent="1">
+          <mxGeometry x="60" y="280" width="230" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="st6" value="6. Тестирование&#10;&#10;Юнит-тесты, проверка&#10;на user-портретах" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=11;align=center;verticalAlign=middle;arcSize=8;" vertex="1" parent="1">
+          <mxGeometry x="350" y="280" width="230" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="st7" value="7. Релиз&#10;&#10;Деплой (Docker),&#10;версионирование" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=11;align=center;verticalAlign=middle;arcSize=8;" vertex="1" parent="1">
+          <mxGeometry x="640" y="280" width="230" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="st8" value="8. Сбор обратной связи&#10;&#10;Метрики использования,&#10;доработки" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=11;align=center;verticalAlign=middle;arcSize=8;" vertex="1" parent="1">
+          <mxGeometry x="930" y="280" width="230" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="e1" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=block;rounded=0;" edge="1" parent="1" source="st1" target="st2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e2" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=block;rounded=0;" edge="1" parent="1" source="st2" target="st3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e3" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=block;rounded=0;" edge="1" parent="1" source="st3" target="st4">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e4" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=block;rounded=0;" edge="1" parent="1" source="st4" target="st5">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1245" y="170" />
+              <mxPoint x="1245" y="250" />
+              <mxPoint x="175" y="250" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e5" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=block;rounded=0;" edge="1" parent="1" source="st5" target="st6">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e6" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=block;rounded=0;" edge="1" parent="1" source="st6" target="st7">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e7" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=block;rounded=0;" edge="1" parent="1" source="st7" target="st8">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="loop" value="итерация: новые данные → новая гипотеза" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=block;rounded=1;dashed=1;strokeColor=#9673a6;fontSize=10;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="st8" target="st1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1175" y="430" />
+              <mxPoint x="1230" y="30" />
+              <mxPoint x="175" y="30" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

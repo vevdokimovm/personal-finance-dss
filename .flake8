@@ -1,0 +1,11 @@
+[flake8]
+max-line-length = 100
+extend-ignore = F403, F405, F401
+exclude = .venv, venv, __pycache__, .mypy_cache, .pytest_cache, alembic, build, dist, knowledge
+# render_portrait_cards.py — research/рендер-скрипт: строки >100 это дословные выходные
+# литералы досье-карточек и легенды (строки таблиц, проза), уходящие экспертам через
+# knowledge/survey_auditory/. Перенос менял бы вывод; per-file-ignore вместо реформата
+# (правило #2: массовый реформат запрещён). Ядро тестирования в этой же папке
+# (generator/invariants/runner) линтуется как обычно.
+per-file-ignores =
+    tools/portrait_testing/render_portrait_cards.py: E501, E741

@@ -1,0 +1,34 @@
+# CodeQL — статический анализ безопасности от GitHub.
+# ЖИВЁТ ТОЛЬКО В ПУБЛИЧНОМ ЗЕРКАЛЕ (mirror_extras): на публичных репо CodeQL
+# бесплатен, на приватном без GitHub Advanced Security этот job просто падал бы.
+# Дополняет bandit/pip-audit из ci.yml межпроцедурным анализом (SQLi, path
+# traversal, инъекции и т.п.) по Python и JS.
+name: CodeQL
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    - cron: "0 4 * * 2"   # вторник 04:00 UTC — еженедельный контрольный прогон
+
+jobs:
+  analyze:
+    name: CodeQL (${{ matrix.language }})
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [python, javascript]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: github/codeql-action/init@v3
+        with:
+          languages: ${{ matrix.language }}
+      - uses: github/codeql-action/analyze@v3
+        with:
+          category: "/language:${{ matrix.language }}"

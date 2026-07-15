@@ -1,0 +1,263 @@
+{% extends "base.html" %}
+{% block title %}Валидация · FINPILOT{% endblock %}
+{% block page_title %}Валидация алгоритма{% endblock %}
+
+{% block content %}
+    <h1 class="sr-only">Валидация алгоритма</h1>
+<section class="glass-panel w-full" style="margin-bottom:24px;">
+    <div class="section-head">
+        <div>
+            <h2 class="section-title">Как проверялся алгоритм</h2>
+            <p class="section-subtitle">Методика валидации СППР на эталонных пользовательских профилях</p>
+        </div>
+    </div>
+    <div style="padding:8px 28px 24px; font-size:.9rem; line-height:1.65; color:var(--c-text2);">
+        <p style="margin:0 0 12px;">
+            Алгоритм проверяется на <strong>десяти репрезентативных портретах</strong>. Они покрывают крайние
+            и типичные ситуации — от дефицитного бюджета до крупной ликвидной позиции, от стабильной зарплаты
+            до сезонного и волатильного дохода — чтобы убедиться, что система ведёт себя корректно на всём
+            диапазоне, а не только на «удобных» данных.
+        </p>
+        <p style="margin:0 0 12px;">
+            Для каждого портрета видно четыре вещи сразу: <strong>(1)</strong> базовые показатели
+            (Rt, Lt, Dt, BLR); <strong>(2)</strong> прогноз на 6 месяцев — у разных портретов он разной формы
+            (растущий, падающий, сезонный, с широким коридором), а не одинаковая прямая; <strong>(3)</strong>
+            рекомендацию алгоритма либо структурный диагноз (fail-loud); <strong>(4)</strong> совпадение с
+            экономически ожидаемым поведением.
+        </p>
+        <p style="margin:0; font-size:.82rem; color:var(--c-text3);">
+            Любой портрет можно загрузить в систему кнопкой на карточке, а свой портрет — проверить в блоке
+            «Проверить свой портрет» ниже.
+        </p>
+    </div>
+</section>
+
+<section class="glass-panel w-full" style="margin-bottom:24px;">
+    <div class="section-head">
+        <div>
+            <h2 class="section-title">Проверить свой портрет</h2>
+            <p class="section-subtitle">Вставьте JSON портрета — алгоритм посчитает метрики, прогноз и рекомендацию без записи в БД</p>
+        </div>
+    </div>
+    <div style="padding:8px 28px 24px;">
+        <div style="display:flex; gap:10px; margin-bottom:10px; flex-wrap:wrap;">
+            <button type="button" id="analyze-template" class="ghost-button" style="padding:7px 14px; font-size:.8rem;">Вставить пример</button>
+            <button type="button" id="analyze-run" class="primary-button" style="padding:7px 18px; font-size:.8rem;">Проверить портрет →</button>
+        </div>
+        <textarea id="analyze-input" spellcheck="false"
+            style="width:100%; min-height:150px; font-family:ui-monospace,Menlo,Consolas,monospace; font-size:.78rem; line-height:1.5; padding:12px 14px; background:var(--c-surface2); color:var(--c-text1); border:1px solid var(--c-border); border-radius:var(--r-sm); resize:vertical;"
+            placeholder='{"income":[{"category":"ЗП","amount":160000}], "expenses":[{"category":"Жизнь","amount":70000}], "obligations":[...], "goals":[...], "liquid_assets":[...], "income_history":[...], "expense_history":[...], "risk_tolerance":3}'></textarea>
+        <div id="analyze-result" style="margin-top:16px;"></div>
+    </div>
+</section>
+
+<section class="glass-panel w-full">
+    <div class="section-head">
+        <div>
+            <h2 class="section-title">Эталонные профили и ожидаемое поведение</h2>
+            <p class="section-subtitle">Разверните карточку — портрет, прогноз и рекомендация считаются вживую</p>
+        </div>
+    </div>
+    <div id="validation-grid" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(360px, 1fr)); gap:16px; padding:8px 28px 28px;">
+        <div style="color:var(--c-text3);">Загрузка кейсов…</div>
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+(function () {
+    const ACCENT = {
+        amber: 'var(--c-amber-text)', green: 'var(--c-green-text)', red: 'var(--c-red-text)',
+        cyan: 'var(--c-cyan-text)', violet: 'var(--c-violet-text)', slate: 'var(--c-text2)'
+    };
+    const fmtRub = (n) => new Intl.NumberFormat('ru-RU').format(Math.round(n)) + ' ₽';
+    const CAT_RU = { income_growth: 'рост дохода', safety: 'безопасность', material: 'материальная', emotional: 'эмоциональная' };
+    const accentOf = (c) => ACCENT[c.accent] || 'var(--c-accent)';
+
+    // ── SVG-спарклайн прогноза: коридор p10–p90 + линия Rt ──────────────────
+    function forecastSpark(fc, color) {
+        const pts = (fc && fc.forecast) || [];
+        if (!pts.length) return '<div style="color:var(--c-text3); font-size:.78rem;">нет прогноза</div>';
+        const W = 320, H = 96, PAD = 6;
+        const rt = pts.map(p => p.Rt);
+        const lo = pts.map(p => (p.Rt_p10 !== undefined ? p.Rt_p10 : p.Rt));
+        const hi = pts.map(p => (p.Rt_p90 !== undefined ? p.Rt_p90 : p.Rt));
+        const ymin = Math.min(...lo, 0), ymax = Math.max(...hi, 0);
+        const span = (ymax - ymin) || 1;
+        const x = (i) => PAD + i * (W - 2 * PAD) / (pts.length - 1);
+        const y = (v) => H - PAD - (v - ymin) / span * (H - 2 * PAD);
+        const line = (arr) => arr.map((v, i) => `${i ? 'L' : 'M'}${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(' ');
+        const band = line(hi) + ' L' + x(pts.length - 1).toFixed(1) + ',' + y(lo[lo.length - 1]).toFixed(1) + ' '
+            + lo.map((v, i) => `L${x(lo.length - 1 - i).toFixed(1)},${y(lo[lo.length - 1 - i]).toFixed(1)}`).join(' ') + ' Z';
+        const zeroLine = (ymin < 0 && ymax > 0)
+            ? `<line x1="${PAD}" y1="${y(0).toFixed(1)}" x2="${W - PAD}" y2="${y(0).toFixed(1)}" stroke="var(--c-red-text)" stroke-width="1" stroke-dasharray="3 3" opacity=".6"/>` : '';
+        return `<svg viewBox="0 0 ${W} ${H}" width="100%" style="max-width:340px; height:auto;" role="img" aria-label="Прогноз Rt на 6 месяцев">
+            <path d="${band}" fill="${color}" opacity=".14"/>
+            ${zeroLine}
+            <path d="${line(rt)}" fill="none" stroke="${color}" stroke-width="2" stroke-linejoin="round"/>
+            ${rt.map((v, i) => `<circle cx="${x(i).toFixed(1)}" cy="${y(v).toFixed(1)}" r="2.4" fill="${color}"/>`).join('')}
+        </svg>`;
+    }
+
+    function metricsRow(m) {
+        const rtColor = m.free_resource >= 0 ? 'var(--c-green-text)' : 'var(--c-red-text)';
+        return `<div style="display:grid; grid-template-columns:1fr 1fr; gap:5px 16px; margin-bottom:12px; padding:10px 12px; background:rgba(99,102,241,.06); border-radius:var(--r-sm); font-size:.82rem;">
+            <div>Доход: <strong>${fmtRub(m.income_total)}</strong></div>
+            <div>Расходы: <strong>${fmtRub(m.expense_total)}</strong></div>
+            <div>Платежи по кредитам: <strong>${fmtRub(m.payments_total)}</strong></div>
+            <div>Ликвидность Lt: <strong>${(m.Lt ?? 0).toFixed(1)} мес</strong></div>
+            <div style="grid-column:1 / -1;">Свободный ресурс Rt: <strong style="color:${rtColor};">${fmtRub(m.free_resource)}</strong>${m.free_resource < 0 ? ' — отрицательный, сработает структурный диагноз' : ''}</div>
+        </div>`;
+    }
+
+    function planBlock(plan, color) {
+        if (!plan || plan.error) return `<div style="color:var(--c-text3); font-size:.8rem;">${plan && plan.error ? plan.error : 'план недоступен'}</div>`;
+        const best = plan.best;
+        const closed = (plan.closed_goals || []);
+        let html = '';
+        if (best && best.explanation) {
+            const e = best.explanation;
+            html += `<div style="font-size:.82rem; line-height:1.55; color:var(--c-text2);">${e.insight || ''}</div>`;
+            if (e.gains && e.gains.length) html += `<ul style="margin:8px 0 0; padding-left:18px; font-size:.8rem; color:var(--c-text2);">${e.gains.map(g => `<li style="margin-bottom:3px;">${g}</li>`).join('')}</ul>`;
+        } else {
+            html += `<div style="font-size:.82rem; color:var(--c-amber-text);">Структурный диагноз (fail-loud): свободных денег для распределения нет — нужен пересмотр расходов или рефинансирование.</div>`;
+        }
+        if (closed.length) html += `<div style="margin-top:8px; font-size:.8rem; color:var(--c-cyan-text);">Разово закрыто из накоплений: ${closed.map(g => g.name).join(', ')}.</div>`;
+        if (plan.crisis_plan) html += `<div style="margin-top:6px; font-size:.78rem; color:var(--c-red-text);">Активен кризис-модуль (дефицит потока).</div>`;
+        if (plan.surplus_plan) html += `<div style="margin-top:6px; font-size:.78rem; color:var(--c-green-text);">Активен слой избытка (surplus).</div>`;
+        return html;
+    }
+
+    function renderAnalysis(d, color) {
+        const fc = d.forecast || {};
+        return `${metricsRow(d.metrics)}
+            <div style="margin:4px 0 6px; font-size:.72rem; text-transform:uppercase; letter-spacing:.4px; color:var(--c-text3);">Прогноз Rt на 6 мес · ${fc.trend === 'improving' ? 'растёт' : fc.trend === 'deteriorating' ? 'снижается' : 'стабилен'}${fc.deficit_alert ? ' · ⚠ прогнозный дефицит' : ''}</div>
+            ${forecastSpark(fc, color)}
+            <div style="margin:12px 0 6px; font-size:.72rem; text-transform:uppercase; letter-spacing:.4px; color:var(--c-text3);">Рекомендация</div>
+            ${planBlock(d.plan, color)}`;
+    }
+
+    function renderPortraitDetail(d, color) {
+        const incItems = d.income.items.map(i => `<li>${i.category}: ${fmtRub(i.amount)}</li>`).join('');
+        const expItems = d.expenses.items.map(i => `<li>${i.category}: ${fmtRub(i.amount)}</li>`).join('');
+        const obl = d.obligations.length ? d.obligations.map(o =>
+            `<li><strong>${o.name}</strong> — ${fmtRub(o.monthly_payment)}/мес, ставка ${(o.interest_rate * 100).toFixed(1)}%${o.term ? ', срок ' + o.term + ' мес' : ''}</li>`).join('') : '<li style="color:var(--c-text3);">нет</li>';
+        const goals = d.goals.length ? d.goals.map(g => {
+            const pct = g.target_amount ? Math.round(g.current_amount / g.target_amount * 100) : 0;
+            const ml = (g.months_left === null || g.months_left === undefined) ? 'бессрочно' : g.months_left + ' мес';
+            return `<li><strong>${g.name}</strong> (${CAT_RU[g.category] || g.category}) — ${fmtRub(g.current_amount)} из ${fmtRub(g.target_amount)} (${pct}%), срок ${ml}</li>`;
+        }).join('') : '<li style="color:var(--c-text3);">нет</li>';
+        const assets = d.liquid_assets.length ? d.liquid_assets.map(a =>
+            `<li><strong>${a.name}</strong> — ${fmtRub(a.amount)}${a.interest_rate ? `, ${(a.interest_rate * 100).toFixed(1)}% годовых` : ''}</li>`).join('') : '<li style="color:var(--c-text3);">нет</li>';
+        return `${renderAnalysis(d, color)}
+            <details style="margin-top:12px;"><summary style="cursor:pointer; font-size:.78rem; font-weight:600; color:var(--c-accent); padding:4px 0;">Полный портрет — доходы, расходы, обязательства, цели</summary>
+            <div style="display:flex; flex-direction:column; gap:8px; line-height:1.5; margin-top:8px; font-size:.8rem;">
+                <div><strong style="color:var(--c-text3); font-size:.7rem; text-transform:uppercase;">Доходы</strong><ul style="margin:3px 0 0; padding-left:18px;">${incItems}</ul></div>
+                <div><strong style="color:var(--c-text3); font-size:.7rem; text-transform:uppercase;">Расходы</strong><ul style="margin:3px 0 0; padding-left:18px;">${expItems}</ul></div>
+                <div><strong style="color:var(--c-text3); font-size:.7rem; text-transform:uppercase;">Обязательства</strong><ul style="margin:3px 0 0; padding-left:18px;">${obl}</ul></div>
+                <div><strong style="color:var(--c-text3); font-size:.7rem; text-transform:uppercase;">Цели</strong><ul style="margin:3px 0 0; padding-left:18px;">${goals}</ul></div>
+                <div><strong style="color:var(--c-text3); font-size:.7rem; text-transform:uppercase;">Ликвидные активы</strong><ul style="margin:3px 0 0; padding-left:18px;">${assets}</ul></div>
+            </div></details>`;
+    }
+
+    function card(c) {
+        const color = accentOf(c);
+        return `<article class="glass-panel" style="padding:18px 20px; border:1px solid var(--c-border); display:flex; flex-direction:column; gap:10px;">
+            <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:10px;">
+                <div>
+                    <div style="font-weight:700; font-size:.95rem;">${c.n}. ${c.name}</div>
+                    <div style="font-size:.76rem; color:var(--c-text3); margin-top:2px;">${c.role}</div>
+                </div>
+                <span style="font-size:.68rem; font-weight:700; text-transform:uppercase; letter-spacing:.4px; color:${color}; border:1px solid ${color}55; border-radius:999px; padding:3px 10px; white-space:nowrap;">${c.tag}</span>
+            </div>
+            <div style="font-size:.82rem; color:var(--c-text2); line-height:1.55;">
+                <strong style="color:var(--c-text3); font-size:.72rem; text-transform:uppercase; letter-spacing:.4px;">Ситуация</strong><br>${c.situation}
+            </div>
+            <div style="font-size:.82rem; color:var(--c-text2); line-height:1.55; padding:10px 12px; background:rgba(255,255,255,.03); border-radius:var(--r-sm); border-left:3px solid ${color};">
+                <strong style="color:${color}; font-size:.72rem; text-transform:uppercase; letter-spacing:.4px;">Ожидаемое поведение</strong><br>${c.expect}
+            </div>
+            <details class="case-detail" data-case="${c.key}" data-accent="${c.accent || ''}">
+                <summary style="cursor:pointer; font-size:.8rem; font-weight:600; color:var(--c-accent); padding:6px 0;">Показать расчёт — метрики, прогноз, рекомендация</summary>
+                <div class="case-detail-body" style="margin-top:10px;"><div style="color:var(--c-text3); font-size:.8rem;">Считаю…</div></div>
+            </details>
+            <button type="button" class="ghost-button validation-load" data-case="${c.key}" style="align-self:flex-start; padding:8px 16px; font-size:.8rem;">Загрузить и проверить →</button>
+        </article>`;
+    }
+
+    const grid = document.getElementById('validation-grid');
+
+    fetch('/api/demo/cases').then(r => r.json()).then(data => {
+        const cases = data.cases || [];
+        grid.innerHTML = cases.map(card).join('');
+    }).catch(() => { grid.innerHTML = '<div style="color:var(--c-red-text);">Не удалось загрузить кейсы.</div>'; });
+
+    grid.addEventListener('toggle', async (e) => {
+        const det = e.target.closest('.case-detail');
+        if (!det || !det.open || det.dataset.loaded) return;
+        det.dataset.loaded = '1';
+        const body = det.querySelector('.case-detail-body');
+        const color = ACCENT[det.dataset.accent] || 'var(--c-accent)';
+        try {
+            const res = await fetch(`/api/demo/preview?case=${encodeURIComponent(det.dataset.case)}`);
+            body.innerHTML = renderPortraitDetail(await res.json(), color);
+        } catch (err) {
+            body.innerHTML = '<div style="color:var(--c-red-text);">Не удалось посчитать портрет.</div>';
+            det.dataset.loaded = '';
+        }
+    }, true);
+
+    grid.addEventListener('click', async (e) => {
+        const btn = e.target.closest('.validation-load');
+        if (!btn) return;
+        const caseKey = btn.dataset.case;
+        btn.disabled = true;
+        const original = btn.textContent;
+        btn.textContent = 'Загрузка…';
+        try {
+            await fetch(`/api/demo/load?case=${encodeURIComponent(caseKey)}`, { method: 'POST' });
+            window.location.href = '/planning';
+        } catch (err) {
+            btn.disabled = false;
+            btn.textContent = original;
+        }
+    });
+
+    // ── Проверка своего портрета ────────────────────────────────────────────
+    const EXAMPLE = {
+        income: [{ category: 'Зарплата', amount: 160000 }],
+        expenses: [{ category: 'Жизнь', amount: 62000 }, { category: 'ЖКХ и связь', amount: 12000 }],
+        obligations: [{ name: 'Кредит наличными', monthly_payment: 22000, interest_rate: 0.24, amount: 480000, term: 24 }],
+        goals: [
+            { name: 'Подушка безопасности', target_amount: 300000, current_amount: 60000, category: 'safety', months_left: 8 },
+            { name: 'Отпуск', target_amount: 150000, current_amount: 20000, category: 'emotional', months_left: 5 }
+        ],
+        liquid_assets: [{ name: 'Накопительный счёт', amount: 200000, interest_rate: 0.18 }],
+        income_history: [130000, 138000, 145000, 150000, 156000, 160000],
+        expense_history: [72000, 73000, 74000, 74000, 74000, 74000],
+        risk_tolerance: 3
+    };
+    const input = document.getElementById('analyze-input');
+    const result = document.getElementById('analyze-result');
+    document.getElementById('analyze-template').addEventListener('click', () => {
+        input.value = JSON.stringify(EXAMPLE, null, 2);
+    });
+    document.getElementById('analyze-run').addEventListener('click', async () => {
+        let payload;
+        try { payload = JSON.parse(input.value); }
+        catch (err) { result.innerHTML = '<div style="color:var(--c-red-text); font-size:.85rem;">Некорректный JSON: ' + err.message + '</div>'; return; }
+        result.innerHTML = '<div style="color:var(--c-text3); font-size:.85rem;">Считаю…</div>';
+        try {
+            const res = await fetch('/api/demo/analyze', {
+                method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
+            });
+            if (!res.ok) throw new Error('HTTP ' + res.status);
+            const d = await res.json();
+            result.innerHTML = `<div class="glass-panel" style="padding:16px 18px; border:1px solid var(--c-border);">${renderAnalysis(d, 'var(--c-accent)')}</div>`;
+        } catch (err) {
+            result.innerHTML = '<div style="color:var(--c-red-text); font-size:.85rem;">Не удалось посчитать: ' + err.message + '</div>';
+        }
+    });
+})();
+</script>
+{% endblock %}
