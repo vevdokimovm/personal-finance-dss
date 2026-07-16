@@ -92,28 +92,30 @@ class TestCloseDebtsFromLiquidity:
         plan = _plan(**self.CASE)
         act = next(a for a in plan["actions"]
                    if a["type"] == "close_debts_from_liquidity")
-        # после хода подушка не ниже 1 месяца расходов
-        assert act["bliq_remaining"] >= 89_000.0 - 0.01
+        # после хода подушка не ниже 2 месяцев расходов (v3.4.0, ADR-006)
+        assert act["bliq_remaining"] >= 178_000.0 - 0.01
 
     def test_not_offered_when_it_breaks_floor(self):
-        thin = dict(self.CASE, bliq=520_000.0)  # 500к на кредит + 20к < месяца расходов
+        # после floor 2 мес (178к) доступно 342к — на разворот потока не хватает
+        thin = dict(self.CASE, bliq=520_000.0)
         plan = _plan(**thin)
         assert not any(a["type"] == "close_debts_from_liquidity"
                        for a in plan["actions"])
         assert plan["severity"] == "cut_required"
 
     def test_partial_paydown_when_liquidity_tight(self):
-        # на полный кредит не хватает (доступно 490к из 500к), но платёж
-        # пропорционален остатку: чтобы вернуть 27к потока при P/A = 28к/500к,
-        # достаточно погасить ~482к — кредит гасится частично, поток развёрнут
-        case = dict(self.CASE, bliq=579_000.0)
+        # на полный кредит не хватает (доступно 490к из 500к при floor
+        # v3.4.0 = 2 мес × 89к = 178к), но платёж пропорционален остатку:
+        # чтобы вернуть 27к потока при P/A = 28к/500к, достаточно погасить
+        # ~482к — кредит гасится частично, поток развёрнут
+        case = dict(self.CASE, bliq=668_000.0)
         plan = _plan(**case)
         act = next(a for a in plan["actions"]
                    if a["type"] == "close_debts_from_liquidity")
         assert act["new_rt"] >= 0
         assert act["bliq_used"] < 500_000.0
         assert act["steps"][0]["closed"] is False
-        assert act["bliq_remaining"] >= 89_000.0 - 0.01  # floor не тронут
+        assert act["bliq_remaining"] >= 178_000.0 - 0.01  # floor 2 мес не тронут
 
     def test_most_efficient_loan_first(self):
         # эффективность = платёж на рубль погашения; loan_b возвращает поток вдвое дешевле
@@ -177,10 +179,12 @@ class TestVasiliiCreditCardCase:
         assert rest["loan"] == "Кредитка Т-Банк"
 
     def test_with_donor_income_avalanche_attacks_card(self):
-        # со ситуативным доходом поток положительный — обычный план, лавина в кредитку
+        # со ситуативным доходом поток положительный — обычный план; подушка
+        # сделана (Lt = 80к/16к = 5 мес > цели 4.5 и floor 2.0 v3.4.0) → SAW
+        # отдаёт поток лавине в кредитку
         result = run_planning(
             income_total=45_000.0, expense_total=16_000.0,
-            obligations=[dict(self.CARD)], goals=[], bliq=4_000.0,
+            obligations=[dict(self.CARD)], goals=[], bliq=80_000.0,
             r_bench=0.14, risk_tolerance=3, today=TODAY,
         )
         assert result["crisis_plan"] is None

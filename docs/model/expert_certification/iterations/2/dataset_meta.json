@@ -1,0 +1,30 @@
+{
+  "iteration": 2,
+  "dataset_version": 2,
+  "generator": "tools/portrait_testing/generator.py :: PortraitGenerator(seed, version=2)",
+  "seed": 20260702,
+  "n": 12000,
+  "id_range": "SP-00000..SP-11999",
+  "frozen_today": "2026-07-02T12:00:00",
+  "layers": "не применимо: v2 предшествует слоистой архитектуре A–E протокола; состав — реалистичное ядро (ПДН-бета по ЦБ/НБКИ, аннуитетная согласованность) + детерминированные edge-kind каждые 3-и id",
+  "correlation_matrix": "не задавалась (гауссова копула появляется в generator v3)",
+  "distribution": {
+    "expert_pack": [
+      "expert_portraits_v2_part1.jsonl.gz",
+      "expert_portraits_v2_part2.jsonl.gz",
+      "expert_portraits_v2_part3.jsonl.gz",
+      "expert_portraits_v2_part4.jsonl.gz"
+    ],
+    "expert_pack_fields": ["id", "income_total", "expense_total", "obligations", "goals", "bliq", "r_bench", "risk_tolerance"],
+    "blindness": "kind/метки слоёв эксперту не передаются намеренно; канонический размеченный файл — knowledge/model_validation/portraits_v2_seed20260702.jsonl.gz",
+    "brief": "docs/model/expert_brief_v2.md"
+  },
+  "identity_check": "экспертный пакет == репо-jsonl == регенерация: 0 расхождений на 12000 (verify, 2026-07-16)",
+  "model_snapshots": {
+    "as_certified": "knowledge/model_validation/model_outcomes_v3_3_0_on_v2.csv.gz (floor 1.0, согласие 78.9%)",
+    "post_calibration": "knowledge/model_validation/model_outcomes_v3_4_0_on_v2.csv.gz (floor 2.0, согласие 88.0%)"
+  },
+  "joined": "knowledge/model_validation/joined_v2.csv.gz (модельная половина v3.4.0 + 4 эксперта)",
+  "accounts": ["V", "M", "J", "S"],
+  "run_metadata_note": "модель/усилие/время/сэмплинг эксперт-сессий владельцем не зафиксированы (пробел раунда 2; в раунде 3 собирать run_metadata.md по протоколу)"
+}

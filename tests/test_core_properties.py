@@ -431,3 +431,63 @@ class TestRiskProfiles:
         assert w_goals[0] < w_goals[-1], w_goals
         assert all(w_rt[i] <= w_rt[i + 1] for i in range(4)), w_rt
         assert w_rt[0] < w_rt[-1], w_rt
+
+
+class TestReserveFloorV340:
+    """Floor резерва 2.0 — калибровка по второй сертификации (v3.4.0, ADR-006).
+
+    Триггер пересмотра ADR-006 сработал: свежая четвёрка экспертов на
+    калиброванном датасете v2 воспроизвела паттерн «подушка до ~2 месяцев
+    важнее лавины и целей» (floor 2.0: согласие 78.9% -> 88.0%, split-half
+    +10.1/+8.1 п.п., шум отбора 0.5 п.п.). Floor от профиля риска не зависит.
+    """
+
+    def test_floor_constant_is_two_months(self):
+        from app.core.ranking import RESERVE_FLOOR_MONTHS
+        assert RESERVE_FLOOR_MONTHS == 2.0
+
+    def test_thin_cushion_beats_avalanche(self):
+        """Lt ~1.5 мес + дорогой долг: v3.3.0 слала бы поток в долг,
+        v3.4.0 достраивает стартовую подушку до 2 месяцев."""
+        from datetime import datetime
+
+        from app.services.planning import run_planning
+
+        result = run_planning(
+            income_total=100000, expense_total=60000,
+            obligations=[{
+                "id": 1, "amount": 400000, "interest_rate": 0.28,
+                "monthly_payment": 12000, "term": 48,
+            }],
+            goals=[],
+            bliq=90000,  # Lt = 1.5 мес
+            risk_tolerance=4,
+            today=datetime(2026, 7, 2),
+        )
+        best = result["best"]
+        assert best is not None
+        assert best["x_reserve"] > best.get(
+            "x_obl_effective", best.get("x_obligations", 0.0)
+        )
+
+    def test_floor_two_already_met_releases_flow(self):
+        """Подушка >= 2 мес: floor заполнен, поток свободен для лавины."""
+        from datetime import datetime
+
+        from app.services.planning import run_planning
+
+        result = run_planning(
+            income_total=100000, expense_total=60000,
+            obligations=[{
+                "id": 1, "amount": 400000, "interest_rate": 0.28,
+                "monthly_payment": 12000, "term": 48,
+            }],
+            goals=[],
+            bliq=150000,  # Lt = 2.5 мес
+            risk_tolerance=4,
+            today=datetime(2026, 7, 2),
+        )
+        best = result["best"]
+        assert best is not None
+        xo = best.get("x_obl_effective", best.get("x_obligations", 0.0))
+        assert xo > best["x_reserve"]

@@ -49,7 +49,13 @@ python -m tools.model_validation.expert_agreement \
 | `portraits_v1_seed20260702.jsonl.gz` | Портреты эталона (вход): 1 JSON/строка — id (SP-XXXXX), kind, income_total, expense_total, obligations[], goals[] (даты ISO), bliq, r_bench, risk_tolerance, l_min |
 | `portraits_v2_seed20260702.jsonl.gz` | То же для калиброванного генератора v2 — датасет второй сертификации |
 | `model_outcomes_v3_1_0_on_v1.csv.gz` | Ответ модели v3.1.0 на портретах v1: id, kind, risk, status, rt, lt, dt, xo, xr, xg, invest, dom, dt_alert, crisis_severity, crisis_actions. Колонки xg и invest независимы (goals+ = xg + invest) |
-| `model_outcomes_v3_1_0_on_v2.csv.gz` | То же на портретах v2 — половина будущего joined второй сертификации |
+| `model_outcomes_v3_1_0_on_v2.csv.gz` | То же на портретах v2 — исторический снимок (модель на момент v6.1.0) |
+| `model_outcomes_v3_3_0_on_v2.csv.gz` | Ответ модели v3.3.0 (as certified, floor 1.0) на портретах v2 (код v6.12.3) — модельная половина второй сертификации; согласие 78.9%. Дельта против снимка v3.1.0: 0 смен статуса, 4 смены доминанты, 12 сплит-дрейфов > 6 коп. на 12 000 (G7-каскад остатка); разбор — `docs/reports/testing/model_outcomes_v3_3_0_on_v2.md` |
+| `model_outcomes_v3_4_0_on_v2.csv.gz` | Ответ ТЕКУЩЕЙ модели v3.4.0 (floor 2.0, ADR-006 update) на портретах v2 (код v6.13.0); согласие 88.0% — `docs/reports/testing/expert_certification_round2.md` |
+| `joined_v2.csv.gz` | Joined второй сертификации: модельная половина v3.4.0 + 4 свежих эксперта (v/m/j/s). Сборка — `tools/model_validation/build_joined.py`; сырые CSV и ревью экспертов — `docs/model/expert_certification/iterations/2/` |
+| `portraits_v3_seed20260716.jsonl.gz` | КАНОНИЧЕСКИЙ размеченный датасет v3 (12 000; слои A–E, meta первой строкой): генератор `tools/portrait_testing/generator_v3.py`, приёмка `tests/test_generator_v3.py`, ТЗ — `docs/model/expert_certification/iterations/2/expert_feedback_aggregate.md` §6 |
+| `expert_portraits_v3_part1..4.jsonl.gz` | СЛЕПОЙ пакет v3 для раунда 3 (проекция без меток; дубли id и битые записи слоя D доживают до эксперта намеренно). Бриф — `docs/model/expert_brief_v3.md` (status=invalid, run_metadata обязателен) |
+| `portraits_v3_coordinator_key.csv.gz` | Ключ координатора v3: id → layer/kind/pair_id/pair_relation/expected_error/id_override — слепота экспертов сохраняется, приёмка и стенд размечают по нему |
 
 Регенерация любого файла: `tools/model_validation/dataset_export.py`
 (portraits / outcomes / expert-pack / markdown, детерминировано по seed+version).

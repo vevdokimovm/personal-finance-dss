@@ -69,6 +69,7 @@ LEGACY_PATTERNS = (
 # Живые доки, где упоминание legacy легитимно (объяснение перехода v2 -> v3).
 LEGACY_ALLOWLIST_FILES = frozenset({
     "docs/math_model_v3_0_0.md",
+    "docs/model/model_history.md",  # сквозная история модели: legacy по назначению
     "docs/reference_profiles.md",
     "docs/reports/adr/adr_template.md",
 })

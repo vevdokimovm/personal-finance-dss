@@ -71,11 +71,12 @@ class TestRanking:
 
     def test_profile_changes_choice(self):
         # Главный эффект refined-модели: с ортогональными критериями профиль реально
-        # меняет выбор. Консерватор (вес ликвидности 0.45) выбирает высокую автономию;
+        # меняет выбор. Оба варианта дают >= 2 мес (floor v3.4.0 удовлетворён, решает
+        # SAW): консерватор (вес ликвидности 0.45) берёт высокую автономию;
         # агрессор (вес целей 0.40) — высокую обеспеченность целей.
         alts = [
             {"name": "liquidity", "Rt_new": 1000, "Lt_new": 6.0, "Dt_new": 0.2, "Si": 0.1},
-            {"name": "goals", "Rt_new": 1000, "Lt_new": 1.0, "Dt_new": 0.2, "Si": 0.9},
+            {"name": "goals", "Rt_new": 1000, "Lt_new": 2.2, "Dt_new": 0.2, "Si": 0.9},
         ]
         conservative = rank_alternatives([dict(a) for a in alts], risk_tolerance=1)
         aggressive = rank_alternatives([dict(a) for a in alts], risk_tolerance=5)
@@ -143,7 +144,7 @@ class TestReserveFloor:
         assert ranked[0]["name"] == "fill_floor"
 
     def test_partial_fill_preferred_when_floor_unreachable(self):
-        # если до 1 месяца не дотянуться, приоритет — максимально близкий к floor
+        # если до floor (2 мес, v3.4.0) не дотянуться — приоритет ближайшему к нему
         alts = [
             {"name": "zero", "Rt_new": 0, "Lt_new": 0.1, "Dt_new": 0.0, "Si": 1.0},
             {"name": "closer", "Rt_new": 0, "Lt_new": 0.6, "Dt_new": 0.0, "Si": 0.3},
@@ -152,10 +153,11 @@ class TestReserveFloor:
         assert ranked[0]["name"] == "closer"
 
     def test_above_floor_saw_decides(self):
-        # оба варианта дают >= 1 мес — floor удовлетворён, решает SAW (агрессор → цели)
+        # оба варианта дают >= 2 мес — floor v3.4.0 удовлетворён, решает SAW
+        # (агрессор → цели)
         alts = [
-            {"name": "reserve", "Rt_new": 0, "Lt_new": 2.5, "Dt_new": 0.0, "Si": 0.1},
-            {"name": "goals", "Rt_new": 0, "Lt_new": 1.4, "Dt_new": 0.0, "Si": 0.9},
+            {"name": "reserve", "Rt_new": 0, "Lt_new": 4.0, "Dt_new": 0.0, "Si": 0.1},
+            {"name": "goals", "Rt_new": 0, "Lt_new": 2.2, "Dt_new": 0.0, "Si": 0.9},
         ]
         ranked = rank_alternatives(alts, risk_tolerance=5)
         assert ranked[0]["name"] == "goals"

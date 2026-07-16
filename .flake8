@@ -1,7 +1,10 @@
 [flake8]
 max-line-length = 100
 extend-ignore = F403, F405, F401
-exclude = .venv, venv, __pycache__, .mypy_cache, .pytest_cache, alembic, build, dist, knowledge
+exclude = .venv, venv, __pycache__, .mypy_cache, .pytest_cache, alembic, build, dist, knowledge,
+    # артефакты-улики независимых экспертных движков (сертификация): их стиль — часть улик,
+    # реформат фальсифицировал бы поставленный экспертом код
+    docs/model/expert_certification/iterations
 # render_portrait_cards.py — research/рендер-скрипт: строки >100 это дословные выходные
 # литералы досье-карточек и легенды (строки таблиц, проза), уходящие экспертам через
 # knowledge/survey_auditory/. Перенос менял бы вывод; per-file-ignore вместо реформата

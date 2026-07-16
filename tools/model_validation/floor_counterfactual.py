@@ -14,6 +14,7 @@
 """
 from __future__ import annotations
 
+import argparse
 import json
 import math
 from collections import Counter
@@ -30,9 +31,9 @@ from tools.portrait_testing.generator import PortraitGenerator
 JOINED = Path("knowledge/model_validation/joined.csv.gz")
 
 
-def run_pass(rows, floor: float) -> dict[str, dict]:
+def run_pass(rows, floor: float, version: int = 1) -> dict[str, dict]:
     rk.RESERVE_FLOOR_MONTHS = floor
-    gen = PortraitGenerator(20260702, version=1)
+    gen = PortraitGenerator(20260702, version=version)
     out = {}
     for r in rows:
         idx = int(r["id"].split("-")[1])
@@ -61,11 +62,26 @@ def agreement(pass_data: dict, ids=None) -> tuple[int, int]:
 
 
 def main() -> None:
-    rows = load_joined(JOINED)
+    parser = argparse.ArgumentParser(description="Counterfactual floor резерва")
+    parser.add_argument("--joined", type=Path, default=JOINED)
+    parser.add_argument("--version", type=int, default=1,
+                        help="версия генератора, которым построен joined")
+    parser.add_argument("--alt-floor", type=float, default=2.0)
+    parser.add_argument("--grid", type=str, default="",
+                        help="доп. сетка floor через запятую: только agreement")
+    args = parser.parse_args()
+
+    rows = load_joined(args.joined)
     base_floor = rk.RESERVE_FLOOR_MONTHS
     try:
-        base = run_pass(rows, 1.0)
-        alt = run_pass(rows, 2.0)
+        base = run_pass(rows, 1.0, version=args.version)
+        alt = run_pass(rows, args.alt_floor, version=args.version)
+        grid_out = {}
+        for raw in filter(None, args.grid.split(",")):
+            f = float(raw)
+            g = run_pass(rows, f, version=args.version)
+            ga, gn = agreement(g)
+            grid_out[raw] = round(ga / gn * 100, 1)
     finally:
         rk.RESERVE_FLOOR_MONTHS = base_floor
 
@@ -123,6 +139,8 @@ def main() -> None:
     print(json.dumps({
         "agreement_base": round(ag_b / n_all * 100, 1),
         "agreement_floor2": round(ag_c / n_all * 100, 1),
+        "alt_floor": args.alt_floor,
+        "grid_agreement": grid_out,
         "changed_portraits": len(changed),
         "transitions": dict(transitions.most_common()),
         "fixed_vs_consensus": {"n": len(fixed), **slices(fixed)},

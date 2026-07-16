@@ -6,7 +6,8 @@
   * `portraits_*.jsonl.gz` — сами портреты (вход): один JSON-объект на строку,
     id формата SP-XXXXX, даты в ISO. Эксперту для независимой оценки не нужен
     ни код, ни генератор — только этот файл.
-  * `model_outcomes_*.csv.gz` — ответ модели v3.1.0 по каждому портрету:
+  * `model_outcomes_*.csv.gz` — ответ ТЕКУЩЕЙ модели по каждому портрету
+    (версию модели фиксировать в имени файла, напр. `model_outcomes_v3_3_0_on_v2`):
     статус, показатели, эффективный сплит, доминанта, инвест-транш, кризис.
     Это половина будущего joined-файла второй сертификации (вторую половину —
     колонки экспертов — добавляют внешние экспертные движки).
@@ -32,6 +33,7 @@ from typing import Any
 
 from tools.model_validation.expert_agreement import FROZEN_TODAY, model_outcome
 from tools.portrait_testing.generator import PortraitGenerator
+from tools.portrait_testing.generator_v3 import PortraitGeneratorV3
 
 
 def _jsonable(node: Any) -> Any:
@@ -45,15 +47,48 @@ def _jsonable(node: Any) -> Any:
 
 
 def export_portraits(out: Path, n: int, seed: int, version: int) -> int:
-    """Пишет n портретов в jsonl.gz; возвращает число записанных строк."""
-    gen = PortraitGenerator(seed, version=version)
+    """Пишет n портретов в jsonl.gz; возвращает число записанных строк.
+
+    Для version=3 первой строкой уходит meta-объект генератора (D3 раунда 2),
+    записи размечены (layer/kind/pair_*/expected_error) — это КАНОНИЧЕСКИЙ
+    файл; слепой экспертный пакет — производный (`export_expert_pack`).
+    """
     out.parent.mkdir(parents=True, exist_ok=True)
     written = 0
+    if version == 3:
+        gen3 = PortraitGeneratorV3(seed, n=n)
+        with gzip.open(out, "wt", encoding="utf-8") as fh:
+            fh.write(json.dumps(_jsonable(gen3.meta()), ensure_ascii=False) + "\n")
+            for i in range(n):
+                portrait = _jsonable(gen3.generate(i))
+                portrait["id"] = f"SP3-{i:05d}"
+                fh.write(json.dumps(portrait, ensure_ascii=False) + "\n")
+                written += 1
+        return written
+    gen = PortraitGenerator(seed, version=version)
     with gzip.open(out, "wt", encoding="utf-8") as fh:
         for i in range(n):
             portrait = _jsonable(gen.generate(i))
             portrait["id"] = f"SP-{i:05d}"
             fh.write(json.dumps(portrait, ensure_ascii=False) + "\n")
+            written += 1
+    return written
+
+
+def export_coordinator_key(out: Path, n: int, seed: int) -> int:
+    """Ключ координатора v3: id -> метки (слепота экспертов сохраняется)."""
+    gen3 = PortraitGeneratorV3(seed, n=n)
+    out.parent.mkdir(parents=True, exist_ok=True)
+    fields = ("id", "layer", "kind", "pair_id", "pair_role",
+              "pair_relation", "expected_error", "id_override")
+    written = 0
+    with gzip.open(out, "wt", encoding="utf-8", newline="") as fh:
+        writer = csv.DictWriter(fh, fieldnames=fields)
+        writer.writeheader()
+        for i in range(n):
+            row = gen3.coordinator_key(i)
+            writer.writerow({k: ("" if row.get(k) is None else row[k])
+                             for k in fields})
             written += 1
     return written
 
@@ -72,6 +107,11 @@ def export_model_outcomes(out: Path, n: int, seed: int, version: int) -> int:
     (в xg НЕ включён: колонки независимы, семантику goals+inv собирает
     потребитель). Кризисные поля — охват G2.
     """
+    if version == 3:
+        raise NotImplementedError(
+            "outcomes для v3 — работа стенда раунда 3: слой D (adversarial) "
+            "требует ветки обработки невалидных записей (status=invalid), "
+            "а слой E — попарной метрики монотонности. См. iteration_protocol.")
     gen = PortraitGenerator(seed, version=version)
     out.parent.mkdir(parents=True, exist_ok=True)
     written = 0
@@ -121,11 +161,16 @@ def export_expert_pack(
     ни типа портрета (kind), ни вычисленных метрик, ни внутренних параметров
     модели (l_min). Только то, что знал бы живой консультант со слов клиента.
     Чанки по chunk_size строк — чтобы раздавать экспертам порциями.
+
+    version=3: проекция `PortraitGeneratorV3.expert_row` — дубли id (слой D)
+    честно доживают до эксперта; каждая часть открывается минимальной
+    meta-строкой (версия/срез/число строк) БЕЗ конфига слоёв — дизайн не течёт.
     """
-    gen = PortraitGenerator(seed, version=version)
     out_dir.mkdir(parents=True, exist_ok=True)
     files: list[Path] = []
     fh = None
+    gen3 = PortraitGeneratorV3(seed, n=n) if version == 3 else None
+    gen = None if version == 3 else PortraitGenerator(seed, version=version)
     try:
         for i in range(n):
             if i % chunk_size == 0:
@@ -135,9 +180,19 @@ def export_expert_pack(
                 path = out_dir / f"expert_portraits_v{version}_part{part}.jsonl.gz"
                 fh = gzip.open(path, "wt", encoding="utf-8")
                 files.append(path)
-            portrait = _jsonable(gen.generate(i))
-            portrait["id"] = f"SP-{i:05d}"
-            row = {k: portrait[k] for k in EXPERT_FIELDS}
+                if version == 3:
+                    part_meta = {
+                        "__meta__": True, "dataset_version": 3, "part": part,
+                        "rows": min(chunk_size, n - i),
+                        "frozen_today": gen3.frozen_today.isoformat(),
+                    }
+                    fh.write(json.dumps(part_meta, ensure_ascii=False) + "\n")
+            if version == 3:
+                row = _jsonable(gen3.expert_row(i))
+            else:
+                portrait = _jsonable(gen.generate(i))
+                portrait["id"] = f"SP-{i:05d}"
+                row = {k: portrait[k] for k in EXPERT_FIELDS}
             fh.write(json.dumps(row, ensure_ascii=False) + "\n")
     finally:
         if fh is not None:
@@ -150,6 +205,10 @@ def _fmt_money(v: float) -> str:
 
 
 def export_markdown(out: Path, n: int, seed: int, version: int) -> int:
+    if version == 3:
+        raise NotImplementedError(
+            "markdown-карточки для v3 не предусмотрены: раздача экспертам — "
+            "jsonl.gz (экспертный бриф v3)")
     """Человекочитаемые СУХИЕ карточки портретов одним .md (для владельца).
 
     Те же правила чистоты, что и в экспертном пакете: без типа портрета и без
@@ -207,15 +266,21 @@ def export_markdown(out: Path, n: int, seed: int, version: int) -> int:
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Экспорт датасетов валидации")
     parser.add_argument(
-        "what", choices=("portraits", "outcomes", "expert-pack", "markdown")
+        "what",
+        choices=("portraits", "outcomes", "expert-pack", "markdown",
+                 "coordinator-key")
     )
     parser.add_argument("--out", type=Path, required=True)
     parser.add_argument("--n", type=int, default=12000)
     parser.add_argument("--seed", type=int, default=20260702)
-    parser.add_argument("--version", type=int, default=2, choices=(1, 2))
+    parser.add_argument("--version", type=int, default=2, choices=(1, 2, 3))
     parser.add_argument("--chunk-size", type=int, default=3000)
     args = parser.parse_args(argv)
 
+    if args.what == "coordinator-key":
+        written = export_coordinator_key(args.out, n=args.n, seed=args.seed)
+        print(f"coordinator-key: {written} строк -> {args.out}")
+        return 0
     if args.what == "expert-pack":
         files = export_expert_pack(
             args.out, n=args.n, seed=args.seed,

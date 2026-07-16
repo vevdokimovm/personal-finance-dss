@@ -111,9 +111,12 @@ def model_outcome(portrait: dict[str, Any]) -> dict[str, Any]:
     }
 
 
-def run_validation(rows: list[dict[str, str]], seed: int = 20260702) -> dict[str, Any]:
-    # Эталон joined.csv построен на генераторе v1 — регенерация строго им
-    gen = PortraitGenerator(seed, version=1)
+def run_validation(
+    rows: list[dict[str, str]], seed: int = 20260702, version: int = 1
+) -> dict[str, Any]:
+    # Регенерация строго тем генератором, которым построен эталонный joined:
+    # раунд 1 — v1 (joined.csv.gz), раунд 2 — v2 (joined_v2.csv.gz)
+    gen = PortraitGenerator(seed, version=version)
     stats: dict[str, Any] = {
         "n": len(rows),
         "status": Counter(),
@@ -247,10 +250,12 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--report", type=Path, default=None)
     parser.add_argument("--title", type=str, default="отчёт")
     parser.add_argument("--seed", type=int, default=20260702)
+    parser.add_argument("--version", type=int, default=1,
+                        help="версия генератора, которым построен joined")
     args = parser.parse_args(argv)
 
     rows = load_joined(args.joined)
-    stats = run_validation(rows, seed=args.seed)
+    stats = run_validation(rows, seed=args.seed, version=args.version)
     ag = stats["agreement"]
     agree_pct = ag["agree"] / ag["with_consensus"] * 100 if ag["with_consensus"] else 0.0
     print(json.dumps({
