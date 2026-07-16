@@ -9,6 +9,7 @@ from __future__ import annotations
 
 from tools.revision.revision_check import (
     REPO_ROOT,
+    CjkCanaryChecker,
     CountChecker,
     LegacyModelChecker,
     LinkChecker,
@@ -32,6 +33,20 @@ class TestRepoRevisionGate:
     def test_structural_counts_match(self) -> None:
         result = CountChecker(REPO_ROOT).run()
         assert result.ok, "Рассинхрон счётчиков docs<->code:\n" + _fmt(result)
+
+    def test_no_cjk_glitches_in_product_tree(self) -> None:
+        result = CjkCanaryChecker(REPO_ROOT).run()
+        assert result.ok, "CJK-глюки генерации в файлах:\n" + _fmt(result)
+
+    def test_cjk_checker_detects_synthetic(self, tmp_path) -> None:
+        # реальный класс глюка: U+957F («длинный») вместо «долгого»; сырой
+        # иероглиф в тестах не держим — конструируем через chr()
+        glitch = "Это итог" + chr(0x957F) + " подбора"
+        (tmp_path / "note.md").write_text(glitch, encoding="utf-8")
+        (tmp_path / "ok.md").write_text("чистый текст, clean text", encoding="utf-8")
+        result = CjkCanaryChecker(tmp_path).run()
+        assert not result.ok
+        assert any("note.md:1" in f.location for f in result.failures)
 
     def test_full_revision_clean(self) -> None:
         results = RevisionChecker().run()

@@ -84,6 +84,24 @@ LEGACY_CONTEXT_MARKERS = (
 EXPECTED_COUNTS = {"tables": 28, "migrations": 29, "openapi_paths": 106}
 
 
+# Канарейка CJK: редкий токен-глюк генерации ассистентов — иероглиф вместо
+# кириллицы/латиницы, иногда семантический. Реальные случаи этого репо до
+# v6.13.1: U+957F («длинный») вместо «долгого» в logo_passport, U+6040 внутри
+# слова «Авторизация» в cybersecurity_methodology. Продукт RU/EN: любой
+# CJK-символ в дереве — дефект, не контент. Сырые иероглифы в этом файле не
+# держим — канарейка не должна ловить саму себя. Диапазоны: кана, CJK Unified
+# (+ext-A, +compat), хангыль.
+CJK_PATTERN = re.compile(
+    r"[\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff\uac00-\ud7af]")
+CJK_SCAN_SUFFIXES = frozenset({
+    ".py", ".md", ".sh", ".html", ".js", ".css", ".json",
+    ".yml", ".yaml", ".cfg", ".ini", ".toml", ".txt",
+})
+# rel-путь -> обоснование легитимного CJK (сегодня пуст; замороженные файлы при
+# необходимости попадают сюда с объяснением, историю не переписываем).
+CJK_ALLOWLIST: dict[str, str] = {}
+
+
 @dataclass(frozen=True)
 class Finding:
     location: str
@@ -174,6 +192,39 @@ class LegacyModelChecker:
         return result
 
 
+class CjkCanaryChecker:
+    name = "CJK-канарейка (токен-глюки генерации)"
+
+    def __init__(self, root: Path) -> None:
+        self._root = root
+
+    def run(self) -> CheckResult:
+        result = CheckResult(self.name)
+        for path in sorted(self._root.rglob("*")):
+            if not path.is_file() or path.suffix not in CJK_SCAN_SUFFIXES:
+                continue
+            if any(part in SKIP_DIRS for part in path.parts):
+                continue
+            rel = path.relative_to(self._root).as_posix()
+            if rel in CJK_ALLOWLIST:
+                continue
+            try:
+                lines = path.read_text(encoding="utf-8").splitlines()
+            except (UnicodeDecodeError, OSError):
+                continue
+            for line_no, line in enumerate(lines, 1):
+                match = CJK_PATTERN.search(line)
+                if match:
+                    snippet = line.strip()[:60]
+                    result.failures.append(Finding(
+                        f"{rel}:{line_no}",
+                        f"CJK-символ '{match.group()}' в: {snippet}",
+                    ))
+        if result.ok:
+            result.infos.append(Finding("сводка", "CJK-символов в дереве продукта: 0"))
+        return result
+
+
 class CountChecker:
     name = "Счётчики структуры docs<->code"
 
@@ -219,7 +270,8 @@ class CountChecker:
 
 class RevisionChecker:
     def __init__(self, root: Path = REPO_ROOT) -> None:
-        self._checks = [LinkChecker(root), LegacyModelChecker(root), CountChecker(root)]
+        self._checks = [LinkChecker(root), LegacyModelChecker(root),
+                        CjkCanaryChecker(root), CountChecker(root)]
 
     def run(self) -> list[CheckResult]:
         return [check.run() for check in self._checks]
