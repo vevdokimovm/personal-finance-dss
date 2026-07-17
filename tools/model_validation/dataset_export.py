@@ -27,13 +27,14 @@ import csv
 import gzip
 import json
 import sys
-from datetime import date, datetime
+from datetime import date, datetime, time
 from pathlib import Path
 from typing import Any
 
 from tools.model_validation.expert_agreement import FROZEN_TODAY, model_outcome
 from tools.portrait_testing.generator import PortraitGenerator
 from tools.portrait_testing.generator_v3 import PortraitGeneratorV3
+from tools.model_validation.portrait_validation import invalid_reason
 
 
 def _jsonable(node: Any) -> Any:
@@ -96,8 +97,65 @@ def export_coordinator_key(out: Path, n: int, seed: int) -> int:
 OUTCOME_FIELDS = (
     "id", "kind", "risk", "status", "rt", "lt", "dt",
     "xo", "xr", "xg", "invest", "dom",
-    "dt_alert", "crisis_severity", "crisis_actions",
+    "dt_alert", "crisis_severity", "crisis_actions", "invalid_reason",
 )
+
+
+def _export_outcomes_v3(out: Path, n: int, seed: int) -> int:
+    """Outcomes для датасета v3: слой D уходит в status=invalid БЕЗ запуска модели.
+
+    Правило invalid зеркально экспертному брифу v3 (`portrait_validation`).
+    id — канонические SP3-{i:05d} (уникальные, стыкуются с ключом координатора);
+    дубли id слоя D — дефект уровня выгрузки, сборщик joined раунда 3
+    сопоставляет ответы экспертов по порядку строк, не по id.
+    """
+    gen3 = PortraitGeneratorV3(seed, n=n)
+    today = datetime.combine(gen3.frozen_today, time(12, 0))
+    out.parent.mkdir(parents=True, exist_ok=True)
+    written = 0
+    with gzip.open(out, "wt", encoding="utf-8", newline="") as fh:
+        writer = csv.DictWriter(fh, fieldnames=OUTCOME_FIELDS)
+        writer.writeheader()
+        for i in range(n):
+            portrait = gen3.generate(i)
+            reason = invalid_reason(portrait)
+            if reason is not None:
+                writer.writerow({
+                    "id": f"SP3-{i:05d}",
+                    "kind": portrait.get("kind", ""),
+                    "risk": portrait.get("risk_tolerance", ""),
+                    "status": "invalid",
+                    "rt": "", "lt": "", "dt": "",
+                    "xo": 0.0, "xr": 0.0, "xg": 0.0, "invest": 0.0,
+                    "dom": "none",
+                    "dt_alert": "",
+                    "crisis_severity": "",
+                    "crisis_actions": "",
+                    "invalid_reason": reason,
+                })
+                written += 1
+                continue
+            o = model_outcome(portrait, today=today)
+            writer.writerow({
+                "id": f"SP3-{i:05d}",
+                "kind": portrait["kind"],
+                "risk": portrait["risk_tolerance"],
+                "status": o["status"],
+                "rt": round(o["rt"], 2),
+                "lt": round(o["lt"], 4),
+                "dt": round(o["dt"], 4),
+                "xo": round(o["xo"], 2),
+                "xr": round(o["xr"], 2),
+                "xg": round(o["xg"] - o["invest"], 2),
+                "invest": round(o["invest"], 2),
+                "dom": o["dom"],
+                "dt_alert": int(o["dt_alert"]),
+                "crisis_severity": o["crisis_severity"] or "",
+                "crisis_actions": o["crisis_actions"],
+                "invalid_reason": "",
+            })
+            written += 1
+    return written
 
 
 def export_model_outcomes(out: Path, n: int, seed: int, version: int) -> int:
@@ -108,10 +166,7 @@ def export_model_outcomes(out: Path, n: int, seed: int, version: int) -> int:
     потребитель). Кризисные поля — охват G2.
     """
     if version == 3:
-        raise NotImplementedError(
-            "outcomes для v3 — работа стенда раунда 3: слой D (adversarial) "
-            "требует ветки обработки невалидных записей (status=invalid), "
-            "а слой E — попарной метрики монотонности. См. iteration_protocol.")
+        return _export_outcomes_v3(out, n=n, seed=seed)
     gen = PortraitGenerator(seed, version=version)
     out.parent.mkdir(parents=True, exist_ok=True)
     written = 0

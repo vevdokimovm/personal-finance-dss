@@ -368,11 +368,31 @@ class TestExportV3:
         assert sum(1 for r in rows if r["layer"] == "E") > 0
         assert sum(1 for r in rows if r["expected_error"]) > 0
 
-    def test_outcomes_v3_fails_loud(self):
+    def test_outcomes_v3_with_invalid_branch(self, tmp_path):
+        import csv
+        import gzip
+        from collections import Counter
         from tools.model_validation.dataset_export import export_model_outcomes
-        with pytest.raises(NotImplementedError):
-            export_model_outcomes(
-                Path("/tmp/never.csv.gz"), n=10, seed=SEED, version=3)
+        out = tmp_path / "outcomes_v3.csv.gz"
+        n = export_model_outcomes(out, n=self.N_SMALL, seed=SEED, version=3)
+        assert n == self.N_SMALL
+        with gzip.open(out, "rt", encoding="utf-8") as fh:
+            rows = list(csv.DictReader(fh))
+        assert len(rows) == self.N_SMALL
+        statuses = Counter(r["status"] for r in rows)
+        assert set(statuses) <= {"ok", "deficit", "invalid", "no_admissible_plan"}
+        gen = PortraitGeneratorV3(seed=SEED, n=self.N_SMALL)
+        d_count = sum(1 for i in range(self.N_SMALL)
+                      if gen.layer_by_index[i] == "D")
+        # слой D битый по построению => ровно он и должен стать invalid
+        assert statuses["invalid"] == d_count
+        for r in rows:
+            if r["status"] == "invalid":
+                assert r["dom"] == "none"
+                assert r["xo"] == r["xr"] == r["xg"] == "0.0"
+                assert r["invalid_reason"]
+            else:
+                assert r["invalid_reason"] == ""
 
     def test_markdown_v3_renders_blind_cards(self, tmp_path):
         from tools.model_validation.dataset_export import export_markdown
@@ -388,3 +408,40 @@ class TestExportV3:
         for token in ("kind", "layer", "pair_id", "expected_error"):
             assert token not in text, f"утечка метки {token}"
         assert "некорректн" in text  # шапка предупреждает про слой сырой выгрузки
+
+
+class TestPortraitValidator:
+    def test_valid_portrait_passes(self):
+        from tools.model_validation.portrait_validation import invalid_reason
+        gen = PortraitGeneratorV3(seed=SEED, n=1200)
+        checked = 0
+        for i in range(1200):
+            p = gen.generate(i)
+            if p["layer"] == "D":
+                continue
+            assert invalid_reason(p) is None, (p["index"], invalid_reason(p))
+            checked += 1
+        assert checked > 1000
+
+    def test_every_d_kind_caught_with_reason(self):
+        from tools.model_validation.portrait_validation import invalid_reason
+        gen = PortraitGeneratorV3(seed=SEED, n=N)
+        seen: dict[str, str] = {}
+        for i in range(N):
+            if gen.layer_by_index[i] != "D":
+                continue
+            p = gen.generate(i)
+            reason = invalid_reason(p)
+            assert reason, f"D-запись не поймана: {p['kind']} (index {i})"
+            seen.setdefault(p["kind"], reason)
+        assert len(seen) == 12, sorted(seen)
+
+    def test_borderline_values_are_valid(self):
+        # бриф: «пограничные, но читаемые — НЕ дефект»
+        from tools.model_validation.portrait_validation import invalid_reason
+        gen = PortraitGeneratorV3(seed=SEED, n=1200)
+        base = next(gen.generate(i) for i in range(1200)
+                    if gen.layer_by_index[i] == "A" and gen.generate(i)["obligations"])
+        base["obligations"][0]["interest_rate"] = 0.59
+        base["income_total"] = 1.9e9
+        assert invalid_reason(base) is None

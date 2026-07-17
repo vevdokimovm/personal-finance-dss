@@ -54,8 +54,13 @@ def expert_consensus(row: dict[str, str]) -> str | None:
     return dom if n >= 3 else None
 
 
-def model_outcome(portrait: dict[str, Any]) -> dict[str, Any]:
-    """Прогон портрета через ядро → статус, эффективный сплит, доминанта."""
+def model_outcome(portrait: dict[str, Any],
+                  today: datetime = FROZEN_TODAY) -> dict[str, Any]:
+    """Прогон портрета через ядро → статус, эффективный сплит, доминанта.
+
+    `today` — дата среза датасета (у v1/v2 это FROZEN_TODAY 2026-07-02;
+    v3 передаёт собственный frozen_today генератора: дедлайны относительные).
+    """
     result = run_planning(
         income_total=portrait["income_total"],
         expense_total=portrait["expense_total"],
@@ -65,7 +70,7 @@ def model_outcome(portrait: dict[str, Any]) -> dict[str, Any]:
         r_bench=portrait["r_bench"],
         risk_tolerance=portrait["risk_tolerance"],
         l_min=portrait["l_min"],
-        today=FROZEN_TODAY,
+        today=today,
     )
     payments = sum(float(o.get("monthly_payment", 0)) for o in portrait["obligations"])
     rt = portrait["income_total"] - portrait["expense_total"] - payments
