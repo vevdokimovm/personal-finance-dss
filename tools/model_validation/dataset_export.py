@@ -204,63 +204,116 @@ def _fmt_money(v: float) -> str:
     return f"{v:,.2f}".replace(",", " ")
 
 
+def _fmt_cell(value) -> str:
+    """Число — как деньги; всё прочее (None/строка/мусор слоя D) — сырьём в !..!."""
+    if isinstance(value, bool) or not isinstance(value, (int, float)):
+        return f"!{value!r}!"
+    return _fmt_money(value)
+
+
+def _fmt_rate(value) -> str:
+    if isinstance(value, bool) or not isinstance(value, (int, float)):
+        return f"!{value!r}!"
+    return f"{value * 100:.1f}%"
+
+
+def _fmt_deadline(goal: dict) -> str:
+    if "deadline" not in goal:
+        return "!нет поля deadline!"
+    value = goal["deadline"]
+    if value is None:
+        return "без дедлайна"
+    if hasattr(value, "isoformat"):
+        return f"дедлайн {value.isoformat()}"
+    return f"дедлайн !{value!r}!"
+
+
 def export_markdown(out: Path, n: int, seed: int, version: int) -> int:
-    if version == 3:
-        raise NotImplementedError(
-            "markdown-карточки для v3 не предусмотрены: раздача экспертам — "
-            "jsonl.gz (экспертный бриф v3)")
     """Человекочитаемые СУХИЕ карточки портретов одним .md (для владельца).
 
     Те же правила чистоты, что и в экспертном пакете: без типа портрета и без
     вычисленных метрик. Регенерируемый артефакт — в архиве кода не хранится,
     выдаётся по запросу.
+
+    version=3: карточки строятся из слепой проекции `expert_row` — дубли id
+    доживают до карточек, битые записи слоя D рендерятся КАК ЕСТЬ (сырое
+    значение в `!..!`), рендер данные не чинит и не падает.
     """
-    gen = PortraitGenerator(seed, version=version)
     out.parent.mkdir(parents=True, exist_ok=True)
     risk_labels = {1: "консервативный", 2: "умеренно-консервативный",
                    3: "сбалансированный", 4: "умеренно-агрессивный",
                    5: "агрессивный"}
+    if version == 3:
+        gen3 = PortraitGeneratorV3(seed, n=n)
+
+        def rows():
+            for i in range(n):
+                yield gen3.expert_row(i)
+
+        header_extra = (
+            f"> Срез дат (все дедлайны относительно него): "
+            f"{gen3.frozen_today.isoformat()}. Небольшая доля записей намеренно "
+            "некорректна — как сырая выгрузка из CRM (битые суммы/даты/поля, "
+            "дубли id); такие значения показаны как есть в `!..!`, карточки "
+            "их не чинят.\n"
+        )
+    else:
+        gen = PortraitGenerator(seed, version=version)
+
+        def rows():
+            for i in range(n):
+                portrait = gen.generate(i)
+                portrait["id"] = f"SP-{i:05d}"
+                yield portrait
+
+        header_extra = ""
+    written = 0
     with open(out, "w", encoding="utf-8") as fh:
         fh.write(
             f"# Портреты датасета v{version} — {n} шт. (seed {seed})\n\n"
             "> Сухие входные данные без подсказок: тип портрета и расчётные "
             "показатели намеренно не приводятся. Регенерация: "
             "`python -m tools.model_validation.dataset_export markdown ...`\n"
+            + header_extra
         )
-        for i in range(n):
-            p = gen.generate(i)
-            risk = p["risk_tolerance"]
+        for row in rows():
+            risk = row.get("risk_tolerance")
+            risk_text = (f"риск {risk} ({risk_labels[risk]})"
+                         if risk in risk_labels else f"риск !{risk!r}!")
             fh.write(
-                f"\n### SP-{i:05d} · риск {risk} ({risk_labels[risk]}) · "
-                f"безрисковая ставка {p['r_bench'] * 100:.2f}%\n"
+                f"\n### {row['id']} · {risk_text} · "
+                f"безрисковая ставка {_fmt_rate(row.get('r_bench'))}\n"
             )
+            income = row.get("income_total", "!поле отсутствует!")
             fh.write(
-                f"Доход {_fmt_money(p['income_total'])} ₽/мес · "
-                f"Расходы {_fmt_money(p['expense_total'])} ₽/мес · "
-                f"Накопления {_fmt_money(p['bliq'])} ₽\n"
+                f"Доход {_fmt_cell(income)} ₽/мес · "
+                f"Расходы {_fmt_cell(row.get('expense_total'))} ₽/мес · "
+                f"Накопления {_fmt_cell(row.get('bliq'))} ₽\n"
             )
-            if p["obligations"]:
+            obligations = row.get("obligations") or []
+            if obligations:
                 items = "; ".join(
-                    f"«{o['name']}» — остаток {_fmt_money(o['amount'])} ₽, "
-                    f"ставка {o['interest_rate'] * 100:.1f}%, "
-                    f"платёж {_fmt_money(o['monthly_payment'])} ₽/мес"
-                    for o in p["obligations"]
+                    f"«{o.get('name', '?')}» — остаток {_fmt_cell(o.get('amount'))} ₽, "
+                    f"ставка {_fmt_rate(o.get('interest_rate'))}, "
+                    f"платёж {_fmt_cell(o.get('monthly_payment'))} ₽/мес"
+                    for o in obligations
                 )
                 fh.write(f"Кредиты: {items}\n")
             else:
                 fh.write("Кредиты: нет\n")
-            if p["goals"]:
+            goals = row.get("goals") or []
+            if goals:
                 items = "; ".join(
-                    f"«{g['name']}» — {_fmt_money(g['target_amount'])} ₽ "
-                    f"(накоплено {_fmt_money(g['current_amount'])})"
-                    + (f", дедлайн {g['deadline'].isoformat()}"
-                       if g.get("deadline") else ", без дедлайна")
-                    for g in p["goals"]
+                    f"«{g.get('name', '?')}» — {_fmt_cell(g.get('target_amount'))} ₽ "
+                    f"(накоплено {_fmt_cell(g.get('current_amount'))}), "
+                    + _fmt_deadline(g)
+                    for g in goals
                 )
                 fh.write(f"Цели: {items}\n")
             else:
                 fh.write("Цели: нет\n")
-    return n
+            written += 1
+    return written
 
 
 def main(argv: list[str] | None = None) -> int:

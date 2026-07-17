@@ -373,3 +373,18 @@ class TestExportV3:
         with pytest.raises(NotImplementedError):
             export_model_outcomes(
                 Path("/tmp/never.csv.gz"), n=10, seed=SEED, version=3)
+
+    def test_markdown_v3_renders_blind_cards(self, tmp_path):
+        from tools.model_validation.dataset_export import export_markdown
+        out = tmp_path / "cards.md"
+        n = export_markdown(out, n=self.N_SMALL, seed=SEED, version=3)
+        text = out.read_text(encoding="utf-8")
+        assert n == self.N_SMALL
+        # одна карточка на входную строку; дубли id — с повторённым id
+        assert text.count("### SP3-") == self.N_SMALL
+        ids = [line.split(" · ")[0] for line in text.splitlines()
+               if line.startswith("### SP3-")]
+        assert len(set(ids)) < self.N_SMALL  # дубли id дожили до карточек
+        for token in ("kind", "layer", "pair_id", "expected_error"):
+            assert token not in text, f"утечка метки {token}"
+        assert "некорректн" in text  # шапка предупреждает про слой сырой выгрузки
