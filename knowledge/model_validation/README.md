@@ -58,6 +58,9 @@ python -m tools.model_validation.expert_agreement \
 | `portraits_v3_coordinator_key.csv.gz` | Ключ координатора v3: id → layer/kind/pair_id/pair_relation/expected_error/id_override — слепота экспертов сохраняется, приёмка и стенд размечают по нему |
 | `model_outcomes_v3_4_0_on_v3.csv.gz` | Модельная половина раунда 3: v3.4.0 + FLOW_EPS на 12 000 портретов v3 (слой D — `status=invalid`, колонки `invalid_reason` и `model_lump`; срез 2026-07-16). Анализ — `round3_model_half_analysis.py`, отчёты — `round3_model_half.md`, `expert_certification_round3.md` |
 | `joined_v3.csv.gz` | Joined третьей сертификации: модель + 4 эксперта, сопоставление ПО ПОРЯДКУ строк (`build_joined_v3.py`, fail-loud id-сверка); согласие 67.5% (action-adjusted 76.3%) при коридоре 64.8–88.0. Сырые артефакты — `docs/model/expert_certification/iterations/3/` |
+| `portraits_v4_seed20260718.jsonl.gz` | КАНОНИЧЕСКИЙ размеченный датасет v4 (12 000; слои A–E, meta первой строкой со спеками продуктов и семейств): генератор `tools/portrait_testing/generator_v4.py`, приёмка `tests/test_generator_v4.py` (35 тестов), ТЗ — `iterations/3/expert_feedback_aggregate.md` §6 |
+| `expert_portraits_v4_part1..4.jsonl.gz` | СЛЕПОЙ пакет v4 для раунда 4 (без меток; валидные дубли id и мусор слоя D доживают до эксперта намеренно). Бриф — `docs/model/expert_brief_v4.md`, методичка — `docs/model/expert_certification/testset_methodology.md` |
+| `portraits_v4_coordinator_key.csv.gz` | Ключ координатора v4: id → layer/kind/**family**/pair_*/expected_error/id_override; раскрывается экспертам ПОСЛЕ сдачи (протокол §4) |
 
 Регенерация любого файла: `tools/model_validation/dataset_export.py`
 (portraits / outcomes / expert-pack / markdown, детерминировано по seed+version).

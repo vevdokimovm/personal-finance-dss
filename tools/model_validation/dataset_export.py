@@ -34,6 +34,7 @@ from typing import Any
 from tools.model_validation.expert_agreement import FROZEN_TODAY, model_outcome
 from tools.portrait_testing.generator import PortraitGenerator
 from tools.portrait_testing.generator_v3 import PortraitGeneratorV3
+from tools.portrait_testing.generator_v4 import PortraitGeneratorV4
 from tools.model_validation.portrait_validation import invalid_reason
 
 
@@ -56,13 +57,14 @@ def export_portraits(out: Path, n: int, seed: int, version: int) -> int:
     """
     out.parent.mkdir(parents=True, exist_ok=True)
     written = 0
-    if version == 3:
-        gen3 = PortraitGeneratorV3(seed, n=n)
+    if version in LAYERED_GENERATORS:
+        gen_l = layered_generator(version, seed, n)
+        prefix = ID_PREFIX[version]
         with gzip.open(out, "wt", encoding="utf-8") as fh:
-            fh.write(json.dumps(_jsonable(gen3.meta()), ensure_ascii=False) + "\n")
+            fh.write(json.dumps(_jsonable(gen_l.meta()), ensure_ascii=False) + "\n")
             for i in range(n):
-                portrait = _jsonable(gen3.generate(i))
-                portrait["id"] = f"SP3-{i:05d}"
+                portrait = _jsonable(gen_l.generate(i))
+                portrait["id"] = f"{prefix}-{i:05d}"
                 fh.write(json.dumps(portrait, ensure_ascii=False) + "\n")
                 written += 1
         return written
@@ -76,22 +78,34 @@ def export_portraits(out: Path, n: int, seed: int, version: int) -> int:
     return written
 
 
-def export_coordinator_key(out: Path, n: int, seed: int) -> int:
-    """Ключ координатора v3: id -> метки (слепота экспертов сохраняется)."""
-    gen3 = PortraitGeneratorV3(seed, n=n)
+def export_coordinator_key(out: Path, n: int, seed: int,
+                           version: int = 3) -> int:
+    """Ключ координатора (v3+): id -> метки; слепота экспертов сохраняется."""
+    gen_l = layered_generator(version, seed, n)
     out.parent.mkdir(parents=True, exist_ok=True)
     fields = ("id", "layer", "kind", "pair_id", "pair_role",
               "pair_relation", "expected_error", "id_override")
+    if version >= 4:
+        fields = fields[:3] + ("family",) + fields[3:]
     written = 0
     with gzip.open(out, "wt", encoding="utf-8", newline="") as fh:
         writer = csv.DictWriter(fh, fieldnames=fields)
         writer.writeheader()
         for i in range(n):
-            row = gen3.coordinator_key(i)
+            row = gen_l.coordinator_key(i)
             writer.writerow({k: ("" if row.get(k) is None else row[k])
                              for k in fields})
             written += 1
     return written
+
+
+LAYERED_GENERATORS = {3: PortraitGeneratorV3, 4: PortraitGeneratorV4}
+ID_PREFIX = {3: "SP3", 4: "SP4"}
+
+
+def layered_generator(version: int, seed: int, n: int):
+    """Слоистые генераторы (v3+): единый фасад generate/expert_row/meta."""
+    return LAYERED_GENERATORS[version](seed, n=n)
 
 
 OUTCOME_FIELDS = (
@@ -101,27 +115,29 @@ OUTCOME_FIELDS = (
 )
 
 
-def _export_outcomes_v3(out: Path, n: int, seed: int) -> int:
-    """Outcomes для датасета v3: слой D уходит в status=invalid БЕЗ запуска модели.
+def _export_outcomes_layered(out: Path, n: int, seed: int,
+                             version: int = 3) -> int:
+    """Outcomes для слоистых датасетов (v3+): слой D — status=invalid без модели.
 
     Правило invalid зеркально экспертному брифу v3 (`portrait_validation`).
     id — канонические SP3-{i:05d} (уникальные, стыкуются с ключом координатора);
     дубли id слоя D — дефект уровня выгрузки, сборщик joined раунда 3
     сопоставляет ответы экспертов по порядку строк, не по id.
     """
-    gen3 = PortraitGeneratorV3(seed, n=n)
-    today = datetime.combine(gen3.frozen_today, time(12, 0))
+    gen_l = layered_generator(version, seed, n)
+    prefix = ID_PREFIX[version]
+    today = datetime.combine(gen_l.frozen_today, time(12, 0))
     out.parent.mkdir(parents=True, exist_ok=True)
     written = 0
     with gzip.open(out, "wt", encoding="utf-8", newline="") as fh:
         writer = csv.DictWriter(fh, fieldnames=OUTCOME_FIELDS)
         writer.writeheader()
         for i in range(n):
-            portrait = gen3.generate(i)
+            portrait = gen_l.generate(i)
             reason = invalid_reason(portrait)
             if reason is not None:
                 writer.writerow({
-                    "id": f"SP3-{i:05d}",
+                    "id": f"{prefix}-{i:05d}",
                     "kind": portrait.get("kind", ""),
                     "risk": portrait.get("risk_tolerance", ""),
                     "status": "invalid",
@@ -137,7 +153,7 @@ def _export_outcomes_v3(out: Path, n: int, seed: int) -> int:
                 continue
             o = model_outcome(portrait, today=today)
             writer.writerow({
-                "id": f"SP3-{i:05d}",
+                "id": f"{prefix}-{i:05d}",
                 "kind": portrait["kind"],
                 "risk": portrait["risk_tolerance"],
                 "status": o["status"],
@@ -166,8 +182,8 @@ def export_model_outcomes(out: Path, n: int, seed: int, version: int) -> int:
     (в xg НЕ включён: колонки независимы, семантику goals+inv собирает
     потребитель). Кризисные поля — охват G2.
     """
-    if version == 3:
-        return _export_outcomes_v3(out, n=n, seed=seed)
+    if version in LAYERED_GENERATORS:
+        return _export_outcomes_layered(out, n=n, seed=seed, version=version)
     gen = PortraitGenerator(seed, version=version)
     out.parent.mkdir(parents=True, exist_ok=True)
     written = 0
@@ -226,8 +242,9 @@ def export_expert_pack(
     out_dir.mkdir(parents=True, exist_ok=True)
     files: list[Path] = []
     fh = None
-    gen3 = PortraitGeneratorV3(seed, n=n) if version == 3 else None
-    gen = None if version == 3 else PortraitGenerator(seed, version=version)
+    layered = version in LAYERED_GENERATORS
+    gen_l = layered_generator(version, seed, n) if layered else None
+    gen = None if layered else PortraitGenerator(seed, version=version)
     try:
         for i in range(n):
             if i % chunk_size == 0:
@@ -237,15 +254,15 @@ def export_expert_pack(
                 path = out_dir / f"expert_portraits_v{version}_part{part}.jsonl.gz"
                 fh = gzip.open(path, "wt", encoding="utf-8")
                 files.append(path)
-                if version == 3:
+                if layered:
                     part_meta = {
-                        "__meta__": True, "dataset_version": 3, "part": part,
-                        "rows": min(chunk_size, n - i),
-                        "frozen_today": gen3.frozen_today.isoformat(),
+                        "__meta__": True, "dataset_version": version,
+                        "part": part, "rows": min(chunk_size, n - i),
+                        "frozen_today": gen_l.frozen_today.isoformat(),
                     }
                     fh.write(json.dumps(part_meta, ensure_ascii=False) + "\n")
-            if version == 3:
-                row = _jsonable(gen3.expert_row(i))
+            if layered:
+                row = _jsonable(gen_l.expert_row(i))
             else:
                 portrait = _jsonable(gen.generate(i))
                 portrait["id"] = f"SP-{i:05d}"
@@ -300,16 +317,16 @@ def export_markdown(out: Path, n: int, seed: int, version: int) -> int:
     risk_labels = {1: "консервативный", 2: "умеренно-консервативный",
                    3: "сбалансированный", 4: "умеренно-агрессивный",
                    5: "агрессивный"}
-    if version == 3:
-        gen3 = PortraitGeneratorV3(seed, n=n)
+    if version in LAYERED_GENERATORS:
+        gen_l = layered_generator(version, seed, n)
 
         def rows():
             for i in range(n):
-                yield gen3.expert_row(i)
+                yield gen_l.expert_row(i)
 
         header_extra = (
             f"> Срез дат (все дедлайны относительно него): "
-            f"{gen3.frozen_today.isoformat()}. Небольшая доля записей намеренно "
+            f"{gen_l.frozen_today.isoformat()}. Небольшая доля записей намеренно "
             "некорректна — как сырая выгрузка из CRM (битые суммы/даты/поля, "
             "дубли id); такие значения показаны как есть в `!..!`, карточки "
             "их не чинят.\n"
@@ -383,12 +400,14 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--out", type=Path, required=True)
     parser.add_argument("--n", type=int, default=12000)
     parser.add_argument("--seed", type=int, default=20260702)
-    parser.add_argument("--version", type=int, default=2, choices=(1, 2, 3))
+    parser.add_argument("--version", type=int, default=2,
+                        choices=(1, 2, 3, 4))
     parser.add_argument("--chunk-size", type=int, default=3000)
     args = parser.parse_args(argv)
 
     if args.what == "coordinator-key":
-        written = export_coordinator_key(args.out, n=args.n, seed=args.seed)
+        written = export_coordinator_key(args.out, n=args.n, seed=args.seed,
+                                         version=args.version)
         print(f"coordinator-key: {written} строк -> {args.out}")
         return 0
     if args.what == "expert-pack":

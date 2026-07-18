@@ -89,8 +89,11 @@
 
 ```
 docs/model/expert_certification/
-  expert_prompt_unified.md          # промпт (постоянен)
+  expert_prompt_unified.md          # промпт итерации 1 (исторический)
   iteration_protocol.md             # этот файл
+  testset_methodology.md            # методичка тест-сетов (слои, power analysis, чек-лист)
+  artifact_catalog.md               # что сдаёт каждый эксперт и почему (провенанс находок)
+  prompts/README.md                 # эволюция промпта по итерациям
   iterations/
     <N>/                            # номер итерации (1..5)
       dataset_meta.json             # dataset_version, seed, конфиг слоёв, контракт сопоставления
