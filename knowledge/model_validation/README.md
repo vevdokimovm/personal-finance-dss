@@ -61,6 +61,7 @@ python -m tools.model_validation.expert_agreement \
 | `portraits_v4_seed20260718.jsonl.gz` | КАНОНИЧЕСКИЙ размеченный датасет v4 (12 000; слои A–E, meta первой строкой со спеками продуктов и семейств): генератор `tools/portrait_testing/generator_v4.py`, приёмка `tests/test_generator_v4.py` (35 тестов), ТЗ — `iterations/3/expert_feedback_aggregate.md` §6 |
 | `expert_portraits_v4_part1..4.jsonl.gz` | СЛЕПОЙ пакет v4 для раунда 4 (без меток; валидные дубли id и мусор слоя D доживают до эксперта намеренно). Бриф — `docs/model/expert_brief_v4.md`, методичка — `docs/model/expert_certification/testset_methodology.md` |
 | `portraits_v4_coordinator_key.csv.gz` | Ключ координатора v4: id → layer/kind/**family**/pair_*/expected_error/id_override; раскрывается экспертам ПОСЛЕ сдачи (протокол §4) |
+| `model_outcomes_v3_4_0_on_v4.csv.gz` + `model_results_v3_4_0_on_v4.md` | Прогон модели v3.4.0 по датасету v4 (ok 7334 / deficit 4066 / invalid 600; D 600/600, 0 ложных; метаморфика 0 нарушений из 300 пар; lump 38%). Комплект и нейминг — стандарт `docs/model/model_run_output_standard.md`, команда `dataset_export run` |
 
 Регенерация любого файла: `tools/model_validation/dataset_export.py`
 (portraits / outcomes / expert-pack / markdown, детерминировано по seed+version).

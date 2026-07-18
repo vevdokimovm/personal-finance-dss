@@ -70,6 +70,7 @@ def _fcf(p: dict) -> float:
     return p["income_total"] - p["expense_total"] - pay
 
 
+@pytest.mark.slow
 class TestDeterminismAndLayout:
     def test_deterministic_by_seed(self):
         a = PortraitGeneratorV4(seed=SEED, n=N)
@@ -94,6 +95,7 @@ class TestDeterminismAndLayout:
             assert key in meta, key
 
 
+@pytest.mark.slow
 class TestLoanProductTyping:
     """P1: главный дефект v3 — ипотека под 30% на 3 года."""
 
@@ -157,6 +159,7 @@ class TestLoanProductTyping:
         assert names == {spec["name"] for spec in LOAN_PRODUCTS.values()}
 
 
+@pytest.mark.slow
 class TestGoalsSpec:
     def test_k_scale_matches_declared_spec(self, portraits, gen):
         """P2: заявленный диапазон k обязан совпадать с фактом (суммарный k)."""
@@ -189,6 +192,7 @@ class TestGoalsSpec:
                 assert "одушк" not in g["name"], "коллизия имени цели с bliq (P6)"
 
 
+@pytest.mark.slow
 class TestExactBoundaryArithmetic:
     """P9: источник R3-F1 — float-остаток в «точном нуле»."""
 
@@ -213,6 +217,7 @@ class TestExactBoundaryArithmetic:
             assert abs(pdn - Decimal("0.40")) <= Decimal("0.021"), pdn
 
 
+@pytest.mark.slow
 class TestLayerCFamilies:
     def test_families_have_statistical_power(self, portraits):
         """P7: страта для выводов — семейство, минимум 385 (±5%, 95%)."""
@@ -253,6 +258,7 @@ class TestLayerCFamilies:
             assert isinstance(b["income_total"], float)
 
 
+@pytest.mark.slow
 class TestLayerDAdversarialV2:
     def test_manifest_and_randomized_volumes(self, portraits):
         d = [p for p in portraits if p["layer"] == "D"]
@@ -283,6 +289,7 @@ class TestLayerDAdversarialV2:
                                                    invalid_reason(p))
 
 
+@pytest.mark.slow
 class TestLayerEMetamorphic:
     def test_relations_include_non_uniform_perturbations(self, portraits):
         rels = {p["pair_relation"] for p in portraits if p["layer"] == "E"}
@@ -327,6 +334,7 @@ class TestLayerEMetamorphic:
                 assert twin["bliq"] == pytest.approx(base["bliq"] * 10.0)
 
 
+@pytest.mark.slow
 class TestPopulationRealism:
     def test_status_shares_match_declared_targets(self, portraits, gen):
         targets = gen.meta()["status_targets"]
@@ -392,6 +400,7 @@ class TestBlindContract:
             assert field in key
 
 
+@pytest.mark.slow
 class TestExportV4:
     """Экспортные контракты v4: канон, слепой пакет, ключ, outcomes, карточки."""
 

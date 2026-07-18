@@ -170,13 +170,22 @@ def test_stress_avalanche_payment_never_grows(
 @stress_settings
 @given(s=scenario(), risk=st.integers(min_value=1, max_value=5))
 def test_stress_utility_bounded_and_argmax(s: dict, risk: int):
-    """Под стрессом: U(a) ∈ [0,1] и рекомендация = argmax при любом профиле (§8)."""
+    """Под стрессом: U(a) ∈ [0,1] и рекомендация = argmax при любом профиле (§8).
+
+    Ключ выбора в v3.4.0 — ЛЕКСИКОГРАФИЧЕСКИЙ (floor_level, utility): сначала
+    заполнение стартовой подушки до RESERVE_FLOOR_MONTHS, затем SAW-полезность
+    (app/core/ranking.py §8). Поэтому рекомендация = argmax по этой ПАРЕ, а не
+    по одной utility: когда ни один вариант не достигает floor, консенсус-модель
+    законно предпочитает вариант с большей подушкой, даже если его utility ниже.
+    """
     ranked = rank_alternatives(_evaluate_all(s), risk)
     for alt in ranked:
         assert -1e-4 <= alt["utility"] <= 1.0 + 1e-4
     recommended = [a for a in ranked if a.get("is_recommended")]
     assert len(recommended) == 1
-    assert recommended[0]["utility"] == pytest.approx(max(a["utility"] for a in ranked))
+    best_key = max((a["floor_level"], a["utility"]) for a in ranked)
+    rec_key = (recommended[0]["floor_level"], recommended[0]["utility"])
+    assert rec_key == pytest.approx(best_key)
 
 
 @stress_settings

@@ -390,20 +390,146 @@ def export_markdown(out: Path, n: int, seed: int, version: int) -> int:
     return written
 
 
+def outcomes_filename(model_version: str, dataset_version: int) -> str:
+    """Имя csv-снимка: model_outcomes_<модель>_on_v<датасет>.csv.gz."""
+    mv = model_version.replace(".", "_")
+    return f"model_outcomes_{mv}_on_v{dataset_version}.csv.gz"
+
+
+def results_filename(model_version: str, dataset_version: int) -> str:
+    """Имя читаемой сводки: model_results_<модель>_on_v<датасет>.md."""
+    mv = model_version.replace(".", "_")
+    return f"model_results_{mv}_on_v{dataset_version}.md"
+
+
+def _summarise_outcomes(rows: list[dict], gen) -> dict:
+    """Числа для сводки: статусы, слои, вердикт D, доминанты, lump."""
+    from collections import Counter
+    key = {r["id"]: gen.coordinator_key(int(r["id"].split("-")[1]))
+           for r in rows}
+    status_counts = dict(Counter(r["status"] for r in rows))
+    layers: dict[str, dict] = {}
+    for r in rows:
+        la = key[r["id"]]["layer"]
+        layers.setdefault(la, Counter())[r["status"]] += 1
+    d_rows = [r for r in rows if key[r["id"]]["layer"] == "D"]
+    d_invalid = sum(1 for r in d_rows if r["status"] == "invalid")
+    false_pos = sum(1 for r in rows
+                    if key[r["id"]]["layer"] != "D" and r["status"] == "invalid")
+    dom = dict(Counter(r["dom"] for r in rows if r["status"] == "ok"))
+    lumps = [float(r.get("model_lump") or 0) for r in rows]
+    nz = [x for x in lumps if x > 0]
+    return {
+        "status_counts": status_counts,
+        "layers": {la: dict(c) for la, c in layers.items()},
+        "d_invalid": d_invalid, "d_total": len(d_rows),
+        "false_positives_on_valid": false_pos,
+        "dominants_ok": dom,
+        "lump_share": round(100 * len(nz) / len(rows), 1) if rows else 0.0,
+    }
+
+
+def _render_summary(model_version: str, dataset_version: int,
+                    stats: dict) -> str:
+    """Читаемая .md-сводка прогона (нейминг и числа — из stats)."""
+    sc = stats["status_counts"]
+    total = sum(sc.values())
+    lines = [
+        f"# Портреты датасета v{dataset_version} через модель "
+        f"{model_version.replace('_', '.')} — результаты",
+        "",
+        f"Прогон {total} портретов через модель "
+        f"**{model_version.replace('_', '.')}**. Ответ только модели "
+        "(эксперты отдельно).",
+        "",
+        "## Статусы",
+        "",
+        f"- ok: {sc.get('ok', 0)} · deficit: {sc.get('deficit', 0)} · "
+        f"invalid: {sc.get('invalid', 0)}",
+        "",
+        "## По слоям",
+        "",
+    ]
+    for la in sorted(stats["layers"]):
+        c = stats["layers"][la]
+        lines.append(f"- {la}: {c}")
+    lines += [
+        "",
+        "## Робастность",
+        "",
+        f"- Слой D (битые записи): {stats['d_invalid']}/{stats['d_total']} "
+        f"отклонены как invalid, ложных на валидных: "
+        f"{stats['false_positives_on_valid']}.",
+        "",
+        "## Доминанты (ok)",
+        "",
+        f"- {stats['dominants_ok']}",
+        "",
+        f"Разовые ходы модели: {stats['lump_share']}% портретов.",
+        "",
+        "Построчные результаты — "
+        f"`knowledge/model_validation/"
+        f"{outcomes_filename(model_version, dataset_version)}`.",
+    ]
+    return "\n".join(lines) + "\n"
+
+
+def run_model_over_dataset(dataset_version: int, seed: int, model_version: str,
+                           out_dir: Path, n: int = 12000) -> dict:
+    """Один прогон модели по датасету → оба выходных файла + числа сводки.
+
+    Имена файлов кодируют версию модели и версию датасета (см.
+    `docs/model/model_run_output_standard.md`). Ручной набор имени не нужен.
+    """
+    out_dir.mkdir(parents=True, exist_ok=True)
+    csv_path = out_dir / outcomes_filename(model_version, dataset_version)
+    export_model_outcomes(csv_path, n=n, seed=seed, version=dataset_version)
+    with gzip.open(csv_path, "rt", encoding="utf-8") as fh:
+        rows = list(csv.DictReader(fh))
+    gen = layered_generator(dataset_version, seed, n)
+    stats = _summarise_outcomes(rows, gen)
+    md_path = out_dir / results_filename(model_version, dataset_version)
+    md_path.write_text(_render_summary(model_version, dataset_version, stats),
+                       encoding="utf-8")
+    return {"outcomes_path": csv_path, "results_path": md_path, **stats}
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Экспорт датасетов валидации")
     parser.add_argument(
         "what",
         choices=("portraits", "outcomes", "expert-pack", "markdown",
-                 "coordinator-key")
+                 "coordinator-key", "run")
     )
-    parser.add_argument("--out", type=Path, required=True)
+    parser.add_argument("--out", type=Path)
     parser.add_argument("--n", type=int, default=12000)
     parser.add_argument("--seed", type=int, default=20260702)
     parser.add_argument("--version", type=int, default=2,
                         choices=(1, 2, 3, 4))
     parser.add_argument("--chunk-size", type=int, default=3000)
+    parser.add_argument("--dataset-version", type=int, choices=(2, 3, 4))
+    parser.add_argument("--model-version", type=str,
+                        help="версия матмодели, напр. v3_4_0")
+    parser.add_argument("--out-dir", type=Path)
     args = parser.parse_args(argv)
+    if args.what != "run" and args.out is None:
+        parser.error("--out обязателен")
+
+    if args.what == "run":
+        if not args.model_version:
+            parser.error("--model-version обязателен: версия МАТМОДЕЛИ "
+                         "(напр. v3_4_0) — это НЕ версия кода APP_VERSION")
+        res = run_model_over_dataset(
+            model_version=args.model_version,
+            dataset_version=args.dataset_version, seed=args.seed,
+            out_dir=args.out_dir or args.out, n=args.n)
+        print(f"run: модель {args.model_version} x датасет v{args.dataset_version}")
+        print(f"  outcomes -> {res['outcomes_path']}")
+        print(f"  results  -> {res['results_path']}")
+        print(f"  статусы: {res['status_counts']}; "
+              f"D {res['d_invalid']}/{res['d_total']}, "
+              f"ложных {res['false_positives_on_valid']}")
+        return 0
 
     if args.what == "coordinator-key":
         written = export_coordinator_key(args.out, n=args.n, seed=args.seed,
