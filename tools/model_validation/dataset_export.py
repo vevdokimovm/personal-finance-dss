@@ -97,7 +97,7 @@ def export_coordinator_key(out: Path, n: int, seed: int) -> int:
 OUTCOME_FIELDS = (
     "id", "kind", "risk", "status", "rt", "lt", "dt",
     "xo", "xr", "xg", "invest", "dom",
-    "dt_alert", "crisis_severity", "crisis_actions", "invalid_reason",
+    "dt_alert", "crisis_severity", "crisis_actions", "invalid_reason", "model_lump",
 )
 
 
@@ -153,6 +153,7 @@ def _export_outcomes_v3(out: Path, n: int, seed: int) -> int:
                 "crisis_severity": o["crisis_severity"] or "",
                 "crisis_actions": o["crisis_actions"],
                 "invalid_reason": "",
+                "model_lump": o["model_lump"],
             })
             written += 1
     return written
@@ -192,6 +193,7 @@ def export_model_outcomes(out: Path, n: int, seed: int, version: int) -> int:
                 "dt_alert": int(o["dt_alert"]),
                 "crisis_severity": o["crisis_severity"] or "",
                 "crisis_actions": o["crisis_actions"],
+                "model_lump": o["model_lump"],
             })
             written += 1
     return written

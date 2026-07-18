@@ -26,6 +26,12 @@ def to_money(value: Any) -> Decimal:
     return d.quantize(_CENTS, rounding=ROUND_HALF_UP)
 
 
+# Полкопейки: допуск денежной арифметики на float. Поток |Rt| <= FLOW_EPS —
+# численный ноль, а не дефицит: кризисный режим не должен включаться от
+# остатка округления (находка R3-F1 второй сертификации, раунд 3).
+FLOW_EPS = 0.005
+
+
 def money(value: Any) -> float:
     """Денежное значение как float, округлённое по ROUND_HALF_UP.
 

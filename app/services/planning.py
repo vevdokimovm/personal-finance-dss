@@ -16,7 +16,7 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Any
 
-from app.core.money import money
+from app.core.money import FLOW_EPS, money
 from app.core.alternatives import evaluate_alternative, generate_alternatives
 from app.core.crisis import build_crisis_plan
 from app.core.filtering import B_MIN, DT_MAX, L_MIN, filter_alternatives
@@ -61,7 +61,8 @@ def run_planning(
     # Только при неотрицательном потоке (v3.1.0): в дефиците цели заморожены,
     # и подушка не тратится на разовое закрытие близких целей — она нужна
     # как запас хода и ресурс балансового хода кризисного модуля.
-    if rt >= 0:
+    is_deficit = rt < -FLOW_EPS  # R3-F1: полкопейки не делают кризис
+    if not is_deficit:
         bliq_after, closed_goals, active_goals = preallocate_from_bliq(bliq, goals, today)
     else:
         bliq_after, closed_goals, active_goals = bliq, [], list(goals)
@@ -79,7 +80,7 @@ def run_planning(
         goals=goals,
         bliq=bliq,
         today=today,
-    ) if rt < 0 else None
+    ) if is_deficit else None
 
     # ── Слой запаса (v3.2.0, G4): разовые ходы из излишка сверх подушки ──
     # Только при неотрицательном потоке: в дефиците запасом распоряжается

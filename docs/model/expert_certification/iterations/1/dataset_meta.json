@@ -1,0 +1,17 @@
+{
+  "iteration": 1,
+  "dataset_version": 1,
+  "generator": "tools/portrait_testing/generator.py :: PortraitGenerator(seed=20260702, version=1)",
+  "seed": 20260702,
+  "n": 12000,
+  "blindness": "отсутствовала: записи раунда 1 содержали поле kind (слепой протокол введён с раунда 2)",
+  "answers_format": "jsonl (monthly_plan/lump_sum_plan/debt_plan/goal_plan/diagnostics/verdict) — до CSV-брифа",
+  "known_defects_of_v1": "см. ретроспективу калибровки и ревью раунда 2 (80.8% дефицитов, аннуитетная несогласованность и др.)",
+  "reports": [
+    "docs/reports/testing/independent_expert_review_2026_07.md",
+    "docs/reports/testing/expert_agreement_v3_1_0.md",
+    "docs/reports/retrospectives/model_calibration_retrospective_2026_07.md"
+  ],
+  "provenance": "перенесено из архивов аккаунтов V/M/J/S 2026-07-17 (v6.15.0); тяжёлые файлы gzip; вложенные zip распакованы в full/",
+  "run_metadata": "не собирались (обязательны с брифа v3)"
+}

@@ -56,7 +56,8 @@ python -m tools.model_validation.expert_agreement \
 | `portraits_v3_seed20260716.jsonl.gz` | КАНОНИЧЕСКИЙ размеченный датасет v3 (12 000; слои A–E, meta первой строкой): генератор `tools/portrait_testing/generator_v3.py`, приёмка `tests/test_generator_v3.py`, ТЗ — `docs/model/expert_certification/iterations/2/expert_feedback_aggregate.md` §6 |
 | `expert_portraits_v3_part1..4.jsonl.gz` | СЛЕПОЙ пакет v3 для раунда 3 (проекция без меток; дубли id и битые записи слоя D доживают до эксперта намеренно). Бриф — `docs/model/expert_brief_v3.md` (status=invalid, run_metadata обязателен) |
 | `portraits_v3_coordinator_key.csv.gz` | Ключ координатора v3: id → layer/kind/pair_id/pair_relation/expected_error/id_override — слепота экспертов сохраняется, приёмка и стенд размечают по нему |
-| `model_outcomes_v3_4_0_on_v3.csv.gz` | Модельная половина раунда 3: ответ v3.4.0 на 12 000 портретов v3 (слой D — `status=invalid` без запуска модели, колонка `invalid_reason`; срез дат 2026-07-16). Анализ — `tools/model_validation/round3_model_half_analysis.py`, отчёт — `docs/reports/testing/round3_model_half.md` |
+| `model_outcomes_v3_4_0_on_v3.csv.gz` | Модельная половина раунда 3: v3.4.0 + FLOW_EPS на 12 000 портретов v3 (слой D — `status=invalid`, колонки `invalid_reason` и `model_lump`; срез 2026-07-16). Анализ — `round3_model_half_analysis.py`, отчёты — `round3_model_half.md`, `expert_certification_round3.md` |
+| `joined_v3.csv.gz` | Joined третьей сертификации: модель + 4 эксперта, сопоставление ПО ПОРЯДКУ строк (`build_joined_v3.py`, fail-loud id-сверка); согласие 67.5% (action-adjusted 76.3%) при коридоре 64.8–88.0. Сырые артефакты — `docs/model/expert_certification/iterations/3/` |
 
 Регенерация любого файла: `tools/model_validation/dataset_export.py`
 (portraits / outcomes / expert-pack / markdown, детерминировано по seed+version).

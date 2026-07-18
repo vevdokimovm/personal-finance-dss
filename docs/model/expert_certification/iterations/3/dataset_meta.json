@@ -1,0 +1,20 @@
+{
+  "iteration": 3,
+  "dataset_version": 3,
+  "generator": "tools/portrait_testing/generator_v3.py :: PortraitGeneratorV3(seed=20260716, n=12000)",
+  "seed": 20260716,
+  "n": 12000,
+  "id_range": "SP3-00000..SP3-11999 (+50 дублей id в слое D через id_override)",
+  "frozen_today": "2026-07-16",
+  "layers": {"A": 4800, "B": 3600, "C": 2400, "D": 600, "E": 600},
+  "distribution": {
+    "expert_pack": ["expert_portraits_v3_part1..4.jsonl.gz (мета-строка в каждой части, без меток слоёв)"],
+    "brief": "docs/model/expert_brief_v3.md (status=invalid, ответ на каждую входную строку, run_metadata обязателен)",
+    "coordinator_key": "knowledge/model_validation/portraits_v3_coordinator_key.csv.gz"
+  },
+  "matching_contract": "сопоставление ответов ПО ПОРЯДКУ строк (дубли id); fail-loud сверка последовательности id — build_joined_v3.py",
+  "model_snapshot": "knowledge/model_validation/model_outcomes_v3_4_0_on_v3.csv.gz (v3.4.0 + FLOW_EPS, колонки invalid_reason и model_lump)",
+  "joined": "knowledge/model_validation/joined_v3.csv.gz",
+  "accounts": ["V", "M", "J", "S"],
+  "run_metadata": "собраны у всех четырёх (долг раунда 2 закрыт): Claude 5, детерминированные stdlib-скрипты, полные 12 000, без ручной разметки"
+}

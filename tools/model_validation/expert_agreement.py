@@ -27,6 +27,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any
 
+from app.core.money import FLOW_EPS
 from app.services.planning import run_planning
 from tools.portrait_testing.generator import PortraitGenerator
 
@@ -76,7 +77,7 @@ def model_outcome(portrait: dict[str, Any],
     rt = portrait["income_total"] - portrait["expense_total"] - payments
     best = result.get("best")
 
-    if rt < 0:
+    if rt < -FLOW_EPS:  # R3-F1: полкопейки не делают кризис
         status = "deficit"
     elif best is None:
         status = "no_admissible_plan"
@@ -100,7 +101,18 @@ def model_outcome(portrait: dict[str, Any],
             dom = "debt" if top == xo else ("reserve" if top == xr else "goals+")
 
     crisis = result.get("crisis_plan")
+    # model_lump — разовые ходы модели из накоплений (сопоставимо с lump
+    # экспертов): преаллокация близких целей + surplus-ходы (G4) + балансовый
+    # ход кризисного модуля.
+    prealloc = float((result.get("bliq_preallocation") or {}).get("bliq_used", 0))
+    surplus = sum(float(m.get("amount", 0))
+                  for m in (result.get("surplus_plan") or {}).get("moves", []))
+    balance_move = 0.0
+    for act in (crisis or {}).get("actions", []):
+        if act.get("type") == "close_debts_from_liquidity":
+            balance_move += float(act.get("bliq_used", 0))
     return {
+        "model_lump": round(prealloc + surplus + balance_move, 2),
         "status": status,
         "rt": rt,
         "lt": float(result["indicators"]["Lt"]),
