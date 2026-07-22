@@ -35,6 +35,17 @@ class TestIdentityAndDeterminism:
     def test_prefix_is_sp5(self, gen):
         assert gen.expert_row(0)["id"].startswith("SP5-")
 
+    def test_no_foreign_prefix_leaks_into_ids(self, gen):
+        """Чужой префикс в id — это отпечаток слоя дефектов.
+
+        В v4 путь `duplicate_id_broken` жёстко зашивал `SP4-`; унаследованный
+        как есть, он пометил бы 17 битых строк датасета v5 так, что эксперт
+        находил бы их одним grep. Слепота пакета этого не переживает.
+        """
+        foreign = [gen.expert_row(i)["id"] for i in range(gen.n)
+                   if not gen.expert_row(i)["id"].startswith("SP5-")]
+        assert not foreign
+
     def test_same_seed_same_data(self):
         a = PortraitGeneratorV5(seed=7, n=200)
         b = PortraitGeneratorV5(seed=7, n=200)

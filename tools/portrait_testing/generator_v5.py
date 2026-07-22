@@ -410,10 +410,12 @@ class PortraitGeneratorV5(PortraitGeneratorV4):
         if amount > widest[1][1]:
             # выше всех бытовых пределов — имя обязано быть безлимитным
             return rng.choice(UNBOUNDED_GOAL_NAMES), amount
-        name = min(GOAL_NAME_RANGES_V5.items(),
-                   key=lambda kv: abs(kv[1][0] - amount))[0]
-        lo, hi = GOAL_NAME_RANGES_V5[name]
-        return name, min(max(amount, lo), hi)
+        # Сумма ниже всех минимумов — берём самое «дешёвое» имя и НЕ
+        # подтягиваем сумму к границе: снэп на минимум даёт кучу одинаковых
+        # значений, то есть тот же обрезанный хвост, только снизу.
+        name = min(GOAL_NAME_RANGES_V5.items(), key=lambda kv: kv[1][0])[0]
+        hi = GOAL_NAME_RANGES_V5[name][1]
+        return name, min(amount, hi)
 
     def _long_horizon_goal(self, rng: Random, income: float) -> dict:
         """ТЗ-4: пенсия и образование детей — горизонт 10-30 лет."""
@@ -494,6 +496,8 @@ class PortraitGeneratorV5(PortraitGeneratorV4):
         return p
 
     # ------------------------------------------------------- слой D: виды v5
+    D_FIELD_FALLBACK = "unclassified"
+
     def _gen_d(self, index: int) -> dict:
         kind = self._d_kind[index]
         if kind in D_KIND_FIELD and not hasattr(
@@ -501,7 +505,13 @@ class PortraitGeneratorV5(PortraitGeneratorV4):
             p = self._gen_d_v5(index, kind)
             if p is not None:
                 return p
-        return super()._gen_d(index)
+        p = super()._gen_d(index)
+        # v4 писал в expected_error человеческую фразу («отрицательное тело
+        # долга»). Для приёмки нужна машинная таксономия «поле:вид», иначе
+        # мощность страт считается по видам и валится ниже порога.
+        field = D_KIND_FIELD.get(p.get("kind"), self.D_FIELD_FALLBACK)
+        p["expected_error"] = f"{field}:{p.get('kind')}"
+        return p
 
     def _gen_d_v5(self, index: int, kind: str) -> dict | None:
         rng = self._rng(index)
@@ -577,6 +587,12 @@ class PortraitGeneratorV5(PortraitGeneratorV4):
 
     def generate(self, index: int) -> dict:
         p = super().generate(index)
+        # v4 зашивал префикс `SP4-` прямо в ветку `duplicate_id_broken`.
+        # Унаследованный как есть, он помечал бы битые строки датасета v5
+        # чужим префиксом — то есть выдавал бы слой дефектов одним grep.
+        override = p.get("id_override")
+        if isinstance(override, str) and not override.startswith(ID_PREFIX):
+            p["id_override"] = ID_PREFIX + override[override.index("-"):]
         if p["layer"] not in ("D", "E"):
             rng = self._rng(index, "goalpolicy")
             self._inject_long_horizon(p, rng)
@@ -602,7 +618,7 @@ class PortraitGeneratorV5(PortraitGeneratorV4):
         if not goals or p.get("kind") in ("magnitude_stress", "no_goals_no_debts"):
             return
         dated = [g for g in goals if g.get("deadline") is not None]
-        if not dated or rng.random() >= 0.12:
+        if not dated or rng.random() >= 0.17:
             return
         income = p.get("income_total")
         if not isinstance(income, (int, float)) or income <= 0:
@@ -660,7 +676,10 @@ class PortraitGeneratorV5(PortraitGeneratorV4):
         k = total / annual
         if K_GOAL_MIN <= k <= K_GOAL_MAX:
             return
-        factor = (K_GOAL_MIN if k < K_GOAL_MIN else K_GOAL_MAX) / k
+        # запас 0.5%: округление до копейки после масштабирования иначе
+        # выносит фактический k за заявленную границу (было 5.0077 при 5.0)
+        target_k = K_GOAL_MIN * 1.005 if k < K_GOAL_MIN else K_GOAL_MAX * 0.995
+        factor = target_k / k
         stress = p.get("kind") in ("magnitude_stress", "magnitude_whale",
                                    "whale_thin_cushion")
         for g in goals:
