@@ -8,6 +8,8 @@
 from __future__ import annotations
 
 import asyncio
+import threading
+from typing import Any
 
 from fastapi.testclient import TestClient
 from starlette.requests import Request
@@ -79,7 +81,19 @@ class TestHsts:
             return PlainTextResponse("ok")
 
         req = Request({"type": "http", "method": "GET", "path": "/", "headers": []})
-        return asyncio.run(mw.dispatch(req, call_next))
+        # PIT: `asyncio.run` падает, если в ТЕКУЩЕМ потоке уже крутится цикл.
+        # В полном прогоне соседний TestClient оставляет свой цикл живым, и
+        # тест валится по порядку запуска, а не по существу. Отдельный поток
+        # даёт заведомо чистый контекст и снимает зависимость от соседей.
+        box: dict[str, Any] = {}
+
+        def _runner() -> None:
+            box["resp"] = asyncio.run(mw.dispatch(req, call_next))
+
+        worker = threading.Thread(target=_runner)
+        worker.start()
+        worker.join()
+        return box["resp"]
 
     def test_hsts_present_when_enabled(self) -> None:
         resp = self._dispatch(hsts=True)

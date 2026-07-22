@@ -35,6 +35,7 @@ from tools.model_validation.expert_agreement import FROZEN_TODAY, model_outcome
 from tools.portrait_testing.generator import PortraitGenerator
 from tools.portrait_testing.generator_v3 import PortraitGeneratorV3
 from tools.portrait_testing.generator_v4 import PortraitGeneratorV4
+from tools.portrait_testing.generator_v5 import PortraitGeneratorV5
 from tools.model_validation.portrait_validation import invalid_reason
 
 
@@ -99,8 +100,9 @@ def export_coordinator_key(out: Path, n: int, seed: int,
     return written
 
 
-LAYERED_GENERATORS = {3: PortraitGeneratorV3, 4: PortraitGeneratorV4}
-ID_PREFIX = {3: "SP3", 4: "SP4"}
+LAYERED_GENERATORS = {3: PortraitGeneratorV3, 4: PortraitGeneratorV4,
+                      5: PortraitGeneratorV5}
+ID_PREFIX = {3: "SP3", 4: "SP4", 5: "SP5"}
 
 
 def layered_generator(version: int, seed: int, n: int):
@@ -512,9 +514,10 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--n", type=int, default=12000)
     parser.add_argument("--seed", type=int, default=20260702)
     parser.add_argument("--version", type=int, default=2,
-                        choices=(1, 2, 3, 4))
+                        choices=(1, 2, 3, 4, 5))
     parser.add_argument("--chunk-size", type=int, default=3000)
-    parser.add_argument("--dataset-version", type=int, choices=(2, 3, 4))
+    parser.add_argument("--dataset-version", type=int,
+                        choices=(2, 3, 4, 5))
     parser.add_argument("--model-version", type=str,
                         help="версия матмодели, напр. v3_4_0")
     parser.add_argument("--out-dir", type=Path)
