@@ -1,0 +1,33 @@
+{
+  "iteration": 4,
+  "dataset_version": 4,
+  "generator": "tools/portrait_testing/generator_v4.py::PortraitGeneratorV4",
+  "seed": 20260718,
+  "n": 12000,
+  "frozen_today": "2026-07-18",
+  "model_version_at_run": "v3.4.0",
+  "model_version_after_round": "v3.5.0",
+  "brief": "docs/model/expert_brief_v4.md",
+  "experts": [
+    "J",
+    "M",
+    "S",
+    "V"
+  ],
+  "artifacts_per_expert": {
+    "J": 18,
+    "M": 16,
+    "S": 20,
+    "V": 16
+  },
+  "joined": "knowledge/model_validation/joined_v4.csv.gz",
+  "outcomes": "knowledge/model_validation/model_outcomes_v3_5_0_on_v4.csv.gz",
+  "headline": {
+    "status_agreement_pct": 100.0,
+    "d_layer_caught": "600/600 у всех четверых, ложных 0",
+    "dom_monthly_pct": 71.6,
+    "dom_action_vector_pct": 79.4,
+    "budget_violations": 0
+  },
+  "report": "docs/reports/testing/expert_certification_round4.md"
+}

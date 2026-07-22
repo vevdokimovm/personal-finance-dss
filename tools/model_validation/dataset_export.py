@@ -111,7 +111,8 @@ def layered_generator(version: int, seed: int, n: int):
 OUTCOME_FIELDS = (
     "id", "kind", "risk", "status", "rt", "lt", "dt",
     "xo", "xr", "xg", "invest", "dom",
-    "dt_alert", "crisis_severity", "crisis_actions", "invalid_reason", "model_lump",
+    "dt_alert", "crisis_severity", "crisis_actions", "invalid_reason",
+    "model_lump", "model_lump_debt", "model_lump_reserve", "model_lump_goal",
 )
 
 
@@ -170,6 +171,9 @@ def _export_outcomes_layered(out: Path, n: int, seed: int,
                 "crisis_actions": o["crisis_actions"],
                 "invalid_reason": "",
                 "model_lump": o["model_lump"],
+                "model_lump_debt": o["model_lump_debt"],
+                "model_lump_reserve": o["model_lump_reserve"],
+                "model_lump_goal": o["model_lump_goal"],
             })
             written += 1
     return written
@@ -210,6 +214,9 @@ def export_model_outcomes(out: Path, n: int, seed: int, version: int) -> int:
                 "crisis_severity": o["crisis_severity"] or "",
                 "crisis_actions": o["crisis_actions"],
                 "model_lump": o["model_lump"],
+                "model_lump_debt": o["model_lump_debt"],
+                "model_lump_reserve": o["model_lump_reserve"],
+                "model_lump_goal": o["model_lump_goal"],
             })
             written += 1
     return written

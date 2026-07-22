@@ -55,6 +55,33 @@ def expert_consensus(row: dict[str, str]) -> str | None:
     return dom if n >= 3 else None
 
 
+# Разовые ходы модели из накоплений (сопоставимо с lump экспертов) по
+# направлениям: преаллокация близких целей + surplus-ходы (G4) + балансовый
+# ход кризисного модуля. Инвестиционный транш — в бакете goals+ (семантика
+# экспертизы: цели и инвестиции объединены).
+SURPLUS_MOVE_DIRECTION = {
+    "repay_debt": "debt",
+    "fund_goal": "goals+",
+    "invest_lump": "goals+",
+}
+
+
+def lump_split(result: dict[str, Any]) -> dict[str, float]:
+    """Разовые ходы плана -> вектор {debt, reserve, goals+}."""
+    out = {"debt": 0.0, "reserve": 0.0, "goals+": 0.0}
+    out["goals+"] += float(
+        (result.get("bliq_preallocation") or {}).get("bliq_used", 0))
+    for move in (result.get("surplus_plan") or {}).get("moves", []) or ():
+        direction = SURPLUS_MOVE_DIRECTION.get(move.get("type"))
+        if direction is None:
+            raise ValueError(f"surplus: неизвестный ход {move.get('type')!r}")
+        out[direction] += float(move.get("amount", 0))
+    for act in (result.get("crisis_plan") or {}).get("actions", []) or ():
+        if act.get("type") == "close_debts_from_liquidity":
+            out["debt"] += float(act.get("bliq_used", 0))
+    return out
+
+
 def model_outcome(portrait: dict[str, Any],
                   today: datetime = FROZEN_TODAY) -> dict[str, Any]:
     """Прогон портрета через ядро → статус, эффективный сплит, доминанта.
@@ -101,18 +128,12 @@ def model_outcome(portrait: dict[str, Any],
             dom = "debt" if top == xo else ("reserve" if top == xr else "goals+")
 
     crisis = result.get("crisis_plan")
-    # model_lump — разовые ходы модели из накоплений (сопоставимо с lump
-    # экспертов): преаллокация близких целей + surplus-ходы (G4) + балансовый
-    # ход кризисного модуля.
-    prealloc = float((result.get("bliq_preallocation") or {}).get("bliq_used", 0))
-    surplus = sum(float(m.get("amount", 0))
-                  for m in (result.get("surplus_plan") or {}).get("moves", []))
-    balance_move = 0.0
-    for act in (crisis or {}).get("actions", []):
-        if act.get("type") == "close_debts_from_liquidity":
-            balance_move += float(act.get("bliq_used", 0))
+    lump = lump_split(result)
     return {
-        "model_lump": round(prealloc + surplus + balance_move, 2),
+        "model_lump": round(sum(lump.values()), 2),
+        "model_lump_debt": round(lump["debt"], 2),
+        "model_lump_reserve": round(lump["reserve"], 2),
+        "model_lump_goal": round(lump["goals+"], 2),
         "status": status,
         "rt": rt,
         "lt": float(result["indicators"]["Lt"]),

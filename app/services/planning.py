@@ -31,7 +31,11 @@ from app.core.metrics import (
     calculate_rt,
     classify_blr,
 )
-from app.core.ranking import RISK_PROFILES, rank_alternatives
+from app.core.ranking import (
+    RISK_PROFILES,
+    effective_floor_months,
+    rank_alternatives,
+)
 from app.core.recommendation import explain_alternative
 from app.utils.time import utcnow
 
@@ -47,6 +51,7 @@ def run_planning(
     l_min: float = L_MIN,
     today: datetime | None = None,
     step: float = 0.10,
+    toxic_floor: bool = True,
 ) -> dict[str, Any]:
     """Полный цикл планирования СППР по ВКР (этапы 1–6)."""
     today = today or utcnow()
@@ -129,7 +134,12 @@ def run_planning(
     )
 
     # ── Ранжирование ───────────────────────────────────────────────────
-    ranked = rank_alternatives(admissible, risk_tolerance)
+    # G8 (стенд р.4): при токсичном долге стартовый запас ликвидности
+    # сокращается — лавина по ставке 40-290% дороже страховки от сбоя дохода.
+    floor_months = (effective_floor_months(obligations, r_bench)
+                    if toxic_floor else None)
+    ranked = rank_alternatives(admissible, risk_tolerance,
+                               floor_months=floor_months)
 
     # ── Инвестиционный транш (v3.1.0, G5): терминальный сток резерва ────
     # Резервный поток сверх целевой подушки Lt* размечается как инвестиции

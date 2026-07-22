@@ -50,7 +50,33 @@ RISK_PROFILES: dict[int, dict[str, Any]] = {
 # out-of-sample (78.9% -> 88.0% согласия). Разбор — ADR-006 (update 2026-07-16).
 RESERVE_FLOOR_MONTHS = 2.0
 
+# Ослабление floor при токсичном долге (третья сертификация, v3.5.0).
+# Гипотеза предзарегистрирована ДО раунда 4: ставка >= max(30%, r_bench+15 п.п.)
+# съедает подушку быстрее, чем подушка страхует сбой дохода, поэтому стартовый
+# запас сокращается до одного месяца, а высвобожденный поток идёт в лавину.
+# Порог двойной: абсолютный отсекает МФО/карты при любом бенчмарке, спред не
+# даёт объявить токсичным нормальный потребкредит при ключевой ставке 24%.
+TOXIC_RATE_ABS = 0.30
+TOXIC_RATE_SPREAD = 0.15
+TOXIC_FLOOR_MONTHS = 1.0
+
 _FLOOR_EPS = 1e-9
+
+
+def is_toxic_debt(obligation: dict[str, Any], r_bench: float) -> bool:
+    """Долг токсичен, если ставка >= max(30%, r_bench + 15 п.п.)."""
+    if float(obligation.get("amount", 0) or 0) <= 0:
+        return False
+    threshold = max(TOXIC_RATE_ABS, float(r_bench) + TOXIC_RATE_SPREAD)
+    return float(obligation.get("interest_rate", 0) or 0) >= threshold
+
+
+def effective_floor_months(obligations: list[dict[str, Any]],
+                           r_bench: float) -> float:
+    """Floor резерва с учётом токсичного долга (хотя бы одного)."""
+    if any(is_toxic_debt(o, r_bench) for o in obligations or ()):
+        return TOXIC_FLOOR_MONTHS
+    return RESERVE_FLOOR_MONTHS
 
 
 def normalize_value(value: float, v_min: float, v_max: float, minimize: bool = False) -> float:
@@ -68,6 +94,7 @@ def normalize_value(value: float, v_min: float, v_max: float, minimize: bool = F
 def rank_alternatives(
     alternatives: list[dict[str, Any]],
     risk_tolerance: int = 3,
+    floor_months: float | None = None,
 ) -> list[dict[str, Any]]:
     """
     Ранжирование через U(a). Лучшая альтернатива получает is_recommended=True.
@@ -81,6 +108,7 @@ def rank_alternatives(
     if not alternatives:
         return []
 
+    floor = RESERVE_FLOOR_MONTHS if floor_months is None else float(floor_months)
     profile = RISK_PROFILES.get(risk_tolerance, RISK_PROFILES[3])
     w_rt, w_lt, w_dt, w_goals = (
         profile["w_rt"], profile["w_lt"], profile["w_dt"], profile["w_goals"]
@@ -107,9 +135,7 @@ def rank_alternatives(
         utility = w_rt * rt_norm + w_lt * lt_norm + w_dt * dt_norm + w_goals * si_norm
         alt["utility"] = round(utility, 4)
         # G6: уровень заполнения стартового месяца ликвидности
-        alt["floor_level"] = round(
-            min(float(alt["Lt_new"]), RESERVE_FLOOR_MONTHS), 6
-        )
+        alt["floor_level"] = round(min(float(alt["Lt_new"]), floor), 6)
         alt["scores"] = {
             "Rt_norm": round(rt_norm, 3),
             "Lt_norm": round(lt_norm, 3),

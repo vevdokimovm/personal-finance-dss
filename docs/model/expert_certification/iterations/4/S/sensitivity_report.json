@@ -1,0 +1,170 @@
+{
+ "cheap_spread=0.016": {
+  "dom_changed": 16,
+  "dom_changed_pct": 0.13,
+  "status_changed": 0,
+  "lump_changed": 60,
+  "lump_changed_pct": 0.5,
+  "top_transitions": [
+   [
+    "goals+->debt",
+    10
+   ],
+   [
+    "reserve->debt",
+    5
+   ],
+   [
+    "goals+->reserve",
+    1
+   ]
+  ],
+  "changed_rows_in_liq_band_08_12": 2
+ },
+ "cheap_spread=0.024": {
+  "dom_changed": 20,
+  "dom_changed_pct": 0.17,
+  "status_changed": 0,
+  "lump_changed": 69,
+  "lump_changed_pct": 0.57,
+  "top_transitions": [
+   [
+    "debt->goals+",
+    15
+   ],
+   [
+    "debt->reserve",
+    3
+   ],
+   [
+    "goals+->reserve",
+    2
+   ]
+  ],
+  "changed_rows_in_liq_band_08_12": 1
+ },
+ "toxic_rate=0.36": {
+  "dom_changed": 139,
+  "dom_changed_pct": 1.16,
+  "status_changed": 0,
+  "lump_changed": 339,
+  "lump_changed_pct": 2.83,
+  "top_transitions": [
+   [
+    "goals+->debt",
+    84
+   ],
+   [
+    "debt->goals+",
+    21
+   ],
+   [
+    "reserve->debt",
+    18
+   ]
+  ],
+  "changed_rows_in_liq_band_08_12": 23
+ },
+ "toxic_rate=0.54": {
+  "dom_changed": 7,
+  "dom_changed_pct": 0.06,
+  "status_changed": 0,
+  "lump_changed": 71,
+  "lump_changed_pct": 0.59,
+  "top_transitions": [
+   [
+    "goals+->debt",
+    3
+   ],
+   [
+    "debt->reserve",
+    2
+   ],
+   [
+    "reserve->debt",
+    1
+   ]
+  ],
+  "changed_rows_in_liq_band_08_12": 2
+ },
+ "reserve_scale=0.8": {
+  "dom_changed": 443,
+  "dom_changed_pct": 3.69,
+  "status_changed": 0,
+  "lump_changed": 3769,
+  "lump_changed_pct": 31.41,
+  "top_transitions": [
+   [
+    "goals+->debt",
+    182
+   ],
+   [
+    "reserve->goals+",
+    155
+   ],
+   [
+    "debt->goals+",
+    106
+   ]
+  ],
+  "changed_rows_in_liq_band_08_12": 206
+ },
+ "reserve_scale=1.2": {
+  "dom_changed": 332,
+  "dom_changed_pct": 2.77,
+  "status_changed": 0,
+  "lump_changed": 3227,
+  "lump_changed_pct": 26.89,
+  "top_transitions": [
+   [
+    "debt->goals+",
+    137
+   ],
+   [
+    "goals+->reserve",
+    124
+   ],
+   [
+    "goals+->debt",
+    70
+   ]
+  ],
+  "changed_rows_in_liq_band_08_12": 162
+ },
+ "min_move=8000.0": {
+  "dom_changed": 0,
+  "dom_changed_pct": 0.0,
+  "status_changed": 0,
+  "lump_changed": 41,
+  "lump_changed_pct": 0.34,
+  "top_transitions": [],
+  "changed_rows_in_liq_band_08_12": 0
+ },
+ "min_move=12000.0": {
+  "dom_changed": 0,
+  "dom_changed_pct": 0.0,
+  "status_changed": 0,
+  "lump_changed": 38,
+  "lump_changed_pct": 0.32,
+  "top_transitions": [],
+  "changed_rows_in_liq_band_08_12": 0
+ },
+ "pdn_high=0.4": {
+  "dom_changed": 0,
+  "dom_changed_pct": 0.0,
+  "status_changed": 0,
+  "lump_changed": 0,
+  "lump_changed_pct": 0.0,
+  "top_transitions": [],
+  "changed_rows_in_liq_band_08_12": 0
+ },
+ "pdn_high=0.6": {
+  "dom_changed": 0,
+  "dom_changed_pct": 0.0,
+  "status_changed": 0,
+  "lump_changed": 0,
+  "lump_changed_pct": 0.0,
+  "top_transitions": [],
+  "changed_rows_in_liq_band_08_12": 0
+ }
+}
