@@ -28,7 +28,7 @@ from tools.portrait_testing.generator_v5 import (
     products_for_rate,
 )
 
-SEED = 20260722
+SEED = 20260723  # сборка 2
 N = 12000
 STRESS_KINDS = frozenset({"magnitude_stress", "magnitude_whale",
                           "whale_thin_cushion"})
@@ -250,10 +250,17 @@ def audit(seed: int = SEED, n: int = N) -> dict:
     # --- §3.7 мощность страт ---------------------------------------------
     fam = Counter(p.get("family") for p in portraits if p["layer"] == "C")
     kinds = Counter(p["kind"] for p in portraits)
+    h5_cells = ("floor_edge_with_near_goal", "floor_edge_no_near_goal",
+                "whale_thin_cushion")
     out["power"] = {
         "layers": dict(Counter(p["layer"] for p in portraits)),
         "c_families": dict(fam),
         "families_below_385": {k: v for k, v in fam.items() if v < 385},
+        # урок ревизии сборки 1: порог держится на ЯЧЕЙКЕ гипотезы, не
+        # только на семействе (было 231/241/120 при семействе 592)
+        "h5_cells": {k: kinds.get(k, 0) for k in h5_cells},
+        "h5_cells_below_385": {k: kinds.get(k, 0) for k in h5_cells
+                               if kinds.get(k, 0) < 385},
         "risk_profiles": dict(Counter(p["risk_tolerance"] for p in valid
                                       if isinstance(p.get("risk_tolerance"),
                                                     int))),

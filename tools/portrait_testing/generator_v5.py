@@ -42,11 +42,20 @@
     капа floor (H5-2).
 
 Без этих семейств гипотезы проверить нечем.
+
+СБОРКА 2 (seed 20260723). Ревизия сборки 1 нашла: ячейки H5-1 (231/241) и
+H5-2 (120) не добирали порог мощности 385, державшийся только на семействе
+(592); хелпер `_seed_goal` оставлял 18 целей ровно по 384 000 ₽. Решение
+владельца — регенерация: итерация последняя, объявленная потеря точности
+(±6.4%/±8.9% вместо ±5%) неприемлема. Изменения: фиксированные квоты ячеек
+(400+джиттер на 12 000), слой C 0.28 -> 0.33 за счёт A (мощность шести
+остальных семейств сохранена), пол и k хелпера целей дрожат.
 """
 from __future__ import annotations
 
 import math
 from datetime import date, timedelta
+from decimal import Decimal
 from random import Random
 
 from tools.portrait_testing.generator_v4 import (  # noqa: F401
@@ -67,7 +76,20 @@ from tools.portrait_testing.generator_v4 import (  # noqa: F401
 )
 
 DATASET_VERSION = 5
+# Сборка 1 (seed 20260722) объявила недобор ячеек H5-1/H5-2; сборка 2
+# добирает их фиксированными квотами (решение владельца: итерация
+# последняя, второго захода не будет).
+DATASET_BUILD = 2
 ID_PREFIX = "SP5"
+
+# Ячейки предзарегистрированных гипотез (H5-1 — разрез кромки floor по
+# наличию близкой цели, H5-2 — кит с тонкой подушкой). Порог мощности 385
+# должен держаться НА КАЖДОЙ ЯЧЕЙКЕ, а не только на семействе — урок ревизии
+# сборки 1 (231/241/120 при семействе 592). Квота фиксированная с джиттером
+# вверх: гарантия >= базы и не-круглые объёмы (круглые — отпечаток дизайна).
+H5_CELL_QUOTA_BASE = 400  # на 12 000; масштабируется пропорционально n
+H5_CELL_KINDS = ("floor_edge_with_near_goal", "floor_edge_no_near_goal",
+                 "whale_thin_cushion")
 
 # ТЗ-8: натуральные пределы сумм по имени цели. Верх поднят там, где это
 # осмысленно (образование, недвижимость), и опущен там, где имя физически
@@ -125,7 +147,7 @@ DEFECT_SHARE_RANGE = (0.042, 0.058)
 QUOTA_JITTER = 0.20  # ±20% на объём вида внутри семейства
 
 LAYER_SHARES: tuple[tuple[str, float], ...] = (
-    ("A", 0.36), ("B", 0.26), ("C", 0.28), ("D", 0.05), ("E", 0.05),
+    ("A", 0.31), ("B", 0.26), ("C", 0.33), ("D", 0.05), ("E", 0.05),
 )
 
 C_FAMILIES_V5: dict[str, tuple[str, ...]] = {
@@ -161,13 +183,15 @@ _C_KIND_WEIGHTS_V5: dict[str, int] = {
     "deadline_today_exact": 80, "deadline_tomorrow": 75,
     "deadline_deep_overdue": 80, "horizon_10y": 85,
     "horizon_30y_retirement": 90,
-    "bliq_zero": 92, "huge_bliq": 88, "no_goals_no_debts": 82,
-    "pdn_boundary": 100,
+    # сборка 2: веса семейства подняты 362 -> 410 — при доле C 0.33 и
+    # фиксированных квотах H5 неудачный джиттер −10% ронял семейство до 374,
+    # ниже порога 385 (замерено самоаудитом на 12 000, seed 20260723)
+    "bliq_zero": 104, "huge_bliq": 100, "no_goals_no_debts": 94,
+    "pdn_boundary": 112,
     "duplicate_id_valid_pair": 150, "duplicate_id_triple": 72,
     "magnitude_whale": 88, "magnitude_stress": 82,
-    # семейство кромки floor должно пройти порог мощности 385 на 12 000
-    "floor_edge_with_near_goal": 190, "floor_edge_no_near_goal": 190,
-    "whale_thin_cushion": 90,
+    # ячейки floor_edge и whale_thin_cushion раздаются НЕ отсюда:
+    # у них фиксированные квоты H5_CELL_QUOTA_BASE (см. _rebuild_v5_layout)
 }
 
 # ТЗ-10: дефекты на всех полях схемы + составные ~15% слоя.
@@ -234,11 +258,11 @@ D_KIND_FIELD: dict[str, str] = {
 class PortraitGeneratorV5(PortraitGeneratorV4):
     """Датасет v5. Совместим по интерфейсу с v4 (generate/expert_row/meta)."""
 
-    def __init__(self, seed: int = 20260722, n: int = 12000,
+    def __init__(self, seed: int = 20260723, n: int = 12000,
                  frozen_today: date | None = None):
         self._v5_seed = seed
         super().__init__(seed=seed, n=n,
-                         frozen_today=frozen_today or date(2026, 7, 22))
+                         frozen_today=frozen_today or date(2026, 7, 23))
         self._rebuild_v5_layout()
 
     # ------------------------------------------------------------- раскладка
@@ -260,10 +284,15 @@ class PortraitGeneratorV5(PortraitGeneratorV4):
 
         self._kind_family = {k: fam for fam, kinds in C_FAMILIES_V5.items()
                              for k in kinds}
+        cell_base = max(1, round(H5_CELL_QUOTA_BASE * self.n / 12000))
+        cell_jit = max(3, cell_base // 12)
+        fixed = {k: cell_base + master.randint(0, cell_jit)
+                 for k in H5_CELL_KINDS}
         self._c_kind = self._deal_jittered(
             master, by_layer["C"], _C_KIND_WEIGHTS_V5,
             pair_kinds=("duplicate_id_valid_pair",),
-            triple_kinds=("duplicate_id_triple",))
+            triple_kinds=("duplicate_id_triple",),
+            fixed_quotas=fixed)
         self._d_kind = self._deal_jittered(
             master, by_layer["D"], _D_KIND_WEIGHTS_V5,
             pair_kinds=("duplicate_id_invalid_pair",))
@@ -326,7 +355,10 @@ class PortraitGeneratorV5(PortraitGeneratorV4):
         d_share = master.uniform(*DEFECT_SHARE_RANGE)
         e_share = master.uniform(0.045, 0.055)
         rest = 1.0 - d_share - e_share
-        base = {"A": 0.36, "B": 0.26, "C": 0.28}
+        # Сборка 2: C вырос 0.28 -> 0.33 за счёт A (0.36 -> 0.31), чтобы
+        # фиксированные квоты ячеек H5 (~1200) не отняли мощность у шести
+        # остальных семейств слоя C (порог 385 у каждого).
+        base = {"A": 0.31, "B": 0.26, "C": 0.33}
         norm = sum(base.values())
         out, acc = [], 0
         plan = [("A", rest * base["A"] / norm), ("B", rest * base["B"] / norm),
@@ -347,14 +379,29 @@ class PortraitGeneratorV5(PortraitGeneratorV4):
     def _deal_jittered(master: Random, indices: list[int],
                        weights: dict[str, int],
                        pair_kinds: tuple[str, ...] = (),
-                       triple_kinds: tuple[str, ...] = ()) -> dict[int, str]:
-        """Раздача видов с дрожанием объёма ±20% (ТЗ-3)."""
+                       triple_kinds: tuple[str, ...] = (),
+                       fixed_quotas: dict[str, int] | None = None,
+                       ) -> dict[int, str]:
+        """Раздача видов с дрожанием объёма ±20% (ТЗ-3).
+
+        `fixed_quotas` — виды с гарантированным объёмом (ячейки
+        предзарегистрированных гипотез): раздаются первыми ровно своей
+        квотой, джиттер ±20% на них не действует — иначе порог мощности 385
+        держится только в среднем, а не на каждой сборке.
+        """
+        fixed_quotas = dict(fixed_quotas or {})
+        pool: list[str] = []
+        for kind, quota in fixed_quotas.items():
+            room = len(indices) - len(pool)
+            if room <= 0:
+                break
+            pool.extend([kind] * min(quota, room))
+        rest = {k: w for k, w in weights.items() if k not in fixed_quotas}
         jittered = {k: max(1, w * (1.0 + master.uniform(-QUOTA_JITTER,
                                                         QUOTA_JITTER)))
-                    for k, w in weights.items()}
+                    for k, w in rest.items()}
         total = sum(jittered.values())
-        share = len(indices) / total if total else 0
-        pool: list[str] = []
+        share = (len(indices) - len(pool)) / total if total else 0
         for kind, w in jittered.items():
             take = max(1, int(round(w * share)))
             if kind in pair_kinds and take % 2:
@@ -362,10 +409,25 @@ class PortraitGeneratorV5(PortraitGeneratorV4):
             if kind in triple_kinds and take % 3:
                 take += 3 - take % 3
             pool.extend([kind] * take)
-        fill = max(weights, key=weights.get)
+        grouped = {k: 2 for k in pair_kinds} | {k: 3 for k in triple_kinds}
+        candidates = rest or weights
+        loose = {k: w for k, w in candidates.items() if k not in grouped}
+        fill = max(loose or candidates, key=(loose or candidates).get)
         while len(pool) < len(indices):
             pool.append(fill)
         del pool[len(indices):]
+        # Обрезка и добивка могли порвать групповые виды (пара с нечётным
+        # объёмом, тройник из четырёх) — тогда сборка групп молча теряет
+        # хвостовой индекс и генерация падает KeyError. Ремонт: лишние
+        # члены группы с хвоста демотируются в одиночный вид.
+        for kind, m in grouped.items():
+            extra = pool.count(kind) % m
+            idx = len(pool) - 1
+            while extra and idx >= 0:
+                if pool[idx] == kind:
+                    pool[idx] = fill
+                    extra -= 1
+                idx -= 1
         master.shuffle(pool)
         return dict(zip(indices, pool))
 
@@ -430,6 +492,60 @@ class PortraitGeneratorV5(PortraitGeneratorV4):
             "current_amount": _round2(target * rng.uniform(0.0, 0.25)),
             "deadline": self.frozen_today + timedelta(days=int(365.25 * years)),
         }
+
+    def _seed_goal(self, p: dict, rng: Random) -> None:
+        """Хелпер «портрету нужна хоть одна цель» — без следа-константы.
+
+        Сборка 1 оставляла 18 целей ровно по 384 000.00 ₽: у v4-хелпера при
+        доходе ниже пола сумма считалась как 40 000 x 0.8 x 12 — то же
+        скопление одного значения, что и снэп на 5 000 ₽, только из другого
+        угла. Пол дохода и k дрожат — совпадение до копейки исчезает.
+        """
+        if p["goals"]:
+            return
+        income = p.get("income_total")
+        base = (float(income) if isinstance(income, (int, float))
+                and not isinstance(income, bool) and income > 0 else 0.0)
+        floor = rng.uniform(34_000.0, 56_000.0)
+        p["goals"] = self._build_goals(rng, max(base, floor),
+                                       rng.uniform(0.55, 1.05), 1)
+
+    def _make_pdn_exact(self, p: dict, rng: Random) -> None:
+        """Точная граница ПДН, переживающая конвейер v5.
+
+        v4-конструкция ломалась дальше по конвейеру: карта пересобирает платёж
+        от остатка (ТЗ-11), легальный кап рескейлит его пропорционально (ТЗ-7)
+        — и точное отношение платежей к доходу исчезало. В сборке 1 из ~130
+        записей вида доживало 11, в сборке 2 без починки — 5. Здесь: продукт
+        выбирается без карты, want запоминается маркером, а generate()
+        восстанавливает платёж ПОСЛЕ капов. Аннуитетная согласованность для
+        слоя C по методичке не требуется (§3.4 — «кроме C/D by design»).
+        Вес точного 0.40 удвоен: строгость «<= 0.40» проверяется на ~40
+        записях, а не на пяти.
+        """
+        base = int(p["income_total"] or 100_000)
+        base -= base % 5  # кратность 5 ₽: want целый, want/income даёт ровно
+        income = float(base or 100_000)  # fl(0.40) без двойного округления
+        target = Decimal(str(rng.choice((0.38, 0.395, 0.40, 0.40,
+                                         0.405, 0.42))))
+        want = float((Decimal(str(income)) * target).quantize(Decimal("0.01")))
+        p["income_total"] = income
+        keys = [k for k in LOAN_PRODUCTS if k != "card"]
+        weights = [LOAN_PRODUCTS[k]["weight"] for k in keys]
+        product = self._weighted_order(rng, keys, weights)[0]
+        loan = self._loan_from_payment(rng, want, strict_amount=False,
+                                       force_product=product)
+        if loan is None:
+            loan = self._loan_from_payment(rng, want, strict_amount=False)
+        if loan:
+            loan = dict(loan, id=1)
+            loan["monthly_payment"] = want
+            p["obligations"] = [loan]
+            p["_pdn_exact_want"] = want
+        else:
+            p["obligations"] = []
+        p["expense_total"] = _round2(min(p["expense_total"],
+                                         max(income - want - 1.0, 0.0)))
 
     # ------------------------------------------------------- слой C: виды v5
     def _gen_c(self, index: int) -> dict:
@@ -689,6 +805,11 @@ class PortraitGeneratorV5(PortraitGeneratorV4):
             self._apply_v5_goal_policy(p, rng)
             self._apply_legal_caps(p)
             self._renumber_goals(p)
+        want = p.pop("_pdn_exact_want", None)
+        if want is not None and p.get("obligations"):
+            # капы могли рескейлить платёж — точная граница восстанавливается
+            # последним шагом, это смысл вида pdn_boundary
+            p["obligations"][0]["monthly_payment"] = want
         return p
 
     @staticmethod
@@ -818,6 +939,7 @@ class PortraitGeneratorV5(PortraitGeneratorV4):
         base = super().meta()
         base.update({
             "dataset_version": DATASET_VERSION,
+            "dataset_build": DATASET_BUILD,
             "generator": "tools/portrait_testing/generator_v5.py::"
                          "PortraitGeneratorV5",
             "id_prefix": ID_PREFIX,

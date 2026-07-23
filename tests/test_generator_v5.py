@@ -8,7 +8,9 @@ from __future__ import annotations
 
 import gzip
 import json
+import math
 from collections import Counter
+from datetime import date
 
 import pytest
 
@@ -25,7 +27,7 @@ N = 3000
 
 @pytest.fixture(scope="module")
 def gen():
-    return PortraitGeneratorV5(seed=20260722, n=N)
+    return PortraitGeneratorV5(seed=20260723, n=N)
 
 
 @pytest.fixture(scope="module")
@@ -285,6 +287,83 @@ class TestH5PreRegisteredFamilies:
             assert 0.9 <= lt <= 2.1, lt
 
 
+class TestBuild2CellPower:
+    """Сборка 2 датасета v5: ячейки предзарегистрированных гипотез добирают
+    порог мощности 385 НА УРОВНЕ ЯЧЕЙКИ, а не только семейства.
+
+    Сборка 1 (seed 20260722) объявила недобор (231/241/120 на 12 000) вместо
+    регенерации. Решение владельца: итерация последняя, второго захода не
+    будет — ячейки добираются фиксированными квотами с джиттером. Порог
+    масштабируется пропорционально n.
+    """
+
+    H5_CELLS = ("floor_edge_with_near_goal", "floor_edge_no_near_goal",
+                "whale_thin_cushion")
+
+    def test_h5_cells_each_pass_power_threshold(self, portraits):
+        need = math.ceil(385 * N / 12000)
+        counts = Counter(p["kind"] for p in portraits)
+        for kind in self.H5_CELLS:
+            assert counts[kind] >= need, (kind, counts[kind], need)
+
+    def test_h5_quotas_are_not_identical_round_numbers(self, portraits):
+        """Ровно равные объёмы — отпечаток дизайна (урок р.4: по 100 на
+        категорию). Квоты дрожат, три ячейки не обязаны совпадать."""
+        counts = Counter(p["kind"] for p in portraits)
+        assert len({counts[k] for k in self.H5_CELLS}) > 1
+
+    def test_seed_goal_leaves_no_constant_pileup(self, portraits):
+        """Сборка 1: 18 целей ровно по 384 000.00 ₽ — след _seed_goal
+        (max(income, 40 000) x 0.8 x 12 при доходе ниже пола). Пол и k
+        дрожат, скопления одного значения нет."""
+        targets = Counter(
+            round(float(g["target_amount"]), 2)
+            for p in portraits if p["layer"] != "D"
+            for g in (p.get("goals") or ())
+            if isinstance(g.get("target_amount"), (int, float))
+            and not isinstance(g.get("target_amount"), bool))
+        top_value, top_count = targets.most_common(1)[0]
+        assert top_count <= 5, (top_value, top_count)
+
+    def test_default_build_is_2026_07_23(self):
+        gen = PortraitGeneratorV5(n=10)
+        assert gen.seed == 20260723
+        assert gen.frozen_today == date(2026, 7, 23)
+
+    def test_pdn_exact_040_has_probe_mass(self, portraits):
+        """Сборка 1 оставляла 11 записей с ПДН ровно 0.40, сборка 2 без
+        починки — 5: карта (ТЗ-11) и легальные капы (ТЗ-7) ломали точную
+        конструкцию дальше по конвейеру. Строгость «<= 0.40» должна
+        проверяться минимум на уровне v4 (26 на 12 000)."""
+        cnt = 0
+        for p in portraits:
+            income = p.get("income_total")
+            if p["layer"] == "D" or not isinstance(income, (int, float)) \
+                    or isinstance(income, bool) or income <= 0:
+                continue
+            pays = sum(o["monthly_payment"]
+                       for o in (p.get("obligations") or ())
+                       if isinstance(o.get("monthly_payment"), (int, float)))
+            if pays / income == 0.40:
+                cnt += 1
+        assert cnt >= math.ceil(26 * N / 12000), cnt
+
+    @pytest.mark.parametrize("n", [60, 200, 500])
+    def test_group_kinds_survive_pool_truncation(self, n):
+        """Регресс сборки 2: фиксированные квоты сместили обрезку пула на
+        хвост, и тройник дублей мог остаться группой из четырёх — сборка
+        групп молча теряла индекс, генерация падала KeyError. Групповые
+        виды обязаны быть кратны своей группе на любом n."""
+        gen = PortraitGeneratorV5(seed=7, n=n)
+        counts = Counter(gen._c_kind.values())
+        counts.update(gen._d_kind.values())
+        assert counts.get("duplicate_id_triple", 0) % 3 == 0
+        assert counts.get("duplicate_id_valid_pair", 0) % 2 == 0
+        assert counts.get("duplicate_id_invalid_pair", 0) % 2 == 0
+        for i in range(n):
+            gen.generate(i)  # не падает
+
+
 class TestInvariantsPreserved:
     """Что эксперты просили не сломать (§3 агрегата)."""
 
@@ -319,7 +398,7 @@ class TestBlindDeclarations:
     """ТЗ п.1 раунда 4: агрегаты в слепой meta, без раскрытия слоёв."""
 
     def test_declarations_cover_all_consensus_claims(self):
-        gen = PortraitGeneratorV5(seed=20260722, n=1200)
+        gen = PortraitGeneratorV5(seed=20260723, n=1200)
         d = gen.blind_declarations()
         for field in ("stress_magnitude_share", "realistic_whale_share",
                       "loan_amount_outside_product_spec_share",
@@ -332,7 +411,7 @@ class TestBlindDeclarations:
         assert 0.0 <= d["income_lognormal_ks_population"] <= 1.0
 
     def test_declarations_do_not_leak_design(self):
-        gen = PortraitGeneratorV5(seed=20260722, n=1200)
+        gen = PortraitGeneratorV5(seed=20260723, n=1200)
         blob = json.dumps(gen.blind_declarations(), ensure_ascii=False).lower()
         for leak in ("layer", "kind", "family", "pair", "expected_error",
                      "слой", "quota", "seed"):
@@ -340,7 +419,7 @@ class TestBlindDeclarations:
 
     def test_declarations_land_in_blind_pack_meta(self, tmp_path):
         from tools.model_validation.dataset_export import export_expert_pack
-        parts = export_expert_pack(tmp_path, n=600, seed=20260722, version=5,
+        parts = export_expert_pack(tmp_path, n=600, seed=20260723, version=5,
                                    chunk_size=300)
         for path in parts:
             with gzip.open(path, "rt", encoding="utf-8") as fh:
