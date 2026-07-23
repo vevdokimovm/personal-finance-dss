@@ -269,6 +269,13 @@ def export_expert_pack(
                         "part": part, "rows": min(chunk_size, n - i),
                         "frozen_today": gen_l.frozen_today.isoformat(),
                     }
+                    # ТЗ п.1 раунда 4: агрегатные декларации в слепой meta —
+                    # эксперт должен отличать намеренный дизайн от дефекта
+                    # генератора, не видя слоёв. Генераторы, у которых их нет,
+                    # отдают meta как раньше.
+                    declare = getattr(gen_l, "blind_declarations", None)
+                    if callable(declare):
+                        part_meta["declarations"] = declare()
                     fh.write(json.dumps(part_meta, ensure_ascii=False) + "\n")
             if layered:
                 row = _jsonable(gen_l.expert_row(i))

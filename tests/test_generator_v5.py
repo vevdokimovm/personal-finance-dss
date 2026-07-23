@@ -6,6 +6,8 @@
 """
 from __future__ import annotations
 
+import gzip
+import json
 from collections import Counter
 
 import pytest
@@ -311,3 +313,38 @@ class TestInvariantsPreserved:
         pairs = Counter(p["pair_id"] for p in portraits
                         if p.get("pair_relation"))
         assert pairs and set(pairs.values()) == {2}
+
+
+class TestBlindDeclarations:
+    """ТЗ п.1 раунда 4: агрегаты в слепой meta, без раскрытия слоёв."""
+
+    def test_declarations_cover_all_consensus_claims(self):
+        gen = PortraitGeneratorV5(seed=20260722, n=1200)
+        d = gen.blind_declarations()
+        for field in ("stress_magnitude_share", "realistic_whale_share",
+                      "loan_amount_outside_product_spec_share",
+                      "goal_amount_outside_name_band_share",
+                      "k_goal_actual_range", "k_goal_declared_range",
+                      "income_lognormal_ks_population", "risk_tolerance_note"):
+            assert field in d, field
+        lo, hi = d["k_goal_actual_range"]
+        assert 0 < lo <= hi <= 6.0
+        assert 0.0 <= d["income_lognormal_ks_population"] <= 1.0
+
+    def test_declarations_do_not_leak_design(self):
+        gen = PortraitGeneratorV5(seed=20260722, n=1200)
+        blob = json.dumps(gen.blind_declarations(), ensure_ascii=False).lower()
+        for leak in ("layer", "kind", "family", "pair", "expected_error",
+                     "слой", "quota", "seed"):
+            assert leak not in blob, f"утечка дизайна в декларациях: {leak}"
+
+    def test_declarations_land_in_blind_pack_meta(self, tmp_path):
+        from tools.model_validation.dataset_export import export_expert_pack
+        parts = export_expert_pack(tmp_path, n=600, seed=20260722, version=5,
+                                   chunk_size=300)
+        for path in parts:
+            with gzip.open(path, "rt", encoding="utf-8") as fh:
+                meta = json.loads(fh.readline())
+            assert meta.get("__meta__") is True
+            assert "declarations" in meta
+            assert "layers" not in meta and "c_families" not in meta

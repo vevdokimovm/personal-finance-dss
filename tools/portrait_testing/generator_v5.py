@@ -572,6 +572,96 @@ class PortraitGeneratorV5(PortraitGeneratorV4):
         return p
 
     # ------------------------------------------------------------- фасады
+    def blind_declarations(self) -> dict:
+        """Агрегаты для усечённой `meta` слепого пакета — ТЗ п.1 раунда 4.
+
+        Все четыре эксперта раунда 4 независимо написали одно и то же: по данным
+        невозможно отличить НАМЕРЕННЫЙ дизайн от ДЕФЕКТА генератора, и ревью
+        уходит в перечисление подозрений вместо финансовых решений. Здесь
+        объявляются ровно те доли, которые снимают шесть консенсусных претензий,
+        и ни одна из них не раскрывает, КАКАЯ запись к чему относится: слои,
+        виды и пары по-прежнему скрыты.
+
+        Считается один раз за прогон и кэшируется.
+        """
+        if getattr(self, "_declarations", None) is not None:
+            return self._declarations
+
+        def _num(x: object) -> bool:
+            return isinstance(x, (int, float)) and not isinstance(x, bool)
+
+        by_name = {spec["name"]: spec for spec in LOAN_PRODUCTS.values()}
+        stress = whale = 0
+        loans = oos = 0
+        goals = out_of_band = 0
+        ks: list[float] = []
+        logs: list[float] = []
+        risk: dict[int, int] = {}
+        for i in range(self.n):
+            p = self.generate(i)
+            kind = p.get("kind")
+            if kind == "magnitude_stress":
+                stress += 1
+            elif kind in ("magnitude_whale", "whale_thin_cushion"):
+                whale += 1
+            for o in p.get("obligations") or ():
+                loans += 1
+                spec = by_name.get(o.get("name"))
+                if spec and _num(o.get("amount")) and not (
+                        spec["amount"][0] * 0.999 <= o["amount"]
+                        <= spec["amount"][1] * 1.001):
+                    oos += 1
+            for g in p.get("goals") or ():
+                goals += 1
+                band = GOAL_NAME_RANGES_V5.get(g.get("name"))
+                if (p["layer"] != "D" and band and _num(g.get("target_amount"))
+                        and not (band[0] * 0.999 <= g["target_amount"]
+                                 <= band[1] * 1.001)):
+                    out_of_band += 1
+            inc = p.get("income_total")
+            if _num(inc) and inc > 0:
+                if p["layer"] == "A":
+                    logs.append(math.log(inc))
+                if p["layer"] != "D" and p.get("goals"):
+                    ks.append(sum(g["target_amount"] for g in p["goals"]
+                                  if _num(g.get("target_amount")))
+                              / (12.0 * inc))
+            rt = p.get("risk_tolerance")
+            if isinstance(rt, int) and not isinstance(rt, bool) and 1 <= rt <= 5:
+                risk[rt] = risk.get(rt, 0) + 1
+
+        mu = sum(logs) / len(logs)
+        sd = (sum((x - mu) ** 2 for x in logs) / len(logs)) ** 0.5
+        ordered = sorted(logs)
+        ks_stat = 0.0
+        for idx, x in enumerate(ordered):
+            cdf = 0.5 * (1.0 + math.erf((x - mu) / (sd * math.sqrt(2.0))))
+            ks_stat = max(ks_stat, abs((idx + 1) / len(ordered) - cdf),
+                          abs(cdf - idx / len(ordered)))
+
+        self._declarations = {
+            "stress_magnitude_share": round(stress / self.n, 4),
+            "realistic_whale_share": round(whale / self.n, 4),
+            "loan_amount_outside_product_spec_share": round(oos / loans, 4),
+            "goal_amount_outside_name_band_share": round(out_of_band / goals, 4),
+            "k_goal_actual_range": [round(min(ks), 4), round(max(ks), 4)],
+            "k_goal_declared_range": [K_GOAL_MIN, K_GOAL_MAX],
+            "income_lognormal_ks_population": round(ks_stat, 4),
+            "risk_tolerance_note": (
+                "равномерен by design (примерно по 1/5 на профиль) — это НЕ "
+                "популяционная доля риск-профилей в России"
+            ),
+            "notes": (
+                "Доли объявлены, чтобы отличать намеренный дизайн от дефекта "
+                "генератора. Остаток кредита выходит за продуктовую спеку "
+                "намеренно — так набирается экстремум долговой нагрузки; суммы "
+                "целей выходят за диапазон имени у стресс-магнитуд и у части "
+                "масштабированных портретов. Какая запись к чему относится — "
+                "не раскрывается."
+            ),
+        }
+        return self._declarations
+
     def expert_row(self, index: int) -> dict:
         p = self.generate(index)
         row = {"id": p.get("id_override", f"{ID_PREFIX}-{index:05d}")}
