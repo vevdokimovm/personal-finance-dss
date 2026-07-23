@@ -4,13 +4,13 @@
 
 ## Статусы
 
-- ok: 8276 · deficit: 3161 · invalid: 563
+- ok: 8278 · deficit: 3159 · invalid: 563
 
 ## По слоям
 
 - A: {'ok': 3590, 'deficit': 755}
 - B: {'deficit': 1523, 'ok': 1615}
-- C: {'ok': 2612, 'deficit': 768}
+- C: {'ok': 2614, 'deficit': 766}
 - D: {'invalid': 563, 'ok': 22, 'deficit': 2}
 - E: {'ok': 437, 'deficit': 113}
 
@@ -20,7 +20,7 @@
 
 ## Доминанты (ok)
 
-- {'goals+': 1487, 'reserve': 2897, 'debt': 3768, 'none': 124}
+- {'goals+': 1489, 'reserve': 2916, 'debt': 3749, 'none': 124}
 
 Разовые ходы модели: 34.9% портретов.
 

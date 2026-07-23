@@ -263,6 +263,25 @@ class TestH5PreRegisteredFamilies:
                if p.get("kind") == "whale_thin_cushion"]
         assert fam
 
+    def test_whale_thin_cushion_actually_contains_whales(self, portraits):
+        """H5-2 без китов проверить нельзя: вся гипотеза о том, что при
+        доходе в миллионы «подушка два месяца расходов» абсурдна как
+        приоритет. Планка кита — ТЗ итерации 3 п.4: реалистичный кит 5-10 млн.
+        """
+        fam = [p for p in portraits
+               if p.get("kind") == "whale_thin_cushion"]
+        incomes = sorted(p["income_total"] for p in fam)
+        assert incomes[len(incomes) // 2] >= 5_000_000
+
+    def test_whale_thin_cushion_cushion_is_actually_thin(self, portraits):
+        """Тонкая подушка = L_t в полосе спора [1; 2), иначе семейство
+        проверяет не то."""
+        for p in portraits:
+            if p.get("kind") != "whale_thin_cushion":
+                continue
+            lt = p["bliq"] / p["expense_total"]
+            assert 0.9 <= lt <= 2.1, lt
+
 
 class TestInvariantsPreserved:
     """Что эксперты просили не сломать (§3 агрегата)."""

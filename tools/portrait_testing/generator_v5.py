@@ -467,14 +467,15 @@ class PortraitGeneratorV5(PortraitGeneratorV4):
             p["goals"] = (p.get("goals") or [])[:2]
             p["goals"].append(self._long_horizon_goal(rng, p["income_total"]))
         elif kind == "whale_thin_cushion":
-            self._make_whale(p, rng, p["income_total"])
-            outflow = p["expense_total"] + sum(
-                o["monthly_payment"] for o in p["obligations"])
-            p["bliq"] = _round2(outflow * rng.uniform(1.0, 1.9))
+            # H5-2: доход реалистичного кита (ТЗ итерации 3 п.4 — 5-10 млн),
+            # а подушка при этом в спорной полосе L_t in [1; 2). Смысл
+            # семейства: при таком доходе «запас два месяца расходов» — это
+            # десятки миллионов в кэше, и вопрос в том, остаётся ли правило
+            # абсолютным или запас должен считаться от активов.
+            self._make_whale(p, rng, rng.uniform(5_000_000, 10_000_000))
             self._seed_loan(p, rng, product="consumer")
+            p["bliq"] = _round2(p["expense_total"] * rng.uniform(1.05, 1.95))
         else:  # кромка floor: L_t в [1; 2)
-            outflow = p["expense_total"] + sum(
-                o["monthly_payment"] for o in p["obligations"])
             p["bliq"] = _round2(max(p["expense_total"], 1.0)
                                 * rng.uniform(1.02, 1.97))
             if not p["obligations"]:
@@ -492,7 +493,6 @@ class PortraitGeneratorV5(PortraitGeneratorV4):
                     if g.get("deadline") is not None:
                         g["deadline"] = self.frozen_today + timedelta(
                             days=rng.randint(400, 1500))
-            del outflow
         return p
 
     # ------------------------------------------------------- слой D: виды v5

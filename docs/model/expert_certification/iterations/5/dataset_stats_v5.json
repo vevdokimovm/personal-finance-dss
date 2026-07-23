@@ -19,10 +19,10 @@
   "loans": 19053,
   "rate_outside_any_product": 0,
   "above_psk_cap_outside_d": 0,
-  "amount_outside_spec": 1264,
+  "amount_outside_spec": 1302,
   "name_product_mismatch": 0,
-  "amount_outside_spec_share": 0.0663,
-  "declared_out_of_spec_share": 0.0685
+  "amount_outside_spec_share": 0.0683,
+  "declared_out_of_spec_share": 0.0704
  },
  "psk_edge_histogram": {
   "2.805": 2,
@@ -99,12 +99,12 @@
  },
  "diagnostic_shares": {
   "flow": {
-   "deficit": 0.2768,
-   "ok": 0.7232
+   "deficit": 0.2766,
+   "ok": 0.7234
   },
   "lt_bands": {
-   "1-2": 0.207,
-   "2-3": 0.1222,
+   "1-2": 0.2106,
+   "2-3": 0.1186,
    "3-6": 0.19,
    "<1": 0.1171,
    ">=6": 0.3636
