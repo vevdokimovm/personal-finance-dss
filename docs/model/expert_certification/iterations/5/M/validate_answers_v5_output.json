@@ -1,0 +1,43 @@
+{
+ "errors": [],
+ "warnings": [],
+ "stats": {
+  "line_endings": "LF only",
+  "csv_lines_with_header": 12001,
+  "status_counts": {
+   "deficit": 3105,
+   "ok": 8273,
+   "invalid": 622
+  },
+  "dom_counts": {
+   "none": 3849,
+   "debt": 2875,
+   "reserve": 2734,
+   "goals+": 2542
+  },
+  "confidence_counts": {
+   "1": 709,
+   "2": 2294,
+   "3": 3897,
+   "4": 3795,
+   "5": 1305
+  },
+  "rows_with_lump": 4916,
+  "lump_share": 0.4096666666666667,
+  "lump_median": 246813.34,
+  "id_mismatches": 0,
+  "enum_violations": 0,
+  "format_violations": 0,
+  "budget_violations": 0,
+  "invalid_or_deficit_zero_violations": 0,
+  "dom_recompute_violations": 0,
+  "lump_plan_mismatches": 0,
+  "lump_action_vocab": {
+   "repay_debt": 4960,
+   "invest_surplus": 2246,
+   "fund_goal": 1384
+  },
+  "summary_rows": 12000
+ },
+ "ok": true
+}

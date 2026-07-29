@@ -1,0 +1,2060 @@
+{
+ "meta_declared": {
+  "stress_magnitude_share": 0.0069,
+  "realistic_whale_share": 0.0438,
+  "loan_amount_outside_product_spec_share": 0.1201,
+  "goal_amount_outside_name_band_share": 0.0111,
+  "k_goal_actual_range": [
+   0.1991,
+   4.9981
+  ],
+  "k_goal_declared_range": [
+   0.2,
+   5.0
+  ],
+  "income_lognormal_ks_population": 0.0183,
+  "risk_tolerance_note": "равномерен by design (примерно по 1/5 на профиль) — это НЕ популяционная доля риск-профилей в России",
+  "notes": "Доли объявлены, чтобы отличать намеренный дизайн от дефекта генератора. Остаток кредита выходит за продуктовую спеку намеренно — так набирается экстремум долговой нагрузки; суммы целей выходят за диапазон имени у стресс-магнитуд и у части масштабированных портретов. Какая запись к чему относится — не раскрывается."
+ },
+ "meta_parts": [
+  {
+   "dataset_version": 5,
+   "part": 1,
+   "rows": 3000,
+   "frozen_today": "2026-07-23"
+  },
+  {
+   "dataset_version": 5,
+   "part": 2,
+   "rows": 3000,
+   "frozen_today": "2026-07-23"
+  },
+  {
+   "dataset_version": 5,
+   "part": 3,
+   "rows": 3000,
+   "frozen_today": "2026-07-23"
+  },
+  {
+   "dataset_version": 5,
+   "part": 4,
+   "rows": 3000,
+   "frozen_today": "2026-07-23"
+  }
+ ],
+ "n_records": 12000,
+ "json_parse_failures": 0,
+ "id_census": {
+  "non_string_ids": 0,
+  "dup_group_sizes": {
+   "2": 102,
+   "3": 31
+  },
+  "pair_broken_forms": {
+   "оба валидные": 74,
+   "оба битые": 9,
+   "один битый": 19
+  },
+  "dup_groups": [
+   {
+    "id": "SP5-00077",
+    "rows": [
+     77,
+     91
+    ],
+    "broken": [
+     false,
+     false
+    ]
+   },
+   {
+    "id": "SP5-00110",
+    "rows": [
+     110,
+     115,
+     126
+    ],
+    "broken": [
+     false,
+     false,
+     false
+    ]
+   },
+   {
+    "id": "SP5-00128",
+    "rows": [
+     128,
+     131,
+     145
+    ],
+    "broken": [
+     false,
+     false,
+     false
+    ]
+   },
+   {
+    "id": "SP5-00230",
+    "rows": [
+     230,
+     283
+    ],
+    "broken": [
+     false,
+     false
+    ]
+   },
+   {
+    "id": "SP5-00359",
+    "rows": [
+     359,
+     399,
+     430
+    ],
+    "broken": [
+     false,
+     false,
+     false
+    ]
+   },
+   {
+    "id": "SP5-00415",
+    "rows": [
+     415,
+     482
+    ],
+    "broken": [
+     false,
+     false
+    ]
+   },
+   {
+    "id": "SP5-00476",
+    "rows": [
+     476,
+     569,
+     1156
+    ],
+    "broken": [
+     false,
+     false,
+     false
+    ]
+   },
+   {
+    "id": "SP5-00524",
+    "rows": [
+     524,
+     529
+    ],
+    "broken": [
+     false,
+     false
+    ]
+   },
+   {
+    "id": "SP5-00592",
+    "rows": [
+     592,
+     620
+    ],
+    "broken": [
+     false,
+     false
+    ]
+   },
+   {
+    "id": "SP5-00680",
+    "rows": [
+     680,
+     723
+    ],
+    "broken": [
+     false,
+     false
+    ]
+   },
+   {
+    "id": "SP5-00774",
+    "rows": [
+     774,
+     780
+    ],
+    "broken": [
+     false,
+     false
+    ]
+   },
+   {
+    "id": "SP5-00853",
+    "rows": [
+     853,
+     878
+    ],
+    "broken": [
+     false,
+     false
+    ]
+   },
+   {
+    "id": "SP5-00930",
+    "rows": [
+     930,
+     2774
+    ],
+    "broken": [
+     true,
+     true
+    ]
+   },
+   {
+    "id": "SP5-00967",
+    "rows": [
+     967,
+     11373
+    ],
+    "broken": [
+     false,
+     true
+    ]
+   },
+   {
+    "id": "SP5-01125",
+    "rows": [
+     1125,
+     1228
+    ],
+    "broken": [
+     false,
+     false
+    ]
+   },
+   {
+    "id": "SP5-01232",
+    "rows": [
+     1232,
+     1293,
+     1319
+    ],
+    "broken": [
+     false,
+     false,
+     false
+    ]
+   },
+   {
+    "id": "SP5-01278",
+    "rows": [
+     1278,
+     1429
+    ],
+    "broken": [
+     false,
+     false
+    ]
+   },
+   {
+    "id": "SP5-01386",
+    "rows": [
+     1386,
+     1724,
+     1798
+    ],
+    "broken": [
+     false,
+     false,
+     false
+    ]
+   },
+   {
+    "id": "SP5-01431",
+    "rows": [
+     1431,
+     1434
+    ],
+    "broken": [
+     false,
+     false
+    ]
+   },
+   {
+    "id": "SP5-01454",
+    "rows": [
+     1454,
+     1529
+    ],
+    "broken": [
+     false,
+     false
+    ]
+   },
+   {
+    "id": "SP5-01593",
+    "rows": [
+     1593,
+     1619
+    ],
+    "broken": [
+     false,
+     false
+    ]
+   },
+   {
+    "id": "SP5-01647",
+    "rows": [
+     1647,
+     1715
+    ],
+    "broken": [
+     false,
+     false
+    ]
+   },
+   {
+    "id": "SP5-01725",
+    "rows": [
+     1725,
+     1752
+    ],
+    "broken": [
+     false,
+     false
+    ]
+   },
+   {
+    "id": "SP5-01817",
+    "rows": [
+     1817,
+     1978,
+     2050
+    ],
+    "broken": [
+     false,
+     false,
+     false
+    ]
+   },
+   {
+    "id": "SP5-01839",
+    "rows": [
+     1839,
+     1889
+    ],
+    "broken": [
+     false,
+     false
+    ]
+   },
+   {
+    "id": "SP5-01937",
+    "rows": [
+     1937,
+     2109
+    ],
+    "broken": [
+     false,
+     false
+    ]
+   },
+   {
+    "id": "SP5-02057",
+    "rows": [
+     2057,
+     2213,
+     2575
+    ],
+    "broken": [
+     false,
+     false,
+     false
+    ]
+   },
+   {
+    "id": "SP5-02128",
+    "rows": [
+     2128,
+     10371
+    ],
+    "broken": [
+     false,
+     true
+    ]
+   },
+   {
+    "id": "SP5-02141",
+    "rows": [
+     2141,
+     2210
+    ],
+    "broken": [
+     false,
+     false
+    ]
+   },
+   {
+    "id": "SP5-02273",
+    "rows": [
+     2273,
+     2398
+    ],
+    "broken": [
+     false,
+     false
+    ]
+   },
+   {
+    "id": "SP5-02404",
+    "rows": [
+     2404,
+     2447
+    ],
+    "broken": [
+     false,
+     false
+    ]
+   },
+   {
+    "id": "SP5-02449",
+    "rows": [
+     2449,
+     2544
+    ],
+    "broken": [
+     false,
+     false
+    ]
+   },
+   {
+    "id": "SP5-02593",
+    "rows": [
+     2593,
+     2731
+    ],
+    "broken": [
+     false,
+     false
+    ]
+   },
+   {
+    "id": "SP5-02796",
+    "rows": [
+     2796,
+     2927,
+     3147
+    ],
+    "broken": [
+     false,
+     false,
+     false
+    ]
+   },
+   {
+    "id": "SP5-02846",
+    "rows": [
+     2846,
+     3036
+    ],
+    "broken": [
+     false,
+     false
+    ]
+   },
+   {
+    "id": "SP5-02860",
+    "rows": [
+     2860,
+     10250
+    ],
+    "broken": [
+     false,
+     true
+    ]
+   },
+   {
+    "id": "SP5-03028",
+    "rows": [
+     3028,
+     7053
+    ],
+    "broken": [
+     false,
+     true
+    ]
+   },
+   {
+    "id": "SP5-03073",
+    "rows": [
+     3073,
+     3306
+    ],
+    "broken": [
+     false,
+     false
+    ]
+   },
+   {
+    "id": "SP5-03206",
+    "rows": [
+     3206,
+     3236,
+     3327
+    ],
+    "broken": [
+     false,
+     false,
+     false
+    ]
+   },
+   {
+    "id": "SP5-03330",
+    "rows": [
+     3330,
+     3408
+    ],
+    "broken": [
+     false,
+     false
+    ]
+   },
+   {
+    "id": "SP5-03386",
+    "rows": [
+     3386,
+     3495,
+     3556
+    ],
+    "broken": [
+     false,
+     false,
+     false
+    ]
+   },
+   {
+    "id": "SP5-03394",
+    "rows": [
+     3394,
+     3572
+    ],
+    "broken": [
+     true,
+     true
+    ]
+   },
+   {
+    "id": "SP5-03544",
+    "rows": [
+     3544,
+     3799
+    ],
+    "broken": [
+     false,
+     false
+    ]
+   },
+   {
+    "id": "SP5-03615",
+    "rows": [
+     3615,
+     3627,
+     3687
+    ],
+    "broken": [
+     false,
+     false,
+     false
+    ]
+   },
+   {
+    "id": "SP5-03645",
+    "rows": [
+     3645,
+     4602
+    ],
+    "broken": [
+     true,
+     true
+    ]
+   },
+   {
+    "id": "SP5-03710",
+    "rows": [
+     3710,
+     3727,
+     3764
+    ],
+    "broken": [
+     false,
+     false,
+     false
+    ]
+   },
+   {
+    "id": "SP5-03834",
+    "rows": [
+     3834,
+     4125,
+     4367
+    ],
+    "broken": [
+     false,
+     false,
+     false
+    ]
+   },
+   {
+    "id": "SP5-03890",
+    "rows": [
+     3890,
+     3928
+    ],
+    "broken": [
+     false,
+     false
+    ]
+   },
+   {
+    "id": "SP5-04031",
+    "rows": [
+     4031,
+     4098
+    ],
+    "broken": [
+     false,
+     false
+    ]
+   },
+   {
+    "id": "SP5-04277",
+    "rows": [
+     4277,
+     4362
+    ],
+    "broken": [
+     false,
+     false
+    ]
+   },
+   {
+    "id": "SP5-04535",
+    "rows": [
+     4535,
+     4573
+    ],
+    "broken": [
+     false,
+     false
+    ]
+   },
+   {
+    "id": "SP5-04542",
+    "rows": [
+     4542,
+     4848,
+     4964
+    ],
+    "broken": [
+     false,
+     false,
+     false
+    ]
+   },
+   {
+    "id": "SP5-04756",
+    "rows": [
+     3593,
+     4756
+    ],
+    "broken": [
+     true,
+     false
+    ]
+   },
+   {
+    "id": "SP5-04829",
+    "rows": [
+     4829,
+     4890
+    ],
+    "broken": [
+     true,
+     true
+    ]
+   },
+   {
+    "id": "SP5-04830",
+    "rows": [
+     4830,
+     5042
+    ],
+    "broken": [
+     false,
+     false
+    ]
+   },
+   {
+    "id": "SP5-04951",
+    "rows": [
+     4951,
+     5224
+    ],
+    "broken": [
+     true,
+     true
+    ]
+   },
+   {
+    "id": "SP5-05020",
+    "rows": [
+     5020,
+     5723
+    ],
+    "broken": [
+     false,
+     true
+    ]
+   },
+   {
+    "id": "SP5-05071",
+    "rows": [
+     5071,
+     5092
+    ],
+    "broken": [
+     false,
+     false
+    ]
+   },
+   {
+    "id": "SP5-05088",
+    "rows": [
+     4950,
+     5088
+    ],
+    "broken": [
+     true,
+     false
+    ]
+   },
+   {
+    "id": "SP5-05094",
+    "rows": [
+     5094,
+     5311
+    ],
+    "broken": [
+     false,
+     false
+    ]
+   },
+   {
+    "id": "SP5-05107",
+    "rows": [
+     5107,
+     5109,
+     5144
+    ],
+    "broken": [
+     false,
+     false,
+     false
+    ]
+   },
+   {
+    "id": "SP5-05323",
+    "rows": [
+     5323,
+     5623
+    ],
+    "broken": [
+     false,
+     false
+    ]
+   },
+   {
+    "id": "SP5-05391",
+    "rows": [
+     5391,
+     10956
+    ],
+    "broken": [
+     false,
+     true
+    ]
+   },
+   {
+    "id": "SP5-05432",
+    "rows": [
+     5432,
+     5613,
+     5787
+    ],
+    "broken": [
+     false,
+     false,
+     false
+    ]
+   },
+   {
+    "id": "SP5-05690",
+    "rows": [
+     5690,
+     5722
+    ],
+    "broken": [
+     false,
+     false
+    ]
+   },
+   {
+    "id": "SP5-05755",
+    "rows": [
+     5755,
+     6035
+    ],
+    "broken": [
+     false,
+     false
+    ]
+   },
+   {
+    "id": "SP5-05851",
+    "rows": [
+     5851,
+     6096
+    ],
+    "broken": [
+     true,
+     true
+    ]
+   },
+   {
+    "id": "SP5-06075",
+    "rows": [
+     6075,
+     6093
+    ],
+    "broken": [
+     false,
+     false
+    ]
+   },
+   {
+    "id": "SP5-06178",
+    "rows": [
+     6178,
+     6182
+    ],
+    "broken": [
+     false,
+     false
+    ]
+   },
+   {
+    "id": "SP5-06280",
+    "rows": [
+     6280,
+     6348
+    ],
+    "broken": [
+     false,
+     false
+    ]
+   },
+   {
+    "id": "SP5-06281",
+    "rows": [
+     6281,
+     10678
+    ],
+    "broken": [
+     false,
+     true
+    ]
+   },
+   {
+    "id": "SP5-06300",
+    "rows": [
+     6300,
+     6409,
+     6495
+    ],
+    "broken": [
+     false,
+     false,
+     false
+    ]
+   },
+   {
+    "id": "SP5-06372",
+    "rows": [
+     6372,
+     6380
+    ],
+    "broken": [
+     false,
+     false
+    ]
+   },
+   {
+    "id": "SP5-06415",
+    "rows": [
+     6415,
+     6484
+    ],
+    "broken": [
+     false,
+     false
+    ]
+   },
+   {
+    "id": "SP5-06748",
+    "rows": [
+     6748,
+     6844,
+     7073
+    ],
+    "broken": [
+     false,
+     false,
+     false
+    ]
+   },
+   {
+    "id": "SP5-06771",
+    "rows": [
+     6771,
+     6898
+    ],
+    "broken": [
+     false,
+     false
+    ]
+   },
+   {
+    "id": "SP5-06827",
+    "rows": [
+     6827,
+     6996
+    ],
+    "broken": [
+     true,
+     true
+    ]
+   },
+   {
+    "id": "SP5-07039",
+    "rows": [
+     7039,
+     7315
+    ],
+    "broken": [
+     false,
+     false
+    ]
+   },
+   {
+    "id": "SP5-07148",
+    "rows": [
+     7148,
+     9498
+    ],
+    "broken": [
+     true,
+     true
+    ]
+   },
+   {
+    "id": "SP5-07345",
+    "rows": [
+     7345,
+     7348
+    ],
+    "broken": [
+     false,
+     false
+    ]
+   },
+   {
+    "id": "SP5-07383",
+    "rows": [
+     7383,
+     7591
+    ],
+    "broken": [
+     false,
+     false
+    ]
+   },
+   {
+    "id": "SP5-07440",
+    "rows": [
+     7440,
+     7465,
+     7552
+    ],
+    "broken": [
+     false,
+     false,
+     false
+    ]
+   },
+   {
+    "id": "SP5-07547",
+    "rows": [
+     1515,
+     7547
+    ],
+    "broken": [
+     true,
+     false
+    ]
+   },
+   {
+    "id": "SP5-07623",
+    "rows": [
+     7623,
+     7624
+    ],
+    "broken": [
+     false,
+     false
+    ]
+   },
+   {
+    "id": "SP5-07634",
+    "rows": [
+     7634,
+     7732,
+     7978
+    ],
+    "broken": [
+     false,
+     false,
+     false
+    ]
+   },
+   {
+    "id": "SP5-07643",
+    "rows": [
+     7643,
+     7666
+    ],
+    "broken": [
+     false,
+     false
+    ]
+   },
+   {
+    "id": "SP5-07828",
+    "rows": [
+     7828,
+     8058
+    ],
+    "broken": [
+     false,
+     false
+    ]
+   },
+   {
+    "id": "SP5-07940",
+    "rows": [
+     3057,
+     7940
+    ],
+    "broken": [
+     true,
+     false
+    ]
+   },
+   {
+    "id": "SP5-08125",
+    "rows": [
+     8125,
+     8199
+    ],
+    "broken": [
+     false,
+     false
+    ]
+   },
+   {
+    "id": "SP5-08171",
+    "rows": [
+     8171,
+     8855,
+     8875
+    ],
+    "broken": [
+     false,
+     false,
+     false
+    ]
+   },
+   {
+    "id": "SP5-08311",
+    "rows": [
+     8311,
+     8327
+    ],
+    "broken": [
+     false,
+     false
+    ]
+   },
+   {
+    "id": "SP5-08438",
+    "rows": [
+     8438,
+     8455
+    ],
+    "broken": [
+     false,
+     false
+    ]
+   },
+   {
+    "id": "SP5-08480",
+    "rows": [
+     8480,
+     8502
+    ],
+    "broken": [
+     false,
+     false
+    ]
+   },
+   {
+    "id": "SP5-08536",
+    "rows": [
+     5780,
+     8536
+    ],
+    "broken": [
+     true,
+     false
+    ]
+   },
+   {
+    "id": "SP5-08545",
+    "rows": [
+     761,
+     8545
+    ],
+    "broken": [
+     true,
+     false
+    ]
+   },
+   {
+    "id": "SP5-08559",
+    "rows": [
+     8559,
+     8560
+    ],
+    "broken": [
+     false,
+     false
+    ]
+   },
+   {
+    "id": "SP5-08565",
+    "rows": [
+     8565,
+     8772
+    ],
+    "broken": [
+     false,
+     false
+    ]
+   },
+   {
+    "id": "SP5-08819",
+    "rows": [
+     8819,
+     8867
+    ],
+    "broken": [
+     false,
+     false
+    ]
+   },
+   {
+    "id": "SP5-08896",
+    "rows": [
+     8896,
+     8938,
+     9236
+    ],
+    "broken": [
+     false,
+     false,
+     false
+    ]
+   },
+   {
+    "id": "SP5-08949",
+    "rows": [
+     8949,
+     9193
+    ],
+    "broken": [
+     false,
+     false
+    ]
+   },
+   {
+    "id": "SP5-09109",
+    "rows": [
+     9095,
+     9109
+    ],
+    "broken": [
+     true,
+     false
+    ]
+   },
+   {
+    "id": "SP5-09201",
+    "rows": [
+     9201,
+     9250
+    ],
+    "broken": [
+     false,
+     false
+    ]
+   },
+   {
+    "id": "SP5-09268",
+    "rows": [
+     9268,
+     9285
+    ],
+    "broken": [
+     false,
+     false
+    ]
+   },
+   {
+    "id": "SP5-09328",
+    "rows": [
+     9328,
+     9382,
+     9383
+    ],
+    "broken": [
+     false,
+     false,
+     false
+    ]
+   },
+   {
+    "id": "SP5-09362",
+    "rows": [
+     9362,
+     9493
+    ],
+    "broken": [
+     false,
+     false
+    ]
+   },
+   {
+    "id": "SP5-09531",
+    "rows": [
+     9531,
+     9682
+    ],
+    "broken": [
+     true,
+     true
+    ]
+   },
+   {
+    "id": "SP5-09598",
+    "rows": [
+     9598,
+     9657
+    ],
+    "broken": [
+     false,
+     false
+    ]
+   },
+   {
+    "id": "SP5-09608",
+    "rows": [
+     9608,
+     9670,
+     9969
+    ],
+    "broken": [
+     false,
+     false,
+     false
+    ]
+   },
+   {
+    "id": "SP5-09722",
+    "rows": [
+     6776,
+     9722
+    ],
+    "broken": [
+     true,
+     false
+    ]
+   },
+   {
+    "id": "SP5-09916",
+    "rows": [
+     9916,
+     9946
+    ],
+    "broken": [
+     false,
+     false
+    ]
+   },
+   {
+    "id": "SP5-09975",
+    "rows": [
+     9975,
+     10265,
+     10276
+    ],
+    "broken": [
+     false,
+     false,
+     false
+    ]
+   },
+   {
+    "id": "SP5-10003",
+    "rows": [
+     10003,
+     10073
+    ],
+    "broken": [
+     false,
+     false
+    ]
+   },
+   {
+    "id": "SP5-10158",
+    "rows": [
+     10158,
+     10486
+    ],
+    "broken": [
+     false,
+     false
+    ]
+   },
+   {
+    "id": "SP5-10335",
+    "rows": [
+     4379,
+     10335
+    ],
+    "broken": [
+     true,
+     false
+    ]
+   },
+   {
+    "id": "SP5-10416",
+    "rows": [
+     10416,
+     10472,
+     10658
+    ],
+    "broken": [
+     false,
+     false,
+     false
+    ]
+   },
+   {
+    "id": "SP5-10634",
+    "rows": [
+     10634,
+     10644
+    ],
+    "broken": [
+     false,
+     false
+    ]
+   },
+   {
+    "id": "SP5-10682",
+    "rows": [
+     10682,
+     10729,
+     11268
+    ],
+    "broken": [
+     false,
+     false,
+     false
+    ]
+   },
+   {
+    "id": "SP5-10724",
+    "rows": [
+     10724,
+     10870
+    ],
+    "broken": [
+     false,
+     false
+    ]
+   },
+   {
+    "id": "SP5-10774",
+    "rows": [
+     1393,
+     10774
+    ],
+    "broken": [
+     true,
+     false
+    ]
+   },
+   {
+    "id": "SP5-11023",
+    "rows": [
+     11023,
+     11040
+    ],
+    "broken": [
+     false,
+     false
+    ]
+   },
+   {
+    "id": "SP5-11071",
+    "rows": [
+     11071,
+     11179
+    ],
+    "broken": [
+     false,
+     false
+    ]
+   },
+   {
+    "id": "SP5-11181",
+    "rows": [
+     11181,
+     11202
+    ],
+    "broken": [
+     false,
+     false
+    ]
+   },
+   {
+    "id": "SP5-11206",
+    "rows": [
+     11206,
+     11490
+    ],
+    "broken": [
+     false,
+     false
+    ]
+   },
+   {
+    "id": "SP5-11338",
+    "rows": [
+     11338,
+     11422,
+     11583
+    ],
+    "broken": [
+     false,
+     false,
+     false
+    ]
+   },
+   {
+    "id": "SP5-11375",
+    "rows": [
+     4765,
+     11375
+    ],
+    "broken": [
+     true,
+     false
+    ]
+   },
+   {
+    "id": "SP5-11544",
+    "rows": [
+     11544,
+     11595
+    ],
+    "broken": [
+     false,
+     false
+    ]
+   },
+   {
+    "id": "SP5-11645",
+    "rows": [
+     11645,
+     11684
+    ],
+    "broken": [
+     false,
+     false
+    ]
+   },
+   {
+    "id": "SP5-11725",
+    "rows": [
+     11725,
+     11768,
+     11833
+    ],
+    "broken": [
+     false,
+     false,
+     false
+    ]
+   },
+   {
+    "id": "SP5-11776",
+    "rows": [
+     11776,
+     11782
+    ],
+    "broken": [
+     false,
+     false
+    ]
+   },
+   {
+    "id": "SP5-11805",
+    "rows": [
+     11805,
+     11832
+    ],
+    "broken": [
+     false,
+     false
+    ]
+   },
+   {
+    "id": "SP5-11854",
+    "rows": [
+     11854,
+     11867
+    ],
+    "broken": [
+     false,
+     false
+    ]
+   },
+   {
+    "id": "SP5-11938",
+    "rows": [
+     11938,
+     11957,
+     11963
+    ],
+    "broken": [
+     false,
+     false,
+     false
+    ]
+   },
+   {
+    "id": "SP5-11942",
+    "rows": [
+     9733,
+     11942
+    ],
+    "broken": [
+     true,
+     false
+    ]
+   }
+  ],
+  "expected_forms": "пара / тройник / пара из двух битых"
+ },
+ "defect_census": {
+  "invalid_total": 622,
+  "invalid_share": 0.051833333333333335,
+  "declared_window": [
+   0.042,
+   0.058
+  ],
+  "by_kind": {
+   "hard": 538,
+   "judgment": 84
+  },
+  "fields_hit_top": [
+   [
+    "income_total",
+    124
+   ],
+   [
+    "цель[0]",
+    118
+   ],
+   [
+    "amount",
+    102
+   ],
+   [
+    "expense_total",
+    71
+   ],
+   [
+    "interest_rate нечисловая",
+    60
+   ],
+   [
+    "monthly_payment",
+    50
+   ],
+   [
+    "кредит[0]",
+    40
+   ],
+   [
+    "bliq",
+    34
+   ],
+   [
+    "target_amount",
+    29
+   ],
+   [
+    "r_bench вне [0;1]",
+    26
+   ],
+   [
+    "interest_rate отрицательная",
+    22
+   ],
+   [
+    "5",
+    18
+   ],
+   [
+    "отсутствует ключ income_total",
+    15
+   ],
+   [
+    "портрет",
+    15
+   ],
+   [
+    "risk_tolerance нечисловой",
+    14
+   ]
+  ],
+  "composite_defects": 97,
+  "composite_share_of_layer": 0.15594855305466238,
+  "coerced_rows": 0
+ },
+ "descriptives": {
+  "income": {
+   "min": 0.0,
+   "p25": 46853.03,
+   "p50": 90809.58,
+   "p75": 235151.37,
+   "p99": 9802544.0,
+   "p999": 1853839215.88,
+   "max": 1979493530.88,
+   "mean": 11456426.503694855
+  },
+  "expense": {
+   "min": 0.0,
+   "p25": 29250.23,
+   "p50": 58906.38,
+   "p75": 161047.03,
+   "p99": 8968175.8,
+   "p999": 1060415659.25,
+   "max": 1399927567.15,
+   "mean": 6196085.13904289
+  },
+  "bliq": {
+   "min": 0.0,
+   "p25": 64792.72,
+   "p50": 199455.88,
+   "p75": 1327864.82,
+   "p99": 137524595.98,
+   "p999": 7233290266.5,
+   "max": 8179632980.43,
+   "mean": 37036675.18696256
+  },
+  "r_bench": {
+   "min": 0.0801,
+   "p25": 0.1301,
+   "p50": 0.1495,
+   "p75": 0.17,
+   "p99": 0.2174,
+   "p999": 0.2338,
+   "max": 0.2393,
+   "mean": 0.1501031815784848
+  },
+  "r_bench_distinct": 1394,
+  "risk_shares": {
+   "3": 2269,
+   "4": 2283,
+   "5": 2303,
+   "2": 2287,
+   "1": 2236
+  },
+  "n_debts": {
+   "1": 3400,
+   "0": 2083,
+   "3": 1678,
+   "2": 3001,
+   "4": 1141,
+   "5": 23,
+   "7": 15,
+   "6": 20,
+   "8": 17
+  },
+  "n_goals": {
+   "4": 1219,
+   "2": 2423,
+   "1": 1966,
+   "8": 618,
+   "3": 1534,
+   "7": 696,
+   "5": 1002,
+   "6": 827,
+   "0": 1093
+  },
+  "fcf": {
+   "min": -3309457.1100000013,
+   "p25": -1149.1000000000058,
+   "p50": 9231.06,
+   "p75": 34584.61,
+   "p99": 5511737.880000001,
+   "p999": 1004922432.48,
+   "max": 1344440953.2900002,
+   "mean": 5175510.560776939
+  },
+  "pdn_finite": {
+   "min": 0.0,
+   "p25": 0.04156223578156296,
+   "p50": 0.14999995583955628,
+   "p75": 0.3041546222134156,
+   "p99": 0.7884463535975604,
+   "p999": 0.8866042365987962,
+   "max": 1.6908722831772647,
+   "mean": 0.19561454662120945
+  },
+  "liq_months_finite": {
+   "min": 0.0,
+   "p25": 1.179246971131675,
+   "p50": 2.424517933623442,
+   "p75": 7.2576834704537,
+   "p99": 28.035024842801274,
+   "p999": 111.5420326677984,
+   "max": 298.7608887196647,
+   "mean": 5.926904615434268
+  }
+ },
+ "declared_verification": {
+  "stress_share_1e9": {
+   "mine": 0.0069166666666666664,
+   "declared": 0.0069
+  },
+  "stress_share": {
+   "mine": 0.019333333333333334,
+   "declared": 0.0069,
+   "note": "мой рабочий порог 1e8 шире декларации"
+  },
+  "whale_share": {
+   "mine": 0.06116666666666667,
+   "declared": 0.0438
+  },
+  "loan_outside_spec_share": {
+   "mine": 0.12440952967755185,
+   "declared": 0.1201,
+   "n_loans": 19476
+  },
+  "goal_outside_name_band_share": {
+   "mine_approx": 0.035123492245835726,
+   "declared": 0.0111,
+   "note": "мои слепые полосы имён"
+  },
+  "k_goal_range": {
+   "mine_population": [
+    0.19909309915473267,
+    4.99812368016599
+   ],
+   "mine_all_valid": [
+    0.19909309915473267,
+    4.99812368016599
+   ],
+   "declared": [
+    0.1991,
+    4.9981
+   ]
+  },
+  "income_lognormal_ks": {
+   "mine_approx": 0.10067274615363642,
+   "declared": 0.0183,
+   "note": "популяция ≈ доход 1e3..5e6, слепое приближение слоя A"
+  }
+ },
+ "boundary_census": {
+  "fcf_exact_zero": 122,
+  "pdn_exact_040": 29,
+  "pdn_band_039_041": 274,
+  "target_eq_current_exact": 56,
+  "overfunded_goals": 0,
+  "deadline_today": 77,
+  "deadline_tomorrow": 74,
+  "deadline_overdue": 92,
+  "goal_horizon_months": {
+   "max": 359,
+   "gt_120m": 1560,
+   "gt_240m": 741
+  },
+  "zero_income": 112,
+  "zero_expense": 86,
+  "zero_bliq": 115,
+  "no_goals": 1093,
+  "no_debts": 2083,
+  "empty_both": 332,
+  "goals_5plus": {
+   "8": 618,
+   "7": 696,
+   "5": 1002,
+   "6": 827
+  },
+  "goals8_single_deadline": 50,
+  "growing_debt_rows": 697,
+  "rate_eq_bench_exact": 79,
+  "rate_near_bench_005": 442
+ },
+ "products": {
+  "Ипотека": {
+   "n": 1723,
+   "rate_min": 0.06,
+   "rate_max": 0.19,
+   "amount_min": 446158.6,
+   "amount_max": 60000000.0,
+   "rate_inside_spec_share": 1.0,
+   "amount_inside_spec_share": 0.9042367962855484
+  },
+  "Автокредит": {
+   "n": 1626,
+   "rate_min": 0.1,
+   "rate_max": 0.25,
+   "amount_min": 42113.43,
+   "amount_max": 18446839.7,
+   "rate_inside_spec_share": 1.0,
+   "amount_inside_spec_share": 0.8690036900369004
+  },
+  "Потребительский кредит": {
+   "n": 6818,
+   "rate_min": 0.16,
+   "rate_max": 0.35,
+   "amount_min": 7658.07,
+   "amount_max": 18059247.4,
+   "rate_inside_spec_share": 1.0,
+   "amount_inside_spec_share": 0.8798767967145791
+  },
+  "Кредитная карта": {
+   "n": 5195,
+   "rate_min": 0.2,
+   "rate_max": 0.4,
+   "amount_min": 1824.7,
+   "amount_max": 4664794.6,
+   "rate_inside_spec_share": 1.0,
+   "amount_inside_spec_share": 0.857747834456208
+  },
+  "Рассрочка": {
+   "n": 2873,
+   "rate_min": 0.0,
+   "rate_max": 0.05,
+   "amount_min": 1069.61,
+   "amount_max": 1860359.3,
+   "rate_inside_spec_share": 1.0,
+   "amount_inside_spec_share": 0.8896623738252698
+  },
+  "Заём МФО": {
+   "n": 1241,
+   "rate_min": 0.5,
+   "rate_max": 2.95,
+   "amount_min": 504.51,
+   "amount_max": 1000000.0,
+   "rate_inside_spec_share": 0.9975825946817083,
+   "amount_inside_spec_share": 0.863013698630137
+  },
+  "psk_edge": {
+   "mfo_290_292": 61,
+   "mfo_292_300": 3,
+   "mfo_above_300": 0,
+   "mfo_illegal_rates_list": [
+    2.93,
+    2.95,
+    2.95
+   ],
+   "mfo_max_amount": 1000000.0,
+   "mfo_max_per_portrait": 3
+  },
+  "card_min_payment": {
+   "n": 5195,
+   "share_2_5pct": 0.9114533205004812,
+   "min": 0.010429997009732376,
+   "max": 0.06697281958981731
+  },
+  "unknown_product_names": {}
+ },
+ "layer_e_scan": {
+  "near_pairs_le2_fields": 171,
+  "scaled_pairs_m5_like": 44,
+  "examples": [
+   {
+    "rows": [
+     4630,
+     4646
+    ],
+    "ids": [
+     "SP5-04630",
+     "SP5-04646"
+    ],
+    "n_diff_fields": 1
+   },
+   {
+    "rows": [
+     2358,
+     2384
+    ],
+    "ids": [
+     "SP5-02358",
+     "SP5-02384"
+    ],
+    "n_diff_fields": 1
+   },
+   {
+    "rows": [
+     2863,
+     2887
+    ],
+    "ids": [
+     "SP5-02863",
+     "SP5-02887"
+    ],
+    "n_diff_fields": 1
+   },
+   {
+    "rows": [
+     4196,
+     4213
+    ],
+    "ids": [
+     "SP5-04196",
+     "SP5-04213"
+    ],
+    "n_diff_fields": 1
+   },
+   {
+    "rows": [
+     6396,
+     6439
+    ],
+    "ids": [
+     "SP5-06396",
+     "SP5-06439"
+    ],
+    "n_diff_fields": 1
+   },
+   {
+    "rows": [
+     7575,
+     7585
+    ],
+    "ids": [
+     "SP5-07575",
+     "SP5-07585"
+    ],
+    "n_diff_fields": 1
+   },
+   {
+    "rows": [
+     1807,
+     1838
+    ],
+    "ids": [
+     "SP5-01807",
+     "SP5-01838"
+    ],
+    "n_diff_fields": 1
+   },
+   {
+    "rows": [
+     2822,
+     2830
+    ],
+    "ids": [
+     "SP5-02822",
+     "SP5-02830"
+    ],
+    "n_diff_fields": 1
+   },
+   {
+    "rows": [
+     2840,
+     2849
+    ],
+    "ids": [
+     "SP5-02840",
+     "SP5-02849"
+    ],
+    "n_diff_fields": 1
+   },
+   {
+    "rows": [
+     2987,
+     2988
+    ],
+    "ids": [
+     "SP5-02987",
+     "SP5-02988"
+    ],
+    "n_diff_fields": 1
+   },
+   {
+    "rows": [
+     5937,
+     5943
+    ],
+    "ids": [
+     "SP5-05937",
+     "SP5-05943"
+    ],
+    "m5_like_k": 10.0
+   },
+   {
+    "rows": [
+     6227,
+     6279
+    ],
+    "ids": [
+     "SP5-06227",
+     "SP5-06279"
+    ],
+    "n_diff_fields": 1
+   }
+  ],
+  "note": "слепая эвристика: пары в одном (risk, n_debts, n_goals) бакете, ≤2 отличающихся поля или общий множитель"
+ },
+ "status_preview": {
+  "deficit": 3105,
+  "ok": 8273,
+  "invalid": 622
+ }
+}

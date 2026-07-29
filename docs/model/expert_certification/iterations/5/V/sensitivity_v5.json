@@ -1,0 +1,825 @@
+{
+ "document": "sensitivity_v5",
+ "method": "одна константа ±20%, остальные заморожены, полный прогон 12 000 записей",
+ "response_metric": "action_changed = смена месячной доминанты ИЛИ смена факта наличия разового хода",
+ "classification_bands": {
+  "методология": ">=15%",
+  "значимая": "5-15%",
+  "кромка порога": "1-5%",
+  "шум": "<1%"
+ },
+ "rows": 12000,
+ "results": [
+  {
+   "constant": "C-16",
+   "attribute": "CAP_RESERVE",
+   "base_value": 0.6,
+   "variants": {
+    "minus20": {
+     "value": 0.48,
+     "status_changed": 0,
+     "status_changed_share": 0.0,
+     "dom_changed": 3108,
+     "dom_changed_share": 0.259,
+     "action_changed": 3108,
+     "action_changed_share": 0.259,
+     "median_amount_shift": 0.0,
+     "mean_amount_shift": 0.09576
+    },
+    "plus20": {
+     "value": 0.72,
+     "status_changed": 0,
+     "status_changed_share": 0.0,
+     "dom_changed": 0,
+     "dom_changed_share": 0.0,
+     "action_changed": 0,
+     "action_changed_share": 0.0,
+     "median_amount_shift": 0.0,
+     "mean_amount_shift": 0.09582
+    }
+   },
+   "max_action_change_share": 0.259,
+   "verdict": "методология"
+  },
+  {
+   "constant": "C-08",
+   "attribute": "TOXIC_RATE",
+   "base_value": 0.35,
+   "variants": {
+    "minus20": {
+     "value": 0.27999999999999997,
+     "status_changed": 0,
+     "status_changed_share": 0.0,
+     "dom_changed": 766,
+     "dom_changed_share": 0.06383,
+     "action_changed": 941,
+     "action_changed_share": 0.07842,
+     "median_amount_shift": 0.0,
+     "mean_amount_shift": 0.08277
+    },
+    "plus20": {
+     "value": 0.42,
+     "status_changed": 0,
+     "status_changed_share": 0.0,
+     "dom_changed": 74,
+     "dom_changed_share": 0.00617,
+     "action_changed": 98,
+     "action_changed_share": 0.00817,
+     "median_amount_shift": 0.0,
+     "mean_amount_shift": 0.00745
+    }
+   },
+   "max_action_change_share": 0.07842,
+   "verdict": "значимая"
+  },
+  {
+   "constant": "C-03",
+   "attribute": "TARGET_MONTHS",
+   "base_value": {
+    "1": 6.0,
+    "2": 5.0,
+    "3": 4.0,
+    "4": 3.0,
+    "5": 3.0
+   },
+   "variants": {
+    "minus20": {
+     "value": {
+      "1": 4.800000000000001,
+      "2": 4.0,
+      "3": 3.2,
+      "4": 2.4000000000000004,
+      "5": 2.4000000000000004
+     },
+     "status_changed": 0,
+     "status_changed_share": 0.0,
+     "dom_changed": 472,
+     "dom_changed_share": 0.03933,
+     "action_changed": 584,
+     "action_changed_share": 0.04867,
+     "median_amount_shift": 0.0,
+     "mean_amount_shift": 0.06663
+    },
+    "plus20": {
+     "value": {
+      "1": 7.199999999999999,
+      "2": 6.0,
+      "3": 4.8,
+      "4": 3.5999999999999996,
+      "5": 3.5999999999999996
+     },
+     "status_changed": 0,
+     "status_changed_share": 0.0,
+     "dom_changed": 378,
+     "dom_changed_share": 0.0315,
+     "action_changed": 445,
+     "action_changed_share": 0.03708,
+     "median_amount_shift": 0.0,
+     "mean_amount_shift": 0.05181
+    }
+   },
+   "max_action_change_share": 0.04867,
+   "verdict": "кромка порога"
+  },
+  {
+   "constant": "C-09",
+   "attribute": "TOXIC_SPREAD",
+   "base_value": 0.2,
+   "variants": {
+    "minus20": {
+     "value": 0.16000000000000003,
+     "status_changed": 0,
+     "status_changed_share": 0.0,
+     "dom_changed": 416,
+     "dom_changed_share": 0.03467,
+     "action_changed": 510,
+     "action_changed_share": 0.0425,
+     "median_amount_shift": 0.0,
+     "mean_amount_shift": 0.04257
+    },
+    "plus20": {
+     "value": 0.24,
+     "status_changed": 0,
+     "status_changed_share": 0.0,
+     "dom_changed": 130,
+     "dom_changed_share": 0.01083,
+     "action_changed": 162,
+     "action_changed_share": 0.0135,
+     "median_amount_shift": 0.0,
+     "mean_amount_shift": 0.01371
+    }
+   },
+   "max_action_change_share": 0.0425,
+   "verdict": "кромка порога"
+  },
+  {
+   "constant": "C-17",
+   "attribute": "CAP_EXPENSIVE",
+   "base_value": 0.5,
+   "variants": {
+    "minus20": {
+     "value": 0.4,
+     "status_changed": 0,
+     "status_changed_share": 0.0,
+     "dom_changed": 410,
+     "dom_changed_share": 0.03417,
+     "action_changed": 410,
+     "action_changed_share": 0.03417,
+     "median_amount_shift": 0.0,
+     "mean_amount_shift": 0.0116
+    },
+    "plus20": {
+     "value": 0.6,
+     "status_changed": 0,
+     "status_changed_share": 0.0,
+     "dom_changed": 23,
+     "dom_changed_share": 0.00192,
+     "action_changed": 23,
+     "action_changed_share": 0.00192,
+     "median_amount_shift": 0.0,
+     "mean_amount_shift": 0.01109
+    }
+   },
+   "max_action_change_share": 0.03417,
+   "verdict": "кромка порога"
+  },
+  {
+   "constant": "C-01",
+   "attribute": "FLOOR_MONTHS",
+   "base_value": 1.0,
+   "variants": {
+    "minus20": {
+     "value": 0.8,
+     "status_changed": 0,
+     "status_changed_share": 0.0,
+     "dom_changed": 96,
+     "dom_changed_share": 0.008,
+     "action_changed": 179,
+     "action_changed_share": 0.01492,
+     "median_amount_shift": 0.0,
+     "mean_amount_shift": 0.03149
+    },
+    "plus20": {
+     "value": 1.2,
+     "status_changed": 0,
+     "status_changed_share": 0.0,
+     "dom_changed": 83,
+     "dom_changed_share": 0.00692,
+     "action_changed": 155,
+     "action_changed_share": 0.01292,
+     "median_amount_shift": 0.0,
+     "mean_amount_shift": 0.03362
+    }
+   },
+   "max_action_change_share": 0.01492,
+   "verdict": "кромка порога"
+  },
+  {
+   "constant": "C-02",
+   "attribute": "FLOOR_MONTHS_CONS",
+   "base_value": 1.5,
+   "variants": {
+    "minus20": {
+     "value": 1.2000000000000002,
+     "status_changed": 0,
+     "status_changed_share": 0.0,
+     "dom_changed": 74,
+     "dom_changed_share": 0.00617,
+     "action_changed": 139,
+     "action_changed_share": 0.01158,
+     "median_amount_shift": 0.0,
+     "mean_amount_shift": 0.03055
+    },
+    "plus20": {
+     "value": 1.7999999999999998,
+     "status_changed": 0,
+     "status_changed_share": 0.0,
+     "dom_changed": 79,
+     "dom_changed_share": 0.00658,
+     "action_changed": 124,
+     "action_changed_share": 0.01033,
+     "median_amount_shift": 0.0,
+     "mean_amount_shift": 0.03005
+    }
+   },
+   "max_action_change_share": 0.01158,
+   "verdict": "кромка порога"
+  },
+  {
+   "constant": "C-11",
+   "attribute": "EXPENSIVE_ABS",
+   "base_value": 0.18,
+   "variants": {
+    "minus20": {
+     "value": 0.144,
+     "status_changed": 0,
+     "status_changed_share": 0.0,
+     "dom_changed": 23,
+     "dom_changed_share": 0.00192,
+     "action_changed": 23,
+     "action_changed_share": 0.00192,
+     "median_amount_shift": 0.0,
+     "mean_amount_shift": 0.00497
+    },
+    "plus20": {
+     "value": 0.216,
+     "status_changed": 0,
+     "status_changed_share": 0.0,
+     "dom_changed": 70,
+     "dom_changed_share": 0.00583,
+     "action_changed": 70,
+     "action_changed_share": 0.00583,
+     "median_amount_shift": 0.0,
+     "mean_amount_shift": 0.02876
+    }
+   },
+   "max_action_change_share": 0.00583,
+   "verdict": "шум"
+  },
+  {
+   "constant": "C-10",
+   "attribute": "EXPENSIVE_SPREAD",
+   "base_value": 0.05,
+   "variants": {
+    "minus20": {
+     "value": 0.04000000000000001,
+     "status_changed": 0,
+     "status_changed_share": 0.0,
+     "dom_changed": 30,
+     "dom_changed_share": 0.0025,
+     "action_changed": 30,
+     "action_changed_share": 0.0025,
+     "median_amount_shift": 0.0,
+     "mean_amount_shift": 0.01034
+    },
+    "plus20": {
+     "value": 0.06,
+     "status_changed": 0,
+     "status_changed_share": 0.0,
+     "dom_changed": 35,
+     "dom_changed_share": 0.00292,
+     "action_changed": 35,
+     "action_changed_share": 0.00292,
+     "median_amount_shift": 0.0,
+     "mean_amount_shift": 0.01307
+    }
+   },
+   "max_action_change_share": 0.00292,
+   "verdict": "шум"
+  },
+  {
+   "constant": "C-27",
+   "attribute": "GOAL_SPLIT",
+   "base_value": {
+    "1": 0.85,
+    "2": 0.75,
+    "3": 0.6,
+    "4": 0.45,
+    "5": 0.3
+   },
+   "variants": {
+    "minus20": {
+     "value": {
+      "1": 0.68,
+      "2": 0.6000000000000001,
+      "3": 0.48,
+      "4": 0.36000000000000004,
+      "5": 0.24
+     },
+     "status_changed": 0,
+     "status_changed_share": 0.0,
+     "dom_changed": 33,
+     "dom_changed_share": 0.00275,
+     "action_changed": 33,
+     "action_changed_share": 0.00275,
+     "median_amount_shift": 0.0,
+     "mean_amount_shift": 0.0313
+    },
+    "plus20": {
+     "value": {
+      "1": 1.0,
+      "2": 0.8999999999999999,
+      "3": 0.72,
+      "4": 0.54,
+      "5": 0.36
+     },
+     "status_changed": 0,
+     "status_changed_share": 0.0,
+     "dom_changed": 19,
+     "dom_changed_share": 0.00158,
+     "action_changed": 19,
+     "action_changed_share": 0.00158,
+     "median_amount_shift": 0.0,
+     "mean_amount_shift": 0.03034
+    }
+   },
+   "max_action_change_share": 0.00275,
+   "verdict": "шум"
+  },
+  {
+   "constant": "C-26",
+   "attribute": "R_GOAL_PLANNING_CAP",
+   "base_value": 0.12,
+   "variants": {
+    "minus20": {
+     "value": 0.096,
+     "status_changed": 0,
+     "status_changed_share": 0.0,
+     "dom_changed": 26,
+     "dom_changed_share": 0.00217,
+     "action_changed": 26,
+     "action_changed_share": 0.00217,
+     "median_amount_shift": 0.0,
+     "mean_amount_shift": 0.00344
+    },
+    "plus20": {
+     "value": 0.144,
+     "status_changed": 0,
+     "status_changed_share": 0.0,
+     "dom_changed": 18,
+     "dom_changed_share": 0.0015,
+     "action_changed": 18,
+     "action_changed_share": 0.0015,
+     "median_amount_shift": 0.0,
+     "mean_amount_shift": 0.00282
+    }
+   },
+   "max_action_change_share": 0.00217,
+   "verdict": "шум"
+  },
+  {
+   "constant": "C-06",
+   "attribute": "BURN_TAPER_FACTOR",
+   "base_value": 0.5,
+   "variants": {
+    "minus20": {
+     "value": 0.4,
+     "status_changed": 0,
+     "status_changed_share": 0.0,
+     "dom_changed": 20,
+     "dom_changed_share": 0.00167,
+     "action_changed": 24,
+     "action_changed_share": 0.002,
+     "median_amount_shift": 0.0,
+     "mean_amount_shift": 0.00277
+    },
+    "plus20": {
+     "value": 0.6,
+     "status_changed": 0,
+     "status_changed_share": 0.0,
+     "dom_changed": 23,
+     "dom_changed_share": 0.00192,
+     "action_changed": 25,
+     "action_changed_share": 0.00208,
+     "median_amount_shift": 0.0,
+     "mean_amount_shift": 0.00248
+    }
+   },
+   "max_action_change_share": 0.00208,
+   "verdict": "шум"
+  },
+  {
+   "constant": "C-24",
+   "attribute": "NO_DEADLINE_HORIZON",
+   "base_value": 60.0,
+   "variants": {
+    "minus20": {
+     "value": 48.0,
+     "status_changed": 0,
+     "status_changed_share": 0.0,
+     "dom_changed": 13,
+     "dom_changed_share": 0.00108,
+     "action_changed": 13,
+     "action_changed_share": 0.00108,
+     "median_amount_shift": 0.0,
+     "mean_amount_shift": 0.00472
+    },
+    "plus20": {
+     "value": 72.0,
+     "status_changed": 0,
+     "status_changed_share": 0.0,
+     "dom_changed": 14,
+     "dom_changed_share": 0.00117,
+     "action_changed": 14,
+     "action_changed_share": 0.00117,
+     "median_amount_shift": 0.0,
+     "mean_amount_shift": 0.00354
+    }
+   },
+   "max_action_change_share": 0.00117,
+   "verdict": "шум"
+  },
+  {
+   "constant": "C-05",
+   "attribute": "BURN_TAPER_THRESHOLD",
+   "base_value": 1000000.0,
+   "variants": {
+    "minus20": {
+     "value": 800000.0,
+     "status_changed": 0,
+     "status_changed_share": 0.0,
+     "dom_changed": 12,
+     "dom_changed_share": 0.001,
+     "action_changed": 12,
+     "action_changed_share": 0.001,
+     "median_amount_shift": 0.0,
+     "mean_amount_shift": 0.00194
+    },
+    "plus20": {
+     "value": 1200000.0,
+     "status_changed": 0,
+     "status_changed_share": 0.0,
+     "dom_changed": 4,
+     "dom_changed_share": 0.00033,
+     "action_changed": 4,
+     "action_changed_share": 0.00033,
+     "median_amount_shift": 0.0,
+     "mean_amount_shift": 0.00048
+    }
+   },
+   "max_action_change_share": 0.001,
+   "verdict": "шум"
+  },
+  {
+   "constant": "C-21",
+   "attribute": "MIN_TICKET",
+   "base_value": 1000.0,
+   "variants": {
+    "minus20": {
+     "value": 800.0,
+     "status_changed": 0,
+     "status_changed_share": 0.0,
+     "dom_changed": 0,
+     "dom_changed_share": 0.0,
+     "action_changed": 5,
+     "action_changed_share": 0.00042,
+     "median_amount_shift": 0.0,
+     "mean_amount_shift": 0.0
+    },
+    "plus20": {
+     "value": 1200.0,
+     "status_changed": 0,
+     "status_changed_share": 0.0,
+     "dom_changed": 0,
+     "dom_changed_share": 0.0,
+     "action_changed": 3,
+     "action_changed_share": 0.00025,
+     "median_amount_shift": 0.0,
+     "mean_amount_shift": 1e-05
+    }
+   },
+   "max_action_change_share": 0.00042,
+   "verdict": "шум"
+  },
+  {
+   "constant": "C-20",
+   "attribute": "CAP_NEUTRAL_DEBT",
+   "base_value": 0.4,
+   "variants": {
+    "minus20": {
+     "value": 0.32000000000000006,
+     "status_changed": 0,
+     "status_changed_share": 0.0,
+     "dom_changed": 3,
+     "dom_changed_share": 0.00025,
+     "action_changed": 3,
+     "action_changed_share": 0.00025,
+     "median_amount_shift": 0.0,
+     "mean_amount_shift": 0.00609
+    },
+    "plus20": {
+     "value": 0.48,
+     "status_changed": 0,
+     "status_changed_share": 0.0,
+     "dom_changed": 1,
+     "dom_changed_share": 8e-05,
+     "action_changed": 1,
+     "action_changed_share": 8e-05,
+     "median_amount_shift": 0.0,
+     "mean_amount_shift": 0.00607
+    }
+   },
+   "max_action_change_share": 0.00025,
+   "verdict": "шум"
+  },
+  {
+   "constant": "C-04",
+   "attribute": "PDN_CUSHION_ADDON",
+   "base_value": 1.0,
+   "variants": {
+    "minus20": {
+     "value": 0.8,
+     "status_changed": 0,
+     "status_changed_share": 0.0,
+     "dom_changed": 1,
+     "dom_changed_share": 8e-05,
+     "action_changed": 1,
+     "action_changed_share": 8e-05,
+     "median_amount_shift": 0.0,
+     "mean_amount_shift": 0.0001
+    },
+    "plus20": {
+     "value": 1.2,
+     "status_changed": 0,
+     "status_changed_share": 0.0,
+     "dom_changed": 1,
+     "dom_changed_share": 8e-05,
+     "action_changed": 2,
+     "action_changed_share": 0.00017,
+     "median_amount_shift": 0.0,
+     "mean_amount_shift": 0.00024
+    }
+   },
+   "max_action_change_share": 0.00017,
+   "verdict": "шум"
+  },
+  {
+   "constant": "C-18",
+   "attribute": "CAP_NEAR_GOALS",
+   "base_value": 0.5,
+   "variants": {
+    "minus20": {
+     "value": 0.4,
+     "status_changed": 0,
+     "status_changed_share": 0.0,
+     "dom_changed": 2,
+     "dom_changed_share": 0.00017,
+     "action_changed": 2,
+     "action_changed_share": 0.00017,
+     "median_amount_shift": 0.0,
+     "mean_amount_shift": 0.00109
+    },
+    "plus20": {
+     "value": 0.6,
+     "status_changed": 0,
+     "status_changed_share": 0.0,
+     "dom_changed": 0,
+     "dom_changed_share": 0.0,
+     "action_changed": 0,
+     "action_changed_share": 0.0,
+     "median_amount_shift": 0.0,
+     "mean_amount_shift": 0.00077
+    }
+   },
+   "max_action_change_share": 0.00017,
+   "verdict": "шум"
+  },
+  {
+   "constant": "C-19",
+   "attribute": "LONG_GOAL_FLOOR",
+   "base_value": 0.1,
+   "variants": {
+    "minus20": {
+     "value": 0.08000000000000002,
+     "status_changed": 0,
+     "status_changed_share": 0.0,
+     "dom_changed": 2,
+     "dom_changed_share": 0.00017,
+     "action_changed": 2,
+     "action_changed_share": 0.00017,
+     "median_amount_shift": 0.0,
+     "mean_amount_shift": 0.00036
+    },
+    "plus20": {
+     "value": 0.12,
+     "status_changed": 0,
+     "status_changed_share": 0.0,
+     "dom_changed": 1,
+     "dom_changed_share": 8e-05,
+     "action_changed": 1,
+     "action_changed_share": 8e-05,
+     "median_amount_shift": 0.0,
+     "mean_amount_shift": 0.00032
+    }
+   },
+   "max_action_change_share": 0.00017,
+   "verdict": "шум"
+  },
+  {
+   "constant": "C-23",
+   "attribute": "LONG_HORIZON",
+   "base_value": 120.0,
+   "variants": {
+    "minus20": {
+     "value": 96.0,
+     "status_changed": 0,
+     "status_changed_share": 0.0,
+     "dom_changed": 1,
+     "dom_changed_share": 8e-05,
+     "action_changed": 1,
+     "action_changed_share": 8e-05,
+     "median_amount_shift": 0.0,
+     "mean_amount_shift": 0.00195
+    },
+    "plus20": {
+     "value": 144.0,
+     "status_changed": 0,
+     "status_changed_share": 0.0,
+     "dom_changed": 0,
+     "dom_changed_share": 0.0,
+     "action_changed": 0,
+     "action_changed_share": 0.0,
+     "median_amount_shift": 0.0,
+     "mean_amount_shift": 0.00064
+    }
+   },
+   "max_action_change_share": 8e-05,
+   "verdict": "шум"
+  },
+  {
+   "constant": "C-28",
+   "attribute": "R_BENCH_FALLBACK",
+   "base_value": 0.15,
+   "variants": {
+    "minus20": {
+     "value": 0.12,
+     "status_changed": 0,
+     "status_changed_share": 0.0,
+     "dom_changed": 1,
+     "dom_changed_share": 8e-05,
+     "action_changed": 1,
+     "action_changed_share": 8e-05,
+     "median_amount_shift": 0.0,
+     "mean_amount_shift": 7e-05
+    },
+    "plus20": {
+     "value": 0.18,
+     "status_changed": 0,
+     "status_changed_share": 0.0,
+     "dom_changed": 1,
+     "dom_changed_share": 8e-05,
+     "action_changed": 1,
+     "action_changed_share": 8e-05,
+     "median_amount_shift": 0.0,
+     "mean_amount_shift": 0.0002
+    }
+   },
+   "max_action_change_share": 8e-05,
+   "verdict": "шум"
+  },
+  {
+   "constant": "C-07",
+   "attribute": "RESERVE_ABS_CAP",
+   "base_value": 30000000.0,
+   "variants": {
+    "minus20": {
+     "value": 24000000.0,
+     "status_changed": 0,
+     "status_changed_share": 0.0,
+     "dom_changed": 0,
+     "dom_changed_share": 0.0,
+     "action_changed": 0,
+     "action_changed_share": 0.0,
+     "median_amount_shift": 0.0,
+     "mean_amount_shift": 0.0
+    },
+    "plus20": {
+     "value": 36000000.0,
+     "status_changed": 0,
+     "status_changed_share": 0.0,
+     "dom_changed": 0,
+     "dom_changed_share": 0.0,
+     "action_changed": 0,
+     "action_changed_share": 0.0,
+     "median_amount_shift": 0.0,
+     "mean_amount_shift": 0.0
+    }
+   },
+   "max_action_change_share": 0.0,
+   "verdict": "шум"
+  },
+  {
+   "constant": "C-13",
+   "attribute": "IMPOSSIBLE_RATE",
+   "base_value": 5.0,
+   "variants": {
+    "minus20": {
+     "value": 4.0,
+     "status_changed": 0,
+     "status_changed_share": 0.0,
+     "dom_changed": 0,
+     "dom_changed_share": 0.0,
+     "action_changed": 0,
+     "action_changed_share": 0.0,
+     "median_amount_shift": 0.0,
+     "mean_amount_shift": 0.0
+    },
+    "plus20": {
+     "value": 6.0,
+     "status_changed": 0,
+     "status_changed_share": 0.0,
+     "dom_changed": 0,
+     "dom_changed_share": 0.0,
+     "action_changed": 0,
+     "action_changed_share": 0.0,
+     "median_amount_shift": 0.0,
+     "mean_amount_shift": 0.0
+    }
+   },
+   "max_action_change_share": 0.0,
+   "verdict": "шум"
+  },
+  {
+   "constant": "C-15",
+   "attribute": "CAP_TOXIC",
+   "base_value": 0.7,
+   "variants": {
+    "minus20": {
+     "value": 0.5599999999999999,
+     "status_changed": 0,
+     "status_changed_share": 0.0,
+     "dom_changed": 0,
+     "dom_changed_share": 0.0,
+     "action_changed": 0,
+     "action_changed_share": 0.0,
+     "median_amount_shift": 0.0,
+     "mean_amount_shift": 0.01549
+    },
+    "plus20": {
+     "value": 0.84,
+     "status_changed": 0,
+     "status_changed_share": 0.0,
+     "dom_changed": 0,
+     "dom_changed_share": 0.0,
+     "action_changed": 0,
+     "action_changed_share": 0.0,
+     "median_amount_shift": 0.0,
+     "mean_amount_shift": 0.01446
+    }
+   },
+   "max_action_change_share": 0.0,
+   "verdict": "шум"
+  },
+  {
+   "constant": "C-22",
+   "attribute": "NEAR_HORIZON",
+   "base_value": 12.0,
+   "variants": {
+    "minus20": {
+     "value": 9.600000000000001,
+     "status_changed": 0,
+     "status_changed_share": 0.0,
+     "dom_changed": 0,
+     "dom_changed_share": 0.0,
+     "action_changed": 0,
+     "action_changed_share": 0.0,
+     "median_amount_shift": 0.0,
+     "mean_amount_shift": 0.00416
+    },
+    "plus20": {
+     "value": 14.399999999999999,
+     "status_changed": 0,
+     "status_changed_share": 0.0,
+     "dom_changed": 0,
+     "dom_changed_share": 0.0,
+     "action_changed": 0,
+     "action_changed_share": 0.0,
+     "median_amount_shift": 0.0,
+     "mean_amount_shift": 0.00237
+    }
+   },
+   "max_action_change_share": 0.0,
+   "verdict": "шум"
+  }
+ ]
+}

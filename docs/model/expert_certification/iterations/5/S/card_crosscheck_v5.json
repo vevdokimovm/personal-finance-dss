@@ -1,0 +1,8 @@
+{
+ "cards": 12000,
+ "jsonl": 12000,
+ "compared": 12000,
+ "issues": 0,
+ "verdict": "CONSISTENT",
+ "sample": []
+}

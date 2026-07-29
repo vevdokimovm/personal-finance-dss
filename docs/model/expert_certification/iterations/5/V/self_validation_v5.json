@@ -1,0 +1,109 @@
+{
+ "document": "self_validation_v5",
+ "checks_total": 20,
+ "checks_passed": 20,
+ "checks_failed": 0,
+ "verdict": "PASS",
+ "checks": [
+  {
+   "check": "CRLF line endings",
+   "passed": true,
+   "detail": "CRLF=12001, одиночных LF=0"
+  },
+  {
+   "check": "no BOM",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "check": "header exact",
+   "passed": true,
+   "detail": "['id', 'status', 'dom', 'res', 'debt', 'goal', 'inv', 'lump', 'confidence']"
+  },
+  {
+   "check": "row count == 12000",
+   "passed": true,
+   "detail": "12000"
+  },
+  {
+   "check": "column count == 9 on every row",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "check": "recommendations row count == 12000",
+   "passed": true,
+   "detail": "12000"
+  },
+  {
+   "check": "positional id match with input",
+   "passed": true,
+   "detail": "первое расхождение: нет"
+  },
+  {
+   "check": "recommendations id order matches csv",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "check": "status enum",
+   "passed": true,
+   "detail": "[]"
+  },
+  {
+   "check": "dom enum",
+   "passed": true,
+   "detail": "[]"
+  },
+  {
+   "check": "confidence integer 1..5",
+   "passed": true,
+   "detail": "[]"
+  },
+  {
+   "check": "all money fields numeric",
+   "passed": true,
+   "detail": "[]"
+  },
+  {
+   "check": "no negative money fields",
+   "passed": true,
+   "detail": "[]"
+  },
+  {
+   "check": "invalid form: dom=none and all zeros",
+   "passed": true,
+   "detail": "[]"
+  },
+  {
+   "check": "budget res+debt+goal+inv <= max(0,FCF)",
+   "passed": true,
+   "detail": "[]"
+  },
+  {
+   "check": "deficit iff FCF<0, split zeroed",
+   "passed": true,
+   "detail": "[]"
+  },
+  {
+   "check": "dom equals argmax of its own split",
+   "passed": true,
+   "detail": "[]"
+  },
+  {
+   "check": "lump == sum(lump_sum_plan.amount)",
+   "passed": true,
+   "detail": "[]"
+  },
+  {
+   "check": "summary row count == 12000",
+   "passed": true,
+   "detail": "12000"
+  },
+  {
+   "check": "summary id order matches allocations",
+   "passed": true,
+   "detail": ""
+  }
+ ]
+}

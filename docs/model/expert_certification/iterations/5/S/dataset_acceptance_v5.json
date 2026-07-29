@@ -1,0 +1,177 @@
+{
+ "verdict": "ACCEPTED",
+ "n_gates": 14,
+ "passed": 13,
+ "warned": 1,
+ "failed": 0,
+ "gates": [
+  {
+   "id": "G1",
+   "name": "12 000 портретов, 4 части по 3 000, служебная строка отделена",
+   "result": "PASS",
+   "blocking": true,
+   "evidence": {
+    "n_rows": 12000,
+    "n_meta": 4
+   }
+  },
+  {
+   "id": "G2",
+   "name": "версия и дата среза едины во всех частях",
+   "result": "PASS",
+   "blocking": true,
+   "evidence": {
+    "versions": [
+     5
+    ],
+    "frozen": [
+     "2026-07-23"
+    ]
+   }
+  },
+  {
+   "id": "G3",
+   "name": "слепой экспорт не содержит меток дизайна",
+   "result": "PASS",
+   "blocking": true,
+   "evidence": {
+    "forbidden_keys_found": []
+   }
+  },
+  {
+   "id": "G4",
+   "name": "доля дефектов в объявленном коридоре 4.2–5.8%",
+   "result": "PASS",
+   "blocking": false,
+   "evidence": {
+    "share": 0.0478
+   }
+  },
+  {
+   "id": "G5",
+   "name": "дубли id сохранены и представлены тремя формами",
+   "result": "PASS",
+   "blocking": false,
+   "evidence": {
+    "forms": {
+     "valid_pair": 74,
+     "triple": 31,
+     "mixed_pair": 19,
+     "broken_pair": 9
+    }
+   }
+  },
+  {
+   "id": "G6",
+   "name": "кап на суммах целей снят (нет пика ровно на 1e8)",
+   "result": "PASS",
+   "blocking": false,
+   "evidence": {
+    "exact_1e8": 0
+   }
+  },
+  {
+   "id": "G7",
+   "name": "длинные горизонты 10–30 лет присутствуют массово",
+   "result": "PASS",
+   "blocking": false,
+   "evidence": {
+    "goals_10y_plus": 1562,
+    "power_threshold": 385
+   }
+  },
+  {
+   "id": "G8",
+   "name": "кромка ПСК заполнена по обе стороны потолка",
+   "result": "PASS",
+   "blocking": false,
+   "evidence": {
+    "band": 61,
+    "over": 25
+   }
+  },
+  {
+   "id": "G9",
+   "name": "ставка и срок остаются внутри продуктовой спеки",
+   "result": "WARN",
+   "blocking": false,
+   "evidence": {
+    "rate_outside": {
+     "Потребительский кредит": 12,
+     "Кредитная карта": 7,
+     "Заём МФО": 3,
+     "Ипотека": 1,
+     "Рассрочка": 1,
+     "Автокредит": 1
+    },
+    "term_outside": {
+     "Кредитная карта": 2512,
+     "Потребительский кредит": 93,
+     "Заём МФО": 79,
+     "Рассрочка": 124,
+     "Автокредит": 26,
+     "Ипотека": 13
+    }
+   }
+  },
+  {
+   "id": "G10",
+   "name": "фактический k целей совпадает с объявленным",
+   "result": "PASS",
+   "blocking": false,
+   "evidence": {
+    "observed": [
+     0.1991,
+     4.9981
+    ]
+   }
+  },
+  {
+   "id": "G11",
+   "name": "равномерность риск-профиля (χ² по 5 уровням)",
+   "result": "PASS",
+   "blocking": false,
+   "evidence": {
+    "distribution": {
+     "3": 2280,
+     "4": 2292,
+     "5": 2313,
+     "2": 2298,
+     "1": 2243
+    }
+   }
+  },
+  {
+   "id": "G12",
+   "name": "объёмы категорий не круглые (нет реверса слоёв группировкой)",
+   "result": "PASS",
+   "blocking": false,
+   "evidence": {
+    "n_broken": 574
+   }
+  },
+  {
+   "id": "G13",
+   "name": "метаморфические пары присутствуют",
+   "result": "PASS",
+   "blocking": false,
+   "evidence": {
+    "M1": 45,
+    "M2": 88,
+    "M3": 88,
+    "M4": 44,
+    "M5": 44
+   }
+  },
+  {
+   "id": "G14",
+   "name": "граничная арифметика точна (ровно нулевой поток даёт 0.0)",
+   "result": "PASS",
+   "blocking": false,
+   "evidence": {
+    "exact": 122,
+    "kopeck": 122
+   }
+  }
+ ]
+}

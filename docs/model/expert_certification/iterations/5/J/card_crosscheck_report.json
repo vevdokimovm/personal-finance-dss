@@ -1,0 +1,8 @@
+{
+ "n_cards": 12000,
+ "n_jsonl": 12000,
+ "mismatches": [],
+ "rows_checked": 12000,
+ "fields_compared": 231953,
+ "n_mismatching_rows": 0
+}

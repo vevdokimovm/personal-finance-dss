@@ -1,0 +1,233 @@
+{
+ "document": "dataset_acceptance_v5",
+ "dataset_version": 5,
+ "seed": "20260723",
+ "frozen_today": "2026-07-23",
+ "produced_before_scoring": true,
+ "verdict": "ACCEPTED",
+ "gates_passed": 12,
+ "gates_passed_with_caveat": 2,
+ "gates_failed": 0,
+ "gates": [
+  {
+   "id": "G-01",
+   "gate": "Полнота и структура пакета",
+   "threshold": "4 части x 3000 + meta",
+   "measured": {
+    "rows": 12000,
+    "parts": 4,
+    "meta_rows": 4
+   },
+   "verdict": "PASS"
+  },
+  {
+   "id": "G-02",
+   "gate": "Доля жёстких дефектов в объявленном коридоре",
+   "threshold": "[0.042; 0.058]",
+   "measured": {
+    "hard_defect_share": 0.04633,
+    "rows": 556
+   },
+   "verdict": "PASS"
+  },
+  {
+   "id": "G-03",
+   "gate": "Составные дефекты",
+   "threshold": "~0.131 слоя",
+   "measured": {
+    "composite_rows": 82,
+    "share_of_layer": 0.1475
+   },
+   "verdict": "PASS"
+  },
+  {
+   "id": "G-04",
+   "gate": "Кап 1e8 на суммах целей снят",
+   "threshold": "0 записей ровно на 1e8",
+   "measured": {
+    "goals_at_exactly_1e8": 0
+   },
+   "verdict": "PASS"
+  },
+  {
+   "id": "G-05",
+   "gate": "Фактический k целей совпадает с заявленным",
+   "threshold": "[0.2; 5.0]",
+   "measured": {
+    "actual_min": 0.19909309915473267,
+    "actual_max": 4.99812368016599,
+    "declared": [
+     0.2,
+     5.0
+    ],
+    "outside": 1
+   },
+   "verdict": "PASS"
+  },
+  {
+   "id": "G-06",
+   "gate": "Длинные горизонты появились и мощны",
+   "threshold": ">=385 наблюдений",
+   "measured": {
+    "goals_gt_120m": 1562,
+    "max_horizon_months": 359.98357289527723
+   },
+   "verdict": "PASS"
+  },
+  {
+   "id": "G-07",
+   "gate": "Кромка ПСК заполнена",
+   "threshold": "есть 2.90-2.92 и 2.93-3.00",
+   "measured": {
+    "at_or_below_legal_cap": 92,
+    "above_legal_cap": 25,
+    "values_above": [
+     2.93,
+     2.95,
+     3.0
+    ]
+   },
+   "verdict": "PASS"
+  },
+  {
+   "id": "G-08",
+   "gate": "Три формы дублей id",
+   "threshold": "пара/тройник/пара из битых",
+   "measured": {
+    "distinct_ids_duplicated": 133,
+    "rows_involved": 297,
+    "forms": {
+     "size2_broken0": 74,
+     "size3_broken0": 31,
+     "size2_broken1": 19,
+     "size2_broken2": 9
+    },
+    "groups_with_identical_payload": 0
+   },
+   "verdict": "PASS"
+  },
+  {
+   "id": "G-09",
+   "gate": "Легальные лимиты продуктов соблюдаются",
+   "threshold": "МФО остаток <= 1 млн, ставка в спеке",
+   "measured": {
+    "mfo_amount_max": 1000000.0,
+    "rate_outside_spec_share_overall": 0.0013
+   },
+   "verdict": "PASS"
+  },
+  {
+   "id": "G-10",
+   "gate": "Карта гасится минимальным платежом 2-5%",
+   "threshold": "основная масса в полосе",
+   "measured": {
+    "share_in_2_5_pct_band": 0.916,
+    "median_payment_to_balance": 0.0373,
+    "cards_total": 5448
+   },
+   "verdict": "PASS"
+  },
+  {
+   "id": "G-11",
+   "gate": "Слой дефектов расширен до 12 полей",
+   "threshold": ">=12 полей",
+   "measured": {
+    "fields_affected": [
+     "12.0",
+     "2026-02-30",
+     "2026-13-45",
+     "bliq",
+     "expense_total",
+     "goals.deadline",
+     "goals.target_amount",
+     "income_total",
+     "obligations.amount",
+     "obligations.interest_rate",
+     "obligations.monthly_payment",
+     "r_bench",
+     "risk_tolerance",
+     "не скажу"
+    ]
+   },
+   "verdict": "PASS"
+  },
+  {
+   "id": "G-12",
+   "gate": "Слепота соблюдена",
+   "threshold": "нет layer/kind/pair_id/expected_error",
+   "measured": {
+    "design_labels_found": 0
+   },
+   "verdict": "PASS"
+  },
+  {
+   "id": "G-13",
+   "gate": "Декларация income_lognormal_ks воспроизводима",
+   "threshold": "воспроизводится из слепого пакета",
+   "measured": {
+    "declared": 0.0183,
+    "reproduced": {
+     "income_lt_1e6": 0.0335,
+     "income_20k_3m": 0.0898,
+     "income_lt_5e6": 0.0996,
+     "income_lt_1e8": 0.1512
+    }
+   },
+   "verdict": "PASS_WITH_CAVEAT",
+   "caveat": "определение 'основной популяции' не задано; декларация не проверяема вслепую"
+  },
+  {
+   "id": "G-14",
+   "gate": "Декларация realistic_whale_share воспроизводима",
+   "threshold": "+-разумный допуск",
+   "measured": {
+    "declared": 0.0438,
+    "measured_income_5m_10m_share": 0.0715,
+    "stress_share_declared": 0.0069,
+    "stress_share_measured": 0.0069,
+    "records_in_1e7_to_1e8": 0
+   },
+   "verdict": "PASS_WITH_CAVEAT",
+   "caveat": "полоса дохода 1e7..1e8 пуста: граница кит/стресс реверсируется одним предикатом income>=1e8"
+  }
+ ],
+ "fitness_for_purpose": {
+  "thin_cushion_band_1_2_months": 2931,
+  "deficit_share": 0.2725,
+  "fcf_exact_zero": 122,
+  "pdn_exact_040": 29,
+  "target_equals_current": 56,
+  "deadline_on_cut_date": 77,
+  "deadline_tomorrow": 74,
+  "growing_debts": 764,
+  "no_debt_no_goals": 332,
+  "metamorphic_pairs_detected": {
+   "M1": 45,
+   "M2": 88,
+   "M3": 88,
+   "M4": 44,
+   "M5": 44,
+   "total": 309
+  }
+ },
+ "known_by_design_not_defects": [
+  "остаток кредита вне продуктовой спеки 12.37% (декларация 12.01%)",
+  "ставки 2.93-3.00 выше легального потолка ПСК — предмет вопроса В1",
+  "r_bench = -0.05 / 4.5 / 12.0 (26 записей) — расширение слоя дефектов",
+  "risk_tolerance = -1/0/6/9/'средний' (32 записи) — там же",
+  "просроченные дедлайны (92 цели) — законный граничный случай",
+  "дубли id с разными данными (297 строк) — проверка позиционного контракта"
+ ],
+ "design_objection": {
+  "what": "Карта не амортизируется в 14.5% случаев; фактический срок вне спеки продукта",
+  "numeric_evidence": "787 из 5448 карт имеют платёж <= месячного процента; 2581 из 5228 карт с расчётным сроком вне полосы 6-36 мес, медиана 39.6",
+  "consequence": "п.5 приёмочных тестов методички для карт не выполним в принципе: револьверный продукт не описывается аннуитетным сроком",
+  "requirement_for_v6": "вывести карту из-под аннуитетного гейта срока; проверять полосу минимального платежа 2-5% (проходит на 91.6%)",
+  "blocking": false
+ },
+ "decision": {
+  "process_all_rows": true,
+  "rows_excluded_for_data_quality": 0,
+  "order": "part1->part2->part3->part4, без сортировки и дедупликации"
+ }
+}

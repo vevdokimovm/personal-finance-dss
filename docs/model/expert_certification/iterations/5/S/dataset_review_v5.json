@@ -1,0 +1,696 @@
+{
+ "dataset_version": 5,
+ "n_rows": 12000,
+ "frozen_today": "2026-07-23",
+ "meta_declarations": {
+  "stress_magnitude_share": 0.0069,
+  "realistic_whale_share": 0.0438,
+  "loan_amount_outside_product_spec_share": 0.1201,
+  "goal_amount_outside_name_band_share": 0.0111,
+  "k_goal_actual_range": [
+   0.1991,
+   4.9981
+  ],
+  "k_goal_declared_range": [
+   0.2,
+   5.0
+  ],
+  "income_lognormal_ks_population": 0.0183,
+  "risk_tolerance_note": "равномерен by design (примерно по 1/5 на профиль) — это НЕ популяционная доля риск-профилей в России",
+  "notes": "Доли объявлены, чтобы отличать намеренный дизайн от дефекта генератора. Остаток кредита выходит за продуктовую спеку намеренно — так набирается экстремум долговой нагрузки; суммы целей выходят за диапазон имени у стресс-магнитуд и у части масштабированных портретов. Какая запись к чему относится — не раскрывается."
+ },
+ "declaration_check": {
+  "stress_magnitude_share": {
+   "declared": 0.0069,
+   "observed": 0.0069166666666666664
+  },
+  "realistic_whale_share": {
+   "declared": 0.0438,
+   "observed": 0.0715
+  },
+  "loan_amount_outside_product_spec_share": {
+   "declared": 0.1201,
+   "observed": 0.12386892285670467
+  },
+  "k_goal_actual_range": {
+   "declared": [
+    0.1991,
+    4.9981
+   ],
+   "observed": [
+    0.19909309915473267,
+    4.99812368016599
+   ]
+  },
+  "income_lognormal_ks_population": {
+   "declared": 0.0183,
+   "observed": 0.10026450850709212
+  }
+ },
+ "descriptives": {
+  "income_total": {
+   "n": 11426,
+   "min": 0.0,
+   "p01": 5504.175,
+   "p05": 19746.892499999998,
+   "p25": 46861.44,
+   "median": 90698.26999999999,
+   "p75": 233502.26,
+   "p95": 6930192.77,
+   "p99": 9785205.8325,
+   "p999": 1846248974.229013,
+   "max": 1979493530.88,
+   "mean": 11408686.597276388
+  },
+  "expense_total": {
+   "n": 11426,
+   "min": 0.0,
+   "p01": 4791.4775,
+   "p05": 11707.105,
+   "p25": 29230.5,
+   "median": 58817.29,
+   "p75": 160065.68,
+   "p95": 4055456.0775,
+   "p99": 8940392.1975,
+   "p999": 1049508360.8837687,
+   "max": 1399927567.15,
+   "mean": 6170302.6277078595
+  },
+  "bliq": {
+   "n": 11426,
+   "min": 0.0,
+   "p01": 84.72,
+   "p05": 16809.440000000002,
+   "p25": 64547.46,
+   "median": 198524.02000000002,
+   "p75": 1299727.8,
+   "p95": 32298601.905,
+   "p99": 134754647.19,
+   "p999": 7230565717.861005,
+   "max": 8179632980.43,
+   "mean": 36882407.14437686
+  },
+  "r_bench": {
+   "n": 11426,
+   "min": -0.05,
+   "p01": 0.0867,
+   "p05": 0.101925,
+   "p25": 0.13,
+   "median": 0.1495,
+   "p75": 0.17,
+   "p95": 0.1979,
+   "p99": 0.218575,
+   "p999": 0.23849250000000138,
+   "max": 12.0,
+   "mean": 0.1579560388587432
+  },
+  "n_obligations": {
+   "n": 11426,
+   "min": 0.0,
+   "p01": 0.0,
+   "p05": 0.0,
+   "p25": 1.0,
+   "median": 2.0,
+   "p75": 3.0,
+   "p95": 4.0,
+   "p99": 4.0,
+   "p999": 8.0,
+   "max": 8.0,
+   "mean": 1.7119726938561177
+  },
+  "n_goals": {
+   "n": 11426,
+   "min": 0.0,
+   "p01": 0.0,
+   "p05": 0.0,
+   "p25": 1.0,
+   "median": 3.0,
+   "p75": 5.0,
+   "p95": 8.0,
+   "p99": 8.0,
+   "p999": 8.0,
+   "max": 8.0,
+   "mean": 3.16882548573429
+  },
+  "interest_rate": {
+   "n": 19561,
+   "min": 0.0,
+   "p01": 0.0032599999999999994,
+   "p05": 0.0172,
+   "p25": 0.1545,
+   "median": 0.2247,
+   "p75": 0.3047,
+   "p95": 0.5,
+   "p99": 2.495420000000009,
+   "p999": 2.93,
+   "max": 3.0,
+   "mean": 0.2832896835540105
+  },
+  "k_goal": {
+   "n": 10236,
+   "min": 0.19909309915473267,
+   "p01": 0.20282726901413095,
+   "p05": 0.24070368493335959,
+   "p25": 0.5588341183298206,
+   "median": 1.143750344911542,
+   "p75": 2.5353224512209542,
+   "p95": 4.58968718201557,
+   "p99": 4.975000004164631,
+   "p999": 4.985359048975347,
+   "max": 4.99812368016599,
+   "mean": 1.671944510848889
+  }
+ },
+ "risk_tolerance_distribution": {
+  "1": 2243,
+  "2": 2298,
+  "3": 2280,
+  "4": 2292,
+  "5": 2313
+ },
+ "defect_layer": {
+  "n_broken": 574,
+  "share": 0.04783333333333333,
+  "compound": 82,
+  "codes": {
+   "bad_date:goal.deadline": 97,
+   "string:obligation.interest_rate": 60,
+   "negative:income_total": 49,
+   "negative:obligation.amount": 45,
+   "null:obligation.amount": 45,
+   "null:income_total": 41,
+   "null:expense_total": 38,
+   "negative:obligation.monthly_payment": 34,
+   "negative:obligation.interest_rate": 22,
+   "string:income_total": 22,
+   "negative:bliq": 21,
+   "missing_key:goal.deadline": 21,
+   "range:risk_tolerance": 18,
+   "negative:expense_total": 18,
+   "rate_physically_impossible": 18,
+   "negative:goal.target_amount": 18,
+   "null:obligation.monthly_payment": 16,
+   "string:expense_total": 15,
+   "missing_key:income_total": 15,
+   "nonint:risk_tolerance": 14,
+   "string:bliq": 13,
+   "empty_string:obligation.amount": 12,
+   "bool:income_total": 12,
+   "null:goal.target_amount": 11
+  }
+ },
+ "boundary_census": {
+  "bliq_zero": 115,
+  "deadline_past": 92,
+  "deadline_today": 77,
+  "deadline_tomorrow": 74,
+  "expense_zero": 86,
+  "flow_exactly_zero_float": 122,
+  "flow_negative": 3116,
+  "flow_zero_kopeck": 122,
+  "goal_horizon_10y_plus": 1562,
+  "goal_horizon_20y_plus": 828,
+  "goal_target_eq_current": 56,
+  "goals_5": 1004,
+  "goals_6": 829,
+  "goals_7": 697,
+  "goals_8": 619,
+  "income_zero": 112,
+  "no_debt_no_goals": 332,
+  "pti_exactly_040": 29,
+  "pti_near_040": 124,
+  "pti_over_080": 92
+ },
+ "duplicate_ids": {
+  "groups": 133,
+  "forms": {
+   "valid_pair": 74,
+   "triple": 31,
+   "mixed_pair": 19,
+   "broken_pair": 9
+  }
+ },
+ "metamorphic_scan": {
+  "M1_income": 45,
+  "M2_rates": 88,
+  "M3_deadlines": 88,
+  "M4_bliq": 44,
+  "M5_scale": 44,
+  "exact_duplicates": 0
+ },
+ "psk_edge": {
+  "band_2.90_2.92": 61,
+  "over_cap_2.93_3.00": 25,
+  "above_3.00": 0,
+  "over_cap_values": [
+   2.93,
+   2.95,
+   3.0
+  ]
+ },
+ "product_spec": {
+  "n_loans": 19561,
+  "amount_outside": {
+   "Потребительский кредит": 819,
+   "Кредитная карта": 739,
+   "Ипотека": 165,
+   "Автокредит": 213,
+   "Заём МФО": 170,
+   "Рассрочка": 317
+  },
+  "rate_outside": {
+   "Потребительский кредит": 12,
+   "Кредитная карта": 7,
+   "Заём МФО": 3,
+   "Ипотека": 1,
+   "Рассрочка": 1,
+   "Автокредит": 1
+  },
+  "term_outside": {
+   "Кредитная карта": 2512,
+   "Потребительский кредит": 93,
+   "Заём МФО": 79,
+   "Рассрочка": 124,
+   "Автокредит": 26,
+   "Ипотека": 13
+  }
+ },
+ "annuity": {
+  "checked": 18799,
+  "consistent": 18671,
+  "growing_debts": 762
+ },
+ "deep_checks": {
+  "psk_typing": {
+   "legal_band": {
+    "Заём МФО": 61
+   },
+   "over_cap": {
+    "Потребительский кредит": 12,
+    "Кредитная карта": 7,
+    "Заём МФО": 3,
+    "Ипотека": 1,
+    "Рассрочка": 1,
+    "Автокредит": 1
+   }
+  },
+  "income_mixture": {
+   "ks_core_below_1m": 0.03344181458059725,
+   "ks_below_5m": 0.10026450850709212,
+   "doe_shelf_bins": [
+    113,
+    111,
+    111,
+    117,
+    116,
+    111,
+    110
+   ],
+   "gap_10m_100m": 0
+  },
+  "metamorphic_uniformity": {
+   "M2": {
+    "uniform_weak": 16,
+    "non_uniform": 25,
+    "single_item": 47
+   },
+   "M3": {
+    "uniform_weak": 6,
+    "non_uniform": 52,
+    "single_item": 30
+   }
+  },
+  "mixed_dup_pairs": {
+   "count": 19,
+   "defects": {
+    "bad_date:goal.deadline": 19
+   }
+  },
+  "r_bench_anomalies": {
+   "negative": 15,
+   "above_100pct": 11
+  }
+ },
+ "findings": [
+  {
+   "code": "DECL-stress_magnitude_share",
+   "what": "проверка декларации stress_magnitude_share",
+   "evidence": {
+    "declared": 0.0069,
+    "observed": 0.006917,
+    "rel_error": 0.0024
+   },
+   "consequence": "подтверждена",
+   "severity": "info"
+  },
+  {
+   "code": "DECL-realistic_whale_share",
+   "what": "проверка декларации realistic_whale_share",
+   "evidence": {
+    "declared": 0.0438,
+    "observed": 0.0715,
+    "rel_error": 0.6324
+   },
+   "consequence": "не подтверждена",
+   "severity": "major"
+  },
+  {
+   "code": "DECL-loan_amount_outside_product_spec_share",
+   "what": "проверка декларации loan_amount_outside_product_spec_share",
+   "evidence": {
+    "declared": 0.1201,
+    "observed": 0.123869,
+    "rel_error": 0.0314
+   },
+   "consequence": "подтверждена",
+   "severity": "info"
+  },
+  {
+   "code": "DECL-k_goal",
+   "what": "фактический диапазон k против объявленного",
+   "evidence": {
+    "declared": [
+     0.1991,
+     4.9981
+    ],
+    "observed": [
+     0.19909309915473267,
+     4.99812368016599
+    ]
+   },
+   "consequence": "ok",
+   "severity": "info"
+  },
+  {
+   "code": "DECL-income_lognormal_ks_population",
+   "what": "проверка декларации income_lognormal_ks_population",
+   "evidence": {
+    "declared": 0.0183,
+    "observed": 0.100265,
+    "rel_error": 4.4789
+   },
+   "consequence": "не подтверждена",
+   "severity": "major"
+  },
+  {
+   "code": "D-VOLUME",
+   "what": "объём слоя дефектов",
+   "evidence": {
+    "n_broken": 574,
+    "share": 0.0478,
+    "declared_band": [
+     0.042,
+     0.058
+    ]
+   },
+   "consequence": "в объявленном коридоре",
+   "severity": "info"
+  },
+  {
+   "code": "D-COMPOUND",
+   "what": "доля составных дефектов внутри слоя D",
+   "evidence": {
+    "n_compound": 82,
+    "share_of_layer": 0.1429
+   },
+   "consequence": "заявлено 13.1%",
+   "severity": "info"
+  },
+  {
+   "code": "D-KINDS",
+   "what": "разнообразие видов дефектов",
+   "evidence": {
+    "distinct_codes": 24,
+    "top": [
+     [
+      "bad_date:goal.deadline",
+      97
+     ],
+     [
+      "string:obligation.interest_rate",
+      60
+     ],
+     [
+      "negative:income_total",
+      49
+     ],
+     [
+      "negative:obligation.amount",
+      45
+     ],
+     [
+      "null:obligation.amount",
+      45
+     ],
+     [
+      "null:income_total",
+      41
+     ],
+     [
+      "null:expense_total",
+      38
+     ],
+     [
+      "negative:obligation.monthly_payment",
+      34
+     ],
+     [
+      "negative:obligation.interest_rate",
+      22
+     ],
+     [
+      "string:income_total",
+      22
+     ],
+     [
+      "negative:bliq",
+      21
+     ],
+     [
+      "missing_key:goal.deadline",
+      21
+     ],
+     [
+      "range:risk_tolerance",
+      18
+     ],
+     [
+      "negative:expense_total",
+      18
+     ],
+     [
+      "rate_physically_impossible",
+      18
+     ]
+    ]
+   },
+   "consequence": "слой D перестал быть лобовым",
+   "severity": "info"
+  },
+  {
+   "code": "C-ZERO-FLOW",
+   "what": "точность границы «ровно нулевой поток»",
+   "evidence": {
+    "exact_float_zero": 122,
+    "zero_to_the_kopeck": 122
+   },
+   "consequence": "приёмочный тест методички п.10",
+   "severity": "info"
+  },
+  {
+   "code": "ID-DUP",
+   "what": "формы дублей id",
+   "evidence": {
+    "groups": 133,
+    "forms": {
+     "valid_pair": 74,
+     "triple": 31,
+     "mixed_pair": 19,
+     "broken_pair": 9
+    }
+   },
+   "consequence": "позиционный контракт обязателен",
+   "severity": "info"
+  },
+  {
+   "code": "E-TWINS",
+   "what": "обнаруживаемые метаморфические близнецы",
+   "evidence": {
+    "M1_income": 45,
+    "M2_rates": 88,
+    "M3_deadlines": 88,
+    "M4_bliq": 44,
+    "M5_scale": 44,
+    "exact_duplicates": 0
+   },
+   "consequence": "слой E присутствует и детектируем вслепую",
+   "severity": "info"
+  },
+  {
+   "code": "PSK-EDGE",
+   "what": "кромка потолка ПСК",
+   "evidence": {
+    "in_band_2.90_2.92": 61,
+    "over_cap_to_3.00": 25,
+    "above_3.00": 0
+   },
+   "consequence": "кромка заполнена, провала нет",
+   "severity": "info"
+  },
+  {
+   "code": "PROD-SPEC",
+   "what": "продуктовая согласованность",
+   "evidence": {
+    "amount_outside_spec": {
+     "Потребительский кредит": 819,
+     "Кредитная карта": 739,
+     "Ипотека": 165,
+     "Автокредит": 213,
+     "Заём МФО": 170,
+     "Рассрочка": 317
+    },
+    "rate_outside_spec": {
+     "Потребительский кредит": 12,
+     "Кредитная карта": 7,
+     "Заём МФО": 3,
+     "Ипотека": 1,
+     "Рассрочка": 1,
+     "Автокредит": 1
+    },
+    "term_outside_spec": {
+     "Кредитная карта": 2512,
+     "Потребительский кредит": 93,
+     "Заём МФО": 79,
+     "Рассрочка": 124,
+     "Автокредит": 26,
+     "Ипотека": 13
+    },
+    "n_loans": 19561
+   },
+   "consequence": "остаток вне спеки объявлен; ставка/срок должны оставаться внутри",
+   "severity": "info"
+  },
+  {
+   "code": "ANNUITY",
+   "what": "аннуитетная согласованность",
+   "evidence": {
+    "checked": 18799,
+    "consistent": 18671,
+    "share": 0.9932,
+    "growing_debts": 762
+   },
+   "consequence": "п.4 приёмочных тестов методички",
+   "severity": "info"
+  },
+  {
+   "code": "POWER",
+   "what": "мощность страт против порога 385",
+   "evidence": {
+    "n_total": 12000,
+    "n_clean": 11426,
+    "n_broken": 574,
+    "strata_below_385": {
+     "income_zero": 112,
+     "flow_exactly_zero_float": 122,
+     "flow_zero_kopeck": 122,
+     "pti_over_080": 92,
+     "pti_near_040": 124,
+     "no_debt_no_goals": 332,
+     "bliq_zero": 115,
+     "deadline_past": 92,
+     "goal_target_eq_current": 56,
+     "expense_zero": 86,
+     "deadline_today": 77,
+     "pti_exactly_040": 29,
+     "deadline_tomorrow": 74
+    }
+   },
+   "consequence": "выводы допустимы только по семействам ≥385",
+   "severity": "info"
+  },
+  {
+   "code": "PSK-TYPING",
+   "what": "продуктовая типизация кромки ПСК",
+   "evidence": {
+    "legal_band_2.90_2.92_by_product": {
+     "Заём МФО": 61
+    },
+    "over_cap_2.93_3.00_by_product": {
+     "Потребительский кредит": 12,
+     "Кредитная карта": 7,
+     "Заём МФО": 3,
+     "Ипотека": 1,
+     "Рассрочка": 1,
+     "Автокредит": 1
+    }
+   },
+   "consequence": "легальная кромка типизирована верно (только МФО); надпотолочные пробы разбросаны по всем продуктам — нарушение продуктовой типизации",
+   "severity": "major"
+  },
+  {
+   "code": "INCOME-MIXTURE",
+   "what": "распределение дохода — смесь, а не лог-нормаль",
+   "evidence": {
+    "ks_core_below_1m": 0.0334,
+    "ks_below_5m": 0.1003,
+    "doe_shelf_bins_1m_4m": [
+     113,
+     111,
+     111,
+     117,
+     116,
+     111,
+     110
+    ],
+    "records_between_10m_and_100m": 0
+   },
+   "consequence": "объявленный KS относится к слою A, вслепую неверифицируем; на оси дохода зияет разрыв 10 млн – 100 млн",
+   "severity": "major"
+  },
+  {
+   "code": "E-UNIFORMITY",
+   "what": "равномерность метаморфических возмущений",
+   "evidence": {
+    "M2": {
+     "uniform_weak": 16,
+     "non_uniform": 25,
+     "single_item": 47
+    },
+    "M3": {
+     "uniform_weak": 6,
+     "non_uniform": 52,
+     "single_item": 30
+    }
+   },
+   "consequence": "урок раунда 3 внедрён частично: слабые равномерные пары ещё есть",
+   "severity": "minor"
+  },
+  {
+   "code": "ID-DUP-4TH-FORM",
+   "what": "четвёртая, необъявленная форма дубля id",
+   "evidence": {
+    "mixed_pairs": 19,
+    "defect_of_broken_partner": {
+     "bad_date:goal.deadline": 19
+    }
+   },
+   "consequence": "объявлено три формы, наблюдается четыре",
+   "severity": "minor"
+  },
+  {
+   "code": "RBENCH-ANOMALY",
+   "what": "аномалии безрискового бенчмарка",
+   "evidence": {
+    "negative": 15,
+    "above_100pct": 11,
+    "values": [
+     -0.05,
+     4.5,
+     12.0
+    ]
+   },
+   "consequence": "мой критерий их чинит зажимом, а не отбраковывает — вероятная точка расхождения с манифестом ожидаемых отказов",
+   "severity": "major"
+  }
+ ]
+}

@@ -1,0 +1,166 @@
+{
+ "verdict": "READY",
+ "n_checks": 18,
+ "failed": 0,
+ "checks": [
+  {
+   "id": "V1",
+   "name": "перевод строки CRLF во всём файле",
+   "result": "PASS",
+   "evidence": {
+    "lf": 12001,
+    "crlf": 12001
+   }
+  },
+  {
+   "id": "V2",
+   "name": "шапка точно по контракту",
+   "result": "PASS",
+   "evidence": {
+    "head": [
+     "id",
+     "status",
+     "dom",
+     "res",
+     "debt",
+     "goal",
+     "inv",
+     "lump",
+     "confidence"
+    ]
+   }
+  },
+  {
+   "id": "V3",
+   "name": "ровно 12 000 строк ответа",
+   "result": "PASS",
+   "evidence": {
+    "rows": 12000
+   }
+  },
+  {
+   "id": "V4",
+   "name": "позиционное совпадение id строка в строку",
+   "result": "PASS",
+   "evidence": {
+    "first_mismatch": null
+   }
+  },
+  {
+   "id": "V5",
+   "name": "enum status",
+   "result": "PASS",
+   "evidence": {
+    "bad": []
+   }
+  },
+  {
+   "id": "V6",
+   "name": "enum dom",
+   "result": "PASS",
+   "evidence": {
+    "bad": []
+   }
+  },
+  {
+   "id": "V7",
+   "name": "confidence — целое 1..5",
+   "result": "PASS",
+   "evidence": {
+    "bad": []
+   }
+  },
+  {
+   "id": "V8",
+   "name": "нет отрицательных сумм",
+   "result": "PASS",
+   "evidence": {
+    "bad": []
+   }
+  },
+  {
+   "id": "V9",
+   "name": "форма invalid: dom=none и все числа 0",
+   "result": "PASS",
+   "evidence": {
+    "bad": []
+   }
+  },
+  {
+   "id": "V10",
+   "name": "дефицит: месячный сплит обнулён",
+   "result": "PASS",
+   "evidence": {
+    "bad": []
+   }
+  },
+  {
+   "id": "V11",
+   "name": "бюджет res+debt+goal+inv ≤ max(0, FCF)",
+   "result": "PASS",
+   "evidence": {
+    "violations": 0,
+    "worst_excess": "0",
+    "sample": []
+   }
+  },
+  {
+   "id": "V12",
+   "name": "dom соответствует крупнейшему бакету (ничьи: reserve>debt>goals+)",
+   "result": "PASS",
+   "evidence": {
+    "bad": []
+   }
+  },
+  {
+   "id": "V13",
+   "name": "recommendations: ровно 12 000 строк",
+   "result": "PASS",
+   "evidence": {
+    "n": 12000
+   }
+  },
+  {
+   "id": "V14",
+   "name": "recommendations: порядок id совпадает с CSV",
+   "result": "PASS",
+   "evidence": {
+    "first_mismatch": null
+   }
+  },
+  {
+   "id": "V15",
+   "name": "заявленный lump == сумме lump_sum_plan",
+   "result": "PASS",
+   "evidence": {
+    "bad": [],
+    "n": 0
+   }
+  },
+  {
+   "id": "V16",
+   "name": "summary: 12 000 строк и тот же порядок id",
+   "result": "PASS",
+   "evidence": {
+    "rows": 12000
+   }
+  },
+  {
+   "id": "V17",
+   "name": "разовый ход не превышает имеющиеся накопления",
+   "result": "PASS",
+   "evidence": {
+    "bad": []
+   }
+  },
+  {
+   "id": "V18",
+   "name": "разовый ход не пробивает жёсткий пол резерва",
+   "result": "PASS",
+   "evidence": {
+    "bad": [],
+    "n": 0
+   }
+  }
+ ]
+}

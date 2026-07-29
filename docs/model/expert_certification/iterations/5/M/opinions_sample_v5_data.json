@@ -1,0 +1,3485 @@
+{
+ "invalid_hard": [
+  {
+   "row": 11,
+   "id": "SP5-00011",
+   "category": "invalid_hard",
+   "input": {
+    "income_total": 153916.55,
+    "expense_total": 77478.27,
+    "bliq": -919011.61,
+    "r_bench": 0.2228,
+    "risk_tolerance": 5,
+    "obligations": [
+     {
+      "id": 1,
+      "name": "Рассрочка",
+      "amount": 5007.79,
+      "interest_rate": 0.0434,
+      "monthly_payment": 395.03
+     },
+     {
+      "id": 2,
+      "name": "Потребительский кредит",
+      "amount": 486531.89,
+      "interest_rate": 0.2953,
+      "monthly_payment": 14347.65
+     },
+     {
+      "id": 3,
+      "name": "Потребительский кредит",
+      "amount": 762604.62,
+      "interest_rate": 0.2075,
+      "monthly_payment": 18868.72
+     },
+     {
+      "id": 4,
+      "name": "Заём МФО",
+      "amount": 92287.93,
+      "interest_rate": 1.3701,
+      "monthly_payment": 22077.67
+     }
+    ],
+    "goals": [
+     {
+      "id": 1,
+      "name": "Образование",
+      "target_amount": 272460.39,
+      "current_amount": 26961.05,
+      "deadline": "2036-04-24"
+     },
+     {
+      "id": 2,
+      "name": "Техника",
+      "target_amount": 28780.74,
+      "current_amount": 2145.5,
+      "deadline": "2029-03-20"
+     },
+     {
+      "id": 3,
+      "name": "Переезд",
+      "target_amount": 82561.38,
+      "current_amount": 3668.4,
+      "deadline": null
+     },
+     {
+      "id": 4,
+      "name": "Лечение",
+      "target_amount": 156307.93,
+      "current_amount": 11900.42,
+      "deadline": "2030-06-17"
+     },
+     {
+      "id": 5,
+      "name": "Техника",
+      "target_amount": 179913.62,
+      "current_amount": 82556.41,
+      "deadline": "2026-12-15"
+     },
+     {
+      "id": 6,
+      "name": "Образование",
+      "target_amount": 353685.4,
+      "current_amount": 118277.68,
+      "deadline": null
+     },
+     {
+      "id": 7,
+      "name": "Отпуск",
+      "target_amount": 55440.51,
+      "current_amount": 7848.31,
+      "deadline": "2028-02-25"
+     }
+    ]
+   },
+   "answer": {
+    "status": "invalid",
+    "dom": "none",
+    "res": 0.0,
+    "debt": 0.0,
+    "goal": 0.0,
+    "inv": 0.0,
+    "lump": 0.0,
+    "confidence": 5,
+    "verdict": "invalid_data"
+   },
+   "diag": {},
+   "lump_plan": [],
+   "invalid_reasons": [
+    "bad_money:bliq"
+   ]
+  },
+  {
+   "row": 23,
+   "id": "SP5-00023",
+   "category": "invalid_hard",
+   "input": {
+    "income_total": 118615.76,
+    "expense_total": 59443.91,
+    "bliq": "нет данных",
+    "r_bench": 0.1347,
+    "risk_tolerance": 1,
+    "obligations": [
+     {
+      "id": 1,
+      "name": "Потребительский кредит",
+      "amount": 518207.92,
+      "interest_rate": 0.2344,
+      "monthly_payment": 13145.14
+     },
+     {
+      "id": 2,
+      "name": "Кредитная карта",
+      "amount": 194882.87,
+      "interest_rate": 0.3378,
+      "monthly_payment": 5044.94
+     },
+     {
+      "id": 3,
+      "name": "Кредитная карта",
+      "amount": 391752.82,
+      "interest_rate": 0.2861,
+      "monthly_payment": 17521.18
+     }
+    ],
+    "goals": [
+     {
+      "id": 1,
+      "name": "Инвестиционный портфель",
+      "target_amount": 1394683.34,
+      "current_amount": 270513.78,
+      "deadline": null
+     }
+    ]
+   },
+   "answer": {
+    "status": "invalid",
+    "dom": "none",
+    "res": 0.0,
+    "debt": 0.0,
+    "goal": 0.0,
+    "inv": 0.0,
+    "lump": 0.0,
+    "confidence": 5,
+    "verdict": "invalid_data"
+   },
+   "diag": {},
+   "lump_plan": [],
+   "invalid_reasons": [
+    "bad_money:bliq"
+   ]
+  },
+  {
+   "row": 46,
+   "id": "SP5-00046",
+   "category": "invalid_hard",
+   "input": {
+    "income_total": 50470.71,
+    "expense_total": 38777.99,
+    "bliq": 29780.59,
+    "r_bench": 0.196,
+    "risk_tolerance": 3,
+    "obligations": [
+     {
+      "id": 1,
+      "name": "Рассрочка",
+      "amount": 234234.74,
+      "interest_rate": -0.15,
+      "monthly_payment": 18455.51
+     }
+    ],
+    "goals": [
+     {
+      "id": 1,
+      "name": "Автомобиль",
+      "target_amount": 486524.54,
+      "current_amount": 92125.43,
+      "deadline": "2034-12-22"
+     },
+     {
+      "id": 2,
+      "name": "Ремонт",
+      "target_amount": 737747.09,
+      "current_amount": 58657.47,
+      "deadline": "2035-03-20"
+     },
+     {
+      "id": 3,
+      "name": "Лечение",
+      "target_amount": 516860.49,
+      "current_amount": 82842.28,
+      "deadline": null
+     }
+    ]
+   },
+   "answer": {
+    "status": "invalid",
+    "dom": "none",
+    "res": 0.0,
+    "debt": 0.0,
+    "goal": 0.0,
+    "inv": 0.0,
+    "lump": 0.0,
+    "confidence": 5,
+    "verdict": "invalid_data"
+   },
+   "diag": {},
+   "lump_plan": [],
+   "invalid_reasons": [
+    "obligation[0]:bad_rate_type"
+   ]
+  },
+  {
+   "row": 58,
+   "id": "SP5-00058",
+   "category": "invalid_hard",
+   "input": {
+    "income_total": "сто тысяч",
+    "expense_total": 44601.75,
+    "bliq": 108857.36,
+    "r_bench": 0.0951,
+    "risk_tolerance": 3,
+    "obligations": [
+     {
+      "id": 1,
+      "name": "Потребительский кредит",
+      "amount": 32391.96,
+      "interest_rate": 0.3316,
+      "monthly_payment": 1984.58
+     }
+    ],
+    "goals": [
+     {
+      "id": 1,
+      "name": "Отпуск",
+      "target_amount": 311025.17,
+      "current_amount": 20109.42,
+      "deadline": null
+     },
+     {
+      "id": 2,
+      "name": "Инвестиционный портфель",
+      "target_amount": 1346659.59,
+      "current_amount": 44155.01,
+      "deadline": null
+     },
+     {
+      "id": 3,
+      "name": "Лечение",
+      "target_amount": 179866.29,
+      "current_amount": 114208.28,
+      "deadline": "2034-06-23"
+     },
+     {
+      "id": 4,
+      "name": "Ремонт",
+      "target_amount": 347518.33,
+      "current_amount": 283699.88,
+      "deadline": null
+     },
+     {
+      "id": 5,
+      "name": "Обучение детей",
+      "target_amount": 587568.95,
+      "current_amount": 477686.12,
+      "deadline": null
+     },
+     {
+      "id": 6,
+      "name": "Переезд",
+      "target_amount": 678266.2,
+      "current_amount": 58321.84,
+      "deadline": "2030-12-04"
+     }
+    ]
+   },
+   "answer": {
+    "status": "invalid",
+    "dom": "none",
+    "res": 0.0,
+    "debt": 0.0,
+    "goal": 0.0,
+    "inv": 0.0,
+    "lump": 0.0,
+    "confidence": 5,
+    "verdict": "invalid_data"
+   },
+   "diag": {},
+   "lump_plan": [],
+   "invalid_reasons": [
+    "bad_money:income_total"
+   ]
+  },
+  {
+   "row": 71,
+   "id": "SP5-00071",
+   "category": "invalid_hard",
+   "input": {
+    "income_total": null,
+    "expense_total": 249054.01,
+    "bliq": 399286.25,
+    "r_bench": 0.1248,
+    "risk_tolerance": 1,
+    "obligations": [
+     {
+      "id": 1,
+      "name": "Потребительский кредит",
+      "amount": 1988768.26,
+      "interest_rate": 0.2936,
+      "monthly_payment": 137916.83
+     },
+     {
+      "id": 2,
+      "name": "Потребительский кредит",
+      "amount": 957551.79,
+      "interest_rate": 0.346,
+      "monthly_payment": 35189.01
+     }
+    ],
+    "goals": [
+     {
+      "id": 1,
+      "name": "Техника",
+      "target_amount": 53345.79,
+      "current_amount": 3255.14,
+      "deadline": "2028-05-04"
+     },
+     {
+      "id": 2,
+      "name": "Отпуск",
+      "target_amount": 50380.01,
+      "current_amount": 4972.35,
+      "deadline": "2034-03-03"
+     },
+     {
+      "id": 3,
+      "name": "Отпуск",
+      "target_amount": 148060.48,
+      "current_amount": 32088.63,
+      "deadline": "2031-04-06"
+     },
+     {
+      "id": 4,
+      "name": "Обучение детей",
+      "target_amount": 313736.97,
+      "current_amount": 167404.86,
+      "deadline": "2034-09-09"
+     },
+     {
+      "id": 5,
+      "name": "Образование",
+      "target_amount": 251801.96,
+      "current_amount": 37661.96,
+      "deadline": "2030-09-29"
+     },
+     {
+      "id": 6,
+      "name": "Лечение",
+      "target_amount": 279168.97,
+      "current_amount": 111942.66,
+      "deadline": null
+     },
+     {
+      "id": 7,
+      "name": "Образование",
+      "target_amount": 432512.97,
+      "current_amount": 170126.91,
+      "deadline": null
+     }
+    ]
+   },
+   "answer": {
+    "status": "invalid",
+    "dom": "none",
+    "res": 0.0,
+    "debt": 0.0,
+    "goal": 0.0,
+    "inv": 0.0,
+    "lump": 0.0,
+    "confidence": 5,
+    "verdict": "invalid_data"
+   },
+   "diag": {},
+   "lump_plan": [],
+   "invalid_reasons": [
+    "bad_money:income_total"
+   ]
+  }
+ ],
+ "invalid_soft": [
+  {
+   "row": 60,
+   "id": "SP5-00060",
+   "category": "invalid_soft",
+   "input": {
+    "income_total": 49384.74,
+    "expense_total": 19425.54,
+    "bliq": 181319.37,
+    "r_bench": -0.05,
+    "risk_tolerance": 3,
+    "obligations": [
+     {
+      "id": 1,
+      "name": "Автокредит",
+      "amount": 326215.92,
+      "interest_rate": 0.1148,
+      "monthly_payment": 6688.31
+     },
+     {
+      "id": 2,
+      "name": "Рассрочка",
+      "amount": 55288.4,
+      "interest_rate": 0.0397,
+      "monthly_payment": 3007.07
+     },
+     {
+      "id": 3,
+      "name": "Кредитная карта",
+      "amount": 115064.56,
+      "interest_rate": 0.2106,
+      "monthly_payment": 4226.04
+     }
+    ],
+    "goals": [
+     {
+      "id": 1,
+      "name": "Образование",
+      "target_amount": 518954.93,
+      "current_amount": 228969.16,
+      "deadline": "2028-04-22"
+     }
+    ]
+   },
+   "answer": {
+    "status": "invalid",
+    "dom": "none",
+    "res": 0.0,
+    "debt": 0.0,
+    "goal": 0.0,
+    "inv": 0.0,
+    "lump": 0.0,
+    "confidence": 4,
+    "verdict": "invalid_data"
+   },
+   "diag": {},
+   "lump_plan": [],
+   "invalid_reasons": [
+    "r_bench_out_of_range:-0.05"
+   ]
+  },
+  {
+   "row": 513,
+   "id": "SP5-00513",
+   "category": "invalid_soft",
+   "input": {
+    "income_total": 57728.63,
+    "expense_total": 32641.04,
+    "bliq": 462328.58,
+    "r_bench": 0.1675,
+    "risk_tolerance": 1,
+    "obligations": [
+     {
+      "id": 1,
+      "name": "Потребительский кредит",
+      "amount": 406462.75,
+      "interest_rate": 12.0,
+      "monthly_payment": 10773.95
+     }
+    ],
+    "goals": [
+     {
+      "id": 1,
+      "name": "Первый взнос по ипотеке",
+      "target_amount": 554194.85,
+      "current_amount": 135379.96,
+      "deadline": "2027-07-23"
+     }
+    ]
+   },
+   "answer": {
+    "status": "invalid",
+    "dom": "none",
+    "res": 0.0,
+    "debt": 0.0,
+    "goal": 0.0,
+    "inv": 0.0,
+    "lump": 0.0,
+    "confidence": 4,
+    "verdict": "invalid_data"
+   },
+   "diag": {},
+   "lump_plan": [],
+   "invalid_reasons": [
+    "obligation[0]:rate_above_physical_cap:12.0>0.6:Потребительский кредит"
+   ]
+  },
+  {
+   "row": 593,
+   "id": "SP5-00593",
+   "category": "invalid_soft",
+   "input": {
+    "income_total": 24003.77,
+    "expense_total": 10221.98,
+    "bliq": 98044.39,
+    "r_bench": 0.1491,
+    "risk_tolerance": 4,
+    "obligations": [
+     {
+      "id": 1,
+      "name": "Потребительский кредит",
+      "amount": 147615.55,
+      "interest_rate": 2.95,
+      "monthly_payment": 4704.34
+     },
+     {
+      "id": 2,
+      "name": "Рассрочка",
+      "amount": 35556.76,
+      "interest_rate": 0.0083,
+      "monthly_payment": 4458.41
+     },
+     {
+      "id": 3,
+      "name": "Потребительский кредит",
+      "amount": 45444.69,
+      "interest_rate": 0.2792,
+      "monthly_payment": 3623.78
+     },
+     {
+      "id": 4,
+      "name": "Потребительский кредит",
+      "amount": 74170.82,
+      "interest_rate": 0.2735,
+      "monthly_payment": 2501.17
+     }
+    ],
+    "goals": [
+     {
+      "id": 1,
+      "name": "Переезд",
+      "target_amount": 86097.92,
+      "current_amount": 32789.62,
+      "deadline": "2027-12-30"
+     },
+     {
+      "id": 2,
+      "name": "Свадьба",
+      "target_amount": 353761.39,
+      "current_amount": 127462.72,
+      "deadline": null
+     }
+    ]
+   },
+   "answer": {
+    "status": "invalid",
+    "dom": "none",
+    "res": 0.0,
+    "debt": 0.0,
+    "goal": 0.0,
+    "inv": 0.0,
+    "lump": 0.0,
+    "confidence": 4,
+    "verdict": "invalid_data"
+   },
+   "diag": {},
+   "lump_plan": [],
+   "invalid_reasons": [
+    "obligation[0]:rate_above_physical_cap:2.95>0.6:Потребительский кредит"
+   ]
+  },
+  {
+   "row": 613,
+   "id": "SP5-00613",
+   "category": "invalid_soft",
+   "input": {
+    "income_total": 59600.28,
+    "expense_total": 41979.51,
+    "bliq": 62888.71,
+    "r_bench": 0.1111,
+    "risk_tolerance": 3,
+    "obligations": [
+     {
+      "id": 1,
+      "name": "Кредитная карта",
+      "amount": 10152.92,
+      "interest_rate": 3.0,
+      "monthly_payment": 336.65
+     },
+     {
+      "id": 2,
+      "name": "Кредитная карта",
+      "amount": 43822.28,
+      "interest_rate": 0.3627,
+      "monthly_payment": 2173.58
+     },
+     {
+      "id": 3,
+      "name": "Потребительский кредит",
+      "amount": 87185.44,
+      "interest_rate": 0.2942,
+      "monthly_payment": 2879.07
+     }
+    ],
+    "goals": [
+     {
+      "id": 1,
+      "name": "Отпуск",
+      "target_amount": 623337.32,
+      "current_amount": 163589.75,
+      "deadline": "2029-12-17"
+     }
+    ]
+   },
+   "answer": {
+    "status": "invalid",
+    "dom": "none",
+    "res": 0.0,
+    "debt": 0.0,
+    "goal": 0.0,
+    "inv": 0.0,
+    "lump": 0.0,
+    "confidence": 4,
+    "verdict": "invalid_data"
+   },
+   "diag": {},
+   "lump_plan": [],
+   "invalid_reasons": [
+    "obligation[0]:rate_above_physical_cap:3.0>0.8:Кредитная карта"
+   ]
+  },
+  {
+   "row": 696,
+   "id": "SP5-00696",
+   "category": "invalid_soft",
+   "input": {
+    "income_total": 47982.21,
+    "expense_total": 41349.67,
+    "bliq": 40372.04,
+    "r_bench": 4.5,
+    "risk_tolerance": 5,
+    "obligations": [
+     {
+      "id": 1,
+      "name": "Кредитная карта",
+      "amount": 18046.15,
+      "interest_rate": 0.2326,
+      "monthly_payment": 563.45
+     },
+     {
+      "id": 2,
+      "name": "Потребительский кредит",
+      "amount": 108661.27,
+      "interest_rate": 0.1998,
+      "monthly_payment": 4630.84
+     }
+    ],
+    "goals": [
+     {
+      "id": 1,
+      "name": "Лечение",
+      "target_amount": 156753.09,
+      "current_amount": 76966.69,
+      "deadline": null
+     },
+     {
+      "id": 2,
+      "name": "Лечение",
+      "target_amount": 101606.99,
+      "current_amount": 7562.05,
+      "deadline": "2033-08-24"
+     }
+    ]
+   },
+   "answer": {
+    "status": "invalid",
+    "dom": "none",
+    "res": 0.0,
+    "debt": 0.0,
+    "goal": 0.0,
+    "inv": 0.0,
+    "lump": 0.0,
+    "confidence": 4,
+    "verdict": "invalid_data"
+   },
+   "diag": {},
+   "lump_plan": [],
+   "invalid_reasons": [
+    "r_bench_out_of_range:4.5"
+   ]
+  }
+ ],
+ "deficit": [
+  {
+   "row": 0,
+   "id": "SP5-00000",
+   "category": "deficit",
+   "input": {
+    "income_total": 0.0,
+    "expense_total": 18803.38,
+    "bliq": 24136.74,
+    "r_bench": 0.171,
+    "risk_tolerance": 3,
+    "obligations": [
+     {
+      "id": 1,
+      "name": "Кредитная карта",
+      "amount": 121331.54,
+      "interest_rate": 0.2187,
+      "monthly_payment": 5407.55
+     }
+    ],
+    "goals": [
+     {
+      "id": 1,
+      "name": "Лечение",
+      "target_amount": 201568.01,
+      "current_amount": 8964.0,
+      "deadline": "2032-04-05"
+     },
+     {
+      "id": 2,
+      "name": "Техника",
+      "target_amount": 354354.48,
+      "current_amount": 240501.02,
+      "deadline": "2032-09-05"
+     },
+     {
+      "id": 3,
+      "name": "Обучение детей",
+      "target_amount": 392302.87,
+      "current_amount": 102780.44,
+      "deadline": "2033-11-29"
+     },
+     {
+      "id": 4,
+      "name": "Техника",
+      "target_amount": 70445.25,
+      "current_amount": 22338.29,
+      "deadline": null
+     }
+    ]
+   },
+   "answer": {
+    "status": "deficit",
+    "dom": "none",
+    "res": 0.0,
+    "debt": 0.0,
+    "goal": 0.0,
+    "inv": 0.0,
+    "lump": 0.0,
+    "confidence": 3,
+    "verdict": "crisis_restructuring"
+   },
+   "diag": {
+    "fcf": -24210.93,
+    "pdn": null,
+    "pdn_inf": true,
+    "burn": 24210.93,
+    "liq_months": 0.9969356815289624,
+    "res_target_m": 3.0,
+    "res_target_rub": 72632.79000000001,
+    "n_debts": 1,
+    "debt_total": 121331.54,
+    "pay_sum": 5407.55,
+    "max_rate": 0.2187,
+    "max_spread": 0.04769999999999999,
+    "n_toxic": 0,
+    "n_expensive": 0,
+    "n_growing": 0,
+    "n_goals": 4,
+    "goal_gap_total": 644086.8599999999,
+    "nearest_deadline_m": 68.435318275154,
+    "n_long_goals": 1,
+    "stress": false,
+    "whale": false,
+    "state_post_lump": 0,
+    "liq_months_post": 0.9969356815289624,
+    "post_lump_fcf": -24210.93
+   },
+   "lump_plan": [],
+   "invalid_reasons": []
+  },
+  {
+   "row": 1,
+   "id": "SP5-00001",
+   "category": "deficit",
+   "input": {
+    "income_total": 104768.37,
+    "expense_total": 86446.51,
+    "bliq": 422703.18,
+    "r_bench": 0.1765,
+    "risk_tolerance": 3,
+    "obligations": [
+     {
+      "id": 1,
+      "name": "Потребительский кредит",
+      "amount": 377529.12,
+      "interest_rate": 0.2958,
+      "monthly_payment": 21701.73
+     }
+    ],
+    "goals": [
+     {
+      "id": 1,
+      "name": "Переезд",
+      "target_amount": 271722.21,
+      "current_amount": 79594.59,
+      "deadline": null
+     },
+     {
+      "id": 2,
+      "name": "Лечение",
+      "target_amount": 329234.2,
+      "current_amount": 110212.87,
+      "deadline": "2032-01-10"
+     }
+    ]
+   },
+   "answer": {
+    "status": "deficit",
+    "dom": "none",
+    "res": 0.0,
+    "debt": 0.0,
+    "goal": 0.0,
+    "inv": 0.0,
+    "lump": 98258.46,
+    "confidence": 2,
+    "verdict": "deficit_trim_and_restructure"
+   },
+   "diag": {
+    "fcf": -3379.8699999999953,
+    "pdn": 0.20714009390429575,
+    "pdn_inf": false,
+    "burn": 108148.23999999999,
+    "liq_months": 3.908553481776495,
+    "res_target_m": 3.0,
+    "res_target_rub": 324444.72,
+    "n_debts": 1,
+    "debt_total": 377529.12,
+    "pay_sum": 21701.73,
+    "max_rate": 0.2958,
+    "max_spread": 0.11930000000000002,
+    "n_toxic": 0,
+    "n_expensive": 1,
+    "n_growing": 0,
+    "n_goals": 2,
+    "goal_gap_total": 411148.95000000007,
+    "nearest_deadline_m": 65.60985626283367,
+    "n_long_goals": 1,
+    "stress": false,
+    "whale": false,
+    "state_post_lump": 2,
+    "liq_months_post": 3.0,
+    "post_lump_fcf": -3379.8699999999953
+   },
+   "lump_plan": [
+    {
+     "action": "repay_debt",
+     "target": "Потребительский кредит",
+     "amount": 98258.46
+    }
+   ],
+   "invalid_reasons": []
+  },
+  {
+   "row": 6,
+   "id": "SP5-00006",
+   "category": "deficit",
+   "input": {
+    "income_total": 124059.61,
+    "expense_total": 117141.28,
+    "bliq": 6837762.29,
+    "r_bench": 0.1853,
+    "risk_tolerance": 2,
+    "obligations": [
+     {
+      "id": 1,
+      "name": "Ипотека",
+      "amount": 1184834.8,
+      "interest_rate": 0.0955,
+      "monthly_payment": 11195.42
+     },
+     {
+      "id": 2,
+      "name": "Потребительский кредит",
+      "amount": 177787.06,
+      "interest_rate": 0.2831,
+      "monthly_payment": 5486.95
+     }
+    ],
+    "goals": [
+     {
+      "id": 1,
+      "name": "Автомобиль",
+      "target_amount": 1237201.83,
+      "current_amount": 226114.97,
+      "deadline": "2027-09-01"
+     },
+     {
+      "id": 2,
+      "name": "Покупка недвижимости",
+      "target_amount": 2616014.04,
+      "current_amount": 421617.97,
+      "deadline": "2050-07-23"
+     },
+     {
+      "id": 3,
+      "name": "Ремонт",
+      "target_amount": 1203375.22,
+      "current_amount": 247074.27,
+      "deadline": "2033-04-28"
+     },
+     {
+      "id": 4,
+      "name": "Образование",
+      "target_amount": 244635.08,
+      "current_amount": 145657.88,
+      "deadline": "2028-11-19"
+     },
+     {
+      "id": 5,
+      "name": "Ремонт",
+      "target_amount": 778784.92,
+      "current_amount": 359606.41,
+      "deadline": "2027-02-13"
+     },
+     {
+      "id": 6,
+      "name": "Образование",
+      "target_amount": 121349.1,
+      "current_amount": 40770.14,
+      "deadline": null
+     },
+     {
+      "id": 7,
+      "name": "Отпуск",
+      "target_amount": 664610.55,
+      "current_amount": 434174.67,
+      "deadline": "2032-05-11"
+     },
+     {
+      "id": 8,
+      "name": "Ремонт",
+      "target_amount": 540387.97,
+      "current_amount": 337650.93,
+      "deadline": "2031-04-03"
+     }
+    ]
+   },
+   "answer": {
+    "status": "deficit",
+    "dom": "none",
+    "res": 0.0,
+    "debt": 0.0,
+    "goal": 0.0,
+    "inv": 0.0,
+    "lump": 177787.06,
+    "confidence": 4,
+    "verdict": "deficit_trim_and_restructure"
+   },
+   "diag": {
+    "fcf": -9764.039999999994,
+    "pdn": 0.13447059844860063,
+    "pdn_inf": false,
+    "burn": 133823.65,
+    "liq_months": 51.09532052070019,
+    "res_target_m": 4.0,
+    "res_target_rub": 535294.6,
+    "n_debts": 2,
+    "debt_total": 1362621.86,
+    "pay_sum": 16682.37,
+    "max_rate": 0.2831,
+    "max_spread": 0.09780000000000003,
+    "n_toxic": 0,
+    "n_expensive": 1,
+    "n_growing": 0,
+    "n_goals": 8,
+    "goal_gap_total": 5193691.470000001,
+    "nearest_deadline_m": 6.7351129363449695,
+    "n_long_goals": 2,
+    "stress": false,
+    "whale": false,
+    "state_post_lump": 2,
+    "liq_months_post": 51.89454949363667,
+    "post_lump_fcf": -4277.0899999999965
+   },
+   "lump_plan": [
+    {
+     "action": "repay_debt",
+     "target": "Потребительский кредит",
+     "amount": 177787.06
+    }
+   ],
+   "invalid_reasons": []
+  },
+  {
+   "row": 8,
+   "id": "SP5-00008",
+   "category": "deficit",
+   "input": {
+    "income_total": 83037.49,
+    "expense_total": 76391.66,
+    "bliq": 96011.96,
+    "r_bench": 0.1407,
+    "risk_tolerance": 1,
+    "obligations": [
+     {
+      "id": 1,
+      "name": "Потребительский кредит",
+      "amount": 569592.03,
+      "interest_rate": 0.2014,
+      "monthly_payment": 19008.65
+     }
+    ],
+    "goals": [
+     {
+      "id": 1,
+      "name": "Техника",
+      "target_amount": 200045.25,
+      "current_amount": 92369.89,
+      "deadline": null
+     },
+     {
+      "id": 2,
+      "name": "Отпуск",
+      "target_amount": 114823.01,
+      "current_amount": 23431.95,
+      "deadline": "2034-08-24"
+     },
+     {
+      "id": 3,
+      "name": "Техника",
+      "target_amount": 333562.45,
+      "current_amount": 158551.26,
+      "deadline": "2032-11-04"
+     },
+     {
+      "id": 4,
+      "name": "Отпуск",
+      "target_amount": 224185.02,
+      "current_amount": 58688.43,
+      "deadline": null
+     },
+     {
+      "id": 5,
+      "name": "Переезд",
+      "target_amount": 371872.32,
+      "current_amount": 110565.05,
+      "deadline": "2032-10-10"
+     },
+     {
+      "id": 6,
+      "name": "Образование",
+      "target_amount": 123192.36,
+      "current_amount": 24744.31,
+      "deadline": "2028-05-02"
+     },
+     {
+      "id": 7,
+      "name": "Переезд",
+      "target_amount": 126994.41,
+      "current_amount": 3943.71,
+      "deadline": null
+     }
+    ]
+   },
+   "answer": {
+    "status": "deficit",
+    "dom": "none",
+    "res": 0.0,
+    "debt": 0.0,
+    "goal": 0.0,
+    "inv": 0.0,
+    "lump": 0.0,
+    "confidence": 2,
+    "verdict": "deficit_trim_and_restructure"
+   },
+   "diag": {
+    "fcf": -12362.819999999992,
+    "pdn": 0.22891648097744766,
+    "pdn_inf": false,
+    "burn": 95400.31,
+    "liq_months": 1.0064114047428148,
+    "res_target_m": 6.0,
+    "res_target_rub": 572401.86,
+    "n_debts": 1,
+    "debt_total": 569592.03,
+    "pay_sum": 19008.65,
+    "max_rate": 0.2014,
+    "max_spread": 0.060700000000000004,
+    "n_toxic": 0,
+    "n_expensive": 1,
+    "n_growing": 0,
+    "n_goals": 7,
+    "goal_gap_total": 1022380.22,
+    "nearest_deadline_m": 21.322381930184804,
+    "n_long_goals": 3,
+    "stress": false,
+    "whale": false,
+    "state_post_lump": 1,
+    "liq_months_post": 1.0064114047428148,
+    "post_lump_fcf": -12362.819999999992
+   },
+   "lump_plan": [],
+   "invalid_reasons": []
+  },
+  {
+   "row": 13,
+   "id": "SP5-00013",
+   "category": "deficit",
+   "input": {
+    "income_total": 70216.06,
+    "expense_total": 62684.92,
+    "bliq": 256456.24,
+    "r_bench": 0.1041,
+    "risk_tolerance": 1,
+    "obligations": [
+     {
+      "id": 1,
+      "name": "Ипотека",
+      "amount": 1265177.15,
+      "interest_rate": 0.0991,
+      "monthly_payment": 14595.11
+     },
+     {
+      "id": 2,
+      "name": "Потребительский кредит",
+      "amount": 233377.83,
+      "interest_rate": 0.3244,
+      "monthly_payment": 7326.66
+     }
+    ],
+    "goals": [
+     {
+      "id": 1,
+      "name": "Отпуск",
+      "target_amount": 107054.81,
+      "current_amount": 15764.46,
+      "deadline": null
+     },
+     {
+      "id": 2,
+      "name": "Лечение",
+      "target_amount": 44072.87,
+      "current_amount": 6532.44,
+      "deadline": null
+     },
+     {
+      "id": 3,
+      "name": "Техника",
+      "target_amount": 142573.56,
+      "current_amount": 88809.29,
+      "deadline": "2028-03-10"
+     }
+    ]
+   },
+   "answer": {
+    "status": "deficit",
+    "dom": "none",
+    "res": 0.0,
+    "debt": 0.0,
+    "goal": 0.0,
+    "inv": 0.0,
+    "lump": 0.0,
+    "confidence": 4,
+    "verdict": "crisis_restructuring"
+   },
+   "diag": {
+    "fcf": -14390.630000000005,
+    "pdn": 0.3122045013633633,
+    "pdn_inf": false,
+    "burn": 84606.69,
+    "liq_months": 3.031157937983391,
+    "res_target_m": 6.0,
+    "res_target_rub": 507640.14,
+    "n_debts": 2,
+    "debt_total": 1498554.98,
+    "pay_sum": 21921.77,
+    "max_rate": 0.3244,
+    "max_spread": 0.22030000000000002,
+    "n_toxic": 0,
+    "n_expensive": 1,
+    "n_growing": 0,
+    "n_goals": 3,
+    "goal_gap_total": 182595.05,
+    "nearest_deadline_m": 19.581108829568787,
+    "n_long_goals": 2,
+    "stress": false,
+    "whale": false,
+    "state_post_lump": 1,
+    "liq_months_post": 3.031157937983391,
+    "post_lump_fcf": -14390.630000000005
+   },
+   "lump_plan": [],
+   "invalid_reasons": []
+  }
+ ],
+ "crisis_S0": [
+  {
+   "row": 10,
+   "id": "SP5-00010",
+   "category": "crisis_S0",
+   "input": {
+    "income_total": 50087.19,
+    "expense_total": 29390.16,
+    "bliq": 39072.05,
+    "r_bench": 0.1935,
+    "risk_tolerance": 4,
+    "obligations": [
+     {
+      "id": 1,
+      "name": "Потребительский кредит",
+      "amount": 456941.36,
+      "interest_rate": 0.2212,
+      "monthly_payment": 18208.55
+     }
+    ],
+    "goals": [
+     {
+      "id": 1,
+      "name": "Лечение",
+      "target_amount": 212077.64,
+      "current_amount": 115425.59,
+      "deadline": null
+     },
+     {
+      "id": 2,
+      "name": "Автомобиль",
+      "target_amount": 783778.44,
+      "current_amount": 116304.5,
+      "deadline": "2029-12-31"
+     }
+    ]
+   },
+   "answer": {
+    "status": "ok",
+    "dom": "reserve",
+    "res": 2488.48,
+    "debt": 0.0,
+    "goal": 0.0,
+    "inv": 0.0,
+    "lump": 0.0,
+    "confidence": 1,
+    "verdict": "build_reserve"
+   },
+   "diag": {
+    "fcf": 2488.480000000003,
+    "pdn": 0.3635370640676788,
+    "pdn_inf": false,
+    "burn": 47598.71,
+    "liq_months": 0.8208636326488681,
+    "res_target_m": 3.0,
+    "res_target_rub": 142796.13,
+    "n_debts": 1,
+    "debt_total": 456941.36,
+    "pay_sum": 18208.55,
+    "max_rate": 0.2212,
+    "max_spread": 0.027700000000000002,
+    "n_toxic": 0,
+    "n_expensive": 0,
+    "n_growing": 0,
+    "n_goals": 2,
+    "goal_gap_total": 764125.99,
+    "nearest_deadline_m": 41.29774127310061,
+    "n_long_goals": 1,
+    "stress": false,
+    "whale": false,
+    "state_post_lump": 0,
+    "liq_months_post": 0.8208636326488681,
+    "post_lump_fcf": 2488.480000000003
+   },
+   "lump_plan": [],
+   "invalid_reasons": []
+  },
+  {
+   "row": 27,
+   "id": "SP5-00027",
+   "category": "crisis_S0",
+   "input": {
+    "income_total": 92371.84,
+    "expense_total": 21944.84,
+    "bliq": 6928.74,
+    "r_bench": 0.136,
+    "risk_tolerance": 5,
+    "obligations": [
+     {
+      "id": 1,
+      "name": "Рассрочка",
+      "amount": 58757.83,
+      "interest_rate": 0.0275,
+      "monthly_payment": 11832.34
+     },
+     {
+      "id": 2,
+      "name": "Потребительский кредит",
+      "amount": 1668513.91,
+      "interest_rate": 0.16,
+      "monthly_payment": 33140.13
+     }
+    ],
+    "goals": [
+     {
+      "id": 1,
+      "name": "Свадьба",
+      "target_amount": 2663429.58,
+      "current_amount": 610562.68,
+      "deadline": "2039-07-23"
+     }
+    ]
+   },
+   "answer": {
+    "status": "ok",
+    "dom": "reserve",
+    "res": 25454.53,
+    "debt": 0.0,
+    "goal": 0.0,
+    "inv": 0.0,
+    "lump": 0.0,
+    "confidence": 4,
+    "verdict": "build_reserve"
+   },
+   "diag": {
+    "fcf": 25454.53,
+    "pdn": 0.48686342071349886,
+    "pdn_inf": false,
+    "burn": 66917.31,
+    "liq_months": 0.10354181900019592,
+    "res_target_m": 2.0,
+    "res_target_rub": 133834.62,
+    "n_debts": 2,
+    "debt_total": 1727271.74,
+    "pay_sum": 44972.47,
+    "max_rate": 0.16,
+    "max_spread": 0.023999999999999994,
+    "n_toxic": 0,
+    "n_expensive": 0,
+    "n_growing": 0,
+    "n_goals": 1,
+    "goal_gap_total": 2052866.9,
+    "nearest_deadline_m": 155.99178644763862,
+    "n_long_goals": 1,
+    "stress": false,
+    "whale": false,
+    "state_post_lump": 0,
+    "liq_months_post": 0.10354181900019592,
+    "post_lump_fcf": 25454.53
+   },
+   "lump_plan": [],
+   "invalid_reasons": []
+  },
+  {
+   "row": 30,
+   "id": "SP5-00030",
+   "category": "crisis_S0",
+   "input": {
+    "income_total": 76300.72,
+    "expense_total": 47823.15,
+    "bliq": 41777.78,
+    "r_bench": 0.1646,
+    "risk_tolerance": 5,
+    "obligations": [
+     {
+      "id": 1,
+      "name": "Потребительский кредит",
+      "amount": 443480.81,
+      "interest_rate": 0.2653,
+      "monthly_payment": 24806.6
+     }
+    ],
+    "goals": [
+     {
+      "id": 1,
+      "name": "Образование",
+      "target_amount": 732486.9,
+      "current_amount": 259199.99,
+      "deadline": "2031-12-02"
+     }
+    ]
+   },
+   "answer": {
+    "status": "ok",
+    "dom": "reserve",
+    "res": 2202.58,
+    "debt": 1468.38,
+    "goal": 0.0,
+    "inv": 0.0,
+    "lump": 0.0,
+    "confidence": 3,
+    "verdict": "build_reserve_and_service_debt"
+   },
+   "diag": {
+    "fcf": 3670.970000000001,
+    "pdn": 0.3251161981171344,
+    "pdn_inf": false,
+    "burn": 72629.75,
+    "liq_months": 0.5752158034414272,
+    "res_target_m": 2.0,
+    "res_target_rub": 145259.5,
+    "n_debts": 1,
+    "debt_total": 443480.81,
+    "pay_sum": 24806.6,
+    "max_rate": 0.2653,
+    "max_spread": 0.10069999999999998,
+    "n_toxic": 0,
+    "n_expensive": 1,
+    "n_growing": 0,
+    "n_goals": 1,
+    "goal_gap_total": 473286.91000000003,
+    "nearest_deadline_m": 64.32854209445586,
+    "n_long_goals": 0,
+    "stress": false,
+    "whale": false,
+    "state_post_lump": 0,
+    "liq_months_post": 0.5752158034414272,
+    "post_lump_fcf": 3670.970000000001
+   },
+   "lump_plan": [],
+   "invalid_reasons": []
+  },
+  {
+   "row": 41,
+   "id": "SP5-00041",
+   "category": "crisis_S0",
+   "input": {
+    "income_total": 46469.36,
+    "expense_total": 42110.04,
+    "bliq": 26369.81,
+    "r_bench": 0.1883,
+    "risk_tolerance": 2,
+    "obligations": [
+     {
+      "id": 1,
+      "name": "Потребительский кредит",
+      "amount": 108575.57,
+      "interest_rate": 0.2189,
+      "monthly_payment": 2991.85
+     }
+    ],
+    "goals": [
+     {
+      "id": 1,
+      "name": "Отпуск",
+      "target_amount": 66356.01,
+      "current_amount": 4610.13,
+      "deadline": "2029-12-02"
+     },
+     {
+      "id": 2,
+      "name": "Переезд",
+      "target_amount": 966195.47,
+      "current_amount": 193484.51,
+      "deadline": "2040-07-22"
+     },
+     {
+      "id": 3,
+      "name": "Инвестиционный портфель",
+      "target_amount": 351153.36,
+      "current_amount": 74465.59,
+      "deadline": "2035-08-01"
+     }
+    ]
+   },
+   "answer": {
+    "status": "ok",
+    "dom": "reserve",
+    "res": 1367.47,
+    "debt": 0.0,
+    "goal": 0.0,
+    "inv": 0.0,
+    "lump": 0.0,
+    "confidence": 3,
+    "verdict": "build_reserve"
+   },
+   "diag": {
+    "fcf": 1367.4700000000012,
+    "pdn": 0.06438328395312524,
+    "pdn_inf": false,
+    "burn": 45101.89,
+    "liq_months": 0.5846719505546221,
+    "res_target_m": 4.0,
+    "res_target_rub": 180407.56,
+    "n_debts": 1,
+    "debt_total": 108575.57,
+    "pay_sum": 2991.85,
+    "max_rate": 0.2189,
+    "max_spread": 0.030600000000000016,
+    "n_toxic": 0,
+    "n_expensive": 0,
+    "n_growing": 0,
+    "n_goals": 3,
+    "goal_gap_total": 1111144.6099999999,
+    "nearest_deadline_m": 40.34496919917864,
+    "n_long_goals": 1,
+    "stress": false,
+    "whale": false,
+    "state_post_lump": 0,
+    "liq_months_post": 0.5846719505546221,
+    "post_lump_fcf": 1367.4700000000012
+   },
+   "lump_plan": [],
+   "invalid_reasons": []
+  },
+  {
+   "row": 49,
+   "id": "SP5-00049",
+   "category": "crisis_S0",
+   "input": {
+    "income_total": 105169.27,
+    "expense_total": 67516.15,
+    "bliq": 93703.01,
+    "r_bench": 0.1658,
+    "risk_tolerance": 3,
+    "obligations": [
+     {
+      "id": 1,
+      "name": "Потребительский кредит",
+      "amount": 434277.43,
+      "interest_rate": 0.2011,
+      "monthly_payment": 12732.99
+     },
+     {
+      "id": 2,
+      "name": "Потребительский кредит",
+      "amount": 509579.93,
+      "interest_rate": 0.1842,
+      "monthly_payment": 10835.74
+     },
+     {
+      "id": 3,
+      "name": "Потребительский кредит",
+      "amount": 242706.32,
+      "interest_rate": 0.3132,
+      "monthly_payment": 8747.09
+     }
+    ],
+    "goals": [
+     {
+      "id": 1,
+      "name": "Ремонт",
+      "target_amount": 309817.61,
+      "current_amount": 150930.09,
+      "deadline": "2026-12-08"
+     },
+     {
+      "id": 2,
+      "name": "Техника",
+      "target_amount": 14823.16,
+      "current_amount": 9342.85,
+      "deadline": "2034-04-24"
+     },
+     {
+      "id": 3,
+      "name": "Отпуск",
+      "target_amount": 98287.08,
+      "current_amount": 23400.97,
+      "deadline": "2030-06-27"
+     }
+    ]
+   },
+   "answer": {
+    "status": "ok",
+    "dom": "reserve",
+    "res": 3202.38,
+    "debt": 2134.92,
+    "goal": 0.0,
+    "inv": 0.0,
+    "lump": 0.0,
+    "confidence": 2,
+    "verdict": "build_reserve_and_service_debt"
+   },
+   "diag": {
+    "fcf": 5337.300000000003,
+    "pdn": 0.3072743587551763,
+    "pdn_inf": false,
+    "burn": 99831.97,
+    "liq_months": 0.9386072417483097,
+    "res_target_m": 3.0,
+    "res_target_rub": 299495.91000000003,
+    "n_debts": 3,
+    "debt_total": 1186563.68,
+    "pay_sum": 32315.82,
+    "max_rate": 0.3132,
+    "max_spread": 0.14739999999999998,
+    "n_toxic": 0,
+    "n_expensive": 1,
+    "n_growing": 0,
+    "n_goals": 3,
+    "goal_gap_total": 239253.94,
+    "nearest_deadline_m": 4.5338809034907595,
+    "n_long_goals": 0,
+    "stress": false,
+    "whale": false,
+    "state_post_lump": 0,
+    "liq_months_post": 0.9386072417483097,
+    "post_lump_fcf": 5337.300000000003
+   },
+   "lump_plan": [],
+   "invalid_reasons": []
+  }
+ ],
+ "toxic": [
+  {
+   "row": 9,
+   "id": "SP5-00009",
+   "category": "toxic",
+   "input": {
+    "income_total": 31617.79,
+    "expense_total": 18256.05,
+    "bliq": 31601.82,
+    "r_bench": 0.1608,
+    "risk_tolerance": 3,
+    "obligations": [
+     {
+      "id": 1,
+      "name": "Кредитная карта",
+      "amount": 83231.48,
+      "interest_rate": 0.3604,
+      "monthly_payment": 1756.54
+     },
+     {
+      "id": 2,
+      "name": "Потребительский кредит",
+      "amount": 32876.08,
+      "interest_rate": 0.18,
+      "monthly_payment": 2326.5
+     }
+    ],
+    "goals": [
+     {
+      "id": 1,
+      "name": "Переезд",
+      "target_amount": 262195.76,
+      "current_amount": 145144.24,
+      "deadline": "2028-07-22"
+     }
+    ]
+   },
+   "answer": {
+    "status": "ok",
+    "dom": "debt",
+    "res": 0.0,
+    "debt": 9278.7,
+    "goal": 0.0,
+    "inv": 0.0,
+    "lump": 9262.73,
+    "confidence": 4,
+    "verdict": "kill_toxic_debt"
+   },
+   "diag": {
+    "fcf": 9278.7,
+    "pdn": 0.12913742548103457,
+    "pdn_inf": false,
+    "burn": 22339.09,
+    "liq_months": 1.4146422258023938,
+    "res_target_m": 3.0,
+    "res_target_rub": 67017.27,
+    "n_debts": 2,
+    "debt_total": 116107.56,
+    "pay_sum": 4083.04,
+    "max_rate": 0.3604,
+    "max_spread": 0.1996,
+    "n_toxic": 1,
+    "n_expensive": 0,
+    "n_growing": 1,
+    "n_goals": 1,
+    "goal_gap_total": 117051.52000000002,
+    "nearest_deadline_m": 23.983572895277206,
+    "n_long_goals": 0,
+    "stress": false,
+    "whale": false,
+    "state_post_lump": 1,
+    "liq_months_post": 1.0,
+    "post_lump_fcf": 9278.7
+   },
+   "lump_plan": [
+    {
+     "action": "repay_debt",
+     "target": "Кредитная карта",
+     "amount": 9262.73
+    }
+   ],
+   "invalid_reasons": []
+  },
+  {
+   "row": 21,
+   "id": "SP5-00021",
+   "category": "toxic",
+   "input": {
+    "income_total": 29466.03,
+    "expense_total": 13848.79,
+    "bliq": 5251.46,
+    "r_bench": 0.1953,
+    "risk_tolerance": 4,
+    "obligations": [
+     {
+      "id": 1,
+      "name": "Заём МФО",
+      "amount": 5328.62,
+      "interest_rate": 1.512,
+      "monthly_payment": 6000.0
+     }
+    ],
+    "goals": [
+     {
+      "id": 1,
+      "name": "Лечение",
+      "target_amount": 188813.77,
+      "current_amount": 63482.59,
+      "deadline": "2034-12-11"
+     },
+     {
+      "id": 2,
+      "name": "Переезд",
+      "target_amount": 196976.54,
+      "current_amount": 30486.97,
+      "deadline": "2033-12-01"
+     }
+    ]
+   },
+   "answer": {
+    "status": "ok",
+    "dom": "debt",
+    "res": 4288.62,
+    "debt": 5328.62,
+    "goal": 0.0,
+    "inv": 0.0,
+    "lump": 0.0,
+    "confidence": 4,
+    "verdict": "attack_expensive_debt"
+   },
+   "diag": {
+    "fcf": 9617.239999999998,
+    "pdn": 0.20362430907726628,
+    "pdn_inf": false,
+    "burn": 19848.79,
+    "liq_months": 0.2645733064836698,
+    "res_target_m": 3.0,
+    "res_target_rub": 59546.37,
+    "n_debts": 1,
+    "debt_total": 5328.62,
+    "pay_sum": 6000.0,
+    "max_rate": 1.512,
+    "max_spread": 1.3167,
+    "n_toxic": 1,
+    "n_expensive": 0,
+    "n_growing": 0,
+    "n_goals": 2,
+    "goal_gap_total": 291820.75,
+    "nearest_deadline_m": 88.31211498973306,
+    "n_long_goals": 0,
+    "stress": false,
+    "whale": false,
+    "state_post_lump": 0,
+    "liq_months_post": 0.2645733064836698,
+    "post_lump_fcf": 9617.239999999998
+   },
+   "lump_plan": [],
+   "invalid_reasons": []
+  },
+  {
+   "row": 33,
+   "id": "SP5-00033",
+   "category": "toxic",
+   "input": {
+    "income_total": 65393.0,
+    "expense_total": 41052.0,
+    "bliq": 65122.63,
+    "r_bench": 0.1508,
+    "risk_tolerance": 4,
+    "obligations": [
+     {
+      "id": 1,
+      "name": "Рассрочка",
+      "amount": 164788.77,
+      "interest_rate": 0.0085,
+      "monthly_payment": 12739.0
+     },
+     {
+      "id": 2,
+      "name": "Заём МФО",
+      "amount": 51656.0,
+      "interest_rate": 2.0386,
+      "monthly_payment": 11602.0
+     }
+    ],
+    "goals": [
+     {
+      "id": 1,
+      "name": "Обучение детей",
+      "target_amount": 677374.3,
+      "current_amount": 222415.91,
+      "deadline": "2027-06-28"
+     },
+     {
+      "id": 2,
+      "name": "Переезд",
+      "target_amount": 1373554.29,
+      "current_amount": 155289.23,
+      "deadline": "2035-10-09"
+     },
+     {
+      "id": 3,
+      "name": "Ремонт",
+      "target_amount": 293238.85,
+      "current_amount": 174107.03,
+      "deadline": "2035-02-13"
+     }
+    ]
+   },
+   "answer": {
+    "status": "ok",
+    "dom": "none",
+    "res": 0.0,
+    "debt": 0.0,
+    "goal": 0.0,
+    "inv": 0.0,
+    "lump": 0.0,
+    "confidence": 3,
+    "verdict": "hold"
+   },
+   "diag": {
+    "fcf": 0.0,
+    "pdn": 0.37222638508708883,
+    "pdn_inf": false,
+    "burn": 65393.0,
+    "liq_months": 0.9958654596057681,
+    "res_target_m": 3.0,
+    "res_target_rub": 196179.0,
+    "n_debts": 2,
+    "debt_total": 216444.77,
+    "pay_sum": 24341.0,
+    "max_rate": 2.0386,
+    "max_spread": 1.8878000000000001,
+    "n_toxic": 1,
+    "n_expensive": 0,
+    "n_growing": 0,
+    "n_goals": 3,
+    "goal_gap_total": 1792355.2700000003,
+    "nearest_deadline_m": 11.170431211498974,
+    "n_long_goals": 0,
+    "stress": false,
+    "whale": false,
+    "state_post_lump": 0,
+    "liq_months_post": 0.9958654596057681,
+    "post_lump_fcf": 0.0
+   },
+   "lump_plan": [],
+   "invalid_reasons": []
+  },
+  {
+   "row": 43,
+   "id": "SP5-00043",
+   "category": "toxic",
+   "input": {
+    "income_total": 41099.06,
+    "expense_total": 19531.68,
+    "bliq": 34373.28,
+    "r_bench": 0.0912,
+    "risk_tolerance": 4,
+    "obligations": [
+     {
+      "id": 1,
+      "name": "Кредитная карта",
+      "amount": 13535.51,
+      "interest_rate": 0.3327,
+      "monthly_payment": 596.21
+     },
+     {
+      "id": 2,
+      "name": "Кредитная карта",
+      "amount": 13583.83,
+      "interest_rate": 0.2061,
+      "monthly_payment": 401.03
+     },
+     {
+      "id": 3,
+      "name": "Кредитная карта",
+      "amount": 10235.55,
+      "interest_rate": 0.3519,
+      "monthly_payment": 241.09
+     }
+    ],
+    "goals": [
+     {
+      "id": 1,
+      "name": "Отпуск",
+      "target_amount": 185525.77,
+      "current_amount": 59815.53,
+      "deadline": "2028-11-20"
+     },
+     {
+      "id": 2,
+      "name": "Автомобиль",
+      "target_amount": 1070624.13,
+      "current_amount": 458881.56,
+      "deadline": "2030-04-22"
+     },
+     {
+      "id": 3,
+      "name": "Обучение детей",
+      "target_amount": 325150.25,
+      "current_amount": 125537.86,
+      "deadline": "2030-07-25"
+     },
+     {
+      "id": 4,
+      "name": "Переезд",
+      "target_amount": 874754.34,
+      "current_amount": 440039.31,
+      "deadline": "2029-10-01"
+     }
+    ]
+   },
+   "answer": {
+    "status": "ok",
+    "dom": "debt",
+    "res": 10164.52,
+    "debt": 10164.52,
+    "goal": 0.0,
+    "inv": 0.0,
+    "lump": 10235.55,
+    "confidence": 3,
+    "verdict": "kill_toxic_debt"
+   },
+   "diag": {
+    "fcf": 20329.049999999996,
+    "pdn": 0.030130372811446295,
+    "pdn_inf": false,
+    "burn": 20770.010000000002,
+    "liq_months": 1.654947686592351,
+    "res_target_m": 3.0,
+    "res_target_rub": 62310.030000000006,
+    "n_debts": 3,
+    "debt_total": 37354.89,
+    "pay_sum": 1238.33,
+    "max_rate": 0.3519,
+    "max_spread": 0.2607,
+    "n_toxic": 1,
+    "n_expensive": 2,
+    "n_growing": 1,
+    "n_goals": 4,
+    "goal_gap_total": 1371780.2299999997,
+    "nearest_deadline_m": 27.958932238193018,
+    "n_long_goals": 0,
+    "stress": false,
+    "whale": false,
+    "state_post_lump": 1,
+    "liq_months_post": 1.1757915175274685,
+    "post_lump_fcf": 20570.139999999996
+   },
+   "lump_plan": [
+    {
+     "action": "repay_debt",
+     "target": "Кредитная карта",
+     "amount": 10235.55
+    }
+   ],
+   "invalid_reasons": []
+  },
+  {
+   "row": 47,
+   "id": "SP5-00047",
+   "category": "toxic",
+   "input": {
+    "income_total": 47777.74,
+    "expense_total": 37082.14,
+    "bliq": 120026.9,
+    "r_bench": 0.1048,
+    "risk_tolerance": 3,
+    "obligations": [
+     {
+      "id": 1,
+      "name": "Кредитная карта",
+      "amount": 78653.72,
+      "interest_rate": 0.3718,
+      "monthly_payment": 1462.17
+     },
+     {
+      "id": 2,
+      "name": "Кредитная карта",
+      "amount": 27425.17,
+      "interest_rate": 0.2314,
+      "monthly_payment": 1151.44
+     },
+     {
+      "id": 3,
+      "name": "Рассрочка",
+      "amount": 20847.53,
+      "interest_rate": 0.0343,
+      "monthly_payment": 3509.39
+     }
+    ],
+    "goals": [
+     {
+      "id": 1,
+      "name": "Переезд",
+      "target_amount": 573346.38,
+      "current_amount": 308498.44,
+      "deadline": null
+     },
+     {
+      "id": 2,
+      "name": "Инвестиционный портфель",
+      "target_amount": 1497314.2,
+      "current_amount": 1329270.91,
+      "deadline": "2032-12-20"
+     }
+    ]
+   },
+   "answer": {
+    "status": "ok",
+    "dom": "debt",
+    "res": 0.0,
+    "debt": 4572.6,
+    "goal": 0.0,
+    "inv": 0.0,
+    "lump": 76821.76,
+    "confidence": 3,
+    "verdict": "kill_toxic_debt"
+   },
+   "diag": {
+    "fcf": 4572.5999999999985,
+    "pdn": 0.12815591528607256,
+    "pdn_inf": false,
+    "burn": 43205.14,
+    "liq_months": 2.7780699240877356,
+    "res_target_m": 3.0,
+    "res_target_rub": 129615.42,
+    "n_debts": 3,
+    "debt_total": 126926.42,
+    "pay_sum": 6123.0,
+    "max_rate": 0.3718,
+    "max_spread": 0.267,
+    "n_toxic": 1,
+    "n_expensive": 1,
+    "n_growing": 1,
+    "n_goals": 2,
+    "goal_gap_total": 432891.23000000004,
+    "nearest_deadline_m": 76.94455852156058,
+    "n_long_goals": 1,
+    "stress": false,
+    "whale": false,
+    "state_post_lump": 1,
+    "liq_months_post": 1.0,
+    "post_lump_fcf": 4572.5999999999985
+   },
+   "lump_plan": [
+    {
+     "action": "repay_debt",
+     "target": "Кредитная карта",
+     "amount": 76821.76
+    }
+   ],
+   "invalid_reasons": []
+  }
+ ],
+ "band_B2": [
+  {
+   "row": 2,
+   "id": "SP5-00002",
+   "category": "band_B2",
+   "input": {
+    "income_total": 53321.04,
+    "expense_total": 29904.96,
+    "bliq": 51118.01,
+    "r_bench": 0.205,
+    "risk_tolerance": 3,
+    "obligations": [
+     {
+      "id": 1,
+      "name": "Потребительский кредит",
+      "amount": 249026.6,
+      "interest_rate": 0.3132,
+      "monthly_payment": 7998.16
+     }
+    ],
+    "goals": [
+     {
+      "id": 1,
+      "name": "Переезд",
+      "target_amount": 516020.41,
+      "current_amount": 100199.41,
+      "deadline": "2029-11-11"
+     }
+    ]
+   },
+   "answer": {
+    "status": "ok",
+    "dom": "debt",
+    "res": 7708.96,
+    "debt": 7708.96,
+    "goal": 0.0,
+    "inv": 0.0,
+    "lump": 0.0,
+    "confidence": 4,
+    "verdict": "attack_expensive_debt"
+   },
+   "diag": {
+    "fcf": 15417.920000000006,
+    "pdn": 0.15000007501729148,
+    "pdn_inf": false,
+    "burn": 37903.119999999995,
+    "liq_months": 1.348649134952479,
+    "res_target_m": 3.0,
+    "res_target_rub": 113709.35999999999,
+    "n_debts": 1,
+    "debt_total": 249026.6,
+    "pay_sum": 7998.16,
+    "max_rate": 0.3132,
+    "max_spread": 0.10819999999999999,
+    "n_toxic": 0,
+    "n_expensive": 1,
+    "n_growing": 0,
+    "n_goals": 1,
+    "goal_gap_total": 415821.0,
+    "nearest_deadline_m": 39.65503080082136,
+    "n_long_goals": 0,
+    "stress": false,
+    "whale": false,
+    "state_post_lump": 1,
+    "liq_months_post": 1.348649134952479,
+    "post_lump_fcf": 15417.920000000006
+   },
+   "lump_plan": [],
+   "invalid_reasons": []
+  },
+  {
+   "row": 5,
+   "id": "SP5-00005",
+   "category": "band_B2",
+   "input": {
+    "income_total": 2211095.6,
+    "expense_total": 1677555.78,
+    "bliq": 5500725.49,
+    "r_bench": 0.1521,
+    "risk_tolerance": 2,
+    "obligations": [
+     {
+      "id": 1,
+      "name": "Потребительский кредит",
+      "amount": 4299376.86,
+      "interest_rate": 0.3091,
+      "monthly_payment": 133912.95
+     }
+    ],
+    "goals": [
+     {
+      "id": 1,
+      "name": "Инвестиционный портфель",
+      "target_amount": 50305784.86,
+      "current_amount": 18722386.3,
+      "deadline": "2030-11-16"
+     },
+     {
+      "id": 2,
+      "name": "Пенсионный капитал",
+      "target_amount": 34089407.81,
+      "current_amount": 12687110.71,
+      "deadline": null
+     }
+    ]
+   },
+   "answer": {
+    "status": "ok",
+    "dom": "debt",
+    "res": 199813.43,
+    "debt": 199813.43,
+    "goal": 0.0,
+    "inv": 0.0,
+    "lump": 0.0,
+    "confidence": 4,
+    "verdict": "attack_expensive_debt"
+   },
+   "diag": {
+    "fcf": 399626.8700000001,
+    "pdn": 0.06056407059016354,
+    "pdn_inf": false,
+    "burn": 1811468.73,
+    "liq_months": 3.0366107893013425,
+    "res_target_m": 4.0,
+    "res_target_rub": 7245874.92,
+    "n_debts": 1,
+    "debt_total": 4299376.86,
+    "pay_sum": 133912.95,
+    "max_rate": 0.3091,
+    "max_spread": 0.15699999999999997,
+    "n_toxic": 0,
+    "n_expensive": 1,
+    "n_growing": 0,
+    "n_goals": 2,
+    "goal_gap_total": 52985695.66,
+    "nearest_deadline_m": 51.81108829568789,
+    "n_long_goals": 1,
+    "stress": false,
+    "whale": false,
+    "state_post_lump": 1,
+    "liq_months_post": 3.0366107893013425,
+    "post_lump_fcf": 399626.8700000001
+   },
+   "lump_plan": [],
+   "invalid_reasons": []
+  },
+  {
+   "row": 15,
+   "id": "SP5-00015",
+   "category": "band_B2",
+   "input": {
+    "income_total": 413914.89,
+    "expense_total": 279019.04,
+    "bliq": 660950.64,
+    "r_bench": 0.1412,
+    "risk_tolerance": 5,
+    "obligations": [
+     {
+      "id": 1,
+      "name": "Рассрочка",
+      "amount": 195311.24,
+      "interest_rate": 0.0468,
+      "monthly_payment": 22127.03
+     },
+     {
+      "id": 2,
+      "name": "Ипотека",
+      "amount": 1390028.53,
+      "interest_rate": 0.125,
+      "monthly_payment": 15732.93
+     },
+     {
+      "id": 3,
+      "name": "Потребительский кредит",
+      "amount": 300497.06,
+      "interest_rate": 0.3444,
+      "monthly_payment": 12728.5
+     },
+     {
+      "id": 4,
+      "name": "Потребительский кредит",
+      "amount": 207042.65,
+      "interest_rate": 0.289,
+      "monthly_payment": 10002.44
+     }
+    ],
+    "goals": [
+     {
+      "id": 1,
+      "name": "Образование",
+      "target_amount": 963298.44,
+      "current_amount": 63148.74,
+      "deadline": null
+     },
+     {
+      "id": 2,
+      "name": "Переезд",
+      "target_amount": 1835449.5,
+      "current_amount": 479340.1,
+      "deadline": "2033-03-10"
+     },
+     {
+      "id": 3,
+      "name": "Образование",
+      "target_amount": 2095197.05,
+      "current_amount": 479751.05,
+      "deadline": "2034-01-13"
+     },
+     {
+      "id": 4,
+      "name": "Лечение",
+      "target_amount": 621374.53,
+      "current_amount": 139126.55,
+      "deadline": null
+     }
+    ]
+   },
+   "answer": {
+    "status": "ok",
+    "dom": "debt",
+    "res": 18269.24,
+    "debt": 56035.71,
+    "goal": 0.0,
+    "inv": 0.0,
+    "lump": 0.0,
+    "confidence": 3,
+    "verdict": "attack_expensive_debt"
+   },
+   "diag": {
+    "fcf": 74304.95000000001,
+    "pdn": 0.1463849246882614,
+    "pdn_inf": false,
+    "burn": 339609.94,
+    "liq_months": 1.946205225912999,
+    "res_target_m": 2.0,
+    "res_target_rub": 679219.88,
+    "n_debts": 4,
+    "debt_total": 2092879.48,
+    "pay_sum": 60590.9,
+    "max_rate": 0.3444,
+    "max_spread": 0.2032,
+    "n_toxic": 0,
+    "n_expensive": 2,
+    "n_growing": 0,
+    "n_goals": 4,
+    "goal_gap_total": 4353953.08,
+    "nearest_deadline_m": 79.5728952772074,
+    "n_long_goals": 2,
+    "stress": false,
+    "whale": false,
+    "state_post_lump": 1,
+    "liq_months_post": 1.946205225912999,
+    "post_lump_fcf": 74304.95000000001
+   },
+   "lump_plan": [],
+   "invalid_reasons": []
+  },
+  {
+   "row": 39,
+   "id": "SP5-00039",
+   "category": "band_B2",
+   "input": {
+    "income_total": 60181.12,
+    "expense_total": 45410.8,
+    "bliq": 167253.79,
+    "r_bench": 0.1589,
+    "risk_tolerance": 3,
+    "obligations": [
+     {
+      "id": 1,
+      "name": "Потребительский кредит",
+      "amount": 411076.05,
+      "interest_rate": 0.3245,
+      "monthly_payment": 13423.56
+     }
+    ],
+    "goals": [
+     {
+      "id": 1,
+      "name": "Отпуск",
+      "target_amount": 912414.15,
+      "current_amount": 320.27,
+      "deadline": "2030-12-09"
+     },
+     {
+      "id": 2,
+      "name": "Первый взнос по ипотеке",
+      "target_amount": 506072.77,
+      "current_amount": 111566.87,
+      "deadline": "2033-11-24"
+     }
+    ]
+   },
+   "answer": {
+    "status": "ok",
+    "dom": "debt",
+    "res": 673.38,
+    "debt": 673.38,
+    "goal": 0.0,
+    "inv": 0.0,
+    "lump": 0.0,
+    "confidence": 2,
+    "verdict": "attack_expensive_debt"
+   },
+   "diag": {
+    "fcf": 1346.760000000002,
+    "pdn": 0.2230526783150596,
+    "pdn_inf": false,
+    "burn": 58834.36,
+    "liq_months": 2.8427910153182596,
+    "res_target_m": 3.0,
+    "res_target_rub": 176503.08000000002,
+    "n_debts": 1,
+    "debt_total": 411076.05,
+    "pay_sum": 13423.56,
+    "max_rate": 0.3245,
+    "max_spread": 0.1656,
+    "n_toxic": 0,
+    "n_expensive": 1,
+    "n_growing": 0,
+    "n_goals": 2,
+    "goal_gap_total": 1306599.78,
+    "nearest_deadline_m": 52.56673511293634,
+    "n_long_goals": 0,
+    "stress": false,
+    "whale": false,
+    "state_post_lump": 1,
+    "liq_months_post": 2.8427910153182596,
+    "post_lump_fcf": 1346.760000000002
+   },
+   "lump_plan": [],
+   "invalid_reasons": []
+  },
+  {
+   "row": 45,
+   "id": "SP5-00045",
+   "category": "band_B2",
+   "input": {
+    "income_total": 292074.74,
+    "expense_total": 183261.31,
+    "bliq": 1241057.17,
+    "r_bench": 0.1421,
+    "risk_tolerance": 1,
+    "obligations": [
+     {
+      "id": 1,
+      "name": "Потребительский кредит",
+      "amount": 806192.09,
+      "interest_rate": 0.2685,
+      "monthly_payment": 24545.05
+     },
+     {
+      "id": 2,
+      "name": "Потребительский кредит",
+      "amount": 1318187.82,
+      "interest_rate": 0.2098,
+      "monthly_payment": 35644.3
+     }
+    ],
+    "goals": [
+     {
+      "id": 1,
+      "name": "Ремонт",
+      "target_amount": 433996.26,
+      "current_amount": 220832.09,
+      "deadline": null
+     },
+     {
+      "id": 2,
+      "name": "Покупка недвижимости",
+      "target_amount": 4049279.16,
+      "current_amount": 835306.91,
+      "deadline": "2056-07-22"
+     }
+    ]
+   },
+   "answer": {
+    "status": "ok",
+    "dom": "debt",
+    "res": 24312.04,
+    "debt": 24312.04,
+    "goal": 0.0,
+    "inv": 0.0,
+    "lump": 0.0,
+    "confidence": 3,
+    "verdict": "attack_expensive_debt"
+   },
+   "diag": {
+    "fcf": 48624.07999999999,
+    "pdn": 0.20607516418571495,
+    "pdn_inf": false,
+    "burn": 243450.66,
+    "liq_months": 5.097776978711004,
+    "res_target_m": 6.0,
+    "res_target_rub": 1460703.96,
+    "n_debts": 2,
+    "debt_total": 2124379.91,
+    "pay_sum": 60189.350000000006,
+    "max_rate": 0.2685,
+    "max_spread": 0.1264,
+    "n_toxic": 0,
+    "n_expensive": 2,
+    "n_growing": 0,
+    "n_goals": 2,
+    "goal_gap_total": 3427136.42,
+    "nearest_deadline_m": 359.98357289527723,
+    "n_long_goals": 2,
+    "stress": false,
+    "whale": false,
+    "state_post_lump": 1,
+    "liq_months_post": 5.097776978711004,
+    "post_lump_fcf": 48624.07999999999
+   },
+   "lump_plan": [],
+   "invalid_reasons": []
+  }
+ ],
+ "whale_or_stress": [
+  {
+   "row": 36,
+   "id": "SP5-00036",
+   "category": "whale_or_stress",
+   "input": {
+    "income_total": 7723592.89,
+    "expense_total": 5336427.69,
+    "bliq": 94874613.23,
+    "r_bench": 0.1452,
+    "risk_tolerance": 3,
+    "obligations": [
+     {
+      "id": 1,
+      "name": "Потребительский кредит",
+      "amount": 5209431.61,
+      "interest_rate": 0.1712,
+      "monthly_payment": 203900.04
+     }
+    ],
+    "goals": [
+     {
+      "id": 1,
+      "name": "Пенсионный капитал",
+      "target_amount": 59304493.01,
+      "current_amount": 51345185.68,
+      "deadline": "2030-12-02"
+     },
+     {
+      "id": 2,
+      "name": "Покупка недвижимости",
+      "target_amount": 97531724.48,
+      "current_amount": 84441907.34,
+      "deadline": "2031-03-10"
+     },
+     {
+      "id": 3,
+      "name": "Инвестиционный портфель",
+      "target_amount": 165858951.44,
+      "current_amount": 143598878.04,
+      "deadline": "2030-11-01"
+     }
+    ]
+   },
+   "answer": {
+    "status": "ok",
+    "dom": "goals+",
+    "res": 0.0,
+    "debt": 0.0,
+    "goal": 821456.6,
+    "inv": 1361808.55,
+    "lump": 78253630.04,
+    "confidence": 2,
+    "verdict": "invest_surplus"
+   },
+   "diag": {
+    "fcf": 2183265.159999999,
+    "pdn": 0.02639963588241379,
+    "pdn_inf": false,
+    "burn": 5540327.73,
+    "liq_months": 17.124368422515683,
+    "res_target_m": 3.0,
+    "res_target_rub": 16620983.190000001,
+    "n_debts": 1,
+    "debt_total": 5209431.61,
+    "pay_sum": 203900.04,
+    "max_rate": 0.1712,
+    "max_spread": 0.025999999999999995,
+    "n_toxic": 0,
+    "n_expensive": 0,
+    "n_growing": 0,
+    "n_goals": 3,
+    "goal_gap_total": 43309197.870000005,
+    "nearest_deadline_m": 51.318275154004105,
+    "n_long_goals": 0,
+    "stress": true,
+    "whale": true,
+    "state_post_lump": 1,
+    "liq_months_post": 2.999999999999999,
+    "post_lump_fcf": 2183265.159999999
+   },
+   "lump_plan": [
+    {
+     "action": "invest_surplus",
+     "target": "portfolio",
+     "amount": 78253630.04
+    }
+   ],
+   "invalid_reasons": []
+  },
+  {
+   "row": 37,
+   "id": "SP5-00037",
+   "category": "whale_or_stress",
+   "input": {
+    "income_total": 6749404.11,
+    "expense_total": 5108201.1,
+    "bliq": 25333412.39,
+    "r_bench": 0.157,
+    "risk_tolerance": 2,
+    "obligations": [
+     {
+      "id": 1,
+      "name": "Ипотека",
+      "amount": 30000000.0,
+      "interest_rate": 0.1262,
+      "monthly_payment": 362709.67
+     },
+     {
+      "id": 2,
+      "name": "Ипотека",
+      "amount": 26450429.18,
+      "interest_rate": 0.1658,
+      "monthly_payment": 368398.19
+     }
+    ],
+    "goals": [
+     {
+      "id": 1,
+      "name": "Пенсионный капитал",
+      "target_amount": 46889985.42,
+      "current_amount": 6232052.59,
+      "deadline": "2033-10-17"
+     },
+     {
+      "id": 2,
+      "name": "Покупка недвижимости",
+      "target_amount": 34102863.85,
+      "current_amount": 4653101.45,
+      "deadline": null
+     }
+    ]
+   },
+   "answer": {
+    "status": "ok",
+    "dom": "goals+",
+    "res": 0.0,
+    "debt": 0.0,
+    "goal": 713642.39,
+    "inv": 196452.75,
+    "lump": 1976176.55,
+    "confidence": 2,
+    "verdict": "fund_goals"
+   },
+   "diag": {
+    "fcf": 910095.1500000004,
+    "pdn": 0.1083218382074325,
+    "pdn_inf": false,
+    "burn": 5839308.96,
+    "liq_months": 4.338426441131486,
+    "res_target_m": 4.0,
+    "res_target_rub": 23357235.84,
+    "n_debts": 2,
+    "debt_total": 56450429.18,
+    "pay_sum": 731107.86,
+    "max_rate": 0.1658,
+    "max_spread": 0.008800000000000002,
+    "n_toxic": 0,
+    "n_expensive": 0,
+    "n_growing": 0,
+    "n_goals": 2,
+    "goal_gap_total": 70107695.23,
+    "nearest_deadline_m": 86.83367556468173,
+    "n_long_goals": 1,
+    "stress": false,
+    "whale": true,
+    "state_post_lump": 2,
+    "liq_months_post": 4.0,
+    "post_lump_fcf": 910095.1500000004
+   },
+   "lump_plan": [
+    {
+     "action": "invest_surplus",
+     "target": "portfolio",
+     "amount": 1976176.55
+    }
+   ],
+   "invalid_reasons": []
+  },
+  {
+   "row": 51,
+   "id": "SP5-00051",
+   "category": "whale_or_stress",
+   "input": {
+    "income_total": 5215745.69,
+    "expense_total": 3326284.54,
+    "bliq": 3852984.95,
+    "r_bench": 0.165,
+    "risk_tolerance": 2,
+    "obligations": [
+     {
+      "id": 1,
+      "name": "Потребительский кредит",
+      "amount": 5000000.0,
+      "interest_rate": 0.2186,
+      "monthly_payment": 138999.36
+     },
+     {
+      "id": 2,
+      "name": "Потребительский кредит",
+      "amount": 2950189.75,
+      "interest_rate": 0.3234,
+      "monthly_payment": 291019.01
+     }
+    ],
+    "goals": [
+     {
+      "id": 1,
+      "name": "Обучение детей",
+      "target_amount": 534874.52,
+      "current_amount": 131923.42,
+      "deadline": "2052-07-22"
+     },
+     {
+      "id": 2,
+      "name": "Покупка недвижимости",
+      "target_amount": 45900858.44,
+      "current_amount": 2169800.62,
+      "deadline": "2034-04-19"
+     }
+    ]
+   },
+   "answer": {
+    "status": "ok",
+    "dom": "debt",
+    "res": 729721.39,
+    "debt": 729721.39,
+    "goal": 0.0,
+    "inv": 0.0,
+    "lump": 0.0,
+    "confidence": 1,
+    "verdict": "attack_expensive_debt"
+   },
+   "diag": {
+    "fcf": 1459442.7800000003,
+    "pdn": 0.0824461918886233,
+    "pdn_inf": false,
+    "burn": 3756302.91,
+    "liq_months": 1.025738616484473,
+    "res_target_m": 4.0,
+    "res_target_rub": 15025211.64,
+    "n_debts": 2,
+    "debt_total": 7950189.75,
+    "pay_sum": 430018.37,
+    "max_rate": 0.3234,
+    "max_spread": 0.1584,
+    "n_toxic": 0,
+    "n_expensive": 1,
+    "n_growing": 0,
+    "n_goals": 2,
+    "goal_gap_total": 44134008.92,
+    "nearest_deadline_m": 92.8788501026694,
+    "n_long_goals": 1,
+    "stress": false,
+    "whale": true,
+    "state_post_lump": 1,
+    "liq_months_post": 1.025738616484473,
+    "post_lump_fcf": 1459442.7800000003
+   },
+   "lump_plan": [],
+   "invalid_reasons": []
+  },
+  {
+   "row": 70,
+   "id": "SP5-00070",
+   "category": "whale_or_stress",
+   "input": {
+    "income_total": 8836675.08,
+    "expense_total": 2295537.35,
+    "bliq": 45564614.48,
+    "r_bench": 0.1999,
+    "risk_tolerance": 1,
+    "obligations": [
+     {
+      "id": 1,
+      "name": "Кредитная карта",
+      "amount": 3000000.0,
+      "interest_rate": 0.3305,
+      "monthly_payment": 112726.19
+     },
+     {
+      "id": 2,
+      "name": "Кредитная карта",
+      "amount": 1917648.26,
+      "interest_rate": 0.4,
+      "monthly_payment": 102099.29
+     },
+     {
+      "id": 3,
+      "name": "Потребительский кредит",
+      "amount": 5000000.0,
+      "interest_rate": 0.2684,
+      "monthly_payment": 271490.46
+     }
+    ],
+    "goals": [
+     {
+      "id": 1,
+      "name": "Покупка недвижимости",
+      "target_amount": 25268735.15,
+      "current_amount": 23186838.36,
+      "deadline": "2033-06-30"
+     },
+     {
+      "id": 2,
+      "name": "Пенсионный капитал",
+      "target_amount": 41005421.75,
+      "current_amount": 37626975.79,
+      "deadline": "2031-12-06"
+     },
+     {
+      "id": 3,
+      "name": "Пенсионный капитал",
+      "target_amount": 2221632.9,
+      "current_amount": 2038592.06,
+      "deadline": null
+     },
+     {
+      "id": 4,
+      "name": "Покупка недвижимости",
+      "target_amount": 32622546.72,
+      "current_amount": 29934767.73,
+      "deadline": null
+     }
+    ]
+   },
+   "answer": {
+    "status": "ok",
+    "dom": "goals+",
+    "res": 0.0,
+    "debt": 0.0,
+    "goal": 101342.04,
+    "inv": 5953479.74,
+    "lump": 31791390.36,
+    "confidence": 2,
+    "verdict": "kill_toxic_debt"
+   },
+   "diag": {
+    "fcf": 6054821.79,
+    "pdn": 0.05503381482257691,
+    "pdn_inf": false,
+    "burn": 2781853.29,
+    "liq_months": 16.379229862262072,
+    "res_target_m": 6.0,
+    "res_target_rub": 16691119.74,
+    "n_debts": 3,
+    "debt_total": 9917648.26,
+    "pay_sum": 486315.94,
+    "max_rate": 0.4,
+    "max_spread": 0.20010000000000003,
+    "n_toxic": 1,
+    "n_expensive": 2,
+    "n_growing": 0,
+    "n_goals": 4,
+    "goal_gap_total": 8331162.579999998,
+    "nearest_deadline_m": 64.4599589322382,
+    "n_long_goals": 2,
+    "stress": false,
+    "whale": true,
+    "state_post_lump": 2,
+    "liq_months_post": 6.0,
+    "post_lump_fcf": 6541137.73
+   },
+   "lump_plan": [
+    {
+     "action": "repay_debt",
+     "target": "Кредитная карта",
+     "amount": 1917648.26
+    },
+    {
+     "action": "repay_debt",
+     "target": "Кредитная карта",
+     "amount": 3000000.0
+    },
+    {
+     "action": "repay_debt",
+     "target": "Потребительский кредит",
+     "amount": 5000000.0
+    },
+    {
+     "action": "invest_surplus",
+     "target": "portfolio",
+     "amount": 21873742.11
+    }
+   ],
+   "invalid_reasons": []
+  },
+  {
+   "row": 94,
+   "id": "SP5-00094",
+   "category": "whale_or_stress",
+   "input": {
+    "income_total": 6109147.84,
+    "expense_total": 3669193.34,
+    "bliq": 16035459.16,
+    "r_bench": 0.1628,
+    "risk_tolerance": 3,
+    "obligations": [
+     {
+      "id": 1,
+      "name": "Потребительский кредит",
+      "amount": 4327780.56,
+      "interest_rate": 0.35,
+      "monthly_payment": 158920.83
+     },
+     {
+      "id": 2,
+      "name": "Автокредит",
+      "amount": 10000000.0,
+      "interest_rate": 0.1174,
+      "monthly_payment": 375540.2
+     },
+     {
+      "id": 3,
+      "name": "Потребительский кредит",
+      "amount": 5000000.0,
+      "interest_rate": 0.2243,
+      "monthly_payment": 195932.04
+     }
+    ],
+    "goals": [
+     {
+      "id": 1,
+      "name": "Обучение детей",
+      "target_amount": 4804385.07,
+      "current_amount": 4673087.24,
+      "deadline": "2033-07-23"
+     },
+     {
+      "id": 2,
+      "name": "Пенсионный капитал",
+      "target_amount": 5084365.71,
+      "current_amount": 4945416.36,
+      "deadline": null
+     },
+     {
+      "id": 3,
+      "name": "Покупка недвижимости",
+      "target_amount": 4855998.78,
+      "current_amount": 4723290.4,
+      "deadline": null
+     },
+     {
+      "id": 4,
+      "name": "Обучение детей",
+      "target_amount": 7292408.03,
+      "current_amount": 7093115.64,
+      "deadline": "2031-06-29"
+     },
+     {
+      "id": 5,
+      "name": "Обучение детей",
+      "target_amount": 9783254.58,
+      "current_amount": 9515890.47,
+      "deadline": "2029-10-10"
+     },
+     {
+      "id": 6,
+      "name": "Автомобиль",
+      "target_amount": 5501538.65,
+      "current_amount": 5351188.48,
+      "deadline": "2033-01-21"
+     },
+     {
+      "id": 7,
+      "name": "Образование",
+      "target_amount": 3420989.02,
+      "current_amount": 3327497.67,
+      "deadline": "2030-01-25"
+     },
+     {
+      "id": 8,
+      "name": "Образование",
+      "target_amount": 2470946.5,
+      "current_amount": 2403418.62,
+      "deadline": "2028-08-22"
+     }
+    ]
+   },
+   "answer": {
+    "status": "ok",
+    "dom": "debt",
+    "res": 0.0,
+    "debt": 1688594.34,
+    "goal": 20967.08,
+    "inv": 0.0,
+    "lump": 2836699.93,
+    "confidence": 1,
+    "verdict": "attack_expensive_debt"
+   },
+   "diag": {
+    "fcf": 1709561.4299999997,
+    "pdn": 0.11955727527458233,
+    "pdn_inf": false,
+    "burn": 4399586.41,
+    "liq_months": 3.6447651360028632,
+    "res_target_m": 3.0,
+    "res_target_rub": 13198759.23,
+    "n_debts": 3,
+    "debt_total": 19327780.56,
+    "pay_sum": 730393.0700000001,
+    "max_rate": 0.35,
+    "max_spread": 0.18719999999999998,
+    "n_toxic": 0,
+    "n_expensive": 2,
+    "n_growing": 0,
+    "n_goals": 8,
+    "goal_gap_total": 1180981.4599999995,
+    "nearest_deadline_m": 25.00205338809035,
+    "n_long_goals": 2,
+    "stress": false,
+    "whale": true,
+    "state_post_lump": 2,
+    "liq_months_post": 3.0,
+    "post_lump_fcf": 1709561.4299999997
+   },
+   "lump_plan": [
+    {
+     "action": "repay_debt",
+     "target": "Потребительский кредит",
+     "amount": 2836699.93
+    }
+   ],
+   "invalid_reasons": []
+  }
+ ],
+ "long_goal": [
+  {
+   "row": 14,
+   "id": "SP5-00014",
+   "category": "long_goal",
+   "input": {
+    "income_total": 39891.69,
+    "expense_total": 35296.55,
+    "bliq": 51973.79,
+    "r_bench": 0.1809,
+    "risk_tolerance": 3,
+    "obligations": [
+     {
+      "id": 1,
+      "name": "Кредитная карта",
+      "amount": 89205.22,
+      "interest_rate": 0.2264,
+      "monthly_payment": 2269.6
+     }
+    ],
+    "goals": [
+     {
+      "id": 1,
+      "name": "Лечение",
+      "target_amount": 116494.73,
+      "current_amount": 26089.94,
+      "deadline": "2030-06-22"
+     },
+     {
+      "id": 2,
+      "name": "Отпуск",
+      "target_amount": 82086.76,
+      "current_amount": 18600.62,
+      "deadline": null
+     },
+     {
+      "id": 3,
+      "name": "Переезд",
+      "target_amount": 208337.32,
+      "current_amount": 45759.0,
+      "deadline": "2030-01-30"
+     },
+     {
+      "id": 4,
+      "name": "Отпуск",
+      "target_amount": 64647.23,
+      "current_amount": 10394.04,
+      "deadline": null
+     },
+     {
+      "id": 5,
+      "name": "Ремонт",
+      "target_amount": 226728.82,
+      "current_amount": 25615.85,
+      "deadline": "2030-07-09"
+     },
+     {
+      "id": 6,
+      "name": "Техника",
+      "target_amount": 19755.57,
+      "current_amount": 2477.04,
+      "deadline": "2027-03-01"
+     }
+    ]
+   },
+   "answer": {
+    "status": "ok",
+    "dom": "reserve",
+    "res": 1627.87,
+    "debt": 0.0,
+    "goal": 697.66,
+    "inv": 0.0,
+    "lump": 0.0,
+    "confidence": 3,
+    "verdict": "build_reserve"
+   },
+   "diag": {
+    "fcf": 2325.540000000001,
+    "pdn": 0.056894054877093446,
+    "pdn_inf": false,
+    "burn": 37566.15,
+    "liq_months": 1.3835271913677605,
+    "res_target_m": 3.0,
+    "res_target_rub": 112698.45000000001,
+    "n_debts": 1,
+    "debt_total": 89205.22,
+    "pay_sum": 2269.6,
+    "max_rate": 0.2264,
+    "max_spread": 0.045499999999999985,
+    "n_toxic": 0,
+    "n_expensive": 0,
+    "n_growing": 0,
+    "n_goals": 6,
+    "goal_gap_total": 589113.9400000001,
+    "nearest_deadline_m": 7.260780287474333,
+    "n_long_goals": 2,
+    "stress": false,
+    "whale": false,
+    "state_post_lump": 1,
+    "liq_months_post": 1.3835271913677605,
+    "post_lump_fcf": 2325.540000000001
+   },
+   "lump_plan": [],
+   "invalid_reasons": []
+  },
+  {
+   "row": 17,
+   "id": "SP5-00017",
+   "category": "long_goal",
+   "input": {
+    "income_total": 59360.39,
+    "expense_total": 40230.64,
+    "bliq": 324227.84,
+    "r_bench": 0.1569,
+    "risk_tolerance": 2,
+    "obligations": [],
+    "goals": [
+     {
+      "id": 1,
+      "name": "Образование",
+      "target_amount": 175150.92,
+      "current_amount": 22231.2,
+      "deadline": "2031-06-08"
+     },
+     {
+      "id": 2,
+      "name": "Обучение детей",
+      "target_amount": 468650.9,
+      "current_amount": 374.93,
+      "deadline": "2030-06-16"
+     },
+     {
+      "id": 3,
+      "name": "Переезд",
+      "target_amount": 354588.88,
+      "current_amount": 14942.45,
+      "deadline": null
+     },
+     {
+      "id": 4,
+      "name": "Отпуск",
+      "target_amount": 53318.22,
+      "current_amount": 9812.38,
+      "deadline": "2033-02-23"
+     }
+    ]
+   },
+   "answer": {
+    "status": "ok",
+    "dom": "goals+",
+    "res": 0.0,
+    "debt": 0.0,
+    "goal": 16003.18,
+    "inv": 3126.56,
+    "lump": 163305.28,
+    "confidence": 4,
+    "verdict": "fund_goals"
+   },
+   "diag": {
+    "fcf": 19129.75,
+    "pdn": 0.0,
+    "pdn_inf": false,
+    "burn": 40230.64,
+    "liq_months": 8.059226500000994,
+    "res_target_m": 4.0,
+    "res_target_rub": 160922.56,
+    "n_debts": 0,
+    "debt_total": 0,
+    "pay_sum": 0,
+    "max_rate": 0.0,
+    "max_spread": null,
+    "n_toxic": 0,
+    "n_expensive": 0,
+    "n_growing": 0,
+    "n_goals": 4,
+    "goal_gap_total": 1004347.9600000001,
+    "nearest_deadline_m": 46.784394250513344,
+    "n_long_goals": 1,
+    "stress": false,
+    "whale": false,
+    "state_post_lump": 2,
+    "liq_months_post": 4.0,
+    "post_lump_fcf": 19129.75
+   },
+   "lump_plan": [
+    {
+     "action": "invest_surplus",
+     "target": "portfolio",
+     "amount": 163305.28
+    }
+   ],
+   "invalid_reasons": []
+  },
+  {
+   "row": 32,
+   "id": "SP5-00032",
+   "category": "long_goal",
+   "input": {
+    "income_total": 39105.91,
+    "expense_total": 28476.15,
+    "bliq": 45637.91,
+    "r_bench": 0.1749,
+    "risk_tolerance": 4,
+    "obligations": [
+     {
+      "id": 1,
+      "name": "Потребительский кредит",
+      "amount": 250779.98,
+      "interest_rate": 0.228,
+      "monthly_payment": 6000.0
+     }
+    ],
+    "goals": [
+     {
+      "id": 1,
+      "name": "Лечение",
+      "target_amount": 29651.93,
+      "current_amount": 4060.78,
+      "deadline": "2028-11-18"
+     },
+     {
+      "id": 2,
+      "name": "Техника",
+      "target_amount": 29951.31,
+      "current_amount": 16096.71,
+      "deadline": null
+     },
+     {
+      "id": 3,
+      "name": "Лечение",
+      "target_amount": 33991.08,
+      "current_amount": 5318.25,
+      "deadline": "2030-01-07"
+     },
+     {
+      "id": 4,
+      "name": "Техника",
+      "target_amount": 21106.02,
+      "current_amount": 5848.07,
+      "deadline": "2028-11-25"
+     }
+    ]
+   },
+   "answer": {
+    "status": "ok",
+    "dom": "reserve",
+    "res": 3240.83,
+    "debt": 0.0,
+    "goal": 1388.92,
+    "inv": 0.0,
+    "lump": 0.0,
+    "confidence": 3,
+    "verdict": "build_reserve"
+   },
+   "diag": {
+    "fcf": 4629.760000000002,
+    "pdn": 0.15342949441657283,
+    "pdn_inf": false,
+    "burn": 34476.15,
+    "liq_months": 1.3237530872791772,
+    "res_target_m": 3.0,
+    "res_target_rub": 103428.45000000001,
+    "n_debts": 1,
+    "debt_total": 250779.98,
+    "pay_sum": 6000.0,
+    "max_rate": 0.228,
+    "max_spread": 0.05310000000000001,
+    "n_toxic": 0,
+    "n_expensive": 0,
+    "n_growing": 0,
+    "n_goals": 4,
+    "goal_gap_total": 83376.53,
+    "nearest_deadline_m": 27.89322381930185,
+    "n_long_goals": 1,
+    "stress": false,
+    "whale": false,
+    "state_post_lump": 1,
+    "liq_months_post": 1.3237530872791772,
+    "post_lump_fcf": 4629.760000000002
+   },
+   "lump_plan": [],
+   "invalid_reasons": []
+  },
+  {
+   "row": 40,
+   "id": "SP5-00040",
+   "category": "long_goal",
+   "input": {
+    "income_total": 84821.44,
+    "expense_total": 59828.29,
+    "bliq": 80845.28,
+    "r_bench": 0.1341,
+    "risk_tolerance": 4,
+    "obligations": [],
+    "goals": [
+     {
+      "id": 1,
+      "name": "Переезд",
+      "target_amount": 183162.18,
+      "current_amount": 76451.36,
+      "deadline": "2034-04-07"
+     },
+     {
+      "id": 2,
+      "name": "Ремонт",
+      "target_amount": 291281.99,
+      "current_amount": 154091.45,
+      "deadline": null
+     }
+    ]
+   },
+   "answer": {
+    "status": "ok",
+    "dom": "reserve",
+    "res": 22696.07,
+    "debt": 0.0,
+    "goal": 2297.07,
+    "inv": 0.0,
+    "lump": 0.0,
+    "confidence": 4,
+    "verdict": "build_reserve"
+   },
+   "diag": {
+    "fcf": 24993.15,
+    "pdn": 0.0,
+    "pdn_inf": false,
+    "burn": 59828.29,
+    "liq_months": 1.3512884957935452,
+    "res_target_m": 3.0,
+    "res_target_rub": 179484.87,
+    "n_debts": 0,
+    "debt_total": 0,
+    "pay_sum": 0,
+    "max_rate": 0.0,
+    "max_spread": null,
+    "n_toxic": 0,
+    "n_expensive": 0,
+    "n_growing": 0,
+    "n_goals": 2,
+    "goal_gap_total": 243901.36,
+    "nearest_deadline_m": 92.48459958932239,
+    "n_long_goals": 1,
+    "stress": false,
+    "whale": false,
+    "state_post_lump": 1,
+    "liq_months_post": 1.3512884957935452,
+    "post_lump_fcf": 24993.15
+   },
+   "lump_plan": [],
+   "invalid_reasons": []
+  },
+  {
+   "row": 74,
+   "id": "SP5-00074",
+   "category": "long_goal",
+   "input": {
+    "income_total": 43519.98,
+    "expense_total": 25585.69,
+    "bliq": 477121.52,
+    "r_bench": 0.1815,
+    "risk_tolerance": 2,
+    "obligations": [],
+    "goals": [
+     {
+      "id": 1,
+      "name": "Переезд",
+      "target_amount": 111289.7,
+      "current_amount": 58480.26,
+      "deadline": null
+     },
+     {
+      "id": 2,
+      "name": "Лечение",
+      "target_amount": 78001.21,
+      "current_amount": 40987.9,
+      "deadline": "2033-12-22"
+     },
+     {
+      "id": 3,
+      "name": "Техника",
+      "target_amount": 55856.92,
+      "current_amount": 29351.57,
+      "deadline": null
+     },
+     {
+      "id": 4,
+      "name": "Лечение",
+      "target_amount": 90413.47,
+      "current_amount": 47510.26,
+      "deadline": "2027-10-24"
+     },
+     {
+      "id": 5,
+      "name": "Свадьба",
+      "target_amount": 716539.9,
+      "current_amount": 376525.76,
+      "deadline": "2031-04-23"
+     },
+     {
+      "id": 6,
+      "name": "Переезд",
+      "target_amount": 290400.4,
+      "current_amount": 152598.94,
+      "deadline": "2029-04-30"
+     },
+     {
+      "id": 7,
+      "name": "Лечение",
+      "target_amount": 34654.93,
+      "current_amount": 18210.4,
+      "deadline": "2031-12-24"
+     }
+    ]
+   },
+   "answer": {
+    "status": "ok",
+    "dom": "goals+",
+    "res": 0.0,
+    "debt": 0.0,
+    "goal": 11439.16,
+    "inv": 6495.12,
+    "lump": 374778.76,
+    "confidence": 4,
+    "verdict": "fund_goals"
+   },
+   "diag": {
+    "fcf": 17934.290000000005,
+    "pdn": 0.0,
+    "pdn_inf": false,
+    "burn": 25585.69,
+    "liq_months": 18.64798330629348,
+    "res_target_m": 4.0,
+    "res_target_rub": 102342.76,
+    "n_debts": 0,
+    "debt_total": 0,
+    "pay_sum": 0,
+    "max_rate": 0.0,
+    "max_spread": null,
+    "n_toxic": 0,
+    "n_expensive": 0,
+    "n_growing": 0,
+    "n_goals": 7,
+    "goal_gap_total": 653491.4400000001,
+    "nearest_deadline_m": 15.047227926078028,
+    "n_long_goals": 2,
+    "stress": false,
+    "whale": false,
+    "state_post_lump": 2,
+    "liq_months_post": 4.000000000000001,
+    "post_lump_fcf": 17934.290000000005
+   },
+   "lump_plan": [
+    {
+     "action": "fund_goal",
+     "target": "Лечение",
+     "amount": 42903.21
+    },
+    {
+     "action": "invest_surplus",
+     "target": "portfolio",
+     "amount": 331875.55
+    }
+   ],
+   "invalid_reasons": []
+  }
+ ]
+}

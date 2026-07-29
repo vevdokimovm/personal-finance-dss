@@ -1,0 +1,9 @@
+{
+ "cards": 12000,
+ "rows": 12000,
+ "checked": 12000,
+ "full_match": 12000,
+ "parse_failures": 0,
+ "mismatch_fields": {},
+ "examples": []
+}

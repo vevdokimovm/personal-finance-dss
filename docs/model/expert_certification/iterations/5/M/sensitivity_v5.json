@@ -1,0 +1,246 @@
+{
+ "artifact": "sensitivity_v5",
+ "metric_base_rows": 12000,
+ "runs": [
+  {
+   "dom_changed": 0.021333333333333333,
+   "status_changed": 0.0,
+   "action_changed": 0.021333333333333333,
+   "bucket_moved_gt10pct_of_ok": 0.0527015592892542,
+   "constant": "MIN_RES_M",
+   "variation": "-20%"
+  },
+  {
+   "dom_changed": 0.026333333333333334,
+   "status_changed": 0.0,
+   "action_changed": 0.026333333333333334,
+   "bucket_moved_gt10pct_of_ok": 0.08570047141303035,
+   "constant": "MIN_RES_M",
+   "variation": "+20%"
+  },
+  {
+   "dom_changed": 0.02725,
+   "status_changed": 0.0,
+   "action_changed": 0.0665,
+   "bucket_moved_gt10pct_of_ok": 0.11180950078568838,
+   "constant": "RES_TARGET_M_ALL",
+   "variation": "-20%"
+  },
+  {
+   "dom_changed": 0.024833333333333332,
+   "status_changed": 0.0,
+   "action_changed": 0.051166666666666666,
+   "bucket_moved_gt10pct_of_ok": 0.08328296869333977,
+   "constant": "RES_TARGET_M_ALL",
+   "variation": "+20%"
+  },
+  {
+   "dom_changed": 0.0036666666666666666,
+   "status_changed": 0.0,
+   "action_changed": 0.012333333333333333,
+   "bucket_moved_gt10pct_of_ok": 0.0397679197389097,
+   "constant": "KEEP_TOX_M",
+   "variation": "-20%"
+  },
+  {
+   "dom_changed": 0.00125,
+   "status_changed": 0.0,
+   "action_changed": 0.011916666666666667,
+   "bucket_moved_gt10pct_of_ok": 0.011241387646561102,
+   "constant": "KEEP_TOX_M",
+   "variation": "+20%"
+  },
+  {
+   "dom_changed": 0.02675,
+   "status_changed": 0.0,
+   "action_changed": 0.07483333333333334,
+   "bucket_moved_gt10pct_of_ok": 0.10068898827511182,
+   "constant": "TOXIC_ABS",
+   "variation": "-20%"
+  },
+  {
+   "dom_changed": 0.0,
+   "status_changed": 0.0,
+   "action_changed": 0.00025,
+   "bucket_moved_gt10pct_of_ok": 0.00024175027196905597,
+   "constant": "TOXIC_ABS",
+   "variation": "+20%"
+  },
+  {
+   "dom_changed": 0.012583333333333334,
+   "status_changed": 0.0,
+   "action_changed": 0.033666666666666664,
+   "bucket_moved_gt10pct_of_ok": 0.04556992626616705,
+   "constant": "TOXIC_SPREAD",
+   "variation": "-20%"
+  },
+  {
+   "dom_changed": 0.0020833333333333333,
+   "status_changed": 0.0,
+   "action_changed": 0.006666666666666667,
+   "bucket_moved_gt10pct_of_ok": 0.007856883838994319,
+   "constant": "TOXIC_SPREAD",
+   "variation": "+20%"
+  },
+  {
+   "dom_changed": 0.013833333333333333,
+   "status_changed": 0.0,
+   "action_changed": 0.024166666666666666,
+   "bucket_moved_gt10pct_of_ok": 0.02562552882871993,
+   "constant": "EXP_SPREAD",
+   "variation": "-20%"
+  },
+  {
+   "dom_changed": 0.014833333333333334,
+   "status_changed": 0.0,
+   "action_changed": 0.026583333333333334,
+   "bucket_moved_gt10pct_of_ok": 0.028043031548410494,
+   "constant": "EXP_SPREAD",
+   "variation": "+20%"
+  },
+  {
+   "dom_changed": 0.0,
+   "status_changed": 0.0,
+   "action_changed": 0.0,
+   "bucket_moved_gt10pct_of_ok": 0.0,
+   "constant": "W_RES_CRISIS_TOX",
+   "variation": "-20%"
+  },
+  {
+   "dom_changed": 0.0,
+   "status_changed": 0.0,
+   "action_changed": 0.0,
+   "bucket_moved_gt10pct_of_ok": 0.0,
+   "constant": "W_RES_CRISIS_TOX",
+   "variation": "+20%"
+  },
+  {
+   "dom_changed": 0.05525,
+   "status_changed": 0.0,
+   "action_changed": 0.05525,
+   "bucket_moved_gt10pct_of_ok": 0.08014021515774206,
+   "constant": "W_RES_CRISIS_EXP",
+   "variation": "-20%"
+  },
+  {
+   "dom_changed": 0.0,
+   "status_changed": 0.0,
+   "action_changed": 0.0,
+   "bucket_moved_gt10pct_of_ok": 0.08038196542971111,
+   "constant": "W_RES_CRISIS_EXP",
+   "variation": "+20%"
+  },
+  {
+   "dom_changed": 0.0,
+   "status_changed": 0.0,
+   "action_changed": 0.0,
+   "bucket_moved_gt10pct_of_ok": 0.14106128369394416,
+   "constant": "W_RES_BUILD_EXP",
+   "variation": "-20%"
+  },
+  {
+   "dom_changed": 0.13541666666666666,
+   "status_changed": 0.0,
+   "action_changed": 0.13541666666666666,
+   "bucket_moved_gt10pct_of_ok": 0.1408195334219751,
+   "constant": "W_RES_BUILD_EXP",
+   "variation": "+20%"
+  },
+  {
+   "dom_changed": 0.0,
+   "status_changed": 0.0,
+   "action_changed": 0.0,
+   "bucket_moved_gt10pct_of_ok": 0.10201861477094162,
+   "constant": "W_RES_BUILD_CHEAP",
+   "variation": "-20%"
+  },
+  {
+   "dom_changed": 0.0,
+   "status_changed": 0.0,
+   "action_changed": 0.0,
+   "bucket_moved_gt10pct_of_ok": 0.11265562673758008,
+   "constant": "W_RES_BUILD_CHEAP",
+   "variation": "+20%"
+  },
+  {
+   "dom_changed": 0.0,
+   "status_changed": 0.0,
+   "action_changed": 0.0,
+   "bucket_moved_gt10pct_of_ok": 0.04460292517829083,
+   "constant": "W_DEBT_POSTRES",
+   "variation": "-20%"
+  },
+  {
+   "dom_changed": 0.0,
+   "status_changed": 0.0,
+   "action_changed": 0.0,
+   "bucket_moved_gt10pct_of_ok": 0.0505258068415327,
+   "constant": "W_DEBT_POSTRES",
+   "variation": "+20%"
+  },
+  {
+   "dom_changed": 0.0,
+   "status_changed": 0.0,
+   "action_changed": 0.0165,
+   "bucket_moved_gt10pct_of_ok": 0.009428260606793182,
+   "constant": "GOAL_LUMP_HORIZON_M",
+   "variation": "-20%"
+  },
+  {
+   "dom_changed": 0.0,
+   "status_changed": 0.0,
+   "action_changed": 0.013916666666666667,
+   "bucket_moved_gt10pct_of_ok": 0.008340384382932432,
+   "constant": "GOAL_LUMP_HORIZON_M",
+   "variation": "+20%"
+  },
+  {
+   "dom_changed": 0.0,
+   "status_changed": 0.0,
+   "action_changed": 0.0,
+   "bucket_moved_gt10pct_of_ok": 0.0033845038075667835,
+   "constant": "HORIZON_OPEN",
+   "variation": "-20%"
+  },
+  {
+   "dom_changed": 0.0,
+   "status_changed": 0.0,
+   "action_changed": 0.0,
+   "bucket_moved_gt10pct_of_ok": 0.0018131270397679197,
+   "constant": "HORIZON_OPEN",
+   "variation": "+20%"
+  },
+  {
+   "dom_changed": 0.00016666666666666666,
+   "status_changed": 0.00025,
+   "action_changed": 0.00025,
+   "bucket_moved_gt10pct_of_ok": 0.00024175027196905597,
+   "constant": "RATE_CAP_MFO",
+   "variation": "-20%"
+  },
+  {
+   "dom_changed": 0.0,
+   "status_changed": 0.0,
+   "action_changed": 0.0,
+   "bucket_moved_gt10pct_of_ok": 0.0,
+   "constant": "RATE_CAP_MFO",
+   "variation": "+20%"
+  },
+  {
+   "dom_changed": 0.0,
+   "status_changed": 0.0,
+   "action_changed": 0.0,
+   "bucket_moved_gt10pct_of_ok": 0.0,
+   "constant": "R_BENCH_HI",
+   "variation": "-20%"
+  },
+  {
+   "dom_changed": 0.0,
+   "status_changed": 0.0,
+   "action_changed": 0.0,
+   "bucket_moved_gt10pct_of_ok": 0.0,
+   "constant": "R_BENCH_HI",
+   "variation": "+20%"
+  }
+ ]
+}

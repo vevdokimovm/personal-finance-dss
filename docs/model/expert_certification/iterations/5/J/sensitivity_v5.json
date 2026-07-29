@@ -1,0 +1,240 @@
+{
+ "n_rows": 12000,
+ "perturbation": "±20% по одной",
+ "results": [
+  {
+   "dom_changed_share": 0.08617,
+   "status_changed_share": 0.0,
+   "lump_changed_share": 0.0,
+   "mean_abs_debt_share_delta": 0.01257,
+   "constant": "S2_exp_debt_share",
+   "base": 0.5,
+   "value": 0.4
+  },
+  {
+   "dom_changed_share": 0.036,
+   "status_changed_share": 0.0,
+   "lump_changed_share": 0.08508,
+   "mean_abs_debt_share_delta": 0.03353,
+   "constant": "TOXIC_RATE",
+   "base": 0.3,
+   "value": 0.36
+  },
+  {
+   "dom_changed_share": 0.03417,
+   "status_changed_share": 0.0,
+   "lump_changed_share": 0.085,
+   "mean_abs_debt_share_delta": 0.03585,
+   "constant": "TOXIC_RATE",
+   "base": 0.3,
+   "value": 0.24
+  },
+  {
+   "dom_changed_share": 0.02375,
+   "status_changed_share": 0.0,
+   "lump_changed_share": 0.0,
+   "mean_abs_debt_share_delta": 0.0298,
+   "constant": "FLOOR",
+   "base": 1.0,
+   "value": 1.2
+  },
+  {
+   "dom_changed_share": 0.01792,
+   "status_changed_share": 0.0,
+   "lump_changed_share": 0.0,
+   "mean_abs_debt_share_delta": 0.00649,
+   "constant": "BAND",
+   "base": 2.0,
+   "value": 1.6
+  },
+  {
+   "dom_changed_share": 0.01508,
+   "status_changed_share": 0.0,
+   "lump_changed_share": 0.0,
+   "mean_abs_debt_share_delta": 0.00972,
+   "constant": "FLOOR",
+   "base": 1.0,
+   "value": 0.8
+  },
+  {
+   "dom_changed_share": 0.01367,
+   "status_changed_share": 0.0,
+   "lump_changed_share": 0.0,
+   "mean_abs_debt_share_delta": 0.00396,
+   "constant": "BAND",
+   "base": 2.0,
+   "value": 2.4
+  },
+  {
+   "dom_changed_share": 0.00933,
+   "status_changed_share": 0.0,
+   "lump_changed_share": 0.08383,
+   "mean_abs_debt_share_delta": 0.01177,
+   "constant": "T_RES_scale",
+   "base": 1.0,
+   "value": 0.8
+  },
+  {
+   "dom_changed_share": 0.00892,
+   "status_changed_share": 0.0,
+   "lump_changed_share": 0.1055,
+   "mean_abs_debt_share_delta": 0.02714,
+   "constant": "LUMP_TOXIC_FLOOR",
+   "base": 1.0,
+   "value": 0.8
+  },
+  {
+   "dom_changed_share": 0.00625,
+   "status_changed_share": 0.0,
+   "lump_changed_share": 0.06708,
+   "mean_abs_debt_share_delta": 0.00857,
+   "constant": "T_RES_scale",
+   "base": 1.0,
+   "value": 1.2
+  },
+  {
+   "dom_changed_share": 0.00233,
+   "status_changed_share": 0.0,
+   "lump_changed_share": 0.09408,
+   "mean_abs_debt_share_delta": 0.00411,
+   "constant": "LUMP_TOXIC_FLOOR",
+   "base": 1.0,
+   "value": 1.2
+  },
+  {
+   "dom_changed_share": 0.00167,
+   "status_changed_share": 0.0,
+   "lump_changed_share": 0.00133,
+   "mean_abs_debt_share_delta": 0.0018,
+   "constant": "EXPENSIVE_SPREAD",
+   "base": 0.01,
+   "value": 0.012
+  },
+  {
+   "dom_changed_share": 0.00142,
+   "status_changed_share": 0.0,
+   "lump_changed_share": 0.00117,
+   "mean_abs_debt_share_delta": 0.00142,
+   "constant": "EXPENSIVE_SPREAD",
+   "base": 0.01,
+   "value": 0.008
+  },
+  {
+   "dom_changed_share": 0.00025,
+   "status_changed_share": 0.0,
+   "lump_changed_share": 0.0,
+   "mean_abs_debt_share_delta": 0.00011,
+   "constant": "LONG_HABIT",
+   "base": 0.1,
+   "value": 0.12
+  },
+  {
+   "dom_changed_share": 0.00025,
+   "status_changed_share": 0.0,
+   "lump_changed_share": 0.0,
+   "mean_abs_debt_share_delta": 0.00076,
+   "constant": "S4_GOAL_CAP",
+   "base": 0.4,
+   "value": 0.48
+  },
+  {
+   "dom_changed_share": 0.00017,
+   "status_changed_share": 0.0,
+   "lump_changed_share": 0.0,
+   "mean_abs_debt_share_delta": 0.00011,
+   "constant": "LONG_HABIT",
+   "base": 0.1,
+   "value": 0.08
+  },
+  {
+   "dom_changed_share": 0.00017,
+   "status_changed_share": 0.0,
+   "lump_changed_share": 0.0,
+   "mean_abs_debt_share_delta": 0.00078,
+   "constant": "S4_GOAL_CAP",
+   "base": 0.4,
+   "value": 0.32
+  },
+  {
+   "dom_changed_share": 8e-05,
+   "status_changed_share": 0.0,
+   "lump_changed_share": 0.0,
+   "mean_abs_debt_share_delta": 9e-05,
+   "constant": "OVERDUE_MONTHS",
+   "base": 6,
+   "value": 7
+  },
+  {
+   "dom_changed_share": 0.0,
+   "status_changed_share": 0.0,
+   "lump_changed_share": 0.04675,
+   "mean_abs_debt_share_delta": 0.0,
+   "constant": "INVEST_EXCESS_MONTHS",
+   "base": 12.0,
+   "value": 9.6
+  },
+  {
+   "dom_changed_share": 0.0,
+   "status_changed_share": 0.0,
+   "lump_changed_share": 0.03925,
+   "mean_abs_debt_share_delta": 0.0,
+   "constant": "INVEST_EXCESS_MONTHS",
+   "base": 12.0,
+   "value": 14.4
+  },
+  {
+   "dom_changed_share": 0.0,
+   "status_changed_share": 0.0,
+   "lump_changed_share": 0.0,
+   "mean_abs_debt_share_delta": 0.0,
+   "constant": "OVERDUE_MONTHS",
+   "base": 6,
+   "value": 5
+  },
+  {
+   "dom_changed_share": 0.0,
+   "status_changed_share": 0.0,
+   "lump_changed_share": 0.0,
+   "mean_abs_debt_share_delta": 0.00077,
+   "constant": "NEAR_DEADLINE_S4",
+   "base": 12,
+   "value": 10
+  },
+  {
+   "dom_changed_share": 0.0,
+   "status_changed_share": 0.0,
+   "lump_changed_share": 0.0,
+   "mean_abs_debt_share_delta": 0.00072,
+   "constant": "NEAR_DEADLINE_S4",
+   "base": 12,
+   "value": 14
+  },
+  {
+   "dom_changed_share": 0.0,
+   "status_changed_share": 0.0,
+   "lump_changed_share": 0.0,
+   "mean_abs_debt_share_delta": 0.01654,
+   "constant": "S2_toxic_debt_share",
+   "base": 0.7,
+   "value": 0.56
+  },
+  {
+   "dom_changed_share": 0.0,
+   "status_changed_share": 0.0,
+   "lump_changed_share": 0.0,
+   "mean_abs_debt_share_delta": 0.01645,
+   "constant": "S2_toxic_debt_share",
+   "base": 0.7,
+   "value": 0.84
+  },
+  {
+   "dom_changed_share": 0.0,
+   "status_changed_share": 0.0,
+   "lump_changed_share": 0.0,
+   "mean_abs_debt_share_delta": 0.01253,
+   "constant": "S2_exp_debt_share",
+   "base": 0.5,
+   "value": 0.6
+  }
+ ]
+}

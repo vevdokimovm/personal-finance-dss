@@ -1,0 +1,813 @@
+{
+ "n": 12000,
+ "status_counts": {
+  "v": {
+   "deficit": 3128,
+   "ok": 8351,
+   "invalid": 521
+  },
+  "m": {
+   "deficit": 3105,
+   "ok": 8273,
+   "invalid": 622
+  },
+  "j": {
+   "deficit": 3105,
+   "ok": 8273,
+   "invalid": 622
+  },
+  "s": {
+   "deficit": 3118,
+   "ok": 8326,
+   "invalid": 556
+  }
+ },
+ "model_status": {
+  "deficit": 3110,
+  "ok": 8290,
+  "invalid": 600
+ },
+ "monthly_dominant": {
+  "rows": 8290,
+  "with_consensus": 6432,
+  "no_consensus": 1858,
+  "model_agrees": 4552,
+  "agreement_pct": 70.77,
+  "top_confusions": [
+   {
+    "consensus": "goals+",
+    "model": "debt",
+    "n": 1066
+   },
+   {
+    "consensus": "reserve",
+    "model": "debt",
+    "n": 365
+   },
+   {
+    "consensus": "debt",
+    "model": "reserve",
+    "n": 256
+   },
+   {
+    "consensus": "reserve",
+    "model": "goals+",
+    "n": 133
+   },
+   {
+    "consensus": "goals+",
+    "model": "reserve",
+    "n": 50
+   },
+   {
+    "consensus": "debt",
+    "model": "goals+",
+    "n": 10
+   }
+  ]
+ },
+ "action_vector": {
+  "rows": 8290,
+  "with_consensus": 6528,
+  "no_consensus": 1762,
+  "model_agrees": 5133,
+  "agreement_pct": 78.63,
+  "top_confusions": [
+   {
+    "consensus": "goals+",
+    "model": "debt",
+    "n": 577
+   },
+   {
+    "consensus": "reserve",
+    "model": "debt",
+    "n": 344
+   },
+   {
+    "consensus": "debt",
+    "model": "reserve",
+    "n": 267
+   },
+   {
+    "consensus": "reserve",
+    "model": "goals+",
+    "n": 133
+   },
+   {
+    "consensus": "goals+",
+    "model": "reserve",
+    "n": 50
+   },
+   {
+    "consensus": "debt",
+    "model": "goals+",
+    "n": 12
+   }
+  ]
+ },
+ "corridor_monthly": {
+  "pairwise": {
+   "v-m": 69.88,
+   "v-j": 57.92,
+   "v-s": 76.65,
+   "m-j": 81.39,
+   "m-s": 72.98,
+   "j-s": 62.85
+  },
+  "pairwise_range": [
+   57.92,
+   81.39
+  ],
+  "leave_one_out": {
+   "v": 83.11,
+   "m": 96.77,
+   "j": 80.53,
+   "s": 89.8
+  },
+  "corridor": [
+   80.53,
+   96.77
+  ]
+ },
+ "corridor_action": {
+  "pairwise": {
+   "v-m": 71.67,
+   "v-j": 58.18,
+   "v-s": 78.06,
+   "m-j": 79.99,
+   "m-s": 73.45,
+   "j-s": 62.52
+  },
+  "pairwise_range": [
+   58.18,
+   79.99
+  ],
+  "leave_one_out": {
+   "v": 84.38,
+   "m": 96.44,
+   "j": 78.75,
+   "s": 89.88
+  },
+  "corridor": [
+   78.75,
+   96.44
+  ]
+ },
+ "by_confidence": {
+  "2": {
+   "n": 911,
+   "agreement_pct": 70.14
+  },
+  "3": {
+   "n": 1862,
+   "agreement_pct": 71.43
+  },
+  "4": {
+   "n": 3655,
+   "agreement_pct": 83.94
+  },
+  "5": {
+   "n": 100,
+   "agreement_pct": 96.0
+  }
+ },
+ "defect_layer": {
+  "d_total": 625,
+  "psk_edge": 25,
+  "other": 600,
+  "model": {
+   "psk_invalid": 0,
+   "other_invalid": 600
+  },
+  "v": {
+   "psk_invalid": 0,
+   "other_invalid": 521,
+   "false_positive_on_valid": 0
+  },
+  "m": {
+   "psk_invalid": 22,
+   "other_invalid": 600,
+   "false_positive_on_valid": 0
+  },
+  "j": {
+   "psk_invalid": 22,
+   "other_invalid": 600,
+   "false_positive_on_valid": 0
+  },
+  "s": {
+   "psk_invalid": 0,
+   "other_invalid": 556,
+   "false_positive_on_valid": 0
+  }
+ },
+ "h5": {
+  "floor_edge_with_near_goal": {
+   "n": 413,
+   "model": {
+    "ok": 328,
+    "reserve_pct": 57.9,
+    "debt_pct": 42.1,
+    "goals_pct": 0.0
+   },
+   "v": {
+    "ok": 328,
+    "reserve_pct": 88.7,
+    "debt_pct": 11.3,
+    "goals_pct": 0.0
+   },
+   "m": {
+    "ok": 328,
+    "reserve_pct": 41.8,
+    "debt_pct": 57.9,
+    "goals_pct": 0.3
+   },
+   "j": {
+    "ok": 328,
+    "reserve_pct": 22.3,
+    "debt_pct": 76.8,
+    "goals_pct": 0.9
+   },
+   "s": {
+    "ok": 328,
+    "reserve_pct": 30.2,
+    "debt_pct": 1.5,
+    "goals_pct": 68.3
+   }
+  },
+  "floor_edge_no_near_goal": {
+   "n": 419,
+   "model": {
+    "ok": 326,
+    "reserve_pct": 55.8,
+    "debt_pct": 42.9,
+    "goals_pct": 1.2
+   },
+   "v": {
+    "ok": 326,
+    "reserve_pct": 88.7,
+    "debt_pct": 11.3,
+    "goals_pct": 0.0
+   },
+   "m": {
+    "ok": 326,
+    "reserve_pct": 44.5,
+    "debt_pct": 55.2,
+    "goals_pct": 0.3
+   },
+   "j": {
+    "ok": 326,
+    "reserve_pct": 25.5,
+    "debt_pct": 74.5,
+    "goals_pct": 0.0
+   },
+   "s": {
+    "ok": 326,
+    "reserve_pct": 89.3,
+    "debt_pct": 10.7,
+    "goals_pct": 0.0
+   }
+  },
+  "whale_thin_cushion": {
+   "n": 432,
+   "model": {
+    "ok": 432,
+    "reserve_pct": 51.4,
+    "debt_pct": 47.7,
+    "goals_pct": 0.9
+   },
+   "v": {
+    "ok": 432,
+    "reserve_pct": 89.6,
+    "debt_pct": 9.3,
+    "goals_pct": 1.2
+   },
+   "m": {
+    "ok": 432,
+    "reserve_pct": 34.5,
+    "debt_pct": 65.0,
+    "goals_pct": 0.5
+   },
+   "j": {
+    "ok": 432,
+    "reserve_pct": 15.7,
+    "debt_pct": 84.3,
+    "goals_pct": 0.0
+   },
+   "s": {
+    "ok": 432,
+    "reserve_pct": 3.9,
+    "debt_pct": 69.7,
+    "goals_pct": 26.4
+   }
+  },
+  "h5_1_gap_reserve_pp": {
+   "model": 2.1,
+   "v": 0.0,
+   "m": -2.7,
+   "j": -3.2,
+   "s": -59.1
+  }
+ },
+ "profiles": {
+  "v": {
+   "ok": 8351,
+   "monthly_share": {
+    "debt": 1.7,
+    "reserve": 1.5,
+    "goals+": 96.9
+   },
+   "lump_share_pct": 42.4,
+   "lump_median": 324060.58,
+   "lump_direction_share": {
+    "debt": 1.9,
+    "reserve": 0.0,
+    "goals+": 98.1
+   },
+   "act_dom": {
+    "reserve": 4783,
+    "goals+": 2235,
+    "debt": 1245,
+    "none": 88
+   }
+  },
+  "m": {
+   "ok": 8273,
+   "monthly_share": {
+    "debt": 1.2,
+    "reserve": 21.0,
+    "goals+": 77.8
+   },
+   "lump_share_pct": 41.0,
+   "lump_median": 246813.35,
+   "lump_direction_share": {
+    "debt": 2.0,
+    "reserve": 0.0,
+    "goals+": 98.0
+   },
+   "act_dom": {
+    "debt": 2992,
+    "reserve": 2715,
+    "goals+": 2482,
+    "none": 84
+   }
+  },
+  "j": {
+   "ok": 8273,
+   "monthly_share": {
+    "debt": 1.9,
+    "reserve": 23.1,
+    "goals+": 75.0
+   },
+   "lump_share_pct": 45.1,
+   "lump_median": 177855.37,
+   "lump_direction_share": {
+    "debt": 12.1,
+    "reserve": 0.0,
+    "goals+": 87.9
+   },
+   "act_dom": {
+    "debt": 4058,
+    "goals+": 2354,
+    "reserve": 1787,
+    "none": 74
+   }
+  },
+  "s": {
+   "ok": 8326,
+   "monthly_share": {
+    "debt": 2.6,
+    "reserve": 0.5,
+    "goals+": 96.9
+   },
+   "lump_share_pct": 42.7,
+   "lump_median": 461444.4,
+   "lump_direction_share": {
+    "debt": 1.5,
+    "reserve": 0.0,
+    "goals+": 98.5
+   },
+   "act_dom": {
+    "reserve": 3546,
+    "goals+": 2863,
+    "debt": 1820,
+    "none": 97
+   }
+  },
+  "model": {
+   "ok": 8290,
+   "monthly_share": {
+    "debt": 4.0,
+    "reserve": 23.2,
+    "goals+": 72.8
+   },
+   "lump_share_pct": 32.8,
+   "lump_median": 321822.98,
+   "lump_direction_share": {
+    "debt": 3.7,
+    "reserve": 0.0,
+    "goals+": 96.3
+   },
+   "act_dom": {
+    "debt": 3407,
+    "reserve": 3037,
+    "goals+": 1750,
+    "none": 96
+   }
+  },
+  "_ok_universe": 11400
+ },
+ "by_layer": {
+  "A": {
+   "rows": 3059,
+   "with_consensus": 2482,
+   "no_consensus": 577,
+   "model_agrees": 2068,
+   "agreement_pct": 83.32,
+   "top_confusions": [
+    {
+     "consensus": "reserve",
+     "model": "debt",
+     "n": 141
+    },
+    {
+     "consensus": "goals+",
+     "model": "debt",
+     "n": 115
+    },
+    {
+     "consensus": "debt",
+     "model": "reserve",
+     "n": 70
+    },
+    {
+     "consensus": "reserve",
+     "model": "goals+",
+     "n": 69
+    },
+    {
+     "consensus": "goals+",
+     "model": "reserve",
+     "n": 12
+    },
+    {
+     "consensus": "debt",
+     "model": "goals+",
+     "n": 7
+    }
+   ]
+  },
+  "B": {
+   "rows": 1607,
+   "with_consensus": 1517,
+   "no_consensus": 90,
+   "model_agrees": 1116,
+   "agreement_pct": 73.57,
+   "top_confusions": [
+    {
+     "consensus": "goals+",
+     "model": "debt",
+     "n": 338
+    },
+    {
+     "consensus": "debt",
+     "model": "reserve",
+     "n": 22
+    },
+    {
+     "consensus": "reserve",
+     "model": "debt",
+     "n": 20
+    },
+    {
+     "consensus": "goals+",
+     "model": "reserve",
+     "n": 18
+    },
+    {
+     "consensus": "reserve",
+     "model": "goals+",
+     "n": 3
+    }
+   ]
+  },
+  "C": {
+   "rows": 3118,
+   "with_consensus": 2168,
+   "no_consensus": 950,
+   "model_agrees": 1667,
+   "agreement_pct": 76.89,
+   "top_confusions": [
+    {
+     "consensus": "debt",
+     "model": "reserve",
+     "n": 152
+    },
+    {
+     "consensus": "reserve",
+     "model": "debt",
+     "n": 151
+    },
+    {
+     "consensus": "goals+",
+     "model": "debt",
+     "n": 111
+    },
+    {
+     "consensus": "reserve",
+     "model": "goals+",
+     "n": 50
+    },
+    {
+     "consensus": "goals+",
+     "model": "reserve",
+     "n": 20
+    },
+    {
+     "consensus": "debt",
+     "model": "none",
+     "n": 12
+    }
+   ]
+  },
+  "D": {
+   "rows": 19,
+   "with_consensus": 1,
+   "no_consensus": 18,
+   "model_agrees": 1,
+   "agreement_pct": 100.0,
+   "top_confusions": []
+  },
+  "E": {
+   "rows": 487,
+   "with_consensus": 360,
+   "no_consensus": 127,
+   "model_agrees": 281,
+   "agreement_pct": 78.06,
+   "top_confusions": [
+    {
+     "consensus": "reserve",
+     "model": "debt",
+     "n": 32
+    },
+    {
+     "consensus": "debt",
+     "model": "reserve",
+     "n": 23
+    },
+    {
+     "consensus": "goals+",
+     "model": "debt",
+     "n": 13
+    },
+    {
+     "consensus": "reserve",
+     "model": "goals+",
+     "n": 11
+    }
+   ]
+  }
+ },
+ "by_family": {
+  "deadline_edges": {
+   "rows": 394,
+   "with_consensus": 283,
+   "no_consensus": 111,
+   "model_agrees": 244,
+   "agreement_pct": 86.22,
+   "top_confusions": [
+    {
+     "consensus": "reserve",
+     "model": "debt",
+     "n": 12
+    },
+    {
+     "consensus": "goals+",
+     "model": "debt",
+     "n": 10
+    },
+    {
+     "consensus": "debt",
+     "model": "reserve",
+     "n": 7
+    },
+    {
+     "consensus": "reserve",
+     "model": "goals+",
+     "n": 7
+    },
+    {
+     "consensus": "goals+",
+     "model": "reserve",
+     "n": 3
+    }
+   ]
+  },
+  "debt_edges": {
+   "rows": 347,
+   "with_consensus": 239,
+   "no_consensus": 108,
+   "model_agrees": 169,
+   "agreement_pct": 70.71,
+   "top_confusions": [
+    {
+     "consensus": "reserve",
+     "model": "debt",
+     "n": 28
+    },
+    {
+     "consensus": "goals+",
+     "model": "debt",
+     "n": 20
+    },
+    {
+     "consensus": "debt",
+     "model": "reserve",
+     "n": 13
+    },
+    {
+     "consensus": "reserve",
+     "model": "goals+",
+     "n": 6
+    },
+    {
+     "consensus": "debt",
+     "model": "goals+",
+     "n": 3
+    }
+   ]
+  },
+  "defects": {
+   "rows": 19,
+   "with_consensus": 1,
+   "no_consensus": 18,
+   "model_agrees": 1,
+   "agreement_pct": 100.0,
+   "top_confusions": []
+  },
+  "floor_edge": {
+   "rows": 1086,
+   "with_consensus": 637,
+   "no_consensus": 449,
+   "model_agrees": 444,
+   "agreement_pct": 69.7,
+   "top_confusions": [
+    {
+     "consensus": "debt",
+     "model": "reserve",
+     "n": 115
+    },
+    {
+     "consensus": "reserve",
+     "model": "debt",
+     "n": 68
+    },
+    {
+     "consensus": "reserve",
+     "model": "goals+",
+     "n": 6
+    },
+    {
+     "consensus": "goals+",
+     "model": "debt",
+     "n": 2
+    },
+    {
+     "consensus": "debt",
+     "model": "goals+",
+     "n": 2
+    }
+   ]
+  },
+  "flow_edges": {
+   "rows": 208,
+   "with_consensus": 114,
+   "no_consensus": 94,
+   "model_agrees": 76,
+   "agreement_pct": 66.67,
+   "top_confusions": [
+    {
+     "consensus": "goals+",
+     "model": "debt",
+     "n": 20
+    },
+    {
+     "consensus": "debt",
+     "model": "none",
+     "n": 12
+    },
+    {
+     "consensus": "reserve",
+     "model": "debt",
+     "n": 3
+    },
+    {
+     "consensus": "goals+",
+     "model": "reserve",
+     "n": 2
+    },
+    {
+     "consensus": "reserve",
+     "model": "goals+",
+     "n": 1
+    }
+   ]
+  },
+  "goal_edges": {
+   "rows": 364,
+   "with_consensus": 285,
+   "no_consensus": 79,
+   "model_agrees": 244,
+   "agreement_pct": 85.61,
+   "top_confusions": [
+    {
+     "consensus": "goals+",
+     "model": "debt",
+     "n": 14
+    },
+    {
+     "consensus": "reserve",
+     "model": "debt",
+     "n": 12
+    },
+    {
+     "consensus": "debt",
+     "model": "reserve",
+     "n": 9
+    },
+    {
+     "consensus": "reserve",
+     "model": "goals+",
+     "n": 5
+    },
+    {
+     "consensus": "goals+",
+     "model": "reserve",
+     "n": 1
+    }
+   ]
+  },
+  "integrity_edges": {
+   "rows": 343,
+   "with_consensus": 274,
+   "no_consensus": 69,
+   "model_agrees": 194,
+   "agreement_pct": 70.8,
+   "top_confusions": [
+    {
+     "consensus": "goals+",
+     "model": "debt",
+     "n": 45
+    },
+    {
+     "consensus": "reserve",
+     "model": "debt",
+     "n": 12
+    },
+    {
+     "consensus": "goals+",
+     "model": "reserve",
+     "n": 10
+    },
+    {
+     "consensus": "debt",
+     "model": "reserve",
+     "n": 7
+    },
+    {
+     "consensus": "reserve",
+     "model": "goals+",
+     "n": 6
+    }
+   ]
+  },
+  "liquidity_edges": {
+   "rows": 376,
+   "with_consensus": 336,
+   "no_consensus": 40,
+   "model_agrees": 296,
+   "agreement_pct": 88.1,
+   "top_confusions": [
+    {
+     "consensus": "reserve",
+     "model": "goals+",
+     "n": 19
+    },
+    {
+     "consensus": "reserve",
+     "model": "debt",
+     "n": 16
+    },
+    {
+     "consensus": "goals+",
+     "model": "reserve",
+     "n": 4
+    },
+    {
+     "consensus": "debt",
+     "model": "reserve",
+     "n": 1
+    }
+   ]
+  }
+ }
+}

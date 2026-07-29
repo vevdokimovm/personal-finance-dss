@@ -1,0 +1,95 @@
+{
+ "all_ok": true,
+ "checks": [
+  {
+   "check": "CSV: нет CRLF, только LF",
+   "ok": true,
+   "detail": "CR bytes: 0"
+  },
+  {
+   "check": "CSV: шапка контракта",
+   "ok": true,
+   "detail": "['id', 'status', 'dom', 'res', 'debt', 'goal', 'inv', 'lump', 'confidence']"
+  },
+  {
+   "check": "CSV: ровно 12 000 строк",
+   "ok": true,
+   "detail": "12000"
+  },
+  {
+   "check": "вход: ровно 12 000 записей",
+   "ok": true,
+   "detail": "12000"
+  },
+  {
+   "check": "порядок id строка-в-строку",
+   "ok": true,
+   "detail": "расхождений: 0"
+  },
+  {
+   "check": "enum status",
+   "ok": true,
+   "detail": "0"
+  },
+  {
+   "check": "enum dom",
+   "ok": true,
+   "detail": "0"
+  },
+  {
+   "check": "confidence целое 1–5",
+   "ok": true,
+   "detail": "0"
+  },
+  {
+   "check": "числа парсятся, нет отрицательных",
+   "ok": true,
+   "detail": "neg=0 parse=0"
+  },
+  {
+   "check": "бюджет res+debt+goal+inv ≤ max(0, FCF)",
+   "ok": true,
+   "detail": "нарушений: 0, худшее превышение: 0.0000"
+  },
+  {
+   "check": "форма invalid: none + нули",
+   "ok": true,
+   "detail": "0"
+  },
+  {
+   "check": "инвариант дефицита: месячные нули",
+   "ok": true,
+   "detail": "0"
+  },
+  {
+   "check": "recommendations: 12 000 строк",
+   "ok": true,
+   "detail": "12000"
+  },
+  {
+   "check": "recommendations: выровнены с CSV (row/id/status)",
+   "ok": true,
+   "detail": "0"
+  },
+  {
+   "check": "lump == сумме lump_sum_plan",
+   "ok": true,
+   "detail": "0"
+  },
+  {
+   "check": "summary: 12 000 строк + шапка",
+   "ok": true,
+   "detail": "12001"
+  },
+  {
+   "check": "summary: id выровнены",
+   "ok": true,
+   "detail": "0"
+  },
+  {
+   "check": "JSONL == карточки (обязательная сверка)",
+   "ok": true,
+   "detail": "полей сравнено: 231953, расхождений: 0"
+  }
+ ]
+}

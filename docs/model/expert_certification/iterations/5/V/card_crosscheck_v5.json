@@ -1,0 +1,43 @@
+{
+ "document": "card_crosscheck_v5",
+ "cards_parsed": 12000,
+ "json_rows": 12000,
+ "fields_compared": {
+  "order": 0,
+  "income": 11910,
+  "expense": 11947,
+  "bliq": 11987,
+  "r_bench": 12000,
+  "n_obligations": 12000,
+  "n_goals": 12000,
+  "obl_name": 20537,
+  "obl_amount": 20480,
+  "obl_rate": 20477,
+  "obl_payment": 20521,
+  "goal_name": 37935,
+  "goal_target": 37924,
+  "goal_current": 37935,
+  "goal_deadline": 37817
+ },
+ "values_skipped_as_broken_in_cards": 397,
+ "mismatches": {
+  "order": 0,
+  "income": 0,
+  "expense": 0,
+  "bliq": 0,
+  "r_bench": 0,
+  "n_obligations": 0,
+  "n_goals": 0,
+  "obl_name": 0,
+  "obl_amount": 0,
+  "obl_rate": 0,
+  "obl_payment": 0,
+  "goal_name": 0,
+  "goal_target": 0,
+  "goal_current": 0,
+  "goal_deadline": 0,
+  "count": 0
+ },
+ "examples": {},
+ "verdict": "PASS"
+}

@@ -1,0 +1,26 @@
+{
+  "expert": "independent-round5",
+  "date": "2026-07-23",
+  "verdict": "ACCEPTED",
+  "gates": [
+    {"id": "G1", "what": "структура 4×3000 + meta", "evidence": {"rows": 12000, "meta_parts_consistent": true}, "status": "PASS"},
+    {"id": "G2", "what": "JSON-парсинг", "evidence": {"parse_failures": 0}, "status": "PASS"},
+    {"id": "G3", "what": "дубли id / позиционный контракт", "evidence": {"pairs": 102, "triples": 31, "pairs_both_broken": 9, "pairs_mixed": 19, "pairs_both_valid": 74}, "status": "PASS"},
+    {"id": "G4", "what": "декларации идентичны в частях", "evidence": {"identical": true}, "status": "PASS"},
+    {"id": "G5", "what": "доля дефектов 4.2–5.8%, не круглая", "evidence": {"my_invalid": 622, "share": 0.05183}, "status": "PASS"},
+    {"id": "G6", "what": "k_goal факт == декларация", "evidence": {"mine": [0.19909, 4.99812], "declared": [0.1991, 4.9981]}, "status": "PASS"},
+    {"id": "G7", "what": "стресс-магнитуды 0.69%", "evidence": {"mine_1e9": 0.00692, "declared": 0.0069}, "status": "PASS"},
+    {"id": "G8", "what": "вне-спековые остатки 12.01%", "evidence": {"mine": 0.12441, "n_loans": 19476}, "status": "PASS"},
+    {"id": "G9", "what": "легальные лимиты МФО", "evidence": {"max_mfo_amount": 1000000.0, "max_mfo_per_portrait": 3}, "status": "PASS"},
+    {"id": "G10", "what": "кромка ПСК", "evidence": {"mfo_290_292": 61, "mfo_probes": [2.93, 2.95, 2.95], "rate_3_00_on_bank_products": 7}, "status": "PASS_NOTE", "finding": "F1"},
+    {"id": "G11", "what": "длинные горизонты", "evidence": {"goals_gt_10y": 1560, "goals_gt_20y": 741, "max_months": 359}, "status": "PASS"},
+    {"id": "G12", "what": "карта мин-платёж 2–5%", "evidence": {"share_in_band": 0.9115, "range": [0.0104, 0.067]}, "status": "PASS_NOTE", "finding": "F3"},
+    {"id": "G13", "what": "карточки == JSONL", "evidence": {"rows": 12000, "fields_compared": 231953, "mismatches": 0}, "status": "PASS"},
+    {"id": "G14", "what": "точная арифметика границ", "evidence": {"fcf_zero_exact": 122, "pdn_040_exact": 29, "target_eq_current": 56}, "status": "PASS"},
+    {"id": "G15", "what": "риск равномерен, r_bench непрерывен", "evidence": {"risk_range": [2236, 2303], "r_bench_distinct": 1394}, "status": "PASS"},
+    {"id": "G16", "what": "слой E обнаружим", "evidence": {"near_pairs": 171, "m5_scaled_pairs": 44}, "status": "PASS"},
+    {"id": "G17", "what": "популяция осмысленна", "evidence": {"status_preview": {"ok": 8273, "deficit": 3105, "invalid": 622}, "median_income": 90809.58}, "status": "PASS"},
+    {"id": "G18", "what": "перефинансированная цель присутствует", "evidence": {"overfunded_goals": 0, "goals_total": 44541}, "status": "WARN", "finding": "F2"},
+    {"id": "G19", "what": "KS лог-нормальности воспроизводим", "evidence": {"declared": 0.0183, "my_blind_mixture_approx": 0.1007}, "status": "NOT_VERIFIABLE_BLIND", "finding": "F4"}
+  ]
+}

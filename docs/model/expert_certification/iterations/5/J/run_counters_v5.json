@@ -1,0 +1,39 @@
+{
+ "n": 12000,
+ "status": {
+  "deficit": 3105,
+  "ok": 8273,
+  "invalid": 622
+ },
+ "dom": {
+  "none": 3849,
+  "debt": 3705,
+  "reserve": 1820,
+  "goals+": 2626
+ },
+ "confidence": {
+  "5": 3062,
+  "4": 5479,
+  "3": 2515,
+  "2": 660,
+  "1": 284
+ },
+ "assumption_counters": {
+  "A_mfo_illegal_valid_rows": 3,
+  "A_bank_rate_invalid_rows": 40,
+  "A_overdue_goal_rows": 92,
+  "A_deadline_today_tomorrow_goals": 151,
+  "A_zero_flow_rows": 122,
+  "A_deficit_rescue_rows": 1836,
+  "A_deficit_no_rescue_rows": 1269,
+  "A_card_partial_rows": 246,
+  "A_coerced_rows": 0,
+  "A_critical_goal_carve_rows": 171,
+  "A_burn_zero_rows": 25,
+  "A_invest_surplus_rows": 472,
+  "A_missing_id_rows": 0,
+  "A_long_habit_rows": 749,
+  "A_lump_rows": 5417,
+  "A_undated_goal_flow_rows": 1057
+ }
+}
