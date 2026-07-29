@@ -62,6 +62,8 @@ python -m tools.model_validation.expert_agreement \
 | `expert_portraits_v4_part1..4.jsonl.gz` | СЛЕПОЙ пакет v4 для раунда 4 (без меток; валидные дубли id и мусор слоя D доживают до эксперта намеренно). Бриф — `docs/model/expert_brief_v4.md`, методичка — `docs/model/expert_certification/testset_methodology.md` |
 | `portraits_v4_coordinator_key.csv.gz` | Ключ координатора v4: id → layer/kind/**family**/pair_*/expected_error/id_override; раскрывается экспертам ПОСЛЕ сдачи (протокол §4) |
 | `model_outcomes_v3_4_0_on_v4.csv.gz` + `model_results_v3_4_0_on_v4.md` | Прогон модели v3.4.0 по датасету v4 (ok 7334 / deficit 4066 / invalid 600; D 600/600, 0 ложных; метаморфика 0 нарушений из 300 пар; lump 38%). Комплект и нейминг — стандарт `docs/model/model_run_output_standard.md`, команда `dataset_export run` |
+| `expert_pack_v5/` + `coordinator_key_v5.csv.gz` | Слепой пакет v5 (СБОРКА 2, seed 20260723) и ключ координатора: id -> layer/kind/family/pair_*/expected_error. Роздан экспертам как `5.zip`; тождество розданного и канона доказано sha256 (v6.22.0) |
+| `model_outcomes_v3_5_0_on_v5.csv.gz` + `model_results_v3_5_0_on_v5.md` | Прогон модели v3.5.0 по датасету v5 — модельная половина раунда 5 (ok 8290 / deficit 3110 / invalid 600; слой D 600/625 при 0 ложных, все 25 пропусков — класс `near_rate_above_cap`, вопрос В1; метаморфика 309 пар, 0 нарушений; lump 32.8%). Разбор — `docs/model/expert_certification/iterations/5/round5_model_half.md`, инструмент — `tools/model_validation/round5_model_half_analysis.py` |
 
 Регенерация любого файла: `tools/model_validation/dataset_export.py`
 (portraits / outcomes / expert-pack / markdown, детерминировано по seed+version).

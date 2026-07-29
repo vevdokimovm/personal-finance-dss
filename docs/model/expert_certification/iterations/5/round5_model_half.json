@@ -1,0 +1,511 @@
+{
+ "layers_status": {
+  "A": {
+   "deficit": 647,
+   "ok": 3059
+  },
+  "B": {
+   "ok": 1607,
+   "deficit": 1500
+  },
+  "C": {
+   "deficit": 826,
+   "ok": 3118
+  },
+  "D": {
+   "invalid": 600,
+   "deficit": 6,
+   "ok": 19
+  },
+  "E": {
+   "ok": 487,
+   "deficit": 131
+  }
+ },
+ "layers_dom_ok": {
+  "A": {
+   "reserve": 1319,
+   "debt": 1325,
+   "goals+": 415
+  },
+  "B": {
+   "debt": 918,
+   "reserve": 158,
+   "goals+": 531
+  },
+  "C": {
+   "reserve": 1384,
+   "debt": 1251,
+   "none": 122,
+   "goals+": 361
+  },
+  "D": {
+   "debt": 15,
+   "reserve": 4
+  },
+  "E": {
+   "reserve": 172,
+   "debt": 283,
+   "goals+": 32
+  }
+ },
+ "d_layer": {
+  "total": 625,
+  "invalid": 600,
+  "missed": 25,
+  "missed_by_expected_error": {
+   "obligations.interest_rate:near_rate_above_cap": {
+    "missed": 25,
+    "total": 25
+   }
+  },
+  "missed_sample": [
+   {
+    "id": "SP5-00593",
+    "kind": "near_rate_above_cap",
+    "expected_error": "obligations.interest_rate:near_rate_above_cap",
+    "model_status": "deficit",
+    "dom": "none"
+   },
+   {
+    "id": "SP5-00613",
+    "kind": "near_rate_above_cap",
+    "expected_error": "obligations.interest_rate:near_rate_above_cap",
+    "model_status": "ok",
+    "dom": "debt"
+   },
+   {
+    "id": "SP5-00959",
+    "kind": "near_rate_above_cap",
+    "expected_error": "obligations.interest_rate:near_rate_above_cap",
+    "model_status": "ok",
+    "dom": "debt"
+   },
+   {
+    "id": "SP5-00996",
+    "kind": "near_rate_above_cap",
+    "expected_error": "obligations.interest_rate:near_rate_above_cap",
+    "model_status": "ok",
+    "dom": "debt"
+   },
+   {
+    "id": "SP5-02093",
+    "kind": "near_rate_above_cap",
+    "expected_error": "obligations.interest_rate:near_rate_above_cap",
+    "model_status": "ok",
+    "dom": "reserve"
+   },
+   {
+    "id": "SP5-03296",
+    "kind": "near_rate_above_cap",
+    "expected_error": "obligations.interest_rate:near_rate_above_cap",
+    "model_status": "ok",
+    "dom": "debt"
+   },
+   {
+    "id": "SP5-03560",
+    "kind": "near_rate_above_cap",
+    "expected_error": "obligations.interest_rate:near_rate_above_cap",
+    "model_status": "ok",
+    "dom": "debt"
+   },
+   {
+    "id": "SP5-04206",
+    "kind": "near_rate_above_cap",
+    "expected_error": "obligations.interest_rate:near_rate_above_cap",
+    "model_status": "ok",
+    "dom": "reserve"
+   },
+   {
+    "id": "SP5-05198",
+    "kind": "near_rate_above_cap",
+    "expected_error": "obligations.interest_rate:near_rate_above_cap",
+    "model_status": "ok",
+    "dom": "debt"
+   },
+   {
+    "id": "SP5-06131",
+    "kind": "near_rate_above_cap",
+    "expected_error": "obligations.interest_rate:near_rate_above_cap",
+    "model_status": "deficit",
+    "dom": "none"
+   }
+  ],
+  "invalid_outside_d": [],
+  "false_positives_on_valid": 0,
+  "reasons": {
+   "кредит": 192,
+   "income_total не число": 75,
+   "непарсящаяся дата дедлайна": 56,
+   "expense_total не число": 53,
+   "income_total отрицательное": 49,
+   "risk_tolerance вне 1..5": 32,
+   "цель": 29,
+   "r_bench вне (0; 1)": 26,
+   "bliq отрицательное": 21,
+   "у цели отсутствует поле deadline": 21,
+   "expense_total отрицательное": 18,
+   "отсутствует поле income_total": 15,
+   "bliq не число": 13
+  }
+ },
+ "c_kinds_status": {
+  "bliq_zero": {
+   "ok": 96,
+   "deficit": 19
+  },
+  "card_minimum_payment": {
+   "deficit": 2,
+   "ok": 57
+  },
+  "cheap_debts_only": {
+   "ok": 52,
+   "deficit": 6
+  },
+  "deadline_deep_overdue": {
+   "ok": 81,
+   "deficit": 22
+  },
+  "deadline_today_exact": {
+   "ok": 72,
+   "deficit": 16
+  },
+  "deadline_tomorrow": {
+   "ok": 78,
+   "deficit": 9
+  },
+  "deficit_flow": {
+   "deficit": 109
+  },
+  "duplicate_id_triple": {
+   "ok": 76,
+   "deficit": 17
+  },
+  "duplicate_id_valid_pair": {
+   "ok": 90,
+   "deficit": 58
+  },
+  "eight_goals_same_deadline": {
+   "deficit": 8,
+   "ok": 51
+  },
+  "fcf_zero_exact": {
+   "ok": 122
+  },
+  "five_goals": {
+   "ok": 61,
+   "deficit": 12
+  },
+  "floor_edge_no_near_goal": {
+   "ok": 326,
+   "deficit": 93
+  },
+  "floor_edge_with_near_goal": {
+   "ok": 328,
+   "deficit": 85
+  },
+  "goal_at_minimum": {
+   "ok": 53,
+   "deficit": 11
+  },
+  "growing_debt": {
+   "ok": 46,
+   "deficit": 4
+  },
+  "horizon_10y": {
+   "ok": 82,
+   "deficit": 19
+  },
+  "horizon_30y_retirement": {
+   "ok": 81,
+   "deficit": 14
+  },
+  "huge_bliq": {
+   "deficit": 22,
+   "ok": 71
+  },
+  "magnitude_stress": {
+   "ok": 83
+  },
+  "magnitude_whale": {
+   "ok": 94
+  },
+  "no_goals_no_debts": {
+   "ok": 106
+  },
+  "overfunded_goal": {
+   "ok": 44,
+   "deficit": 13
+  },
+  "overleveraged": {
+   "deficit": 66,
+   "ok": 9
+  },
+  "pdn_boundary": {
+   "ok": 103
+  },
+  "psk_edge_valid": {
+   "ok": 48,
+   "deficit": 11
+  },
+  "rate_eq_bench_exact": {
+   "ok": 44,
+   "deficit": 25
+  },
+  "rate_near_bench": {
+   "deficit": 24,
+   "ok": 41
+  },
+  "seven_goals": {
+   "deficit": 8,
+   "ok": 58
+  },
+  "six_goals": {
+   "ok": 52,
+   "deficit": 10
+  },
+  "target_eq_current_kopeck": {
+   "deficit": 12,
+   "ok": 45
+  },
+  "toxic_mfo_thin_cushion": {
+   "ok": 50,
+   "deficit": 19
+  },
+  "whale_thin_cushion": {
+   "ok": 432
+  },
+  "zero_expenses": {
+   "ok": 86
+  },
+  "zero_income": {
+   "deficit": 112
+  }
+ },
+ "families": {
+  "deadline_edges": {
+   "n": 474,
+   "status": {
+    "ok": 394,
+    "deficit": 80
+   },
+   "dom_ok": {
+    "debt": 160,
+    "reserve": 171,
+    "goals+": 63
+   }
+  },
+  "debt_edges": {
+   "n": 504,
+   "status": {
+    "deficit": 157,
+    "ok": 347
+   },
+   "dom_ok": {
+    "reserve": 147,
+    "debt": 167,
+    "goals+": 33
+   }
+  },
+  "defects": {
+   "n": 285,
+   "status": {
+    "invalid": 260,
+    "deficit": 6,
+    "ok": 19
+   },
+   "dom_ok": {
+    "debt": 15,
+    "reserve": 4
+   }
+  },
+  "floor_edge": {
+   "n": 1264,
+   "status": {
+    "ok": 1086,
+    "deficit": 178
+   },
+   "dom_ok": {
+    "reserve": 594,
+    "debt": 484,
+    "goals+": 8
+   }
+  },
+  "flow_edges": {
+   "n": 429,
+   "status": {
+    "deficit": 221,
+    "ok": 208
+   },
+   "dom_ok": {
+    "none": 122,
+    "goals+": 39,
+    "debt": 45,
+    "reserve": 2
+   }
+  },
+  "goal_edges": {
+   "n": 438,
+   "status": {
+    "deficit": 74,
+    "ok": 364
+   },
+   "dom_ok": {
+    "reserve": 166,
+    "debt": 162,
+    "goals+": 36
+   }
+  },
+  "integrity_edges": {
+   "n": 418,
+   "status": {
+    "ok": 343,
+    "deficit": 75
+   },
+   "dom_ok": {
+    "debt": 135,
+    "goals+": 102,
+    "reserve": 106
+   }
+  },
+  "liquidity_edges": {
+   "n": 417,
+   "status": {
+    "deficit": 41,
+    "ok": 376
+   },
+   "dom_ok": {
+    "reserve": 198,
+    "goals+": 80,
+    "debt": 98
+   }
+  }
+ },
+ "metamorphic": {
+  "M1_income": {
+   "pairs": 45,
+   "status_violations": [],
+   "dom_flips": 3,
+   "flip_examples": [
+    [
+     "E5-0056",
+     "reserve",
+     "->",
+     "debt",
+     "lt",
+     "3.631"
+    ],
+    [
+     "E5-0161",
+     "reserve",
+     "->",
+     "debt",
+     "lt",
+     "1.7026"
+    ],
+    [
+     "E5-0287",
+     "debt",
+     "->",
+     "reserve",
+     "lt",
+     "1.9591"
+    ]
+   ],
+   "ok_pairs": 36,
+   "dom_flip_rate": 0.0833,
+   "l1_rel_median": 0.0777,
+   "l1_rel_p95": 1.3042
+  },
+  "M2_rate_all": {
+   "pairs": 44,
+   "status_violations": [],
+   "dom_flips": 0,
+   "flip_examples": [],
+   "ok_pairs": 35,
+   "dom_flip_rate": 0.0,
+   "l1_rel_median": 0.0,
+   "l1_rel_p95": 0.0
+  },
+  "M2_rate_single": {
+   "pairs": 44,
+   "status_violations": [],
+   "dom_flips": 1,
+   "flip_examples": [
+    [
+     "E5-0086",
+     "reserve",
+     "->",
+     "debt",
+     "lt",
+     "1.1034"
+    ]
+   ],
+   "ok_pairs": 36,
+   "dom_flip_rate": 0.0278,
+   "l1_rel_median": 0.0,
+   "l1_rel_p95": 0.0
+  },
+  "M3_deadline_all": {
+   "pairs": 44,
+   "status_violations": [],
+   "dom_flips": 0,
+   "flip_examples": [],
+   "ok_pairs": 33,
+   "dom_flip_rate": 0.0,
+   "l1_rel_median": 0.0,
+   "l1_rel_p95": 0.0
+  },
+  "M3_deadline_single": {
+   "pairs": 44,
+   "status_violations": [],
+   "dom_flips": 0,
+   "flip_examples": [],
+   "ok_pairs": 34,
+   "dom_flip_rate": 0.0,
+   "l1_rel_median": 0.0,
+   "l1_rel_p95": 0.0
+  },
+  "M4_bliq": {
+   "pairs": 44,
+   "status_violations": [],
+   "dom_flips": 2,
+   "flip_examples": [
+    [
+     "E5-0110",
+     "reserve",
+     "->",
+     "debt",
+     "lt",
+     "1.9228"
+    ],
+    [
+     "E5-0257",
+     "reserve",
+     "->",
+     "debt",
+     "lt",
+     "1.9394"
+    ]
+   ],
+   "ok_pairs": 37,
+   "dom_flip_rate": 0.0541,
+   "l1_rel_median": 0.0,
+   "l1_rel_p95": 0.4
+  },
+  "M5_scale": {
+   "pairs": 44,
+   "status_violations": [],
+   "dom_flips": 0,
+   "flip_examples": [],
+   "ok_pairs": 31,
+   "dom_flip_rate": 0.0,
+   "l1_rel_median": 9.0,
+   "l1_rel_p95": 9.0
+  }
+ },
+ "lump": {
+  "share_pct": 32.77,
+  "median": 321822.98
+ }
+}
