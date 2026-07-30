@@ -11,11 +11,14 @@ class RegisterRequest(BaseModel):
     password: str = Field(min_length=8, max_length=128)
     display_name: Optional[str] = Field(default=None, max_length=255)
     consent: bool = Field(
-        default=True,
-        description="Согласие на обработку ПДн (152-ФЗ). "
-                    "Веб-форма требует явную галочку; явный false → отказ.")
+        description="Согласие на обработку ПДн (152-ФЗ). ОБЯЗАТЕЛЬНОЕ поле без "
+                    "значения по умолчанию: default=True на уровне контракта — "
+                    "это предотмеченная галочка, надзор читает её как навязанное "
+                    "согласие (юрблок L2). Явный false → отказ в регистрации.")
     newsletter_opt_in: bool = Field(
-        default=False, description="Согласие на новости/рассылку (необязательно).")
+        default=False,
+        description="Согласие на рекламную рассылку. Независимо от согласия на "
+                    "обработку ПДн: склеивать обязательное с необязательным нельзя.")
     referral_code: Optional[str] = Field(
         default=None, max_length=12, description="Реферальный код пригласившего (необязательно).")
 

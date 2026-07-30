@@ -8,9 +8,25 @@ from __future__ import annotations
 
 import json
 import logging
+import re
 from datetime import datetime, timezone
 
 _CONTEXT_FIELDS = ("request_id", "method", "path", "status_code", "latency_ms", "user_id")
+
+# Маскирование ПДн в логах (юрблок L10). Финансовый портрет — чувствительнее
+# паспорта, а отладочный вывод с суммами и адресами уезжает в систему
+# агрегации и живёт там годами. Маскируем на форматтере, а не на вызовах:
+# полагаться на дисциплину каждого `logger.info` бесполезно.
+_EMAIL_RE = re.compile(r"[\w.+-]+@[\w-]+\.[\w.-]+")
+# Денежная сумма: четыре и более значащих цифр, с копейками или без.
+# Короткие числа (коды ответов, счётчики, идентификаторы шагов) не трогаем.
+_MONEY_RE = re.compile(r"\b\d{4,}(?:[.,]\d{1,2})?\b")
+
+
+def scrub(text: str) -> str:
+    """Убирает из строки e-mail и денежные суммы."""
+    text = _EMAIL_RE.sub("<email>", text)
+    return _MONEY_RE.sub("<amount>", text)
 
 
 class JsonFormatter(logging.Formatter):
@@ -21,7 +37,7 @@ class JsonFormatter(logging.Formatter):
             "timestamp": datetime.fromtimestamp(record.created, tz=timezone.utc).isoformat(),
             "level": record.levelname,
             "logger": record.name,
-            "message": record.getMessage(),
+            "message": scrub(record.getMessage()),
         }
         for field in _CONTEXT_FIELDS:
             value = getattr(record, field, None)

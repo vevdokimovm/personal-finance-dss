@@ -2,14 +2,27 @@
 from __future__ import annotations
 
 
+def _register(client, email: str, password: str = "strongpass1"):
+    """Регистрация с явным согласием на обработку ПДн.
+
+    Поле `consent` обязательное и без значения по умолчанию (юрблок L2):
+    предотмеченная галочка читается надзором как навязанное согласие,
+    поэтому контракт требует его называть явно в каждом вызове.
+    """
+    return client.post(
+        "/api/auth/register",
+        json={"email": email, "password": password, "consent": True},
+    )
+
+
 def _auth_header(client, email: str, password: str = "passwordX1") -> dict[str, str]:
-    r = client.post("/api/auth/register", json={"email": email, "password": password})
+    r = _register(client, email, password)
     assert r.status_code == 201
     return {"Authorization": f"Bearer {r.json()['access_token']}"}
 
 
 def test_register_returns_token_and_user(client):
-    r = client.post("/api/auth/register", json={"email": "u1@fp.io", "password": "strongpass1"})
+    r = _register(client, "u1@fp.io", "strongpass1")
     assert r.status_code == 201
     body = r.json()
     assert body["access_token"]
@@ -17,18 +30,18 @@ def test_register_returns_token_and_user(client):
 
 
 def test_register_duplicate_email_conflict(client):
-    client.post("/api/auth/register", json={"email": "dup@fp.io", "password": "strongpass1"})
-    r = client.post("/api/auth/register", json={"email": "dup@fp.io", "password": "other12345"})
+    _register(client, "dup@fp.io", "strongpass1")
+    r = _register(client, "dup@fp.io", "other12345")
     assert r.status_code == 409
 
 
 def test_register_weak_password_rejected(client):
-    r = client.post("/api/auth/register", json={"email": "weak@fp.io", "password": "short"})
+    r = _register(client, "weak@fp.io", "short")
     assert r.status_code == 422
 
 
 def test_login_success_and_wrong_password(client):
-    client.post("/api/auth/register", json={"email": "log@fp.io", "password": "strongpass1"})
+    _register(client, "log@fp.io", "strongpass1")
     ok = client.post("/api/auth/login", json={"email": "log@fp.io", "password": "strongpass1"})
     assert ok.status_code == 200
     bad = client.post("/api/auth/login", json={"email": "log@fp.io", "password": "WRONGPASS"})
@@ -47,7 +60,7 @@ def test_password_is_hashed_not_plaintext(client):
     from app.database.crud import get_user_by_email
     from app.database.db import SessionLocal
 
-    client.post("/api/auth/register", json={"email": "hash@fp.io", "password": "strongpass1"})
+    _register(client, "hash@fp.io", "strongpass1")
     db = SessionLocal()
     try:
         user = get_user_by_email(db, "hash@fp.io")

@@ -14,6 +14,7 @@ from fastapi.responses import RedirectResponse
 from sqlalchemy.orm import Session
 
 from app.config import settings
+from app.core.legal import CONSENT_MARKETING, CONSENT_PERSONAL_DATA
 from app.database.crud import (
     count_users,
     create_user,
@@ -51,6 +52,7 @@ from app.services import mfa as mfa_service
 from app.services.email_dispatch import dispatch_email
 from app.services.email_service import email_service
 from app.services.event_logger import log_event
+from app.services.consent import grant_consent
 from app.services.security import password_hasher, token_service
 from app.utils.time import utcnow
 
@@ -109,6 +111,17 @@ def register(
         newsletter_opt_in=payload.newsletter_opt_in,
         referred_by_code=referred_by,
     )
+
+    # Согласия пишутся ОТДЕЛЬНЫМИ записями с редакцией текста и обстоятельствами
+    # выдачи (юрблок L1/L4). Обязательное — только обработка ПДн; рассылка идёт
+    # своей записью и только при явном opt-in.
+    _client_ip = request.client.host if request.client else None
+    _user_agent = request.headers.get("user-agent")
+    grant_consent(db, user.id, CONSENT_PERSONAL_DATA,
+                  source_ip=_client_ip, user_agent=_user_agent)
+    if payload.newsletter_opt_in:
+        grant_consent(db, user.id, CONSENT_MARKETING,
+                      source_ip=_client_ip, user_agent=_user_agent)
 
     # Ссылка подтверждения email (токен на 48 ч).
     verify_token = token_service.issue_verification(user.id, user.email)

@@ -6,7 +6,7 @@ from decimal import Decimal
 from typing import Optional
 
 from sqlalchemy import (
-    JSON, Boolean, Date, DateTime, Float, ForeignKey, Integer, Numeric, String, Text,
+    JSON, Boolean, Date, DateTime, Float, ForeignKey, Index, Integer, Numeric, String, Text,
     UniqueConstraint,
 )
 
@@ -65,6 +65,41 @@ class User(Base):
     # mfa_enabled=False при заведённом секрете = «pending» (ещё не подтверждён кодом).
     mfa_secret: Mapped[Optional[str]] = mapped_column(EncryptedString, nullable=True)
     mfa_enabled: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
+
+
+class UserConsent(Base):
+    """Согласие пользователя: тип, редакция текста, момент выдачи и отзыва (L1, L4).
+
+    Одна строка = один акт согласия. Отзыв НЕ удаляет строку и не переписывает
+    её тип: проставляется `withdrawn_at`, и запись остаётся доказательством того,
+    что в такой-то период обработка велась на законном основании. Повторная
+    выдача после отзыва создаёт новую строку — история согласий линейна и
+    восстановима.
+
+    `doc_version` обязателен: при изменении текста согласия надо знать, на какую
+    именно редакцию согласился конкретный человек. Без версии согласие
+    недоказуемо, даже если дата есть.
+
+    `source_ip` и `user_agent` — обстоятельства выдачи, сами по себе ПДн,
+    поэтому лежат зашифрованными.
+    """
+    __tablename__ = "user_consents"
+    __table_args__ = (
+        Index("ix_user_consents_user_type", "user_id", "consent_type"),
+    )
+
+    id: Mapped[str] = mapped_column(
+        String(36), primary_key=True, default=lambda: str(uuid.uuid4())
+    )
+    user_id: Mapped[str] = mapped_column(
+        String(36), ForeignKey("users.id"), nullable=False, index=True
+    )
+    consent_type: Mapped[str] = mapped_column(String(32), nullable=False)
+    doc_version: Mapped[str] = mapped_column(String(16), nullable=False)
+    granted_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=utcnow)
+    withdrawn_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+    source_ip: Mapped[Optional[str]] = mapped_column(EncryptedString, nullable=True)
+    user_agent: Mapped[Optional[str]] = mapped_column(EncryptedString, nullable=True)
 
 
 class RevokedToken(Base):

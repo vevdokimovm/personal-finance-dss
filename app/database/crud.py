@@ -16,6 +16,7 @@ from app.core.categorization import (
     normalize_match_key,
 )
 from app.core.money import to_money
+from app.services.consent import purge_consents
 from app.database.models import (
     Budget,
     Category,
@@ -1107,6 +1108,9 @@ def delete_user(db: Session, user_id: str) -> bool:
     # Аналитика и рекомендации — тоже персональные данные (право на удаление).
     db.execute(delete(Event).where(Event.user_id == user_id))
     db.execute(delete(Recommendation).where(Recommendation.user_id == user_id))
+    # Согласия (152-ФЗ, право на удаление): данных, для которых нужно основание,
+    # больше нет — значит и хранить доказательство основания незачем.
+    purge_consents(db, user_id)
     db.delete(user)
     db.commit()
     return True
