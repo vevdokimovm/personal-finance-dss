@@ -1,4 +1,4 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 
 from app.api.routes_analysis import router as analysis_router
 from app.api.routes_auth import router as auth_router
@@ -10,6 +10,7 @@ from app.api.routes_demo import router as demo_router
 from app.api.routes_experiments import admin_router as experiments_admin_router
 from app.api.routes_experiments import router as experiments_router
 from app.api.routes_fx import router as fx_router
+from app.api._consent_guard import require_financial_consent
 from app.api.routes_goals import router as goals_router
 from app.api.routes_households import router as households_router
 from app.api.routes_liquid_assets import router as liquid_assets_router
@@ -31,11 +32,17 @@ from app.config import settings
 router = APIRouter(prefix=settings.API_PREFIX)
 router.include_router(auth_router)
 router.include_router(consents_router)
-router.include_router(transactions_router)
-router.include_router(obligations_router)
-router.include_router(goals_router)
+
+# Юрблок L1: финансовый портрет обрабатывается по ОТДЕЛЬНОМУ согласию.
+# Гейт висит на роутерах целиком, а не на отдельных ручках: пропуск одной
+# ручки означал бы обработку без основания, и заметить это было бы нечем.
+_FIN = [Depends(require_financial_consent)]
+
+router.include_router(transactions_router, dependencies=_FIN)
+router.include_router(obligations_router, dependencies=_FIN)
+router.include_router(goals_router, dependencies=_FIN)
 router.include_router(households_router)
-router.include_router(liquid_assets_router)
+router.include_router(liquid_assets_router, dependencies=_FIN)
 router.include_router(categories_router)
 router.include_router(user_prefs_router)
 router.include_router(analysis_router)

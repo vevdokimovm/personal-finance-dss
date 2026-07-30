@@ -42,7 +42,7 @@
 |---|---|---|---|---|
 | L1 | **Три раздельных согласия с фиксацией даты и времени на сервере** | все три согласия | ✅ таблица `user_consents` (`consent_type`, `doc_version`, `granted_at`, `withdrawn_at`, `source_ip`, `user_agent`), миграция `0030` с переносом старых `users.consent_at` | `tests/test_consents.py` |
 | L2 | **Ни один чекбокс не отмечен заранее** | 152-ФЗ | ✅ `consent: bool` в `RegisterRequest` — обязательное поле БЕЗ значения по умолчанию; явный `false` → отказ | `tests/test_auth.py`, `tests/test_consents.py` |
-| L3 | **Отзыв согласия работает** | согласия, разделы об отзыве | ✅ `POST /api/consents/{type}/withdraw`, `UNWITHDRAWABLE` защищает основание обработки ПДн | `tests/test_consents.py` |
+| L3 | **Отзыв согласия работает** | согласия, разделы об отзыве | ✅ `DELETE /api/consents/{type}`, `UNWITHDRAWABLE` защищает основание обработки ПДн (отзыв возможен только вместе с удалением аккаунта) | `tests/test_consents.py` |
 | L4 | **Версионирование текстов согласий** | 152-ФЗ, практика | ✅ `doc_version` обязателен; реестр редакций — `app/core/legal.py::LEGAL_DOCUMENTS` | `tests/test_consents.py` |
 | L5 | Дисклеймер 39-ФЗ на странице рекомендаций | оферта, `ui-snippets.md` | ⬜ фронт (веха 8) | — |
 | L6 | Cookie-баннер с раздельным выбором | `cookie-policy.md` | ⬜ фронт (веха 8) | — |

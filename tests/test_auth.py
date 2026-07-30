@@ -16,9 +16,19 @@ def _register(client, email: str, password: str = "strongpass1"):
 
 
 def _auth_header(client, email: str, password: str = "passwordX1") -> dict[str, str]:
+    """Готовый к работе пользователь: зарегистрирован И дал согласие на финданные.
+
+    Согласие выдаётся здесь, а не в самих тестах, потому что моделирует
+    реальный путь: обработка финансового портрета требует ОТДЕЛЬНОГО основания
+    (юрблок L1), и без него роутеры обязаны отвечать 403. Тесты про изоляцию
+    данных проверяют изоляцию, а не гейт — гейт проверяется отдельно
+    в `tests/test_consent_gate.py`.
+    """
     r = _register(client, email, password)
     assert r.status_code == 201
-    return {"Authorization": f"Bearer {r.json()['access_token']}"}
+    headers = {"Authorization": f"Bearer {r.json()['access_token']}"}
+    client.post("/api/consents/financial_data", headers=headers)
+    return headers
 
 
 def test_register_returns_token_and_user(client):

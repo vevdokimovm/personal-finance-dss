@@ -204,6 +204,24 @@ async def read_legal_consent(ctx: dict = Depends(page_context)) -> HTMLResponse:
     )
 
 
+@app.get("/legal/marketing-consent", response_class=HTMLResponse,
+         summary="Согласие на рекламную рассылку")
+async def read_legal_marketing_consent(
+    ctx: dict = Depends(page_context),
+) -> HTMLResponse:
+    return templates.TemplateResponse(
+        request=ctx["request"], name="legal/marketing_consent.html", context=ctx
+    )
+
+
+@app.get("/legal/cookies", response_class=HTMLResponse,
+         summary="Политика использования cookie")
+async def read_legal_cookies(ctx: dict = Depends(page_context)) -> HTMLResponse:
+    return templates.TemplateResponse(
+        request=ctx["request"], name="legal/cookies.html", context=ctx
+    )
+
+
 @app.get(
     "/legal/financial-consent",
     response_class=HTMLResponse,
