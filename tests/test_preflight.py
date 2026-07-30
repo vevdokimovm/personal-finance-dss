@@ -12,7 +12,9 @@ from tools.preflight import (
     app_version,
     changelog_version,
     grep_in_and_chain,
+    repo_id,
     soft_hyphens,
+    version_file,
     watchlog_version,
     watchlog_window,
 )
@@ -82,3 +84,36 @@ class TestGrepInAndChain:
     def test_plain_grep_is_not_flagged(self, repo):
         (repo / "fine.sh").write_text("grep x file\n", encoding="utf-8")
         assert grep_in_and_chain(repo) == []
+
+
+class TestRepoIdentity:
+    """Стандарт 48: опознавательные знаки читаются изнутри дерева.
+
+    Смысл проверки — не аккуратность, а защита от реального сценария: архив
+    переименовали, деплойер опознал репу по имени файла и опубликовал версию
+    в чужой репозиторий. `.repo-id` внутри дерева переименовать нельзя.
+    """
+
+    def test_repo_id_is_read(self, repo):
+        (repo / ".repo-id").write_text("vevdokimovm/x\n", encoding="utf-8")
+        assert repo_id(repo) == "vevdokimovm/x"
+
+    def test_missing_repo_id_is_none(self, repo):
+        assert repo_id(repo) is None
+
+    def test_only_first_line_counts(self, repo):
+        (repo / ".repo-id").write_text("vevdokimovm/x\nмусор\n",
+                                       encoding="utf-8")
+        assert repo_id(repo) == "vevdokimovm/x"
+
+    def test_version_file_is_read_without_prefix(self, repo):
+        (repo / "VERSION").write_text("1.2.3\n", encoding="utf-8")
+        assert version_file(repo) == "1.2.3"
+
+    def test_version_with_v_prefix_is_returned_as_is_for_the_check(self, repo):
+        (repo / "VERSION").write_text("v1.2.3\n", encoding="utf-8")
+        assert version_file(repo).startswith("v")
+
+    def test_empty_version_is_none(self, repo):
+        (repo / "VERSION").write_text("\n", encoding="utf-8")
+        assert version_file(repo) is None

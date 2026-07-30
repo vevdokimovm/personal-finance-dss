@@ -7,7 +7,10 @@
 
 Проверяется то и только то, что машина может установить сама:
 
-  * согласованность версии в `app/config.py`, CHANGELOG и шапке WATCHLOG;
+  * согласованность версии в `app/config.py`, CHANGELOG, шапке WATCHLOG и
+    файле `VERSION` (стандарт 48 — опознавательные знаки репозитория);
+  * наличие и корректность `.repo-id`: без него деплойер опознаёт архив по
+    имени файла, а имя можно переименовать — и версия уедет в чужую репу;
   * ровно десять записей в окне §3 WATCHLOG;
   * отсутствие мягких переносов `\\u00ad` в markdown;
   * отсутствие паттерна `&& grep` в скриптах репозитория (PIT-001);
@@ -53,6 +56,21 @@ def watchlog_version(repo: Path) -> str | None:
     match = re.search(r"ВЕРСИЯ КОДА: `v(\d+\.\d+\.\d+)`",
                       _read(repo / "docs/WATCHLOG.md"))
     return match.group(1) if match else None
+
+
+def version_file(repo: Path) -> str | None:
+    """Стандарт 48: `VERSION` — одна строка, версия БЕЗ префикса `v`."""
+    raw = _read(repo / "VERSION").strip()
+    return raw or None
+
+
+def repo_id(repo: Path) -> str | None:
+    """Стандарт 48: `.repo-id` — `<владелец>/<имя-репы>`, одна строка."""
+    raw = _read(repo / ".repo-id").strip().splitlines()
+    return raw[0].strip() if raw else None
+
+
+EXPECTED_REPO_ID = "vevdokimovm/personal-finance-dss"
 
 
 def watchlog_window(repo: Path) -> int:
@@ -118,7 +136,8 @@ def run(repo: Path) -> int:
 
     versions = {"app/config.py": app_version(repo),
                 "CHANGELOG.md": changelog_version(repo),
-                "WATCHLOG": watchlog_version(repo)}
+                "WATCHLOG": watchlog_version(repo),
+                "VERSION": version_file(repo)}
     if len(set(versions.values())) != 1 or None in versions.values():
         failures.append(f"версии расходятся: {versions}")
 
@@ -135,6 +154,17 @@ def run(repo: Path) -> int:
     if chains:
         failures.append(f"`&& grep` без `|| true` (PIT-001): "
                         f"{', '.join(chains[:3])}")
+
+    identity = repo_id(repo)
+    if identity is None:
+        failures.append("нет `.repo-id` — деплойер опознает архив по имени "
+                        "файла (стандарт 48)")
+    elif identity != EXPECTED_REPO_ID:
+        failures.append(f"`.repo-id` = {identity!r}, ожидается "
+                        f"{EXPECTED_REPO_ID!r} — архив уехал бы не в ту репу")
+    if version_file(repo) and version_file(repo).startswith("v"):
+        failures.append("`VERSION` содержит префикс `v` — стандарт 48 требует "
+                        "версию без него")
 
     pg_problem = pg_matrix_evidence(repo)
 

@@ -15,6 +15,22 @@ on:
   workflow_dispatch:       # ручной запуск full/deep
 
 jobs:
+  # ── (0) PREFLIGHT — БЛОКИРУЮЩИЙ и самый дешёвый гейт. ──
+  # Контрмера уровня 3 из docs/reports/recurrence_ledger.md: правила, которые
+  # трижды не сработали в виде текста, проверяются кодом. Стоит секунды и
+  # ловит ceremony-дрейф до того, как запустится всё остальное.
+  preflight:
+    name: Preflight (церемония и грабли)
+    if: github.event_name == 'push' || github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Предполётная проверка
+        run: python -m tools.preflight
+
   # ── (1) БЫСТРЫЙ — БЛОКИРУЮЩИЙ гейт. Матрица SQLite + PostgreSQL, покрытие ≥ 90%. ──
   fast:
     name: Быстрый (${{ matrix.db }})
