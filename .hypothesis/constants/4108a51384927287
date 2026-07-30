@@ -1,0 +1,4 @@
+# file: /home/claude/work/repo/personal-finance-dss-v7.5.0/tools/model_validation/build_joined.py
+# hypothesis_version: 6.155.7
+
+[0.0, 1.0, '--expert', '--out', '--outcomes', '--portraits', '.gz', '=', 'TAG=PATH', '__main__', 'append', 'budget_violations', 'crisis_actions', 'crisis_severity', 'debt', 'deficit', 'dom', 'dt', 'dt_alert', 'expense_total', 'goal', 'goals+', 'id', 'income_total', 'inv', 'invest', 'j', 'kind', 'lt', 'lump', 'm', 'model_dom', 'model_invest', 'model_status', 'model_xg', 'model_xo', 'model_xr', 'monthly_payment', 'none', 'obligations', 'ok', 'outcomes: дубли id', 'res', 'reserve', 'risk', 'rows', 'rt', 's', 'status', 'utf-8', 'v', 'wt', 'xg', 'xo', 'xr']

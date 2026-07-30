@@ -1,0 +1,4 @@
+# file: /home/claude/work/repo/personal-finance-dss-v7.5.0/app/api/routes_analytics.py
+# hypothesis_version: 6.155.7
+
+[365, ',', '/analytics', '/funnel', '/overview', 'goal_created', 'login_success', 'obligation_created', 'steps', 'Аналитика']

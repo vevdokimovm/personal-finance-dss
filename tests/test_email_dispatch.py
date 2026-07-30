@@ -117,7 +117,8 @@ class TestDispatchWiredIntoRegistration:
 
         r = client.post(
             "/api/auth/register",
-            json={"email": "wire@fp.io", "password": "strongpass1"},
+            json={"email": "wire@fp.io", "password": "strongpass1",
+                  "consent": True},
         )
         assert r.status_code == 201
 

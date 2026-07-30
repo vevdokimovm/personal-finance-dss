@@ -100,4 +100,4 @@
 
 **Связанные документы:** `docs/legal/README.md` (карта L1–L10) ·
 `docs/legal/` (сам пакет) · `docs/legal_questions_for_lawyer.md` ·
-`docs/FINPILOT_cybersecurity_guide.md` · `knowledge/roles/lawyer-finpilot/`.
+`docs/cybersecurity_finpilot_checklist.md` · `knowledge/roles/lawyer-finpilot/`.

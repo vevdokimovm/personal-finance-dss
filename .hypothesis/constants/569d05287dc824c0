@@ -1,0 +1,4 @@
+# file: /home/claude/work/repo/personal-finance-dss-v7.5.0/app/core/filtering.py
+# hypothesis_version: 6.155.7
+
+[0.0, 5e-05, 0.4, 'Dt_new', 'Lt_new', 'Rt_new', 'is_admissible', 'violations']

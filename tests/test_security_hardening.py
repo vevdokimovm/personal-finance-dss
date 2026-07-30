@@ -55,9 +55,24 @@ def _register(client: TestClient, email: str = "lock@test.io", password: str = "
     )
 
 
+def _grant_financial(client, response):
+    """Выдаёт согласие на обработку финданных по токену из регистрации.
+
+    Юрблок L1: цели и обязательства — финансовый портрет, он обрабатывается по
+    ОТДЕЛЬНОМУ основанию, и роутеры без него отвечают 403. Сам гейт проверяется
+    в `tests/test_consent_gate.py`; здесь согласие — предусловие сценария,
+    а не предмет проверки.
+    """
+    token = response.json().get("access_token")
+    if token:
+        client.post("/api/consents/financial_data",
+                    headers={"Authorization": f"Bearer {token}"})
+    return response
+
+
 class TestLoginLockout:
     def test_lockout_after_max_attempts(self, client: TestClient) -> None:
-        _register(client, email="lock1@test.io")
+        _grant_financial(client, _register(client, email="lock1@test.io"))
         for _ in range(settings.LOGIN_MAX_ATTEMPTS):
             r = client.post(
                 "/api/auth/login", json={"email": "lock1@test.io", "password": "wrong"}
@@ -70,7 +85,7 @@ class TestLoginLockout:
         assert r.status_code == 429
 
     def test_successful_login_resets_counter(self, client: TestClient) -> None:
-        _register(client, email="reset@test.io")
+        _grant_financial(client, _register(client, email="reset@test.io"))
         for _ in range(settings.LOGIN_MAX_ATTEMPTS - 1):
             client.post("/api/auth/login", json={"email": "reset@test.io", "password": "wrong"})
         r = client.post(
@@ -82,7 +97,7 @@ class TestLoginLockout:
         assert r.status_code == 401
 
     def test_correct_password_before_lockout(self, client: TestClient) -> None:
-        _register(client, email="ok@test.io")
+        _grant_financial(client, _register(client, email="ok@test.io"))
         r = client.post(
             "/api/auth/login", json={"email": "ok@test.io", "password": "password123"}
         )
@@ -93,7 +108,7 @@ class TestLoginLockout:
 
 class TestAmountValidation:
     def test_negative_goal_target_rejected(self, client: TestClient) -> None:
-        _register(client, email="g@test.io")
+        _grant_financial(client, _register(client, email="g@test.io"))
         r = client.post(
             "/api/goals",
             json={"name": "G", "target_amount": -1000, "deadline": "2027-01-01T00:00:00"},
@@ -101,7 +116,7 @@ class TestAmountValidation:
         assert r.status_code == 422
 
     def test_negative_obligation_amount_rejected(self, client: TestClient) -> None:
-        _register(client, email="o@test.io")
+        _grant_financial(client, _register(client, email="o@test.io"))
         r = client.post(
             "/api/obligations",
             json={"name": "O", "amount": -5000, "monthly_payment": 1000},
@@ -109,7 +124,7 @@ class TestAmountValidation:
         assert r.status_code == 422
 
     def test_valid_goal_accepted(self, client: TestClient) -> None:
-        _register(client, email="gv@test.io")
+        _grant_financial(client, _register(client, email="gv@test.io"))
         r = client.post(
             "/api/goals",
             json={"name": "G", "target_amount": 100000, "deadline": "2027-01-01T00:00:00"},

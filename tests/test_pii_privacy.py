@@ -26,9 +26,24 @@ def _register(client: TestClient, email="pii@test.io", password="password123", n
     )
 
 
+def _grant_financial(client, response):
+    """Выдаёт согласие на обработку финданных по токену из регистрации.
+
+    Юрблок L1: цели и обязательства — финансовый портрет, он обрабатывается по
+    ОТДЕЛЬНОМУ основанию, и роутеры без него отвечают 403. Сам гейт проверяется
+    в `tests/test_consent_gate.py`; здесь согласие — предусловие сценария,
+    а не предмет проверки.
+    """
+    token = response.json().get("access_token")
+    if token:
+        client.post("/api/consents/financial_data",
+                    headers={"Authorization": f"Bearer {token}"})
+    return response
+
+
 class TestEncryptionAtRest:
     def test_display_name_encrypted_in_db(self, client: TestClient) -> None:
-        _register(client, email="enc@test.io", name="Секретное Имя")
+        _grant_financial(client, _register(client, email="enc@test.io", name="Секретное Имя"))
         with engine.connect() as conn:
             row = conn.execute(
                 text("SELECT display_name FROM users WHERE email = :e"), {"e": "enc@test.io"}
@@ -37,13 +52,13 @@ class TestEncryptionAtRest:
         assert "Секретное" not in row[0]  # в БД зашифровано
 
     def test_display_name_readable_via_orm(self, client: TestClient) -> None:
-        _register(client, email="orm@test.io", name="Читаемое Имя")
+        _grant_financial(client, _register(client, email="orm@test.io", name="Читаемое Имя"))
         me = client.get("/api/auth/me")
         assert me.status_code == 200
         assert me.json()["display_name"] == "Читаемое Имя"  # через ORM расшифровано
 
     def test_goal_comment_encrypted_in_db(self, client: TestClient) -> None:
-        _register(client, email="gc@test.io")
+        _grant_financial(client, _register(client, email="gc@test.io"))
         r = client.post(
             "/api/goals",
             json={
@@ -75,7 +90,7 @@ class TestEncryptionAtRest:
 
 class TestPiiAccessAudit:
     def test_profile_access_audited(self, client: TestClient) -> None:
-        _register(client, email="audit@test.io")
+        _grant_financial(client, _register(client, email="audit@test.io"))
         client.get("/api/auth/me")
         with engine.connect() as conn:
             cnt = conn.execute(

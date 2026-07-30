@@ -1,0 +1,4 @@
+# file: /home/claude/work/repo/personal-finance-dss-v7.5.0/app/api/routes_consents.py
+# hypothesis_version: 6.155.7
+
+[204, 404, 409, '/consents', '/legal/documents', 'consents', 'disclaimer_39fz', 'documents', 'effective_from', 'granted', 'granted_at', 'title', 'type', 'url', 'user-agent', 'version', 'Выдать согласие', 'Отозвать согласие', 'Согласия и право']

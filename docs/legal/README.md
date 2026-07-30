@@ -112,5 +112,5 @@ user-agent по политике). Миграция обратно совмес�
 
 **Связанные документы:** `docs/legal/` (сам пакет) ·
 `docs/legal_questions_for_lawyer.md` (вопросы человеку с ответственностью) ·
-`docs/FINPILOT_cybersecurity_guide.md` (техническая сторона 152-ФЗ) ·
+`docs/cybersecurity_finpilot_checklist.md` (техническая сторона 152-ФЗ) ·
 `knowledge/roles/lawyer-finpilot/` (роль юриста для работы внутри проекта).

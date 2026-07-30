@@ -12,7 +12,8 @@ PORTRAITS = ["anna", "dmitriy", "mikhail", "igor", "olga", "viktor"]
 
 def _login(client, email: str = "owner@fp.io", password: str = "strongpass1") -> None:
     """Регистрирует и логинит пользователя — TestClient сохраняет cookie сессии."""
-    client.post("/api/auth/register", json={"email": email, "password": password})
+    client.post("/api/auth/register",
+                json={"email": email, "password": password, "consent": True})
     resp = client.post("/api/auth/login", json={"email": email, "password": password})
     assert resp.status_code == 200, resp.text
 

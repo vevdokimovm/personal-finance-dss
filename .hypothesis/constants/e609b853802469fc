@@ -1,0 +1,4 @@
+# file: /home/claude/work/repo/personal-finance-dss-v7.5.0/app/database/crud.py
+# hypothesis_version: 6.155.7
+
+[0.0, 100, 1000, 'BLR', 'Dt', 'Lt', 'RUB', 'Rt', '_household_ids_cache', 'accepted', 'amount', 'bank', 'categories', 'category', 'cnt', 'count', 'created_at', 'currency', 'date', 'deposit', 'description', 'expense', 'expired', 'household_id', 'id', 'indicators', 'initial', 'invalid', 'is_deleted', 'is_recurring', 'is_synced', 'limit_amount', 'manual', 'material', 'mcc', 'member', 'merchant', 'name', 'other', 'over', 'owner', 'pct', 'pending', 'period_days', 'premium', 'revoked', 'risk_profile', 'spent', 'top3', 'top_merchants', 'total', 'total_expense', 'type', 'user_id', 'utility', 'viewer', 'x_goals', 'x_obligations', 'x_reserve', 'Депозит']

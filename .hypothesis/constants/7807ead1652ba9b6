@@ -1,0 +1,4 @@
+# file: /home/claude/work/repo/personal-finance-dss-v7.5.0/app/services/cbr_rate.py
+# hypothesis_version: 6.155.7
+
+[0.13, 0.14, 0.16, 100.0, 300, 365, 403, 900, ',', '.', 'Accept', 'CBR key rate: %s', 'Content-Type', 'DT', 'KR', 'POST', 'RATE', 'SOAPAction', 'User-Agent', 'as_of', 'cache', 'cache_db', 'cbr', 'cbr_keyrate_post_tax', 'detail', 'effective_date', 'fallback', 'fetched_on', 'key_rate', 'ok', 'r_bench', 'rate', 'reason', 'replace', 'source', 'stored', 'tax_rate', 'ts', 'utf-8', '}']

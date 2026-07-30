@@ -81,7 +81,10 @@ LEGACY_CONTEXT_MARKERS = (
     "прежн", "раньше", "было", "историч", "legacy", "переход", "заменен",
 )
 
-EXPECTED_COUNTS = {"tables": 28, "migrations": 29, "openapi_paths": 106}
+# tables 29: добавлена `user_consents` (юрблок L1, миграция 0030).
+# migrations 31: 0030 (раздельные согласия) и 0031 (перенос согласия на
+# финданные существующим пользователям).
+EXPECTED_COUNTS = {"tables": 29, "migrations": 31, "openapi_paths": 106}
 
 
 # Канарейка CJK: редкий токен-глюк генерации ассистентов — иероглиф вместо

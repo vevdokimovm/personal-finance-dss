@@ -1,0 +1,4 @@
+# file: /home/claude/work/repo/personal-finance-dss-v7.5.0/app/api/routes_budgets.py
+# hypothesis_version: 6.155.7
+
+['/budgets', '/status', '/{budget_id}', 'budget_deleted', 'budget_id', 'budget_set', 'category', 'limit', 'Бюджет не найден.', 'Бюджеты', 'Список бюджетов', 'Удалить бюджет']

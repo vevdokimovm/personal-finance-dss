@@ -4,6 +4,7 @@ from typing import Any, Dict, List, Optional
 
 from pydantic import BaseModel, Field
 
+from app.core.legal import DISCLAIMER_39FZ
 from app.schemas.goal import GoalCreate
 from app.schemas.obligation import ObligationCreate
 from app.schemas.transaction import TransactionCreate
@@ -38,3 +39,9 @@ class RecommendationResponse(BaseModel):
     indicators: IndicatorsResponse
     recommendation: str
     input_summary: Dict[str, Any]
+    # Дисклеймер 39-ФЗ едет ВМЕСТЕ с рекомендацией, а не лежит в соседнем
+    # реестре документов (юрблок L5). Требование оферты — предупреждение на
+    # том же экране, где человек принимает решение о деньгах. Если текст
+    # приходится отдельно запрашивать другим вызовом, его наличие на экране
+    # зависит от того, вспомнит ли о нём фронт; здесь забыть нельзя.
+    disclaimer: str = Field(default=DISCLAIMER_39FZ)

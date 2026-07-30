@@ -210,5 +210,8 @@ def test_plaid_disabled_without_config(client):
 
 
 def _token(client) -> str:
-    r = client.post("/api/auth/register", json={"email": "plaid@fp.io", "password": "strongpass1"})
+    r = client.post(
+        "/api/auth/register",
+        json={"email": "plaid@fp.io", "password": "strongpass1", "consent": True},
+    )
     return r.json()["access_token"]

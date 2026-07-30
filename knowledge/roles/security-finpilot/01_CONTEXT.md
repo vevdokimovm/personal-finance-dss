@@ -50,4 +50,4 @@ Lt = B_liq / Σe. Версия v2.x запрещена к использован
 
 ## Специфика для этой роли
 
-Действующая методичка — `docs/FINPILOT_cybersecurity_guide.md`. Открытые пункты: Redis rate-limit, CSP без `unsafe-inline`, отзыв JWT, ротация ключей MultiFernet, хранение ПДн в РФ.
+Действующая методичка — `docs/cybersecurity_finpilot_checklist.md`. Открытые пункты: Redis rate-limit, CSP без `unsafe-inline`, отзыв JWT, ротация ключей MultiFernet, хранение ПДн в РФ.

@@ -1,0 +1,4 @@
+# file: /home/claude/work/repo/personal-finance-dss-v7.5.0/app/api/routes_plaid.py
+# hypothesis_version: 6.155.7
+
+['/exchange', '/plaid', '/sync', 'BLR', 'Dt', 'Lt', 'Plaid (open banking)', 'Rt', 'accounts', 'accounts_synced', 'allocation', 'detail', 'indicators', 'item_id', 'plaid-item', 'plaid_linked', 'plaid_synced', 'to_debt', 'to_goals', 'to_reserve', 'transactions_synced']

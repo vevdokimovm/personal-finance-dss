@@ -1,0 +1,4 @@
+# file: /home/claude/work/repo/personal-finance-dss-v7.5.0/app/services/plan_export.py
+# hypothesis_version: 6.155.7
+
+[0.0, 100, '#', '#,##0" ₽"', '0.0', '0.00', '0.000', '2BBF6A', 'A', 'Arial', 'B', 'BLR', 'C', 'D', 'Dt', 'E', 'F', 'FFFFFF', 'H1', 'H2', 'Lt', 'Rt', 'Small', 'best_name', 'blr', 'dt_pct', 'goals', 'i', 'indicators', 'lt', 'name', 'obl', 'profile', 'res', 'risk_profile', 'rt', 'solid', 'top3', 'u', 'utility', 'x_goals', 'x_obligations', 'x_reserve', 'Все варианты (топ-3)', 'Долг', 'ЗНАЧЕНИЕ', 'Значение', 'Ликвидность (Lt)', 'Лучший вариант', 'На цели', 'На цели, ₽', 'Название', 'Направление', 'Оценка', 'Оценка полезности U', 'ПОКАЗАТЕЛЬ', 'План', 'Подушка (BLR), мес', 'Показатели', 'Показатель', 'Профиль риска', 'Резерв', 'Цели']

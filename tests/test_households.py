@@ -35,7 +35,13 @@ def _register(client, email: str) -> str:
         json={"email": email, "password": "password123", "consent": True},
     )
     assert r.status_code == 201, r.text
-    return r.json()["access_token"]
+    token = r.json()["access_token"]
+    # Юрблок L1: цели и обязательства — финансовый портрет, он обрабатывается
+    # по ОТДЕЛЬНОМУ согласию. Сам гейт проверяется в tests/test_consent_gate.py;
+    # здесь он не предмет проверки, а предусловие сценария про домохозяйства.
+    client.post("/api/consents/financial_data",
+                headers={"Authorization": f"Bearer {token}"})
+    return token
 
 
 def _h(token: str) -> dict:

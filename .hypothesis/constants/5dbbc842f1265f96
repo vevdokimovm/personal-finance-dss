@@ -1,0 +1,4 @@
+# file: /home/claude/work/repo/personal-finance-dss-v7.5.0/app/ingestion/providers/manual.py
+# hypothesis_version: 6.155.7
+
+['0', '0.0', '0.14', 'RUB', 'account_id', 'accounts', 'amount', 'balance', 'base_currency', 'category', 'currency', 'current_amount', 'date', 'deadline', 'debt_id', 'debts', 'description', 'goal_id', 'goals', 'horizon_months', 'interest_rate', 'is_liquid', 'l_min', 'manual', 'material', 'mcc', 'monthly_payment', 'name', 'r_bench', 'risk_profile', 'target_amount', 'term_months', 'transaction_id', 'transactions', 'type']

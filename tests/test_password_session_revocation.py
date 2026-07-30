@@ -30,7 +30,10 @@ from app.utils.time import utcnow
 
 
 def _register(client: TestClient, email: str, password: str = "password123") -> str:
-    r = client.post("/api/auth/register", json={"email": email, "password": password})
+    r = client.post(
+        "/api/auth/register",
+        json={"email": email, "password": password, "consent": True},
+    )
     assert r.status_code == 201
     return r.json()["access_token"]
 

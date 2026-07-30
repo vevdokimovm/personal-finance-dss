@@ -14,7 +14,11 @@ from fastapi.responses import RedirectResponse
 from sqlalchemy.orm import Session
 
 from app.config import settings
-from app.core.legal import CONSENT_MARKETING, CONSENT_PERSONAL_DATA
+from app.core.legal import (
+    CONSENT_MARKETING,
+    CONSENT_PERSONAL_DATA,
+    REQUIRED_AT_REGISTRATION,
+)
 from app.database.crud import (
     count_users,
     create_user,
@@ -117,8 +121,12 @@ def register(
     # своей записью и только при явном opt-in.
     _client_ip = request.client.host if request.client else None
     _user_agent = request.headers.get("user-agent")
-    grant_consent(db, user.id, CONSENT_PERSONAL_DATA,
-                  source_ip=_client_ip, user_agent=_user_agent)
+    # Итерируем REQUIRED_AT_REGISTRATION, а не пишем тип руками: иначе добавление
+    # второго обязательного согласия в реестр не изменило бы поведение кода —
+    # константа документировала бы намерение и не исполняла его.
+    for _required in REQUIRED_AT_REGISTRATION:
+        grant_consent(db, user.id, _required,
+                      source_ip=_client_ip, user_agent=_user_agent)
     if payload.newsletter_opt_in:
         grant_consent(db, user.id, CONSENT_MARKETING,
                       source_ip=_client_ip, user_agent=_user_agent)

@@ -1,0 +1,4 @@
+# file: /home/claude/work/repo/personal-finance-dss-v7.5.0/app/api/routes_transactions.py
+# hypothesis_version: 6.155.7
+
+[255, '/category-rules', '/transactions', ';', 'Content-Disposition', 'amount', 'category', 'description', 'from_attributes', 'income', 'is_synced', 'learned', 'rule', 'transaction', 'transaction_created', 'transaction_deleted', 'transaction_id', 'transaction_restored', 'type', 'updated_count', 'Банк', 'Дата', 'Доход', 'Источник', 'Категория', 'Описание', 'Правило не найдено.', 'Расход', 'Ручной', 'Создать транзакцию', 'Сумма', 'Тип', 'Транзакции', 'Удалить транзакцию', '\ufeff']
