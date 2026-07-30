@@ -19,11 +19,20 @@ if not os.environ.get("DATABASE_URL"):
 
 from fastapi.testclient import TestClient
 
+from sqlalchemy.orm import close_all_sessions
+
 from app.database.db import Base, SessionLocal, engine
 from app.main import app
 
 
 def _reset_db() -> None:
+    # Сначала гасим пул: на PostgreSQL любое незакрытое соединение с открытой
+    # транзакцией держит блокировку на таблице, и DROP встаёт намертво —
+    # прогон подвисает без единой ошибки. На SQLite этого не видно вообще,
+    # поэтому дефект живёт до первого запуска матрицы (правило «SQLite молча
+    # прощает» — ровно про такие случаи).
+    close_all_sessions()
+    engine.dispose()
     with engine.begin() as conn:
         conn.exec_driver_sql("DROP TABLE IF EXISTS alembic_version")
     Base.metadata.drop_all(bind=engine)
