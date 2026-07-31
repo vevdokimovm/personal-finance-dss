@@ -1,7 +1,7 @@
 # FINPILOT — СППР для персональных финансов
 
 [![CI](https://github.com/vevdokimovm/personal-finance-dss/actions/workflows/ci.yml/badge.svg)](https://github.com/vevdokimovm/personal-finance-dss/actions/workflows/ci.yml)
-![version](https://img.shields.io/badge/version-7.7.0-blue)
+![version](https://img.shields.io/badge/version-7.7.1-blue)
 ![python](https://img.shields.io/badge/python-3.12-blue)
 ![coverage](https://img.shields.io/badge/coverage-92%25-brightgreen)
 ![tests](https://img.shields.io/badge/tests-1473-brightgreen)
@@ -25,7 +25,7 @@
 
 ---
 
-## Текущее состояние (v7.7.0, июль 2026)
+## Текущее состояние (v7.7.1, июль 2026)
 
 | | |
 |---|---|
