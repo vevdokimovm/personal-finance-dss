@@ -133,3 +133,36 @@
 - https://oneuptime.com/blog/post/2026-01-30-strangler-fig-pattern/view
 - https://qubstudio.com/blog/digital-onboarding-fintech/
 - https://zigment.ai/blog/7-ways-to-reduce-fintech-onboarding-drop-off-in-2026
+
+## 8. Поверхности Claude и управление контекстом (отчёты 5–6)
+
+- https://www.anthropic.com/supported-countries
+- https://www.anthropic.com/legal/consumer-terms
+- https://code.claude.com/docs/en/setup
+- https://code.claude.com/docs/en/permission-modes
+- https://code.claude.com/docs/en/worktrees
+- https://code.claude.com/docs/en/checkpointing
+- https://code.claude.com/docs/en/statusline
+- https://code.claude.com/docs/en/plugin-marketplaces
+- https://claude.com/blog/steering-claude-code-skills-hooks-rules-subagents-and-more
+- https://claude.com/blog/auto-mode
+- https://www.anthropic.com/engineering/claude-code-auto-mode
+- https://www.anthropic.com/engineering/advanced-tool-use
+- https://claude.com/blog/improving-skill-creator-test-measure-and-refine-agent-skills
+- https://www.newsletter.swirlai.com/p/agent-skills-progressive-disclosure
+- https://www.anthropic.com/product/claude-cowork
+- https://support.claude.com/en/articles/13345190-get-started-with-claude-cowork
+- https://claude.com/blog/how-people-are-using-claude-cowork
+- https://www.promptarmor.com/resources/implement-claude-cowork-securely
+- https://www.anthropic.com/news/claude-design-anthropic-labs
+- https://www.builder.io/blog/claude-design
+- https://support.claude.com/en/articles/8606394-how-large-is-the-context-window-on-paid-claude-plans
+- https://platform.claude.com/docs/en/build-with-claude/compaction
+- https://support.claude.com/en/articles/11473015-retrieval-augmented-generation-rag-for-projects
+- https://support.claude.com/en/articles/12429409-manage-usage-credits-for-paid-claude-plans
+- https://support.claude.com/en/articles/8241126-upload-files-to-claude
+- https://support.claude.com/en/articles/10167454-use-the-github-integration
+- https://github.com/anthropics/claude-code/issues/25759
+- https://github.com/anthropics/claude-code/issues/62175
+- https://github.com/anthropics/claude-code/issues/28625
+- https://unmarkdown.com/blog/claude-compacting-explained

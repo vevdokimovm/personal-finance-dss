@@ -8,6 +8,8 @@
 | `claude_models_and_token_economics.md` | Модели Claude 5, усилия, экономика токенов, поверхности |
 | `claude_skills_and_fintech_design.md` | Skills/Connectors/Plugins в claude.ai, дизайн-язык финтехов РФ |
 | `frontend_architecture_and_security.md` | Архитектура SPA, безопасность, деплой в РФ, доменные паттерны |
+| `claude_surfaces_and_extensions.md` | Code, Cowork, Design, плагины, скиллы |
+| `context_management_three_levels.md` | Контекст: запрос, чат, Проект; две стены |
 | `sources_registry.md` | Все источники с URL |
 | `raw/` | **Исходники дословно** — первичный материал, правило §18 |
 
