@@ -1,4 +1,0 @@
-# file: /home/claude/work/repo/personal-finance-dss-v7.5.0/app/api/_consent_guard.py
-# hypothesis_version: 6.155.7
-
-['code', 'consent_required', 'consent_type', 'document', 'message', 'title', 'url', 'version']

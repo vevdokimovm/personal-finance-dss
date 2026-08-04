@@ -1,4 +1,0 @@
-# file: /home/claude/work/repo/personal-finance-dss-v7.5.0/app/api/routes_b2b.py
-# hypothesis_version: 6.155.7
-
-[0.0, 0.14, '/analyze', '/v1', '1=income, 2=expense', 'B2B', 'RUB', 'X-API-Key', 'alternatives_total', 'b2b_analyze', 'base_currency', 'debts', 'goals', 'material']

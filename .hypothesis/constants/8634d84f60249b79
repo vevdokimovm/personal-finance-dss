@@ -1,4 +1,0 @@
-# file: /home/claude/work/repo/personal-finance-dss-v7.5.0/app/api/routes_banks.py
-# hypothesis_version: 6.155.7
-
-[b'%PDF-', b'PK\x03\x04', 0.0, 1024, '/banks', '/list', '/sync', '/sync/{bank_id}', '/upload', 'added_count', 'amount', 'bank_detected', 'date', 'description', 'error', 'filename', 'income', 'message', 'reconciliation', 'skipped_duplicates', 'source', 'statement_imported', 'status', 'success', 'tinkoff', 'total_expense', 'total_income', 'type', 'Банки']

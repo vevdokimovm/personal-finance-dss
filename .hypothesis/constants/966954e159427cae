@@ -1,4 +1,0 @@
-# file: /home/claude/work/repo/personal-finance-dss-v7.5.0/app/database/db.py
-# hypothesis_version: 6.155.7
-
-['DATABASE_URL', 'check_same_thread', 'connect_args', 'pool_pre_ping', 'postgres://', 'postgresql://', 'sqlite', 'sqlite:///./sppr.db']

@@ -1,4 +1,0 @@
-# file: /home/claude/work/repo/personal-finance-dss-v7.5.0/app/core/goals_priority.py
-# hypothesis_version: 6.155.7
-
-[0.0, 0.5, 1.0, 2.0, 3.0, 12.0, 30.0, '_priority', '_remaining', '_urgency', '_weight', 'amount', 'category', 'current_amount', 'deadline', 'emotional', 'id', 'income_growth', 'material', 'months_left', 'name', 'priority', 'remaining', 'safety', 'share', 'target_amount', 'urgency', 'weight']

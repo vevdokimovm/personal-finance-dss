@@ -1,4 +1,0 @@
-# file: /home/claude/work/repo/personal-finance-dss-v7.5.0/app/api/routes_fx.py
-# hypothesis_version: 6.155.7
-
-['/convert', '/fx', '/rates', '/refresh', 'amount', 'from', 'result', 'to', 'Валюты', 'Список курсов к USD']

@@ -1,4 +1,0 @@
-# file: /home/claude/work/repo/personal-finance-dss-v7.5.0/app/services/currency.py
-# hypothesis_version: 6.155.7
-
-['0', '0.01', '1', 'CurrencyConverter', 'RUB', 'USD', 'amount', 'currency', 'current_amount', 'model_dump', 'monthly_payment', 'target_amount']

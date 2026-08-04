@@ -1,4 +1,0 @@
-# file: /home/claude/work/repo/personal-finance-dss-v7.5.0/app/core/preprocessing.py
-# hypothesis_version: 6.155.7
-
-[0.0, 'active_goals', 'amount', 'category', 'current_amount', 'date', 'expense', 'goals', 'income', 'interest_rate', 'liquid_assets', 'material', 'monthly_payment', 'obligations', 'target_amount', 'term', 'transactions', 'type', 'tzinfo', 'Без категории']

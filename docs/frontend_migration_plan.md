@@ -97,6 +97,15 @@ Dev — Vite dev-server, проксирует `/api` на FastAPI (127.0.0.1:800
    существующий бренд/лого/токены из `frontend/static`; гоняем 2–3 направления редизайна на канвасе
    (dashboard + planning как якорные экраны); вход — `ui_visual_design_brief.md`; лочим направление →
    handoff-bundle в Claude Code.
+
+   > **[!] ОБНОВЛЕНО 2026-07-31 (v7.8.0).** Пункт выше описывал передачу в Claude Code как
+   > одностороннюю (handoff-bundle). С обновления Claude Design 17.06.2026 связь **двусторонняя**:
+   > команда `/design-sync` в Claude Code тянет дизайн-систему из локальной кодовой базы в Design
+   > (и обратно), а `/design` позволяет работать с проектами Design прямо из терминала. Требуется
+   > Claude Code не ниже v2.1.181. Практическое следствие: 68 CSS-переменных из
+   > `frontend/static/css/styles.css` не пересказываются словами, а импортируются — Design строит
+   > на наших компонентах и сверяет вывод с нашей системой. Порядок шагов фазы 1 — в
+   > `docs/frontend_milestone8_plan.md`, этап Э1.
 3. **Фаза 2 — ядро экранов (по одному, TDD).** Порядок: сначала auth-флоу (login/register/reset —
    фундамент), затем dashboard, затем денежное ядро (transactions → obligations → goals → planning).
    Каждый экран = компонент + Vitest + Playwright E2E. **CRUD-флоу обязаны иметь E2E** (§5 #13 WATCHLOG).

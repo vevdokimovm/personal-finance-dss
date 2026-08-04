@@ -1,4 +1,0 @@
-# file: /home/claude/work/repo/personal-finance-dss-v7.5.0/tools/portrait_testing/runner.py
-# hypothesis_version: 6.155.7
-
-[2000, 2026, 20260702, '## Падения (crash)', '--gen-version', '--n', '--report', '--seed', ':', 'I8', '__main__', '```', 'bliq', 'by_kind', 'crashes', 'elapsed_sec', 'expense_total', 'gen_version', 'goals', 'income_total', 'index', 'kind', 'l_min', 'msg', 'n', 'obligations', 'r_bench', 'risk_tolerance', 'seed', 'static', 'trace', 'utf-8', 'violations', '| Тип | Кол-во |', '|---|---|', 'Нарушений нет.']

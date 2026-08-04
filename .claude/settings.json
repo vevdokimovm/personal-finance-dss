@@ -1,0 +1,24 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cd \"$CLAUDE_PROJECT_DIR\" && if echo \"$CLAUDE_FILE_PATHS\" | grep -qE '\\.(py)$'; then flake8 $CLAUDE_FILE_PATHS 2>&1 | head -20; fi; exit 0"
+          }
+        ]
+      },
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cd \"$CLAUDE_PROJECT_DIR\" && if echo \"$CLAUDE_FILE_PATHS\" | grep -qE '\\.(css|tsx|ts)$'; then grep -nE '#[0-9a-fA-F]{3,8}\\b|[^-a-z][0-9]+px' $CLAUDE_FILE_PATHS 2>/dev/null | grep -v 'tokens' | head -20; fi; exit 0"
+          }
+        ]
+      }
+    ]
+  }
+}

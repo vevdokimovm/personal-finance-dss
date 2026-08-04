@@ -1,4 +1,0 @@
-# file: /home/claude/work/repo/personal-finance-dss-v7.5.0/app/api/routes_recommendation.py
-# hypothesis_version: 6.155.7
-
-[180, 512, '/recommendation', 'RUB', 'amount', 'current_amount', 'date', 'deadline', 'interest_rate', 'monthly_payment', 'target_amount', 'type', 'utf-8', 'Рекомендации']

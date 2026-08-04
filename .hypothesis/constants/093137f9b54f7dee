@@ -1,4 +1,0 @@
-# file: /home/claude/work/repo/personal-finance-dss-v7.5.0/app/services/report_pdf.py
-# hypothesis_version: 6.155.7
-
-[0.5, 100, ' руб', '#2BBF6A', '#DDDDDD', '#F7F9F8', ',', 'BACKGROUND', 'BOTTOMPADDING', 'Body', 'FONTNAME', 'FONTSIZE', 'FinpilotSans', 'FinpilotSans-Bold', 'GRID', 'H1', 'H2', 'LEFT', 'LEFTPADDING', 'RIGHTPADDING', 'ROWBACKGROUNDS', 'Small', 'TEXTCOLOR', 'TOPPADDING', 'amount', 'assets', 'current', 'expense', 'fonts', 'free_resource', 'goals', 'income', 'name', 'obligations', 'obligations_payment', 'payment', 'target', 'Доходы', 'Значение', 'Название', 'Накоплено', 'Обязательств нет.', 'Обязательства', 'Остаток', 'Платёж', 'Показатель', 'Прогресс', 'Расходы', 'Свободный ресурс', 'Сводка', 'Ставка', 'Целевая сумма', 'Целей нет.', 'Цели', 'Цель']

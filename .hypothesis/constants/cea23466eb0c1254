@@ -1,4 +1,0 @@
-# file: /home/claude/work/repo/personal-finance-dss-v7.5.0/app/ingestion/providers/plaid.py
-# hypothesis_version: 6.155.7
-
-['0', '100', 'Account', 'Debt', 'USD', 'account_id', 'accounts', 'added', 'amount', 'apr', 'available', 'balance', 'balances', 'cash management', 'cd', 'clientId', 'credit', 'current', 'date', 'iso_currency_code', 'liabilities', 'mcc', 'money market', 'name', 'plaid', 'production', 'sandbox', 'savings', 'secret', 'subtype', 'to_dict', 'transaction_id']
