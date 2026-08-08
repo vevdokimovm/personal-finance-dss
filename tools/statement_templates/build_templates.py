@@ -18,6 +18,7 @@ from __future__ import annotations
 
 import csv
 import io
+import os
 from pathlib import Path
 
 import openpyxl
@@ -30,12 +31,25 @@ from reportlab.lib.styles import ParagraphStyle
 from reportlab.platypus import Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle
 
 OUT = Path("app/data/statement_templates")
-FONT_PATH = "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"
+# Docker/CI — Linux; локальный macOS — путь, куда DejaVu ставится через brew/Font Book.
+FONT_PATH_CANDIDATES = (
+    "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
+    "/Library/Fonts/DejaVuSans.ttf",
+)
 FONT = "DejaVu"
 
 
+def _resolve_font_path() -> str:
+    for path in FONT_PATH_CANDIDATES:
+        if os.path.exists(path):
+            return path
+    raise FileNotFoundError(
+        "DejaVuSans.ttf не найден: " + ", ".join(FONT_PATH_CANDIDATES)
+    )
+
+
 def _ensure_font() -> None:
-    pdfmetrics.registerFont(TTFont(FONT, FONT_PATH))
+    pdfmetrics.registerFont(TTFont(FONT, _resolve_font_path()))
 
 
 def _write_csv(name: str, header: list[str], rows: list[list[str]], bom: bool = False) -> None:

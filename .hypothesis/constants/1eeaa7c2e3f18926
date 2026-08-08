@@ -1,4 +1,0 @@
-# file: /home/claude/work/repo/app/core/alternatives.py
-# hypothesis_version: 6.155.7
-
-[0.0, 0.1, 0.6, 1.0, 100, '; ', 'Dt_new', 'Lt_new', 'Rt_new', 'Si', 'amount', 'avalanche_detail', 'closed', 'deficit', 'delta_payment', 'description', 'goal_allocation', 'goal_breakdown', 'id', 'interest_rate', 'monthly_payment', 'name', 'new_amount', 'new_payment', 'paid_in', 'passed', 'payment_saved', 'r_bench', 'skipped', 'x_goals', 'x_goals_unused', 'x_obl_effective', 'x_obl_unused', 'x_obligations', 'x_remain', 'x_reserve', 'x_reserve_effective', 'x_unused_to_goals', 'Всё в резерв', 'Всё на цели', 'Дефицитный бюджет', 'обязательства', 'резерв', 'цели']

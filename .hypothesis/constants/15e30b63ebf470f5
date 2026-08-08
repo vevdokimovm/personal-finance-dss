@@ -1,4 +1,0 @@
-# file: /home/claude/work/repo/tools/model_validation/portrait_validation.py
-# hypothesis_version: 6.155.7
-
-[3.0, 'amount', 'bliq', 'current_amount', 'deadline', 'expense_total', 'goals', 'income_total', 'interest_rate', 'monthly_payment', 'obligations', 'r_bench', 'risk_tolerance', 'target_amount']

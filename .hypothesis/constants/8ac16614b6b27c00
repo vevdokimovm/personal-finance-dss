@@ -1,4 +1,0 @@
-# file: /home/claude/work/repo/app/services/pipeline.py
-# hypothesis_version: 6.155.7
-
-['BLR', 'BLR_status', 'Bliq', 'Bt', 'CFt', 'Dt', 'Et', 'It', 'Lt', 'Rt', 'SigmaP', 'active_goals', 'active_goals_count', 'goals', 'goals_count', 'indicators', 'input_summary', 'liquid_assets', 'liquid_assets_count', 'obligations', 'obligations_count', 'recommendation', 'transactions', 'transactions_count']

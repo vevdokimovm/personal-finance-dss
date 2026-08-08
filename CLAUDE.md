@@ -4,7 +4,7 @@
 планка качества — Т-Банк, Сбер, Альфа. Обработка персональных данных: 152-ФЗ обязателен.
 
 ## Стек
-FastAPI · SQLAlchemy 2.0 · Alembic · Pydantic v2 · PostgreSQL/SQLite · Python 3.12.
+Бэкенд — см. requirements.txt / pyproject.toml.
 Фронтенд вехи 8: Vite · React 19 · TypeScript · TanStack Router/Query · Zustand ·
 Radix через shadcn/ui · Recharts + visx · KaTeX · Vitest · Playwright.
 

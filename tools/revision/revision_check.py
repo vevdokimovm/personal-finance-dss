@@ -51,6 +51,8 @@ LINK_ALLOWLIST = {
         "плановый ассет вехи 8 (PWA), ещё не создан",
     ("knowledge/business/ios_app_store_pipeline.md", "frontend/static/images/icon-512.png"):
         "плановый ассет вехи 8 (иконка), ещё не создан",
+    ("docs/frontend_milestone8_plan.md", "docs/ui_visual_direction.md"):
+        "плановый артефакт вехи 8 (шаг 1.3, выбор направления дизайна), ещё не создан",
     ("knowledge/project_meta/project_instructions_s.md", "docs/Математическая_модель_v3_0_0.md"):
         "снапшот реальных project-инструкций; правка нужна в источнике",
     ("knowledge/project_meta/project_instructions_v.md", "docs/model_vs_code.md"):

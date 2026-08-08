@@ -25,6 +25,7 @@ from __future__ import annotations
 
 import csv
 import io
+import os
 from dataclasses import dataclass
 from datetime import date
 
@@ -34,9 +35,22 @@ from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
 
-FONT_PATH = "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"
+# Docker/CI — Linux; локальный macOS — путь, куда DejaVu ставится через brew/Font Book.
+FONT_PATH_CANDIDATES = (
+    "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
+    "/Library/Fonts/DejaVuSans.ttf",
+)
 FONT = "DejaVu"
 _FONT_READY = False
+
+
+def _resolve_font_path() -> str:
+    for path in FONT_PATH_CANDIDATES:
+        if os.path.exists(path):
+            return path
+    raise FileNotFoundError(
+        "DejaVuSans.ttf не найден: " + ", ".join(FONT_PATH_CANDIDATES)
+    )
 
 
 @dataclass(frozen=True)
@@ -60,7 +74,7 @@ class Style:
 def _ensure_font() -> None:
     global _FONT_READY
     if not _FONT_READY:
-        pdfmetrics.registerFont(TTFont(FONT, FONT_PATH))
+        pdfmetrics.registerFont(TTFont(FONT, _resolve_font_path()))
         _FONT_READY = True
 
 

@@ -2,6 +2,37 @@
 
 Формат: [Keep a Changelog](https://keepachangelog.com/ru/1.0.0/). Версионирование — [SemVer](https://semver.org/lang/ru/).
 
+## [8.3.2] — 2026-08-07 — Тестовое окружение чинено под macOS-хост (PATCH)
+
+### Исправлено
+- `tools/statement_templates/synth.py` и `tools/statement_templates/build_templates.py`
+  жёстко ссылались на шрифт `/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf` — путь,
+  который существует только в Docker/CI (Linux). На хосте macOS без контейнера все 11
+  property-тестов рендера PDF-выписок (`tests/test_statement_property.py`) падали
+  с `TTFError`. Обе точки регистрации шрифта переведены на список кандидатов:
+  Linux-путь пробуется первым (Docker/CI не трогали), при его отсутствии — фолбэк на
+  `/Library/Fonts/DejaVuSans.ttf` (macOS). Явная ошибка с перечислением проверенных
+  путей, если не найдено ни одного.
+- `tools/revision/revision_check.py`: `docs/frontend_milestone8_plan.md` ссылается на
+  `docs/ui_visual_direction.md` — файл, который появится как результат шага 1.3 этапа Э1
+  (выбор визуального направления), ещё не пройденного. Гейт ревизии (`tests/test_repo_revision.py`)
+  считал это битой ссылкой. Добавлена запись в `LINK_ALLOWLIST` по тому же образцу, что уже
+  используется для других непройденных артефактов вехи 8 (PWA-иконка, `docs/PWA_УСТАНОВКА.md`).
+- `.claude/hooks/tests-gate.sh`: `Stop`-гейт вызывал `python3 -m pytest`, что на этой машине
+  резолвится в системный Python 3.10 без установленных зависимостей проекта (`bcrypt` и др.) —
+  гейт падал с `ModuleNotFoundError`, а не с реальным результатом тестов. Теперь гейт
+  предпочитает `.venv/bin/python3`, если такое окружение есть в проекте, и откатывается на
+  системный `python3` только при его отсутствии.
+
+### Известно и не чинится в этом батче
+- Как и в v8.3.1: `docs/frontend_milestone8_plan.md` → `docs/ui_visual_direction.md` — ссылка
+  вперёд, теперь явно занесена в allowlist (см. выше), разрешится сама на Э1.
+
+### Замечание к окружению
+На хосте не было `.venv` — заведён на Python 3.13 (3.12 из `pyproject.toml` на машине
+недоступен; 3.13 ближе остальных установленных). Полный прогон после фикса:
+**1509/1509 SQLite** (1 skipped), `errors=0`.
+
 ## [8.3.1] — 2026-08-06 — Снимок OpenAPI протух на три мажора (PATCH)
 
 ### Исправлено

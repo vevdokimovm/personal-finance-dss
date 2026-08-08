@@ -1,4 +1,0 @@
-# file: /home/claude/work/repo/app/api/routes_subscription.py
-# hypothesis_version: 6.155.7
-
-['/me', '/subscription', 'expires_at', 'features', 'is_premium', 'tier', 'Подписка']

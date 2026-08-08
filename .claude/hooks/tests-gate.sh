@@ -12,7 +12,9 @@ cd "$root" || exit 0
 [ -f logs/agent-audit.jsonl ] || exit 0
 grep -q '"tool": *"\(Edit\|Write\|MultiEdit\)"' logs/agent-audit.jsonl 2>/dev/null || exit 0
 
-if ! python -m pytest -q -x > /tmp/finpilot-gate.log 2>&1; then
+PYBIN="$root/.venv/bin/python3"
+[ -x "$PYBIN" ] || PYBIN="python3"
+if ! "$PYBIN" -m pytest -q -x > /tmp/finpilot-gate.log 2>&1; then
   python3 -c '
 import json
 tail = open("/tmp/finpilot-gate.log", errors="replace").read().splitlines()[-15:]

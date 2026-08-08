@@ -1,4 +1,0 @@
-# file: /home/claude/work/repo/app/database/init_db.py
-# hypothesis_version: 6.155.7
-
-['0001', 'alembic', 'alembic.ini', 'alembic_version', 'head', 'script_location', 'transactions']
