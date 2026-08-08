@@ -1,6 +1,6 @@
 # Исследования вехи 8
 
-Три методички, собранные 30–31 июля 2026 перед стартом фронтенда. Основание для
+Семь методичек, собранных 30 июля — 5 августа 2026 перед стартом фронтенда. Основание для
 `docs/reports/adr/adr_011_milestone8_tooling.md` и `docs/frontend_milestone8_plan.md`.
 
 | Файл | О чём |
@@ -10,6 +10,7 @@
 | `frontend_architecture_and_security.md` | Архитектура SPA, безопасность, деплой в РФ, доменные паттерны |
 | `claude_surfaces_and_extensions.md` | Code, Cowork, Design, плагины, скиллы |
 | `context_management_three_levels.md` | Контекст: запрос, чат, Проект; две стены |
+| `agent_loop_hooks_and_subagents.md` | Агентский контур: хуки, субагенты, MCP, промптинг под Claude 5 |
 | `sources_registry.md` | Все источники с URL |
 | `raw/` | **Исходники дословно** — первичный материал, правило §18 |
 

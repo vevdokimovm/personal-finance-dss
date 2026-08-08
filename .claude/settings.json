@@ -1,21 +1,75 @@
 {
+  "permissions": {
+    "deny": [
+      "Read(./.env)",
+      "Read(./.env.*)",
+      "Read(./**/*.pem)",
+      "Read(./**/*.key)",
+      "Read(./**/id_rsa*)"
+    ]
+  },
   "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write|Read",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR/.claude/hooks/block-secrets.sh\""
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR/.claude/hooks/block-destructive.sh\""
+          }
+        ]
+      }
+    ],
     "PostToolUse": [
       {
         "matcher": "Edit|Write",
         "hooks": [
           {
             "type": "command",
-            "command": "cd \"$CLAUDE_PROJECT_DIR\" && if echo \"$CLAUDE_FILE_PATHS\" | grep -qE '\\.(py)$'; then flake8 $CLAUDE_FILE_PATHS 2>&1 | head -20; fi; exit 0"
+            "command": "\"$CLAUDE_PROJECT_DIR/.claude/hooks/lint-python.sh\""
+          },
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR/.claude/hooks/check-design-tokens.sh\""
           }
         ]
       },
       {
-        "matcher": "Edit|Write",
+        "matcher": "*",
         "hooks": [
           {
             "type": "command",
-            "command": "cd \"$CLAUDE_PROJECT_DIR\" && if echo \"$CLAUDE_FILE_PATHS\" | grep -qE '\\.(css|tsx|ts)$'; then grep -nE '#[0-9a-fA-F]{3,8}\\b|[^-a-z][0-9]+px' $CLAUDE_FILE_PATHS 2>/dev/null | grep -v 'tokens' | head -20; fi; exit 0"
+            "command": "\"$CLAUDE_PROJECT_DIR/.claude/hooks/audit-log.sh\""
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR/.claude/hooks/tests-gate.sh\"",
+            "timeout": 600
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR/.claude/hooks/session-context.sh\""
           }
         ]
       }

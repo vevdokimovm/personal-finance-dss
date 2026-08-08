@@ -1,0 +1,4 @@
+# file: /home/claude/work/repo/app/core/investment.py
+# hypothesis_version: 6.155.7
+
+[0.0, 0.2, 0.4, 0.6, 0.8, 12.0, 36.0, 'amount', 'bonds', 'cushion_part', 'deposits', 'equity', 'equity_share', 'investment_tranche', 'note', 'split', 'x_reserve']

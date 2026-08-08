@@ -1,0 +1,4 @@
+# file: /home/claude/work/repo/app/core/recommendation.py
+# hypothesis_version: 6.155.7
+
+[0.0, 0.2, 0.4, 0.5, 2.5, 100, ', ', '. ', '; ', 'Dt', 'Dt_new', 'Lt', 'Lt_new', 'Rt', 'Rt_new', 'amount', 'bonds', 'costs', 'cushion_part', 'delta', 'deposits', 'emotional', 'equity', 'gains', 'goal_allocation', 'income_growth', 'insight', 'interest_rate', 'investment_tranche', 'is_recommended', 'material', 'new_payment', 'note', 'safety', 'split', 'x_goals_unused', 'x_obl_effective', 'x_obl_unused', 'x_obligations', 'x_reserve', 'x_reserve_effective', 'безопасность', 'материальная цель', 'рост дохода', 'самый дорогой кредит', 'эмоциональная цель']

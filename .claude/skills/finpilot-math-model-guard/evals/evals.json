@@ -1,0 +1,35 @@
+{
+  "skill": "finpilot-math-model-guard",
+  "runs_per_case": 3,
+  "note": "Негативы обязательны: скилл, срабатывающий всегда, так же плох, как не срабатывающий никогда. Типовой разрыв — в описании: оно объясняет WHAT вместо WHEN.",
+  "cases": [
+    {
+      "prompt": "Почини расчёт ликвидности в сервисе рекомендаций",
+      "should_trigger": true
+    },
+    {
+      "prompt": "Добавь тест на инвариант ПДН",
+      "should_trigger": true
+    },
+    {
+      "prompt": "Почему альтернатив 66, а не 21",
+      "should_trigger": true
+    },
+    {
+      "prompt": "Проверь, правильно ли берётся ключевая ставка",
+      "should_trigger": true
+    },
+    {
+      "prompt": "Свёрстай экран профиля риска",
+      "should_trigger": false
+    },
+    {
+      "prompt": "Добавь индекс в миграции",
+      "should_trigger": false
+    },
+    {
+      "prompt": "Отформатируй сумму в рублях",
+      "should_trigger": false
+    }
+  ]
+}

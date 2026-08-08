@@ -1,0 +1,4 @@
+# file: /home/claude/work/repo/tools/revision/revision_check.py
+# hypothesis_version: 6.155.7
+
+[106, '#', '*', '*.md', '*.py', '.,);:', '.cfg', '.css', '.git', '.html', '.hypothesis', '.ini', '.js', '.json', '.md', '.mypy_cache', '.py', '.pytest_cache', '.sh', '.toml', '.txt', '.venv', '.yaml', '.yml', '/RELEASES.md', '/reports/audits/', '/reports/incidents/', '/reports/merges/', '/reports/releases/', '/reports/testing/', '/roadmap_archive/', '/science/', '21 альтернатив', 'CHANGELOG.md', 'CLEAN', 'DRIFT', 'L_min\\s*=\\s*0[.,]30', 'OK', '__init__.py', '__main__', '__pycache__', '__tablename__\\s*=', 'alembic', 'api', 'app', 'docs', 'docs/WATCHLOG.md', 'flow-based', 'ignore', 'legacy', 'migrations', 'node_modules', 'openapi.json', 'openapi_paths', 'paths', 'tables', 'tests/test_x.py', 'utf-8', 'v2', 'versions', 'Битые ссылки', 'было', 'заменен', 'историч', 'не использ', 'переход', 'прежн', 'раньше', 'сводка', 'старая', 'старо', 'устар', 'шаг 20%', '→']

@@ -1,0 +1,4 @@
+# file: /home/claude/work/repo/app/core/crisis.py
+# hypothesis_version: 6.155.7
+
+[0.0, 1e-09, 0.005, 0.01, 1.0, 999.0, ', ', 'actions', 'amount', 'bliq_remaining', 'bliq_used', 'closed', 'critical', 'current_amount', 'cut_expenses', 'cut_required', 'deficit', 'freeze_goals', 'goals', 'id', 'interest_rate', 'loan', 'monthly_payment', 'name', 'new_lt', 'new_rt', 'options', 'paid_in', 'payment_saved', 'restructure_debt', 'runway_months', 'severity', 'share_of_expenses', 'steps', 'summary', 'target_amount', 'type', 'кредитные каникулы', 'реструктуризация', 'рефинансирование']

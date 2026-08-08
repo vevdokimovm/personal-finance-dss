@@ -33,7 +33,11 @@ if [ -n "$CC_VER" ] && ver_lt "$CC_VER" "2.1.181"; then
   /bin/echo "[!] ВЕРСИЯ СТАРАЯ: $CC_VER < 2.1.181"
   /bin/echo "    Команды /design-sync и /design НЕ заработают - а на них стоит этап Э1 вехи 8."
   /bin/echo "    Обнови и запусти скрипт заново:"
-  /bin/echo "        npm update -g @anthropic-ai/claude-code"
+  /bin/echo "        claude update          # <- ЭТО. Установка нативная."
+  /bin/echo ""
+  /bin/echo "    npm update -g НЕ обновляет нативную установку (даёт EACCES на corepack)."
+  /bin/echo "    Если claude update падает на storage.googleapis.com - включи VPN:"
+  /bin/echo "    обрыв сокета на середине это фильтрация на пути, а не поломка Claude Code."
   /bin/echo ""
   /bin/echo "    Плагины поставить всё равно можно - они от версии не зависят."
   /usr/bin/printf "    Продолжить установку плагинов на старой версии? [y/N] "
@@ -56,9 +60,10 @@ REQUIRED=(
 )
 
 # --- Полезные, ставятся по ходу -------------------------------------------
+# code-review убран намеренно: дублирует pr-review-toolkit, два ревьюера
+# жрут контекст и дают конфликтующие голоса (заход 7, направление 6).
 OPTIONAL=(
   context7
-  code-review
   pr-review-toolkit
   playground
   skill-creator
@@ -92,6 +97,13 @@ done
 for p in "${OPTIONAL[@]}"; do
   install_plugin "$p"
 done
+
+/bin/echo ""
+/bin/echo "=== Уборка ==="
+# research-pipeline@local ссылается на локальный маркетплейс, которого нет.
+# Не смертелен, но claude doctor будет краснеть, а ошибки в контуре копятся.
+"$CLAUDE_BIN" plugin uninstall research-pipeline 2>/dev/null | /usr/bin/tail -n 1
+"$CLAUDE_BIN" plugin marketplace remove local 2>/dev/null | /usr/bin/tail -n 1
 
 /bin/echo ""
 /bin/echo "=== Готово ==="

@@ -1,0 +1,35 @@
+{
+  "skill": "finpilot-react-component",
+  "runs_per_case": 3,
+  "note": "Негативы обязательны: скилл, срабатывающий всегда, так же плох, как не срабатывающий никогда. Типовой разрыв — в описании: оно объясняет WHAT вместо WHEN.",
+  "cases": [
+    {
+      "prompt": "Свёрстай карточку с распределением свободного потока",
+      "should_trigger": true
+    },
+    {
+      "prompt": "Добавь форму ввода нового долга",
+      "should_trigger": true
+    },
+    {
+      "prompt": "Почини выравнивание в таблице целей",
+      "should_trigger": true
+    },
+    {
+      "prompt": "Сделай график прогноза баланса на 12 месяцев",
+      "should_trigger": true
+    },
+    {
+      "prompt": "Напиши миграцию Alembic для новой таблицы",
+      "should_trigger": false
+    },
+    {
+      "prompt": "Объясни, как считается ПДН",
+      "should_trigger": false
+    },
+    {
+      "prompt": "Проверь, почему падает тест в test_saw.py",
+      "should_trigger": false
+    }
+  ]
+}

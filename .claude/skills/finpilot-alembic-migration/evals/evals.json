@@ -1,0 +1,35 @@
+{
+  "skill": "finpilot-alembic-migration",
+  "runs_per_case": 3,
+  "note": "Негативы обязательны: скилл, срабатывающий всегда, так же плох, как не срабатывающий никогда. Типовой разрыв — в описании: оно объясняет WHAT вместо WHEN.",
+  "cases": [
+    {
+      "prompt": "Добавь таблицу для хранения согласий пользователя",
+      "should_trigger": true
+    },
+    {
+      "prompt": "Нужна колонка is_archived с дефолтом false",
+      "should_trigger": true
+    },
+    {
+      "prompt": "Alembic ругается на две головы, разберись",
+      "should_trigger": true
+    },
+    {
+      "prompt": "Добавь индекс на user_id в таблице транзакций",
+      "should_trigger": true
+    },
+    {
+      "prompt": "Напиши тест для SAW-агрегации",
+      "should_trigger": false
+    },
+    {
+      "prompt": "Свёрстай экран настроек",
+      "should_trigger": false
+    },
+    {
+      "prompt": "Посчитай ПДН для портрета",
+      "should_trigger": false
+    }
+  ]
+}

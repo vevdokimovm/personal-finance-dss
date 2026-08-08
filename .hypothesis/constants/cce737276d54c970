@@ -1,0 +1,4 @@
+# file: /home/claude/work/repo/app/services/telegram.py
+# hypothesis_version: 6.155.7
+
+[200, '/link', '/start', '/status', '/unlink', 'Content-Type', 'application/json', 'chat', 'chat_id', 'id', 'message', 'text', 'utf-8', 'your_bot']
