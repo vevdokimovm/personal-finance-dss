@@ -10,8 +10,12 @@ playwright-report/
 test-results/
 blob-report/
 
-# ── TanStack Router — автогенерируемое дерево маршрутов ────────────────
+# ── TanStack Router — автогенерируемое дерево маршрутов и кэш плагина ──
 src/routeTree.gen.ts
+.tanstack/
+
+# ── TypeScript — инкрементальный кэш сборки ─────────────────────────────
+*.tsbuildinfo
 
 # ── Логи / кэши ──────────────────────────────────────────────────────
 *.local

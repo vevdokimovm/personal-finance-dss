@@ -1,12 +1,18 @@
 """Repo revision checker — статические проверки актуальности docs <-> code.
 
 Гоняется как гейт перед релизом (обёртка `tests/test_repo_revision.py` тянет его
-в fast-тир, плюс CLI). Три проверки:
+в fast-тир, плюс CLI). Проверки:
   1. Битые ссылки на файлы репо, с делением источника на живой vs замороженный
      (историю не переписываем) и allowlist известно-приемлемых.
   2. Утечка legacy-параметров мат-модели (v2.x) в живые доки.
   3. Счётчики структуры (таблицы / миграции / пути OpenAPI) против пинов —
      форсирует синк доков при изменении схемы/API.
+  4. Пары путей, различающиеся только регистром (`docs/GLOSSARY.md` vs
+     `docs/glossary.md`) — на macOS/Windows регистронезависимая ФС молча
+     схлопывает такую пару в один файл, в Docker/CI (регистрочувствительная
+     Linux-ФС) оба живут отдельно и ссылки на «не тот» вариант бьются. Источник
+     — `git ls-files` (список путей как строк, не обход диска: коллизия видна
+     даже там, где ОС её сама скрывает).
 
 Динамическая проверка календарных мин — отдельным инструментом `tools/timewarp`
 (нужен pytest, см. методичку). Процесс и когда запускать —
@@ -16,6 +22,7 @@ from __future__ import annotations
 
 import json
 import re
+import subprocess
 from dataclasses import dataclass, field
 from pathlib import Path
 
@@ -278,10 +285,70 @@ class CountChecker:
         return result
 
 
+class CaseCollisionChecker:
+    name = "Пути, различающиеся только регистром"
+
+    def __init__(self, root: Path, *, paths: list[str] | None = None) -> None:
+        self._root = root
+        self._injected_paths = paths
+
+    def _tracked_paths(self) -> list[str] | None:
+        """Список путей от git ls-files, или None если git недоступен/не репозиторий.
+
+        Намеренно НЕ обход диска (Path.rglob): на регистронезависимой ФС (macOS,
+        Windows) `docs/GLOSSARY.md` и `docs/glossary.md` — один и тот же inode,
+        обход увидит только одну запись, и коллизия останется невидимой именно
+        там, где её удобнее всего поймать — до пуша в Docker/CI. `git ls-files`
+        хранит путь как строку в индексе, поэтому видит оба варианта, даже когда
+        ОС на диске уже схлопнула их в один файл.
+        """
+        if self._injected_paths is not None:
+            return self._injected_paths
+        try:
+            proc = subprocess.run(
+                ["git", "ls-files"],
+                cwd=self._root,
+                capture_output=True,
+                text=True,
+                check=True,
+                timeout=10,
+            )
+        except (OSError, subprocess.SubprocessError):
+            return None
+        paths = [line for line in proc.stdout.splitlines() if line]
+        return paths or None
+
+    def run(self) -> CheckResult:
+        result = CheckResult(self.name)
+        paths = self._tracked_paths()
+        if paths is None:
+            result.infos.append(Finding(
+                "сводка", "git ls-files недоступен или пуст — проверка пропущена",
+            ))
+            return result
+        by_lower: dict[str, set[str]] = {}
+        for p in paths:
+            by_lower.setdefault(p.lower(), set()).add(p)
+        for lower, variants in sorted(by_lower.items()):
+            if len(variants) > 1:
+                result.failures.append(Finding(
+                    lower,
+                    "регистро-дубликаты: " + ", ".join(sorted(variants))
+                    + " — молча совпадают на регистронезависимой ФС (macOS/Windows), "
+                    "ломаются в Docker/CI",
+                ))
+        if result.ok:
+            result.infos.append(
+                Finding("сводка", f"проверено путей: {len(paths)}, коллизий регистра: 0")
+            )
+        return result
+
+
 class RevisionChecker:
     def __init__(self, root: Path = REPO_ROOT) -> None:
         self._checks = [LinkChecker(root), LegacyModelChecker(root),
-                        CjkCanaryChecker(root), CountChecker(root)]
+                        CjkCanaryChecker(root), CountChecker(root),
+                        CaseCollisionChecker(root)]
 
     def run(self) -> list[CheckResult]:
         return [check.run() for check in self._checks]

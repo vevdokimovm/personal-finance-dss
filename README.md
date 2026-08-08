@@ -477,7 +477,7 @@ Dockerfile, docker-compose.yml, gunicorn_conf.py
 | [`SECURITY.md`](SECURITY.md) | Единый security-док: меры (ссылки на код), что осталось, домены ревью, план реагирования |
 | [`docs/DEPLOY.md`](docs/DEPLOY.md) | Пошаговый деплой на VPS |
 | [`docs/CONTRIBUTING.md`](docs/CONTRIBUTING.md) | Процесс: TDD-цикл, PG для схемы, Definition of Done |
-| [`docs/GLOSSARY.md`](docs/GLOSSARY.md) | Термины и обозначения (Rt, Lt, Dt, BLR, Sn…) |
+| [`docs/glossary.md`](docs/glossary.md) | Термины и обозначения (Rt, Lt, Dt, BLR, Sn…) |
 | [`docs/reports/incidents_summary.md`](docs/reports/incidents_summary.md) · [`docs/reports/investigations_summary.md`](docs/reports/investigations_summary.md) | Реестры инцидентов и расследований |
 
 ---

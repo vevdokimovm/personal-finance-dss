@@ -9,6 +9,7 @@ from __future__ import annotations
 
 from tools.revision.revision_check import (
     REPO_ROOT,
+    CaseCollisionChecker,
     CjkCanaryChecker,
     CountChecker,
     LegacyModelChecker,
@@ -47,6 +48,25 @@ class TestRepoRevisionGate:
         result = CjkCanaryChecker(tmp_path).run()
         assert not result.ok
         assert any("note.md:1" in f.location for f in result.failures)
+
+    def test_no_case_only_path_collisions(self) -> None:
+        result = CaseCollisionChecker(REPO_ROOT).run()
+        assert result.ok, "Пути-регистро-дубликаты:\n" + _fmt(result)
+
+    def test_case_collision_checker_detects_synthetic(self) -> None:
+        # Реальный класс бага (этот батч): docs/GLOSSARY.md vs docs/glossary.md —
+        # один inode на macOS (регистронезависимая ФС), два разных файла в Docker/CI.
+        # На диске такую пару здесь не создать (тот же коллапс), поэтому список путей
+        # подаётся напрямую — так же, как CaseCollisionChecker читает git ls-files.
+        paths = ["docs/glossary.md", "docs/GLOSSARY.md", "docs/README.md"]
+        result = CaseCollisionChecker(REPO_ROOT, paths=paths).run()
+        assert not result.ok
+        assert any("docs/glossary.md" in f.location for f in result.failures)
+
+    def test_case_collision_checker_skips_when_no_git(self, tmp_path) -> None:
+        result = CaseCollisionChecker(tmp_path).run()
+        assert result.ok
+        assert any("пропущена" in f.detail for f in result.infos)
 
     def test_full_revision_clean(self) -> None:
         results = RevisionChecker().run()
