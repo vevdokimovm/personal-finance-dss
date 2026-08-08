@@ -24,6 +24,18 @@ export function DashboardSkeleton() {
           </div>
         ))}
       </div>
+      {/* Заглушки под AllocationPanel и ForecastPanel — без них loading короче
+          loaded и страница «прыгает» на их высоту при появлении данных. */}
+      <div className="fp-panel" aria-hidden="true">
+        <div className={clsx("fp-skeleton", "fp-skel-panel-title")} />
+        <div className={clsx("fp-skeleton", "fp-skel-panel-lede")} />
+        <div className={clsx("fp-skeleton", "fp-skel-alloc-bar")} />
+      </div>
+      <div className="fp-panel" aria-hidden="true">
+        <div className={clsx("fp-skeleton", "fp-skel-panel-title")} />
+        <div className={clsx("fp-skeleton", "fp-skel-panel-lede")} />
+        <div className={clsx("fp-skeleton", "fp-skel-chart")} />
+      </div>
     </main>
   );
 }

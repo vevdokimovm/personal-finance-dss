@@ -1,0 +1,30 @@
+.fp-theme-toggle {
+  display: inline-flex;
+}
+.fp-theme-toggle__select {
+  font-family: inherit;
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  color: var(--c-text2);
+  background: var(--c-surface);
+  /* --c-border-hl даёт ~2.9:1 на --c-surface в тёмной теме — ниже 3:1
+     (WCAG 1.4.11, non-text contrast для рамки интерактивного контрола).
+     --c-text3 тем же токеном что и остальной "приглушённый" текст проекта
+     держит ~5.3:1 в обеих темах (a11y-auditor, v8.5.2). */
+  border: var(--border-w) solid var(--c-text3);
+  border-radius: var(--r-sm);
+  padding: var(--sp-2) var(--sp-3);
+  min-height: var(--tap-target-min);
+  cursor: pointer;
+  transition:
+    color var(--motion-fast) var(--ease),
+    border-color var(--motion-fast) var(--ease);
+}
+.fp-theme-toggle__select:hover {
+  color: var(--c-text);
+  border-color: var(--c-accent);
+}
+.fp-theme-toggle__select:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: var(--focus-ring-offset);
+}

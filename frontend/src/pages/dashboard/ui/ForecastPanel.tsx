@@ -11,24 +11,18 @@ import {
 import { formatMoney } from "@shared/lib/money/formatMoney";
 import { t } from "@shared/lib/i18n/t";
 import type { ForecastResult } from "@entities/plan-summary";
+import { buildForecastChartData } from "./buildForecastChartData";
 
 export function ForecastPanel({ forecast }: { forecast: ForecastResult }) {
-  const points = forecast.forecast;
-  const last = points[points.length - 1];
-  const chartData = [
-    {
-      period: 0,
-      Rt: forecast.current.Rt,
-      Rt_p10: forecast.current.Rt,
-      Rt_p90: forecast.current.Rt,
-    },
-    ...points.map((p) => ({
-      period: p.period,
-      Rt: p.Rt,
-      Rt_p10: p.Rt_p10 ?? p.Rt,
-      Rt_p90: p.Rt_p90 ?? p.Rt,
-    })),
-  ];
+  const chartData = buildForecastChartData(forecast);
+  const last = chartData[chartData.length - 1];
+  // Диапазон в подвале — только если API реально дал p10/p90 для последней
+  // точки (не coalesced-заглушка buildForecastChartData: там ?? Rt подменяет
+  // отсутствующий интервал нулевой шириной для стека графика, но в текстовом
+  // подвале показывать "диапазон X-X" при фактическом отсутствии интервала
+  // было бы вводящим в заблуждение — как и раньше, просто скрываем строку).
+  const lastRaw = forecast.forecast[forecast.forecast.length - 1];
+  const hasRange = lastRaw != null && lastRaw.Rt_p10 != null && lastRaw.Rt_p90 != null;
 
   return (
     <section className="fp-panel">
@@ -58,7 +52,11 @@ export function ForecastPanel({ forecast }: { forecast: ForecastResult }) {
               width={72}
             />
             <Tooltip
-              formatter={(value) => formatMoney(Number(value))}
+              // Только медиана (Rt) — p10/полоса служебные, полный диапазон
+              // уже есть в table.sr-only ниже (aria-hidden на самом графике).
+              formatter={(value, _name, entry) =>
+                entry?.dataKey === "Rt" ? formatMoney(Number(value)) : ""
+              }
               labelFormatter={(label) =>
                 label === 0 ? t("сейчас") : t("{n} мес", { n: Number(label) })
               }
@@ -70,16 +68,20 @@ export function ForecastPanel({ forecast }: { forecast: ForecastResult }) {
             />
             <Area
               type="monotone"
-              dataKey="Rt_p90"
+              dataKey="Rt_p10"
+              stackId="range"
               stroke="none"
-              fill="var(--c-accent-bg)"
+              fill="none"
+              legendType="none"
               isAnimationActive={false}
             />
             <Area
               type="monotone"
-              dataKey="Rt_p10"
+              dataKey="Rt_band"
+              stackId="range"
               stroke="none"
-              fill="var(--c-bg)"
+              fill="var(--c-accent-bg)"
+              legendType="none"
               isAnimationActive={false}
             />
             <Line
@@ -123,7 +125,7 @@ export function ForecastPanel({ forecast }: { forecast: ForecastResult }) {
           <span>
             {t("Медиана к {h} мес: {v}", { h: forecast.horizon, v: formatMoney(last.Rt) })}
           </span>
-          {last.Rt_p10 != null && last.Rt_p90 != null && (
+          {hasRange && (
             <span>
               {t("Диапазон (80%): {lo} – {hi}", {
                 lo: formatMoney(last.Rt_p10),

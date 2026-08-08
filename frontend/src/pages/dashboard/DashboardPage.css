@@ -92,6 +92,10 @@
   background: var(--c-amber-bg);
   color: var(--c-amber);
 }
+.fp-metric-badge--danger {
+  background: var(--c-red-bg);
+  color: var(--c-red);
+}
 .fp-metric-badge--muted {
   background: var(--c-bg2);
   color: var(--c-text3);
@@ -100,6 +104,15 @@
   font-size: var(--fs-2xl);
   font-weight: 800;
   margin-bottom: var(--sp-2);
+}
+/* TOK-жёсткий инвариант матмодели (ПДН ≤ 0.40) нарушен/близко — см.
+   docs/math_model_v3_0_0.md. Не применять --danger к мягким критериям
+   (ликвидность, подушка) — у них канон не задаёт жёсткого порога. */
+.fp-metric-value--warn {
+  color: var(--c-amber);
+}
+.fp-metric-value--danger {
+  color: var(--c-red);
 }
 .fp-metric-caption {
   font-size: var(--fs-xs);
@@ -203,6 +216,25 @@
 .fp-skel-metric-value {
   width: 40%;
   height: var(--fs-2xl);
+}
+.fp-skel-panel-title {
+  width: 32ch;
+  height: var(--fs-lg);
+  margin-bottom: var(--sp-2);
+}
+.fp-skel-panel-lede {
+  width: 52ch;
+  height: var(--fs-sm);
+  margin-bottom: var(--sp-5);
+}
+.fp-skel-alloc-bar {
+  width: 100%;
+  height: var(--sp-3);
+  border-radius: var(--r-full);
+}
+.fp-skel-chart {
+  width: 100%;
+  height: var(--chart-height-sm);
 }
 
 .fp-skeleton {

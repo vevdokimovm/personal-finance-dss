@@ -24,6 +24,14 @@ a {
   color: var(--c-accent);
 }
 
+.fp-app-topbar {
+  display: flex;
+  justify-content: flex-end;
+  padding: var(--sp-4) var(--sp-5) 0;
+  max-width: var(--content-max);
+  margin: 0 auto;
+}
+
 /* Видимо только скринридеру — заголовки h1/статус загрузки на экранах без видимого текста. */
 .sr-only {
   position: absolute;

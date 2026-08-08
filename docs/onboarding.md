@@ -12,7 +12,17 @@
 
 ## Поднять локально (10 минут)
 
-1. `python3 -m venv .venv && source .venv/bin/activate`
+> **[!] Проект живёт в `.venv`, не в системном Python.** На новой машине системный `python3`
+> может резолвиться в устаревшую версию (найдено на практике: macOS-хост дал 3.10, а
+> `numpy==2.4.4` из `requirements-dev.txt` требует ≥3.11 — `pip install` падал только на этом
+> пакете, всё остальное молча ставилось глобально в системный Python). Если `.venv` отсутствует,
+> ставь его **явно свежим** интерпретатором (`python3.13 -m venv .venv`, не первым `python3` из
+> PATH) — не полагайся на то, что «`pip install` без ошибок» значит «окружение верное».
+> `.claude/hooks/tests-gate.sh` при отсутствующем `.venv` тихо откатывается на системный
+> `python3` — это защита от падения хука, а не санкционированный способ гонять тесты проекта.
+
+1. `python3.13 -m venv .venv && source .venv/bin/activate` (версия — см. предупреждение выше;
+   `python3` без номера может оказаться старше, чем требуют зависимости)
 2. `pip install -r requirements.txt -r requirements-dev.txt`
 3. `uvicorn app.main:app --reload` → http://127.0.0.1:8000 (SQLite из коробки; PG — `DATABASE_URL`).
 4. Тесты: `pytest -q` (fast-suite; полный контур — `docs/QA.md`). E2E: `playwright install chromium`.
