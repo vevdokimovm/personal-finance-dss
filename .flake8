@@ -4,7 +4,10 @@ extend-ignore = F403, F405, F401
 exclude = .venv, venv, __pycache__, .mypy_cache, .pytest_cache, alembic, build, dist, knowledge,
     # артефакты-улики независимых экспертных движков (сертификация): их стиль — часть улик,
     # реформат фальсифицировал бы поставленный экспертом код
-    docs/model/expert_certification/iterations
+    docs/model/expert_certification/iterations,
+    # frontend/node_modules — вендоренный JS-стек (Э2 плана вехи 8); часть пакетов (katex,
+    # flatted) несёт с собой служебные .py-скрипты не нашего авторства — не наш код, не линтуется
+    frontend/node_modules
 # render_portrait_cards.py — research/рендер-скрипт: строки >100 это дословные выходные
 # литералы досье-карточек и легенды (строки таблиц, проза), уходящие экспертам через
 # knowledge/survey_auditory/. Перенос менял бы вывод; per-file-ignore вместо реформата

@@ -28,7 +28,7 @@ class Settings(BaseSettings):
         description="Название проекта.",
     )
     APP_VERSION: str = Field(
-        default="8.4.1",
+        default="8.5.0",
         description="Версия приложения (INFRA-13): код, UI-футер, git-тег.",
     )
     PROJECT_TAGLINE: str = Field(
@@ -46,8 +46,14 @@ class Settings(BaseSettings):
         description="Окружение: development | production (INFRA-10/12).",
     )
     CORS_ORIGINS: str = Field(
-        default="http://localhost:8000,http://127.0.0.1:8000",
-        description="Разрешённые источники CORS через запятую (INFRA-12).",
+        default=(
+            "http://localhost:8000,http://127.0.0.1:8000,"
+            "http://localhost:5173,http://127.0.0.1:5173"
+        ),
+        description=(
+            "Разрешённые источники CORS через запятую (INFRA-12). "
+            "5173 — Vite dev-server (frontend/), веха 8, Э2+; прод переопределяет env-переменной."
+        ),
     )
     RATE_LIMIT_REQUESTS: int = Field(
         default=30,

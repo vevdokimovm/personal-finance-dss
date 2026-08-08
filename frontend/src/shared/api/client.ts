@@ -15,7 +15,10 @@ import { client } from "./generated/client.gen";
  */
 export function configureApiClient(): void {
   client.setConfig({
-    baseUrl: "/api",
+    // Пусто, не "/api": пути в OpenAPI-снимке уже абсолютные и включают /api
+    // (роутеры примонтированы с этим префиксом на бэкенде) — baseUrl="/api" даёт
+    // /api/api/... и 403 на несуществующий путь (найдено вручную в браузере, не молча).
+    baseUrl: "",
     credentials: "include",
   });
 }

@@ -1,0 +1,242 @@
+/* Направление «Спокойный» — перенесено из docs/ui_directions/calm/dashboard.html
+   (выбор владельца, docs/ui_visual_direction.md). Только токены, ни одного px/hex вне них —
+   see .claude/hooks/check-design-tokens.sh. */
+
+.fp-dashboard {
+  max-width: var(--content-max);
+  margin: 0 auto;
+  padding: var(--sp-6) var(--sp-5) var(--sp-8);
+}
+
+/* ── Hero ──────────────────────────────────────────── */
+.fp-hero {
+  background: var(--c-surface);
+  border: var(--border-w) solid var(--c-border);
+  border-radius: var(--r-xl);
+  padding: var(--sp-7);
+  margin-bottom: var(--sp-7);
+  box-shadow: var(--shadow-card);
+}
+.fp-eyebrow {
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  color: var(--c-text3);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.fp-hero-value {
+  font-size: var(--fs-3xl);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  margin: var(--sp-2) 0 var(--sp-3);
+  color: var(--c-text);
+}
+.fp-hero-sub {
+  color: var(--c-text2);
+  max-width: 62ch;
+  font-size: var(--fs-md);
+  margin: 0 0 var(--sp-6);
+}
+.fp-hero-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-7);
+  padding-top: var(--sp-5);
+  border-top: var(--border-w) solid var(--c-border);
+}
+.fp-hero-stat-label {
+  font-size: var(--fs-xs);
+  color: var(--c-text3);
+  display: block;
+  margin-bottom: var(--sp-1);
+}
+.fp-hero-stat-value {
+  font-size: var(--fs-lg);
+  font-weight: 700;
+}
+.fp-hero-cta {
+  margin-top: var(--sp-6);
+}
+
+/* ── Metrics ──────────────────────────────────────────── */
+.fp-metrics {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--sp-6);
+  margin-bottom: var(--sp-7);
+}
+.fp-metric-card {
+  background: var(--c-surface);
+  border: var(--border-w) solid var(--c-border);
+  border-radius: var(--r-lg);
+  padding: var(--sp-6);
+}
+.fp-metric-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: var(--sp-3);
+}
+.fp-metric-name {
+  font-size: var(--fs-sm);
+  color: var(--c-text2);
+  font-weight: 600;
+}
+.fp-metric-badge {
+  font-size: var(--fs-xs);
+  padding: var(--sp-0) var(--sp-2);
+  border-radius: var(--r-full);
+  font-weight: 600;
+}
+.fp-metric-badge--warn {
+  background: var(--c-amber-bg);
+  color: var(--c-amber);
+}
+.fp-metric-badge--muted {
+  background: var(--c-bg2);
+  color: var(--c-text3);
+}
+.fp-metric-value {
+  font-size: var(--fs-2xl);
+  font-weight: 800;
+  margin-bottom: var(--sp-2);
+}
+.fp-metric-caption {
+  font-size: var(--fs-xs);
+  color: var(--c-text3);
+  line-height: 1.5;
+}
+
+/* ── Panels ──────────────────────────────────────────── */
+.fp-panel {
+  background: var(--c-surface);
+  border: var(--border-w) solid var(--c-border);
+  border-radius: var(--r-lg);
+  padding: var(--sp-6);
+  margin-bottom: var(--sp-6);
+}
+.fp-panel h2 {
+  font-size: var(--fs-lg);
+  font-weight: 700;
+  margin: 0 0 var(--sp-2);
+}
+.fp-panel .fp-lede {
+  color: var(--c-text2);
+  font-size: var(--fs-sm);
+  margin: 0 0 var(--sp-5);
+  max-width: 68ch;
+}
+
+.fp-alloc-bar {
+  display: flex;
+  height: var(--sp-3);
+  border-radius: var(--r-full);
+  overflow: hidden;
+  gap: var(--sp-0);
+  margin-bottom: var(--sp-3);
+}
+.fp-alloc-legend {
+  display: flex;
+  gap: var(--sp-6);
+  flex-wrap: wrap;
+  font-size: var(--fs-sm);
+}
+.fp-alloc-legend .fp-dot {
+  width: var(--sp-2);
+  height: var(--sp-2);
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: var(--sp-2);
+}
+
+.fp-forecast-chart {
+  width: 100%;
+  height: var(--chart-height-sm);
+}
+.fp-forecast-foot {
+  display: flex;
+  justify-content: space-between;
+  font-size: var(--fs-xs);
+  color: var(--c-text3);
+  margin-top: var(--sp-3);
+}
+
+/* ── Empty / error / skeleton ──────────────────────────── */
+.fp-state-panel {
+  background: var(--c-surface);
+  border: var(--border-w) solid var(--c-border);
+  border-radius: var(--r-xl);
+  padding: var(--sp-7);
+  text-align: center;
+  max-width: 62ch;
+  margin: var(--sp-8) auto;
+}
+.fp-state-panel h2 {
+  font-size: var(--fs-xl);
+  margin: 0 0 var(--sp-3);
+}
+.fp-state-panel p {
+  color: var(--c-text2);
+  font-size: var(--fs-md);
+  margin: 0 0 var(--sp-6);
+}
+
+.fp-skel-eyebrow {
+  width: 30ch;
+  height: var(--sp-3);
+  margin-bottom: var(--sp-3);
+}
+.fp-skel-hero-value {
+  width: 40%;
+  height: var(--fs-3xl);
+  margin-bottom: var(--sp-3);
+}
+.fp-skel-hero-sub {
+  width: 100%;
+  height: var(--fs-xl);
+}
+.fp-skel-metric-label {
+  width: 60%;
+  height: var(--fs-md);
+  margin-bottom: var(--sp-4);
+}
+.fp-skel-metric-value {
+  width: 40%;
+  height: var(--fs-2xl);
+}
+
+.fp-skeleton {
+  display: block;
+  background: linear-gradient(
+    90deg,
+    var(--c-surface) 25%,
+    var(--c-surface-up) 50%,
+    var(--c-surface) 75%
+  );
+  background-size: 200% 100%;
+  border-radius: var(--r-md);
+  animation: fp-shimmer 1.4s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .fp-skeleton {
+    animation: none;
+  }
+}
+@keyframes fp-shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* 768px = var(--bp-md) в tokens.css — CSS не позволяет custom property в условии @media. */
+@media (max-width: 768px) {
+  .fp-metrics {
+    grid-template-columns: 1fr;
+  }
+  .fp-hero-value {
+    font-size: var(--fs-2xl);
+  }
+}
