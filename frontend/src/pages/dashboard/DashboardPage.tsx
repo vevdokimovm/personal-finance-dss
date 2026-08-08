@@ -4,9 +4,9 @@ import { DashboardSkeleton } from "./ui/DashboardSkeleton";
 import { DashboardEmpty } from "./ui/DashboardEmpty";
 import { DashboardErrorState } from "./ui/DashboardErrorState";
 import { Hero } from "./ui/Hero";
-import { MetricsGrid } from "./ui/MetricsGrid";
-import { AllocationPanel } from "./ui/AllocationPanel";
-import { ForecastPanel } from "./ui/ForecastPanel";
+import { MetricsGrid } from "@widgets/metrics-grid";
+import { AllocationPanel } from "@widgets/allocation-panel";
+import { ForecastPanel } from "@widgets/forecast-panel";
 import "./DashboardPage.css";
 
 export function DashboardPage() {
@@ -38,25 +38,12 @@ export function DashboardPage() {
     return <DashboardEmpty />;
   }
 
-  const best = plan.top3[0];
-
   return (
     <main className="fp-dashboard">
       <h1 className="sr-only">{t("Финансовый обзор")}</h1>
       <Hero plan={plan} />
       <MetricsGrid indicators={plan.indicators} />
-      {best ? (
-        <AllocationPanel best={best} />
-      ) : (
-        <section className="fp-panel">
-          <h2>{t("Плана распределения нет")}</h2>
-          <p className="fp-lede">
-            {t(
-              "Расходы и платежи превышают доход — свободных денег не остаётся, и алгоритм не выдаёт рекомендацию (fail-loud), а не молчит об этом.",
-            )}
-          </p>
-        </section>
-      )}
+      <AllocationPanel best={plan.top3[0] ?? null} />
       <ForecastPanel forecast={forecast} />
     </main>
   );

@@ -12,6 +12,8 @@ import { formatMoney } from "@shared/lib/money/formatMoney";
 import { t } from "@shared/lib/i18n/t";
 import type { ForecastResult } from "@entities/plan-summary";
 import { buildForecastChartData } from "./buildForecastChartData";
+import "@shared/ui/panel.css";
+import "./ForecastPanel.css";
 
 export function ForecastPanel({ forecast }: { forecast: ForecastResult }) {
   const chartData = buildForecastChartData(forecast);

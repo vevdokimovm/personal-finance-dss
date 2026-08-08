@@ -1,0 +1,67 @@
+.fp-metrics {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--sp-6);
+  margin-bottom: var(--sp-7);
+}
+.fp-metric-card {
+  background: var(--c-surface);
+  border: var(--border-w) solid var(--c-border);
+  border-radius: var(--r-lg);
+  padding: var(--sp-6);
+}
+.fp-metric-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: var(--sp-3);
+}
+.fp-metric-name {
+  font-size: var(--fs-sm);
+  color: var(--c-text2);
+  font-weight: 600;
+}
+.fp-metric-badge {
+  font-size: var(--fs-xs);
+  padding: var(--sp-0) var(--sp-2);
+  border-radius: var(--r-full);
+  font-weight: 600;
+}
+.fp-metric-badge--warn {
+  background: var(--c-amber-bg);
+  color: var(--c-amber);
+}
+.fp-metric-badge--danger {
+  background: var(--c-red-bg);
+  color: var(--c-red);
+}
+.fp-metric-badge--muted {
+  background: var(--c-bg2);
+  color: var(--c-text3);
+}
+.fp-metric-value {
+  font-size: var(--fs-2xl);
+  font-weight: 800;
+  margin-bottom: var(--sp-2);
+}
+/* TOK-жёсткий инвариант матмодели (ПДН ≤ 0.40) нарушен/близко — см.
+   docs/math_model_v3_0_0.md. Не применять --danger к мягким критериям
+   (ликвидность, подушка) — у них канон не задаёт жёсткого порога. */
+.fp-metric-value--warn {
+  color: var(--c-amber);
+}
+.fp-metric-value--danger {
+  color: var(--c-red);
+}
+.fp-metric-caption {
+  font-size: var(--fs-xs);
+  color: var(--c-text3);
+  line-height: 1.5;
+}
+
+/* 768px = var(--bp-md) в tokens.css — CSS не позволяет custom property в условии @media. */
+@media (max-width: 768px) {
+  .fp-metrics {
+    grid-template-columns: 1fr;
+  }
+}

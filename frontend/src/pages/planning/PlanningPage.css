@@ -1,0 +1,49 @@
+.fp-planning {
+  max-width: var(--content-max);
+  margin: 0 auto;
+  padding: var(--sp-6) var(--sp-5) var(--sp-8);
+}
+.fp-planning h1 {
+  font-size: var(--fs-xl);
+  margin: 0;
+}
+.fp-planning__head {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  margin-bottom: var(--sp-5);
+}
+.fp-planning__risk-badge {
+  background: var(--c-accent-bg);
+  color: var(--c-accent);
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  padding: var(--sp-0) var(--sp-2);
+  border-radius: var(--r-full);
+}
+
+.fp-planning__inputs {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--sp-4);
+  background: var(--c-surface);
+  border: var(--border-w) solid var(--c-border);
+  border-radius: var(--r-lg);
+  padding: var(--sp-5) var(--sp-6);
+  margin: 0 0 var(--sp-7);
+}
+.fp-planning__inputs dt {
+  font-size: var(--fs-xs);
+  color: var(--c-text3);
+  margin-bottom: var(--sp-1);
+}
+.fp-planning__inputs dd {
+  font-weight: 700;
+  margin: 0;
+}
+
+@media (max-width: 768px) {
+  .fp-planning__inputs {
+    grid-template-columns: 1fr 1fr;
+  }
+}

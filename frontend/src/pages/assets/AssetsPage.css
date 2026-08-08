@@ -1,0 +1,62 @@
+.fp-assets {
+  max-width: var(--content-max);
+  margin: 0 auto;
+  padding: var(--sp-5);
+}
+.fp-assets h1 {
+  font-size: var(--fs-xl);
+  margin: 0 0 var(--sp-2);
+}
+.fp-assets__lede {
+  color: var(--c-text2);
+  font-size: var(--fs-sm);
+  max-width: 68ch;
+  margin: 0 0 var(--sp-5);
+}
+.fp-assets__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+
+.fp-asset-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-4);
+  background: var(--c-surface);
+  border: var(--border-w) solid var(--c-border);
+  border-radius: var(--r-md);
+  padding: var(--sp-4);
+}
+.fp-asset-row__main {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-0);
+  min-width: 0;
+}
+.fp-asset-row__name {
+  font-weight: 600;
+}
+.fp-asset-row__type {
+  color: var(--c-text3);
+  font-size: var(--fs-xs);
+}
+.fp-asset-row__rate {
+  color: var(--c-text3);
+  font-size: var(--fs-sm);
+  flex-shrink: 0;
+}
+.fp-asset-row__amount {
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+@media (max-width: 768px) {
+  .fp-asset-row {
+    flex-wrap: wrap;
+  }
+}

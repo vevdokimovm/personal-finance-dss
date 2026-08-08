@@ -2,6 +2,7 @@ import { MetricCard } from "./MetricCard";
 import { formatNumber, formatPercent } from "@shared/lib/money/formatMoney";
 import { t } from "@shared/lib/i18n/t";
 import type { PlanIndicators } from "@entities/plan-summary";
+import "./MetricsGrid.css";
 
 // Жёсткий инвариант канона v3.0.0 (docs/math_model_v3_0_0.md): ПДН <= 0.40.
 // "Приближение" не задано каноном числом — продуктовый запас в 5 п.п., не
@@ -27,7 +28,7 @@ export function MetricsGrid({ indicators }: { indicators: PlanIndicators }) {
   const blrRisk = indicators.BLR != null && indicators.BLR < RUNWAY_WARN_THRESHOLD;
 
   return (
-    <section className="fp-metrics">
+    <section className="fp-metrics" aria-label={t("Ключевые показатели")}>
       <MetricCard
         name={t("Ликвидность")}
         badge={ltRisk ? t("{n} мес. автономии", { n: formatNumber(indicators.Lt) }) : undefined}

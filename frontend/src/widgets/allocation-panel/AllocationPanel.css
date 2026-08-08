@@ -1,0 +1,21 @@
+.fp-alloc-bar {
+  display: flex;
+  height: var(--sp-3);
+  border-radius: var(--r-full);
+  overflow: hidden;
+  gap: var(--sp-0);
+  margin-bottom: var(--sp-3);
+}
+.fp-alloc-legend {
+  display: flex;
+  gap: var(--sp-6);
+  flex-wrap: wrap;
+  font-size: var(--fs-sm);
+}
+.fp-alloc-legend .fp-dot {
+  width: var(--sp-2);
+  height: var(--sp-2);
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: var(--sp-2);
+}

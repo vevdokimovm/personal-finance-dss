@@ -1,0 +1,44 @@
+.fp-profile {
+  max-width: var(--content-max);
+  margin: 0 auto;
+  padding: var(--sp-5);
+}
+.fp-profile h1 {
+  font-size: var(--fs-xl);
+  margin: 0 0 var(--sp-5);
+}
+.fp-profile__card {
+  background: var(--c-surface);
+  border: var(--border-w) solid var(--c-border);
+  border-radius: var(--r-lg);
+  padding: var(--sp-6);
+  max-width: 60ch;
+}
+.fp-profile__row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--sp-4);
+  padding: var(--sp-3) 0;
+  border-bottom: var(--border-w) solid var(--c-border);
+}
+.fp-profile__row:last-child {
+  border-bottom: none;
+}
+.fp-profile__label {
+  color: var(--c-text3);
+  font-size: var(--fs-sm);
+}
+.fp-profile__value {
+  font-weight: 600;
+}
+.fp-profile__badge {
+  display: inline-block;
+  margin-left: var(--sp-2);
+  background: var(--c-amber-bg);
+  color: var(--c-amber);
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  padding: var(--sp-0) var(--sp-2);
+  border-radius: var(--r-full);
+}
