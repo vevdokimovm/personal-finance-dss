@@ -1,0 +1,83 @@
+.fp-transactions {
+  max-width: var(--content-max);
+  margin: 0 auto;
+  padding: var(--sp-5);
+}
+.fp-transactions h1 {
+  font-size: var(--fs-xl);
+  margin: 0 0 var(--sp-5);
+}
+.fp-transactions__legend {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  color: var(--c-text3);
+  font-size: var(--fs-xs);
+  margin: 0 0 var(--sp-4);
+}
+.fp-transactions__legend .fp-dot {
+  width: var(--sp-2);
+  height: var(--sp-2);
+  border-radius: 50%;
+  display: inline-block;
+}
+.fp-transactions__legend .fp-dot:not(:first-child) {
+  margin-left: var(--sp-3);
+}
+
+.fp-transactions__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+
+.fp-transaction-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-4);
+  background: var(--c-surface);
+  border: var(--border-w) solid var(--c-border);
+  border-radius: var(--r-md);
+  padding: var(--sp-4);
+}
+.fp-transaction-row__main {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-0);
+  min-width: 0;
+}
+.fp-transaction-row__category {
+  font-weight: 600;
+}
+.fp-transaction-row__description {
+  color: var(--c-text3);
+  font-size: var(--fs-xs);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.fp-transaction-row__date {
+  color: var(--c-text3);
+  font-size: var(--fs-sm);
+  flex-shrink: 0;
+}
+.fp-transaction-row__amount--income {
+  color: var(--c-green);
+  font-weight: 700;
+  flex-shrink: 0;
+}
+.fp-transaction-row__amount--expense {
+  color: var(--c-red);
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+@media (max-width: 768px) {
+  .fp-transaction-row {
+    flex-wrap: wrap;
+  }
+}

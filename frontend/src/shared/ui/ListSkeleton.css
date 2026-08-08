@@ -1,0 +1,23 @@
+.fp-list-skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+}
+.fp-list-skeleton__row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--sp-4);
+  background: var(--c-surface);
+  border: var(--border-w) solid var(--c-border);
+  border-radius: var(--r-md);
+  padding: var(--sp-4);
+}
+.fp-skel-row-primary {
+  width: 45%;
+  height: var(--fs-md);
+}
+.fp-skel-row-secondary {
+  width: 20%;
+  height: var(--fs-md);
+}

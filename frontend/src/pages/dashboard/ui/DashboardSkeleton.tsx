@@ -1,5 +1,6 @@
 import clsx from "clsx";
 import { t } from "@shared/lib/i18n/t";
+import "@shared/ui/skeleton.css";
 
 /** Загрузка — TOK-06/A11Y-09: скелетон, не спиннер; уважает prefers-reduced-motion (см. CSS).
  * role="status" (не aria-live на узле с уже готовым содержимым при монтировании) — надёжнее

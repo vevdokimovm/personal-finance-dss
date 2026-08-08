@@ -1,0 +1,66 @@
+.fp-obligations {
+  max-width: var(--content-max);
+  margin: 0 auto;
+  padding: var(--sp-5);
+}
+.fp-obligations h1 {
+  font-size: var(--fs-xl);
+  margin: 0 0 var(--sp-5);
+}
+.fp-obligations__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+}
+
+.fp-obligation-row {
+  background: var(--c-surface);
+  border: var(--border-w) solid var(--c-border);
+  border-radius: var(--r-md);
+  padding: var(--sp-4);
+}
+.fp-obligation-row__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--sp-3);
+  margin-bottom: var(--sp-2);
+}
+.fp-obligation-row__name {
+  font-weight: 600;
+}
+.fp-obligation-row__payment {
+  font-weight: 700;
+  flex-shrink: 0;
+}
+.fp-obligation-row__payment-unit {
+  color: var(--c-text3);
+  font-weight: 400;
+  font-size: var(--fs-xs);
+}
+.fp-obligation-row__meta {
+  display: flex;
+  gap: var(--sp-4);
+  color: var(--c-text3);
+  font-size: var(--fs-xs);
+  margin-bottom: var(--sp-3);
+}
+.fp-obligation-row__bar {
+  height: var(--sp-1);
+  background: var(--c-bg2);
+  /* --c-bg2 даёт ~1.0-1.15:1 на --c-surface (обе темы) — ниже WCAG 1.4.11 (3:1
+     для значимой графики: прогресс — не декорация). Граница --c-text3 держит
+     ~5.3:1 в обеих темах (тот же токен, что уже чинил контраст ThemeToggle,
+     v8.5.2) — трек различим по контуру, даже если сама заливка бледная. */
+  border: var(--border-w) solid var(--c-text3);
+  border-radius: var(--r-full);
+  overflow: hidden;
+}
+.fp-obligation-row__bar-fill {
+  height: 100%;
+  background: var(--c-accent);
+  border-radius: var(--r-full);
+}
