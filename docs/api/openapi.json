@@ -62,6 +62,69 @@
         "title": "AllocationDTO",
         "type": "object"
       },
+      "AnalyzePortrait": {
+        "description": "Произвольный портрет для проверки на странице «Валидация» (загрузка/вставка JSON).",
+        "properties": {
+          "expense_history": {
+            "items": {
+              "type": "number"
+            },
+            "title": "Expense History",
+            "type": "array"
+          },
+          "expenses": {
+            "items": {
+              "$ref": "#/components/schemas/_AnalyzeItem"
+            },
+            "title": "Expenses",
+            "type": "array"
+          },
+          "goals": {
+            "items": {
+              "$ref": "#/components/schemas/_AnalyzeGoal"
+            },
+            "title": "Goals",
+            "type": "array"
+          },
+          "income": {
+            "items": {
+              "$ref": "#/components/schemas/_AnalyzeItem"
+            },
+            "title": "Income",
+            "type": "array"
+          },
+          "income_history": {
+            "items": {
+              "type": "number"
+            },
+            "title": "Income History",
+            "type": "array"
+          },
+          "liquid_assets": {
+            "items": {
+              "$ref": "#/components/schemas/_AnalyzeAsset"
+            },
+            "title": "Liquid Assets",
+            "type": "array"
+          },
+          "obligations": {
+            "items": {
+              "$ref": "#/components/schemas/_AnalyzeObligation"
+            },
+            "title": "Obligations",
+            "type": "array"
+          },
+          "risk_tolerance": {
+            "default": 3,
+            "maximum": 5.0,
+            "minimum": 1.0,
+            "title": "Risk Tolerance",
+            "type": "integer"
+          }
+        },
+        "title": "AnalyzePortrait",
+        "type": "object"
+      },
       "AuthResponse": {
         "properties": {
           "access_token": {
@@ -730,9 +793,16 @@
             "type": "number"
           },
           "deadline": {
-            "format": "date-time",
-            "title": "Deadline",
-            "type": "string"
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Deadline"
           },
           "household_id": {
             "anyOf": [
@@ -779,8 +849,7 @@
         },
         "required": [
           "name",
-          "target_amount",
-          "deadline"
+          "target_amount"
         ],
         "title": "GoalCreate",
         "type": "object"
@@ -802,9 +871,16 @@
             "type": "number"
           },
           "deadline": {
-            "format": "date-time",
-            "title": "Deadline",
-            "type": "string"
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Deadline"
           },
           "goal_id": {
             "title": "Goal Id",
@@ -823,8 +899,7 @@
           "goal_id",
           "name",
           "target_amount",
-          "current_amount",
-          "deadline"
+          "current_amount"
         ],
         "title": "GoalDTO",
         "type": "object"
@@ -863,9 +938,16 @@
             "type": "number"
           },
           "deadline": {
-            "format": "date-time",
-            "title": "Deadline",
-            "type": "string"
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Deadline"
           },
           "id": {
             "title": "Id",
@@ -911,7 +993,6 @@
           "name",
           "target_amount",
           "current_amount",
-          "deadline",
           "category"
         ],
         "title": "GoalResponse",
@@ -2002,6 +2083,11 @@
       },
       "RecommendationResponse": {
         "properties": {
+          "disclaimer": {
+            "default": "FINPILOT не является инвестиционным советником и не оказывает услуг по инвестиционному консультированию. Расчёты носят информационный характер и не являются индивидуальной инвестиционной рекомендацией. Решение и ответственность за него остаются за вами.",
+            "title": "Disclaimer",
+            "type": "string"
+          },
           "indicators": {
             "$ref": "#/components/schemas/IndicatorsResponse"
           },
@@ -2026,8 +2112,7 @@
       "RegisterRequest": {
         "properties": {
           "consent": {
-            "default": true,
-            "description": "Согласие на обработку ПДн (152-ФЗ). Веб-форма требует явную галочку; явный false → отказ.",
+            "description": "Согласие на обработку ПДн (152-ФЗ). ОБЯЗАТЕЛЬНОЕ поле без значения по умолчанию: default=True на уровне контракта — это предотмеченная галочка, надзор читает её как навязанное согласие (юрблок L2). Явный false → отказ в регистрации.",
             "title": "Consent",
             "type": "boolean"
           },
@@ -2050,7 +2135,7 @@
           },
           "newsletter_opt_in": {
             "default": false,
-            "description": "Согласие на новости/рассылку (необязательно).",
+            "description": "Согласие на рекламную рассылку. Независимо от согласия на обработку ПДн: склеивать обязательное с необязательным нельзя.",
             "title": "Newsletter Opt In",
             "type": "boolean"
           },
@@ -2076,7 +2161,8 @@
         },
         "required": [
           "email",
-          "password"
+          "password",
+          "consent"
         ],
         "title": "RegisterRequest",
         "type": "object"
@@ -2682,12 +2768,117 @@
         ],
         "title": "VariantIn",
         "type": "object"
+      },
+      "_AnalyzeAsset": {
+        "properties": {
+          "amount": {
+            "default": 0.0,
+            "title": "Amount",
+            "type": "number"
+          },
+          "interest_rate": {
+            "default": 0.0,
+            "title": "Interest Rate",
+            "type": "number"
+          },
+          "name": {
+            "default": "Актив",
+            "title": "Name",
+            "type": "string"
+          }
+        },
+        "title": "_AnalyzeAsset",
+        "type": "object"
+      },
+      "_AnalyzeGoal": {
+        "properties": {
+          "category": {
+            "default": "material",
+            "title": "Category",
+            "type": "string"
+          },
+          "current_amount": {
+            "default": 0.0,
+            "title": "Current Amount",
+            "type": "number"
+          },
+          "months_left": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Months Left"
+          },
+          "name": {
+            "default": "Цель",
+            "title": "Name",
+            "type": "string"
+          },
+          "target_amount": {
+            "default": 0.0,
+            "title": "Target Amount",
+            "type": "number"
+          }
+        },
+        "title": "_AnalyzeGoal",
+        "type": "object"
+      },
+      "_AnalyzeItem": {
+        "properties": {
+          "amount": {
+            "default": 0.0,
+            "title": "Amount",
+            "type": "number"
+          },
+          "category": {
+            "default": "Прочее",
+            "title": "Category",
+            "type": "string"
+          }
+        },
+        "title": "_AnalyzeItem",
+        "type": "object"
+      },
+      "_AnalyzeObligation": {
+        "properties": {
+          "amount": {
+            "default": 0.0,
+            "title": "Amount",
+            "type": "number"
+          },
+          "interest_rate": {
+            "default": 0.0,
+            "title": "Interest Rate",
+            "type": "number"
+          },
+          "monthly_payment": {
+            "default": 0.0,
+            "title": "Monthly Payment",
+            "type": "number"
+          },
+          "name": {
+            "default": "Обязательство",
+            "title": "Name",
+            "type": "string"
+          },
+          "term": {
+            "default": 0,
+            "title": "Term",
+            "type": "integer"
+          }
+        },
+        "title": "_AnalyzeObligation",
+        "type": "object"
       }
     }
   },
   "info": {
     "title": "FINPILOT",
-    "version": "5.14.0"
+    "version": "8.3.0"
   },
   "openapi": "3.1.0",
   "paths": {
@@ -4205,6 +4396,156 @@
         ]
       }
     },
+    "/api/consents": {
+      "get": {
+        "description": "Все известные типы, включая невыданные: фронт должен знать, что спросить.",
+        "operationId": "get_consents_api_consents_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Get Consents Api Consents Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Состояние согласий пользователя",
+        "tags": [
+          "Согласия и право"
+        ]
+      }
+    },
+    "/api/consents/{consent_type}": {
+      "delete": {
+        "operationId": "withdraw_api_consents__consent_type__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "consent_type",
+            "required": true,
+            "schema": {
+              "title": "Consent Type",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Отозвать согласие",
+        "tags": [
+          "Согласия и право"
+        ]
+      },
+      "post": {
+        "operationId": "grant_api_consents__consent_type__post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "consent_type",
+            "required": true,
+            "schema": {
+              "title": "Consent Type",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Grant Api Consents  Consent Type  Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Выдать согласие",
+        "tags": [
+          "Согласия и право"
+        ]
+      }
+    },
+    "/api/demo/analyze": {
+      "post": {
+        "description": "Принимает произвольный портрет (JSON) и возвращает метрики, прогноз и\nрекомендацию — не записывая в БД. Позволяет валидировать алгоритм на своих данных.\nДедлайны целей задаются как months_left; переводим в дату для preallocation.",
+        "operationId": "analyze_demo_api_demo_analyze_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AnalyzePortrait"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Analyze Demo Api Demo Analyze Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Проверить произвольный портрет (валидация)",
+        "tags": [
+          "Демо-данные"
+        ]
+      }
+    },
     "/api/demo/cases": {
       "get": {
         "operationId": "list_cases_api_demo_cases_get",
@@ -4213,12 +4554,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": {
-                    "items": {
-                      "type": "string"
-                    },
-                    "type": "array"
-                  },
+                  "additionalProperties": true,
                   "title": "Response List Cases Api Demo Cases Get",
                   "type": "object"
                 }
@@ -4227,7 +4563,7 @@
             "description": "Successful Response"
           }
         },
-        "summary": "Список доступных демо-кейсов",
+        "summary": "Список демо-кейсов с метаданными",
         "tags": [
           "Демо-данные"
         ]
@@ -4260,7 +4596,7 @@
     },
     "/api/demo/load": {
       "post": {
-        "description": "Загружает один из шести кейсов из портретов.\nПараметр case: anna | dmitriy | mikhail | igor | olga | viktor\nДоступно только в гостевом режиме — тестовая песочница не смешивается с данными\nреального аккаунта.",
+        "description": "Загружает один из десяти эталонных кейсов.\nДоступно только в гостевом режиме — тестовая песочница не смешивается с данными\nреального аккаунта.",
         "operationId": "load_demo_api_demo_load_post",
         "parameters": [
           {
@@ -4308,7 +4644,7 @@
     },
     "/api/demo/preview": {
       "get": {
-        "description": "Возвращает финансовый портрет кейса (доходы, расходы, обязательства, цели,\nнакопления) и базовые метрики — без записи в БД. Для раздела «Валидация».",
+        "description": "Полный расчёт кейса без записи в БД: портрет, метрики, прогноз и рекомендация.\nДля раздела «Валидация» — визуальная проверка всех основных функций сразу.",
         "operationId": "preview_demo_api_demo_preview_get",
         "parameters": [
           {
@@ -4346,7 +4682,7 @@
             "description": "Validation Error"
           }
         },
-        "summary": "Детальный портрет кейса без загрузки в БД",
+        "summary": "Портрет кейса + метрики + прогноз + рекомендация",
         "tags": [
           "Демо-данные"
         ]
@@ -5319,6 +5655,30 @@
         "summary": "Словарь переводов для языка (для фронтенда)",
         "tags": [
           "Локализация"
+        ]
+      }
+    },
+    "/api/legal/documents": {
+      "get": {
+        "description": "Публичный: версии нужны и до входа — на странице регистрации.",
+        "operationId": "legal_documents_api_legal_documents_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Legal Documents Api Legal Documents Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Реестр юридических документов",
+        "tags": [
+          "Согласия и право"
         ]
       }
     },
@@ -7170,6 +7530,24 @@
         "summary": "Согласие на обработку ПДн"
       }
     },
+    "/legal/cookies": {
+      "get": {
+        "operationId": "read_legal_cookies_legal_cookies_get",
+        "responses": {
+          "200": {
+            "content": {
+              "text/html": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Политика использования cookie"
+      }
+    },
     "/legal/financial-consent": {
       "get": {
         "operationId": "read_legal_financial_consent_legal_financial_consent_get",
@@ -7186,6 +7564,24 @@
           }
         },
         "summary": "Согласие на обработку финансовых данных"
+      }
+    },
+    "/legal/marketing-consent": {
+      "get": {
+        "operationId": "read_legal_marketing_consent_legal_marketing_consent_get",
+        "responses": {
+          "200": {
+            "content": {
+              "text/html": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Согласие на рекламную рассылку"
       }
     },
     "/legal/privacy": {

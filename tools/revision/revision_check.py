@@ -84,7 +84,12 @@ LEGACY_CONTEXT_MARKERS = (
 # tables 29: добавлена `user_consents` (юрблок L1, миграция 0030).
 # migrations 31: 0030 (раздельные согласия) и 0031 (перенос согласия на
 # финданные существующим пользователям).
-EXPECTED_COUNTS = {"tables": 29, "migrations": 31, "openapi_paths": 106}
+# openapi_paths 112 (v8.3.1): снимок в docs/api был протухшим на три мажора —
+# держал схему 5.14.0 со 106 путями, тогда как код отдавал 112. Недоставало
+# ровно юридического контура вехи 7 (/api/consents, /api/legal/documents,
+# /legal/cookies, /legal/marketing-consent). Пин был подогнан под протухший
+# снимок, поэтому гейт молчал о расхождении, а не ловил его.
+EXPECTED_COUNTS = {"tables": 29, "migrations": 31, "openapi_paths": 112}
 
 
 # Канарейка CJK: редкий токен-глюк генерации ассистентов — иероглиф вместо
