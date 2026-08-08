@@ -2,6 +2,72 @@
 
 Формат: [Keep a Changelog](https://keepachangelog.com/ru/1.0.0/). Версионирование — [SemVer](https://semver.org/lang/ru/).
 
+## [8.4.0] — 2026-08-07 — Веха 8, этап Э2: каркас фронта (MINOR)
+
+### Добавлено
+- `frontend/` — рабочий каркас SPA: Vite + React 19 + TypeScript, TanStack Router (файловая
+  маршрутизация) + TanStack Query, Zustand, Radix UI (Button/Tooltip как первые примитивы —
+  без Tailwind, стилизация напрямую токенами проекта, см. «Решения» ниже), Recharts + KaTeX
+  установлены. Структура папок — Feature-Sliced Design (`app/pages/widgets/features/entities/
+  shared`); `pages/widgets/features/entities` пока пустые с README — поэкранная раскладка
+  сознательно отложена до Э3 (`docs/frontend_migration_plan.md` §6).
+- Типизированный API-клиент сгенерирован из `docs/api/openapi.json` через `@hey-api/openapi-ts`
+  (SDK + типы + хуки TanStack Query, `frontend/src/shared/api/generated/`) — клиент не написан
+  руками. Конфиг — `frontend/openapi-ts.config.ts`, команда — `npm run generate:client`.
+- Слой токенов направления «Спокойный» перенесён в `frontend/src/app/styles/tokens.css`
+  (докупили `--r-xs`, `--border-w`, `--tap-target-min`, `--c-accent-ink`, `--focus-ring` —
+  их не было в `docs/ui_directions/calm/tokens.css`, понадобились для реальных компонентов).
+- `.claude/hooks/check-design-tokens.sh` теперь **блокирует** (exit 2) хардкод-hex/px мимо
+  токенов в `.css/.ts/.tsx` — раньше только предупреждал (exit 0). Проверено: тестовый файл
+  с `color: #ff00ff` блокируется.
+- CI (`.github/workflows/ci.yml`): новый job `frontend` в fast-тир — typecheck, lint, format,
+  Vitest, сборка, каждый шаг блокирующий; в full-тир добавлен фронт-E2E (Playwright,
+  chromium+firefox+webkit, как и у бэка).
+- Vitest (3 теста, `Button.test.tsx`) и Playwright E2E (`e2e/smoke.spec.ts`) — зелёные, включая
+  реальный прогон через `vite build` → `vite preview` → браузер.
+
+### Исправлено
+- **WCAG AA — контраст текста кнопки в светлой теме.** Все три направления
+  (`docs/ui_directions/{calm,precise,confident}/`) держали один хардкод-цвet текста кнопки
+  (тёмные чернила из тёмной темы) без переопределения для светлой — на светлом
+  `--c-accent-strong` контраст падал до 2.65–3.17:1 (нужно ≥4.5:1). Добавлен токен
+  `--c-accent-ink`, свой на тему, проверено расчётом (7.85/6.25/8.22:1 тёмная,
+  5.34/6.45/5.41:1 светлая — все выше порога). Найдено и починено при переносе токенов в
+  реальные компоненты, не при первичной сборке макетов — там же и осталось бы незамеченным
+  дальше по вехе.
+- `docs/api/openapi.json` пересобран (`python -m tools.api_snapshot.dump_openapi`) —
+  112 путей, без дрейфа от пина `EXPECTED_COUNTS` в `tools/revision/revision_check.py`.
+
+### Решения (зафиксировано, не «само собой»)
+- **Без Tailwind.** Radix-примитивы стилизованы напрямую CSS-переменными проекта — тот же
+  паттерн, что у shadcn/ui (неоформленные примитивы + своя стилизация), но без утилитарного
+  CSS-фреймворка поверх токен-системы: класс вида `p-4` — тот же хардкод мимо токенов, что и
+  инлайн `padding:16px`, и его тоже ловил бы `check-design-tokens.sh`.
+- **TypeScript 5.9.3, не 7.0.2 (latest).** `typescript-eslint` (все версии, включая alpha)
+  поддерживает `typescript <6.1.0` — с TS 7 линтер не работает вовсе. Пиннинг вниз ради рабочего
+  типизированного линтинга на старте многомесячной миграции; поднять при выходе поддержки.
+- **Кодогенерация клиента — `@hey-api/openapi-ts`, не `openapi-typescript`+`openapi-fetch`.**
+  `docs/frontend_migration_plan.md` §1.2 называет второе, `docs/frontend_milestone8_plan.md`
+  Шаг 2 (после правки в этом батче) — hey-api. Выбран hey-api: генерирует хуки TanStack Query
+  целиком, `openapi-typescript` дал бы только типы — хуки пришлось бы дописывать руками, что
+  прямо против «клиент не пишем руками». `docs/frontend_migration_plan.md` §1.2 не обновлён —
+  разночтение стоит закрыть отдельно.
+- Приняли (не форсировали даунгрейд): `@hey-api/openapi-ts` тянет транзитивный `js-yaml` с
+  advisory (квадратичная сложность DoS). Только dev-зависимость кодогена, единственный вход —
+  наш же `docs/api/openapi.json`, непроверенного YAML в конвейере нет.
+
+### Известно и не чинится в этом батче
+- `docs/frontend_migration_plan.md` §1.2 всё ещё называет `openapi-typescript`+`openapi-fetch`
+  и «68 CSS-переменных» (то же число, что было в `docs/frontend_milestone8_plan.md` до правки
+  в v8.3.2 — верно 40 уникальных, см. `docs/design_tokens_audit.md`) — не тронут в этом батче,
+  расходится с решением выше и с `docs/frontend_milestone8_plan.md`.
+- **CI job `contract-diff` не собран.** `docs/frontend_milestone8_plan.md` Шаг 2 и «Гейт Э2»
+  называют его явно: перегенерировать `openapi.json` из живого приложения и сравнить с
+  зафиксированной копией, падать при расхождении — ловит бэкенд-дрейф (роут поменялся, снимок
+  не пересобран). Не то же самое, что 4 гейта из текущего батча (typecheck/lint/vitest/build),
+  требует поднимать бэкенд в CI-джобе — самостоятельная задача, не втиснута в конец этого батча.
+- Favicon не заведён — один некритичный 404 в консоли на `/favicon.ico`.
+
 ## [8.3.2] — 2026-08-07 — Тестовое окружение чинено под macOS-хост (PATCH)
 
 ### Исправлено

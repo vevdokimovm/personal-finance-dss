@@ -1,0 +1,10 @@
+dist
+coverage
+playwright-report
+src/shared/api/generated
+package-lock.json
+
+# Старый Jinja2-фронт (server-rendered) — живёт параллельно всю миграцию
+# (docs/frontend_migration_plan.md §1.1), не часть нового Prettier-форматирования.
+static/
+templates/

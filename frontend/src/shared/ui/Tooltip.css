@@ -1,0 +1,15 @@
+.fp-tooltip {
+  background: var(--c-surface-up);
+  color: var(--c-text);
+  border: var(--border-w) solid var(--c-border-hl);
+  border-radius: var(--r-sm);
+  padding: var(--sp-2) var(--sp-3);
+  font-size: var(--fs-xs);
+  box-shadow: var(--shadow-card);
+  max-width: 32ch; /* читаемая ширина строки, не магическое число (docs/artifact-design) */
+  z-index: 50;
+}
+
+.fp-tooltip__arrow {
+  fill: var(--c-surface-up);
+}

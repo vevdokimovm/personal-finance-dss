@@ -1,0 +1,104 @@
+/* ═══════════════════════════════════════════════════════════
+   FINPILOT — направление «Выверенный» (Precise / ledger)
+   Холодная нейтральная шкала, плотная сетка, границы вместо теней.
+   Персона «бухгалтер»: максимум чисел на экран, табличная точность.
+   ═══════════════════════════════════════════════════════════ */
+
+:root {
+    --c-bg:          #12151B;
+    --c-bg2:         #1A1E26;
+    --c-surface:     #1A1E26;
+    --c-surface-up:  #212632;
+    --c-border:      rgba(210, 220, 235, .08);
+    --c-border-hl:   #5E687A;
+
+    --c-text:        #EEF1F5;
+    --c-text2:       #B6BECC;
+    --c-text3:       #8991A2;
+
+    --c-accent:        #4FAE7C;
+    --c-accent-hl:     #63C491;
+    --c-accent-strong: #4FAE7C;   /* фон кнопки */
+    --c-accent-ink:    #0F1F17;   /* текст поверх --c-accent-strong — 6.25:1 */
+    --c-accent-bg:     rgba(79, 174, 124, .12);
+
+    --c-green:      #4FAE7C;
+    --c-green-bg:   rgba(79, 174, 124, .10);
+    --c-red:        #D97A63;
+    --c-red-bg:     rgba(217, 122, 99, .10);
+    --c-amber:      #CBA054;
+    --c-amber-bg:   rgba(203, 160, 84, .10);
+    --c-blue:       #6FA3D6;
+    --c-blue-bg:    rgba(111, 163, 214, .10);
+
+    /* Крисп-радиусы — почти прямые углы, единый малый шаг */
+    --r-sm:   4px;
+    --r-md:   6px;
+    --r-lg:   10px;
+    --r-xl:   14px;
+    --r-full: 9999px;
+
+    --ease: cubic-bezier(.4, 0, .2, 1);
+    --motion-fast: 120ms;
+    --motion-base: 180ms;
+
+    /* Тень почти не используется — разделение даёт --c-border-hl */
+    --shadow-card:  0 1px 2px rgba(0,0,0,.30);
+    --shadow-float: 0 4px 16px rgba(0,0,0,.35);
+
+    --font-body: 'IBM Plex Sans', 'Segoe UI', system-ui, sans-serif;
+    --font-mono: 'IBM Plex Mono', ui-monospace, 'SFMono-Regular', monospace;
+
+    /* Компактная шкала — меньше шаг между ступенями, тело всё равно ≥16px */
+    --fs-xs:   .75rem;     /* 12px */
+    --fs-sm:   .8125rem;   /* 13px */
+    --fs-base: 1rem;       /* 16px */
+    --fs-md:   1.0625rem;  /* 17px */
+    --fs-lg:   1.1875rem;  /* 19px */
+    --fs-xl:   1.5rem;     /* 24px */
+    --fs-2xl:  1.875rem;   /* 30px */
+    --fs-3xl:  2.375rem;   /* 38px — герой-число компактнее, чем в других направлениях */
+
+    /* Плотная сетка — короче базовый шаг, чаще узлы */
+    --sp-1: 4px;
+    --sp-2: 8px;
+    --sp-3: 8px;
+    --sp-4: 12px;
+    --sp-5: 16px;
+    --sp-6: 20px;
+    --sp-7: 28px;
+    --sp-8: 40px;
+
+    --content-max: 1320px;
+}
+
+[data-theme="light"] {
+    --c-bg:          #F5F6F8;
+    --c-bg2:         #EAECF0;
+    --c-surface:     #FFFFFF;
+    --c-surface-up:  #FFFFFF;
+    --c-border:      #DDE1E7;
+    --c-border-hl:   #7B85A0;
+
+    --c-text:        #14181F;
+    --c-text2:       #4A5262;
+    --c-text3:       #677082;
+
+    --c-accent:        #146C43;
+    --c-accent-hl:     #1E8C58;
+    --c-accent-strong: #146C43;   /* фон кнопки */
+    --c-accent-ink:    #FFFFFF;   /* текст поверх --c-accent-strong — 6.45:1 */
+    --c-accent-bg:     rgba(20, 108, 67, .08);
+
+    --c-green:      #146C43;
+    --c-green-bg:   rgba(20, 108, 67, .08);
+    --c-red:        #A6341F;
+    --c-red-bg:     rgba(166, 52, 31, .08);
+    --c-amber:      #8A5A00;
+    --c-amber-bg:   rgba(138, 90, 0, .08);
+    --c-blue:       #1D5A96;
+    --c-blue-bg:    rgba(29, 90, 150, .08);
+
+    --shadow-card:  0 1px 2px rgba(15,20,30,.05);
+    --shadow-float: 0 4px 16px rgba(15,20,30,.10);
+}

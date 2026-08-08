@@ -1,0 +1,26 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__plugin_chrome-devtools-mcp_chrome-devtools__navigate_page",
+      "Bash(npm view *)",
+      "Bash(python3 -c \"import json,sys; v=json.load\\(sys.stdin\\); print\\(v[-5:]\\)\")",
+      "Bash(python3 -c \"import json,sys; print\\(json.load\\(sys.stdin\\)[-8:]\\)\")",
+      "Bash(npm install *)",
+      "Bash(npm run *)",
+      "Bash(python3 -c \"import json,sys; d=json.load\\(sys.stdin\\); print\\('bin:', d.get\\('bin'\\)\\); print\\('main:', d.get\\('main'\\)\\); print\\('exports:', d.get\\('exports'\\)\\)\")",
+      "Bash(cd *)",
+      "Bash(echo \"EXIT:$?\")",
+      "Read(//tmp/**)",
+      "Bash(npx playwright *)",
+      "Bash(SECRET_KEY=dev-smoke-test .venv/bin/uvicorn app.main:app --port 8000)",
+      "Bash(echo \"backend pid: $!\")",
+      "Bash(curl -s -o /dev/null -w \"backend health: %{http_code}\\\\n\" http://127.0.0.1:8000/docs)",
+      "Bash(echo \"vite pid: $!\")",
+      "Bash(curl -s -o /dev/null -w \"vite: %{http_code}\\\\n\" http://127.0.0.1:5173/)",
+      "Bash(curl *)",
+      "mcp__plugin_chrome-devtools-mcp_chrome-devtools__take_screenshot",
+      "mcp__plugin_chrome-devtools-mcp_chrome-devtools__list_network_requests",
+      "mcp__plugin_chrome-devtools-mcp_chrome-devtools__evaluate_script"
+    ]
+  }
+}

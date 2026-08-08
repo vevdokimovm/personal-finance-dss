@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="ru" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FINPILOT — направление «Выверенный» (макет)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="./tokens.css">
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--c-bg);
+    color: var(--c-text);
+    font-family: var(--font-body);
+    font-size: var(--fs-base);
+    line-height: 1.45;
+    font-variant-numeric: tabular-nums;
+  }
+  a { color: var(--c-accent); }
+  :focus-visible { outline: 2px solid var(--c-accent-hl); outline-offset: 1px; border-radius: 2px; }
+  .num { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+
+  .shell { max-width: var(--content-max); margin: 0 auto; padding: var(--sp-5) var(--sp-4) var(--sp-8); }
+
+  .topbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--sp-5); }
+  .wordmark { font-weight: 700; font-size: var(--fs-md); }
+  .wordmark span { color: var(--c-accent); }
+  .theme-toggle {
+    display: inline-flex; align-items: center; gap: var(--sp-2);
+    background: var(--c-surface); border: 1px solid var(--c-border-hl);
+    color: var(--c-text2); font-family: inherit; font-size: var(--fs-xs);
+    padding: 6px var(--sp-3); border-radius: var(--r-sm);
+    cursor: pointer; min-height: 32px;
+  }
+  .theme-toggle:hover { color: var(--c-text); border-color: var(--c-accent); }
+
+  /* ── Ledger strip: все входные числа в один ряд ─────── */
+  .ledger {
+    display: grid; grid-template-columns: repeat(7, 1fr);
+    border: 1px solid var(--c-border); border-radius: var(--r-sm);
+    margin-bottom: var(--sp-4); overflow: hidden;
+  }
+  .ledger > div { padding: var(--sp-3) var(--sp-4); border-right: 1px solid var(--c-border); }
+  .ledger > div:last-child { border-right: none; }
+  .ledger-label { font-size: 11px; color: var(--c-text3); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 3px; }
+  .ledger-value { font-family: var(--font-mono); font-size: var(--fs-md); font-weight: 600; }
+
+  /* ── Hero — компактнее, встроен в общий ритм ─────────── */
+  .hero {
+    display: grid; grid-template-columns: 1.3fr 1fr; gap: var(--sp-5);
+    background: var(--c-surface); border: 1px solid var(--c-border);
+    border-radius: var(--r-md); padding: var(--sp-5); margin-bottom: var(--sp-4);
+  }
+  .eyebrow { font-size: 11px; font-weight: 600; color: var(--c-text3); text-transform: uppercase; letter-spacing: .05em; }
+  .hero-value { font-family: var(--font-mono); font-size: var(--fs-3xl); font-weight: 600; letter-spacing: -.01em; margin: 4px 0 var(--sp-2); }
+  .hero-sub { color: var(--c-text2); font-size: var(--fs-sm); max-width: 56ch; margin: 0 0 var(--sp-3); }
+  .btn-primary {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: var(--c-accent-strong); color: var(--c-accent-ink);
+    font-weight: 600; font-size: var(--fs-sm);
+    padding: 8px var(--sp-4); border-radius: var(--r-sm);
+    text-decoration: none; min-height: 36px;
+  }
+  .hero-side { border-left: 1px solid var(--c-border); padding-left: var(--sp-5); display: flex; flex-direction: column; justify-content: center; gap: var(--sp-3); }
+  .hero-side-row { display: flex; justify-content: space-between; font-size: var(--fs-sm); }
+  .hero-side-row .num { font-weight: 600; }
+
+  /* ── 4-up metric grid, плотно ─────────────────────────── */
+  .metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--sp-3); margin-bottom: var(--sp-4); }
+  .metric-card { background: var(--c-surface); border: 1px solid var(--c-border); border-radius: var(--r-sm); padding: var(--sp-4); }
+  .metric-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 6px; }
+  .metric-name { font-size: 12px; color: var(--c-text2); font-weight: 600; }
+  .metric-badge { font-size: 10px; padding: 1px 6px; border-radius: 3px; font-weight: 600; border: 1px solid currentColor; }
+  .metric-badge.warn { color: var(--c-amber); background: var(--c-amber-bg); }
+  .metric-badge.ok { color: var(--c-text3); background: var(--c-bg2); border-color: var(--c-border); }
+  .metric-value { font-family: var(--font-mono); font-size: var(--fs-xl); font-weight: 600; margin-bottom: 3px; }
+  .metric-caption { font-size: 11px; color: var(--c-text3); line-height: 1.4; }
+
+  .panel { background: var(--c-surface); border: 1px solid var(--c-border); border-radius: var(--r-md); padding: var(--sp-4); margin-bottom: var(--sp-3); }
+  .panel h2 { font-size: var(--fs-md); font-weight: 700; margin: 0 0 2px; }
+  .panel .lede { color: var(--c-text2); font-size: var(--fs-sm); margin: 0 0 var(--sp-3); max-width: 72ch; }
+
+  /* ── Распределение — таблица + полоса ────────────────── */
+  table.alloc-table { width: 100%; border-collapse: collapse; font-size: var(--fs-sm); margin-bottom: var(--sp-3); }
+  table.alloc-table th { text-align: left; font-size: 11px; color: var(--c-text3); font-weight: 600; text-transform: uppercase; letter-spacing: .03em; padding-bottom: 6px; border-bottom: 1px solid var(--c-border); }
+  table.alloc-table td { padding: 6px 0; border-bottom: 1px solid var(--c-border); }
+  table.alloc-table td.num { text-align: right; font-family: var(--font-mono); }
+  table.alloc-table tr:last-child td { border-bottom: none; }
+  .swatch { display: inline-block; width: 9px; height: 9px; border-radius: 2px; margin-right: 8px; }
+  .alloc-bar { display: flex; height: 8px; border-radius: 2px; overflow: hidden; gap: 1px; }
+
+  /* ── Forecast: график + числовая таблица рядом ────────── */
+  .forecast-grid { display: grid; grid-template-columns: 1.5fr 1fr; gap: var(--sp-5); align-items: start; }
+  table.fc-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  table.fc-table th, table.fc-table td { padding: 5px 6px; text-align: right; border-bottom: 1px solid var(--c-border); }
+  table.fc-table th:first-child, table.fc-table td:first-child { text-align: left; }
+  table.fc-table th { color: var(--c-text3); font-weight: 600; font-size: 10px; text-transform: uppercase; }
+  table.fc-table td { font-family: var(--font-mono); }
+  .forecast-caption { font-size: 11px; color: var(--c-text3); margin-top: var(--sp-3); line-height: 1.5; }
+
+  footer { font-size: 11px; color: var(--c-text3); text-align: center; margin-top: var(--sp-6); }
+
+  @media (max-width: 900px) {
+    .ledger { grid-template-columns: repeat(3, 1fr); }
+    .hero { grid-template-columns: 1fr; }
+    .hero-side { border-left: none; border-top: 1px solid var(--c-border); padding-left: 0; padding-top: var(--sp-4); }
+    .metrics { grid-template-columns: repeat(2, 1fr); }
+    .forecast-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <div class="topbar">
+    <div class="wordmark">FINPILOT <span>·</span> Обзор</div>
+    <button class="theme-toggle" id="themeToggle">Светлая тема</button>
+  </div>
+
+  <h1 style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);">Финансовый обзор — направление «Выверенный»</h1>
+
+  <!-- LEDGER STRIP -->
+  <div class="ledger">
+    <div><div class="ledger-label">Доход I</div><div class="ledger-value">180 000</div></div>
+    <div><div class="ledger-label">Расходы E</div><div class="ledger-value">78 000</div></div>
+    <div><div class="ledger-label">Платежи ΣP</div><div class="ledger-value">62 500</div></div>
+    <div><div class="ledger-label">Свободно Rt</div><div class="ledger-value" style="color:var(--c-accent)">39 500</div></div>
+    <div><div class="ledger-label">Ликвидность Lt</div><div class="ledger-value" style="color:var(--c-amber)">0,00</div></div>
+    <div><div class="ledger-label">ПДН Dt</div><div class="ledger-value">34,7%</div></div>
+    <div><div class="ledger-label">BLR</div><div class="ledger-value">3,40</div></div>
+  </div>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div>
+      <div class="eyebrow">Свободные деньги в этом месяце</div>
+      <div class="hero-value">39 500 ₽</div>
+      <p class="hero-sub">После доходов, обязательных расходов и платежей по кредитам. Полный разбор — в строке показателей выше.</p>
+      <a href="#" class="btn-primary">Построить план распределения →</a>
+    </div>
+    <div class="hero-side">
+      <div class="hero-side-row"><span>Допустимых альтернатив</span><span class="num">66 / 66</span></div>
+      <div class="hero-side-row"><span>Полезность лучшей (U)</span><span class="num">0,80</span></div>
+      <div class="hero-side-row"><span>r_bench</span><span class="num">0,14</span></div>
+      <div class="hero-side-row"><span>Шаг дискретизации</span><span class="num">10%</span></div>
+    </div>
+  </section>
+
+  <!-- METRICS -->
+  <section class="metrics">
+    <article class="metric-card">
+      <div class="metric-head"><span class="metric-name">Свободные деньги</span><span class="metric-badge ok">в месяц</span></div>
+      <div class="metric-value">39 500</div>
+      <div class="metric-caption">Остаётся после всех обязательных трат</div>
+    </article>
+    <article class="metric-card">
+      <div class="metric-head"><span class="metric-name">Ликвидность</span><span class="metric-badge warn">0 мес</span></div>
+      <div class="metric-value">0,00</div>
+      <div class="metric-caption">Месяцев автономии, stock-based B_liq/E. Резерва нет.</div>
+    </article>
+    <article class="metric-card">
+      <div class="metric-head"><span class="metric-name">ПДН</span><span class="metric-badge ok">порог 40%</span></div>
+      <div class="metric-value">34,7%</div>
+      <div class="metric-caption">Доля дохода на кредиты, запас 5,3 п.п. до порога</div>
+    </article>
+    <article class="metric-card">
+      <div class="metric-head"><span class="metric-name">BLR</span><span class="metric-badge ok">со всеми накопл.</span></div>
+      <div class="metric-value">3,40</div>
+      <div class="metric-caption">(Bt+B_liq)/E — месяцев без дохода</div>
+    </article>
+  </section>
+
+  <!-- ALLOCATION -->
+  <section class="panel">
+    <h2>Распределение свободных денег (a*)</h2>
+    <p class="lede">66 альтернатив (шаг 10%), допустимых по фильтру ликвидности и ПДН — 66 из 66. Лучшая по полезности (U = 0,80):</p>
+    <table class="alloc-table">
+      <thead><tr><th>Направление</th><th style="text-align:right">Сумма</th><th style="text-align:right">Доля</th></tr></thead>
+      <tbody>
+        <tr><td><span class="swatch" style="background:var(--c-red)"></span>Досрочное погашение</td><td class="num">0 ₽</td><td class="num">0%</td></tr>
+        <tr><td><span class="swatch" style="background:var(--c-amber)"></span>Резерв</td><td class="num">39 500 ₽</td><td class="num">100%</td></tr>
+        <tr><td><span class="swatch" style="background:var(--c-green)"></span>Цели</td><td class="num">0 ₽</td><td class="num">0%</td></tr>
+      </tbody>
+    </table>
+    <div class="alloc-bar"><div style="flex:100; background:var(--c-amber);"></div></div>
+  </section>
+
+  <!-- FORECAST -->
+  <section class="panel">
+    <h2>Прогноз резерва на 12 месяцев</h2>
+    <p class="lede">SES + Monte-Carlo, интервал 80% [p10–p90]. Медиана растёт на Rt = 39 500 ₽/мес при полном следовании рекомендации.</p>
+    <div class="forecast-grid">
+      <svg viewBox="0 0 460 190" role="img" aria-label="Прогноз резерва: медиана 0 → 474 000 ₽ за 12 месяцев, интервал 80% расширяется" style="width:100%; height:auto;">
+        <line x1="34" y1="12" x2="34" y2="164" stroke="var(--c-border)" stroke-width="1"/>
+        <line x1="34" y1="164" x2="440" y2="164" stroke="var(--c-border)" stroke-width="1"/>
+        <polygon points="34,164 136,132.8 238,96.4 340,58.9 440,17.5 440,94.5 340,109.5 238,125.9 136,144.6 34,164"
+                 fill="var(--c-accent-bg)"/>
+        <polyline points="34,164 136,138.7 238,111.2 340,83.7 440,56.4"
+                  fill="none" stroke="var(--c-accent)" stroke-width="2"/>
+        <g fill="var(--c-text3)" font-size="9.5" font-family="var(--font-mono)">
+          <text x="34"  y="177" text-anchor="middle">0</text>
+          <text x="136" y="177" text-anchor="middle">3</text>
+          <text x="238" y="177" text-anchor="middle">6</text>
+          <text x="340" y="177" text-anchor="middle">9</text>
+          <text x="440" y="177" text-anchor="end">12мес</text>
+        </g>
+      </svg>
+      <table class="fc-table">
+        <thead><tr><th>Мес</th><th>p10</th><th>Медиана</th><th>p90</th></tr></thead>
+        <tbody>
+          <tr><td>0</td><td>0</td><td>0</td><td>0</td></tr>
+          <tr><td>3</td><td>93 000</td><td>118 500</td><td>144 000</td></tr>
+          <tr><td>6</td><td>173 000</td><td>237 000</td><td>301 000</td></tr>
+          <tr><td>9</td><td>244 000</td><td>355 500</td><td>467 000</td></tr>
+          <tr><td>12</td><td>308 000</td><td>474 000</td><td>640 000</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="forecast-caption">Текущие показатели (I/E/ΣP/Rt/Lt/Dt/BLR/a*/U) — реальные значения профиля «anna» из docs/reference_profiles.md. Траектория прогноза — иллюстративная проекция по Rt с расширением интервала по методу движка; точные p10/p90 отдаёт /api/planning/forecast.</p>
+  </section>
+
+  <footer>Направление «Выверенный» · макет для сравнения, не готовый экран · шрифты IBM Plex Sans / IBM Plex Mono</footer>
+
+</div>
+<script>
+  var toggle = document.getElementById('themeToggle');
+  toggle.addEventListener('click', function () {
+    var isLight = document.documentElement.getAttribute('data-theme') === 'light';
+    document.documentElement.setAttribute('data-theme', isLight ? 'dark' : 'light');
+    toggle.textContent = isLight ? 'Светлая тема' : 'Тёмная тема';
+  });
+</script>
+</body>
+</html>

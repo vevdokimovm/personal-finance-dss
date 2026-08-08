@@ -1,0 +1,35 @@
+.fp-button {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  font-family: inherit;
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  border-radius: var(--r-full);
+  padding: var(--sp-3) var(--sp-5);
+  min-height: var(--tap-target-min); /* A11Y-09 — цель нажатия */
+  border: var(--border-w) solid transparent;
+  cursor: pointer;
+  transition:
+    filter var(--motion-fast) var(--ease),
+    border-color var(--motion-fast) var(--ease),
+    color var(--motion-fast) var(--ease);
+}
+
+.fp-button--primary {
+  background: var(--c-accent-strong);
+  color: var(--c-accent-ink);
+}
+.fp-button--primary:hover {
+  filter: brightness(1.08);
+}
+
+.fp-button--ghost {
+  background: transparent;
+  border-color: var(--c-border-hl);
+  color: var(--c-text2);
+}
+.fp-button--ghost:hover {
+  color: var(--c-text);
+  border-color: var(--c-accent);
+}

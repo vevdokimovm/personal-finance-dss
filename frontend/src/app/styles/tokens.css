@@ -1,0 +1,112 @@
+/* ═══════════════════════════════════════════════════════════
+   FINPILOT SPA — токены направления «Спокойный» (Calm).
+   Перенесено из docs/ui_directions/calm/tokens.css (выбор владельца,
+   docs/ui_visual_direction.md) без изменения значений — источник истины
+   на время миграции: этот файл. Структура токенов (--c-, --r-, --shadow-) — как в старом
+   frontend/static/css/styles.css, плюс новые группы --fs- и --sp-, которых там не было
+   (docs/design_tokens_audit.md).
+   ═══════════════════════════════════════════════════════════ */
+
+:root {
+  /* ── Цвет: тёмная тема (по умолчанию) ── */
+  --c-bg: #1c1a16;
+  --c-bg2: #242119;
+  --c-surface: #242119;
+  --c-surface-up: #2c2820;
+  --c-border: rgba(255, 250, 240, 0.08);
+  --c-border-hl: #6e6858;
+
+  --c-text: #f3f1ea;
+  --c-text2: #c9c4b6;
+  --c-text3: #9a947f;
+
+  --c-accent: #4fcb8b; /* текст/ссылки, 8.48:1 на фоне */
+  --c-accent-hl: #6bda9f; /* крупные числа/иконки (≥24px, 3:1+) */
+  --c-accent-strong: #4fcb8b; /* фон кнопки */
+  --c-accent-ink: #12251a; /* текст поверх --c-accent-strong — 7.85:1, см. shared/ui/Button */
+  --c-accent-bg: rgba(79, 203, 139, 0.12);
+
+  --c-green: #4fcb8b;
+  --c-green-bg: rgba(79, 203, 139, 0.1);
+  --c-red: #e2836b;
+  --c-red-bg: rgba(226, 131, 107, 0.1);
+  --c-amber: #d9a857;
+  --c-amber-bg: rgba(217, 168, 87, 0.1);
+  --c-blue: #6fa8d8;
+  --c-blue-bg: rgba(111, 168, 216, 0.1);
+
+  --r-xs: 4px;
+  --r-sm: 10px;
+  --r-md: 16px;
+  --r-lg: 24px;
+  --r-xl: 32px;
+  --r-full: 9999px;
+
+  --ease: cubic-bezier(0.4, 0, 0.2, 1);
+  --motion-fast: 150ms;
+  --motion-base: 220ms;
+
+  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.2), 0 10px 28px rgba(0, 0, 0, 0.22);
+  --shadow-float: 0 14px 40px rgba(0, 0, 0, 0.3);
+
+  /* TOK-07 — единый видимый фокус-индикатор, ≥3:1 в обеих темах. */
+  --focus-ring: 2px solid var(--c-accent-hl);
+  --focus-ring-offset: 2px;
+
+  /* Структурные константы — тоже токены (ни одного px вне токенов, без исключений). */
+  --border-w: 1px;
+  --tap-target-min: 44px; /* A11Y-09, WCAG 2.5.8 */
+
+  --font-body: "Manrope", "Segoe UI", system-ui, sans-serif;
+  --fs-xs: 0.8125rem; /* 13px — подписи, мелкий принт */
+  --fs-sm: 0.875rem; /* 14px */
+  --fs-base: 1rem; /* 16px — тело (TOK-03: минимум 16px) */
+  --fs-md: 1.125rem; /* 18px */
+  --fs-lg: 1.375rem; /* 22px */
+  --fs-xl: 1.75rem; /* 28px */
+  --fs-2xl: 2.375rem; /* 38px */
+  --fs-3xl: 3rem; /* 48px — герой-число */
+
+  /* 4px-база (TOK-04), с наклоном к щедрым значениям — направление «Спокойный». */
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 16px;
+  --sp-5: 24px;
+  --sp-6: 32px;
+  --sp-7: 48px;
+  --sp-8: 64px;
+
+  --content-max: 1180px;
+}
+
+[data-theme="light"] {
+  --c-bg: #faf9f5;
+  --c-bg2: #f1efe8;
+  --c-surface: #ffffff;
+  --c-surface-up: #ffffff;
+  --c-border: #e6e2d8;
+  --c-border-hl: #948c7b;
+
+  --c-text: #2b2a25;
+  --c-text2: #6b6659;
+  --c-text3: #726d5f;
+
+  --c-accent: #1b7a4a; /* 5.07:1 на фоне */
+  --c-accent-hl: #2bbf6a; /* бренд-зелёный, крупные элементы (≥24px) */
+  --c-accent-strong: #1b7a4a; /* фон кнопки */
+  --c-accent-ink: #ffffff; /* текст поверх --c-accent-strong — 5.34:1 */
+  --c-accent-bg: rgba(43, 191, 106, 0.1);
+
+  --c-green: #1b7a4a;
+  --c-green-bg: rgba(27, 122, 74, 0.08);
+  --c-red: #b14732;
+  --c-red-bg: rgba(177, 71, 50, 0.08);
+  --c-amber: #8f5a10;
+  --c-amber-bg: rgba(143, 90, 16, 0.08);
+  --c-blue: #2a6fad;
+  --c-blue-bg: rgba(42, 111, 173, 0.08);
+
+  --shadow-card: 0 1px 2px rgba(30, 25, 15, 0.06), 0 10px 28px rgba(30, 25, 15, 0.07);
+  --shadow-float: 0 14px 40px rgba(30, 25, 15, 0.12);
+}
