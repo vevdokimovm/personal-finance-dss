@@ -63,7 +63,9 @@ services:
     # Без ports: приложение доступно снаружи только через nginx.
 
   nginx:
-    image: nginx:1.27-alpine
+    build:
+      context: .
+      dockerfile: nginx/Dockerfile
     restart: unless-stopped
     depends_on:
       - web

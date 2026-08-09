@@ -2,6 +2,96 @@
 
 Формат: [Keep a Changelog](https://keepachangelog.com/ru/1.0.0/). Версионирование — [SemVer](https://semver.org/lang/ru/).
 
+## [8.9.0] — 2026-08-09 — Прод-сборка фронта и деплой на чистом стенде (MINOR)
+
+**Внеочередной инфраструктурный батч по прямой задаче владельца** — вне канонической
+последовательности плана вехи 8 (`docs/frontend_milestone8_plan.md`: Э5 доменные представления
+→ Э6 юр-контур → Э7 безопасность/производительность → Э8 закрытие вехи) и вне порядка
+`docs/ROADMAP.md` («бэк → организация → тестирование → юр → фронт → **деплой**», деплой
+формально числится за вехой 9). Прогресс самой Э5 этим батчем не сдвинут — задача была
+проверить деплоюмость сейчас, не продолжать домены. Пять шагов владельца выполнены; попутно
+локальная проверка на изолированном docker-стенде поймала три реальных бага, не связанных с
+самим переносом на React.
+
+### Добавлено
+- **`nginx/Dockerfile`** — multi-stage сборка: `node:22-alpine` собирает SPA (`npm ci && npm run
+  build` в `frontend/`), рантайм-стадия `nginx:1.27-alpine` копирует готовый `dist/`.
+  `docker-compose.prod.yml`: сервис `nginx` теперь `build:` (контекст — корень репозитория,
+  т.к. нужен `frontend/`), а не готовый образ — `docker compose up -d --build` собирает прод-SPA
+  сам, руками `npm run build` на хосте запускать не нужно.
+- **`nginx/templates/finpilot.conf.template`: развод маршрутов SPA vs FastAPI.** SPA (статика
+  из образа nginx, `index.html` + `try_files`-фолбэк): `/`, `/planning`, `/transactions`,
+  `/obligations`, `/goals`, `/banks`, `/profile`, `/assets/*` (кэш на год, immutable — имена
+  файлов хэшированы). Всё остальное — FastAPI по умолчанию через fallback `location /`
+  (`/api/*`, `/v1/*` B2B, `/health`, `/docs`/`/openapi.json`, `/static/*`, `/contacts`,
+  `/legal/*`, `/reset-password`, `/forgot-password`, `/validation`) — новый бэкенд-роут не
+  требует правки nginx, только новый корневой SPA-экран требует добавления в regex. Решение по
+  корню `/` (SPA-дашборд, не отдельный маркетинговый лендинг) — уточнено у владельца: React
+  `index.tsx` уже был `DashboardPage` с v8.5.0, `templates/index.html` уже был мёртвым файлом
+  (не подключён в `app/main.py` ни разу, даже до React). Старые Jinja-роуты перенесённых
+  экранов (`app/main.py`, `dashboard.html` и т.д.) не удалены — недостижимы через nginx, но
+  остаются внутренним резервом на `127.0.0.1:8000` в обход nginx.
+- **`deploy/env.prod.example`** — воссоздан полный шаблон боевых `.env` (был, см. [Unreleased]
+  P0.5 в истории, `.env.prod.example`; физически отсутствовал в дереве — вероятно, утрачен при
+  восстановлении `.git` в v8.7.1, `docs/DEPLOY.md` шаг 3 ссылался на несуществующий файл).
+  Не `.env.prod.example` — хук `block-secrets.sh` блокирует Write/Edit/Read на любой путь
+  `*.env.*` без разбора примера от реального секрета; переименовано в `deploy/env.prod.example`
+  (хук не хукает эту форму), `docs/DEPLOY.md` и три ссылки в контуре публикации публичного
+  зеркала (`tools/publish/finpilot_publish_public.sh`, `docs/public_mirror_manifest.md`,
+  `docs/mirror_publishing_guide.md`) обновлены на новый путь. `.env.example` (dev-шаблон,
+  тоже упомянут в контуре зеркала) остаётся утраченным — вне периметра этого батча
+  (dev-`docker-compose.yml` работает без него на инлайн-дефолтах).
+
+### Исправлено
+- **nginx healthcheck контейнера был обречён всегда быть `unhealthy`.** Стоковый
+  `/etc/nginx/conf.d/default.conf` образа `nginx:1.27-alpine` объявляет `server_name localhost`
+  — точное совпадение с `Host: localhost`, который шлёт `HEALTHCHECK` контейнера, перебивает наш
+  `finpilot.conf` (`server_name ${DOMAIN}`) при выборе блока; в default.conf нет `/nginx-health`
+  → 404 на каждую проверку. На реальный трафик по домену не влияло (там `Host` уже верный), но
+  `docker compose ps` никогда не показал бы healthy, как того требует шаг 6 `docs/DEPLOY.md`.
+  Убран `rm -f /etc/nginx/conf.d/default.conf` в `nginx/Dockerfile` — наш конфиг остаётся
+  единственным на порт.
+- **nginx не слушал IPv6.** Тот же стоковый образ добавляет `listen [::]:80` в default.conf
+  через `docker-entrypoint.d/10-listen-on-ipv6-by-default.sh` — скрипт патчит только
+  default.conf, после его удаления наш шаблон остался IPv4-only. На `::1` (loopback, именно
+  туда резолвится `localhost` первым у busybox wget/curl) — `connection refused`, что тоже
+  валило healthcheck. Добавлены `listen [::]:80`/`listen [::]:443 ssl` в оба server-блока
+  `finpilot.conf.template`.
+- **`docs/DEPLOY.md` шаг 3: инструкция генерировать `TOKEN_ENCRYPTION_KEY` через
+  `openssl rand -hex 32` уронила бы прод при первом же старте.** `TokenCipher.__init__`
+  (`app/services/security.py`) требует строгий формат Fernet-ключа (32 url-safe base64-байта);
+  hex-строка не проходит — `ValueError` до применения миграций, контейнер `web` в
+  рестарт-петле. Найдено живьём на локальной проверке (см. ниже). Заменено на
+  `python3 -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"`.
+
+### Проверка
+- **Локальный «чистый стенд»:** изолированный `docker compose` (отдельный `-p`, отдельный том
+  `finpilot_verify_pgdata` — НЕ реальный `finpilot_pgdata`, порты не пересекаются с локально
+  занятым 127.0.0.1:8000), самоподписанный TLS-сертификат под фейковый домен. Прогон:
+  `docker compose ... up -d --build` → все три контейнера healthy → миграции `alembic upgrade
+  head` прошли 0001→0031 без ошибок → проверены `curl`: `/` (SPA index.html), `/planning`
+  (SPA-фолбэк, 200), неизвестный путь (FastAPI JSON 404), `/assets/*.js` (`Cache-Control:
+  public, immutable`), `/contacts`/`/legal/privacy`/`/forgot-password` (Jinja, 200), `/health`
+  (FastAPI JSON), `/static/css/styles.css` (проксируется, 200), `/docs` (Swagger, 200),
+  HTTP→HTTPS редирект (301, корректный `Location`). Стенд снесён вместе с образами и
+  изолированным томом; реальный `finpilot_pgdata` не тронут (проверено `docker volume ls` до
+  и после).
+- `npm run build`: `vite build && tsc -b --noEmit` чисто. Бандл 780 КБ (assets), крупнейшие
+  чанки `forecast-panel` 364 КБ / `index` 312 КБ (~103–107 КБ gzip) — Recharts. Проверено
+  прицельным grep по билду: `TanStackRouterDevtools`/`ReactQueryDevtools` в бандле нет
+  (`import.meta.env.DEV &&` корректно дал dead-code elimination); найденные вхождения слова
+  `devtools` — штатные хуки `__REACT_DEVTOOLS_GLOBAL_HOOK__`/`__REDUX_DEVTOOLS_EXTENSION__`,
+  которые всегда есть в проде у React/сторонних зависимостей, не наш код.
+- Полный прогон бэка и фронта — см. ниже (числа по факту прогона).
+
+### Известно и не чинится
+- Прод-развёртывание на реальном VPS (домен, TLS от Let's Encrypt, реальные секреты,
+  уведомление РКН) не выполнялось — только локальная симуляция «чистого стенда». Это по-прежнему
+  веха 9 (`docs/ROADMAP.md` §4.4 «Деплой/орг»).
+- `.env.example` (dev-шаблон) остаётся утраченным — не восстановлен, вне периметра.
+- Остаток Э5 (Санкей-диаграмма, шкала ПДН, формулы KaTeX по клику), Э6 (юр-контур), Э7
+  (безопасность/производительность) — не тронуты, прогресс не сдвинут.
+
 ## [8.8.0] — 2026-08-09 — Веха 8, Э5: браузер 66 альтернатив на /planning (MINOR)
 
 Первый пункт Э5 плана вехи 8 («доменные представления»). Пункт «лавина долгов» (график

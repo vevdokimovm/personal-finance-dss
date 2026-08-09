@@ -36,7 +36,32 @@
 > → «продолжай». Копия в чат — с версией в имени: `WATCHLOG finpilot_vX_Y_Z.md`. Архивная копия —
 > `docs/WATCHLOG.md` без версии.
 
-> ## ВЕРСИЯ КОДА: `v8.8.0` · **ВЕХА 8 ИДЁТ — ФРОНТЕНД, Э5 НАЧАТ.** **v8.8.0 (Э5 — браузер 66
+> ## ВЕРСИЯ КОДА: `v8.9.0` · **ВЕХА 8 ИДЁТ — ФРОНТЕНД, Э5 НАЧАТ (v8.9.0 — внеочередной
+инфра-батч, прогресс Э5 не сдвинут).** **v8.9.0 (прод-сборка фронта и деплой на чистом
+стенде, MINOR):** задача владельца вне канона плана вехи 8 (Э5→Э6 юр→Э7→Э8) и вне порядка
+ROADMAP (деплой формально веха 9). `nginx/Dockerfile` (multi-stage node+nginx) — SPA
+собирается прямо внутри `docker compose up --build`; nginx разводит маршруты: `/`,
+`/planning`, `/transactions`, `/obligations`, `/goals`, `/banks`, `/profile` — SPA
+(`index.html` + fallback), всё остальное (`/api`, `/v1`, `/health`, `/docs`, `/static`,
+`/contacts`, `/legal/*`, `/reset-password`, `/forgot-password`, `/validation`) — FastAPI по
+умолчанию через fallback `location /`. Корень `/` — SPA-дашборд, не отдельный лендинг
+(уточнено у владельца; `templates/index.html` был мёртв ещё до React). `deploy/env.prod.example`
+воссоздан (был `.env.prod.example`, утрачен при восстановлении `.git` в v8.7.1; переименован —
+хук `block-secrets.sh` блокирует Write/Edit/Read на `*.env.*` без разбора примера от секрета).
+Локальная проверка на изолированном docker-стенде (свой том, свой порт — реальный
+`finpilot_pgdata` не тронут) поймала три реальных бага: стоковый `default.conf` образа nginx
+перехватывал `Host: localhost` healthcheck раньше нашего конфига (контейнер вечно `unhealthy`
+при рабочем внешнем трафике) — убран; IPv6 не слушался — `listen [::]:80/443` добавлен;
+`docs/DEPLOY.md` учил генерировать `TOKEN_ENCRYPTION_KEY` через `openssl rand -hex 32` —
+уронило бы прод на старте (`TokenCipher` требует строгий формат Fernet-ключа), заменено на
+`Fernet.generate_key()`. Попутно найден и починен баг ревизионного гейта
+(`tools/revision/revision_check.py`): `REF_PATTERN` обрезал «расширения» длиннее 6 символов
+(`\.\w{1,6}` → `\.\w+`) — `deploy/env.prod.example`/`finpilot.conf.template` ложно считались
+битыми ссылками. По ходу на машине кончилось место на диске (33 ГБ в
+`~/Library/Containers/com.docker.docker`) — снесено с согласия владельца, там только
+синтетические dev-тома, ничего боевого. Полный прогон: **1512/1512, 0 errors, 0 failures**
+(1 skipped); Vitest 75/75, Playwright 25/25; `flake8` чист; `mypy` — 3 известных долга (см.
+v8.5.0). **v8.8.0 (Э5 — браузер 66
 альтернатив на /planning, MINOR):** первый пункт Э5. `AlternativesBrowser` раскрывает полный
 `ranked[]` под `AllocationPanel` с сортировкой по критериям — новых бэкенд-полей не нужно, `ranked`
 уже отдавался, фронт его не читал. `PlanAlternative`/`CalculatePlanResult` дотипизированы (`id`,
@@ -133,7 +158,33 @@ inode (проверено `stat -f "%i"`), в Docker/CI — два разных 
 
 ## §0. RESUME POINT — отсюда продолжаем
 
-- **[!] v8.8.0 — ВЕХА 8, Э5 НАЧАТ: БРАУЗЕР 66 АЛЬТЕРНАТИВ.**
+- **[!] v8.9.0 — ВНЕОЧЕРЕДНОЙ ИНФРА-БАТЧ (прод-сборка фронта + деплой), Э5 НЕ ПРОДВИНУТ.**
+  Прямая задача владельца вне канона плана вехи 8 (`docs/frontend_milestone8_plan.md`:
+  Э5→Э6 юр→Э7→Э8) и вне порядка `docs/ROADMAP.md` («деплой» формально веха 9). Пять шагов:
+  (1) `npm run build` — бандл 780 КБ, `TanStackRouterDevtools`/`ReactQueryDevtools` в проде
+  нет (dead-code elimination через `import.meta.env.DEV &&` подтверждён grep по бандлу);
+  (2) `nginx/Dockerfile` (multi-stage node+nginx) + `nginx/templates/finpilot.conf.template`
+  разводит SPA (`/`, `/planning`, `/transactions`, `/obligations`, `/goals`, `/banks`,
+  `/profile`, `/assets/*`) от FastAPI/Jinja по умолчанию (`/api`, `/v1`, `/health`, `/docs`,
+  `/static`, `/contacts`, `/legal/*`, `/reset-password`, `/forgot-password`, `/validation`) —
+  решение по корню `/` (SPA, не отдельный лендинг) уточнено у владельца; (3) `docker-compose.prod.yml`
+  собирает nginx из своего Dockerfile вместо готового образа; (4) локальная проверка на
+  изолированном docker-стенде (свой том/порт, реальный `finpilot_pgdata` не тронут) —
+  все три контейнера healthy, миграции 0001→0031 прошли, все маршруты проверены curl;
+  (5) `docs/DEPLOY.md` починен: `deploy/env.prod.example` воссоздан (был `.env.prod.example`,
+  утрачен при восстановлении `.git` v8.7.1; переименован — `block-secrets.sh` блокирует
+  `*.env.*` без разбора примера от секрета), инструкция `TOKEN_ENCRYPTION_KEY` через
+  `openssl rand -hex 32` заменена на `Fernet.generate_key()` (старая уронила бы прод на
+  первом старте). Проверка живьём поймала три реальных бага (стоковый `default.conf`
+  nginx-образа ломал healthcheck, отсутствовал IPv6-listen, неверная генерация ключа) —
+  все починены, подробности CHANGELOG [8.9.0]. Попутно найден и починен баг ревизионного
+  гейта (`REF_PATTERN` в `tools/revision/revision_check.py` обрезал расширения длиннее
+  6 символов — `\.\w{1,6}` → `\.\w+`). По ходу на машине кончился диск (33 ГБ Docker Desktop,
+  снесено с согласия владельца — только синтетические dev-тома). Полный прогон: 1512/1512,
+  0 errors, 0 failures (1 skipped); Vitest 75/75, Playwright 25/25; flake8 чист; mypy — 3
+  известных долга. **СЛЕДУЮЩИЙ ШАГ не изменился — Э5 продолжается там же, где остановился
+  на v8.8.0** (см. запись ниже): Санкей-диаграмма, шкала ПДН, KaTeX-формулы по клику.
+- **v8.8.0 — ВЕХА 8, Э5 НАЧАТ: БРАУЗЕР 66 АЛЬТЕРНАТИВ.**
   Развилка из v8.7.1 разрешена владельцем в чате: Э5 (доменные представления), не остаток §8.2а.
   Первый пункт Э5 — `AlternativesBrowser` на `/planning` (`frontend/src/pages/planning/ui/`):
   свёрнутый по умолчанию браузер полного `ranked[]` (до 66 альтернатив) под `AllocationPanel`,
@@ -795,6 +846,18 @@ pitfall — маппинг в §5); в конце батча WATCHLOG живёт
 ## §3. Последние 10 версий (новое сверху; РОВНО 10 — добавил новую, удали старую снизу)
 
 > Полная история — `CHANGELOG.md` / `docs/RELEASES.md`. Здесь только 10 свежих (правило в шапке).
+- **v8.9.0** — Прод-сборка фронта и деплой на чистом стенде (MINOR). Внеочередной инфра-батч
+  вне канона плана вехи 8 и вне порядка ROADMAP (деплой формально веха 9); прогресс Э5 не
+  сдвинут. `nginx/Dockerfile` (multi-stage node+nginx) собирает SPA прямо в `docker compose
+  up --build`; nginx разводит SPA (`/`, `/planning`, `/transactions`, `/obligations`, `/goals`,
+  `/banks`, `/profile`) от FastAPI/Jinja по умолчанию. Локальная проверка на изолированном
+  docker-стенде поймала три бага (healthcheck nginx ловил стоковый `default.conf`, не было
+  IPv6-listen, `TOKEN_ENCRYPTION_KEY` в DEPLOY.md генерировался в неверном формате — уронило
+  бы прод). `deploy/env.prod.example` воссоздан (был `.env.prod.example`, утрачен в v8.7.1).
+  Попутно починен баг ревизионного гейта (`REF_PATTERN` обрезал расширения длиннее 6 симв.).
+  Диск на машине кончился по ходу — 33 ГБ Docker Desktop снесены с согласия владельца
+  (только синтетические dev-тома). Полный прогон: 1512/1512, 0 errors, 0 failures (1 skipped);
+  Vitest 75/75, Playwright 25/25; flake8 чист; mypy — 3 известных долга.
 - **v8.8.0** — Веха 8, Э5: браузер 66 альтернатив на /planning (MINOR). Развилка из v8.7.1
   разрешена владельцем — Э5, не остаток §8.2а. `AlternativesBrowser` раскрывает полный `ranked[]`
   под AllocationPanel, сортировка по критериям; новых бэкенд-полей не нужно. Лавина долгов
@@ -865,9 +928,6 @@ pitfall — маппинг в §5); в конце батча WATCHLOG живёт
   кнопки в светлой теме во всех трёх макетах `docs/ui_directions/`; `check-design-tokens.sh`
   теперь блокирует хардкод мимо токенов; CI-гейты (typecheck/lint/format/vitest/build + E2E).
   Полный прогон бэка 1509/1509, 0 errors. Кода продукта не тронуто.
-- **v8.3.2** — Тестовое окружение под macOS-хост (PATCH): фолбэк пути DejaVuSans на
-  `/Library/Fonts`, `LINK_ALLOWLIST` для ссылки вперёд `frontend_milestone8_plan → ui_visual_direction`,
-  `Stop`-гейт тестов на `.venv/bin/python3`. Полный прогон 1509/1509 SQLite. Кода продукта не тронуто.
 ## §4. Заметки и находки (не переоткрывать)
 
 - **Месячные показатели — за текущий месяц, НЕ за всю историю (v6.4.0):** `calculate_income_total`/

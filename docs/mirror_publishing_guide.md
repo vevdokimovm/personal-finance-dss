@@ -82,7 +82,7 @@ zsh ~/Downloads/finpilot_publish_public.sh push     # собрать + commit + 
 **Что уходит наружу (allow-list):** `app/`, `tests/`, `alembic/`, `frontend/`, инфра
 (`deploy/ nginx/ loadtest/ scripts/ .github/`, Docker*, gunicorn, run.py, Makefile),
 конфиги качества (`pyproject/pytest/.flake8/.mypy/.pylintrc/.pre-commit/.coveragerc`,
-`requirements*`), env-шаблоны (`.env.example`, `.env.prod.example`), корневые
+`requirements*`), env-шаблоны (`.env.example`, `deploy/env.prod.example`), корневые
 `README/LICENSE/SECURITY.md`, и из `docs/` — **только `DEPLOY.md` + `RELEASES.md`**.
 
 **Что НЕ уходит:** `knowledge/**` целиком, `tools/**`, `docs/` кроме двух выше (весь процесс,

@@ -20,7 +20,7 @@
 | Фронт (текущий) | `frontend/` | Работающий Jinja+JS слой; заменится React-фронтом (веха 7). |
 | Инфра | `Dockerfile`, `docker-compose*.yml`, `docker-entrypoint.sh`, `deploy/`, `nginx/`, `gunicorn_conf.py`, `run.py`, `Makefile`, `loadtest/`, `scripts/`, `.github/` | Показ прод-зрелости: контейнеризация, reverse-proxy, CI трёх уровней, нагрузочное. |
 | Конфиги качества | `pyproject.toml`, `pytest.ini`, `.flake8`, `.mypy.ini`, `.pylintrc`, `.pre-commit-config.yaml`, `.coveragerc`, `requirements*.txt`, `.gitignore`, `.dockerignore` | Инженерная культура видна с порога. |
-| Env-шаблоны | `.env.example`, `.env.prod.example` | Только плейсхолдеры (проверено); показывают операционную продуманность (fail-loud, ротация ключей). |
+| Env-шаблоны | `.env.example`, `deploy/env.prod.example` | Только плейсхолдеры (проверено); показывают операционную продуманность (fail-loud, ротация ключей). |
 | Корневые доки | `README.md`, `LICENSE`, `SECURITY.md` | Лицо репозитория; SECURITY.md — конвенция GitHub (vulnerability disclosure). |
 | Тех-доки | `docs/`: **только `DEPLOY.md` + `RELEASES.md`** (RELEASES переписан с нуля — история публичных версий) | Минимум для запуска. Процесс, баг-репорты, ADR, глоссарий, гайды, реестры — конфиденциальная кухня, закрыты (v5.18.4). |
 

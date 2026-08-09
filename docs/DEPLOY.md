@@ -54,13 +54,17 @@ cd /opt/finpilot
 ## Шаг 3. Боевые переменные (.env)
 
 ```bash
-cp .env.prod.example .env
+cp deploy/env.prod.example .env
 
 # Сгенерировать стойкие секреты
 openssl rand -hex 32   # → JWT_SECRET
-openssl rand -hex 32   # → TOKEN_ENCRYPTION_KEY
 openssl rand -hex 24   # → ADMIN_API_KEY
 openssl rand -hex 24   # → POSTGRES_PASSWORD
+
+# TOKEN_ENCRYPTION_KEY — ОБЯЗАТЕЛЬНО через Fernet.generate_key(), не openssl rand:
+# формат ключа строгий (32 url-safe base64 байта), hex-строка не подходит и уронит
+# приложение при старте (TokenCipher.__init__ -> ValueError, до fail-loud проверки).
+python3 -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"  # → TOKEN_ENCRYPTION_KEY
 
 nano .env              # заполнить DOMAIN, секреты, SMTP, LEGAL_*
 ```
@@ -146,7 +150,36 @@ docker compose -f docker-compose.prod.yml up -d --build
 ```
 
 Поднимется три контейнера: `db` (PostgreSQL, том `finpilot_pgdata`), `web` (gunicorn, миграции
-прогонятся автоматически на старте), `nginx` (80/443, TLS).
+прогонятся автоматически на старте), `nginx` (80/443, TLS). `nginx` собирается из своего
+`Dockerfile` (`nginx/Dockerfile`) — на стадии сборки внутри контейнера прогоняется прод-сборка
+SPA (`npm ci && npm run build` в `frontend/`), готовый `dist/` копируется в образ. Руками
+`npm run build` на хосте запускать не нужно — `docker compose up --build` делает это сам.
+
+---
+
+## Шаг 5.1. Кто что отдаёт (nginx: SPA vs FastAPI)
+
+Веха 8 перенесла основные экраны (дашборд, планирование, операции, обязательства, цели,
+банки, профиль) на React SPA; второстепенные (контакты, юр-документы, восстановление пароля,
+гостевая песочница валидации) и весь API остаются на FastAPI/Jinja. `nginx/templates/finpilot.conf.template`
+разводит это так:
+
+- **SPA (статика из `nginx`-образа, `/usr/share/nginx/html`):** `/`, `/planning`, `/transactions`,
+  `/obligations`, `/goals`, `/banks`, `/profile`, `/assets/*` (хэшированные JS/CSS, кэш на год).
+  Все эти пути отдают `index.html`, роутинг — на клиенте (TanStack Router).
+- **FastAPI (`proxy_pass` на `web:8000`) — всё остальное по умолчанию:** `/api/*`, `/v1/*` (B2B),
+  `/health`, `/docs`/`/openapi.json`, `/static/*` (статика Jinja-страниц), `/contacts`,
+  `/legal/*`, `/reset-password`, `/forgot-password`, `/validation`. Специально НЕ перечислены
+  поимённо в конфиге — location `/` ловит их как fallback, поэтому новый бэкенд-роут
+  (включая `/docs`) не требует правки nginx.
+
+**Если во фронте появляется новый корневой SPA-экран** (`frontend/src/routes/*.tsx`) — добавь
+его в regex `location ~ ^/(planning|transactions|...)` конфига, иначе nginx проксирует путь
+в FastAPI и получит 404 (Jinja-роута для нового экрана уже нет).
+
+Старые Jinja-шаблоны/роуты для перенесённых экранов (`dashboard.html`, `planning.html` и т.д.,
+`app/main.py`) намеренно не удалены — недостижимы через nginx (SPA перехватывает путь раньше),
+но остаются как внутренний резерв (доступны напрямую на `127.0.0.1:8000` в обход nginx).
 
 ---
 

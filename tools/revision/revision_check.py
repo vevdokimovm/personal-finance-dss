@@ -43,7 +43,7 @@ FROZEN_HINTS = (
 
 REF_PATTERN = re.compile(
     r"(?<![\w/])((?:docs|knowledge|tools|app|tests|alembic|scripts|frontend|deploy|nginx)"
-    r"/[\w./\-]+\.\w{1,6})"
+    r"/[\w./\-]+\.\w+)"
 )
 
 # (файл-источник, битая ссылка) -> причина. Известно-приемлемые, не роняют гейт.

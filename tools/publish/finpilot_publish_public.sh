@@ -121,7 +121,7 @@ ALLOW_FILES=(
   .pre-commit-config.yaml
   .gitignore
   .env.example
-  .env.prod.example
+  deploy/env.prod.example
 )
 
 # ── ALLOW-LIST: docs (МИНИМУМ — только нужное для запуска; правило v5.18.4) ───

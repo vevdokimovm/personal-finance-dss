@@ -12,6 +12,7 @@ map $http_upgrade $connection_upgrade {
 # ── HTTP (80): ACME-challenge + редирект на HTTPS ───────────────────────────
 server {
     listen 80;
+    listen [::]:80;
     server_name ${DOMAIN} www.${DOMAIN};
 
     # Внутренний healthcheck контейнера (до редиректа).
@@ -34,6 +35,7 @@ server {
 # ── HTTPS (443): основной сервер ────────────────────────────────────────────
 server {
     listen 443 ssl;
+    listen [::]:443 ssl;
     http2 on;
     server_name ${DOMAIN} www.${DOMAIN};
 
@@ -64,14 +66,39 @@ server {
     gzip_min_length 1024;
     gzip_types text/plain text/css application/javascript application/json image/svg+xml;
 
-    # Статика с кэшированием на клиенте.
+    # Статика Jinja-страниц (css/js/images для contacts, legal/*, восстановления пароля).
     location /static/ {
         proxy_pass http://web:8000;
         expires 7d;
         add_header Cache-Control "public";
     }
 
-    # Приложение (gunicorn).
+    # ── SPA (React, веха 8): хэшированные ассеты сборки vite, кэш навечно ───────
+    # Имена файлов содержат хэш контента (index-DobliUDD.js) — безопасно кэшировать
+    # immutable, при новой сборке имя изменится само.
+    location /assets/ {
+        root /usr/share/nginx/html;
+        expires 1y;
+        add_header Cache-Control "public, immutable";
+    }
+
+    # ── SPA (React, веха 8): экраны приложения — отдаём index.html, роутинг на
+    # клиенте (TanStack Router). Список — frontend/src/routes/*.tsx (кроме
+    # __root.tsx). Добавили новый корневой экран во фронте — добавь его сюда.
+    location ~ ^/(planning|transactions|obligations|goals|banks|profile)(/|$) {
+        root /usr/share/nginx/html;
+        try_files /index.html =404;
+    }
+
+    location = / {
+        root /usr/share/nginx/html;
+        try_files /index.html =404;
+    }
+
+    # ── Всё остальное — FastAPI (gunicorn): /api, /v1 (B2B), /health, /docs,
+    # второстепенные Jinja-экраны (contacts, legal/*, forgot/reset-password,
+    # validation) — намеренно НЕ перечисляем их поимённо здесь: любой путь,
+    # не забранный SPA-блоками выше, безопасно попадает на бэкенд по умолчанию.
     location / {
         proxy_pass http://web:8000;
         proxy_http_version 1.1;
