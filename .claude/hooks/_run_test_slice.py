@@ -48,9 +48,11 @@ def run_phase(pybin: str, args: list[str], timeout_s: int, log) -> tuple[int, bo
         return proc.returncode, False
     except subprocess.TimeoutExpired as exc:
         if exc.stdout:
-            log.write(exc.stdout if isinstance(exc.stdout, str) else exc.stdout.decode(errors="replace"))
+            out = exc.stdout if isinstance(exc.stdout, str) else exc.stdout.decode(errors="replace")
+            log.write(out)
         if exc.stderr:
-            log.write(exc.stderr if isinstance(exc.stderr, str) else exc.stderr.decode(errors="replace"))
+            err = exc.stderr if isinstance(exc.stderr, str) else exc.stderr.decode(errors="replace")
+            log.write(err)
         log.write(f"\n[фаза не уложилась в {timeout_s} с — прервана]\n")
         return -1, True
 

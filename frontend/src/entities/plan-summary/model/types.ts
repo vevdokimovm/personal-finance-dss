@@ -18,11 +18,19 @@ export interface PlanIndicators {
 }
 
 export interface PlanAlternative {
+  id: string;
   name: string;
   x_obligations: number;
   x_reserve: number;
   x_goals: number;
+  /** SAW-полезность альтернативы (app/core/ranking.py rank_alternatives), 0..1. */
   utility: number;
+  /** Свободный поток/ликвидность/ПДН ПОСЛЕ применения альтернативы (evaluate_alternative). */
+  Rt_new: number;
+  Lt_new: number;
+  Dt_new: number;
+  /** Только у одной альтернативы в ranked — лучшая по (floor_level, utility). */
+  is_recommended?: boolean;
 }
 
 export interface PlanInputSummary {
@@ -37,6 +45,13 @@ export interface PlanInputSummary {
 export interface CalculatePlanResult {
   indicators: PlanIndicators;
   top3: PlanAlternative[];
+  /** Все допустимые альтернативы (после фильтра §5), отсортированные по (floor_level, utility) —
+   * до 66 при канонической сетке шага 10% (app/core/alternatives.py generate_alternatives).
+   * top3 — НЕ буквально ranked[:3]: строится из distinct_ranked, дедуплицированного по
+   * эффективному распределению (app/services/planning.py, _effective_signature), плюс
+   * explanation. top3[0] и ranked[0] всегда совпадают (первый элемент дедупликация не
+   * выбрасывает), начиная со второго — позиции могут разойтись. */
+  ranked: PlanAlternative[];
   admissible_count: number;
   alternatives_total: number;
   input_summary: PlanInputSummary;

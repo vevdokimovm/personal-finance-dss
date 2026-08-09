@@ -11,9 +11,38 @@ const PLAN_ANNA = {
       x_reserve: 39500,
       x_goals: 0,
       utility: 0.8,
+      Rt_new: 0,
+      Lt_new: 1.2,
+      Dt_new: 0.3472,
+      is_recommended: true,
     },
   ],
-  admissible_count: 66,
+  ranked: [
+    {
+      id: "a0100",
+      name: "Всё в резерв",
+      x_obligations: 0,
+      x_reserve: 39500,
+      x_goals: 0,
+      utility: 0.8,
+      Rt_new: 0,
+      Lt_new: 1.2,
+      Dt_new: 0.3472,
+      is_recommended: true,
+    },
+    {
+      id: "a1000",
+      name: "Всё на погашение долга",
+      x_obligations: 39500,
+      x_reserve: 0,
+      x_goals: 0,
+      utility: 0.62,
+      Rt_new: 0,
+      Lt_new: 0.2,
+      Dt_new: 0.28,
+    },
+  ],
+  admissible_count: 2,
   alternatives_total: 66,
   input_summary: {
     income: 180000,
@@ -46,10 +75,22 @@ test("план распределения показывает риск-проф
 test("дефицит на /planning — fail-loud сообщение вместо аллокации", async ({ page }) => {
   await page.unroute("**/api/planning/calculate");
   await page.route("**/api/planning/calculate", (route) =>
-    route.fulfill({ json: { ...PLAN_ANNA, top3: [], admissible_count: 0 } }),
+    route.fulfill({ json: { ...PLAN_ANNA, top3: [], ranked: [], admissible_count: 0 } }),
   );
   await page.goto("/planning");
   await expect(page.getByText("Плана распределения нет")).toBeVisible();
+});
+
+test("браузер альтернатив: свёрнут по умолчанию, раскрывается и сортируется", async ({ page }) => {
+  await page.goto("/planning");
+  await expect(page.getByText("Всё на погашение долга")).not.toBeVisible();
+  await page.getByRole("button", { name: "Показать все (2)" }).click();
+  await expect(page.getByText("Всё на погашение долга")).toBeVisible();
+  await expect(page.getByText("рекомендовано")).toBeVisible();
+
+  await page.getByLabel("Сортировать по").selectOption("Долговой нагрузке (ПДН)");
+  const rows = page.locator(".fp-alt-row__name");
+  await expect(rows.first()).toContainText("Всё на погашение долга");
 });
 
 test("дашборд → «Построить план распределения →» ведёт на рабочий /planning", async ({ page }) => {

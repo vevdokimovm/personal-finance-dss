@@ -1,0 +1,97 @@
+.fp-alt-browser__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  flex-wrap: wrap;
+}
+.fp-alt-browser__head h2 {
+  margin: 0;
+}
+
+.fp-alt-browser__sort {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  margin: var(--sp-4) 0;
+  font-size: var(--fs-sm);
+  color: var(--c-text2);
+}
+.fp-alt-browser__sort select {
+  font-family: inherit;
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  color: var(--c-text2);
+  background: var(--c-surface);
+  /* Тот же контраст рамки, что уже проверен a11y-auditor у ThemeToggle (v8.5.2). */
+  border: var(--border-w) solid var(--c-text3);
+  border-radius: var(--r-sm);
+  padding: var(--sp-2) var(--sp-3);
+  min-height: var(--tap-target-min);
+  cursor: pointer;
+}
+.fp-alt-browser__sort select:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: var(--focus-ring-offset);
+}
+
+.fp-alt-browser__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+}
+
+.fp-alt-row {
+  background: var(--c-bg2);
+  border: var(--border-w) solid var(--c-border);
+  border-radius: var(--r-md);
+  padding: var(--sp-4);
+}
+.fp-alt-row__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--sp-3);
+  margin-bottom: var(--sp-2);
+}
+.fp-alt-row__name {
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+}
+.fp-alt-row__badge {
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  /* Сплошная пара --c-accent-strong/--c-accent-ink (та же, что у Button primary,
+     Button.css) — не --c-accent на --c-accent-bg: тонированный фон поверх карточки
+     --c-bg2 даёт ~4.30:1 в светлой теме, ниже AA 4.5:1 (a11y-auditor). Сплошной фон
+     держит заявленные в tokens.css 5.34:1 (светлая) / 7.85:1 (тёмная) без пересчёта
+     под конкретный фон-подложку. */
+  color: var(--c-accent-ink);
+  background: var(--c-accent-strong);
+  border-radius: var(--r-full);
+  padding: var(--sp-0) var(--sp-2);
+}
+.fp-alt-row__utility {
+  font-weight: 700;
+  flex-shrink: 0;
+  color: var(--c-text2);
+  font-size: var(--fs-sm);
+}
+.fp-alt-row__meta,
+.fp-alt-row__split {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-4);
+  font-size: var(--fs-xs);
+  /* --c-text3 на фоне карточки --c-bg2 (не --c-surface) даёт ~4.49:1 в светлой теме —
+     на грани AA 4.5:1 (a11y-auditor). --c-text2 темнее и держит запас увереннее. */
+  color: var(--c-text2);
+}
+.fp-alt-row__meta {
+  margin-bottom: var(--sp-1);
+}

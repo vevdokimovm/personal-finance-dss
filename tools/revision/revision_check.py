@@ -64,6 +64,10 @@ LINK_ALLOWLIST = {
         "снапшот реальных project-инструкций; правка нужна в источнике",
     ("knowledge/project_meta/project_instructions_v.md", "docs/model_vs_code.md"):
         "снапшот реальных project-инструкций; правка нужна в источнике",
+    ("docs/reports/ui_audit_e3.md", "frontend/src/pages/dashboard/ui/ForecastPanel.tsx"):
+        "историческая ссылка на состояние Э3 — компонент вынесен в @widgets/forecast-panel "
+        "в v8.7.0 (Э4 партия 2), отчёт не переписывается задним числом. Файл лежит в "
+        "docs/reports/ напрямую, не в reports/audits/ — под FROZEN_HINTS не подпадает.",
 }
 
 # Паттерны устаревшей мат-модели v2.x (не должны заявляться как текущий факт).

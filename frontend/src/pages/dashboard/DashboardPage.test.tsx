@@ -27,11 +27,25 @@ function queryResult<T>(partial: Partial<UseQueryResult<T>>): UseQueryResult<T> 
   } as UseQueryResult<T>;
 }
 
+const ALT_RESERVE = {
+  id: "a0100",
+  name: "Всё в резерв",
+  x_obligations: 0,
+  x_reserve: 39500,
+  x_goals: 0,
+  utility: 0.8,
+  Rt_new: 0,
+  Lt_new: 1.2,
+  Dt_new: 0.347,
+  is_recommended: true,
+};
+
 const PLAN_ANNA: CalculatePlanResult = {
   risk_profile: "Сбалансированный",
   indicators: { Rt: 39500, Lt: 0, Dt: 0.347, BLR: 3.4, It: 180000, Et: 78000, SigmaP: 62500 },
-  top3: [{ name: "Всё в резерв", x_obligations: 0, x_reserve: 39500, x_goals: 0, utility: 0.8 }],
-  admissible_count: 66,
+  top3: [ALT_RESERVE],
+  ranked: [ALT_RESERVE],
+  admissible_count: 1,
   alternatives_total: 66,
   input_summary: {
     income: 180000,
@@ -90,7 +104,12 @@ describe("DashboardPage", () => {
   });
 
   it("показывает fail-loud сообщение, когда top3 пуст (дефицит, кейс mikhail)", () => {
-    const deficitPlan: CalculatePlanResult = { ...PLAN_ANNA, top3: [], admissible_count: 0 };
+    const deficitPlan: CalculatePlanResult = {
+      ...PLAN_ANNA,
+      top3: [],
+      ranked: [],
+      admissible_count: 0,
+    };
     usePlanMock.mockReturnValue(queryResult({ data: deficitPlan }));
     useForecastMock.mockReturnValue(queryResult({ data: FORECAST_ANNA }));
     render(<DashboardPage />);

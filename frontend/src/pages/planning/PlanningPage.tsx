@@ -5,12 +5,13 @@ import { t } from "@shared/lib/i18n/t";
 import { MetricsGrid } from "@widgets/metrics-grid";
 import { AllocationPanel } from "@widgets/allocation-panel";
 import { ForecastPanel } from "@widgets/forecast-panel";
+import { AlternativesBrowser } from "./ui/AlternativesBrowser";
 import "./PlanningPage.css";
 
 /** Полный план: та же пара usePlan/useForecast, что на dashboard (Э3) — не новая
  * сущность. Отличие от dashboard — не свёрнутая карточка, а полная разбивка
- * (риск-профиль, доходы/расходы/резерв входных данных). Сравнение top3
- * альтернатив и браузер по всем 66 — Э5 ("доменные представления"), не эта партия. */
+ * (риск-профиль, доходы/расходы/резерв входных данных), плюс браузер по всем
+ * допустимым альтернативам (Э5, `AlternativesBrowser`) под свёрнутым top3. */
 export function PlanningPage() {
   const planQuery = usePlan();
   const forecastQuery = useForecast(12);
@@ -125,6 +126,7 @@ export function PlanningPage() {
       </dl>
       <MetricsGrid indicators={plan.indicators} />
       <AllocationPanel best={plan.top3[0] ?? null} />
+      <AlternativesBrowser alternatives={plan.ranked} />
       <ForecastPanel forecast={forecast} />
     </main>
   );
