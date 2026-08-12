@@ -321,9 +321,24 @@ semantic-токенов, primitive-палитру не дублировать. �
 
 ### Э8 — Закрытие вехи
 
-Полный прогон бэка (матрица SQLite + PostgreSQL), `python -m tools.preflight`, обновление
-WATCHLOG / CHANGELOG / ROADMAP, блок «Предложения Claude» владельцу — без него веха не
-закрывается.
+**Снос старых Jinja-шаблонов и роутов для перенесённых экранов.** ★ Шаг выпал при
+перенумерации этапов плана — восстановлен явно (замечание владельца, v8.9.3). Семь экранов
+(`dashboard`, `planning`, `transactions`, `obligations`, `goals`, `banks`, `profile`) перенесены
+на React ещё в Э3–Э4 (v8.5.0–v8.7.0), но их Jinja-версии (`frontend/templates/{dashboard,
+planning,transactions,obligations,goals,banks,profile}.html` + соответствующие
+`@app.get(...) → TemplateResponse` в `app/main.py`) намеренно не удалялись — служили резервом
+на время миграции, доступны напрямую на `127.0.0.1:8000` в обход nginx (SPA перехватывает путь
+раньше на 80/443). `templates/index.html` — отдельный случай, мёртв уже сейчас (корень `/`
+маппится на `read_dashboard`/`dashboard.html`, `index.html` ни на один роут не подключён).
+До этого шага удалять НЕЛЬЗЯ: пока nginx — единственный слой, разводящий SPA/FastAPI, прямой
+доступ на 8000 остаётся аварийным путём отладки. Условие для сноса — после Э7 (когда
+security-контур на самом nginx устоялся) или явное решение владельца раньше. Объём: удалить
+7 `.html` + `index.html` (8 файлов), 7 роутов из `app/main.py`, обновить тесты
+(`tests/test_frontend_static.py` и любые, бьющие в старые Jinja-роуты напрямую).
+
+**Основное закрытие.** Полный прогон бэка (матрица SQLite + PostgreSQL), `python -m
+tools.preflight`, обновление WATCHLOG / CHANGELOG / ROADMAP, блок «Предложения Claude»
+владельцу — без него веха не закрывается.
 
 ---
 
