@@ -10,7 +10,7 @@ Radix через shadcn/ui · Recharts + visx · KaTeX · Vitest · Playwright.
 
 ## Канон
 Авторитет — файлы в `docs/`, не память и не эти инструкции.
-- Матмодель: `docs/math_model_v3_5_0.md`. **v2.x запрещена.** История калибровок — `docs/model/model_history.md`.
+- Матмодель: `docs/math_model.md`. **v2.x запрещена.** История калибровок — `docs/model/model_history.md`.
 - Где стоим: `docs/WATCHLOG.md` — читать первым.
 - План вехи 8: `docs/frontend_milestone8_plan.md`. Контур: `docs/reports/adr/adr_011_milestone8_tooling.md`.
 - Нормы интерфейса: `docs/ui_ux_design_standard.md`. Эстетика: `docs/ui_visual_design_brief.md`.

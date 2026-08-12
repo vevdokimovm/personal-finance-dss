@@ -159,7 +159,7 @@ flowchart TD
 - **Жёсткие инварианты** — `Rt ≥ 0` (нельзя уйти в минус по потоку) и `ПДН ≤ 0.40`
   (показатель долговой нагрузки), которые отсекают опасные варианты до ранжирования.
 
-Полный разбор: [`docs/math_model_v3_5_0.md`](docs/math_model_v3_5_0.md) (каноническая модель,
+Полный разбор: [`docs/math_model.md`](docs/math_model.md) (каноническая модель,
 источник истины по параметрам), [`docs/algorithm_stack.md`](docs/algorithm_stack.md) (как это
 работает по шагам в коде), [`docs/diagrams.md`](docs/diagrams.md) (8 диаграмм: слои, ER,
 конвейер ядра, поток `/calculate`, развёртывание, middleware, аутентификация, карта фронта).
@@ -495,7 +495,7 @@ Dockerfile, docker-compose.yml, gunicorn_conf.py
 | [`docs/reports/report_types.md`](docs/reports/report_types.md) | Роутер: какой тип разбора писать (инцидент / расследование / баг / pitfall) |
 | [`docs/reports/incident_postmortem_guide.md`](docs/reports/incident_postmortem_guide.md) | Практический шаблон/метод инцидента (post-mortem, SEV, RCA) |
 | [`docs/documentation_methodology.md`](docs/documentation_methodology.md) | Общая теория документирования: blameless, RCA, runbook, ADR/RFC, SLO/error budget |
-| [`docs/math_model_v3_5_0.md`](docs/math_model_v3_5_0.md) | Каноническая математическая модель (источник истины по параметрам) |
+| [`docs/math_model.md`](docs/math_model.md) | Каноническая математическая модель (источник истины по параметрам) |
 | [`docs/algorithm_stack.md`](docs/algorithm_stack.md) | Девятишаговый конвейер ядра по шагам в коде |
 | [`docs/diagrams.md`](docs/diagrams.md) | 8 диаграмм: слои, ER, конвейер, потоки, развёртывание, auth, фронт |
 | [`docs/testing_infrastructure.md`](docs/testing_infrastructure.md) | Карта тестов: уровни, три категории, PG-матрица, E2E |

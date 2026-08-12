@@ -25,7 +25,7 @@ FastAPI · SQLAlchemy 2.0 · Alembic · Pydantic v2 · Jinja2 + vanilla JS (уе
 
 ## Математическое ядро
 
-Канон — **v3.5.0** (`docs/math_model_v3_5_0.md`), и только он: SAW-свёртка,
+Канон — **v3.5.0** (`docs/math_model.md`), и только он: SAW-свёртка,
 Avalanche-фильтр долгов, SES + Монте-Карло, 5 риск-профилей, 66 альтернатив
 (шаг 10%), жёсткие инварианты Rt ≥ 0 и ПДН ≤ 0.40. Ликвидность stock-based:
 Lt = B_liq / Σe. Версия v2.x запрещена к использованию.
@@ -50,4 +50,4 @@ Lt = B_liq / Σe. Версия v2.x запрещена к использован
 
 ## Специфика для этой роли
 
-Канон модели — `docs/math_model_v3_5_0.md` (SAW, Avalanche, SES + Монте-Карло, 66 альтернатив шагом 10%, инварианты Rt ≥ 0 и ПДН ≤ 0.40, ДИ прогноза 80%). Формальные замеры и контрфакты — `docs/reports/testing/`. Оценка модели по десяти шкалам — `docs/model/model_quality_scorecard.md`.
+Канон модели — `docs/math_model.md` (SAW, Avalanche, SES + Монте-Карло, 66 альтернатив шагом 10%, инварианты Rt ≥ 0 и ПДН ≤ 0.40, ДИ прогноза 80%). Формальные замеры и контрфакты — `docs/reports/testing/`. Оценка модели по десяти шкалам — `docs/model/model_quality_scorecard.md`.

@@ -1,7 +1,7 @@
 """Инварианты мат-модели v3.4.0 — исполняемая спецификация для свипа.
 
 Каждая проверка возвращает список нарушений вида "I<n>: ...". Пустой список = чисто.
-Канон: docs/math_model_v3_5_0.md + app/core (filtering, ranking, alternatives,
+Канон: docs/math_model.md + app/core (filtering, ranking, alternatives,
 crisis, forecast).
 
 Изменения v3.1.0 (по независимой экспертизе, 12 000 портретов × 4 эксперта):

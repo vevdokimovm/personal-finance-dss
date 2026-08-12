@@ -55,7 +55,8 @@
 
 - **`app/`** — код приложения. Не для документации.
 - **`docs/`** — техническая документация репозитория (про код и разработку):
-  `engineering_practices.md`, `math_model_v3_0_0.md`, ADR-навигация, `diagrams/`, и т.п.
+  `engineering_practices.md`, `math_model.md` (канон — стабильное имя, не версионируется
+  в имени файла, историю смотри в `docs/model/history/`), ADR-навигация, `diagrams/`, и т.п.
   - **`docs/reports/`** — все отчёты, по типам: `adr/`, `incidents/`, `investigations/`, `merges/`.
   - **`docs/diagrams/`** — диаграммы архитектуры и модели (`.drawio` + превью).
 - **`knowledge/`** — не-кодовая база знаний проекта:

@@ -191,5 +191,5 @@ handoff их сшивает. Первоисточник по экосистем�
 - `docs/ui_ux_design_standard.md` — токены, состояния, a11y.
 - `docs/ROADMAP.md` (раздел «ВЕХА 8») — первоисточник задач вехи.
 - `docs/api/openapi.json` — контракт бэка (источник типов фронта, §1.2).
-- `docs/algorithm_stack.md`, `docs/math_model_v3_5_0.md` — что визуализируем (ядро продукта).
+- `docs/algorithm_stack.md`, `docs/math_model.md` — что визуализируем (ядро продукта).
 - `knowledge/guides/claude_infrastructure_methodology.md` §12–13 — поверхности Claude и субагенты.

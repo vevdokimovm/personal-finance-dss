@@ -68,6 +68,16 @@ LINK_ALLOWLIST = {
         "историческая ссылка на состояние Э3 — компонент вынесен в @widgets/forecast-panel "
         "в v8.7.0 (Э4 партия 2), отчёт не переписывается задним числом. Файл лежит в "
         "docs/reports/ напрямую, не в reports/audits/ — под FROZEN_HINTS не подпадает.",
+    ("docs/ui_visual_direction.md", "docs/math_model_v3_5_0.md"):
+        "историческая ссылка на состояние на момент отчёта (файл лежал в docs/ под этим "
+        "именем) — переименован в docs/math_model.md в v8.9.4, отчёт не переписывается "
+        "задним числом. Лежит прямо в docs/, не подпадает под FROZEN_HINTS.",
+    ("docs/model/expert_certification/iterations/5/round5_model_half.md", "docs/math_model_v3_5_0.md"):
+        "историческая ссылка на канон-файл на момент раунда 5 — переименован в "
+        "docs/math_model.md в v8.9.4, отчёт эксперимента не переписывается задним числом.",
+    ("docs/reports/adr/adr_006_reserve_floor_calibration.md", "docs/math_model_v3_5_0.md"):
+        "историческая ссылка на канон-файл на момент ADR — переименован в docs/math_model.md "
+        "в v8.9.4, ADR не переписывается задним числом.",
 }
 
 # Паттерны устаревшей мат-модели v2.x (не должны заявляться как текущий факт).
@@ -81,7 +91,8 @@ LEGACY_PATTERNS = (
 
 # Живые доки, где упоминание legacy легитимно (объяснение перехода v2 -> v3).
 LEGACY_ALLOWLIST_FILES = frozenset({
-    "docs/math_model_v3_0_0.md",
+    "docs/model/history/math_model_v3_0_0.md",
+    "docs/model/history/math_model_v3_1_0.md",
     "docs/model/model_history.md",  # сквозная история модели: legacy по назначению
     "docs/reference_profiles.md",
     "docs/reports/adr/adr_template.md",

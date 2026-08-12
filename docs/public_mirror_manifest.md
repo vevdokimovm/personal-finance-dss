@@ -34,7 +34,7 @@
 | `CHANGELOG.md` | 300+ КБ внутренней истории с деталями процесса; версию наружу несёт README-бейдж и релизы зеркала. |
 | `docs/pitfalls.md`, `sandbox_runbook.md`, `session_continuity.md`, `tool_call_channel_failures.md`, `test_run_optimization.md`, `versioning_and_releases.md`, `infrastructure.md` | Claude-специфичная механика работы и внутренняя инфра. |
 | `docs/legal_questions_for_lawyer.md`, `docs/pdn_data_map.md`, `docs/backup_restore.md`, `docs/slo.md`, `LEGAL.md` | Юр/операционная внутрянка до ревью юристом; карту ПДн наружу не надо. |
-| `docs/math_model_v3_5_0.md` (текущий канон) и исторические `math_model_v3_0_0.md`/`v3_1_0.md`, `algorithm_stack.md`, `reference_profiles.md`, `diagrams.md`, `ui_ux_design_standard.md`, `ui_visual_design_brief.md`, API-снапшот | **Ядро IP и планы** — см. Q2 ниже. В скрипте лежат закомментированным OPTIONAL-блоком: включаются одной строкой, если решишь. |
+| `docs/math_model.md` (текущий канон) и исторические `math_model_v3_0_0.md`/`v3_1_0.md`, `algorithm_stack.md`, `reference_profiles.md`, `diagrams.md`, `ui_ux_design_standard.md`, `ui_visual_design_brief.md`, API-снапшот | **Ядро IP и планы** — см. Q2 ниже. В скрипте лежат закомментированным OPTIONAL-блоком: включаются одной строкой, если решишь. |
 | `tools/**` | Публикатор, cost-tracker (org id), портретный генератор и внутренние пайплайны — процессная кухня. |
 | `.env*` (кроме example), `*.db`, кэши | Секреты и локальные артефакты; guard + rsync-excludes страхуют. |
 
