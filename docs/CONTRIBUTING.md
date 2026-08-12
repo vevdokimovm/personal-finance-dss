@@ -7,7 +7,7 @@
 
 ## 1. Стек и запуск локально
 
-- Python 3.12, FastAPI, SQLAlchemy 2.0, Alembic, Pydantic v2, Jinja2, vanilla JS.
+- Python 3.13, FastAPI, SQLAlchemy 2.0, Alembic, Pydantic v2, Jinja2, vanilla JS.
 - БД: SQLite (локально, быстро) / PostgreSQL (production и проверка схемы).
 
 ```

@@ -19,7 +19,7 @@ FINPILOT — алгоритмическая СППР по личным фина�
 ## Стек и окружение
 
 FastAPI · SQLAlchemy 2.0 · Alembic · Pydantic v2 · Jinja2 + vanilla JS (уезжает
-на React+TS по ADR-001) · PostgreSQL/SQLite · Python 3.12 · Docker.
+на React+TS по ADR-001) · PostgreSQL/SQLite · Python 3.13 · Docker.
 Репозитории: `personal-finance-dss` (приватный) + `finpilot` (публичное зеркало).
 Разработка ведётся с четырёх аккаунтов, синхронизация — `docs/WATCHLOG.md`.
 

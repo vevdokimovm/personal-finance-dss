@@ -1,5 +1,5 @@
 # ── Stage 1: builder — установка зависимостей в изолированный venv ──
-FROM python:3.12-slim AS builder
+FROM python:3.13-slim AS builder
 
 WORKDIR /app
 ENV PIP_NO_CACHE_DIR=1 \
@@ -14,7 +14,7 @@ RUN python -m venv /opt/venv \
     && /opt/venv/bin/pip install --no-cache-dir --only-binary=:all: -r requirements.txt
 
 # ── Stage 2: runtime — только venv и код, без сборочных инструментов ──
-FROM python:3.12-slim AS runtime
+FROM python:3.13-slim AS runtime
 
 WORKDIR /app
 ENV PATH="/opt/venv/bin:$PATH" \

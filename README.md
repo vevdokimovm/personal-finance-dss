@@ -2,7 +2,7 @@
 
 [![CI](https://github.com/vevdokimovm/personal-finance-dss/actions/workflows/ci.yml/badge.svg)](https://github.com/vevdokimovm/personal-finance-dss/actions/workflows/ci.yml)
 ![version](https://img.shields.io/badge/version-7.7.1-blue)
-![python](https://img.shields.io/badge/python-3.12-blue)
+![python](https://img.shields.io/badge/python-3.13-blue)
 ![coverage](https://img.shields.io/badge/coverage-92%25-brightgreen)
 ![tests](https://img.shields.io/badge/tests-1473-brightgreen)
 ![license](https://img.shields.io/badge/license-MIT-green)
@@ -291,7 +291,7 @@ cache-busting статики и совместимость 204-ответов с
 | Тесты | pytest, hypothesis (property-based), Playwright (E2E), locust (нагрузка) |
 | Качество | ruff, mypy, bandit, pip-audit, coverage (гейт 90%) |
 
-Python 3.12. Около 10 600 строк кода приложения, 14 модулей ядра, 19 миграций Alembic.
+Python 3.13. Около 10 600 строк кода приложения, 14 модулей ядра, 19 миграций Alembic.
 
 ---
 
