@@ -32,7 +32,7 @@
 | Вопрос | Где ответ |
 |---|---|
 | Где мы сейчас и что дальше | `docs/WATCHLOG.md` (§0) → `docs/ROADMAP.md` (механизм в шапке) |
-| Математика продукта | `docs/math_model_v3_0_0.md` — ЕДИНСТВЕННЫЙ канон (v2.x мертва) |
+| Математика продукта | `docs/math_model_v3_5_0.md` — ЕДИНСТВЕННЫЙ канон (v2.x мертва) |
 | Как разрабатываем | `knowledge/guides/development_process_methodology.md` + `docs/engineering_practices.md` |
 | Тестирование и гейты | `docs/QA.md` (TDD, 90% покрытия, SQLite+PG матрица, timewarp) |
 | Безопасность | корневой `SECURITY.md` |

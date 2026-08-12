@@ -17,7 +17,7 @@ function cardByName(container: HTMLElement, name: string): HTMLElement {
   return card as HTMLElement;
 }
 
-describe("MetricsGrid — пороговая раскраска ПДН (жёсткий инвариант канона v3.0.0, ≤0.40)", () => {
+describe("MetricsGrid — пороговая раскраска ПДН (жёсткий инвариант канона v3.5.0, ≤0.40)", () => {
   it("Dt=0.347 (норма, anna) — без danger/warn на значении", () => {
     const { container } = render(<MetricsGrid indicators={indicators({ Dt: 0.347 })} />);
     const value = cardByName(container, "Долговая нагрузка (ПДН)").querySelector(
@@ -63,7 +63,7 @@ describe("MetricsGrid — пороговая раскраска ПДН (жёст
 });
 
 describe("MetricsGrid — ликвидность и подушка: мягкие критерии канона, warn максимум, не danger", () => {
-  // Канон v3.0.0 (docs/math_model_v3_0_0.md): L_min=0 по умолчанию, отсев по
+  // Канон v3.5.0 (docs/math_model_v3_5_0.md): L_min=0 по умолчанию, отсев по
   // ликвидности МЯГКИЙ — в отличие от ПДН здесь нет жёсткого инварианта,
   // поэтому danger не применяется никогда, только warn ("внимание").
   it("Lt=0 (нет автономии) — warn на бейдже и значении, но не danger", () => {

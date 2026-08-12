@@ -1,10 +1,10 @@
 # FINPILOT — СППР для персональных финансов
 
 [![CI](https://github.com/vevdokimovm/personal-finance-dss/actions/workflows/ci.yml/badge.svg)](https://github.com/vevdokimovm/personal-finance-dss/actions/workflows/ci.yml)
-![version](https://img.shields.io/badge/version-7.7.1-blue)
+![version](https://img.shields.io/badge/version-8.9.1-blue)
 ![python](https://img.shields.io/badge/python-3.13-blue)
-![coverage](https://img.shields.io/badge/coverage-92%25-brightgreen)
-![tests](https://img.shields.io/badge/tests-1473-brightgreen)
+![coverage](https://img.shields.io/badge/coverage-gate%2090%25-brightgreen)
+![tests](https://img.shields.io/badge/tests-1512%20%2B%2075%20%2B%2025-brightgreen)
 ![license](https://img.shields.io/badge/license-MIT-green)
 
 **FINPILOT** — система поддержки принятия решений (СППР), которая отвечает на один вопрос,
@@ -25,14 +25,14 @@
 
 ---
 
-## Текущее состояние (v7.7.1, июль 2026)
+## Текущее состояние (v8.9.1, август 2026)
 
 | | |
 |---|---|
 | **Матмодель** | канон **v3.5.0**, пять раундов независимой экспертной сертификации, оценка по десяти шкалам — **85.7 / 100** |
-| **Тесты** | **1473** на SQLite и матрица PostgreSQL, гейт покрытия 90%, flake8 = 0, ревизионный гейт docs↔code |
-| **Вехи** | 1–7 закрыты. Следующая — **8, фронтенд** (React + TS, ADR-001). Готовность к ней — **86 / 100** |
-| **Юрблок** | шесть требований из десяти закрыты кодом и покрыты тестами; остальные — фронтовые и деплойные по построению |
+| **Тесты** | бэкенд **1512** на SQLite и матрице PostgreSQL, фронт Vitest **75** + Playwright **25**, гейт покрытия 90%, flake8 = 0, ревизионный гейт docs↔code |
+| **Вехи** | 1–7 закрыты. **8 (фронтенд) идёт** — React 19 SPA поднят и заменил Jinja2 на основных экранах (дашборд, планирование, операции, обязательства, цели, банки, профиль), сейчас на шаге Э5 (доменные представления). Прод-деплой пайплайн (Docker + nginx) проверен на изолированном стенде |
+| **Юрблок** | шесть требований из десяти закрыты кодом и покрыты тестами; экраны согласия/cookie-баннер на фронте — открытый шаг Э6 |
 | **Веха 6** | тестирование матмодели закрыто по исчерпанию информативности метода, не по идеальности — условия возобновления зафиксированы |
 
 Подробно: `docs/reports/audits/full_revision_before_frontend.md` (ревизия и оценка
@@ -61,7 +61,7 @@
 ## Демо за 30 секунд
 
 Запустите проект ([Быстрый старт](#быстрый-старт)) и в боковой панели выберите один из
-**шести готовых портретов пользователей** — от студента с микрозаймом до семьи 56 лет с
+**десяти готовых портретов пользователей** — от студента с микрозаймом до семьи 56 лет с
 ипотекой. Данные не зашиты: они пересчитываются **реальным движком** в реальном времени, и
 вы сразу видите распределение, прогноз и обоснование под конкретную ситуацию.
 
@@ -159,7 +159,7 @@ flowchart TD
 - **Жёсткие инварианты** — `Rt ≥ 0` (нельзя уйти в минус по потоку) и `ПДН ≤ 0.40`
   (показатель долговой нагрузки), которые отсекают опасные варианты до ранжирования.
 
-Полный разбор: [`docs/math_model_v3_0_0.md`](docs/math_model_v3_0_0.md) (каноническая модель,
+Полный разбор: [`docs/math_model_v3_5_0.md`](docs/math_model_v3_5_0.md) (каноническая модель,
 источник истины по параметрам), [`docs/algorithm_stack.md`](docs/algorithm_stack.md) (как это
 работает по шагам в коде), [`docs/diagrams.md`](docs/diagrams.md) (8 диаграмм: слои, ER,
 конвейер ядра, поток `/calculate`, развёртывание, middleware, аутентификация, карта фронта).
@@ -272,6 +272,18 @@ cache-busting статики и совместимость 204-ответов с
 Отсюда же дисциплина процесса: предполётная проверка блокирующим job'ом CI, реестр рецидивов
 с эскалацией контрмеры по числу повторов и опознавательные знаки репозитория.
 
+### v8.x.x — фронтенд (React SPA, идёт)
+
+Перенос интерфейса с server-side Jinja2 на React 19 + TypeScript SPA (Vite, TanStack
+Router/Query, Zustand, Radix UI, Recharts + visx, KaTeX), API не меняется — тот же бэкенд
+обслуживает оба интерфейса. Основные экраны (дашборд, планирование, операции, обязательства,
+цели, банки, профиль) уже на React; второстепенные (контакты, юр-документы, восстановление
+пароля) остаются на Jinja2 по решению — не всё стоило переносить. Прод-деплой: nginx
+собирает SPA внутри Docker и разводит маршруты SPA/FastAPI. Сейчас на шаге Э5 (доменные
+представления — раскрытие альтернатив, помесячный прогноз, объяснение формул); юр-контур
+фронта (согласия, cookie-баннер) и security/perf-гейты (CSP, security-заголовки) — открытые
+следующие шаги. План — `docs/frontend_milestone8_plan.md`, статус — `docs/WATCHLOG.md`.
+
 > Читаемая история по вехам — в [`docs/RELEASES.md`](docs/RELEASES.md). Подробная история по каждой
 > версии — в [`CHANGELOG.md`](CHANGELOG.md). «Где мы сейчас» и резюме точки разработки — в
 > [`docs/WATCHLOG.md`](docs/WATCHLOG.md).
@@ -284,53 +296,61 @@ cache-busting статики и совместимость 204-ответов с
 |---|---|
 | Backend | FastAPI, SQLAlchemy 2.0, Pydantic v2, Alembic |
 | База данных | SQLite (локально) / PostgreSQL 16 (Docker / прод) |
-| Frontend | Server-side Jinja2 + vanilla HTML/CSS/JS (без SPA-фреймворка) |
+| Frontend | React 19 + TypeScript SPA (Vite) — TanStack Router/Query, Zustand, Radix UI/shadcn, Recharts + visx, KaTeX. Второстепенные экраны (контакты, юр-документы, восстановление пароля) и весь API — по-прежнему FastAPI/Jinja2 |
 | Математика | NumPy/чистый Python — SAW, Monte-Carlo, Theil-Sen, stars-and-bars |
-| Прод-запуск | Gunicorn + uvicorn-воркеры, nginx (TLS Let's Encrypt) |
+| Прод-запуск | Gunicorn + uvicorn-воркеры; nginx собирает и отдаёт SPA (multi-stage Docker-сборка) + TLS (Let's Encrypt) + reverse-proxy на FastAPI |
 | Инфраструктура | Docker (multi-stage), docker compose, GitHub Actions CI |
-| Тесты | pytest, hypothesis (property-based), Playwright (E2E), locust (нагрузка) |
-| Качество | ruff, mypy, bandit, pip-audit, coverage (гейт 90%) |
+| Тесты | pytest, hypothesis (property-based) — бэкенд; Vitest + Playwright — фронтенд; locust (нагрузка) |
+| Качество | ruff, mypy, bandit, pip-audit, coverage (гейт 90%); фронт — eslint, prettier, tsc, Lighthouse CI (веха 8, шаг Э7) |
 
-Python 3.13. Около 10 600 строк кода приложения, 14 модулей ядра, 19 миграций Alembic.
+Python 3.13. Около 16 700 строк кода бэкенда, 20 модулей ядра, 31 миграция Alembic.
 
 ---
 
 ## Быстрый старт
 
-### Через Docker (рекомендуется)
+Веха 8 идёт: основные экраны (дашборд, планирование, операции, обязательства, цели, банки,
+профиль) — на React SPA, второстепенные (контакты, юр-документы, восстановление пароля) и
+весь API — по-прежнему на FastAPI/Jinja2. **Смотреть текущий React-фронт локально нужно через
+Vite dev-сервер, не через `docker compose up`** — dev-compose поднимает только бэкенд.
 
-Поднимает приложение вместе с PostgreSQL одной командой:
+### Бэкенд (обязателен в любом случае)
 
+**Через Docker (проще всего):**
 ```bash
 docker compose up --build
 ```
+Backend будет доступен на `http://localhost:8000` (Jinja-страницы — на `/dashboard` и т.д.,
+API — на `/api/*`, Swagger — на `/docs`).
 
-Приложение будет доступно на `http://localhost:8000/dashboard`.
+**Или локально без Docker (macOS / Linux):**
+```bash
+python3 -m venv venv && source venv/bin/activate
+pip install -r requirements.txt -r requirements-dev.txt
+alembic upgrade head
+python3 -m uvicorn app.main:app --reload --port 8000
+```
 
-### Локально (macOS / Linux)
+### Фронтенд — React SPA (чтобы увидеть текущее состояние вехи 8)
 
-1. Создать и активировать виртуальное окружение:
-   ```bash
-   python3 -m venv venv
-   source venv/bin/activate
-   ```
-2. Установить зависимости:
-   ```bash
-   pip install -r requirements.txt -r requirements-dev.txt
-   ```
-3. Применить миграции:
-   ```bash
-   alembic upgrade head
-   ```
-4. Запустить сервер:
-   ```bash
-   python3 -m uvicorn app.main:app --reload --port 8000
-   ```
-5. Открыть `http://127.0.0.1:8000/dashboard` (при обновлении статики — жёсткое обновление
-   `Cmd/Ctrl+Shift+R`).
+В отдельном терминале, пока бэкенд крутится на :8000:
+```bash
+cd frontend
+npm install
+npm run dev
+```
+Открыть `http://localhost:5173` — это и есть текущий React-интерфейс (не :8000!). Vite сам
+проксирует `/api` на `127.0.0.1:8000`, отдельная настройка CORS не нужна.
 
-Для быстрого знакомства загрузите демо-данные: в боковой панели выберите один из десяти
-портретов пользователей — данные пересчитываются реальным движком.
+Для быстрого знакомства с движком без регистрации — гостевой режим и один из десяти демо-
+портретов пользователей в боковой панели: данные пересчитываются реальным движком, не
+захардкожены.
+
+### Прод-сборка (проверить именно то, что уедет на сервер)
+
+`docker-compose.prod.yml` собирает SPA внутри Docker (`nginx/Dockerfile`, multi-stage) и
+отдаёт готовую сборку через nginx — ближе к реальному деплою, но требует `.env` с секретами
+(см. `docs/DEPLOY.md`). Для повседневной разработки/просмотра — вариант выше проще и быстрее.
 
 ### Переменные окружения
 
@@ -362,11 +382,14 @@ docker compose up --build
 | **deep** | по cron / вручную | стресс-property (тысячи примеров) + мутационное тестирование ядра |
 
 ```bash
-make test-fast        # быстрый набор перед коммитом
-make test-full        # полный прогон перед релизом
-make e2e              # браузерные сквозные (chromium)
+make test-fast        # быстрый набор перед коммитом (бэкенд)
+make test-full        # полный прогон перед релизом (бэкенд)
+make e2e              # браузерные сквозные, бэкенд (chromium)
 make security         # bandit + pip-audit
 ```
+
+Фронтенд (в `frontend/`): `npm run test` (Vitest, 75 тестов), `npm run test:e2e` (Playwright,
+25 тестов, chromium/firefox/webkit), `npm run lint` / `typecheck` / `format:check`.
 
 > Запускайте через `python3 -m pytest` (не голый `pytest`): голая команда может подхватить
 > системный pytest вне venv.
@@ -448,8 +471,10 @@ app/
   schemas/      Pydantic v2 схемы (валидация I/O)
   config.py     настройки (pydantic-settings)
   main.py       сборка приложения, middleware, lifespan
-alembic/        миграции (0001–0019)
-frontend/       шаблоны Jinja2 и статика (app.js, auth.js, styles.css)
+alembic/        миграции (0001–0031)
+frontend/       React 19 SPA (src/, package.json, Vitest + Playwright e2e/) —
+                И одновременно старые Jinja-шаблоны/статика (templates/, static/) для
+                второстепенных страниц (контакты, юр-документы, восстановление пароля)
 tests/          pytest: unit/integration + property + e2e/ + full/ + deep/
 loadtest/       нагрузочный сценарий locust
 docs/           каноническая документация (см. ниже)
@@ -470,10 +495,11 @@ Dockerfile, docker-compose.yml, gunicorn_conf.py
 | [`docs/reports/report_types.md`](docs/reports/report_types.md) | Роутер: какой тип разбора писать (инцидент / расследование / баг / pitfall) |
 | [`docs/reports/incident_postmortem_guide.md`](docs/reports/incident_postmortem_guide.md) | Практический шаблон/метод инцидента (post-mortem, SEV, RCA) |
 | [`docs/documentation_methodology.md`](docs/documentation_methodology.md) | Общая теория документирования: blameless, RCA, runbook, ADR/RFC, SLO/error budget |
-| [`docs/math_model_v3_0_0.md`](docs/math_model_v3_0_0.md) | Каноническая математическая модель (источник истины по параметрам) |
+| [`docs/math_model_v3_5_0.md`](docs/math_model_v3_5_0.md) | Каноническая математическая модель (источник истины по параметрам) |
 | [`docs/algorithm_stack.md`](docs/algorithm_stack.md) | Девятишаговый конвейер ядра по шагам в коде |
 | [`docs/diagrams.md`](docs/diagrams.md) | 8 диаграмм: слои, ER, конвейер, потоки, развёртывание, auth, фронт |
 | [`docs/testing_infrastructure.md`](docs/testing_infrastructure.md) | Карта тестов: уровни, три категории, PG-матрица, E2E |
+| [`docs/frontend_milestone8_plan.md`](docs/frontend_milestone8_plan.md) | Активный план вехи 8 (фронтенд): этапы Э0–Э8, что сделано, что дальше |
 | [`SECURITY.md`](SECURITY.md) | Единый security-док: меры (ссылки на код), что осталось, домены ревью, план реагирования |
 | [`docs/DEPLOY.md`](docs/DEPLOY.md) | Пошаговый деплой на VPS |
 | [`docs/CONTRIBUTING.md`](docs/CONTRIBUTING.md) | Процесс: TDD-цикл, PG для схемы, Definition of Done |

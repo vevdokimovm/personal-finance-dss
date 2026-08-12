@@ -1,7 +1,7 @@
 # SRS — FINPILOT (Software Requirements Specification)
 
 Заполненная спецификация требований по шаблону `knowledge/guides/templates/srs_guide.md`.
-Каноничная математическая модель — **v3.0.0** (`docs/math_model_v3_0_0.md`); v2.x — legacy, не использовать.
+Каноничная математическая модель — **v3.5.0** (`docs/math_model_v3_5_0.md`); v2.x — legacy, не использовать.
 
 ## 1. Назначение
 FINPILOT — алгоритмическая СППР (система поддержки принятия решений) для персональных финансов:
