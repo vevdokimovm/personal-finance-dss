@@ -39,6 +39,31 @@ def test_calculate_income_override_changes_result(client: TestClient) -> None:
     assert high["input_summary"]["income"] != base["input_summary"]["income"]
 
 
+def test_investment_tranche_iis_and_growth_survive_response_model(client: TestClient) -> None:
+    """`response_model=PlanningCalculateResponse` тихо срезает необъявленные
+    поля — юнит-тесты на run_planning() этого не ловят (минуют сериализацию).
+    Regression: iis_deduction_estimate потерялся именно так в v8.18.0."""
+    # Без демо-профиля: demo-цели анны съедают весь избыток (best x_reserve=0,
+    # транша нет) — здесь нужен предсказуемый портрет, не реалистичный кейс.
+    client.patch("/api/user-prefs", json={"iis_type": "A", "iis_contributed_this_year": 0.0})
+    # bliq выше целевой подушки — иначе весь резервный поток уходит на добор
+    # cushion_gap, транша не формируется (тот же расчёт, что в run_planning).
+    client.post("/api/liquid-assets", json={
+        "name": "Вклад", "amount": 1_000_000, "interest_rate": 0.14, "type": "deposit",
+    })
+    resp = client.post("/api/planning/calculate", json={
+        "risk_tolerance": 4, "income_override": 500_000, "expense_override": 50_000,
+    })
+    assert resp.status_code == 200
+    tranche = resp.json()["best"]["investment_tranche"]
+    assert tranche is not None
+    assert tranche["growth_illustration"] is not None
+    assert len(tranche["growth_illustration"]) > 0
+    assert {"rate", "years", "future_value"} <= set(tranche["growth_illustration"][0].keys())
+    assert tranche["iis_deduction_estimate"] is not None
+    assert tranche["iis_deduction_estimate"]["deduction"] > 0
+
+
 def test_forecast_returns_series(client: TestClient) -> None:
     _load_anna(client)
     resp = client.post("/api/planning/forecast", json={"horizon": 6})

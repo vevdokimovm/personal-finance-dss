@@ -152,12 +152,29 @@ class InvestmentTrancheSplit(BaseModel):
     equity: float = 0.0
 
 
+class IISDeductionEstimate(BaseModel):
+    """Реальный вычет ИИС типа А (ADR-017) — только когда применимо, иначе None."""
+
+    eligible_amount: float
+    deduction: float
+
+
+class GrowthIllustrationPoint(BaseModel):
+    """Иллюстрация сложного процента — НЕ прогноз, НЕ рекомендация инструмента."""
+
+    rate: float
+    years: int
+    future_value: float
+
+
 class InvestmentTranche(BaseModel):
     amount: float
     cushion_part: float = 0.0
     split: InvestmentTrancheSplit
     equity_share: float = 0.0
     note: str = ""
+    iis_deduction_estimate: Optional[IISDeductionEstimate] = None
+    growth_illustration: Optional[List[GrowthIllustrationPoint]] = None
 
 
 class ExplanationDelta(BaseModel):

@@ -1825,6 +1825,30 @@
         "title": "GoalResponse",
         "type": "object"
       },
+      "GrowthIllustrationPoint": {
+        "description": "Иллюстрация сложного процента — НЕ прогноз, НЕ рекомендация инструмента.",
+        "properties": {
+          "future_value": {
+            "title": "Future Value",
+            "type": "number"
+          },
+          "rate": {
+            "title": "Rate",
+            "type": "number"
+          },
+          "years": {
+            "title": "Years",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "rate",
+          "years",
+          "future_value"
+        ],
+        "title": "GrowthIllustrationPoint",
+        "type": "object"
+      },
       "HTTPValidationError": {
         "properties": {
           "detail": {
@@ -2039,6 +2063,25 @@
         "title": "HouseholdUpdate",
         "type": "object"
       },
+      "IISDeductionEstimate": {
+        "description": "Реальный вычет ИИС типа А (ADR-017) — только когда применимо, иначе None.",
+        "properties": {
+          "deduction": {
+            "title": "Deduction",
+            "type": "number"
+          },
+          "eligible_amount": {
+            "title": "Eligible Amount",
+            "type": "number"
+          }
+        },
+        "required": [
+          "eligible_amount",
+          "deduction"
+        ],
+        "title": "IISDeductionEstimate",
+        "type": "object"
+      },
       "IndicatorsResponse": {
         "properties": {
           "BLR": {
@@ -2227,6 +2270,30 @@
             "default": 0.0,
             "title": "Equity Share",
             "type": "number"
+          },
+          "growth_illustration": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/GrowthIllustrationPoint"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Growth Illustration"
+          },
+          "iis_deduction_estimate": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/IISDeductionEstimate"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "note": {
             "default": "",
@@ -4199,7 +4266,7 @@
   },
   "info": {
     "title": "FINPILOT",
-    "version": "8.17.0"
+    "version": "8.18.0"
   },
   "openapi": "3.1.0",
   "paths": {

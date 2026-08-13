@@ -12,8 +12,11 @@ from datetime import datetime
 
 from app.core.investment import (
     EQUITY_SHARE_BY_PROFILE,
+    GROWTH_ILLUSTRATION_RATES,
+    GROWTH_ILLUSTRATION_YEARS,
     annotate_investment_tranche,
     estimate_iis_deduction,
+    project_compound_growth,
 )
 from app.services.planning import run_planning
 
@@ -214,3 +217,50 @@ class TestPlanningIntegration:
         # но диагностика транша реально разная (иначе тест ничего не проверял бы)
         assert with_iis_a["best"]["investment_tranche"]["iis_deduction_estimate"] is not None
         assert with_iis_a_maxed["best"]["investment_tranche"]["iis_deduction_estimate"] is None
+
+
+class TestProjectCompoundGrowth:
+    def test_matches_compound_interest_formula(self):
+        result = project_compound_growth(100_000.0, years=[10], rates=[0.08])
+        assert result == [
+            {"rate": 0.08, "years": 10, "future_value": round(100_000.0 * 1.08**10, 2)}
+        ]
+
+    def test_default_years_and_rates_used(self):
+        result = project_compound_growth(100_000.0)
+        assert len(result) == len(GROWTH_ILLUSTRATION_YEARS) * len(GROWTH_ILLUSTRATION_RATES)
+        assert {r["years"] for r in result} == set(GROWTH_ILLUSTRATION_YEARS)
+        assert {r["rate"] for r in result} == set(GROWTH_ILLUSTRATION_RATES)
+
+    def test_higher_rate_gives_higher_value_same_years(self):
+        result = project_compound_growth(100_000.0, years=[10], rates=[0.05, 0.12])
+        by_rate = {r["rate"]: r["future_value"] for r in result}
+        assert by_rate[0.12] > by_rate[0.05]
+
+    def test_zero_amount_returns_none(self):
+        assert project_compound_growth(0.0) is None
+
+    def test_negative_amount_returns_none(self):
+        assert project_compound_growth(-100.0) is None
+
+
+class TestAnnotateGrowthIllustration:
+    def test_growth_illustration_present_when_tranche_exists(self):
+        alt = {"x_reserve": 50_000.0}
+        annotate_investment_tranche(
+            alt, bliq=400_000.0, expense_total=50_000.0,
+            lt_target=4.0, risk_tolerance=2,
+        )
+        tr = alt["investment_tranche"]
+        assert tr["growth_illustration"] is not None
+        assert len(tr["growth_illustration"]) == (
+            len(GROWTH_ILLUSTRATION_YEARS) * len(GROWTH_ILLUSTRATION_RATES)
+        )
+
+    def test_growth_illustration_absent_when_no_tranche(self):
+        alt = {"x_reserve": 30_000.0}
+        annotate_investment_tranche(
+            alt, bliq=100_000.0, expense_total=50_000.0,  # 2 мес < цели — транша нет
+            lt_target=4.5, risk_tolerance=3,
+        )
+        assert alt["investment_tranche"] is None

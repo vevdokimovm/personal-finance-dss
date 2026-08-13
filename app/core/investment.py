@@ -80,6 +80,41 @@ def estimate_iis_deduction(
     }
 
 
+# Иллюстрация сложного процента (2026-08-13, обсуждение с владельцем по итогам
+# опроса ЦА): ставки — НЕ прогноз, НЕ рекомендация инструмента, НЕ привязаны к
+# конкретному классу активов из build_shelf_split/EQUITY_SHARE_BY_PROFILE и не
+# зависят от риск-профиля — единая иллюстрация «как работает сложный процент»
+# для любого пользователя. Порядок величины (5/8/12%) — общий ориентир (ближе к
+# консервативному/среднему/оптимистичному сценарию накопления), не измерение и
+# не консенсус экспертизы. Обязателен дисклеймер при показе пользователю
+# (39-ФЗ, `docs/legal/terms-of-service.md` п.4.2 — не индивидуальная
+# инвестиционная рекомендация).
+GROWTH_ILLUSTRATION_YEARS = [5, 10, 20]
+GROWTH_ILLUSTRATION_RATES = [0.05, 0.08, 0.12]
+
+
+def project_compound_growth(
+    amount: float,
+    years: list[int] | None = None,
+    rates: list[float] | None = None,
+) -> list[dict[str, float]] | None:
+    """Сложный процент: amount * (1+rate)^years для каждой пары (rate, years).
+
+    None при amount <= 0 — иллюстрировать нечего. Чистая функция, не входит ни
+    в выбор альтернативы, ни в решение модели — та же красная линия, что у
+    estimate_iis_deduction (ADR-017): диагностика, не совет.
+    """
+    if amount <= 0:
+        return None
+    years = years if years is not None else GROWTH_ILLUSTRATION_YEARS
+    rates = rates if rates is not None else GROWTH_ILLUSTRATION_RATES
+    return [
+        {"rate": rate, "years": y, "future_value": money(amount * (1 + rate) ** y)}
+        for rate in rates
+        for y in years
+    ]
+
+
 # Полный G5 (v3.2.0): инструмент зависит от горизонта. Короткий горизонт не
 # терпит просадок — акции исключаются независимо от риск-профиля.
 HORIZON_SHORT_MONTHS = 12.0
@@ -157,5 +192,6 @@ def annotate_investment_tranche(
         "equity_share": equity_share,
         "note": note,
         "iis_deduction_estimate": iis_estimate,
+        "growth_illustration": project_compound_growth(invest),
     }
     return alt
