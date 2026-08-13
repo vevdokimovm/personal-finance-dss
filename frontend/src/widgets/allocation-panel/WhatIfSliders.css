@@ -1,0 +1,88 @@
+.fp-whatif {
+  margin-top: var(--sp-5);
+  padding-top: var(--sp-5);
+  border-top: var(--border-w) solid var(--c-border);
+}
+.fp-whatif__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--sp-3);
+}
+.fp-whatif h3 {
+  font-size: var(--fs-base);
+  font-weight: 700;
+  margin: 0 0 var(--sp-1);
+}
+.fp-whatif__hint {
+  color: var(--c-text3);
+  font-size: var(--fs-xs);
+  margin: 0 0 var(--sp-4);
+}
+.fp-whatif__sliders {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+}
+.fp-whatif__slider {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-1);
+}
+.fp-whatif__slider-head {
+  display: flex;
+  justify-content: space-between;
+  font-size: var(--fs-sm);
+  color: var(--c-text2);
+}
+.fp-whatif__slider input[type="range"] {
+  width: 100%;
+  /* Тач-таргет A11Y-09 — на самом инпуте, не на обёртке: у нативного range визуальный трек
+     тонкий, но бокс (и с ним область нажатия) растягивается на всю заданную высоту. */
+  min-height: var(--tap-target-min);
+}
+/* Цвет ползунка = цвет его категории в столбце/легенде выше (--c-red долг, --c-green цели) —
+   не общий нейтральный акцент: design-critic поймал, что accent-color совпадал с --c-green
+   («Цели») на ОБОИХ ползунках, то есть ползунок «Досрочное погашение» был случайно зелёным. */
+.fp-whatif__slider--debt input[type="range"] {
+  accent-color: var(--c-red);
+}
+.fp-whatif__slider--goals input[type="range"] {
+  accent-color: var(--c-green);
+}
+.fp-whatif__result {
+  display: flex;
+  gap: var(--sp-2) var(--sp-5);
+  flex-wrap: wrap;
+  align-items: center;
+  margin-top: var(--sp-4);
+  padding: var(--sp-3) var(--sp-4);
+  background: var(--c-surface-up);
+  border: var(--border-w) solid var(--c-border);
+  border-radius: var(--r-sm);
+  font-size: var(--fs-sm);
+}
+.fp-whatif__unavailable {
+  color: var(--c-text2);
+}
+.fp-whatif__dti {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+}
+/* Тот же словарь бейджей, что MetricCard/MetricsGrid.css для DTI_WARN_THRESHOLD — один порог
+   должен звучать одним визуальным языком в обоих местах экрана (design-critic, v8.11.0). */
+.fp-whatif__badge {
+  font-size: var(--fs-xs);
+  padding: var(--sp-0) var(--sp-2);
+  border-radius: var(--r-full);
+  font-weight: 600;
+}
+.fp-whatif__badge--warn {
+  background: var(--c-amber-bg);
+  color: var(--c-amber);
+}
+.fp-whatif__badge--muted {
+  background: var(--c-bg2);
+  color: var(--c-text3);
+}

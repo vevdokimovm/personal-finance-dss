@@ -43,7 +43,7 @@ export function DashboardPage() {
       <h1 className="sr-only">{t("Финансовый обзор")}</h1>
       <Hero plan={plan} />
       <MetricsGrid indicators={plan.indicators} />
-      <AllocationPanel best={plan.top3[0] ?? null} />
+      <AllocationPanel best={plan.top3[0] ?? null} alternatives={plan.ranked} />
       <ForecastPanel forecast={forecast} />
     </main>
   );

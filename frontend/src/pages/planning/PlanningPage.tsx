@@ -125,7 +125,7 @@ export function PlanningPage() {
         </div>
       </dl>
       <MetricsGrid indicators={plan.indicators} />
-      <AllocationPanel best={plan.top3[0] ?? null} />
+      <AllocationPanel best={plan.top3[0] ?? null} alternatives={plan.ranked} />
       <AlternativesBrowser alternatives={plan.ranked} />
       <ForecastPanel forecast={forecast} />
     </main>

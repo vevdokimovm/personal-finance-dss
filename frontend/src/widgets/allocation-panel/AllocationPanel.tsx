@@ -6,6 +6,13 @@ import { t } from "@shared/lib/i18n/t";
 import { Button } from "@shared/ui";
 import type { PlanAlternative } from "@entities/plan-summary";
 import { buildAllocationSankeyData } from "./buildAllocationSankeyData";
+import {
+  GRID_NOTCHES,
+  findMatchingAlternative,
+  hasNonZeroCategory,
+  notchesOf,
+} from "./findMatchingAlternative";
+import { WhatIfSliders } from "./WhatIfSliders";
 import "@shared/ui/panel.css";
 import "./AllocationPanel.css";
 
@@ -72,9 +79,28 @@ function AllocationSankeyLink({
  *
  * best=null — дефицит (top3 пуст): алгоритм не молчит, а явно объясняет, что рекомендации
  * нет (fail-loud), не отдельная ветка на каждой странице — используется и на dashboard,
- * и на planning (Э4 партия 2), чтобы текст не разошёлся между ними. */
-export function AllocationPanel({ best }: { best: PlanAlternative | null }) {
+ * и на planning (Э4 партия 2), чтобы текст не разошёлся между ними.
+ *
+ * `alternatives` — полный `ranked[]` того же плана (та же коллекция, что уходит в
+ * AlternativesBrowser на /planning). Столбец, легенда и диаграмма Санкея ниже реагируют на
+ * ползунки «что если» (WhatIfSliders) — это ОДИН интерактивный составной столбец, не
+ * рекомендация сверху и отдельная песочница снизу (план вехи 8, Э5: «составной столбец плюс
+ * ползунки «что если»» — design-critic поймал именно рассинхрон этих двух половин как блокер
+ * v8.11.0). AllocationPanel новых чисел не считает — только ищет готовую, уже посчитанную
+ * бэкендом альтернативу в `alternatives` (findMatchingAlternative), канон математики заморожен
+ * до решения владельца. */
+export function AllocationPanel({
+  best,
+  alternatives,
+}: {
+  best: PlanAlternative | null;
+  alternatives: PlanAlternative[];
+}) {
   const [detailed, setDetailed] = useState(false);
+  const total = best ? best.x_obligations + best.x_reserve + best.x_goals : 0;
+  const recommendedNotches = best ? notchesOf(best, total) : { debt: 0, goals: 0 };
+  const [debtNotch, setDebtNotch] = useState(recommendedNotches.debt);
+  const [goalsNotch, setGoalsNotch] = useState(recommendedNotches.goals);
 
   if (!best) {
     return (
@@ -89,9 +115,40 @@ export function AllocationPanel({ best }: { best: PlanAlternative | null }) {
     );
   }
 
-  const total = best.x_obligations + best.x_reserve + best.x_goals;
-  const pct = (value: number) => (total > 0 ? Math.round((value / total) * 100) : 0);
-  const sankeyData = buildAllocationSankeyData(best);
+  const hasDebtOption = hasNonZeroCategory(alternatives, "x_obligations");
+  const hasGoalsOption = hasNonZeroCategory(alternatives, "x_goals");
+  const canShowWhatIf = hasDebtOption || hasGoalsOption;
+
+  // Ползунки независимы, но их сумма не может превышать GRID_NOTCHES (резерв не может стать
+  // отрицательным) — при движении одного досчитываем клампом второй, а не только через атрибут
+  // max (иначе React-state второго ползунка останется устаревшим и резерв уйдёт в минус).
+  function onDebtChange(next: number) {
+    setDebtNotch(next);
+    setGoalsNotch((g) => Math.min(g, GRID_NOTCHES - next));
+  }
+  function onGoalsChange(next: number) {
+    setGoalsNotch(next);
+    setDebtNotch((d) => Math.min(d, GRID_NOTCHES - next));
+  }
+  function resetToRecommended() {
+    setDebtNotch(recommendedNotches.debt);
+    setGoalsNotch(recommendedNotches.goals);
+  }
+
+  const reserveNotch = GRID_NOTCHES - debtNotch - goalsNotch;
+  const isRecommended =
+    debtNotch === recommendedNotches.debt && goalsNotch === recommendedNotches.goals;
+  const activeAlt = findMatchingAlternative(alternatives, total, debtNotch, goalsNotch);
+
+  const debtAmount = (total * debtNotch) / GRID_NOTCHES;
+  const reserveAmount = (total * reserveNotch) / GRID_NOTCHES;
+  const goalsAmount = (total * goalsNotch) / GRID_NOTCHES;
+
+  const sankeyData = buildAllocationSankeyData({
+    x_obligations: debtAmount,
+    x_reserve: reserveAmount,
+    x_goals: goalsAmount,
+  });
   // Санкей из одной связи — то же самое, что уже показывает столбец выше, ничего не добавляет.
   const canShowSankey = sankeyData.links.length > 1;
 
@@ -99,42 +156,52 @@ export function AllocationPanel({ best }: { best: PlanAlternative | null }) {
     <section className="fp-panel">
       <h2>{t("Куда пойдут свободные деньги")}</h2>
       <p className="fp-lede">
-        {t("Рекомендация СППР ({name}), полезность U = {u}.", {
-          name: best.name,
-          u: formatNumber(best.utility, 2),
-        })}
+        {isRecommended
+          ? t("Рекомендация СППР ({name}), полезность U = {u}.", {
+              name: best.name,
+              u: formatNumber(best.utility, 2),
+            })
+          : t("Гипотетический вариант — не рекомендация СППР.")}
       </p>
       <div className="fp-alloc-bar" role="presentation">
-        {best.x_obligations > 0 && (
-          <div style={{ flex: pct(best.x_obligations), background: "var(--c-red)" }} />
-        )}
-        {best.x_reserve > 0 && (
-          <div style={{ flex: pct(best.x_reserve), background: "var(--c-amber)" }} />
-        )}
-        {best.x_goals > 0 && (
-          <div style={{ flex: pct(best.x_goals), background: "var(--c-green)" }} />
-        )}
+        {debtNotch > 0 && <div style={{ flex: debtNotch, background: "var(--c-red)" }} />}
+        {reserveNotch > 0 && <div style={{ flex: reserveNotch, background: "var(--c-amber)" }} />}
+        {goalsNotch > 0 && <div style={{ flex: goalsNotch, background: "var(--c-green)" }} />}
       </div>
       <div className="fp-alloc-legend">
         <span>
           <i className="fp-dot" style={{ background: "var(--c-red)" }} />
           {t("Досрочное погашение — {sum} ({pct}%)", {
-            sum: formatMoney(best.x_obligations),
-            pct: pct(best.x_obligations),
+            sum: formatMoney(debtAmount),
+            pct: debtNotch * 10,
           })}
         </span>
         <span>
           <i className="fp-dot" style={{ background: "var(--c-amber)" }} />
           {t("Резерв — {sum} ({pct}%)", {
-            sum: formatMoney(best.x_reserve),
-            pct: pct(best.x_reserve),
+            sum: formatMoney(reserveAmount),
+            pct: reserveNotch * 10,
           })}
         </span>
         <span>
           <i className="fp-dot" style={{ background: "var(--c-green)" }} />
-          {t("Цели — {sum} ({pct}%)", { sum: formatMoney(best.x_goals), pct: pct(best.x_goals) })}
+          {t("Цели — {sum} ({pct}%)", { sum: formatMoney(goalsAmount), pct: goalsNotch * 10 })}
         </span>
       </div>
+
+      {canShowWhatIf && (
+        <WhatIfSliders
+          hasDebtOption={hasDebtOption}
+          hasGoalsOption={hasGoalsOption}
+          debtNotch={debtNotch}
+          goalsNotch={goalsNotch}
+          onDebtChange={onDebtChange}
+          onGoalsChange={onGoalsChange}
+          match={activeAlt}
+          isRecommended={isRecommended}
+          onReset={resetToRecommended}
+        />
+      )}
 
       {canShowSankey && (
         <>
@@ -151,10 +218,10 @@ export function AllocationPanel({ best }: { best: PlanAlternative | null }) {
           </Button>
           {detailed && (
             // Столбец и легенда выше — уже полный и всегда видимый источник этих же чисел
-            // текстом; диаграмма ниже строго декоративная (как fp-forecast-chart в ForecastPanel).
-            // overflow-x на внешнем блоке + min-width на внутреннем (--chart-sankey-min-width) —
-            // на узких экранах диаграмма становится горизонтально прокручиваемой, а не сплющивает
-            // подписи категорий друг на друга.
+            // текстом (и реагируют на те же ползунки); диаграмма ниже строго декоративная (как
+            // fp-forecast-chart в ForecastPanel). overflow-x на внешнем блоке + min-width на
+            // внутреннем (--chart-sankey-min-width) — на узких экранах диаграмма становится
+            // горизонтально прокручиваемой, а не сплющивает подписи категорий друг на друга.
             <div className="fp-alloc-sankey" aria-hidden="true">
               <div className="fp-alloc-sankey__inner">
                 <ResponsiveContainer>

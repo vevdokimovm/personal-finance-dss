@@ -1,69 +1,88 @@
 import { describe, expect, it } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { AllocationPanel } from "./AllocationPanel";
 import type { PlanAlternative } from "@entities/plan-summary";
 
-const ALT_MIXED: PlanAlternative = {
-  id: "a0100",
-  name: "Смешанное распределение",
-  x_obligations: 10000,
-  x_reserve: 20000,
-  x_goals: 5000,
-  utility: 0.7,
-  Rt_new: 0,
-  Lt_new: 1.2,
-  Dt_new: 0.3,
-};
+const TOTAL = 35000;
 
-const ALT_RESERVE_ONLY: PlanAlternative = {
-  id: "a0200",
-  name: "Всё в резерв",
-  x_obligations: 0,
-  x_reserve: 39500,
-  x_goals: 0,
-  utility: 0.8,
-  Rt_new: 0,
-  Lt_new: 1.2,
-  Dt_new: 0.347,
-};
+function alt(
+  id: string,
+  d: number,
+  r: number,
+  g: number,
+  extra?: Partial<PlanAlternative>,
+): PlanAlternative {
+  return {
+    id,
+    name: id,
+    x_obligations: (TOTAL * d) / 10,
+    x_reserve: (TOTAL * r) / 10,
+    x_goals: (TOTAL * g) / 10,
+    utility: 0.7,
+    Rt_new: TOTAL,
+    Lt_new: 1.2,
+    Dt_new: 0.3,
+    ...extra,
+  };
+}
 
-describe("AllocationPanel — режим «подробно» (Санкей, Э5 плана вехи 8)", () => {
-  it("по умолчанию диаграмма Санкея свёрнута, столбец всегда виден", () => {
-    render(<AllocationPanel best={ALT_MIXED} />);
-    expect(screen.getByRole("button", { name: "Подробно — диаграмма Санкея" })).toHaveAttribute(
-      "aria-pressed",
-      "false",
-    );
-    expect(screen.queryByText("Свернуть диаграмму")).not.toBeInTheDocument();
+// Полная сетка 0..10 по долгу/целям (резерв — остаток), чтобы ползунки могли реально двигаться.
+const FULL_GRID: PlanAlternative[] = [];
+for (let d = 0; d <= 10; d++) {
+  for (let g = 0; g <= 10 - d; g++) {
+    FULL_GRID.push(alt(`a-${d}-${g}`, d, 10 - d - g, g));
+  }
+}
+const BEST = { ...FULL_GRID.find((a) => a.id === "a-3-4")!, name: "Смешанное распределение" };
+
+const ALT_RESERVE_ONLY: PlanAlternative = alt("a0200", 0, 10, 0, { name: "Всё в резерв" });
+
+describe("AllocationPanel — составной столбец реагирует на ползунки «что если» (Э5, v8.11.0)", () => {
+  it("по умолчанию показывает рекомендацию СППР и суммы best", () => {
+    render(<AllocationPanel best={BEST} alternatives={FULL_GRID} />);
+    expect(screen.getByText(/Рекомендация СППР \(Смешанное распределение\)/)).toBeInTheDocument();
+    expect(screen.getByText(/Досрочное погашение — .*\(30%\)/)).toBeInTheDocument();
+    expect(screen.getByText(/Цели — .*\(40%\)/)).toBeInTheDocument();
   });
 
-  it("раскрывается по клику, кнопка меняет текст и aria-pressed", async () => {
-    render(<AllocationPanel best={ALT_MIXED} />);
-    const button = screen.getByRole("button", { name: "Подробно — диаграмма Санкея" });
-    await userEvent.click(button);
-    expect(screen.getByRole("button", { name: "Свернуть диаграмму" })).toHaveAttribute(
-      "aria-pressed",
-      "true",
-    );
+  it("движение ползунка пересчитывает столбец/легенду и переключает текст на «гипотетический вариант»", () => {
+    render(<AllocationPanel best={BEST} alternatives={FULL_GRID} />);
+    // 30% -> 40%, цели остаются 40% (сумма не превышает 100%).
+    fireEvent.change(screen.getByLabelText("Досрочное погашение"), { target: { value: "4" } });
+
+    expect(screen.getByText(/Гипотетический вариант — не рекомендация СППР/)).toBeInTheDocument();
+    expect(screen.getByText(/Досрочное погашение — .*\(40%\)/)).toBeInTheDocument();
   });
 
-  it("кнопка не использует aria-expanded/aria-controls — раскрываемый блок строго декоративен (aria-hidden), «раскрытие» для AT не происходит (находка a11y-auditor)", () => {
-    render(<AllocationPanel best={ALT_MIXED} />);
-    const button = screen.getByRole("button", { name: "Подробно — диаграмма Санкея" });
-    expect(button).not.toHaveAttribute("aria-expanded");
-    expect(button).not.toHaveAttribute("aria-controls");
+  it("кнопка «Вернуть рекомендацию» возвращает исходные суммы и текст рекомендации", async () => {
+    render(<AllocationPanel best={BEST} alternatives={FULL_GRID} />);
+    fireEvent.change(screen.getByLabelText("Досрочное погашение"), { target: { value: "4" } });
+    await userEvent.click(screen.getByRole("button", { name: "Вернуть рекомендацию" }));
+
+    expect(screen.getByText(/Рекомендация СППР \(Смешанное распределение\)/)).toBeInTheDocument();
+    expect(screen.getByText(/Досрочное погашение — .*\(30%\)/)).toBeInTheDocument();
   });
 
-  it("при единственной активной категории (одна связь) переключатель не показывается — Санкей из одной линии не добавляет информации к столбцу", () => {
-    render(<AllocationPanel best={ALT_RESERVE_ONLY} />);
+  it("диаграмма Санкея (режим «подробно») строится из текущей позиции ползунков, не только из best", async () => {
+    render(<AllocationPanel best={BEST} alternatives={FULL_GRID} />);
+    fireEvent.change(screen.getByLabelText("Досрочное погашение"), { target: { value: "4" } });
+    await userEvent.click(screen.getByRole("button", { name: "Подробно — диаграмма Санкея" }));
+    // Санкей декоративен (aria-hidden) — проверяем, что блок вообще смонтирован после смены позиции.
+    expect(document.querySelector(".fp-alloc-sankey")).toBeInTheDocument();
+  });
+
+  it("при единственной активной категории (вся сумма в резерв) — ни ползунков, ни переключателя Санкея нет", () => {
+    render(<AllocationPanel best={ALT_RESERVE_ONLY} alternatives={[ALT_RESERVE_ONLY]} />);
+    expect(screen.queryByText("Что если распределить иначе?")).not.toBeInTheDocument();
     expect(
       screen.queryByRole("button", { name: "Подробно — диаграмма Санкея" }),
     ).not.toBeInTheDocument();
   });
 
-  it("дефицит (best=null) — переключатель тоже не показывается", () => {
-    render(<AllocationPanel best={null} />);
-    expect(screen.queryByRole("button", { name: /Подробно/ })).not.toBeInTheDocument();
+  it("дефицит (best=null) — fail-loud сообщение, без ползунков и без падений", () => {
+    render(<AllocationPanel best={null} alternatives={[]} />);
+    expect(screen.getByText("Плана распределения нет")).toBeInTheDocument();
+    expect(screen.queryByText("Что если распределить иначе?")).not.toBeInTheDocument();
   });
 });

@@ -1,14 +1,9 @@
 import { MetricCard } from "./MetricCard";
 import { formatNumber, formatPercent } from "@shared/lib/money/formatMoney";
 import { t } from "@shared/lib/i18n/t";
+import { DTI_THRESHOLD, DTI_WARN_THRESHOLD } from "@entities/plan-summary";
 import type { PlanIndicators } from "@entities/plan-summary";
 import "./MetricsGrid.css";
-
-// Жёсткий инвариант канона v3.5.0 (docs/math_model.md): ПДН <= 0.40.
-// "Приближение" не задано каноном числом — продуктовый запас в 5 п.п., не
-// матмодель (см. finpilot-math-model-guard: канон даёт только сам порог 0.40).
-const DTI_THRESHOLD = 0.4;
-const DTI_WARN_THRESHOLD = 0.35;
 
 // Ликвидность и «подушка» — МЯГКИЕ критерии канона (L_min=0 по умолчанию
 // выключен, docs/math_model.md: "отсев по ликвидности мягкий").
