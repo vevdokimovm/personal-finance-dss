@@ -34,6 +34,7 @@ from app.core.metrics import (
 from app.core.ranking import (
     RISK_PROFILES,
     effective_floor_months,
+    income_cv,
     rank_alternatives,
 )
 from app.core.recommendation import explain_alternative
@@ -52,8 +53,15 @@ def run_planning(
     today: datetime | None = None,
     step: float = 0.10,
     toxic_floor: bool = True,
+    income_history: list[float] | None = None,
 ) -> dict[str, Any]:
-    """Полный цикл планирования СППР по ВКР (этапы 1–6)."""
+    """Полный цикл планирования СППР по ВКР (этапы 1–6).
+
+    income_history (ADR-015, канон v3.7.0): реальная помесячная история дохода
+    (app/services/forecasting.py::build_monthly_history) — влияет ТОЛЬКО на floor
+    резерва через волатильность (income_cv). Rt/Dt/кризисный режим считаются по
+    income_total (факт текущего месяца) безусловно, история на них не влияет.
+    """
     today = today or utcnow()
     profile = RISK_PROFILES.get(risk_tolerance, RISK_PROFILES[3])
 
@@ -136,8 +144,11 @@ def run_planning(
     # ── Ранжирование ───────────────────────────────────────────────────
     # G8 (стенд р.4): при токсичном долге стартовый запас ликвидности
     # сокращается — лавина по ставке 40-290% дороже страховки от сбоя дохода.
-    floor_months = (effective_floor_months(obligations, r_bench)
-                    if toxic_floor else None)
+    # ADR-015: волатильность дохода поднимает floor в обратную сторону.
+    floor_months = (
+        effective_floor_months(obligations, r_bench, income_history=income_history)
+        if toxic_floor else None
+    )
     ranked = rank_alternatives(admissible, risk_tolerance,
                                floor_months=floor_months)
 
@@ -215,6 +226,14 @@ def run_planning(
             # Флаг перегруженного ПДН (v3.1.0): план выдаётся, но пользователю
             # показывается предупреждение + рекомендация рефинансирования.
             "Dt_alert": dt > DT_MAX,
+            # ADR-015 (канон v3.7.0): диагностика волатильности дохода — None,
+            # если истории недостаточно (income_cv сама решает, что значит
+            # «недостаточно»). Только для объяснения пользователю, почему floor
+            # выше обычного; на Rt/Dt/допустимость не влияет.
+            "income_cv": (
+                round(cv, 4) if (cv := income_cv(income_history)) is not None
+                else None
+            ),
         },
         "bliq_preallocation": {
             "closed_goals": [

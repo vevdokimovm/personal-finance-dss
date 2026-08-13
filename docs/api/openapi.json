@@ -2896,6 +2896,17 @@
               }
             ],
             "title": "Sigmap"
+          },
+          "income_cv": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Income Cv"
           }
         },
         "required": [
@@ -3934,7 +3945,7 @@
   },
   "info": {
     "title": "FINPILOT",
-    "version": "8.11.1"
+    "version": "8.14.2"
   },
   "openapi": "3.1.0",
   "paths": {

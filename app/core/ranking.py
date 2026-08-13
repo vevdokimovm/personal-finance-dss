@@ -60,6 +60,18 @@ TOXIC_RATE_ABS = 0.30
 TOXIC_RATE_SPREAD = 0.15
 TOXIC_FLOOR_MONTHS = 1.0
 
+# Волатильность дохода поднимает floor (ADR-015) — зеркально G8, в обратную
+# сторону: непредсказуемый доход делает подушку ценнее (единственная страховка
+# от месяца без денег), токсичный долг — дешевле (лавина съедает деньги
+# быстрее, чем страхует лишний месяц). Красная линия ADR-015: эта константа
+# трогает ТОЛЬКО floor (лексикографический приоритет между уже допустимыми
+# альтернативами) — Rt/Dt/допустимость (§6 канона) и кризисный режим (§12,
+# инвариант I12) считаются по фактическому потоку текущего месяца безусловно,
+# волатильность истории на них не влияет никогда.
+INCOME_VOLATILITY_THRESHOLD = 0.3
+INCOME_VOLATILITY_MIN_MONTHS = 6
+INCOME_VOLATILITY_FLOOR_BOOST_CAP = 1.0
+
 _FLOOR_EPS = 1e-9
 
 
@@ -71,12 +83,44 @@ def is_toxic_debt(obligation: dict[str, Any], r_bench: float) -> bool:
     return float(obligation.get("interest_rate", 0) or 0) >= threshold
 
 
-def effective_floor_months(obligations: list[dict[str, Any]],
-                           r_bench: float) -> float:
-    """Floor резерва с учётом токсичного долга (хотя бы одного)."""
+def income_cv(income_history: list[float] | None) -> float | None:
+    """Коэффициент вариации дохода по реальной помесячной истории (ADR-015).
+
+    None — данных недостаточно (< INCOME_VOLATILITY_MIN_MONTHS содержательных
+    месяцев, где «содержательный» = ненулевой — как ведущие нули у
+    build_monthly_history, это отсутствие данных за бин, не месяц с нулевым
+    доходом), доход трактуется как стабильный. Тот же фолбэк-принцип, что у
+    choose_point_forecast для короткой истории, порог строже (6, не 3) — CV на
+    трёх точках слишком шумный показатель, чтобы на нём менять решение.
+    """
+    if income_history is None:
+        return None
+    nonzero = [v for v in income_history if v > 0]
+    if len(nonzero) < INCOME_VOLATILITY_MIN_MONTHS:
+        return None
+    mean = sum(nonzero) / len(nonzero)
+    if mean <= 0:
+        return None
+    variance = sum((v - mean) ** 2 for v in nonzero) / len(nonzero)
+    return (variance ** 0.5) / mean
+
+
+def effective_floor_months(
+    obligations: list[dict[str, Any]],
+    r_bench: float,
+    income_history: list[float] | None = None,
+) -> float:
+    """Floor резерва: токсичный долг (G8) приоритетнее волатильности дохода
+    (ADR-015) — лавина дороже любой страховки, порядок приоритета фиксирован.
+    """
     if any(is_toxic_debt(o, r_bench) for o in obligations or ()):
         return TOXIC_FLOOR_MONTHS
-    return RESERVE_FLOOR_MONTHS
+    cv = income_cv(income_history)
+    if cv is None:
+        return RESERVE_FLOOR_MONTHS
+    boost = min(INCOME_VOLATILITY_FLOOR_BOOST_CAP,
+                max(0.0, cv - INCOME_VOLATILITY_THRESHOLD))
+    return round(RESERVE_FLOOR_MONTHS + boost, 4)
 
 
 def normalize_value(value: float, v_min: float, v_max: float, minimize: bool = False) -> float:

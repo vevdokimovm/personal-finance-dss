@@ -83,6 +83,7 @@ def _plan_fingerprint(
     r_bench: float,
     risk_tolerance: int,
     l_min: float,
+    income_history: list[float] | None = None,
 ) -> str:
     payload = {
         "income": round(float(income_total), 2),
@@ -93,6 +94,9 @@ def _plan_fingerprint(
         "l_min": round(float(l_min), 4),
         "obligations": _stable_items(obligations),
         "goals": _stable_items(goals),
+        # ADR-015: история дохода влияет на floor через волатильность — без
+        # неё в отпечатке кэш отдавал бы старый floor после смены истории.
+        "income_history": [round(float(v), 2) for v in (income_history or [])],
     }
     blob = json.dumps(payload, sort_keys=True, default=str, ensure_ascii=False)
     return hashlib.sha256(blob.encode("utf-8")).hexdigest()
@@ -248,6 +252,13 @@ def _compute_plan(
     # active_goals = только незакрытые цели
     active_goals = prepared["active_goals"]
 
+    # ADR-015 (канон v3.7.0): реальная помесячная история дохода — влияет
+    # только на floor резерва через волатильность (app/core/ranking.py::
+    # income_cv), income_total/Rt/Dt/кризисный режим не трогает. transactions
+    # ещё НЕ отфильтрованы по periodDays=30 (prepare_data фильтрует внутри
+    # СВОЕЙ копии) — здесь нужен полный список для истории за 8 месяцев.
+    income_history = build_monthly_history(transactions)["income"]
+
     cache_key = "plan:%s:%s" % (
         user_id or "guest",
         _plan_fingerprint(
@@ -259,6 +270,7 @@ def _compute_plan(
             r_bench=r_bench,
             risk_tolerance=risk_tolerance,
             l_min=l_min,
+            income_history=income_history,
         ),
     )
     cached = _planning_cache.get(cache_key)
@@ -275,6 +287,7 @@ def _compute_plan(
         r_bench=r_bench,
         risk_tolerance=risk_tolerance,
         l_min=l_min,
+        income_history=income_history,
     )
 
     result["input_summary"] = {

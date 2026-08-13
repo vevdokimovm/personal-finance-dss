@@ -75,6 +75,16 @@ class TestAnnotate:
         )
         assert "АСВ" in alt["investment_tranche"]["note"]
 
+    def test_iis_note_present(self):
+        # ADR-014, вариант B: нота про вычет ИИС рядом с нотой АСВ, механику
+        # транша не меняет (то же самое разбиение депозит/облигации/акции).
+        alt = {"x_reserve": 50_000.0}
+        annotate_investment_tranche(
+            alt, bliq=400_000.0, expense_total=50_000.0,
+            lt_target=4.0, risk_tolerance=2,
+        )
+        assert "ИИС" in alt["investment_tranche"]["note"]
+
 
 class TestPlanningIntegration:
     def test_terminal_sink_becomes_investment(self):

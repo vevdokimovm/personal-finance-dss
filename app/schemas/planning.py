@@ -35,6 +35,9 @@ class PlanningIndicators(BaseModel):
     BLR: Optional[float] = None
     BLR_status: Optional[BLRStatus] = None
     Dt_alert: bool = False
+    # ADR-015 (канон v3.7.0): диагностика волатильности дохода — None, если
+    # истории недостаточно. Влияет только на floor резерва, не на Rt/Dt.
+    income_cv: Optional[float] = None
 
 
 class ClosedGoal(BaseModel):

@@ -75,6 +75,22 @@ class PortraitGenerator:
             return self._generate_v1(rng, index)
         return self._generate_v2(rng, index)
 
+    def generate_with_income_history(self, index: int, months: int = 8) -> dict[str, Any]:
+        """`generate(index)` + `income_history` (ADR-015, benchmark-only). Не трогает
+        `generate()` — отдельный метод, чтобы существующие ~1500 тестов на форму
+        портрета не зависели от нового поля. Волатильность из широкого диапазона,
+        смещена к стабильности (доля 0.0 в наборе), чтобы бенчмарк видел оба класса."""
+        p = self.generate(index)
+        rng = random.Random(self.seed * 1_000_007 + index)
+        volatility = rng.choice([0.0, 0.0, 0.0, 0.1, 0.2, 0.4, 0.6, 0.9])
+        income = float(p["income_total"])
+        history = [
+            round(max(0.0, income * (1 + rng.uniform(-volatility, volatility))), 2)
+            for _ in range(months)
+        ]
+        p["income_history"] = history
+        return p
+
     # ── v1 (legacy, бит-в-бит: регенерация эталона экспертизы) ──────────
 
     def _generate_v1(self, rng: random.Random, index: int) -> dict[str, Any]:

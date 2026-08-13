@@ -214,6 +214,25 @@ class TestPlanningIntegration:
         )
         assert result["crisis_plan"] is None
 
+    def test_crisis_plan_ignores_income_history_adr_015(self):
+        """Красная линия ADR-015: волатильность/уровень исторического дохода
+        НЕ подавляет и не смягчает кризисный режим — это факт о текущем месяце
+        (income_total), а не об истории. Портрет: этот месяц дефицитный, но
+        историческое среднее ВЫШЕ текущего дохода (выглядело бы "стабильно
+        хорошо" по среднему) — кризисный план обязан сработать всё равно,
+        инвариант I12 не должен зависеть от income_history ни при каких его
+        значениях."""
+        history_looks_fine = [80_000.0] * 8  # среднее заметно выше текущего дохода
+        result = run_planning(
+            income_total=30_000.0, expense_total=45_000.0,
+            obligations=[], goals=[], bliq=90_000.0,
+            r_bench=0.14, risk_tolerance=2, today=TODAY,
+            income_history=history_looks_fine,
+        )
+        plan = result["crisis_plan"]
+        assert plan is not None and plan["actions"]
+        assert result["indicators"]["Rt"] < 0
+
     def test_bliq_preallocation_suppressed_in_deficit(self):
         # в дефиците цели заморожены — этап 4.0 не тратит подушку на близкие цели
         result = run_planning(
