@@ -86,3 +86,61 @@ describe("AllocationPanel — составной столбец реагируе
     expect(screen.queryByText("Что если распределить иначе?")).not.toBeInTheDocument();
   });
 });
+
+describe("AllocationPanel — объяснение выбранного плана (батч 0.3/0.4, v8.13.5)", () => {
+  const BEST_WITH_EXPLANATION: PlanAlternative = {
+    ...BEST,
+    explanation: {
+      gains: ["Досрочно гасим 10 000 ₽ — самый дорогой кредит."],
+      costs: ["2 000 ₽ не пошли в цели — они уже профинансированы."],
+      insight:
+        "Рекомендуем направить 30% на досрочку, 40% на цели. Решающим оказалось то, " +
+        "насколько снизилась долговая нагрузка.",
+      dominant_criterion: "Dt",
+      counterfactual: {
+        available: true,
+        alternative_id: "a-2-5",
+        utility_gap: 0.03,
+        dominant_criterion: "Lt",
+        text:
+          "Следующий по оценке вариант отстаёт примерно на 3 из 100 баллов — в основном " +
+          "тем, насколько выросла подушка безопасности.",
+      },
+    },
+  };
+
+  it("для рекомендации показывает insight, gains, costs и контрфакт", () => {
+    render(<AllocationPanel best={BEST_WITH_EXPLANATION} alternatives={FULL_GRID} />);
+    expect(screen.getByText(/Решающим оказалось то, насколько снизилась/)).toBeInTheDocument();
+    expect(screen.getByText(/Досрочно гасим 10 000 ₽/)).toBeInTheDocument();
+    expect(screen.getByText(/2 000 ₽ не пошли в цели/)).toBeInTheDocument();
+    expect(screen.getByText(/Следующий по оценке вариант отстаёт/)).toBeInTheDocument();
+  });
+
+  it("после отклонения от рекомендации ползунком объяснение скрывается — оно только у best", () => {
+    render(<AllocationPanel best={BEST_WITH_EXPLANATION} alternatives={FULL_GRID} />);
+    fireEvent.change(screen.getByLabelText("Досрочное погашение"), { target: { value: "4" } });
+    expect(screen.queryByText(/Решающим оказалось то,/)).not.toBeInTheDocument();
+  });
+
+  it("без explanation (старый кэш/ответ) — панель рендерится без объяснения, без падений", () => {
+    render(<AllocationPanel best={BEST} alternatives={FULL_GRID} />);
+    expect(screen.getByText(/Рекомендация СППР/)).toBeInTheDocument();
+    expect(screen.queryByText(/Решающим оказалось то,/)).not.toBeInTheDocument();
+  });
+
+  it("контрфакт unavailable — параграф не рендерится", () => {
+    const alt: PlanAlternative = {
+      ...BEST,
+      explanation: {
+        gains: [],
+        costs: [],
+        insight: "Рекомендуем направить всё в резерв.",
+        counterfactual: { available: false },
+      },
+    };
+    render(<AllocationPanel best={alt} alternatives={FULL_GRID} />);
+    expect(screen.getByText(/Рекомендуем направить всё в резерв/)).toBeInTheDocument();
+    expect(screen.queryByText(/Следующий по оценке вариант/)).not.toBeInTheDocument();
+  });
+});

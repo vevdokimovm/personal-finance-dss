@@ -17,6 +17,36 @@ export interface PlanIndicators {
   SigmaP?: number | null;
 }
 
+/** Вклад критериев SAW в utility (батч 0.3, app/core/ranking.py::rank_alternatives) —
+ * ключи служебные (Rt/Lt/Dt/Si), как у ExplanationDelta ниже; сумма ≈ utility. */
+export interface WeightedScores {
+  Rt: number;
+  Lt: number;
+  Dt: number;
+  Si: number;
+}
+
+/** Что изменилось бы, чтобы победил другой вариант (батч 0.4) — сравнение с реально
+ * посчитанным следующим по рангу вариантом, не гипотетический сценарий. */
+export interface Counterfactual {
+  available: boolean;
+  alternative_id?: string | null;
+  utility_gap?: number | null;
+  /** Служебный ключ (Rt/Lt/Dt/Si) — человеческая формулировка уже в `text`. */
+  dominant_criterion?: string | null;
+  text?: string | null;
+}
+
+export interface Explanation {
+  gains: string[];
+  costs: string[];
+  insight: string;
+  /** Служебный ключ доминирующего критерия — человеческая фраза уже вплетена в `insight`
+   * («Решающим для оценки оказалось то, …»), отдельно рендерить не обязательно. */
+  dominant_criterion?: string | null;
+  counterfactual?: Counterfactual | null;
+}
+
 export interface PlanAlternative {
   id: string;
   name: string;
@@ -31,6 +61,10 @@ export interface PlanAlternative {
   Dt_new: number;
   /** Только у одной альтернативы в ranked — лучшая по (floor_level, utility). */
   is_recommended?: boolean;
+  weighted_scores?: WeightedScores;
+  /** Только у top3 — explain_alternative() вызывается лишь для них (app/services/planning.py).
+   * У произвольного элемента ranked[] (гипотетическая позиция ползунков «что если») — не будет. */
+  explanation?: Explanation | null;
 }
 
 export interface PlanInputSummary {

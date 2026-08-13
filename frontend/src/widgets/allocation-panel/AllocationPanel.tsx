@@ -163,6 +163,34 @@ export function AllocationPanel({
             })
           : t("Гипотетический вариант — не рекомендация СППР.")}
       </p>
+
+      {/* Объяснение — только у best (explain_alternative вызывается лишь для top3,
+       * app/services/planning.py); произвольная позиция ползунков «что если» его не
+       * несёт, поэтому показываем только пока пользователь не отошёл от рекомендации. */}
+      {isRecommended && best.explanation && (
+        <div className="fp-alloc-explanation">
+          <p className="fp-alloc-explanation__insight">{best.explanation.insight}</p>
+          {best.explanation.gains.length > 0 && (
+            <ul className="fp-alloc-explanation__list fp-alloc-explanation__list--gains">
+              {best.explanation.gains.map((g, i) => (
+                <li key={i}>{g}</li>
+              ))}
+            </ul>
+          )}
+          {best.explanation.costs.length > 0 && (
+            <ul className="fp-alloc-explanation__list fp-alloc-explanation__list--costs">
+              {best.explanation.costs.map((c, i) => (
+                <li key={i}>{c}</li>
+              ))}
+            </ul>
+          )}
+          {best.explanation.counterfactual?.available && best.explanation.counterfactual.text && (
+            <p className="fp-alloc-explanation__counterfactual">
+              {best.explanation.counterfactual.text}
+            </p>
+          )}
+        </div>
+      )}
       <div className="fp-alloc-bar" role="presentation">
         {debtNotch > 0 && <div style={{ flex: debtNotch, background: "var(--c-red)" }} />}
         {reserveNotch > 0 && <div style={{ flex: reserveNotch, background: "var(--c-amber)" }} />}

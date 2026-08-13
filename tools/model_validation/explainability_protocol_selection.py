@@ -23,7 +23,10 @@
   7. Длинная цель, индексированная на инфляцию (> 36 мес, батч 0.1)
 
 Запуск: python -m tools.model_validation.explainability_protocol_selection
-Выход: docs/reports/testing/explainability_review_material.md
+Выход (два файла из одного отбора, без повторного прогона модели):
+  - explainability_review_material.md       — с разметкой веток, приёмка отбора,
+    НЕ для раздачи (протокол требует убрать разметку перед раздачей эксперту);
+  - explainability_review_material_blind.md — без разметки, для раздачи.
 """
 from __future__ import annotations
 
@@ -36,6 +39,7 @@ from app.services.planning import run_planning
 from tools.portrait_testing.generator import PortraitGenerator
 
 OUTPUT = Path("docs/reports/testing/explainability_review_material.md")
+OUTPUT_BLIND = Path("docs/reports/testing/explainability_review_material_blind.md")
 FROZEN_TODAY = datetime(2026, 7, 2, 12, 0, 0)
 GEN_TODAY = date(2026, 7, 2)
 QUOTA_PER_BUCKET = {
@@ -89,10 +93,14 @@ def _fmt_money(v: float) -> str:
     return f"{v:,.0f}".replace(",", " ")
 
 
-def _render_case(idx: int, bucket: str, p: dict[str, Any], result: dict[str, Any]) -> str:
+def _render_case(
+    idx: int, bucket: str, p: dict[str, Any], result: dict[str, Any],
+    *, blind: bool = False,
+) -> str:
     ind = result["indicators"]
+    header = f"## Портрет {idx}" if blind else f"## Портрет {idx} — ветка «{bucket}»"
     lines = [
-        f"## Портрет {idx} — ветка «{bucket}»",
+        header,
         "",
         f"- Доход {_fmt_money(p['income_total'])} ₽, расходы {_fmt_money(p['expense_total'])} ₽, "
         f"обязательств: {len(p['obligations'])}, целей: {len(p['goals'])}, "
@@ -132,7 +140,9 @@ def _render_case(idx: int, bucket: str, p: dict[str, Any], result: dict[str, Any
     return "\n".join(lines)
 
 
-def select_and_render(seed: int = 20260812, pool: int = 4000) -> str:
+def select(
+    seed: int = 20260812, pool: int = 4000,
+) -> dict[str, list[tuple[dict, dict]]]:
     gen = PortraitGenerator(seed, version=2)
     buckets: dict[str, list[tuple[dict, dict]]] = {k: [] for k in QUOTA_PER_BUCKET}
 
@@ -153,8 +163,23 @@ def select_and_render(seed: int = 20260812, pool: int = 4000) -> str:
             continue
         buckets[bucket].append((p, result))
 
+    return buckets
+
+
+def render(
+    buckets: dict[str, list[tuple[dict, dict]]], pool: int, *, blind: bool = False,
+) -> str:
+    """blind=True — без служебных «ветка «X»» в заголовках (для раздачи эксперту,
+    explainability_protocol.md требует это перед раздачей). blind=False — с
+    разметкой, для приёмки отбора (эта версия не покидает проект)."""
+    title = (
+        "# Материал для протокола проверки объяснимости"
+        if blind else
+        "# Материал для протокола проверки объяснимости (аннотированная версия — "
+        "НЕ для раздачи, только приёмка отбора)"
+    )
     sections = [
-        "# Материал для протокола проверки объяснимости",
+        title,
         "",
         "> Подготовлено кодом (`tools/model_validation/"
         "explainability_protocol_selection.py`), не отобрано вручную — воспроизводимо по "
@@ -168,13 +193,13 @@ def select_and_render(seed: int = 20260812, pool: int = 4000) -> str:
     for bucket, quota in QUOTA_PER_BUCKET.items():
         got = len(buckets[bucket])
         total_selected += got
-        if got < quota:
+        if got < quota and not blind:
             sections.append(
                 f"> **[!] Ветка «{bucket}»: набрано {got} из {quota}** — не хватило "
                 f"портретов в пуле {pool}, увеличить `pool` при перегенерации.\n"
             )
         for p, result in buckets[bucket]:
-            sections.append(_render_case(idx, bucket, p, result))
+            sections.append(_render_case(idx, bucket, p, result, blind=blind))
             idx += 1
 
     total_quota = sum(QUOTA_PER_BUCKET.values())
@@ -183,10 +208,17 @@ def select_and_render(seed: int = 20260812, pool: int = 4000) -> str:
 
 
 def main() -> None:
-    text = select_and_render()
+    seed, pool = 20260812, 4000
+    buckets = select(seed=seed, pool=pool)
+
     OUTPUT.parent.mkdir(parents=True, exist_ok=True)
-    OUTPUT.write_text(text, encoding="utf-8")
-    print(f"Материал записан: {OUTPUT} ({len(text)} байт)")
+    annotated = render(buckets, pool, blind=False)
+    OUTPUT.write_text(annotated, encoding="utf-8")
+    print(f"Материал (аннотированный, для приёмки): {OUTPUT} ({len(annotated)} байт)")
+
+    blind_text = render(buckets, pool, blind=True)
+    OUTPUT_BLIND.write_text(blind_text, encoding="utf-8")
+    print(f"Материал (слепой, для раздачи): {OUTPUT_BLIND} ({len(blind_text)} байт)")
 
 
 if __name__ == "__main__":
