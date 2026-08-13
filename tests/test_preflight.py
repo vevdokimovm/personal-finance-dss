@@ -13,6 +13,7 @@ from tools.preflight import (
     changelog_version,
     grep_in_and_chain,
     repo_id,
+    revision_check_failures,
     soft_hyphens,
     version_file,
     watchlog_version,
@@ -32,6 +33,14 @@ def repo(tmp_path):
     (tmp_path / "docs" / "WATCHLOG.md").write_text(
         f"> ## ВЕРСИЯ КОДА: `v1.2.3` · x\n\n## §3\n{window}\n\n## §4\n",
         encoding="utf-8")
+    # RevisionChecker::CountChecker читает docs/api/openapi.json безусловно
+    # (crash, не graceful skip, при отсутствии файла) — нужен для любого
+    # вызова revision_check_failures() на синтетическом дереве, даже если
+    # сами счётчики не совпадут с EXPECTED_COUNTS (это ожидаемо и не то,
+    # что проверяют тесты ниже).
+    (tmp_path / "docs" / "api").mkdir()
+    (tmp_path / "docs" / "api" / "openapi.json").write_text(
+        '{"paths": {}}', encoding="utf-8")
     return tmp_path
 
 
@@ -117,3 +126,28 @@ class TestRepoIdentity:
     def test_empty_version_is_none(self, repo):
         (repo / "VERSION").write_text("\n", encoding="utf-8")
         assert version_file(repo) is None
+
+
+class TestRevisionCheckIntegration:
+    """PIT-017 (v8.13.2): preflight не вызывал revision_check вообще — битая
+    ссылка на ещё не созданный файл прошла через два прогона preflight подряд,
+    поймалась только полным pytest. Эти тесты — единственная защита от
+    повторного «тихого» разрыва этой интеграции."""
+
+    def test_broken_link_in_living_doc_is_caught(self, repo):
+        (repo / "docs" / "x.md").write_text(
+            "ссылка на docs/reports/testing/nonexistent_probe.md\n",
+            encoding="utf-8")
+        failures = revision_check_failures(repo)
+        assert any("битая ссылка" in f for f in failures)
+
+    def test_clean_repo_reports_no_broken_links(self, repo):
+        failures = revision_check_failures(repo)
+        assert not any("битая ссылка" in f for f in failures)
+
+    def test_findings_are_prefixed_with_check_name(self, repo):
+        (repo / "docs" / "x.md").write_text(
+            "ссылка на docs/reports/testing/nonexistent_probe.md\n",
+            encoding="utf-8")
+        failures = revision_check_failures(repo)
+        assert any(f.startswith("revision_check[") for f in failures)

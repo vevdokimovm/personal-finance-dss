@@ -52,6 +52,23 @@ class TestRanking:
         ranked = rank_alternatives(self._alts(), risk_tolerance=1)
         assert ranked[0]["name"] == "B"
 
+    def test_weighted_scores_present_with_four_criteria(self):
+        ranked = rank_alternatives(self._alts(), risk_tolerance=3)
+        for alt in ranked:
+            assert set(alt["weighted_scores"].keys()) == {"Rt", "Lt", "Dt", "Si"}
+
+    def test_weighted_scores_sum_equals_utility(self):
+        ranked = rank_alternatives(self._alts(), risk_tolerance=3)
+        for alt in ranked:
+            total = sum(alt["weighted_scores"].values())
+            assert abs(total - alt["utility"]) < 1e-3
+
+    def test_weighted_scores_does_not_change_sort_order(self):
+        # чисто аддитивное поле — сортировка и is_recommended не должны сдвинуться
+        ranked = rank_alternatives(self._alts(), risk_tolerance=1)
+        assert ranked[0]["name"] == "B"
+        assert ranked[0]["is_recommended"] is True
+
     def test_single_alternative_no_crash(self):
         # единственная альтернатива: min==max по всем критериям → нет деления на ноль
         ranked = rank_alternatives(

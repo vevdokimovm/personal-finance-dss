@@ -32,6 +32,18 @@ NEAR_GOAL_HORIZON_MONTHS = 3    # горизонт «близкой» цели
 URGENCY_OPEN_ENDED = 1.0
 FALLBACK_MONTHS = 12.0          # защитный фолбэк для нераспознанного значения дедлайна
 
+# Инфляционная индексация целей (батч 0.1, Волна 0, канон v3.6.0, §11.3).
+# Цель на 10-30 лет (пенсия, образование детей), посчитанная в номинальных
+# рублях, — систематическое занижение суммы: единственная не спорная (не
+# требующая экспертного консенсуса) ошибка карты качества модели
+# (`docs/model/model_quality_scorecard.md` ось 5/10). Ставка — официальная
+# цель Банка России по инфляции (ДКП, «вблизи 4% постоянно»), тот же класс
+# источника, что у `r_bench`-фолбэка (ключевая ставка ЦБ). Горизонт «> ~3 лет»
+# — формулировка самой карты качества; ниже порога цели в номинале и так
+# близки к реальной покупательной способности, разница тонет в шуме прогноза.
+GOAL_INFLATION_RATE = 0.04
+GOAL_INFLATION_HORIZON_MONTHS = 36.0
+
 
 def months_left_or_none(deadline: Any, today: datetime) -> float | None:
     """Месяцев до дедлайна; None — цель бессрочная (deadline не задан)."""
@@ -66,6 +78,34 @@ def _months_left(deadline: Any, today: datetime) -> float:
     return max(1.0, delta_days / 30.0)
 
 
+def inflated_target_amount(
+    target_amount: float,
+    deadline: Any,
+    today: datetime,
+    rate: float | None = None,
+    horizon_months: float | None = None,
+) -> float:
+    """Целевая сумма с поправкой на инфляцию для целей дальше ~3 лет (§11.3, v3.6.0).
+
+    Бессрочные цели (`deadline=None`) не индексируются — нет горизонта, от
+    которого считать годы. `rate`/`horizon_months` читаются из модульных
+    констант КАЖДЫЙ вызов (не как значение параметра по умолчанию), чтобы
+    бенчмарк на портретах мог переключать `GOAL_INFLATION_RATE` до/после без
+    протаскивания параметра через весь стек вызовов (`evaluate_alternative` →
+    `calculate_goals_si`/`goals_allocation_breakdown` → сюда).
+    """
+    if rate is None:
+        rate = GOAL_INFLATION_RATE
+    if horizon_months is None:
+        horizon_months = GOAL_INFLATION_HORIZON_MONTHS
+
+    months = months_left_or_none(deadline, today)
+    if months is None or months <= horizon_months:
+        return target_amount
+    years = months / 12.0
+    return target_amount * (1.0 + rate) ** years
+
+
 def calculate_goals_si(
     x_goals: float,
     goals: list[dict[str, Any]],
@@ -89,10 +129,12 @@ def calculate_goals_si(
 
     enriched = []
     for g in goals:
-        remaining = max(0.0, float(g.get("target_amount", 0)) - float(g.get("current_amount", 0)))
+        deadline = g.get("deadline")
+        target = inflated_target_amount(float(g.get("target_amount", 0)), deadline, today)
+        remaining = max(0.0, target - float(g.get("current_amount", 0)))
         if remaining <= 0:
             continue
-        urgency = urgency_of(g.get("deadline"), today)
+        urgency = urgency_of(deadline, today)
         weight = CATEGORY_WEIGHTS.get(str(g.get("category", "material")), 1.0)
         enriched.append({
             **g,
@@ -180,11 +222,13 @@ def goals_allocation_breakdown(
 
     enriched = []
     for g in goals:
-        remaining = max(0.0, float(g.get("target_amount", 0)) - float(g.get("current_amount", 0)))
+        deadline = g.get("deadline")
+        target = inflated_target_amount(float(g.get("target_amount", 0)), deadline, today)
+        remaining = max(0.0, target - float(g.get("current_amount", 0)))
         if remaining <= 0:
             continue
-        months = months_left_or_none(g.get("deadline"), today)
-        urgency = urgency_of(g.get("deadline"), today)
+        months = months_left_or_none(deadline, today)
+        urgency = urgency_of(deadline, today)
         weight = CATEGORY_WEIGHTS.get(str(g.get("category", "material")), 1.0)
         enriched.append({
             "id": g.get("id"),

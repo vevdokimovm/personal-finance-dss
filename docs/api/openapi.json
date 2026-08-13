@@ -62,6 +62,305 @@
         "title": "AllocationDTO",
         "type": "object"
       },
+      "Alternative": {
+        "properties": {
+          "Dt_new": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Dt New"
+          },
+          "Lt_new": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lt New"
+          },
+          "Rt_new": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rt New"
+          },
+          "Si": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Si"
+          },
+          "avalanche_detail": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AvalancheDetail"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "explanation": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Explanation"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "floor_level": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Floor Level"
+          },
+          "goal_allocation": {
+            "additionalProperties": {
+              "type": "number"
+            },
+            "title": "Goal Allocation",
+            "type": "object"
+          },
+          "goal_breakdown": {
+            "items": {
+              "$ref": "#/components/schemas/GoalBreakdownItem"
+            },
+            "title": "Goal Breakdown",
+            "type": "array"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "investment_tranche": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/InvestmentTranche"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "is_admissible": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Is Admissible"
+          },
+          "is_recommended": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Is Recommended"
+          },
+          "name": {
+            "default": "",
+            "title": "Name",
+            "type": "string"
+          },
+          "obligation_allocation": {
+            "items": {
+              "$ref": "#/components/schemas/ObligationAllocationItem"
+            },
+            "title": "Obligation Allocation",
+            "type": "array"
+          },
+          "scores": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AlternativeScores"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "utility": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Utility"
+          },
+          "violations": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Violations",
+            "type": "array"
+          },
+          "weighted_scores": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/WeightedScores"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "x_goals": {
+            "default": 0.0,
+            "title": "X Goals",
+            "type": "number"
+          },
+          "x_goals_unused": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "X Goals Unused"
+          },
+          "x_obl_effective": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "X Obl Effective"
+          },
+          "x_obl_unused": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "X Obl Unused"
+          },
+          "x_obligations": {
+            "default": 0.0,
+            "title": "X Obligations",
+            "type": "number"
+          },
+          "x_remain": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "X Remain"
+          },
+          "x_reserve": {
+            "default": 0.0,
+            "title": "X Reserve",
+            "type": "number"
+          },
+          "x_reserve_effective": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "X Reserve Effective"
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "title": "Alternative",
+        "type": "object"
+      },
+      "AlternativeScores": {
+        "description": "Нормализованные (min-max) значения критериев внутри множества\nальтернатив — app/core/ranking.py::rank_alternatives.",
+        "properties": {
+          "Dt_norm": {
+            "title": "Dt Norm",
+            "type": "number"
+          },
+          "Lt_capped": {
+            "title": "Lt Capped",
+            "type": "number"
+          },
+          "Lt_norm": {
+            "title": "Lt Norm",
+            "type": "number"
+          },
+          "Rt_norm": {
+            "title": "Rt Norm",
+            "type": "number"
+          },
+          "Si_norm": {
+            "title": "Si Norm",
+            "type": "number"
+          }
+        },
+        "required": [
+          "Rt_norm",
+          "Lt_norm",
+          "Dt_norm",
+          "Si_norm",
+          "Lt_capped"
+        ],
+        "title": "AlternativeScores",
+        "type": "object"
+      },
       "AnalyzePortrait": {
         "description": "Произвольный портрет для проверки на странице «Валидация» (загрузка/вставка JSON).",
         "properties": {
@@ -174,6 +473,90 @@
         "title": "AuthResponse",
         "type": "object"
       },
+      "AvalancheDetail": {
+        "properties": {
+          "delta_payment": {
+            "default": 0.0,
+            "title": "Delta Payment",
+            "type": "number"
+          },
+          "passed": {
+            "items": {
+              "$ref": "#/components/schemas/AvalanchePassed"
+            },
+            "title": "Passed",
+            "type": "array"
+          },
+          "r_bench": {
+            "title": "R Bench",
+            "type": "number"
+          },
+          "skipped": {
+            "items": {
+              "$ref": "#/components/schemas/AvalancheSkipped"
+            },
+            "title": "Skipped",
+            "type": "array"
+          },
+          "x_unused_to_goals": {
+            "default": 0.0,
+            "title": "X Unused To Goals",
+            "type": "number"
+          }
+        },
+        "required": [
+          "r_bench"
+        ],
+        "title": "AvalancheDetail",
+        "type": "object"
+      },
+      "AvalanchePassed": {
+        "properties": {
+          "closed": {
+            "default": false,
+            "title": "Closed",
+            "type": "boolean"
+          },
+          "interest_rate": {
+            "default": 0.0,
+            "title": "Interest Rate",
+            "type": "number"
+          },
+          "name": {
+            "default": "",
+            "title": "Name",
+            "type": "string"
+          },
+          "paid_in": {
+            "default": 0.0,
+            "title": "Paid In",
+            "type": "number"
+          },
+          "payment_saved": {
+            "default": 0.0,
+            "title": "Payment Saved",
+            "type": "number"
+          }
+        },
+        "title": "AvalanchePassed",
+        "type": "object"
+      },
+      "AvalancheSkipped": {
+        "properties": {
+          "interest_rate": {
+            "default": 0.0,
+            "title": "Interest Rate",
+            "type": "number"
+          },
+          "name": {
+            "default": "",
+            "title": "Name",
+            "type": "string"
+          }
+        },
+        "title": "AvalancheSkipped",
+        "type": "object"
+      },
       "BLRStatus": {
         "properties": {
           "label": {
@@ -190,6 +573,29 @@
           "label"
         ],
         "title": "BLRStatus",
+        "type": "object"
+      },
+      "BliqPreallocation": {
+        "properties": {
+          "bliq_remaining": {
+            "default": 0.0,
+            "title": "Bliq Remaining",
+            "type": "number"
+          },
+          "bliq_used": {
+            "default": 0.0,
+            "title": "Bliq Used",
+            "type": "number"
+          },
+          "closed_goals": {
+            "items": {
+              "$ref": "#/components/schemas/ClosedGoal"
+            },
+            "title": "Closed Goals",
+            "type": "array"
+          }
+        },
+        "title": "BliqPreallocation",
         "type": "object"
       },
       "Body_upload_statement_api_banks_upload_post": {
@@ -420,6 +826,31 @@
         "title": "ChangePasswordRequest",
         "type": "object"
       },
+      "ClosedGoal": {
+        "properties": {
+          "amount": {
+            "default": 0.0,
+            "title": "Amount",
+            "type": "number"
+          },
+          "id": {
+            "anyOf": [
+              {},
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Id"
+          },
+          "name": {
+            "default": "",
+            "title": "Name",
+            "type": "string"
+          }
+        },
+        "title": "ClosedGoal",
+        "type": "object"
+      },
       "ConvertRequest": {
         "properties": {
           "amount": {
@@ -445,6 +876,62 @@
           "to_currency"
         ],
         "title": "ConvertRequest",
+        "type": "object"
+      },
+      "Counterfactual": {
+        "description": "Что изменилось бы, чтобы победил другой вариант (батч 0.4, Волна 0).\n\nСравнение с реально посчитанным следующим по рангу вариантом из того же\nranked[] — не гипотетический сценарий. `dominant_criterion` здесь —\nслужебный ключ (Rt/Lt/Dt/Si), как у существующего `delta`; человеческая\nформулировка — в `text` (без формульной нотации, FR-01/UX-02).",
+        "properties": {
+          "alternative_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Alternative Id"
+          },
+          "available": {
+            "default": false,
+            "title": "Available",
+            "type": "boolean"
+          },
+          "dominant_criterion": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Dominant Criterion"
+          },
+          "text": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Text"
+          },
+          "utility_gap": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Utility Gap"
+          }
+        },
+        "title": "Counterfactual",
         "type": "object"
       },
       "DebtDTO": {
@@ -682,6 +1169,81 @@
         "title": "ExperimentUpdate",
         "type": "object"
       },
+      "Explanation": {
+        "properties": {
+          "costs": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Costs",
+            "type": "array"
+          },
+          "counterfactual": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Counterfactual"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "delta": {
+            "$ref": "#/components/schemas/ExplanationDelta"
+          },
+          "dominant_criterion": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Dominant Criterion"
+          },
+          "gains": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Gains",
+            "type": "array"
+          },
+          "insight": {
+            "default": "",
+            "title": "Insight",
+            "type": "string"
+          }
+        },
+        "required": [
+          "delta"
+        ],
+        "title": "Explanation",
+        "type": "object"
+      },
+      "ExplanationDelta": {
+        "properties": {
+          "Dt": {
+            "title": "Dt",
+            "type": "number"
+          },
+          "Lt": {
+            "title": "Lt",
+            "type": "number"
+          },
+          "Rt": {
+            "title": "Rt",
+            "type": "number"
+          }
+        },
+        "required": [
+          "Rt",
+          "Lt",
+          "Dt"
+        ],
+        "title": "ExplanationDelta",
+        "type": "object"
+      },
       "ForecastRequest": {
         "properties": {
           "horizon": {
@@ -752,6 +1314,72 @@
           "rate_to_usd"
         ],
         "title": "FxRateUpsert",
+        "type": "object"
+      },
+      "GoalBreakdownItem": {
+        "properties": {
+          "amount": {
+            "default": 0.0,
+            "title": "Amount",
+            "type": "number"
+          },
+          "category": {
+            "default": "material",
+            "title": "Category",
+            "type": "string"
+          },
+          "id": {
+            "anyOf": [
+              {},
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Id"
+          },
+          "months_left": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Months Left"
+          },
+          "name": {
+            "default": "",
+            "title": "Name",
+            "type": "string"
+          },
+          "priority": {
+            "default": 0.0,
+            "title": "Priority",
+            "type": "number"
+          },
+          "remaining": {
+            "default": 0.0,
+            "title": "Remaining",
+            "type": "number"
+          },
+          "share": {
+            "default": 0.0,
+            "title": "Share",
+            "type": "number"
+          },
+          "urgency": {
+            "default": 1.0,
+            "title": "Urgency",
+            "type": "number"
+          },
+          "weight": {
+            "default": 1.0,
+            "title": "Weight",
+            "type": "number"
+          }
+        },
+        "title": "GoalBreakdownItem",
         "type": "object"
       },
       "GoalCategory": {
@@ -1322,6 +1950,122 @@
         "title": "IndicatorsResponse",
         "type": "object"
       },
+      "InputSummary": {
+        "properties": {
+          "bliq": {
+            "title": "Bliq",
+            "type": "number"
+          },
+          "expense": {
+            "title": "Expense",
+            "type": "number"
+          },
+          "goals_count": {
+            "title": "Goals Count",
+            "type": "integer"
+          },
+          "income": {
+            "title": "Income",
+            "type": "number"
+          },
+          "l_min": {
+            "title": "L Min",
+            "type": "number"
+          },
+          "liquid_assets_count": {
+            "title": "Liquid Assets Count",
+            "type": "integer"
+          },
+          "obligations_count": {
+            "title": "Obligations Count",
+            "type": "integer"
+          },
+          "r_bench": {
+            "title": "R Bench",
+            "type": "number"
+          },
+          "r_bench_source": {
+            "title": "R Bench Source",
+            "type": "string"
+          },
+          "risk_tolerance": {
+            "title": "Risk Tolerance",
+            "type": "integer"
+          },
+          "transactions_count": {
+            "title": "Transactions Count",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "income",
+          "expense",
+          "bliq",
+          "transactions_count",
+          "obligations_count",
+          "goals_count",
+          "liquid_assets_count",
+          "r_bench",
+          "r_bench_source",
+          "l_min",
+          "risk_tolerance"
+        ],
+        "title": "InputSummary",
+        "type": "object"
+      },
+      "InvestmentTranche": {
+        "properties": {
+          "amount": {
+            "title": "Amount",
+            "type": "number"
+          },
+          "cushion_part": {
+            "default": 0.0,
+            "title": "Cushion Part",
+            "type": "number"
+          },
+          "equity_share": {
+            "default": 0.0,
+            "title": "Equity Share",
+            "type": "number"
+          },
+          "note": {
+            "default": "",
+            "title": "Note",
+            "type": "string"
+          },
+          "split": {
+            "$ref": "#/components/schemas/InvestmentTrancheSplit"
+          }
+        },
+        "required": [
+          "amount",
+          "split"
+        ],
+        "title": "InvestmentTranche",
+        "type": "object"
+      },
+      "InvestmentTrancheSplit": {
+        "properties": {
+          "bonds": {
+            "default": 0.0,
+            "title": "Bonds",
+            "type": "number"
+          },
+          "deposits": {
+            "default": 0.0,
+            "title": "Deposits",
+            "type": "number"
+          },
+          "equity": {
+            "default": 0.0,
+            "title": "Equity",
+            "type": "number"
+          }
+        },
+        "title": "InvestmentTrancheSplit",
+        "type": "object"
+      },
       "InviteAcceptResponse": {
         "properties": {
           "household_id": {
@@ -1640,6 +2384,41 @@
         "title": "NotificationOut",
         "type": "object"
       },
+      "ObligationAllocationItem": {
+        "properties": {
+          "id": {
+            "anyOf": [
+              {},
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Id"
+          },
+          "interest_rate": {
+            "default": 0.0,
+            "title": "Interest Rate",
+            "type": "number"
+          },
+          "name": {
+            "default": "",
+            "title": "Name",
+            "type": "string"
+          },
+          "new_amount": {
+            "default": 0.0,
+            "title": "New Amount",
+            "type": "number"
+          },
+          "new_payment": {
+            "default": 0.0,
+            "title": "New Payment",
+            "type": "number"
+          }
+        },
+        "title": "ObligationAllocationItem",
+        "type": "object"
+      },
       "ObligationCreate": {
         "properties": {
           "amount": {
@@ -1910,6 +2689,221 @@
           }
         },
         "title": "PlanHistorySave",
+        "type": "object"
+      },
+      "PlanningCalculateResponse": {
+        "description": "Ответ POST /planning/calculate.",
+        "properties": {
+          "admissible_count": {
+            "title": "Admissible Count",
+            "type": "integer"
+          },
+          "alternatives_total": {
+            "title": "Alternatives Total",
+            "type": "integer"
+          },
+          "best": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Alternative"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "bliq_preallocation": {
+            "$ref": "#/components/schemas/BliqPreallocation"
+          },
+          "crisis_plan": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Crisis Plan"
+          },
+          "indicators": {
+            "$ref": "#/components/schemas/PlanningIndicators"
+          },
+          "input_summary": {
+            "$ref": "#/components/schemas/InputSummary"
+          },
+          "ranked": {
+            "items": {
+              "$ref": "#/components/schemas/Alternative"
+            },
+            "title": "Ranked",
+            "type": "array"
+          },
+          "rejected": {
+            "items": {
+              "$ref": "#/components/schemas/Alternative"
+            },
+            "title": "Rejected",
+            "type": "array"
+          },
+          "rejected_count": {
+            "title": "Rejected Count",
+            "type": "integer"
+          },
+          "risk_profile": {
+            "title": "Risk Profile",
+            "type": "string"
+          },
+          "surplus_plan": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Surplus Plan"
+          },
+          "top3": {
+            "items": {
+              "$ref": "#/components/schemas/Alternative"
+            },
+            "title": "Top3",
+            "type": "array"
+          },
+          "weights": {
+            "$ref": "#/components/schemas/Weights"
+          }
+        },
+        "required": [
+          "indicators",
+          "bliq_preallocation",
+          "risk_profile",
+          "weights",
+          "alternatives_total",
+          "admissible_count",
+          "rejected_count",
+          "input_summary"
+        ],
+        "title": "PlanningCalculateResponse",
+        "type": "object"
+      },
+      "PlanningIndicators": {
+        "properties": {
+          "BLR": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Blr"
+          },
+          "BLR_status": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/BLRStatus"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "Bliq": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Bliq"
+          },
+          "Bt": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Bt"
+          },
+          "CFt": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cft"
+          },
+          "Dt": {
+            "title": "Dt",
+            "type": "number"
+          },
+          "Dt_alert": {
+            "default": false,
+            "title": "Dt Alert",
+            "type": "boolean"
+          },
+          "Et": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Et"
+          },
+          "It": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "It"
+          },
+          "Lt": {
+            "title": "Lt",
+            "type": "number"
+          },
+          "Rt": {
+            "title": "Rt",
+            "type": "number"
+          },
+          "SigmaP": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sigmap"
+          }
+        },
+        "required": [
+          "Rt",
+          "Lt",
+          "Dt"
+        ],
+        "title": "PlanningIndicators",
         "type": "object"
       },
       "PlanningRequest": {
@@ -2769,6 +3763,68 @@
         "title": "VariantIn",
         "type": "object"
       },
+      "WeightedScores": {
+        "description": "Вклад каждого критерия SAW в utility: w_x * x_norm (батч 0.3, Волна 0).\n\nАддитивно к `scores` — сумма полей равна `utility` с точностью округления.\nНе влияет на ранжирование (сортировка по floor_level/utility не менялась).",
+        "properties": {
+          "Dt": {
+            "title": "Dt",
+            "type": "number"
+          },
+          "Lt": {
+            "title": "Lt",
+            "type": "number"
+          },
+          "Rt": {
+            "title": "Rt",
+            "type": "number"
+          },
+          "Si": {
+            "title": "Si",
+            "type": "number"
+          }
+        },
+        "required": [
+          "Rt",
+          "Lt",
+          "Dt",
+          "Si"
+        ],
+        "title": "WeightedScores",
+        "type": "object"
+      },
+      "Weights": {
+        "properties": {
+          "lt_target": {
+            "title": "Lt Target",
+            "type": "number"
+          },
+          "w_dt": {
+            "title": "W Dt",
+            "type": "number"
+          },
+          "w_goals": {
+            "title": "W Goals",
+            "type": "number"
+          },
+          "w_lt": {
+            "title": "W Lt",
+            "type": "number"
+          },
+          "w_rt": {
+            "title": "W Rt",
+            "type": "number"
+          }
+        },
+        "required": [
+          "w_rt",
+          "w_lt",
+          "w_dt",
+          "w_goals",
+          "lt_target"
+        ],
+        "title": "Weights",
+        "type": "object"
+      },
       "_AnalyzeAsset": {
         "properties": {
           "amount": {
@@ -2878,7 +3934,7 @@
   },
   "info": {
     "title": "FINPILOT",
-    "version": "8.3.2"
+    "version": "8.11.1"
   },
   "openapi": "3.1.0",
   "paths": {
@@ -6259,9 +7315,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response Calculate Plan Api Planning Calculate Post",
-                  "type": "object"
+                  "$ref": "#/components/schemas/PlanningCalculateResponse"
                 }
               }
             },

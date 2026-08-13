@@ -15,7 +15,14 @@
   * отсутствие мягких переносов `\\u00ad` в markdown;
   * отсутствие паттерна `&& grep` в скриптах репозитория (PIT-001);
   * наличие свежего свидетельства о прогоне матрицы PostgreSQL, если в
-    `alembic/versions/` появилась миграция новее этого свидетельства.
+    `alembic/versions/` появилась миграция новее этого свидетельства;
+  * `tools.revision.revision_check` (битые ссылки, устаревшие упоминания канона
+    матмодели, CJK-канарейка, счётчики структуры, коллизии регистра пути) —
+    до v8.13.1 preflight его НЕ вызывал: битая ссылка на ещё не созданный файл
+    прошла через два прогона preflight подряд и поймалась только полным
+    прогоном `pytest` (`tests/test_repo_revision.py`). Один и тот же класс
+    проблемы, что PIT-016 — гейт, который заявлен как проверяющий X, но X не
+    проверяет, хуже отсутствующего гейта: создаёт ложную уверенность.
 
 Чего инструмент НЕ делает: не заменяет прогон тестов и не подтверждает, что
 поведение верное. Он ловит ceremony-дрейф и известные грабли, не более.
@@ -29,6 +36,8 @@ import argparse
 import re
 import sys
 from pathlib import Path
+
+from tools.revision.revision_check import RevisionChecker
 
 REPO = Path(__file__).resolve().parents[1]
 SOFT_HYPHEN = "\u00ad"
@@ -122,6 +131,21 @@ def pg_matrix_evidence(repo: Path) -> str | None:
     return None
 
 
+def revision_check_failures(repo: Path) -> list[str]:
+    """`tools.revision.revision_check` вызван из preflight (PIT-017, v8.13.2):
+
+    до этого preflight не проверял битые ссылки/устаревший канон/CJK/счётчики
+    структуры вообще — только ручная привычка гонять `revision_check` отдельно
+    рядом с preflight, не гарантия кода.
+    """
+    hits: list[str] = []
+    for res in RevisionChecker(repo).run():
+        for finding in res.failures:
+            hits.append(f"revision_check[{res.name}] {finding.location}: "
+                        f"{finding.detail}")
+    return hits
+
+
 MANUAL_QUESTIONS = (
     "Сработает ли это на ВТОРОМ прогоне подряд, когда входных данных для шага "
     "уже нет, а результат прошлой работы лежит на диске?",
@@ -167,6 +191,8 @@ def run(repo: Path) -> int:
                         "версию без него")
 
     pg_problem = pg_matrix_evidence(repo)
+
+    failures.extend(revision_check_failures(repo))
 
     print("=== PREFLIGHT ===")
     for item in failures:

@@ -42,6 +42,7 @@ from app.services.forecasting import build_monthly_history, forecast_indicators
 from app.services.currency import to_base_currency
 from app.services.plan_export import plan_to_pdf, plan_to_xlsx
 from app.services.planning import run_planning
+from app.schemas.planning import PlanningCalculateResponse
 from app.utils.time import utcnow
 
 
@@ -159,7 +160,11 @@ def _serialize_assets(items) -> list[dict[str, Any]]:
     ]
 
 
-@router.post("/calculate", summary="Полный цикл СППР: генерация и ранжирование альтернатив")
+@router.post(
+    "/calculate",
+    summary="Полный цикл СППР: генерация и ранжирование альтернатив",
+    response_model=PlanningCalculateResponse,
+)
 def calculate_plan(
     payload: PlanningRequest,
     db: Session = Depends(get_db),

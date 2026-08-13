@@ -176,8 +176,15 @@ def run_planning(
         distinct_ranked.append(alt)
 
     # ── Top-3 с объяснениями ───────────────────────────────────────────
+    # next_alt (батч 0.4, Волна 0): следующая по рангу альтернатива для
+    # контрфакта — реально посчитанный сосед из того же distinct_ranked[],
+    # не гипотетический сценарий. У последней в top3 next_alt берётся из
+    # хвоста distinct_ranked (если он есть за пределами тройки).
     top3 = []
-    for alt in distinct_ranked[:3]:
+    for i, alt in enumerate(distinct_ranked[:3]):
+        next_alt = (
+            distinct_ranked[i + 1] if i + 1 < len(distinct_ranked) else None
+        )
         explanation = explain_alternative(
             alt=alt,
             rt=rt, lt=lt, dt=dt,
@@ -186,6 +193,7 @@ def run_planning(
             goals_total=goals_total,
             risk_profile_label=profile["label"],
             alternatives_count=len(alternatives),
+            next_alt=next_alt,
         )
         top3.append({**alt, "explanation": explanation})
 

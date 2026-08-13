@@ -143,6 +143,16 @@ def rank_alternatives(
             "Si_norm": round(si_norm, 3),
             "Lt_capped": round(lt_eff, 4),
         }
+        # Вклад каждого критерия в utility (батч 0.3, Волна 0 — карта качества,
+        # ось «объяснимость»): w_x * x_norm. Чисто аддитивно — не влияет на
+        # ранжирование, сумма полей равна utility. Читает app/core/
+        # recommendation.py::explain_alternative для доминирующего критерия.
+        alt["weighted_scores"] = {
+            "Rt": round(w_rt * rt_norm, 4),
+            "Lt": round(w_lt * lt_norm, 4),
+            "Dt": round(w_dt * dt_norm, 4),
+            "Si": round(w_goals * si_norm, 4),
+        }
 
     alternatives.sort(
         key=lambda a: (a["floor_level"], a["utility"]), reverse=True

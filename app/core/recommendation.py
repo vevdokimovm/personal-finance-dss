@@ -16,6 +16,17 @@ CATEGORY_LABELS = {
     "emotional": "эмоциональная цель",
 }
 
+# Человеческие подписи критериев SAW для вклада в вердикт и контрфакта
+# (батч 0.3/0.4, Волна 0 — карта качества, ось «объяснимость»). Читаются
+# app/core/ranking.py::rank_alternatives поля weighted_scores — ключи Rt/Lt/
+# Dt/Si там служебные (как у существующего delta), в прозу не попадают.
+CRITERION_LABELS = {
+    "Rt": "сколько свободных денег остаётся каждый месяц",
+    "Lt": "насколько выросла подушка безопасности",
+    "Dt": "насколько снизилась долговая нагрузка",
+    "Si": "насколько продвинулись ваши цели",
+}
+
 
 def build_recommendation_text(
     rt: float,
@@ -107,6 +118,52 @@ def build_recommendation_text(
     return " ".join(parts)
 
 
+def _dominant_criterion(weighted_scores: dict[str, float] | None) -> str | None:
+    """Критерий SAW с наибольшим вкладом в utility выбранной альтернативы."""
+    if not weighted_scores:
+        return None
+    scores = weighted_scores
+    return max(scores, key=lambda k: scores[k])
+
+
+def _counterfactual(
+    alt: dict[str, Any], next_alt: dict[str, Any] | None
+) -> dict[str, Any] | None:
+    """Что изменилось бы, чтобы победил другой вариант (батч 0.4, Волна 0).
+
+    Сравнение с реально посчитанным следующим по рангу вариантом из того же
+    ranked[] — не гипотетический сценарий. None, если следующего варианта
+    нет (единственная допустимая альтернатива); available=False, если у
+    альтернатив ещё нет weighted_scores/utility (вызов вне rank_alternatives).
+    """
+    if next_alt is None:
+        return None
+    ws_alt = alt.get("weighted_scores")
+    ws_next = next_alt.get("weighted_scores")
+    utility_alt = alt.get("utility")
+    utility_next = next_alt.get("utility")
+    if not ws_alt or not ws_next or utility_alt is None or utility_next is None:
+        return {"available": False}
+
+    gap = {k: ws_alt.get(k, 0.0) - ws_next.get(k, 0.0) for k in ws_alt}
+    dominant_gap = max(gap, key=lambda k: gap[k])
+    utility_gap = round(float(utility_alt) - float(utility_next), 4)
+    label = CRITERION_LABELS.get(dominant_gap, "итоговая оценка варианта")
+    gap_points = abs(utility_gap) * 100
+    text = (
+        f"Следующий по оценке вариант отстаёт примерно на {gap_points:.0f} "
+        f"из 100 возможных баллов оценки — в основном тем, {label}. Если бы "
+        f"это было выше у него, порядок вариантов мог бы поменяться."
+    )
+    return {
+        "available": True,
+        "alternative_id": next_alt.get("id"),
+        "utility_gap": utility_gap,
+        "dominant_criterion": dominant_gap,
+        "text": text,
+    }
+
+
 def explain_alternative(
     alt: dict[str, Any],
     rt: float,
@@ -117,13 +174,18 @@ def explain_alternative(
     goals_total: float,
     risk_profile_label: str,
     alternatives_count: int = 0,
+    next_alt: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     """
     Объяснение «почему именно этот план» обычным языком:
-        gains   — что улучшается,
-        costs   — чем приходится жертвовать,
-        insight — главный вывод.
-    Формат возврата стабилен (его читают фронтенд и снимок рекомендации).
+        gains              — что улучшается,
+        costs              — чем приходится жертвовать,
+        insight            — главный вывод,
+        dominant_criterion — какой критерий SAW внёс наибольший вклад (батч 0.3),
+        counterfactual     — что изменилось бы, чтобы победил другой вариант
+                              (батч 0.4; None без next_alt).
+    Формат возврата стабилен (его читают фронтенд и снимок рекомендации);
+    новые поля — аддитивны, старые не убраны и не переименованы.
     """
     delta_rt = alt.get("Rt_new", rt) - rt
     delta_lt = alt.get("Lt_new", lt) - lt
@@ -262,6 +324,13 @@ def explain_alternative(
             f"«{risk_profile_label}» такой перекос чуть менее выгоден."
         )
 
+    # ── Вклад критериев SAW (батч 0.3, Волна 0) ────────────────────────
+    dominant_criterion = _dominant_criterion(alt.get("weighted_scores"))
+    if dominant_criterion is not None:
+        insight.append(
+            f"Решающим для оценки оказалось то, {CRITERION_LABELS[dominant_criterion]}."
+        )
+
     if not gains:
         gains.append("Все деньги остаются у вас в распоряжении на следующий месяц.")
 
@@ -269,6 +338,8 @@ def explain_alternative(
         "gains": gains,
         "costs": costs,
         "insight": " ".join(insight),
+        "dominant_criterion": dominant_criterion,
+        "counterfactual": _counterfactual(alt, next_alt),
         "delta": {
             "Rt": round(delta_rt, 2),
             "Lt": round(delta_lt, 4),

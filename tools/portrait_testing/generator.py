@@ -23,6 +23,7 @@
 """
 from __future__ import annotations
 
+import copy
 import random
 from datetime import date, timedelta
 from typing import Any
@@ -307,3 +308,78 @@ class PortraitGenerator:
                 "deadline": deadline,
             })
         return items
+
+
+# ── метаморфические отношения (E-слой) ─────────────────────────────────────
+#
+# M2_rate_all/M3_deadline_all (генераторы v4/v5, `docs/model/model_quality_
+# scorecard.md` ось 4) дают L1=0 на всех парах: равномерный сдвиг ставок
+# сохраняет порядок Avalanche, равномерный сдвиг дедлайнов — порядок
+# срочности целей, оба by design. Заменены на адресные M2_rate_second/
+# M3_deadline_second — тот же механизм, что уже доказанно информативен у
+# *_single (раунды 4-5), но целятся во ВТОРОЙ по рангу элемент, а не в
+# первый: могут перевернуть относительный порядок, когда разрыв между
+# позициями 1 и 2 узкий, а равномерный сдвиг не может по построению.
+# generator_v4.py/generator_v5.py — замороженные артефакты сертификации
+# (v5 наследует v4 без переопределения `_gen_e`), правка их нарушила бы
+# бит-в-бит воспроизводимость раундов 4/5 (ось 8 карты). Поэтому починка —
+# здесь, в живом generator.py (v2 — «актуальный канон», не заморожен), а не
+# в frozen-файлах.
+METAMORPHIC_RELATIONS: tuple[str, ...] = (
+    "M1_income", "M2_rate_single", "M2_rate_second", "M3_deadline_single",
+    "M3_deadline_second", "M4_bliq", "M5_scale",
+)
+
+
+def build_metamorphic_twin(base: dict[str, Any], relation: str) -> dict[str, Any]:
+    """Строит «twin»-портрет из `base` по метаморфическому отношению.
+
+    `base` не мутируется. При недостатке элементов для адресного отношения
+    (< 2 обязательств/датированных целей) поведение деградирует к варианту
+    `_single` — портрет остаётся валидным, пара просто менее информативна.
+    """
+    twin = copy.deepcopy(base)
+    if relation == "M1_income":
+        twin["income_total"] = round(base["income_total"] * 1.01, 2)
+    elif relation == "M2_rate_single":
+        obligations = twin["obligations"]
+        if obligations:
+            top = max(obligations, key=lambda o: o["interest_rate"])
+            top["interest_rate"] = round(top["interest_rate"] + 0.01, 4)
+    elif relation == "M2_rate_second":
+        obligations = twin["obligations"]
+        if len(obligations) >= 2:
+            ranked = sorted(obligations, key=lambda o: o["interest_rate"],
+                            reverse=True)
+            ranked[1]["interest_rate"] = round(
+                ranked[1]["interest_rate"] + 0.01, 4)
+        elif obligations:
+            obligations[0]["interest_rate"] = round(
+                obligations[0]["interest_rate"] + 0.01, 4)
+    elif relation == "M3_deadline_single":
+        dated = [g for g in twin["goals"] if g["deadline"] is not None]
+        if dated:
+            nearest = min(dated, key=lambda g: g["deadline"])
+            nearest["deadline"] = nearest["deadline"] + timedelta(days=183)
+    elif relation == "M3_deadline_second":
+        dated = [g for g in twin["goals"] if g["deadline"] is not None]
+        if len(dated) >= 2:
+            ranked = sorted(dated, key=lambda g: g["deadline"])
+            ranked[1]["deadline"] = ranked[1]["deadline"] + timedelta(days=183)
+        elif dated:
+            dated[0]["deadline"] = dated[0]["deadline"] + timedelta(days=183)
+    elif relation == "M4_bliq":
+        twin["bliq"] = round(base["bliq"] * 1.01, 2)
+    elif relation == "M5_scale":
+        twin["income_total"] = round(base["income_total"] * 10.0, 2)
+        twin["expense_total"] = round(base["expense_total"] * 10.0, 2)
+        twin["bliq"] = round(base["bliq"] * 10.0, 2)
+        for o in twin["obligations"]:
+            o["amount"] = round(o["amount"] * 10.0, 2)
+            o["monthly_payment"] = round(o["monthly_payment"] * 10.0, 2)
+        for g in twin["goals"]:
+            g["target_amount"] = round(g["target_amount"] * 10.0, 2)
+            g["current_amount"] = round(g["current_amount"] * 10.0, 2)
+    else:
+        raise ValueError(f"неизвестное метаморфическое отношение: {relation}")
+    return twin
