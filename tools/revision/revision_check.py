@@ -50,6 +50,10 @@ REF_PATTERN = re.compile(
 LINK_ALLOWLIST = {
     ("docs/WATCHLOG.md", "tools/publish/finpilot_publish.sh"):
         "историческое упоминание переименования скрипта (не ссылка)",
+    ("docs/WATCHLOG.md", "docs/math_model_v3_5_0.md"):
+        "историческое упоминание переименования канона (v8.9.4: math_model_v3_5_0.md -> "
+        "docs/math_model.md) в прозе §0/§3 — не ссылка. Тот же паттерн уже в allowlist для "
+        "трёх других файлов (см. ниже), WATCHLOG пропущен при первом проходе.",
     ("docs/test_run_optimization.md", "tests/test_x.py"):
         "плейсхолдер синтаксиса в примере команды pytest",
     ("knowledge/business/android_google_play_pipeline.md", "docs/PWA_УСТАНОВКА.md"):
@@ -72,7 +76,8 @@ LINK_ALLOWLIST = {
         "историческая ссылка на состояние на момент отчёта (файл лежал в docs/ под этим "
         "именем) — переименован в docs/math_model.md в v8.9.4, отчёт не переписывается "
         "задним числом. Лежит прямо в docs/, не подпадает под FROZEN_HINTS.",
-    ("docs/model/expert_certification/iterations/5/round5_model_half.md", "docs/math_model_v3_5_0.md"):
+    ("docs/model/expert_certification/iterations/5/round5_model_half.md",
+     "docs/math_model_v3_5_0.md"):
         "историческая ссылка на канон-файл на момент раунда 5 — переименован в "
         "docs/math_model.md в v8.9.4, отчёт эксперимента не переписывается задним числом.",
     ("docs/reports/adr/adr_006_reserve_floor_calibration.md", "docs/math_model_v3_5_0.md"):

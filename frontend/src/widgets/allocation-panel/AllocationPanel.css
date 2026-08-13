@@ -19,3 +19,16 @@
   display: inline-block;
   margin-right: var(--sp-2);
 }
+.fp-alloc-toggle {
+  margin-top: var(--sp-4);
+}
+.fp-alloc-sankey {
+  width: 100%;
+  height: var(--chart-height-sm);
+  margin-top: var(--sp-4);
+  overflow-x: auto;
+}
+.fp-alloc-sankey__inner {
+  height: 100%;
+  min-width: var(--chart-sankey-min-width);
+}
