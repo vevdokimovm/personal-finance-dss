@@ -93,3 +93,16 @@ class TestDebtAmortizationSchedule:
     def test_shared_target_selection_matches_avalanche(self):
         targets = select_avalanche_targets(_obligations(), 0.14)
         assert [o["id"] for o in targets] == [1]  # только id 1 (0.24 >= 0.14), по убыванию ставки
+
+    def test_rounds_half_up_not_banker(self):
+        # amount=100, rate=0.015 (1.5% годовых) → проценты за 1 месяц = 100*0.015/12 =
+        # 0.125 ровно, точная граница копейки. Канон проекта — ROUND_HALF_UP (app/core/
+        # money.py, скилл finpilot-money-format): 0.125 → 0.13. round() из stdlib на
+        # точном float 0.125 применяет банковское round-half-to-even → 0.12 (неверно
+        # по канону). Долг гасится за 1 месяц (monthly_payment=1000 >> amount+interest),
+        # так что baseline_total_interest — это ровно эта одна начисленная сумма.
+        obls = [{"id": 1, "amount": 100.0, "monthly_payment": 1000.0, "interest_rate": 0.015}]
+        summary = build_debt_amortization_schedule(obls, x_obl_monthly=1.0, r_bench=0.01)
+        assert summary is not None
+        assert summary.baseline_months == 1
+        assert summary.baseline_total_interest == 0.13
