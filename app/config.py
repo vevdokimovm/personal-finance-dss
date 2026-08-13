@@ -28,7 +28,7 @@ class Settings(BaseSettings):
         description="Название проекта.",
     )
     APP_VERSION: str = Field(
-        default="8.16.1",
+        default="8.17.0",
         description="Версия приложения (INFRA-13): код, UI-футер, git-тег.",
     )
     PROJECT_TAGLINE: str = Field(
@@ -44,6 +44,16 @@ class Settings(BaseSettings):
     ENVIRONMENT: str = Field(
         default="development",
         description="Окружение: development | production (INFRA-10/12).",
+    )
+    TELEMETRY_COLLECTION_ENABLED: bool = Field(
+        default=False,
+        description=(
+            "Телеметрия принятия совета (волна 0, п. 0.6, docs/model/telemetry_spec.md). "
+            "False по умолчанию — намеренно: правовой контур обезличивания для "
+            "использования этих данных в сертификации модели (152-ФЗ, ROADMAP §8.2а) "
+            "закрывается юристом отдельно от кода. Переключать в True — решение "
+            "владельца ПОСЛЕ закрытия контура, не автоматика при деплое."
+        ),
     )
     CORS_ORIGINS: str = Field(
         default=(

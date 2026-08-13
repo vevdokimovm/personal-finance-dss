@@ -514,6 +514,41 @@ class PlanSnapshot(Base):
     deleted_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
 
 
+class PlanAdviceEvent(Base):
+    """Телеметрия принятия совета (волна 0, п. 0.6, `docs/model/telemetry_spec.md`).
+
+    ДОРМАНТНАЯ инфраструктура: запись в эту таблицу происходит только когда
+    `settings.TELEMETRY_COLLECTION_ENABLED=True` (default False,
+    `app/api/routes_telemetry.py::_ensure_telemetry_enabled`) — правовой контур
+    обезличивания для использования этих данных в сертификации модели (152-ФЗ,
+    ROADMAP §8.2а) закрывается юристом отдельно, флаг переключается только после.
+
+    Две фазы: `shown_at` пишется при показе плана (POST), `outcome`/
+    `modified_to`/`decided_at` — при решении пользователя (PATCH), могут не
+    заполниться никогда (пользователь ушёл, не решив).
+    """
+
+    __tablename__ = "plan_advice_events"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    plan_id: Mapped[str] = mapped_column(
+        String(36), nullable=False, index=True, default=lambda: str(uuid.uuid4())
+    )
+    user_id: Mapped[Optional[str]] = mapped_column(
+        ForeignKey("users.id"), nullable=True, index=True
+    )
+    model_version: Mapped[str] = mapped_column(String(32), nullable=False)
+    app_version: Mapped[str] = mapped_column(String(32), nullable=False)
+    input_snapshot_hash: Mapped[str] = mapped_column(String(64), nullable=False)
+    advice: Mapped[dict] = mapped_column(JSON, nullable=False)
+    outcome: Mapped[Optional[str]] = mapped_column(String(16), nullable=True)
+    modified_to: Mapped[Optional[dict]] = mapped_column(JSON, nullable=True)
+    shown_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=utcnow)
+    decided_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+    is_deleted: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False, index=True)
+    deleted_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+
+
 class UserCategoryRule(Base):
     """Пользовательское правило категоризации (P2.7, обучение на правках).
 

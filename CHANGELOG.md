@@ -2,6 +2,32 @@
 
 Формат: [Keep a Changelog](https://keepachangelog.com/ru/1.0.0/). Версионирование — [SemVer](https://semver.org/lang/ru/).
 
+## [8.17.0] — 2026-08-13 — Телеметрия принятия совета: код готов, дормантен до правового контура (волна 0, п. 0.6) (MINOR)
+
+Последний пункт «Волны 0» (`docs/model/model_completion_plan.md` §4). Без неё раунд сертификации
+на живых данных (волна 2) имел бы вход, но не эталон — но событие содержит `user_id` и хеш
+финансового портрета, поэтому включение сбора ждёт правового контура обезличивания (152-ФЗ,
+ROADMAP §8.2а) — задачи юриста, не кода.
+
+### Добавлено
+- **Миграция `0032_plan_advice_events`** — таблица `plan_advice_events`
+  (`plan_id`/`user_id`/`model_version`/`app_version`/`input_snapshot_hash`/`advice`/`outcome`/
+  `modified_to`/`shown_at`/`decided_at`, soft-delete). Проверена upgrade/downgrade/upgrade на
+  SQLite и изолированном PostgreSQL (не боевая БД).
+- **`app/database/models.py::PlanAdviceEvent`** + `app/database/crud.py::create_advice_event`/
+  `record_advice_decision`.
+- **`app/api/routes_telemetry.py`** — `POST /api/telemetry/advice-events` (показ плана) и
+  `PATCH /api/telemetry/advice-events/{plan_id}/decision` (`accepted`/`modified`/`ignored`).
+  Роутер за гейтом `require_financial_consent` (тот же, что transactions/obligations/goals/
+  liquid-assets).
+- **`settings.TELEMETRY_COLLECTION_ENABLED`** (`app/config.py`, default **False**) — оба
+  эндпоинта отвечают 404 (`_ensure_telemetry_enabled`, по образцу `_ensure_plaid_enabled`),
+  пока флаг не включён явно. Переключение — решение владельца после закрытия правового контура,
+  не автоматика при деплое.
+- **`tests/test_api_telemetry.py`** — 9 тестов: 404 по умолчанию, создание/решение события,
+  401 без авторизации, 403 без согласия на финданные, 422 на невалидный вход, 404 на чужой/
+  несуществующий `plan_id`. Зелёные на SQLite и PostgreSQL.
+
 ## [8.16.1] — 2026-08-13 — Волна 0 добита: кросс-платформенная сверка, снимок модели, пересчёт карты качества (PATCH)
 
 Три пункта «Волны 0» (`docs/model/model_completion_plan.md` §4), не требующие ни экспертов, ни

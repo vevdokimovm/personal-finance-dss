@@ -6,21 +6,23 @@
 
 | Поле | Значение |
 |---|---|
-| Дата | 2026-07-30 |
-| Версия кода | v7.6.0 |
-| Последняя миграция | **0031** (`0031_financial_consent_backfill.py`) |
-| СУБД | PostgreSQL 16.14 (Ubuntu, песочница) |
-| `alembic upgrade head` | прошло, цепочка 0026 → 0031 |
-| Внешний ключ | `user_consents_user_id_fkey → users(id)` создан |
-| Обратимость | `downgrade 0029` → `upgrade head` и `downgrade 0030` → `upgrade head` прошли |
-| Тесты на PostgreSQL | **141 / 141** (дельта ревизии) |
-| Тесты на SQLite | **1473 / 1473** (ПОЛНЫЙ прогон) |
+| Дата | 2026-08-13 |
+| Версия кода | v8.17.0 |
+| Последняя миграция | **0032** (`0032_plan_advice_events.py`) |
+| СУБД | PostgreSQL 16-alpine (Docker, изолированный контейнер на :55432, не боевая БД) |
+| `alembic upgrade head` | прошло, цепочка 0007 → 0032 (контейнер поднят с чистого образа) |
+| Обратимость | `downgrade 0032` → `upgrade head` прошли |
+| Тесты на PostgreSQL | **50 / 50** (дельта ревизии) |
+| Тесты на SQLite | **1581 / 1581, 2 known-fail на счётчиках ревизии (починены в этом же батче)** (ПОЛНЫЙ прогон) |
 
-Группа прогона: `test_consents`, `test_auth`, `test_api_auth_flow`,
-`test_api_crud`, `test_observability`.
+Группа прогона: `test_api_telemetry` (новые эндпоинты 0032), `test_consents`,
+`test_api_crud` (регрессия на существующих финансовых роутерах).
 
-**Найдено прогоном:** PG-only взаимная блокировка в `_reset_db()` —
-`DROP TABLE` против соединения `idle in transaction`. Разбор —
+**Предыдущий прогон (2026-07-30, v7.6.0, миграция 0031)** — архивная запись:
+141/141 на PostgreSQL, 1473/1473 на SQLite (полный), группа `test_consents`,
+`test_auth`, `test_api_auth_flow`, `test_api_crud`, `test_observability`.
+Найдено тогда: PG-only взаимная блокировка в `_reset_db()` — `DROP TABLE`
+против соединения `idle in transaction`. Разбор —
 `docs/reports/incidents/postgres_false_debt_repeat.md`.
 
 **Рецепт подъёма PostgreSQL в песочнице** (две команды, повторно подтверждён):

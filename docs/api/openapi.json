@@ -39,6 +39,151 @@
         "title": "AccountDTO",
         "type": "object"
       },
+      "AdviceDecision": {
+        "description": "Решение пользователя по ранее показанному плану.",
+        "properties": {
+          "modified_to": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Modified To"
+          },
+          "outcome": {
+            "enum": [
+              "accepted",
+              "modified",
+              "ignored"
+            ],
+            "title": "Outcome",
+            "type": "string"
+          }
+        },
+        "required": [
+          "outcome"
+        ],
+        "title": "AdviceDecision",
+        "type": "object"
+      },
+      "AdviceEventCreate": {
+        "description": "Событие показа плана (волна 0, п. 0.6, `docs/model/telemetry_spec.md`).",
+        "properties": {
+          "advice": {
+            "additionalProperties": true,
+            "title": "Advice",
+            "type": "object"
+          },
+          "app_version": {
+            "minLength": 1,
+            "title": "App Version",
+            "type": "string"
+          },
+          "input_snapshot_hash": {
+            "maxLength": 64,
+            "minLength": 1,
+            "title": "Input Snapshot Hash",
+            "type": "string"
+          },
+          "model_version": {
+            "minLength": 1,
+            "title": "Model Version",
+            "type": "string"
+          }
+        },
+        "required": [
+          "model_version",
+          "app_version",
+          "input_snapshot_hash",
+          "advice"
+        ],
+        "title": "AdviceEventCreate",
+        "type": "object"
+      },
+      "AdviceEventResponse": {
+        "properties": {
+          "advice": {
+            "additionalProperties": true,
+            "title": "Advice",
+            "type": "object"
+          },
+          "app_version": {
+            "title": "App Version",
+            "type": "string"
+          },
+          "decided_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Decided At"
+          },
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "input_snapshot_hash": {
+            "title": "Input Snapshot Hash",
+            "type": "string"
+          },
+          "model_version": {
+            "title": "Model Version",
+            "type": "string"
+          },
+          "modified_to": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Modified To"
+          },
+          "outcome": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Outcome"
+          },
+          "plan_id": {
+            "title": "Plan Id",
+            "type": "string"
+          },
+          "shown_at": {
+            "format": "date-time",
+            "title": "Shown At",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "plan_id",
+          "model_version",
+          "app_version",
+          "input_snapshot_hash",
+          "advice",
+          "shown_at"
+        ],
+        "title": "AdviceEventResponse",
+        "type": "object"
+      },
       "AllocationDTO": {
         "properties": {
           "to_debt": {
@@ -4009,7 +4154,7 @@
   },
   "info": {
     "title": "FINPILOT",
-    "version": "8.15.1"
+    "version": "8.17.0"
   },
   "openapi": "3.1.0",
   "paths": {
@@ -8225,6 +8370,99 @@
         "summary": "Приём апдейтов Telegram (для setWebhook на проде)",
         "tags": [
           "Telegram"
+        ]
+      }
+    },
+    "/api/telemetry/advice-events": {
+      "post": {
+        "operationId": "create_advice_event_endpoint_api_telemetry_advice_events_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdviceEventCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdviceEventResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Записать показ плана",
+        "tags": [
+          "Телеметрия принятия совета"
+        ]
+      }
+    },
+    "/api/telemetry/advice-events/{plan_id}/decision": {
+      "patch": {
+        "operationId": "record_advice_decision_endpoint_api_telemetry_advice_events__plan_id__decision_patch",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "plan_id",
+            "required": true,
+            "schema": {
+              "title": "Plan Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdviceDecision"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdviceEventResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Записать решение пользователя по показанному плану",
+        "tags": [
+          "Телеметрия принятия совета"
         ]
       }
     },

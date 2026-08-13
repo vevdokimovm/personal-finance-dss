@@ -26,6 +26,7 @@ from app.api.routes_recommendation import router as recommendation_router
 from app.api.routes_transactions import router as transactions_router
 from app.api.routes_subscription import router as subscription_router
 from app.api.routes_telegram import router as telegram_router
+from app.api.routes_telemetry import router as telemetry_router
 from app.api.routes_user_prefs import router as user_prefs_router
 from app.config import settings
 
@@ -43,6 +44,7 @@ router.include_router(obligations_router, dependencies=_FIN)
 router.include_router(goals_router, dependencies=_FIN)
 router.include_router(households_router)
 router.include_router(liquid_assets_router, dependencies=_FIN)
+router.include_router(telemetry_router, dependencies=_FIN)
 router.include_router(categories_router)
 router.include_router(user_prefs_router)
 router.include_router(analysis_router)
