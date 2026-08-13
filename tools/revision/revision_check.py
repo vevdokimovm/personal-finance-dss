@@ -118,7 +118,7 @@ LEGACY_CONTEXT_MARKERS = (
 # ровно юридического контура вехи 7 (/api/consents, /api/legal/documents,
 # /legal/cookies, /legal/marketing-consent). Пин был подогнан под протухший
 # снимок, поэтому гейт молчал о расхождении, а не ловил его.
-EXPECTED_COUNTS = {"tables": 30, "migrations": 32, "openapi_paths": 114}
+EXPECTED_COUNTS = {"tables": 30, "migrations": 33, "openapi_paths": 114}
 
 
 # Канарейка CJK: редкий токен-глюк генерации ассистентов — иероглиф вместо

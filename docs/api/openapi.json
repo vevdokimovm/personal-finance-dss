@@ -3781,6 +3781,22 @@
             "title": "Id",
             "type": "integer"
           },
+          "iis_contributed_this_year": {
+            "default": 0.0,
+            "title": "Iis Contributed This Year",
+            "type": "number"
+          },
+          "iis_type": {
+            "default": "none",
+            "enum": [
+              "none",
+              "A",
+              "B",
+              "three"
+            ],
+            "title": "Iis Type",
+            "type": "string"
+          },
           "l_min": {
             "title": "L Min",
             "type": "number"
@@ -3831,6 +3847,35 @@
               }
             ],
             "title": "Horizon"
+          },
+          "iis_contributed_this_year": {
+            "anyOf": [
+              {
+                "minimum": 0.0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Iis Contributed This Year"
+          },
+          "iis_type": {
+            "anyOf": [
+              {
+                "enum": [
+                  "none",
+                  "A",
+                  "B",
+                  "three"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Iis Type"
           },
           "l_min": {
             "anyOf": [

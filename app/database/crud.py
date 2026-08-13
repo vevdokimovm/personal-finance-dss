@@ -951,6 +951,8 @@ def update_user_prefs(
     horizon: Optional[int] = None,
     r_bench: Optional[float] = None,
     base_currency: Optional[str] = None,
+    iis_type: Optional[str] = None,
+    iis_contributed_this_year: Optional[float] = None,
     user_id: Optional[str] = None,
 ) -> UserPrefs:
     prefs = get_user_prefs(db, user_id=user_id)
@@ -964,6 +966,10 @@ def update_user_prefs(
         prefs.r_bench = r_bench
     if base_currency is not None:
         prefs.base_currency = base_currency
+    if iis_type is not None:
+        prefs.iis_type = iis_type
+    if iis_contributed_this_year is not None:
+        prefs.iis_contributed_this_year = iis_contributed_this_year
     db.commit()
     db.refresh(prefs)
     return prefs

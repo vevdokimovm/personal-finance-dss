@@ -56,8 +56,15 @@ def run_planning(
     step: float = 0.10,
     toxic_floor: bool = True,
     income_history: list[float] | None = None,
+    iis_type: str = "none",
+    iis_contributed_this_year: float = 0.0,
 ) -> dict[str, Any]:
     """Полный цикл планирования СППР по ВКР (этапы 1–6).
+
+    iis_type/iis_contributed_this_year (ADR-017, канон v3.9.0): статус ИИС
+    пользователя — влияет ТОЛЬКО на текст/диагностику инвестиционного транша
+    (`app/core/investment.py::estimate_iis_deduction`), вызывается ПОСЛЕ
+    ранжирования, никогда не входит в utility/сортировку/выбор альтернативы.
 
     income_history (ADR-015, канон v3.7.0): реальная помесячная история дохода
     (app/services/forecasting.py::build_monthly_history) — влияет ТОЛЬКО на floor
@@ -164,6 +171,8 @@ def run_planning(
             expense_total=expense_total,
             lt_target=float(profile["lt_target"]),
             risk_tolerance=risk_tolerance,
+            iis_type=iis_type,
+            iis_contributed_this_year=iis_contributed_this_year,
         )
 
     # Дедупликация по ФАКТИЧЕСКОМУ распределению: если досрочка перенаправлена

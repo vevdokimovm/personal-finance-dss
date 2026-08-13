@@ -32,5 +32,7 @@ def patch_prefs(
         horizon=payload.horizon,
         r_bench=payload.r_bench,
         base_currency=payload.base_currency,
+        iis_type=payload.iis_type,
+        iis_contributed_this_year=payload.iis_contributed_this_year,
         user_id=user_id,
     )

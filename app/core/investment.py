@@ -50,6 +50,36 @@ IIS_NOTE = (
     "на налоговый вычет 13% — если счёт ещё не открыт, для этой суммы может быть выгоден."
 )
 
+# ADR-017 (2026-08-13): продолжение ADR-014 — реальный расчёт вычета для типа А,
+# не просто упоминание льготы. Только тип А: закон однозначен (вычет = 13% от
+# взносов, потолок 400 000 ₽/год), правила ИИС-3 имеют переходные положения,
+# которые не берёмся кодировать без риска выдать неверную цифру (см. ADR-017,
+# вариант D, отклонён). Диагностика ПОСЛЕ ранжирования — не входит в выбор
+# альтернативы, красная линия ADR-017 (как у ADR-016).
+IIS_ANNUAL_LIMIT = 400_000.0
+IIS_DEDUCTION_RATE = 0.13
+
+
+def estimate_iis_deduction(
+    amount: float, iis_type: str, contributed_this_year: float = 0.0
+) -> dict[str, float] | None:
+    """Вычет ИИС типа А — детерминированный факт закона, не мнение экспертизы.
+
+    None: не тип А, сумма транша <= 0, или лимит года уже исчерпан
+    (contributed_this_year >= 400 000). Не выдумывает цифру для типа Б/ИИС-3.
+    """
+    if iis_type != "A" or amount <= 0:
+        return None
+    remaining_limit = max(0.0, IIS_ANNUAL_LIMIT - max(0.0, contributed_this_year))
+    eligible = min(amount, remaining_limit)
+    if eligible <= 0:
+        return None
+    return {
+        "eligible_amount": money(eligible),
+        "deduction": money(eligible * IIS_DEDUCTION_RATE),
+    }
+
+
 # Полный G5 (v3.2.0): инструмент зависит от горизонта. Короткий горизонт не
 # терпит просадок — акции исключаются независимо от риск-профиля.
 HORIZON_SHORT_MONTHS = 12.0
@@ -86,6 +116,8 @@ def annotate_investment_tranche(
     expense_total: float,
     lt_target: float,
     risk_tolerance: int,
+    iis_type: str = "none",
+    iis_contributed_this_year: float = 0.0,
 ) -> dict[str, Any]:
     """Размечает инвестиционную часть резервного потока альтернативы.
 
@@ -109,11 +141,21 @@ def annotate_investment_tranche(
     )
     split = build_shelf_split(invest, risk_tolerance)
 
+    iis_estimate = estimate_iis_deduction(invest, iis_type, iis_contributed_this_year)
+    if iis_estimate is not None:
+        note = (
+            f"{DEPOSIT_INSURANCE_NOTE} При взносе {iis_estimate['eligible_amount']:,.0f} ₽ "
+            f"на ИИС типа А вычет составит {iis_estimate['deduction']:,.0f} ₽ (13%)."
+        )
+    else:
+        note = f"{DEPOSIT_INSURANCE_NOTE} {IIS_NOTE}"
+
     alt["investment_tranche"] = {
         "amount": invest,
         "cushion_part": money(x_res - invest),
         "split": split,
         "equity_share": equity_share,
-        "note": f"{DEPOSIT_INSURANCE_NOTE} {IIS_NOTE}",
+        "note": note,
+        "iis_deduction_estimate": iis_estimate,
     }
     return alt

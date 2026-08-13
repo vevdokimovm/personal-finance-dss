@@ -84,6 +84,8 @@ def _plan_fingerprint(
     risk_tolerance: int,
     l_min: float,
     income_history: list[float] | None = None,
+    iis_type: str = "none",
+    iis_contributed_this_year: float = 0.0,
 ) -> str:
     payload = {
         "income": round(float(income_total), 2),
@@ -97,6 +99,11 @@ def _plan_fingerprint(
         # ADR-015: история дохода влияет на floor через волатильность — без
         # неё в отпечатке кэш отдавал бы старый floor после смены истории.
         "income_history": [round(float(v), 2) for v in (income_history or [])],
+        # ADR-017: статус ИИС меняет только текст/диагностику транша, но и это
+        # часть ответа — без него кэш отдавал бы старую (или чужую) заметку
+        # про вычет после смены статуса ИИС пользователем.
+        "iis_type": iis_type,
+        "iis_contributed_this_year": round(float(iis_contributed_this_year), 2),
     }
     blob = json.dumps(payload, sort_keys=True, default=str, ensure_ascii=False)
     return hashlib.sha256(blob.encode("utf-8")).hexdigest()
@@ -271,6 +278,8 @@ def _compute_plan(
             risk_tolerance=risk_tolerance,
             l_min=l_min,
             income_history=income_history,
+            iis_type=prefs.iis_type,
+            iis_contributed_this_year=float(prefs.iis_contributed_this_year),
         ),
     )
     cached = _planning_cache.get(cache_key)
@@ -288,6 +297,8 @@ def _compute_plan(
         risk_tolerance=risk_tolerance,
         l_min=l_min,
         income_history=income_history,
+        iis_type=prefs.iis_type,
+        iis_contributed_this_year=float(prefs.iis_contributed_this_year),
     )
 
     result["input_summary"] = {

@@ -379,6 +379,12 @@ class UserPrefs(Base):
     horizon: Mapped[int] = mapped_column(Integer, nullable=False, default=12)
     r_bench: Mapped[Decimal] = mapped_column(Numeric(6, 4), nullable=False, default=Decimal("0.14"))
     base_currency: Mapped[str] = mapped_column(String(3), nullable=False, default="RUB")
+    # ADR-017: статус ИИС — только тип А получает численный расчёт вычета
+    # (app/core/investment.py::estimate_iis_deduction), Б/three/none — текстовая нота.
+    iis_type: Mapped[str] = mapped_column(String(8), nullable=False, default="none")
+    iis_contributed_this_year: Mapped[Decimal] = mapped_column(
+        Numeric(12, 2), nullable=False, default=Decimal("0")
+    )
     updated_at: Mapped[datetime] = mapped_column(
         DateTime, nullable=False, default=utcnow, onupdate=utcnow
     )
