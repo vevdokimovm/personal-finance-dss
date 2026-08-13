@@ -371,6 +371,28 @@ sanitize_tree() {
   [ -f "$dest/docs/RELEASES.md" ] && "$SED" -i '' 's|ADR-001|решение по стеку фронтенда|g' \
     "$dest/docs/RELEASES.md"
 
+  # 6. CHANGELOG.md для зеркала (2026-08-13, v8.19.3). Приватный CHANGELOG.md намеренно
+  #    НЕ публикуется (deny-list, 300+ КБ внутренней кухни) — но без ЛЮБОГО корневого
+  #    CHANGELOG.md общий деплойер (`~/Downloads/deploy.sh`, generic find_changelog())
+  #    не находит секцию для текущей версии и создаёт релиз БЕЗ ОПИСАНИЯ (найдено живьём
+  #    при первом реальном push v8.19.2: "CHANGELOG не найден — релиз без описания не
+  #    создаю"). Пишем маленький публичный CHANGELOG.md той же секцией, что уже готовит
+  #    extract_public_notes() из tools/publish/public_release_notes.md (privacy-reviewed
+  #    guard_notes'ом) — не выдумываем новый источник текста, просто кладём его туда, где
+  #    generic-парсер деплойера способен его найти. Если секции для версии нет — та же
+  #    нейтральная заготовка, что и raньше уходила молча только в тело релиза.
+  extract_public_notes "$ver"
+  {
+    printf '# CHANGELOG\n\n'
+    printf 'История версий публичного зеркала. Полная инженерная история — приватный\n'
+    printf 'монорепо, здесь не публикуется. См. также `docs/RELEASES.md`.\n\n'
+    printf '## [%s] — %s\n\n' "$ver" "$("$HEAD" -c 4096 "$TITLE_TMP" | "$SED" -E "s|^FINPILOT v${ver}( — )?||")"
+    # Тело notes_tmp может начинаться со своего "## {дата}" (заготовка по умолчанию в
+    # extract_public_notes) — под секцией версии это второй `##` подряд; понижаем на
+    # уровень, только для CHANGELOG.md, тело релиза (NOTES_TMP сам файл) не трогаем.
+    /bin/cat "$NOTES_TMP" 2>/dev/null | "$SED" -E 's|^## |### |'
+  } > "$dest/CHANGELOG.md"
+
   log "SANITIZE ок (LICENSE=PolyForm, имя/приватный-репо/внутренние ссылки обезличены, версия=${ver})."
 }
 

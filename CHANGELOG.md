@@ -2,6 +2,38 @@
 
 Формат: [Keep a Changelog](https://keepachangelog.com/ru/1.0.0/). Версионирование — [SemVer](https://semver.org/lang/ru/).
 
+## [8.19.4] — 2026-08-13 — Реальный push зеркала: релиз без описания, имя архива (PATCH)
+
+Владелец реально запустил `ONLY=finpilot zsh ~/Downloads/deploy.sh` на архиве из v8.19.3.
+Дерево+тег ушли на GitHub чисто, но **релиз не создался**: общий деплойер ищет `CHANGELOG.md`
+в корне дерева, а мирорное дерево его намеренно не публикует (300+ КБ внутренней кухни
+приватного репо). Владелец также явно решил: репозиторий на GitHub остаётся называться
+`finpilot` (переименование в `finpilot-public-mirror` и обратно проверено вживую в той же
+сессии), а длиннее — только имя архива на диске, `finpilot-public-mirror-vX.Y.Z.zip` —
+понятнее ему, чем `finpilot-mirror-` из предыдущего батча.
+
+### Починено
+- **`sanitize_tree()` теперь пишет `CHANGELOG.md`** в собранное дерево зеркала — из той же
+  секции `tools/publish/public_release_notes.md`, что уже готовила `extract_public_notes()`
+  для тела релиза (один источник текста, не два). Закрывает класс «релиз создаётся, но без
+  описания» на будущее — не только для этой версии.
+- **`docs/archive_naming_standard.md`** — канон архива зеркала: `finpilot-public-mirror-
+  vX.Y.Z.zip` (не `finpilot-mirror-`, использовавшееся несколько часов той же сессии, и не
+  голое `finpilot-`). Заодно почищен `WATCHLOG_personal-finance-dss-vX.Y.Z.md` →
+  `WATCHLOG-personal-finance-dss-vX.Y.Z.md` (дефис, не подчёркивание — тот же канон, что и
+  сам архив).
+- **`docs/public_mirror_state.md` §7** — переписан: раньше предписывал публиковать зеркало
+  прямым `push`/`release` самого санитайзера, хотя реальная практика (по решению владельца) —
+  через общий `deploy.sh` с `ONLY=finpilot`. Живой порядок команд задокументирован.
+- **`~/Downloads/deploy.sh`** (вне этого репозитория): `REPO_MAP` получил
+  `finpilot-public-mirror=finpilot` (старая запись `finpilot-mirror=finpilot` оставлена для
+  совместимости с уже лежащим в Downloads архивом прошлого имени); `MIRRORS` — третий алиас;
+  `find_changelog()` — общий (не только для этого репо) фоллбэк на `RELEASES.md`, когда
+  `CHANGELOG.md` нет вовсе (защита на будущее, независимо от починки CHANGELOG.md выше).
+
+Пересобран `finpilot-public-mirror-v8.19.3.zip` (535 файлов, 5.9 МБ, guard пройден) — ждёт
+повторного `ONLY=finpilot zsh ~/Downloads/deploy.sh` от владельца.
+
 ## [8.19.3] — 2026-08-13 — Первая реальная сборка публичного зеркала: 4 находки (PATCH)
 
 По прямой просьбе владельца собран `finpilot-mirror-v8.19.2.zip` для публичного зеркала
