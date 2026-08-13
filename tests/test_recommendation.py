@@ -25,6 +25,14 @@ class TestRecommendationText:
         for token in ["Rt", "Lt", "U(a)", "форм."]:
             assert token not in text
 
+    def test_money_uses_nbsp_before_ruble_sign_not_plain_space(self):
+        text = build_recommendation_text(
+            rt=5000, lt=0.5, dt=0.1, has_active_goals=False,
+            expense_total=30000, obligation_payments=40000,
+        )
+        assert " ₽" in text
+        assert " ₽" not in text
+
 
 class TestExplainAlternative:
     @staticmethod
@@ -54,6 +62,58 @@ class TestExplainAlternative:
         blob = " ".join(result["gains"] + result["costs"]) + " " + result["insight"]
         for token in ["Rt", "Lt", "U(a)", "Avalanche", "форм."]:
             assert token not in blob
+
+
+class TestExplainAlternativeMoneyFormat:
+    """Деньги в прозе объяснения — тот же канон, что и formatMoney на фронте
+    (skill finpilot-money-format): неразрывный пробел в разрядах разряда,
+    запятая как десятичный, знак рубля после числа через NBSP. Раньше здесь
+    был голый f"{x:,.0f} ₽" (обычная запятая-разделитель, обычный пробел) —
+    в одной панели рядом с легендой (formatMoney) получались два разных
+    формата одного и того же числа (design-critic, проход по v8.14.0)."""
+
+    NBSP = " "
+
+    def test_gains_use_nbsp_before_ruble_sign(self):
+        alt = {
+            "x_obligations": 10_000, "x_reserve": 3000, "x_goals": 2000,
+            "obligation_allocation": [{"name": "кредит", "new_payment": 0, "interest_rate": 0.2}],
+            "Rt_new": 1200, "Lt_new": 0.4, "Dt_new": 0.18,
+        }
+        result = explain_alternative(
+            alt, rt=1000, lt=0.35, dt=0.3,
+            expense_total=40000, obligation_payments=15000,
+            goals_total=100000, risk_profile_label="Сбалансированный",
+        )
+        blob = " ".join(result["gains"] + result["costs"]) + " " + result["insight"]
+        assert f"{self.NBSP}₽" in blob
+        assert " ₽" not in blob  # обычный пробел перед знаком — не канон
+
+    def test_large_sum_uses_nbsp_thousands_separator_not_comma(self):
+        alt = {
+            "x_obligations": 120_000, "x_reserve": 3000, "x_goals": 2000,
+            "Rt_new": 1200, "Lt_new": 0.4, "Dt_new": 0.18,
+        }
+        result = explain_alternative(
+            alt, rt=1000, lt=0.35, dt=0.3,
+            expense_total=40000, obligation_payments=15000,
+            goals_total=100000, risk_profile_label="Сбалансированный",
+        )
+        blob = " ".join(result["gains"])
+        assert f"120{self.NBSP}000" in blob
+        assert "120,000" not in blob
+
+    def test_split_summary_says_early_repayment_in_full_words(self):
+        alt = {
+            "x_obligations": 10_000, "x_reserve": 3000, "x_goals": 2000,
+            "Rt_new": 1200, "Lt_new": 0.4, "Dt_new": 0.18,
+        }
+        result = explain_alternative(
+            alt, rt=1000, lt=0.35, dt=0.3,
+            expense_total=40000, obligation_payments=15000,
+            goals_total=100000, risk_profile_label="Сбалансированный",
+        )
+        assert "досрочку" not in result["insight"]
 
 
 class TestExplainAlternativeDominantCriterion:

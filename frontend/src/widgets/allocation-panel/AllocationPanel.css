@@ -34,33 +34,62 @@
 }
 
 .fp-alloc-explanation {
-  margin-top: var(--sp-4);
-  padding-top: var(--sp-4);
+  /* Ритм разделителя — как у сестринского .fp-whatif (WhatIfSliders.css), не своя
+     линейка --sp-4: два border-top в одной панели звучали по-разному (design-critic). */
+  margin-top: var(--sp-5);
+  margin-bottom: var(--sp-4); /* отрыв от цветной полосы .fp-alloc-bar ниже */
+  padding-top: var(--sp-5);
   border-top: var(--border-w) solid var(--c-border);
   display: flex;
   flex-direction: column;
-  gap: var(--sp-2);
+  gap: var(--sp-3);
+  max-width: 68ch; /* как .fp-lede выше (panel.css) — бриф §1.3, 60–75 знаков в строке */
 }
+.fp-alloc-explanation p,
+.fp-alloc-explanation ul {
+  margin: 0; /* сбрасываем UA-маргины блоков — расстояние даёт только gap контейнера */
+}
+.fp-alloc-explanation h3 {
+  font-size: var(--fs-base);
+  font-weight: 700;
+}
+/* Инсайт — главный вывод блока, ему первичный цвет и кегль тела (TOK-03); списки ниже —
+   вспомогательные детали, вторичный цвет (было наоборот — design-critic). */
 .fp-alloc-explanation__insight {
-  font-size: var(--fs-sm);
-  color: var(--c-text2);
+  font-size: var(--fs-base);
+  color: var(--c-text);
+}
+.fp-alloc-explanation__group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-1);
+}
+.fp-alloc-explanation__group-label {
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  color: var(--c-text3);
 }
 .fp-alloc-explanation__list {
   list-style: none;
+  padding: 0;
   display: flex;
   flex-direction: column;
   gap: var(--sp-1);
   font-size: var(--fs-sm);
+  color: var(--c-text2);
 }
 .fp-alloc-explanation__list li {
   padding-left: var(--sp-4);
   position: relative;
 }
+/* Маркер декоративный (текстовая подпись группы выше — единственный надёжный носитель смысла
+   для скринридера, A11Y-07). Оба списка нейтрального цвета: зелёный здесь конфликтовал бы с
+   --c-green = «Цели» в легенде/столбце этой же панели (design-critic). */
 .fp-alloc-explanation__list--gains li::before {
   content: "+";
   position: absolute;
   left: 0;
-  color: var(--c-green);
+  color: var(--c-text3);
 }
 .fp-alloc-explanation__list--costs li::before {
   content: "\2212"; /* минус */
@@ -69,7 +98,10 @@
   color: var(--c-text3);
 }
 .fp-alloc-explanation__counterfactual {
-  font-size: var(--fs-xs);
+  font-size: var(--fs-sm);
   color: var(--c-text3);
-  font-style: italic;
+}
+.fp-alloc-explanation__placeholder {
+  font-size: var(--fs-sm);
+  color: var(--c-text3);
 }

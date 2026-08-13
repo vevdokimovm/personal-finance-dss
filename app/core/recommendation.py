@@ -9,6 +9,24 @@ from __future__ import annotations
 
 from typing import Any
 
+_NBSP = " "
+
+
+def _ru_thousands(value: float) -> str:
+    """Целое число с неразрывным пробелом между разрядами, без знака валюты —
+    для случаев вида «с X до Y ₽», где ₽ ставится один раз, в конце пары."""
+    return f"{round(value):,}".replace(",", _NBSP)
+
+
+def _ru_money(value: float) -> str:
+    """Сумма в прозе объяснения — тот же канон, что formatMoney на фронте
+    (skill finpilot-money-format): неразрывный пробел между разрядами и перед
+    знаком рубля. Суммы здесь всегда целые рубли (обязательства/резерв/цели
+    считаются в рублях без копеек на этом уровне), дробная часть не нужна —
+    в отличие от formatMoney, копейки прятать не от чего."""
+    return f"{_ru_thousands(value)}{_NBSP}₽"
+
+
 CATEGORY_LABELS = {
     "income_growth": "рост дохода",
     "safety": "безопасность",
@@ -53,7 +71,7 @@ def build_recommendation_text(
             f"Тревожный сигнал: на платежи по кредитам уходит {dt*100:.0f}% дохода — "
             f"это больше безопасной границы в 40%. Стоит снизить нагрузку: "
             f"рефинансировать дорогие кредиты или уменьшить ежемесячный платёж, "
-            f"растянув срок (сейчас на кредиты уходит {obligation_payments:,.0f} ₽ в месяц)."
+            f"растянув срок (сейчас на кредиты уходит {_ru_money(obligation_payments)} в месяц)."
         )
     elif dt > 0.2:
         parts.append(
@@ -66,21 +84,22 @@ def build_recommendation_text(
         parts.append(
             f"Финансовая подушка пока тонкая — её хватит примерно на {autonomy:.1f} мес. "
             f"жизни без дохода. Безопасный минимум — 3 месяца расходов "
-            f"(около {expense_total * 3:,.0f} ₽), поэтому в первую очередь стоит пополнять резерв."
+            f"(около {_ru_money(expense_total * 3)}), поэтому в первую очередь "
+            f"стоит пополнять резерв."
         )
 
     # ── Свободный поток ────────────────────────────────────────────────
     if rt > 0:
         if has_active_goals:
             parts.append(
-                f"После всех обязательных трат у вас остаётся {rt:,.0f} ₽ свободных денег. "
+                f"После всех обязательных трат у вас остаётся {_ru_money(rt)} свободных денег. "
                 f"У вас есть цели для накопления — как поделить эти деньги между досрочным "
                 f"погашением кредитов, подушкой безопасности и целями, система подбирает "
                 f"под ваш подход к риску."
             )
         elif autonomy >= 2.5:
             parts.append(
-                f"После всех обязательных трат у вас остаётся {rt:,.0f} ₽ свободных денег, "
+                f"После всех обязательных трат у вас остаётся {_ru_money(rt)} свободных денег, "
                 f"а подушка уже на комфортном уровне. Можно направить свободные средства "
                 f"на досрочное погашение дорогих кредитов или поставить цель для накопления."
             )
@@ -88,13 +107,13 @@ def build_recommendation_text(
         deficit = abs(rt)
         savings = max(0.0, liquid_savings) + max(0.0, goals_accumulated)
         msg = (
-            f"Бюджет в минусе: обязательные траты превышают доход на {deficit:,.0f} ₽ в месяц. "
+            f"Бюджет в минусе: обязательные траты превышают доход на {_ru_money(deficit)} в месяц. "
         )
         if savings > 0 and deficit > 0:
             runway = int(savings // deficit)
             if runway >= 1:
                 msg += (
-                    f"Покрыть дефицит можно из накоплений — у вас {savings:,.0f} ₽ "
+                    f"Покрыть дефицит можно из накоплений — у вас {_ru_money(savings)} "
                     f"(подушка и ликвидные средства), этого хватит примерно на {runway} мес. "
                     f"Но это временный буфер: за это время нужно сократить расходы, "
                     f"увеличить доход или снизить нагрузку по кредитам, "
@@ -102,7 +121,7 @@ def build_recommendation_text(
                 )
             else:
                 msg += (
-                    f"Накоплений ({savings:,.0f} ₽) не хватит даже на месяц такого дефицита — "
+                    f"Накоплений ({_ru_money(savings)}) не хватит даже на месяц такого дефицита — "
                     f"ситуация требует срочного пересмотра расходов или рефинансирования кредитов."
                 )
         else:
@@ -218,24 +237,24 @@ def explain_alternative(
         dt_new = alt.get("Dt_new", dt) * 100
         drop = abs(delta_dt) * 100
         gains.append(
-            f"Досрочно гасим {x_obl_eff:,.0f} ₽ — в первую очередь {which}, "
+            f"Досрочно гасим {_ru_money(x_obl_eff)} — в первую очередь {which}, "
             f"потому что чем дороже кредит, тем выгоднее его закрывать раньше. "
             f"Доля дохода, уходящая на кредиты, снижается с {dt_now:.0f}% до {dt_new:.0f}%."
             if drop >= 0.5 else
-            f"Досрочно гасим {x_obl_eff:,.0f} ₽ — в первую очередь {which}, "
+            f"Досрочно гасим {_ru_money(x_obl_eff)} — в первую очередь {which}, "
             f"потому что дорогие кредиты выгоднее закрывать раньше."
         )
 
     if x_obl_unused > 0:
         costs.append(
-            f"{x_obl_unused:,.0f} ₽ не пошли на досрочное погашение: оставшиеся кредиты "
+            f"{_ru_money(x_obl_unused)} не пошли на досрочное погашение: оставшиеся кредиты "
             f"дешёвые, и держать эти деньги на накопительном счёте выгоднее, чем гасить их "
             f"раньше срока. Поэтому сумма перенаправлена в ваши цели."
         )
 
     if x_goals_unused > 0:
         costs.append(
-            f"{x_goals_unused:,.0f} ₽ не пошли в цели: они уже профинансированы на нужную "
+            f"{_ru_money(x_goals_unused)} не пошли в цели: они уже профинансированы на нужную "
             f"сумму. Поэтому деньги перенаправлены в подушку безопасности — она всегда "
             f"пригодится на случай потери дохода."
         )
@@ -246,26 +265,26 @@ def explain_alternative(
         cushion_part = float(tranche.get("cushion_part", 0))
         if cushion_part > 0:
             gains.append(
-                f"В подушку безопасности добираем {cushion_part:,.0f} ₽ — "
+                f"В подушку безопасности добираем {_ru_money(cushion_part)} — "
                 f"до целевого запаса на случай потери дохода."
             )
         split = tranche.get("split", {})
         shelf = []
         if float(split.get("deposits", 0)) > 0:
-            shelf.append(f"{split['deposits']:,.0f} ₽ — депозит или накопительный счёт")
+            shelf.append(f"{_ru_money(split['deposits'])} — депозит или накопительный счёт")
         if float(split.get("bonds", 0)) > 0:
-            shelf.append(f"{split['bonds']:,.0f} ₽ — облигации (например, ОФЗ)")
+            shelf.append(f"{_ru_money(split['bonds'])} — облигации (например, ОФЗ)")
         if float(split.get("equity", 0)) > 0:
-            shelf.append(f"{split['equity']:,.0f} ₽ — акции (индексный портфель)")
+            shelf.append(f"{_ru_money(split['equity'])} — акции (индексный портфель)")
         gains.append(
-            f"Подушка уже на целевом уровне, поэтому {tranche['amount']:,.0f} ₽ "
+            f"Подушка уже на целевом уровне, поэтому {_ru_money(tranche['amount'])} "
             f"работают как инвестиции: " + "; ".join(shelf) + ". "
             + str(tranche.get("note", ""))
         )
     elif x_res > 0:
         months_cover = x_res / expense_total if expense_total > 0 else 0
         gains.append(
-            f"В подушку безопасности откладываем {x_res:,.0f} ₽ — это примерно "
+            f"В подушку безопасности откладываем {_ru_money(x_res)} — это примерно "
             f"{months_cover:.1f} мес. ваших расходов в запасе на случай потери дохода."
         )
 
@@ -275,15 +294,15 @@ def explain_alternative(
         total_to_goals = sum(float(v) for v in goal_alloc.values())
         if total_to_goals > 0:
             gains.append(
-                f"На ваши цели направляем {total_to_goals:,.0f} ₽ — деньги поделены между "
+                f"На ваши цели направляем {_ru_money(total_to_goals)} — деньги поделены между "
                 f"целями по их важности и тому, насколько близок срок."
             )
 
     # ── Изменение свободных денег ─────────────────────────────────────
     if delta_rt > 0:
         gains.append(
-            f"Свободных денег со временем станет больше: с {rt:,.0f} до "
-            f"{alt.get('Rt_new', rt):,.0f} ₽ в месяц — потому что платежи по кредитам "
+            f"Свободных денег со временем станет больше: с {_ru_thousands(rt)} до "
+            f"{_ru_money(alt.get('Rt_new', rt))} в месяц — потому что платежи по кредитам "
             f"уменьшатся."
         )
 
@@ -298,11 +317,13 @@ def explain_alternative(
 
     split_parts: list[str] = []
     if x_obl_eff > 0:
-        split_parts.append(f"{_pct(x_obl_eff)}% на досрочку кредитов ({x_obl_eff:,.0f} ₽)")
+        split_parts.append(
+            f"{_pct(x_obl_eff)}% на досрочное погашение кредитов ({_ru_money(x_obl_eff)})"
+        )
     if x_res > 0:
-        split_parts.append(f"{_pct(x_res)}% в подушку безопасности ({x_res:,.0f} ₽)")
+        split_parts.append(f"{_pct(x_res)}% в подушку безопасности ({_ru_money(x_res)})")
     if goals_sum > 0:
-        split_parts.append(f"{_pct(goals_sum)}% на цели ({goals_sum:,.0f} ₽)")
+        split_parts.append(f"{_pct(goals_sum)}% на цели ({_ru_money(goals_sum)})")
     split_str = ", ".join(
         split_parts) if split_parts else "вся сумма остаётся свободной на следующий месяц"
 

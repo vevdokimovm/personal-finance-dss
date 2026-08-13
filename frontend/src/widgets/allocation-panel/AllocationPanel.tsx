@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Layer, ResponsiveContainer, Sankey, Tooltip } from "recharts";
 import type { SankeyLinkProps, SankeyNode, SankeyNodeProps } from "recharts";
 import { formatMoney, formatNumber } from "@shared/lib/money/formatMoney";
@@ -23,6 +23,17 @@ type ColoredSankeyNode = SankeyNode & { color?: string };
 // это метрика текста, а не отступ со шкалы --sp-*; синхронизировано с --chart-sankey-min-width
 // в tokens.css (тот же множитель заложен и там).
 const SANKEY_LABEL_MARGIN = 130;
+
+// Тот же паттерн, что WhatIfSliders.tsx (LIVE_ANNOUNCE_DEBOUNCE_MS): при перетаскивании
+// ползунка isRecommended меняется на каждой отметке, живая область не должна объявлять
+// каждую — задержка только в озвучке, видимый блок ниже обновляется мгновенно.
+const EXPLANATION_ANNOUNCE_DEBOUNCE_MS = 400;
+
+function describeExplanationState(isRecommended: boolean): string {
+  return isRecommended
+    ? t("Показано объяснение рекомендации.")
+    : t("Гипотетический вариант — объяснение есть только у рекомендации.");
+}
 
 /** Узел рисуется сам — дефолтный рендер recharts красит узлы магическим `#0088fe`
  * (запрещено правилом «только токены») и не подписывает их вовсе. */
@@ -101,6 +112,24 @@ export function AllocationPanel({
   const recommendedNotches = best ? notchesOf(best, total) : { debt: 0, goals: 0 };
   const [debtNotch, setDebtNotch] = useState(recommendedNotches.debt);
   const [goalsNotch, setGoalsNotch] = useState(recommendedNotches.goals);
+  const isRecommended =
+    debtNotch === recommendedNotches.debt && goalsNotch === recommendedNotches.goals;
+
+  // Блок объяснения больше не размонтируется при отходе от рекомендации (см. JSX ниже) — иначе
+  // ползунки, стоящие под ним, прыгали на 150–250 px под курсором при каждом движении
+  // (design-critic). Живая область объявляет смену состояния отдельно от видимого текста —
+  // тот же паттерн debounce, что WhatIfSliders. Хуки должны стоять до early return ниже
+  // (`if (!best)`) — иначе react-hooks/rules-of-hooks: порядок хуков не может зависеть от best.
+  const [explanationAnnounced, setExplanationAnnounced] = useState(() =>
+    describeExplanationState(isRecommended),
+  );
+  useEffect(() => {
+    const timer = setTimeout(
+      () => setExplanationAnnounced(describeExplanationState(isRecommended)),
+      EXPLANATION_ANNOUNCE_DEBOUNCE_MS,
+    );
+    return () => clearTimeout(timer);
+  }, [isRecommended]);
 
   if (!best) {
     return (
@@ -136,8 +165,6 @@ export function AllocationPanel({
   }
 
   const reserveNotch = GRID_NOTCHES - debtNotch - goalsNotch;
-  const isRecommended =
-    debtNotch === recommendedNotches.debt && goalsNotch === recommendedNotches.goals;
   const activeAlt = findMatchingAlternative(alternatives, total, debtNotch, goalsNotch);
 
   const debtAmount = (total * debtNotch) / GRID_NOTCHES;
@@ -164,31 +191,64 @@ export function AllocationPanel({
           : t("Гипотетический вариант — не рекомендация СППР.")}
       </p>
 
-      {/* Объяснение — только у best (explain_alternative вызывается лишь для top3,
-       * app/services/planning.py); произвольная позиция ползунков «что если» его не
-       * несёт, поэтому показываем только пока пользователь не отошёл от рекомендации. */}
-      {isRecommended && best.explanation && (
+      {/* explanation есть только у best (explain_alternative вызывается лишь для top3,
+       * app/services/planning.py) — произвольная позиция ползунков «что если» его не
+       * несёт. Блок при этом ОСТАЁТСЯ смонтированным (не исчезает целиком): под ним стоят
+       * ползунки WhatIfSliders, и полное схлопывание блока на каждое движение ползунка
+       * прыгало бы версткой прямо под курсором/пальцем (design-critic). Вместо этого
+       * контент внутри переключается на короткую заглушку. */}
+      {best.explanation && (
         <div className="fp-alloc-explanation">
-          <p className="fp-alloc-explanation__insight">{best.explanation.insight}</p>
-          {best.explanation.gains.length > 0 && (
-            <ul className="fp-alloc-explanation__list fp-alloc-explanation__list--gains">
-              {best.explanation.gains.map((g, i) => (
-                <li key={i}>{g}</li>
-              ))}
-            </ul>
-          )}
-          {best.explanation.costs.length > 0 && (
-            <ul className="fp-alloc-explanation__list fp-alloc-explanation__list--costs">
-              {best.explanation.costs.map((c, i) => (
-                <li key={i}>{c}</li>
-              ))}
-            </ul>
-          )}
-          {best.explanation.counterfactual?.available && best.explanation.counterfactual.text && (
-            <p className="fp-alloc-explanation__counterfactual">
-              {best.explanation.counterfactual.text}
+          <h3>{t("Почему выбран такой план")}</h3>
+          {isRecommended ? (
+            <>
+              <p className="fp-alloc-explanation__insight">{best.explanation.insight}</p>
+              {best.explanation.gains.length > 0 && (
+                <div className="fp-alloc-explanation__group">
+                  <p className="fp-alloc-explanation__group-label">{t("Что улучшается")}</p>
+                  <ul
+                    role="list"
+                    className="fp-alloc-explanation__list fp-alloc-explanation__list--gains"
+                  >
+                    {best.explanation.gains.map((g, i) => (
+                      <li key={i}>{g}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+              {best.explanation.costs.length > 0 && (
+                <div className="fp-alloc-explanation__group">
+                  <p className="fp-alloc-explanation__group-label">
+                    {t("Чем приходится жертвовать")}
+                  </p>
+                  <ul
+                    role="list"
+                    className="fp-alloc-explanation__list fp-alloc-explanation__list--costs"
+                  >
+                    {best.explanation.costs.map((c, i) => (
+                      <li key={i}>{c}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+              {best.explanation.counterfactual?.available &&
+                best.explanation.counterfactual.text && (
+                  <p className="fp-alloc-explanation__counterfactual">
+                    {best.explanation.counterfactual.text}
+                  </p>
+                )}
+            </>
+          ) : (
+            <p className="fp-alloc-explanation__placeholder">
+              {t("Это гипотетический вариант — объяснение есть только у рекомендации.")}
             </p>
           )}
+          {/* Живая область объявляет смену состояния коротко, не весь блок целиком — иначе
+           * возврат к рекомендации диктовал бы диктору весь insight+gains+costs заново на
+           * каждое движение ползунка (тот же принцип, что WhatIfSliders.tsx). */}
+          <p className="sr-only" role="status" aria-live="polite">
+            {explanationAnnounced}
+          </p>
         </div>
       )}
       <div className="fp-alloc-bar" role="presentation">

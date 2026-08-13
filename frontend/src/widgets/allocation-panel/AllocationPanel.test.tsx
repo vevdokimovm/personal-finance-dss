@@ -117,10 +117,21 @@ describe("AllocationPanel — объяснение выбранного план
     expect(screen.getByText(/Следующий по оценке вариант отстаёт/)).toBeInTheDocument();
   });
 
-  it("после отклонения от рекомендации ползунком объяснение скрывается — оно только у best", () => {
+  it("после отклонения от рекомендации ползунком insight/gains/costs заменяются заглушкой, блок не исчезает", () => {
     render(<AllocationPanel best={BEST_WITH_EXPLANATION} alternatives={FULL_GRID} />);
     fireEvent.change(screen.getByLabelText("Досрочное погашение"), { target: { value: "4" } });
     expect(screen.queryByText(/Решающим оказалось то,/)).not.toBeInTheDocument();
+    expect(
+      screen.getByText("Это гипотетический вариант — объяснение есть только у рекомендации."),
+    ).toBeInTheDocument();
+    // Заголовок и контейнер остаются смонтированными — не прыгает верстка под ползунком ниже.
+    expect(screen.getByText("Почему выбран такой план")).toBeInTheDocument();
+  });
+
+  it("списки gains/costs имеют видимые текстовые подписи, не только цвет/значок", () => {
+    render(<AllocationPanel best={BEST_WITH_EXPLANATION} alternatives={FULL_GRID} />);
+    expect(screen.getByText("Что улучшается")).toBeInTheDocument();
+    expect(screen.getByText("Чем приходится жертвовать")).toBeInTheDocument();
   });
 
   it("без explanation (старый кэш/ответ) — панель рендерится без объяснения, без падений", () => {
