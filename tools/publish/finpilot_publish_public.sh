@@ -47,7 +47,7 @@ set -euo pipefail
 
 # ── КОНФИГ (проверь пути под свою машину) ────────────────────────────────────
 # Приватное монорепо (источник):
-SOURCE_REPO="${FINPILOT_SRC:-$HOME/PycharmProjects/personal-finance-dss}"
+SOURCE_REPO="${FINPILOT_SRC:-$HOME/Documents/finpilot}"
 # Рабочая папка публичного зеркала (git-клон finpilot):
 STAGING_DIR="${FINPILOT_STAGE:-$HOME/dev/finpilot-public}"
 # Remote публичной репы. Практика проекта — HTTPS + токен (см.
@@ -207,6 +207,26 @@ RSYNC_EXCLUDES=(
   --exclude '*.sqlite3'
   --exclude '.DS_Store'
   --exclude 'finpilot_publish_public.sh'   # сам публикатор не публикуется
+  # [!] 2026-08-13 (v8.19.2). Найдено запуском check: frontend/ разрешён целиком
+  # (ALLOW_DIRS), а до этой строки исключались только Python-кэши — JS-артефакты
+  # не были исключены НИ РАЗУ. node_modules/ (268 МБ на момент находки) уехал бы в
+  # публичное зеркало целиком, а GUARD 2/3 падал с "argument list too long" ещё до
+  # того, как это стало бы видно (совпадение секрет-паттерна AKIA... внутри
+  # node_modules/prettier — ложное срабатывание на исходнике парсера Flow, не
+  # секрет; см. run_guard ниже — сам вывод тоже почищен от того же класса краша).
+  # Список — 1:1 с frontend/.gitignore §«Зависимости/сборка»+«Тесты»+TanStack.
+  --exclude 'node_modules'
+  --exclude 'dist'
+  --exclude 'dist-ssr'
+  --exclude '.typecheck-tmp'
+  --exclude 'coverage'
+  --exclude 'playwright-report'
+  --exclude 'test-results'
+  --exclude 'blob-report'
+  --exclude '.tanstack'
+  --exclude '*.tsbuildinfo'
+  --exclude '*.local'
+  --exclude '.eslintcache'
   # [!] v8.1.0. Урок сборки v8.0.0: allow-list по КАТАЛОГУ пропускает всё, что в этот
   # каталог положат позже. deploy/ разрешён целиком — и вместе с ним чуть не уехал
   # универсальный деплойер с картой ВСЕХ репозиториев владельца. Ниже — точечные
@@ -359,10 +379,16 @@ run_guard() {
   local dir="$1"
   local failed=0
 
+  # [!] 2026-08-13 (v8.19.2): mode_build/mode_push сканируют $STAGING_DIR — это
+  # git-клон, а не голая папка mode_check'а. Без исключения .git/ гвард ловит
+  # СВОИ ЖЕ служебные метаданные (reflog в .git/logs/* хранит имя git-committer'а
+  # машины — "Vasilii Evdokimov" — при каждом clone/commit) и падает на дереве,
+  # где реальной утечки нет: .git/ никогда не публикуется как содержимое, это
+  # служебные данные самого клона. Исключаем во всех трёх guard'ах.
   log "GUARD 1/3: проверка запрещённых имён..."
   local pat hit
   for pat in "${DENY_NAME_PATTERNS[@]}"; do
-    hit="$("$FIND" "$dir" -type f -name "$pat" 2>/dev/null || true)"
+    hit="$("$FIND" "$dir" -type f -name "$pat" -not -path '*/.git/*' 2>/dev/null || true)"
     if [ -n "$hit" ]; then
       warn "ЗАПРЕЩЁННЫЙ ФАЙЛ просочился ($pat):"
       /bin/echo "$hit" >&2
@@ -371,20 +397,24 @@ run_guard() {
   done
 
   log "GUARD 2/3: скан на секреты..."
+  # Было hit="$(grep ...)" + echo "$hit" — при большом объёме совпадений (найдено
+  # на node_modules ДО того, как его стали исключать выше) echo падал с
+  # "argument list too long", и это выглядело как провал guard'а без диагностики.
+  # grep пишет прямо в pipe, переменная-накопитель не нужна; печатаем ИМЕНА
+  # файлов (-l), не сами строки — секрет, если он настоящий, незачем ещё раз
+  # копировать в терминал/лог.
   for pat in "${SECRET_PATTERNS[@]}"; do
-    hit="$("$GREP" -rIE "$pat" "$dir" 2>/dev/null || true)"
-    if [ -n "$hit" ]; then
-      warn "СЕКРЕТ-ПАТТЕРН найден (/$pat/):"
-      /bin/echo "$hit" | "$HEAD" -20 >&2
+    if "$GREP" -rIlE --exclude-dir=.git "$pat" "$dir" 2>/dev/null | "$HEAD" -1 | "$GREP" -q .; then
+      warn "СЕКРЕТ-ПАТТЕРН найден (/$pat/) в файлах:"
+      "$GREP" -rIlE --exclude-dir=.git "$pat" "$dir" 2>/dev/null | "$HEAD" -20 >&2
       failed=1
     fi
   done
 
   log "GUARD 3/3: скан на личные имена и приватный репо (правило безымянности)..."
-  hit="$("$GREP" -rIE "$NAME_RE" "$dir" 2>/dev/null || true)"
-  if [ -n "$hit" ]; then
-    warn "ЛИЧНОЕ ИМЯ / ПРИВАТНЫЙ РЕПО в дереве — санитайзер пропустил, добавь правило:"
-    /bin/echo "$hit" | "$HEAD" -20 >&2
+  if "$GREP" -rIlE --exclude-dir=.git "$NAME_RE" "$dir" 2>/dev/null | "$HEAD" -1 | "$GREP" -q .; then
+    warn "ЛИЧНОЕ ИМЯ / ПРИВАТНЫЙ РЕПО в дереве — санитайзер пропустил, файлы:"
+    "$GREP" -rIlE --exclude-dir=.git "$NAME_RE" "$dir" 2>/dev/null | "$HEAD" -20 >&2
     failed=1
   fi
 

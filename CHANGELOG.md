@@ -2,6 +2,49 @@
 
 Формат: [Keep a Changelog](https://keepachangelog.com/ru/1.0.0/). Версионирование — [SemVer](https://semver.org/lang/ru/).
 
+## [8.19.3] — 2026-08-13 — Первая реальная сборка публичного зеркала: 4 находки (PATCH)
+
+По прямой просьбе владельца собран `finpilot-mirror-v8.19.2.zip` для публичного зеркала
+(`tools/publish/finpilot_publish_public.sh check`/`build`) — первый реальный прогон с тех пор,
+как в allow-list вехи 8 попал React-фронтенд. Прогон нашёл и починил четыре проблемы
+санитайзера/guard'а (детали и разбор урока — `docs/public_mirror_state.md` §5а):
+
+### Починено
+- **`frontend/node_modules/` (268 МБ) уехал бы в зеркало целиком** — `RSYNC_EXCLUDES`
+  исключал только Python-кэши, ни одного JS-паттерна. Добавлены исключения 1:1 с
+  `frontend/.gitignore` (`node_modules`, `dist`, `playwright-report`, `test-results`,
+  `.tanstack` и т.д.).
+- **GUARD 2/3 падал с `argument list too long`** вместо диагностики — `hit="$(grep …)"` +
+  `echo "$hit"` не пережили объём совпадений на node_modules (ложное срабатывание секрет-
+  паттерна AKIA внутри исходника `prettier`, не секрет). Переписан на прямой pipe, печатает
+  имена файлов, не содержимое.
+- **`run_guard()` на `build`/`push` ловил собственный `.git/`** — reflog git-клона `$STAGING_
+  DIR` несёт имя git-committer'а машины, guard падал бы на КАЖДОЙ реальной сборке. Все три
+  guard'а получили `--exclude-dir=.git`.
+- **Реальное имя владельца в синтетических тестовых фикстурах** — `tests/test_crisis.py`
+  (`TestVasiliiCreditCardCase` → `TestHighInterestCreditCardCase`),
+  `tests/test_statement_parser_real_formats.py` (3 места), `tests/test_pdf_parsers.py`
+  (2 места), `tests/test_consents.py` (1 место, не утечка — `example.com`, заменено для
+  чистоты). Найдено ручным сквозным грепом по allow-list дереву, не только тем, что guard
+  показал за один прогон — по прямому требованию владельца дойти до конца, не
+  ограничиваться автоматическим гейтом.
+
+### Также
+- `docs/archive_naming_standard.md` — канон архива публичного зеркала исправлен на
+  `finpilot-mirror-vX.Y.Z.zip` (не голое `finpilot-`, которое без `.repo-id` в дереве
+  зеркала REPO_MAP общего `deploy.sh` увёл бы в ПРИВАТНЫЙ репозиторий); там же починена
+  повторно пойманная (см. `docs/pitfalls.md` PIT-014) ложь «санитайзер не реализован».
+- `~/Downloads/deploy.sh` (вне этого репозитория, отдельный личный тулинг владельца):
+  `SOURCE_REPO` по умолчанию указывал на несуществующий `~/PycharmProjects/personal-
+  finance-dss` — исправлено на `~/Documents/finpilot`; добавлена запись `REPO_MAP`
+  `finpilot-mirror=finpilot`, без которой архив с новым именем ушёл бы не в ту репу
+  (или завёл бы пустую репу-сироту `finpilot-mirror`).
+- `docs/public_mirror_state.md` — §1/§4 обновлены под факт (готовый к публикации архив
+  v8.19.2, а не непроверяемая запись про v8.0.0), добавлен §5а с разбором находок.
+
+Тесты: `pytest -q` полный набор зелёный (изменены только 4 файла тестов, значения имён
+нигде не проверялись в assert'ах). `flake8`/`mypy`/`preflight` чисты.
+
 ## [8.19.2] — 2026-08-13 — Decimal в графике погашения долга, узкий периметр (PATCH)
 
 Закрытие `docs/model/model_completion_plan.md` §2.5 (Decimal в денежном ядре) — по прямому

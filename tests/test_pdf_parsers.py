@@ -75,7 +75,7 @@ class TestSberText:
     def test_expense_no_sign(self):
         lines = [
             "02.07.2025 13:28 Перевод с карты 550,00 0,00",
-            "02.07.2025 924257 Перевод для Е. Василий Максимович. Операция по счету",
+            "02.07.2025 924257 Перевод для П. Игорь Николаевич. Операция по счету",
         ]
         txns = _sber_text_to_transactions(lines)
         assert len(txns) == 1
@@ -86,7 +86,7 @@ class TestSberText:
     def test_income_plus_sign(self):
         lines = [
             "02.07.2025 13:26 Перевод СБП +550,00 550,00",
-            "02.07.2025 444669 Перевод от Е. Василий Максимович. Операция по счету",
+            "02.07.2025 444669 Перевод от П. Игорь Николаевич. Операция по счету",
         ]
         txns = _sber_text_to_transactions(lines)
         assert txns[0]["type"] == "income"

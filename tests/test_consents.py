@@ -212,7 +212,7 @@ class TestDeletionAndLogs:
         assert rows == []
 
     def test_scrub_masks_email(self):
-        assert "vasilii@example.com" not in scrub("письмо vasilii@example.com ушло")
+        assert "ivan@example.com" not in scrub("письмо ivan@example.com ушло")
 
     def test_scrub_masks_amounts(self):
         assert "147500.55" not in scrub("списано 147500.55 ₽")

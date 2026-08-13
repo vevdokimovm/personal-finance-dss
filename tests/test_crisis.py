@@ -156,7 +156,7 @@ class TestRestructuring:
         assert rest["interest_rate"] == 0.32
 
 
-class TestVasiliiCreditCardCase:
+class TestHighInterestCreditCardCase:
     """Живой кейс из ROADMAP §6.3: кредитка Т-Банк, долг 100к+, минималка ~6к,
     доход 20к стабильно (+ до 25к донорство ситуативно)."""
 
