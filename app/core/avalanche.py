@@ -17,6 +17,22 @@ from __future__ import annotations
 from typing import Any
 
 
+def select_avalanche_targets(
+    obligations: list[dict[str, Any]],
+    r_bench: float,
+) -> list[dict[str, Any]]:
+    """Обязательства с rl >= r_bench, по убыванию ставки (форм. 41, шаги 1-2).
+
+    Общая логика таргетинга — переиспользуется помесячным графиком погашения
+    (ADR-016, app/core/amortization.py), чтобы не дублировать фильтр+сортировку.
+    """
+    return sorted(
+        [o for o in obligations if float(o.get("interest_rate", 0)) >= r_bench],
+        key=lambda o: float(o.get("interest_rate", 0)),
+        reverse=True,
+    )
+
+
 def allocate_obligations_avalanche(
     x_obl: float,
     obligations: list[dict[str, Any]],
@@ -34,11 +50,7 @@ def allocate_obligations_avalanche(
     if x_obl <= 0 or not obligations:
         return 0.0, [dict(o) for o in obligations], x_obl
 
-    targets = sorted(
-        [o for o in obligations if float(o.get("interest_rate", 0)) >= r_bench],
-        key=lambda o: float(o.get("interest_rate", 0)),
-        reverse=True,
-    )
+    targets = select_avalanche_targets(obligations, r_bench)
 
     if not targets:
         # Все долги ниже бенчмарка — досрочка невыгодна (NPV-правило)

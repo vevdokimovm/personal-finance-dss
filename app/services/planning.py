@@ -13,11 +13,13 @@
 """
 from __future__ import annotations
 
+from dataclasses import asdict
 from datetime import datetime
 from typing import Any
 
 from app.core.money import FLOW_EPS, money
 from app.core.alternatives import evaluate_alternative, generate_alternatives
+from app.core.amortization import build_debt_amortization_schedule
 from app.core.crisis import build_crisis_plan
 from app.core.filtering import B_MIN, DT_MAX, L_MIN, filter_alternatives
 from app.core.goals_priority import preallocate_from_bliq
@@ -210,6 +212,24 @@ def run_planning(
 
     best = top3[0] if top3 else None
 
+    # ADR-016 (канон v3.8.0): график погашения ПОБЕДИВШЕЙ альтернативы. Строго
+    # ПОСЛЕ ranking/crisis — чистый read-only downstream-потребитель уже
+    # принятого решения; красная линия «не влияет на Rt/Dt/crisis_plan»
+    # выполняется по конструкции (amortization.py не импортируется
+    # ranking.py/crisis.py). Считается ОДИН раз для best, не на все
+    # альтернативы сетки d/r/g (контроль стоимости).
+    debt_schedule = None
+    if best is not None:
+        debt_schedule = build_debt_amortization_schedule(
+            # ИСХОДНЫЕ obligations, не best["obligation_allocation"] — тот уже
+            # отражает ОДНОРАЗОВОЕ применение x_obl_effective; на исходных
+            # балансах x_obl_effective разворачивается как РЕГУЛЯРНЫЙ
+            # ежемесячный платёж — в этом и смысл полного графика.
+            obligations=obligations,
+            x_obl_monthly=float(best.get("x_obl_effective", 0.0)),
+            r_bench=r_bench,
+        )
+
     return {
         "indicators": {
             "It": money(income_total),
@@ -234,6 +254,11 @@ def run_planning(
                 round(cv, 4) if (cv := income_cv(income_history)) is not None
                 else None
             ),
+            # ADR-016 (канон v3.8.0): диагностика графика погашения победившей
+            # альтернативы — None, если досрочки нет/некуда её девать. Только
+            # для объяснения пользователю, не участвует в допустимости/
+            # ранжировании.
+            "debt_schedule": asdict(debt_schedule) if debt_schedule else None,
         },
         "bliq_preallocation": {
             "closed_goals": [

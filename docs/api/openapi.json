@@ -977,6 +977,60 @@
         "title": "DebtDTO",
         "type": "object"
       },
+      "DebtSchedule": {
+        "description": "Помесячный график погашения долга — baseline vs накопительная лавина\n(ADR-016, канон v3.8.0, §10.5). Диагностика победившей альтернативы, не\nвлияет на допустимость/ранжирование/кризисный режим.",
+        "properties": {
+          "accelerated_months": {
+            "title": "Accelerated Months",
+            "type": "integer"
+          },
+          "accelerated_total_interest": {
+            "title": "Accelerated Total Interest",
+            "type": "number"
+          },
+          "baseline_months": {
+            "title": "Baseline Months",
+            "type": "integer"
+          },
+          "baseline_total_interest": {
+            "title": "Baseline Total Interest",
+            "type": "number"
+          },
+          "horizon_capped": {
+            "title": "Horizon Capped",
+            "type": "boolean"
+          },
+          "interest_saved": {
+            "title": "Interest Saved",
+            "type": "number"
+          },
+          "months_saved": {
+            "title": "Months Saved",
+            "type": "integer"
+          },
+          "negative_amortization": {
+            "title": "Negative Amortization",
+            "type": "boolean"
+          },
+          "qualifying_debt_count": {
+            "title": "Qualifying Debt Count",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "baseline_months",
+          "accelerated_months",
+          "baseline_total_interest",
+          "accelerated_total_interest",
+          "interest_saved",
+          "months_saved",
+          "horizon_capped",
+          "negative_amortization",
+          "qualifying_debt_count"
+        ],
+        "title": "DebtSchedule",
+        "type": "object"
+      },
       "ExchangeRequest": {
         "properties": {
           "item_id": {
@@ -2897,6 +2951,16 @@
             ],
             "title": "Sigmap"
           },
+          "debt_schedule": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/DebtSchedule"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "income_cv": {
             "anyOf": [
               {
@@ -3945,7 +4009,7 @@
   },
   "info": {
     "title": "FINPILOT",
-    "version": "8.14.2"
+    "version": "8.15.1"
   },
   "openapi": "3.1.0",
   "paths": {

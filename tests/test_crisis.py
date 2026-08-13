@@ -233,6 +233,25 @@ class TestPlanningIntegration:
         assert plan is not None and plan["actions"]
         assert result["indicators"]["Rt"] < 0
 
+    def test_crisis_plan_unaffected_by_debt_schedule_adr_016(self):
+        """Красная линия ADR-016: график погашения (даже с большой
+        потенциальной экономией на процентах) НЕ влияет на Rt/Dt/crisis_plan —
+        считается строго ПОСЛЕ ранжирования, чисто диагностически. Долг с
+        высокой ставкой даёт заметную экономию при досрочке — если бы график
+        как-то протекал в решение, это был бы незавалидированный пятый
+        критерий SAW."""
+        obligations = [
+            {"id": 1, "amount": 500_000, "interest_rate": 0.35, "monthly_payment": 20_000},
+        ]
+        result = run_planning(
+            income_total=30_000.0, expense_total=45_000.0,
+            obligations=obligations, goals=[], bliq=90_000.0,
+            r_bench=0.14, risk_tolerance=2, today=TODAY,
+        )
+        plan = result["crisis_plan"]
+        assert plan is not None and plan["actions"]
+        assert result["indicators"]["Rt"] < 0
+
     def test_bliq_preallocation_suppressed_in_deficit(self):
         # в дефиците цели заморожены — этап 4.0 не тратит подушку на близкие цели
         result = run_planning(

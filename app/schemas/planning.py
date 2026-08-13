@@ -22,6 +22,22 @@ from pydantic import BaseModel, Field, field_validator
 from app.schemas.recommendation import BLRStatus
 
 
+class DebtSchedule(BaseModel):
+    """Помесячный график погашения долга — baseline vs накопительная лавина
+    (ADR-016, канон v3.8.0, §10.5). Диагностика победившей альтернативы, не
+    влияет на допустимость/ранжирование/кризисный режим."""
+
+    baseline_months: int
+    accelerated_months: int
+    baseline_total_interest: float
+    accelerated_total_interest: float
+    interest_saved: float
+    months_saved: int
+    horizon_capped: bool
+    negative_amortization: bool
+    qualifying_debt_count: int
+
+
 class PlanningIndicators(BaseModel):
     It: Optional[float] = None
     Et: Optional[float] = None
@@ -38,6 +54,10 @@ class PlanningIndicators(BaseModel):
     # ADR-015 (канон v3.7.0): диагностика волатильности дохода — None, если
     # истории недостаточно. Влияет только на floor резерва, не на Rt/Dt.
     income_cv: Optional[float] = None
+    # ADR-016 (канон v3.8.0): диагностика графика погашения победившей
+    # альтернативы — None, если досрочки нет/некуда её девать. Только для
+    # объяснения пользователю, не участвует в допустимости/ранжировании.
+    debt_schedule: Optional[DebtSchedule] = None
 
 
 class ClosedGoal(BaseModel):

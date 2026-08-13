@@ -29,6 +29,7 @@ from hypothesis import HealthCheck, given, settings
 from hypothesis import strategies as st
 
 from app.core.alternatives import evaluate_alternative, generate_alternatives
+from app.core.amortization import build_debt_amortization_schedule
 from app.core.avalanche import allocate_obligations_avalanche
 from app.core.filtering import B_MIN, DT_MAX, filter_alternatives
 from app.core.metrics import (
@@ -306,6 +307,27 @@ class TestAlternativeEvaluation:
             old = old_by_id[o["id"]]
             assert float(o["monthly_payment"]) <= float(old["monthly_payment"]) + 1e-6
             assert float(o["amount"]) <= float(old["amount"]) + 1e-6
+
+
+class TestAmortizationInvariants:
+    """ADR-016 (канон v3.8.0, §10.5): помесячный график погашения — накопительная
+    лавина никогда не может обойтись ДОРОЖЕ baseline на широком случайном
+    пространстве обязательств (не только ручных сценариях test_amortization.py)."""
+
+    @core_settings
+    @given(
+        x_obl=nonneg_money,
+        obligations=obligations_list(),
+        r_bench=rate,
+    )
+    def test_accelerated_never_worse_than_baseline(
+        self, x_obl: float, obligations: list[dict], r_bench: float
+    ):
+        summary = build_debt_amortization_schedule(obligations, x_obl, r_bench)
+        if summary is None:
+            return
+        assert summary.accelerated_total_interest <= summary.baseline_total_interest + 1e-6
+        assert summary.accelerated_months <= summary.baseline_months
 
 
 # ── §6: допустимость (жёсткие инварианты безопасности) ───────────────────────
