@@ -38,7 +38,7 @@ FROZEN_HINTS = (
     "CHANGELOG.md", "/RELEASES.md", "/roadmap_archive/",
     "/reports/merges/", "/reports/releases/", "/reports/incidents/",
     "/reports/investigations/", "/reports/audits/", "/reports/testing/",
-    "/science/",
+    "/reports/decisions/", "/science/",
 )
 
 REF_PATTERN = re.compile(
@@ -83,6 +83,14 @@ LINK_ALLOWLIST = {
     ("docs/reports/adr/adr_006_reserve_floor_calibration.md", "docs/math_model_v3_5_0.md"):
         "историческая ссылка на канон-файл на момент ADR — переименован в docs/math_model.md "
         "в v8.9.4, ADR не переписывается задним числом.",
+    ("docs/design_tokens_audit.md", "frontend/templates/profile.html"):
+        "снимок на 2026-08-07/v8.3.2 (до React) — profile.html снесён частичным сносом Jinja "
+        "v8.23.0 (docs/reports/decisions/2026-08-14_jinja_frontend_removal.md), аудит "
+        "точечных строк не переписывается задним числом. Лежит прямо в docs/, не подпадает "
+        "под FROZEN_HINTS — тот же случай, что ui_visual_direction.md выше. dashboard.html/"
+        "planning.html/transactions.html из того же снимка НЕ в этом списке — они после "
+        "исправления в том же разборе остались на Jinja (React-версии read-only, снос убрал бы "
+        "CRUD), ссылки на них живые.",
 }
 
 # Паттерны устаревшей мат-модели v2.x (не должны заявляться как текущий факт).

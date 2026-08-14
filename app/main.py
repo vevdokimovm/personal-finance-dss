@@ -178,11 +178,6 @@ async def read_validation(ctx: dict = Depends(page_context)):
     return templates.TemplateResponse(request=ctx["request"], name="validation.html", context=ctx)
 
 
-@app.get("/profile", response_class=HTMLResponse, summary="Личный профиль и настройки")
-async def read_profile(ctx: dict = Depends(page_context)) -> HTMLResponse:
-    return templates.TemplateResponse(request=ctx["request"], name="profile.html", context=ctx)
-
-
 # ── Юридический блок (P1.1): публичные документы и контакты ────────────
 @app.get("/legal/privacy", response_class=HTMLResponse, summary="Политика обработки ПДн (152-ФЗ)")
 async def read_legal_privacy(ctx: dict = Depends(page_context)) -> HTMLResponse:
@@ -236,19 +231,3 @@ async def read_legal_financial_consent(ctx: dict = Depends(page_context)) -> HTM
 @app.get("/contacts", response_class=HTMLResponse, summary="Контакты и реквизиты оператора")
 async def read_contacts(ctx: dict = Depends(page_context)) -> HTMLResponse:
     return templates.TemplateResponse(request=ctx["request"], name="contacts.html", context=ctx)
-
-
-@app.get("/reset-password", response_class=HTMLResponse, summary="Страница установки нового пароля")
-async def read_reset_password(
-    token: str = "", ctx: dict = Depends(page_context)
-) -> HTMLResponse:
-    return templates.TemplateResponse(
-        request=ctx["request"], name="reset_password.html", context={**ctx, "reset_token": token}
-    )
-
-
-@app.get("/forgot-password", response_class=HTMLResponse, summary="Страница запроса сброса пароля")
-async def read_forgot_password(ctx: dict = Depends(page_context)) -> HTMLResponse:
-    return templates.TemplateResponse(
-        request=ctx["request"], name="forgot_password.html", context=ctx
-    )

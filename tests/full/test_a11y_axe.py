@@ -46,9 +46,8 @@ _AXE_PATH = os.path.join(os.path.dirname(__file__), "vendor", "axe.min.js")
 # страницы нет by design (вход через модалку), /legal — только /legal/{privacy,terms,consent}.
 PAGES = [
     "/", "/dashboard", "/planning", "/transactions", "/obligations", "/goals",
-    "/banks", "/validation", "/profile", "/contacts",
+    "/banks", "/validation", "/contacts",
     "/legal/privacy", "/legal/terms", "/legal/consent",
-    "/forgot-password",
 ]
 THEMES = ["dark", "light"]
 
