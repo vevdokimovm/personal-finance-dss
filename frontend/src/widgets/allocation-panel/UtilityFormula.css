@@ -1,0 +1,29 @@
+.fp-utility-formula {
+  margin-top: var(--sp-3);
+}
+.fp-utility-formula__body {
+  margin-top: var(--sp-2);
+  padding: var(--sp-3) var(--sp-4);
+  background: var(--c-surface-up);
+  border: var(--border-w) solid var(--c-border);
+  border-radius: var(--r-sm);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+/* KaTeX сам считает свои размеры в em относительно унаследованного font-size — здесь не
+   заданы px/hex, только контейнер под горизонтальный скролл на узких экранах (CMP-07), тот
+   же паттерн, что overflow-x у .fp-alloc-sankey для диаграммы Санкея. */
+.fp-utility-formula__katex {
+  overflow-x: auto;
+}
+.fp-utility-formula__legend {
+  margin: 0;
+  font-size: var(--fs-xs);
+  color: var(--c-text3);
+}
+.fp-utility-formula__loading {
+  margin: var(--sp-2) 0 0;
+  font-size: var(--fs-xs);
+  color: var(--c-text3);
+}

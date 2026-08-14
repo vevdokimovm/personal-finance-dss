@@ -7,4 +7,5 @@ export type {
   ForecastPoint,
   PlanAlternative,
   PlanIndicators,
+  WeightedScores,
 } from "./model/types";

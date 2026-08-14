@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { AllocationPanel } from "./AllocationPanel";
 import type { PlanAlternative } from "@entities/plan-summary";
@@ -46,6 +46,11 @@ describe("AllocationPanel — составной столбец реагируе
     expect(screen.getByText(/Цели — .*\(40%\)/)).toBeInTheDocument();
   });
 
+  it("лede не содержит сырую формульную нотацию «U = …» (CMP-05, design-critic v8.10.0)", () => {
+    render(<AllocationPanel best={BEST} alternatives={FULL_GRID} />);
+    expect(screen.queryByText(/U = /)).not.toBeInTheDocument();
+  });
+
   it("движение ползунка пересчитывает столбец/легенду и переключает текст на «гипотетический вариант»", () => {
     render(<AllocationPanel best={BEST} alternatives={FULL_GRID} />);
     // 30% -> 40%, цели остаются 40% (сумма не превышает 100%).
@@ -90,6 +95,7 @@ describe("AllocationPanel — составной столбец реагируе
 describe("AllocationPanel — объяснение выбранного плана (батч 0.3/0.4, v8.13.5)", () => {
   const BEST_WITH_EXPLANATION: PlanAlternative = {
     ...BEST,
+    weighted_scores: { Rt: 0.05, Lt: 0.12, Dt: 0.34, Si: 0.03 },
     explanation: {
       gains: ["Досрочно гасим 10 000 ₽ — самый дорогой кредит."],
       costs: ["2 000 ₽ не пошли в цели — они уже профинансированы."],
@@ -132,6 +138,25 @@ describe("AllocationPanel — объяснение выбранного план
     render(<AllocationPanel best={BEST_WITH_EXPLANATION} alternatives={FULL_GRID} />);
     expect(screen.getByText("Что улучшается")).toBeInTheDocument();
     expect(screen.getByText("Чем приходится жертвовать")).toBeInTheDocument();
+  });
+
+  it("формула оценки раскрывается по клику у рекомендации (KaTeX, не голая «U = {u}»)", async () => {
+    render(<AllocationPanel best={BEST_WITH_EXPLANATION} alternatives={FULL_GRID} />);
+    const toggle = screen.getByRole("button", { name: "Показать формулу оценки" });
+    expect(document.querySelector(".katex")).not.toBeInTheDocument();
+    await userEvent.click(toggle);
+    // Тело формулы (katex) грузится лениво отдельным чанком — появляется асинхронно.
+    await waitFor(() => {
+      expect(document.querySelectorAll(".katex").length).toBeGreaterThan(0);
+    });
+  });
+
+  it("формула оценки скрывается вместе с остальным объяснением при отходе от рекомендации", () => {
+    render(<AllocationPanel best={BEST_WITH_EXPLANATION} alternatives={FULL_GRID} />);
+    fireEvent.change(screen.getByLabelText("Досрочное погашение"), { target: { value: "4" } });
+    expect(
+      screen.queryByRole("button", { name: "Показать формулу оценки" }),
+    ).not.toBeInTheDocument();
   });
 
   it("без explanation (старый кэш/ответ) — панель рендерится без объяснения, без падений", () => {

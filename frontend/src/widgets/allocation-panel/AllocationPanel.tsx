@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Layer, ResponsiveContainer, Sankey, Tooltip } from "recharts";
 import type { SankeyLinkProps, SankeyNode, SankeyNodeProps } from "recharts";
-import { formatMoney, formatNumber } from "@shared/lib/money/formatMoney";
+import { formatMoney } from "@shared/lib/money/formatMoney";
 import { t } from "@shared/lib/i18n/t";
 import { Button } from "@shared/ui";
 import type { PlanAlternative } from "@entities/plan-summary";
@@ -12,6 +12,7 @@ import {
   hasNonZeroCategory,
   notchesOf,
 } from "./findMatchingAlternative";
+import { UtilityFormula } from "./UtilityFormula";
 import { WhatIfSliders } from "./WhatIfSliders";
 import "@shared/ui/panel.css";
 import "./AllocationPanel.css";
@@ -184,10 +185,7 @@ export function AllocationPanel({
       <h2>{t("Куда пойдут свободные деньги")}</h2>
       <p className="fp-lede">
         {isRecommended
-          ? t("Рекомендация СППР ({name}), полезность U = {u}.", {
-              name: best.name,
-              u: formatNumber(best.utility, 2),
-            })
+          ? t("Рекомендация СППР ({name}).", { name: best.name })
           : t("Гипотетический вариант — не рекомендация СППР.")}
       </p>
 
@@ -237,6 +235,13 @@ export function AllocationPanel({
                     {best.explanation.counterfactual.text}
                   </p>
                 )}
+              {/* weighted_scores считается для КАЖДОЙ альтернативы в rank_alternatives
+               * (app/core/ranking.py) безусловно, не только для top3 — в отличие от
+               * explanation теоретически не может отсутствовать здесь, но проверяем на
+               * случай старого кэша (тот же принцип защиты, что у explanation выше). */}
+              {best.weighted_scores && (
+                <UtilityFormula weightedScores={best.weighted_scores} utility={best.utility} />
+              )}
             </>
           ) : (
             <p className="fp-alloc-explanation__placeholder">

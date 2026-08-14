@@ -98,8 +98,12 @@ export function AlternativesBrowser({ alternatives }: { alternatives: PlanAltern
                       <span className="fp-alt-row__badge">{t("рекомендовано")}</span>
                     )}
                   </span>
+                  {/* Раньше «U = {u}» — сырая формульная нотация без объяснения (CMP-05,
+                   * design-critic v8.10.0); человеческая подпись вместо переменной модели.
+                   * Раскрываемая формула — только у рекомендации в AllocationPanel
+                   * (UtilityFormula), не на каждой из 66 строк этого списка. */}
                   <span className="fp-alt-row__utility">
-                    {t("U = {u}", { u: formatNumber(alt.utility, 2) })}
+                    {t("Оценка {u}", { u: formatNumber(alt.utility, 2) })}
                   </span>
                 </div>
                 <div className="fp-alt-row__meta">
