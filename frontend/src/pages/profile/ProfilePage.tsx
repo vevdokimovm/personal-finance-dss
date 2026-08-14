@@ -1,8 +1,30 @@
+import { useSearch, Link } from "@tanstack/react-router";
 import { ListSkeleton, StatePanel, Button } from "@shared/ui";
 import { t } from "@shared/lib/i18n/t";
 import { formatDate } from "@shared/lib/date/formatDate";
 import { useProfile, NotAuthenticatedError } from "@entities/profile";
 import "./ProfilePage.css";
+
+/** GET /api/auth/verify (ссылка в письме) редиректит сюда с ?verified=1|0 — не отдельный
+ * экран (routes_auth.py::verify_email), только баннер поверх уже существующего профиля. */
+function VerifiedBanner() {
+  const search = useSearch({ strict: false }) as { verified?: string };
+  if (search.verified === "1") {
+    return (
+      <p className="fp-profile__banner fp-profile__banner--success" role="status">
+        {t("Email подтверждён.")}
+      </p>
+    );
+  }
+  if (search.verified === "0") {
+    return (
+      <p className="fp-profile__banner" role="alert">
+        {t("Ссылка подтверждения недействительна или устарела — не получилось подтвердить email.")}
+      </p>
+    );
+  }
+  return null;
+}
 
 /** Профиль — единственная запись текущего пользователя, не список: "пусто" не имеет
  * смысла для синглтона. Состояний четыре, но не как у списков (loading/empty/error/
@@ -28,10 +50,15 @@ export function ProfilePage() {
     return (
       <main className="fp-profile">
         <h1>{t("Профиль")}</h1>
-        <StatePanel title={t("Нужно войти в систему")}>
-          {t(
-            "Профиль доступен только после входа. Экран входа для этой версии интерфейса ещё не готов.",
-          )}
+        <StatePanel
+          title={t("Нужно войти в систему")}
+          action={
+            <Button variant="primary" asChild>
+              <Link to="/login">{t("Войти")}</Link>
+            </Button>
+          }
+        >
+          {t("Профиль доступен только после входа.")}
         </StatePanel>
       </main>
     );
@@ -61,6 +88,7 @@ export function ProfilePage() {
   return (
     <main className="fp-profile">
       <h1>{t("Профиль")}</h1>
+      <VerifiedBanner />
       <section className="fp-profile__card">
         <div className="fp-profile__row">
           <span className="fp-profile__label">{t("Имя")}</span>

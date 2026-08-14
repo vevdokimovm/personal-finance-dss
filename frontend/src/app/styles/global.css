@@ -26,7 +26,9 @@ a {
 
 .fp-app-topbar {
   display: flex;
+  align-items: center;
   justify-content: flex-end;
+  gap: var(--sp-4);
   padding: var(--sp-4) var(--sp-5) 0;
   max-width: var(--content-max);
   margin: 0 auto;

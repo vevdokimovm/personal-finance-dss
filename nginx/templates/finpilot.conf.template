@@ -85,7 +85,11 @@ server {
     # ── SPA (React, веха 8): экраны приложения — отдаём index.html, роутинг на
     # клиенте (TanStack Router). Список — frontend/src/routes/*.tsx (кроме
     # __root.tsx). Добавили новый корневой экран во фронте — добавь его сюда.
-    location ~ ^/(planning|transactions|obligations|goals|banks|profile)(/|$) {
+    # login/register/forgot-password/reset-password (v8.22.0) заменяют собой легаси
+    # Jinja-страницы forgot_password.html/reset_password.html (были живые, отдавались
+    # FastAPI ниже) и никогда не существовавший login.html/register.html (в легаси вход
+    # был JS-модалкой в общем base.html, недостижимой после переноса семи экранов на React).
+    location ~ ^/(planning|transactions|obligations|goals|banks|profile|login|register|forgot-password|reset-password)(/|$) {
         root /usr/share/nginx/html;
         try_files /index.html =404;
     }
@@ -96,9 +100,11 @@ server {
     }
 
     # ── Всё остальное — FastAPI (gunicorn): /api, /v1 (B2B), /health, /docs,
-    # второстепенные Jinja-экраны (contacts, legal/*, forgot/reset-password,
-    # validation) — намеренно НЕ перечисляем их поимённо здесь: любой путь,
-    # не забранный SPA-блоками выше, безопасно попадает на бэкенд по умолчанию.
+    # второстепенные Jinja-экраны (contacts, legal/*, validation) — намеренно НЕ
+    # перечисляем их поимённо здесь: любой путь, не забранный SPA-блоками выше,
+    # безопасно попадает на бэкенд по умолчанию. Легаси forgot_password.html/
+    # reset_password.html в app/main.py остаются (аварийный доступ мимо nginx,
+    # тот же принцип, что у Jinja-версий семи уже перенесённых экранов, ROADMAP §8.2).
     location / {
         proxy_pass http://web:8000;
         proxy_http_version 1.1;

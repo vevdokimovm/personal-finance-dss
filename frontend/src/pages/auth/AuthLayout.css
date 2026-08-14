@@ -1,0 +1,115 @@
+.fp-auth {
+  min-height: calc(100vh - var(--sp-8));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--sp-5);
+}
+.fp-auth__card {
+  width: 100%;
+  max-width: 40ch;
+  background: var(--c-surface);
+  border: var(--border-w) solid var(--c-border);
+  border-radius: var(--r-lg);
+  padding: var(--sp-6);
+}
+.fp-auth__card h1 {
+  font-size: var(--fs-lg);
+  font-weight: 700;
+  margin: 0 0 var(--sp-2);
+}
+.fp-auth__lede {
+  color: var(--c-text2);
+  font-size: var(--fs-sm);
+  margin: 0 0 var(--sp-5);
+}
+.fp-auth__footer {
+  margin-top: var(--sp-5);
+  padding-top: var(--sp-4);
+  border-top: var(--border-w) solid var(--c-border);
+  font-size: var(--fs-sm);
+  color: var(--c-text2);
+}
+
+/* ── Форма: общие классы для login/register/forgot-password/reset-password ──
+   FRM-02 (docs/ui_ux_design_standard.md): видимый постоянный label, не только placeholder. */
+.fp-auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+}
+.fp-auth-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-1);
+}
+.fp-auth-field label {
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  color: var(--c-text2);
+}
+.fp-auth-field input {
+  font: inherit;
+  font-size: var(--fs-base);
+  color: var(--c-text);
+  background: var(--c-surface-up);
+  border: var(--border-w) solid var(--c-border-hl);
+  border-radius: var(--r-sm);
+  padding: var(--sp-3);
+  min-height: var(--tap-target-min);
+}
+.fp-auth-field input:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: var(--focus-ring-offset);
+}
+.fp-auth-field input[aria-invalid="true"] {
+  border-color: var(--c-red);
+}
+.fp-auth-field__hint {
+  font-size: var(--fs-xs);
+  color: var(--c-text3);
+  margin: 0;
+}
+.fp-auth-field__error {
+  font-size: var(--fs-xs);
+  color: var(--c-red);
+  margin: 0;
+}
+/* FRM-04: ошибка не только цветом — иконка-символ текстом перед сообщением. */
+.fp-auth-field__error::before {
+  content: "! ";
+  font-weight: 700;
+}
+
+.fp-auth-banner {
+  font-size: var(--fs-sm);
+  padding: var(--sp-3) var(--sp-4);
+  border-radius: var(--r-sm);
+  border: var(--border-w) solid var(--c-red);
+  background: var(--c-red-bg);
+  color: var(--c-text);
+}
+.fp-auth-banner--success {
+  border-color: var(--c-accent);
+  background: var(--c-accent-bg);
+}
+
+.fp-auth-consent {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sp-2);
+  font-size: var(--fs-sm);
+  color: var(--c-text2);
+}
+/* Тач-таргет A11Y-09 (--tap-target-min) — на обёртывающем <label> целиком (клик по всему
+   блоку, не только по квадратику), не растягиванием самого чекбокса: иначе он выглядит
+   неестественно большим. */
+.fp-auth-consent input {
+  margin-top: var(--sp-0);
+  flex-shrink: 0;
+}
+.fp-auth-consent {
+  cursor: pointer;
+  min-height: var(--tap-target-min);
+  align-items: center;
+}

@@ -11,10 +11,14 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as BanksRouteImport } from './routes/banks'
+import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as GoalsRouteImport } from './routes/goals'
+import { Route as LoginRouteImport } from './routes/login'
 import { Route as ObligationsRouteImport } from './routes/obligations'
 import { Route as PlanningRouteImport } from './routes/planning'
 import { Route as ProfileRouteImport } from './routes/profile'
+import { Route as RegisterRouteImport } from './routes/register'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as TransactionsRouteImport } from './routes/transactions'
 
 const IndexRoute = IndexRouteImport.update({
@@ -27,9 +31,19 @@ const BanksRoute = BanksRouteImport.update({
   path: '/banks',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
+  id: '/forgot-password',
+  path: '/forgot-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const GoalsRoute = GoalsRouteImport.update({
   id: '/goals',
   path: '/goals',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ObligationsRoute = ObligationsRouteImport.update({
@@ -47,6 +61,16 @@ const ProfileRoute = ProfileRouteImport.update({
   path: '/profile',
   getParentRoute: () => rootRouteImport,
 } as any)
+const RegisterRoute = RegisterRouteImport.update({
+  id: '/register',
+  path: '/register',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TransactionsRoute = TransactionsRouteImport.update({
   id: '/transactions',
   path: '/transactions',
@@ -56,29 +80,41 @@ const TransactionsRoute = TransactionsRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/banks': typeof BanksRoute
+  '/forgot-password': typeof ForgotPasswordRoute
   '/goals': typeof GoalsRoute
+  '/login': typeof LoginRoute
   '/obligations': typeof ObligationsRoute
   '/planning': typeof PlanningRoute
   '/profile': typeof ProfileRoute
+  '/register': typeof RegisterRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/transactions': typeof TransactionsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/banks': typeof BanksRoute
+  '/forgot-password': typeof ForgotPasswordRoute
   '/goals': typeof GoalsRoute
+  '/login': typeof LoginRoute
   '/obligations': typeof ObligationsRoute
   '/planning': typeof PlanningRoute
   '/profile': typeof ProfileRoute
+  '/register': typeof RegisterRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/transactions': typeof TransactionsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/banks': typeof BanksRoute
+  '/forgot-password': typeof ForgotPasswordRoute
   '/goals': typeof GoalsRoute
+  '/login': typeof LoginRoute
   '/obligations': typeof ObligationsRoute
   '/planning': typeof PlanningRoute
   '/profile': typeof ProfileRoute
+  '/register': typeof RegisterRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/transactions': typeof TransactionsRoute
 }
 export interface FileRouteTypes {
@@ -86,38 +122,54 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/banks'
+    | '/forgot-password'
     | '/goals'
+    | '/login'
     | '/obligations'
     | '/planning'
     | '/profile'
+    | '/register'
+    | '/reset-password'
     | '/transactions'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/banks'
+    | '/forgot-password'
     | '/goals'
+    | '/login'
     | '/obligations'
     | '/planning'
     | '/profile'
+    | '/register'
+    | '/reset-password'
     | '/transactions'
   id:
     | '__root__'
     | '/'
     | '/banks'
+    | '/forgot-password'
     | '/goals'
+    | '/login'
     | '/obligations'
     | '/planning'
     | '/profile'
+    | '/register'
+    | '/reset-password'
     | '/transactions'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   BanksRoute: typeof BanksRoute
+  ForgotPasswordRoute: typeof ForgotPasswordRoute
   GoalsRoute: typeof GoalsRoute
+  LoginRoute: typeof LoginRoute
   ObligationsRoute: typeof ObligationsRoute
   PlanningRoute: typeof PlanningRoute
   ProfileRoute: typeof ProfileRoute
+  RegisterRoute: typeof RegisterRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
   TransactionsRoute: typeof TransactionsRoute
 }
 
@@ -137,11 +189,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BanksRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/forgot-password': {
+      id: '/forgot-password'
+      path: '/forgot-password'
+      fullPath: '/forgot-password'
+      preLoaderRoute: typeof ForgotPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/goals': {
       id: '/goals'
       path: '/goals'
       fullPath: '/goals'
       preLoaderRoute: typeof GoalsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/obligations': {
@@ -165,6 +231,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProfileRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/register': {
+      id: '/register'
+      path: '/register'
+      fullPath: '/register'
+      preLoaderRoute: typeof RegisterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/transactions': {
       id: '/transactions'
       path: '/transactions'
@@ -178,10 +258,14 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   BanksRoute: BanksRoute,
+  ForgotPasswordRoute: ForgotPasswordRoute,
   GoalsRoute: GoalsRoute,
+  LoginRoute: LoginRoute,
   ObligationsRoute: ObligationsRoute,
   PlanningRoute: PlanningRoute,
   ProfileRoute: ProfileRoute,
+  RegisterRoute: RegisterRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
   TransactionsRoute: TransactionsRoute,
 }
 export const routeTree = rootRouteImport

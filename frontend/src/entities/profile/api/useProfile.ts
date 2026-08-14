@@ -11,6 +11,11 @@ import { meApiAuthMeGet } from "@shared/api/generated";
  * снимка. */
 export class NotAuthenticatedError extends Error {}
 
+/** Общий ключ кэша «кто я сейчас» — читает не только ProfilePage, но и топбар/auth-хуки
+ * (entities/auth), которые инвалидируют его после логина/логаута. Один источник истины,
+ * не строковый литерал в двух местах, который может разъехаться при правке. */
+export const PROFILE_QUERY_KEY = ["profile", "me"] as const;
+
 /** GET /api/auth/me — тот же паттерн, что usePlan/useForecast (entities/plan-summary),
  * но throwOnError:false вместо true: нужен доступ к response.status, чтобы отличить
  * 401 (нет смысла молча предлагать "Повторить" по кругу — a11y-auditor, Э4 партия 2,
@@ -18,7 +23,7 @@ export class NotAuthenticatedError extends Error {}
  * реального сетевого сбоя, где повтор осмыслен. */
 export function useProfile() {
   return useQuery({
-    queryKey: ["profile", "me"],
+    queryKey: PROFILE_QUERY_KEY,
     queryFn: async () => {
       const { data, error, response } = await meApiAuthMeGet({ throwOnError: false });
       if (error) {

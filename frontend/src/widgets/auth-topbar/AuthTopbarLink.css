@@ -1,0 +1,13 @@
+.fp-auth-topbar {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+}
+.fp-auth-topbar__email {
+  font-size: var(--fs-sm);
+  color: var(--c-text2);
+}
+.fp-auth-topbar__login-link {
+  font-size: var(--fs-sm);
+  font-weight: 600;
+}

@@ -32,6 +32,20 @@
 .fp-profile__value {
   font-weight: 600;
 }
+.fp-profile__banner {
+  margin: 0 0 var(--sp-5);
+  padding: var(--sp-3) var(--sp-4);
+  border-radius: var(--r-sm);
+  border: var(--border-w) solid var(--c-red);
+  background: var(--c-red-bg);
+  color: var(--c-text);
+  font-size: var(--fs-sm);
+  max-width: 60ch;
+}
+.fp-profile__banner--success {
+  border-color: var(--c-accent);
+  background: var(--c-accent-bg);
+}
 .fp-profile__badge {
   display: inline-block;
   margin-left: var(--sp-2);
