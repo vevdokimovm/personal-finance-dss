@@ -93,3 +93,36 @@ describe("MetricsGrid — ликвидность и подушка: мягкие
     expect(screen.getByText("включая цели")).toBeInTheDocument();
   });
 });
+
+describe("MetricsGrid — шкала с зонами (план вехи 8, Э5) для Ликвидности и ПДН", () => {
+  it("карточки Ликвидность и ПДН несут визуальную шкалу, «Подушка» — нет (вне периметра плана)", () => {
+    const { container } = render(<MetricsGrid indicators={indicators({})} />);
+    expect(
+      cardByName(container, "Ликвидность").querySelector(".fp-zone-scale"),
+    ).toBeInTheDocument();
+    expect(
+      cardByName(container, "Долговая нагрузка (ПДН)").querySelector(".fp-zone-scale"),
+    ).toBeInTheDocument();
+    expect(
+      cardByName(container, "Подушка со всеми накоплениями").querySelector(".fp-zone-scale"),
+    ).not.toBeInTheDocument();
+  });
+});
+
+describe("MetricsGrid — дисклеймер 601-ФЗ при ПДН выше 50% (план вехи 8, Э5)", () => {
+  it("Dt=0.401 (только что превысил модельный порог 40%) — дисклеймера ещё нет, юридический порог 50%", () => {
+    render(<MetricsGrid indicators={indicators({ Dt: 0.401 })} />);
+    expect(screen.queryByText(/выше 50%/)).not.toBeInTheDocument();
+  });
+
+  it("Dt=0.5 ровно — ещё не строго выше порога, дисклеймера нет", () => {
+    render(<MetricsGrid indicators={indicators({ Dt: 0.5 })} />);
+    expect(screen.queryByText(/выше 50%/)).not.toBeInTheDocument();
+  });
+
+  it("Dt=0.55 (выше 50%) — спокойный дисклеймер о рисках на экране (601-ФЗ)", () => {
+    render(<MetricsGrid indicators={indicators({ Dt: 0.55 })} />);
+    expect(screen.getByText(/выше 50%/)).toBeInTheDocument();
+    expect(screen.getByText(/не оценка вашей платёжеспособности/)).toBeInTheDocument();
+  });
+});

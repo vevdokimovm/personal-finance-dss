@@ -63,6 +63,48 @@
   margin-top: var(--sp-1);
   opacity: 0.8;
 }
+.fp-zone-scale {
+  position: relative;
+  margin: var(--sp-3) 0;
+}
+.fp-zone-scale__track {
+  display: flex;
+  height: var(--sp-2);
+  border-radius: var(--r-full);
+  overflow: hidden;
+}
+.fp-zone-scale__zone--muted {
+  /* --c-bg2 почти сливался с белой карточкой в светлой теме (--c-surface тоже #fff) —
+     зона переставала быть видимой зоной. --c-border даёт различимую границу в обеих темах. */
+  background: var(--c-border);
+}
+.fp-zone-scale__zone--warn {
+  background: var(--c-amber-bg);
+}
+.fp-zone-scale__zone--danger {
+  background: var(--c-red-bg);
+}
+/* Маркер — текущее значение поверх зон; тёмный на любой зоне за счёт --c-text, а не цвета
+   зоны под ним (иначе на danger-красном маркер того же тона стал бы невидимым). */
+.fp-zone-scale__marker {
+  position: absolute;
+  top: 50%;
+  width: var(--sp-0);
+  height: calc(var(--sp-2) + var(--sp-1) * 2);
+  background: var(--c-text);
+  border-radius: var(--r-full);
+  transform: translate(-50%, -50%);
+}
+.fp-metric-disclaimer {
+  margin-top: var(--sp-3);
+  padding: var(--sp-2) var(--sp-3);
+  background: var(--c-amber-bg);
+  border: var(--border-w) solid var(--c-amber);
+  border-radius: var(--r-sm);
+  font-size: var(--fs-xs);
+  color: var(--c-text2);
+  line-height: 1.5;
+}
 
 /* 768px = var(--bp-md) в tokens.css — CSS не позволяет custom property в условии @media. */
 @media (max-width: 768px) {
