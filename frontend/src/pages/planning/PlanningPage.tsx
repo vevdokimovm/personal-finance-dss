@@ -1,5 +1,5 @@
 import { usePlan, useForecast } from "@entities/plan-summary";
-import { ListSkeleton, StatePanel, Button } from "@shared/ui";
+import { ListSkeleton, StatePanel, Button, Formula } from "@shared/ui";
 import { formatMoney } from "@shared/lib/money/formatMoney";
 import { t } from "@shared/lib/i18n/t";
 import { MetricsGrid } from "@widgets/metrics-grid";
@@ -110,7 +110,9 @@ export function PlanningPage() {
           <dd>{formatMoney(input_summary.expense)}</dd>
         </div>
         <div>
-          <dt>{t("Свободный резерв (B_liq)")}</dt>
+          <dt>
+            {t("Свободный резерв")} (<Formula tex="B_{liq}" fallback="B_liq" />)
+          </dt>
           <dd>{formatMoney(input_summary.bliq)}</dd>
         </div>
         <div>

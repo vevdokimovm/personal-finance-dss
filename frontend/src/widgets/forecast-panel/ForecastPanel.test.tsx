@@ -1,7 +1,9 @@
 import type { ReactElement, ReactNode } from "react";
 import { describe, expect, it } from "vitest";
+import { render, screen, waitFor } from "@testing-library/react";
 import { Area } from "recharts";
-import { ForecastPanel } from "./ForecastPanel";
+import type { TooltipPayload } from "recharts/types/state/tooltipSlice";
+import { ForecastPanel, ForecastTooltip } from "./ForecastPanel";
 import { buildForecastChartData } from "./buildForecastChartData";
 import type { ForecastResult } from "@entities/plan-summary";
 
@@ -74,6 +76,50 @@ describe("buildForecastChartData", () => {
         expect(point.Rt_band).toBeGreaterThanOrEqual(0);
       }
     }
+  });
+});
+
+// Три Area/Line на графике (Rt/Rt_band/Rt_p10, две служебные для стека закраски диапазона) —
+// раньше recharts рисовал тултип-строку НА КАЖДУЮ, сырые dataKey утекали в интерфейс как есть
+// («Rt_band :», «Rt_p10 :» пустой строкой). Мокаем то же множество записей, что реально даёт
+// recharts на графике с тремя сериями в одной точке.
+function mockPayload(): TooltipPayload {
+  return [
+    { dataKey: "Rt_p10", value: 350000, graphicalItemId: "a" },
+    { dataKey: "Rt_band", value: 50000, graphicalItemId: "b" },
+    { dataKey: "Rt", value: 400000, graphicalItemId: "c" },
+  ] as unknown as TooltipPayload;
+}
+
+describe("ForecastTooltip — только медиана, не сырые dataKey служебных серий", () => {
+  it("не активен — ничего не рендерит", () => {
+    const { container } = render(
+      <ForecastTooltip active={false} payload={mockPayload()} label={6} />,
+    );
+    expect(container).toBeEmptyDOMElement();
+  });
+
+  it("из трёх записей payload (Rt/Rt_band/Rt_p10) рендерится ровно одна строка — медиана", () => {
+    render(<ForecastTooltip active payload={mockPayload()} label={6} />);
+    expect(screen.getByText("6 мес")).toBeInTheDocument();
+    expect(screen.getByText(/400 000/)).toBeInTheDocument();
+    // Раньше здесь были ещё «Rt_band :» и «Rt_p10 :» — служебные dataKey голым текстом.
+    expect(screen.queryByText(/Rt_band/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Rt_p10/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/350 000/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/50 000/)).not.toBeInTheDocument();
+  });
+
+  it("подпись медианы — через KaTeX (Rₜ), не голое «Rt» plain-текстом", async () => {
+    render(<ForecastTooltip active payload={mockPayload()} label={6} />);
+    await waitFor(() => {
+      expect(document.querySelector(".katex")).toBeInTheDocument();
+    });
+  });
+
+  it("сейчас (period=0) — не «0 мес»", () => {
+    render(<ForecastTooltip active payload={mockPayload()} label={0} />);
+    expect(screen.getByText("сейчас")).toBeInTheDocument();
   });
 });
 

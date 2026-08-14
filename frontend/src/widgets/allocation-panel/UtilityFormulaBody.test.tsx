@@ -7,8 +7,9 @@ const WEIGHTED_SCORES = { Rt: 0.05, Lt: 0.12, Dt: 0.34, Si: 0.03 };
 describe("UtilityFormulaBody — рендер формулы через KaTeX, не голым текстом «U = {u}» (CMP-05)", () => {
   it("рендерит и символьную, и инстанцированную числами формулу через KaTeX", () => {
     render(<UtilityFormulaBody weightedScores={WEIGHTED_SCORES} utility={0.54} />);
+    // 2 формулы (символьная + инстанцированная) + 4 символа критериев в легенде.
     const katexNodes = document.querySelectorAll(".katex");
-    expect(katexNodes.length).toBe(2); // символьная + инстанцированная числами
+    expect(katexNodes.length).toBe(6);
 
     const body = document.querySelector(".fp-utility-formula__body")!;
     // Числа реально подставлены (не заглушка) — ищем в MathML-annotation (сырой TeX-источник).
@@ -16,11 +17,14 @@ describe("UtilityFormulaBody — рендер формулы через KaTeX, �
     expect(body.textContent).toContain("0{,}54");
   });
 
-  it("расшифровка служебных ключей Rt/Lt/Dt/Si — человеческим языком, не голыми буквами", () => {
+  it("расшифровка служебных ключей Rt/Lt/Dt/Si — символ через KaTeX (не голый plain-текст) плюс человеческое слово", () => {
     render(<UtilityFormulaBody weightedScores={WEIGHTED_SCORES} utility={0.54} />);
     expect(screen.getByText(/свободный поток/)).toBeInTheDocument();
     expect(screen.getByText(/подушка безопасности/)).toBeInTheDocument();
     expect(screen.getByText(/долговая нагрузка/)).toBeInTheDocument();
     expect(screen.getByText(/продвижение целей/)).toBeInTheDocument();
+
+    const legend = document.querySelector(".fp-utility-formula__legend")!;
+    expect(legend.querySelectorAll(".katex").length).toBe(4);
   });
 });

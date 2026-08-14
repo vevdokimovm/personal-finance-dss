@@ -8,7 +8,7 @@ export interface MetricCardProps {
    * задать отдельно (напр. бейдж нейтральный, а число уже в зоне внимания). */
   valueVariant?: "warn" | "danger" | "none";
   value: string;
-  caption: string;
+  caption: ReactNode;
 }
 
 export function MetricCard({

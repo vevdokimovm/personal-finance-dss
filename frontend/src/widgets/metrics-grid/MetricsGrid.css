@@ -58,6 +58,11 @@
   color: var(--c-text3);
   line-height: 1.5;
 }
+.fp-metric-caption__formula {
+  display: block;
+  margin-top: var(--sp-1);
+  opacity: 0.8;
+}
 
 /* 768px = var(--bp-md) в tokens.css — CSS не позволяет custom property в условии @media. */
 @media (max-width: 768px) {

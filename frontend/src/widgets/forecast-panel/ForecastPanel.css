@@ -9,3 +9,23 @@
   color: var(--c-text3);
   margin-top: var(--sp-3);
 }
+.fp-forecast-tooltip {
+  background: var(--c-surface-up);
+  border: var(--border-w) solid var(--c-border-hl);
+  border-radius: var(--r-sm);
+  padding: var(--sp-2) var(--sp-3);
+}
+.fp-forecast-tooltip__label {
+  margin: 0 0 var(--sp-1);
+  font-size: var(--fs-xs);
+  color: var(--c-text3);
+}
+.fp-forecast-tooltip__value {
+  margin: 0;
+  font-weight: 600;
+  color: var(--c-accent);
+}
+.fp-forecast-tooltip__symbol {
+  font-weight: 400;
+  color: var(--c-text3);
+}

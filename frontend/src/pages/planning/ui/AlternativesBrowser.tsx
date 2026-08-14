@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { formatMoney, formatNumber, formatPercent } from "@shared/lib/money/formatMoney";
 import { t } from "@shared/lib/i18n/t";
-import { Button } from "@shared/ui";
+import { Button, Formula } from "@shared/ui";
 import type { PlanAlternative } from "@entities/plan-summary";
 import "@shared/ui/panel.css";
 import "./AlternativesBrowser.css";
@@ -18,10 +18,14 @@ const SORTERS: Record<SortKey, (a: PlanAlternative, b: PlanAlternative) => numbe
   Dt_new: (a, b) => a.Dt_new - b.Dt_new,
 };
 
+// Юникодный подстрочный индекс (U+209C, не буква "т" уменьшенным кеглем) — максимум
+// типографики, доступный внутри нативного <option>: браузер не рендерит там ни KaTeX,
+// ни любой другой HTML/React-компонент, только текстовый узел (единственное место в этом
+// проходе, где переменную нельзя набрать через <Formula>, см. shared/ui/Formula.tsx).
 const SORT_LABELS: Record<SortKey, string> = {
   recommended: t("Рекомендации СППР"),
-  Rt_new: t("Свободному потоку (Rt)"),
-  Lt_new: t("Ликвидности (Lt)"),
+  Rt_new: t("Свободному потоку (Rₜ)"),
+  Lt_new: t("Ликвидности (Lₜ)"),
   Dt_new: t("Долговой нагрузке (ПДН)"),
 };
 
@@ -107,8 +111,12 @@ export function AlternativesBrowser({ alternatives }: { alternatives: PlanAltern
                   </span>
                 </div>
                 <div className="fp-alt-row__meta">
-                  <span>{t("Rt {v}", { v: formatMoney(alt.Rt_new) })}</span>
-                  <span>{t("Lt {v} мес.", { v: formatNumber(alt.Lt_new) })}</span>
+                  <span>
+                    <Formula tex="R_t" fallback="Rt" /> {formatMoney(alt.Rt_new)}
+                  </span>
+                  <span>
+                    <Formula tex="L_t" fallback="Lt" /> {formatNumber(alt.Lt_new)} {t("мес.")}
+                  </span>
                   <span>{t("ПДН {v}", { v: formatPercent(alt.Dt_new) })}</span>
                 </div>
                 <div className="fp-alt-row__split">

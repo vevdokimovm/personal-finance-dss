@@ -22,12 +22,21 @@ const SYMBOLIC_FORMULA_HTML = katex.renderToString(
 
 // Та же формулировка, что app/core/recommendation.py::CRITERION_LABELS — не импортируется
 // через границу Python/TypeScript, синхронизируется вручную при правке одного из двух мест.
-const CRITERION_LABELS: Record<keyof WeightedScores, string> = {
-  Rt: t("свободный поток"),
-  Lt: t("подушка безопасности"),
-  Dt: t("долговая нагрузка"),
-  Si: t("продвижение целей"),
-};
+// Символ рядом — не голое «Rt» plain-текстом (выглядело как отладочный вывод, не типографика),
+// а тот же KaTeX-рендер, что и в формуле выше: R_t с настоящим подстрочным индексом.
+const CRITERION_ITEMS: { key: keyof WeightedScores; symbol: string; label: string }[] = [
+  { key: "Rt", symbol: "R_t", label: t("свободный поток") },
+  { key: "Lt", symbol: "L_t", label: t("подушка безопасности") },
+  { key: "Dt", symbol: "D_t", label: t("долговая нагрузка") },
+  { key: "Si", symbol: "S_i", label: t("продвижение целей") },
+];
+
+const CRITERION_SYMBOL_HTML: Record<keyof WeightedScores, string> = Object.fromEntries(
+  CRITERION_ITEMS.map(({ key, symbol }) => [
+    key,
+    katex.renderToString(symbol, { throwOnError: false, displayMode: false }),
+  ]),
+) as Record<keyof WeightedScores, string>;
 
 function toKatexNumber(value: number): string {
   return value.toFixed(2).replace(".", "{,}");
@@ -62,14 +71,17 @@ export function UtilityFormulaBody({
         className="fp-utility-formula__katex"
         dangerouslySetInnerHTML={{ __html: instantiatedHtml }}
       />
-      <p className="fp-utility-formula__legend">
-        {t("Rt — {rt}, Lt — {lt}, Dt — {dt}, Si — {si}.", {
-          rt: CRITERION_LABELS.Rt,
-          lt: CRITERION_LABELS.Lt,
-          dt: CRITERION_LABELS.Dt,
-          si: CRITERION_LABELS.Si,
-        })}
-      </p>
+      <ul className="fp-utility-formula__legend" role="list">
+        {CRITERION_ITEMS.map(({ key, label }) => (
+          <li key={key}>
+            <span
+              className="fp-utility-formula__legend-symbol"
+              dangerouslySetInnerHTML={{ __html: CRITERION_SYMBOL_HTML[key] }}
+            />
+            <span className="fp-utility-formula__legend-label">{label}</span>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }

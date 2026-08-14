@@ -1,6 +1,7 @@
 import { MetricCard } from "./MetricCard";
 import { formatNumber, formatPercent } from "@shared/lib/money/formatMoney";
 import { t } from "@shared/lib/i18n/t";
+import { Formula } from "@shared/ui";
 import { DTI_THRESHOLD, DTI_WARN_THRESHOLD } from "@entities/plan-summary";
 import type { PlanIndicators } from "@entities/plan-summary";
 import "./MetricsGrid.css";
@@ -29,7 +30,14 @@ export function MetricsGrid({ indicators }: { indicators: PlanIndicators }) {
         badge={ltRisk ? t("{n} мес. автономии", { n: formatNumber(indicators.Lt) }) : undefined}
         badgeVariant={ltRisk ? "warn" : "muted"}
         value={formatNumber(indicators.Lt)}
-        caption={t("Месяцев жизни на свободном резерве (stock-based, B_liq/E).")}
+        caption={
+          <>
+            {t("Месяцев без дохода, если использовать только свободный резерв (без целей).")}
+            <span className="fp-metric-caption__formula">
+              <Formula tex="L_t = \dfrac{B_{liq}}{\sum e}" fallback="Lt = Bliq / Σe" />
+            </span>
+          </>
+        }
       />
       <MetricCard
         name={t("Долговая нагрузка (ПДН)")}
@@ -42,14 +50,31 @@ export function MetricsGrid({ indicators }: { indicators: PlanIndicators }) {
         }
         badgeVariant={dtiVariant}
         value={formatPercent(indicators.Dt)}
-        caption={t("Доля дохода на кредиты. Запас {gap} п.п. до порога.", { gap: dtiGap })}
+        caption={
+          <>
+            {t("Доля дохода на кредиты. Запас {gap} п.п. до порога.", { gap: dtiGap })}
+            <span className="fp-metric-caption__formula">
+              <Formula tex="D_t = \dfrac{\sum P}{I}" fallback="Dt = ΣP / I" />
+            </span>
+          </>
+        }
       />
       <MetricCard
         name={t("Подушка со всеми накоплениями")}
         badge={blrRisk ? t("мало") : t("включая цели")}
         badgeVariant={blrRisk ? "warn" : "muted"}
         value={indicators.BLR != null ? formatNumber(indicators.BLR) : "—"}
-        caption={t("Месяцев без дохода, если использовать все текущие накопления.")}
+        caption={
+          <>
+            {t("Месяцев без дохода, если использовать все текущие накопления.")}
+            <span className="fp-metric-caption__formula">
+              <Formula
+                tex="BLR = \dfrac{B_t + B_t^{liq}}{\sum e}"
+                fallback="BLR = (Bt + Btliq) / Σe"
+              />
+            </span>
+          </>
+        }
       />
     </section>
   );

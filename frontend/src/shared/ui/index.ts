@@ -4,3 +4,4 @@ export { Tooltip, TooltipProvider } from "./Tooltip";
 export { ThemeToggle } from "./ThemeToggle";
 export { StatePanel } from "./StatePanel";
 export { ListSkeleton } from "./ListSkeleton";
+export { Formula } from "./Formula";

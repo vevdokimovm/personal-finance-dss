@@ -21,7 +21,7 @@ describe("UtilityFormula — раскрываемая по клику форму
     const katexNodes = await screen.findAllByText(
       (_, el) => el?.classList.contains("katex") ?? false,
     );
-    expect(katexNodes.length).toBe(2); // символьная + инстанцированная числами
+    expect(katexNodes.length).toBe(6); // 2 формулы + 4 символа критериев в легенде
   });
 
   it("кнопка помечена aria-expanded/aria-controls на реально раскрывающуюся область — не декоративную (в отличие от диаграммы Санкея)", async () => {

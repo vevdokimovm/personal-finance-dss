@@ -19,6 +19,21 @@
 }
 .fp-utility-formula__legend {
   margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-1) var(--sp-4);
+}
+.fp-utility-formula__legend li {
+  display: flex;
+  align-items: baseline;
+  gap: var(--sp-1);
+}
+.fp-utility-formula__legend-symbol {
+  color: var(--c-text2);
+}
+.fp-utility-formula__legend-label {
   font-size: var(--fs-xs);
   color: var(--c-text3);
 }

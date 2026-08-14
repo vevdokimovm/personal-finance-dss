@@ -8,12 +8,49 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import type { TooltipPayload } from "recharts/types/state/tooltipSlice";
 import { formatMoney } from "@shared/lib/money/formatMoney";
 import { t } from "@shared/lib/i18n/t";
+import { Formula } from "@shared/ui";
 import type { ForecastResult } from "@entities/plan-summary";
 import { buildForecastChartData } from "./buildForecastChartData";
 import "@shared/ui/panel.css";
 import "./ForecastPanel.css";
+
+/** Только поля, которые реально читаются — не родовой `TooltipContentProps<TValue,TName>`
+ * (requires coordinate/accessibilityLayer/activeIndex и жёстко фиксирует generic-параметры,
+ * которые `<Tooltip>` без явной аннотации выводит иначе — `tsc -b` в `npm run build` ловит
+ * рассинхрон типов там, где обычный `tsc --noEmit` почему-то нет). */
+interface ForecastTooltipProps {
+  active?: boolean;
+  payload?: TooltipPayload;
+  label?: string | number;
+}
+
+/** Recharts по умолчанию рисует одну строку тултипа НА КАЖДУЮ серию графика (три Area/Line
+ * ниже — Rt/Rt_band/Rt_p10, две служебные для стека закраски диапазона) — сырые имена
+ * `dataKey` утекали в интерфейс как есть («Rt_band :», «Rt_p10 :» пустой строкой), потому
+ * что прежний `formatter` умел спрятать только ЗНАЧЕНИЕ строки, не саму строку. Полный
+ * диапазон уже есть в `table.sr-only` ниже — здесь показываем только медиану, одной строкой. */
+export function ForecastTooltip({ active, payload, label }: ForecastTooltipProps) {
+  if (!active) return null;
+  const point = payload?.find((p) => p.dataKey === "Rt");
+  if (!point || point.value == null) return null;
+  return (
+    <div className="fp-forecast-tooltip">
+      <p className="fp-forecast-tooltip__label">
+        {label === 0 ? t("сейчас") : t("{n} мес", { n: Number(label) })}
+      </p>
+      <p className="fp-forecast-tooltip__value">
+        <span className="fp-forecast-tooltip__symbol">
+          <Formula tex="R_t" fallback="Rt" />
+        </span>
+        {" = "}
+        {formatMoney(Number(point.value))}
+      </p>
+    </div>
+  );
+}
 
 export function ForecastPanel({ forecast }: { forecast: ForecastResult }) {
   const chartData = buildForecastChartData(forecast);
@@ -53,21 +90,7 @@ export function ForecastPanel({ forecast }: { forecast: ForecastResult }) {
               tickFormatter={(v: number) => formatMoney(v)}
               width={72}
             />
-            <Tooltip
-              // Только медиана (Rt) — p10/полоса служебные, полный диапазон
-              // уже есть в table.sr-only ниже (aria-hidden на самом графике).
-              formatter={(value, _name, entry) =>
-                entry?.dataKey === "Rt" ? formatMoney(Number(value)) : ""
-              }
-              labelFormatter={(label) =>
-                label === 0 ? t("сейчас") : t("{n} мес", { n: Number(label) })
-              }
-              contentStyle={{
-                background: "var(--c-surface-up)",
-                border: "var(--border-w) solid var(--c-border-hl)",
-                borderRadius: "var(--r-sm)",
-              }}
-            />
+            <Tooltip content={ForecastTooltip} />
             <Area
               type="monotone"
               dataKey="Rt_p10"
