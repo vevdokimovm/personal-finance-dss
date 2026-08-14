@@ -1,6 +1,6 @@
 import type { ReactElement, ReactNode } from "react";
-import { describe, expect, it } from "vitest";
-import { render, screen, waitFor } from "@testing-library/react";
+import { describe, expect, it, vi } from "vitest";
+import { act, render, screen, waitFor } from "@testing-library/react";
 import { Area } from "recharts";
 import type { TooltipPayload } from "recharts/types/state/tooltipSlice";
 import { ForecastPanel, ForecastTooltip } from "./ForecastPanel";
@@ -44,6 +44,9 @@ const FORECAST_ANNA: ForecastResult = {
     { period: 6, Rt: 400000, Rt_p10: 350000, Rt_p90: 450000 },
     { period: 12, Rt: 813519, Rt_p10: 682866, Rt_p90: 952920 },
   ],
+  r_bench: 0.139,
+  real_r_bench: 0.139,
+  r_bench_source: "cbr_keyrate_post_tax",
 };
 
 // pavel — дефицит: p10/p90 ОБА отрицательные. Старый баг (Area без stackId,
@@ -56,6 +59,9 @@ const FORECAST_PAVEL: ForecastResult = {
     { period: 6, Rt: -350000, Rt_p10: -450000, Rt_p90: -280000 },
     { period: 12, Rt: -709583, Rt_p10: -823544, Rt_p90: -587992 },
   ],
+  r_bench: 0.139,
+  real_r_bench: 0.139,
+  r_bench_source: "cbr_keyrate_post_tax",
 };
 
 describe("buildForecastChartData", () => {
@@ -149,4 +155,63 @@ describe("ForecastPanel — конфигурация полосы p10-p90", () =
       expect(fills).toEqual(["none", "var(--c-accent-bg)"]);
     },
   );
+});
+
+describe("ForecastPanel — сценарий «что если» и живая область результата (design-critic/a11y-auditor, v8.24.0)", () => {
+  it("пометка сценария появляется только когда r_bench_source === request, не при реальной ставке", () => {
+    const { rerender } = render(<ForecastPanel forecast={FORECAST_ANNA} />);
+    expect(screen.queryByText(/Сценарий «что если»/)).not.toBeInTheDocument();
+
+    const overridden = { ...FORECAST_ANNA, r_bench: 0.25, r_bench_source: "request" };
+    rerender(<ForecastPanel forecast={overridden} />);
+    expect(
+      screen.getByText(/Сценарий «что если»: график посчитан со ставкой 25,0%/),
+    ).toBeInTheDocument();
+  });
+
+  // Не screen.getByRole("status") — тот же приём, что WhatIfSliders.test.tsx: sr-only регион
+  // testing-library в jsdom иногда не засчитывает как accessible по вычисленным стилям.
+  // formatMoney разделяет разряды неразрывным пробелом (U+00A0, канон денег CLAUDE.md п.6) —
+  // нормализуем в обычный перед сравнением, иначе строковый литерал с обычным пробелом
+  // никогда не совпадёт с реальным DOM.
+  function anyStatusContains(text: string): boolean {
+    return Array.from(document.querySelectorAll('[role="status"]')).some((el) =>
+      el.textContent?.replace(/\u00a0/g, " ").includes(text),
+    );
+  }
+
+  it("живая область объявляет обновлённый результат после дебаунса — не на первом рендере, не мгновенно", () => {
+    vi.useFakeTimers();
+    const { rerender } = render(
+      <ForecastPanel
+        forecast={FORECAST_ANNA}
+        horizon={12}
+        onHorizonChange={vi.fn()}
+        rBench={undefined}
+        onRBenchChange={vi.fn()}
+      />,
+    );
+    expect(anyStatusContains("900 000")).toBe(false);
+
+    const updated: ForecastResult = {
+      ...FORECAST_ANNA,
+      forecast: [{ period: 12, Rt: 900000, Rt_p10: 800000, Rt_p90: 1000000 }],
+    };
+    rerender(
+      <ForecastPanel
+        forecast={updated}
+        horizon={12}
+        onHorizonChange={vi.fn()}
+        rBench={undefined}
+        onRBenchChange={vi.fn()}
+      />,
+    );
+    // Сразу после смены пропса ещё не объявлено — задержка, не каждое промежуточное значение.
+    expect(anyStatusContains("900 000")).toBe(false);
+    act(() => {
+      vi.advanceTimersByTime(300);
+    });
+    expect(anyStatusContains("900 000")).toBe(true);
+    vi.useRealTimers();
+  });
 });

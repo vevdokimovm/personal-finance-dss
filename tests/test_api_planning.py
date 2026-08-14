@@ -73,6 +73,23 @@ def test_forecast_returns_series(client: TestClient) -> None:
     assert len(body["forecast"]) == 6
 
 
+def test_forecast_r_bench_override_changes_result(client: TestClient) -> None:
+    _load_anna(client)
+    base = client.post("/api/planning/forecast", json={"horizon": 6}).json()
+    high = client.post(
+        "/api/planning/forecast", json={"horizon": 6, "r_bench": 0.30}
+    ).json()
+    assert high["r_bench"] == 0.30
+    assert high["r_bench_source"] == "request"
+    assert base["r_bench"] != 0.30
+    assert base["r_bench_source"] != "request"
+    # real_r_bench — настоящая ставка НЕЗАВИСИМО от override (кнопка «сбросить» во
+    # фронте на неё опирается): у обоих ответов она одинаковая и совпадает с r_bench
+    # непереопределённого ответа, а не эхом override.
+    assert high["real_r_bench"] == base["r_bench"]
+    assert high["real_r_bench"] != 0.30
+
+
 def test_key_rate_endpoint(client: TestClient) -> None:
     resp = client.get("/api/planning/key-rate")
     assert resp.status_code == 200

@@ -31,6 +31,14 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 SKIP_DIRS = frozenset({
     ".git", "__pycache__", ".venv", "node_modules",
     ".pytest_cache", ".mypy_cache", ".hypothesis",
+    # Сборочные/тестовые артефакты фронта (frontend/.gitignore) — генерируются `npm run
+    # build`/Playwright, не исходники. Без них CJK-канарейка ловит саму себя на минифицированном
+    # KaTeX в dist/ (регекспы шрифтовых диапазонов содержат реальные CJK-символы легитимно) —
+    # тот же класс гейта-с-ложной-уверенностью, что уже был у openapi_paths (см. комментарий
+    # выше по коду), только не пойман раньше, потому что dist/ обычно не существует на момент
+    # прогона.
+    "dist", "dist-ssr", "coverage", "playwright-report", "test-results", "blob-report",
+    ".tanstack",
 })
 
 # Источник считается замороженным (ссылки были верны на своей версии — не чиним).
@@ -126,7 +134,10 @@ LEGACY_CONTEXT_MARKERS = (
 # ровно юридического контура вехи 7 (/api/consents, /api/legal/documents,
 # /legal/cookies, /legal/marketing-consent). Пин был подогнан под протухший
 # снимок, поэтому гейт молчал о расхождении, а не ловил его.
-EXPECTED_COUNTS = {"tables": 30, "migrations": 33, "openapi_paths": 114}
+# openapi_paths 111 (v8.23.0): -3 — снесены /profile, /forgot-password, /reset-password
+# (Jinja-роуты с подтверждённым паритетом в React, docs/reports/decisions/
+# 2026-08-14_jinja_frontend_removal.md); снимок пересобран `tools/api_snapshot/dump_openapi.py`.
+EXPECTED_COUNTS = {"tables": 30, "migrations": 33, "openapi_paths": 111}
 
 
 # Канарейка CJK: редкий токен-глюк генерации ассистентов — иероглиф вместо

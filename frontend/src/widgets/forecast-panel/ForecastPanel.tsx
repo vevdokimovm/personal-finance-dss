@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState } from "react";
 import {
   Area,
   AreaChart,
@@ -9,11 +10,12 @@ import {
   YAxis,
 } from "recharts";
 import type { TooltipPayload } from "recharts/types/state/tooltipSlice";
-import { formatMoney } from "@shared/lib/money/formatMoney";
+import { formatMoney, formatPercent } from "@shared/lib/money/formatMoney";
 import { t } from "@shared/lib/i18n/t";
 import { Formula } from "@shared/ui";
 import type { ForecastResult } from "@entities/plan-summary";
 import { buildForecastChartData } from "./buildForecastChartData";
+import { ForecastControls } from "./ForecastControls";
 import "@shared/ui/panel.css";
 import "./ForecastPanel.css";
 
@@ -52,7 +54,25 @@ export function ForecastTooltip({ active, payload, label }: ForecastTooltipProps
   );
 }
 
-export function ForecastPanel({ forecast }: { forecast: ForecastResult }) {
+/** `horizon`/`onHorizonChange`/`rBench`/`onRBenchChange` необязательны — без них (дашборд,
+ * свёрнутая карточка Э3) панель просто показывает прогноз без контролов. С ними (страница
+ * планирования, §8.4) появляется `ForecastControls` — управляемые горизонт+ставка живут у
+ * вызывающего (тот же владелец, что `useForecast`), панель их не хранит. */
+export function ForecastPanel({
+  forecast,
+  horizon,
+  onHorizonChange,
+  rBench,
+  onRBenchChange,
+  isFetching = false,
+}: {
+  forecast: ForecastResult;
+  horizon?: number;
+  onHorizonChange?: (horizon: number) => void;
+  rBench?: number;
+  onRBenchChange?: (rBench: number | undefined) => void;
+  isFetching?: boolean;
+}) {
   const chartData = buildForecastChartData(forecast);
   const last = chartData[chartData.length - 1];
   // Диапазон в подвале — только если API реально дал p10/p90 для последней
@@ -62,6 +82,8 @@ export function ForecastPanel({ forecast }: { forecast: ForecastResult }) {
   // было бы вводящим в заблуждение — как и раньше, просто скрываем строку).
   const lastRaw = forecast.forecast[forecast.forecast.length - 1];
   const hasRange = lastRaw != null && lastRaw.Rt_p10 != null && lastRaw.Rt_p90 != null;
+  const showControls = onHorizonChange != null && onRBenchChange != null;
+  const isOverridden = forecast.r_bench_source === "request";
 
   return (
     <section className="fp-panel">
@@ -69,6 +91,34 @@ export function ForecastPanel({ forecast }: { forecast: ForecastResult }) {
       <p className="fp-lede">
         {t("SES + Monte-Carlo, интервал 80% (p10–p90) вокруг медианного сценария.")}
       </p>
+      {/* Без этой строки единственный признак того, что график больше не считает по реальной
+       * ставке — появление кнопки «Сбросить» под ползунком в другом месте экрана (design-critic,
+       * правило 7: условная информация не держится на одном слабом признаке). */}
+      {isOverridden && (
+        <p className="fp-lede">
+          {t("Сценарий «что если»: график посчитан со ставкой {v}, не решение СППР.", {
+            v: formatPercent(forecast.r_bench),
+          })}
+        </p>
+      )}
+
+      {showControls && (
+        <ForecastControls
+          horizon={horizon ?? forecast.horizon}
+          onHorizonChange={onHorizonChange}
+          rBench={rBench}
+          onRBenchChange={onRBenchChange}
+          realRBench={forecast.real_r_bench}
+          isOverridden={isOverridden}
+          isFetching={isFetching}
+        />
+      )}
+      {/* Компонент-обёртка с хуками отдельно от ForecastPanel: ForecastPanel.test.tsx вызывает
+       * ForecastPanel(...) напрямую как функцию (не через render()), чтобы прочитать дерево
+       * <Area> без ResizeObserver — хуки в самом ForecastPanel сломали бы этот приём. JSX-ссылка
+       * на дочерний компонент безопасна: React вызывает его функцию только при реальном
+       * рендере/монтировании, которого в том тесте нет. */}
+      {showControls && <ForecastResultAnnouncer forecast={forecast} lastMedian={last?.Rt} />}
 
       {/* График декоративный (aria-hidden) — та же информация в таблице ниже полностью,
           не только последняя точка (WCAG 1.1.1, находка a11y-auditor №2). */}
@@ -161,5 +211,46 @@ export function ForecastPanel({ forecast }: { forecast: ForecastResult }) {
         </div>
       )}
     </section>
+  );
+}
+
+/** Живая область объявляет ГОТОВЫЙ результат после пересчёта (a11y-auditor: `ForecastControls`
+ * объявляет только факт «идёт пересчёт», после завершения область немела — цифры узнать можно
+ * было только вручную дойдя до таблицы/подвала). Тот же паттерн debounce, что
+ * `WhatIfSliders.describeResult` — не на первом рендере (иначе объявляет саму загрузку страницы,
+ * которую и так видно), с задержкой, чтобы не диктовать каждое промежуточное значение при
+ * протяжке ползунка, только устоявшийся итог. */
+function ForecastResultAnnouncer({
+  forecast,
+  lastMedian,
+}: {
+  forecast: ForecastResult;
+  lastMedian: number | undefined;
+}) {
+  const isFirstRender = useRef(true);
+  const [announced, setAnnounced] = useState("");
+
+  useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
+    const timer = setTimeout(() => {
+      setAnnounced(
+        lastMedian != null
+          ? t("Прогноз обновлён: медиана к {h} мес — {v}.", {
+              h: forecast.horizon,
+              v: formatMoney(lastMedian),
+            })
+          : "",
+      );
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [forecast, lastMedian]);
+
+  return (
+    <p className="sr-only" role="status" aria-live="polite">
+      {announced}
+    </p>
   );
 }

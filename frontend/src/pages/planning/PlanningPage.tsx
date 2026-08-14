@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { usePlan, useForecast } from "@entities/plan-summary";
 import { ListSkeleton, StatePanel, Button, Formula } from "@shared/ui";
 import { formatMoney } from "@shared/lib/money/formatMoney";
@@ -14,7 +15,11 @@ import "./PlanningPage.css";
  * допустимым альтернативам (Э5, `AlternativesBrowser`) под свёрнутым top3. */
 export function PlanningPage() {
   const planQuery = usePlan();
-  const forecastQuery = useForecast(12);
+  // §8.4: горизонт/ставка «что если» живут здесь — тот же владелец, что useForecast (плюс
+  // ForecastPanel остаётся управляемым компонентом, как AllocationPanel/WhatIfSliders).
+  const [horizon, setHorizon] = useState(12);
+  const [rBench, setRBench] = useState<number | undefined>(undefined);
+  const forecastQuery = useForecast(horizon, rBench);
 
   if (planQuery.isLoading || forecastQuery.isLoading) {
     return (
@@ -129,7 +134,14 @@ export function PlanningPage() {
       <MetricsGrid indicators={plan.indicators} />
       <AllocationPanel best={plan.top3[0] ?? null} alternatives={plan.ranked} />
       <AlternativesBrowser alternatives={plan.ranked} />
-      <ForecastPanel forecast={forecast} />
+      <ForecastPanel
+        forecast={forecast}
+        horizon={horizon}
+        onHorizonChange={setHorizon}
+        rBench={rBench}
+        onRBenchChange={setRBench}
+        isFetching={forecastQuery.isFetching}
+      />
     </main>
   );
 }

@@ -1,0 +1,86 @@
+.fp-forecast-controls {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+  margin-bottom: var(--sp-4);
+  padding-bottom: var(--sp-4);
+  border-bottom: var(--border-w) solid var(--c-border);
+}
+.fp-forecast-controls__hint {
+  margin: 0;
+  font-size: var(--fs-xs);
+  color: var(--c-text3);
+}
+.fp-forecast-controls__row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: var(--sp-5);
+}
+.fp-forecast-controls__field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-1);
+  font-size: var(--fs-sm);
+  color: var(--c-text2);
+}
+.fp-forecast-controls__field select {
+  font-family: inherit;
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  color: var(--c-text2);
+  background: var(--c-surface);
+  border: var(--border-w) solid var(--c-text3);
+  border-radius: var(--r-sm);
+  padding: var(--sp-2) var(--sp-3);
+  min-height: var(--tap-target-min);
+  cursor: pointer;
+}
+.fp-forecast-controls__field select:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: var(--focus-ring-offset);
+}
+.fp-forecast-controls__field--slider {
+  /* flex:1 без flex-basis не давал полю перенестись на свою строку на узких экранах
+     (design-critic v8.24.0) — grow остаётся, но не ниже читаемой ширины трека. */
+  flex: 1 1 var(--forecast-slider-min-width);
+}
+.fp-forecast-controls__slider-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--sp-2);
+}
+.fp-forecast-controls__slider-value {
+  display: inline-flex;
+  align-items: baseline;
+  gap: var(--sp-2);
+  font-weight: 600;
+}
+.fp-forecast-controls__field--slider input[type="range"] {
+  width: 100%;
+  min-height: var(--tap-target-min);
+  /* Не --c-accent: тот же цвет уже держит медианную линию/значение графика (правило 4
+     брифа — акцент занят результатом). Ползунок ставит сценарий, не факт — нейтральный
+     --c-blue (design-critic v8.24.0). */
+  accent-color: var(--c-blue);
+}
+.fp-forecast-controls__field--slider input[type="range"]:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: var(--focus-ring-offset);
+}
+.fp-forecast-controls__slider-scale {
+  display: flex;
+  justify-content: space-between;
+  font-size: var(--fs-xs);
+  color: var(--c-text3);
+}
+.fp-forecast-controls__reset {
+  font-size: var(--fs-xs);
+}
+.fp-forecast-controls__status {
+  min-height: 1em;
+  margin: 0;
+  font-size: var(--fs-xs);
+  color: var(--c-text3);
+}

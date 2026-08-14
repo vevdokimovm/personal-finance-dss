@@ -61,6 +61,9 @@ const FORECAST_ANNA: ForecastResult = {
   current: { Bt: 265000, Rt: 39500, Lt: 0, Dt: 0.347 },
   horizon: 12,
   forecast: [{ period: 12, Rt: 813519, Rt_p10: 682866, Rt_p90: 952920 }],
+  r_bench: 0.139,
+  real_r_bench: 0.139,
+  r_bench_source: "cbr_keyrate_post_tax",
 };
 
 describe("DashboardPage", () => {

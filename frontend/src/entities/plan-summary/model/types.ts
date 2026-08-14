@@ -106,4 +106,15 @@ export interface ForecastResult {
   current: { Bt: number; Rt: number; Lt: number; Dt: number };
   horizon: number;
   forecast: ForecastPoint[];
+  /** Ставка капитализации баланса, фактически применённая (app/api/routes_planning.py::
+   * get_forecast) — либо сценарий из запроса, либо реальная OCR (ключевая ЦБ после НДФЛ). */
+  r_bench: number;
+  /** "request" — сценарий «что если»; иначе источник реальной OCR
+   * (app/services/cbr_rate.py::get_opportunity_cost_rate). */
+  r_bench_source: string;
+  /** Настоящая OCR НЕЗАВИСИМО от сценария — считается всегда, даже когда `r_bench` выше
+   * это override из запроса. Нужна отдельно от `r_bench`: тот эхо'ит применённую ставку
+   * (override ИЛИ реальную), одного поля недостаточно, чтобы после override узнать, к чему
+   * возвращаться кнопкой «сбросить» (баг найден и исправлен при живой проверке в браузере). */
+  real_r_bench: number;
 }

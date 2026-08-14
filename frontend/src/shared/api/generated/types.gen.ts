@@ -35,6 +35,100 @@ export type AccountDto = {
 };
 
 /**
+ * AdviceDecision
+ *
+ * Решение пользователя по ранее показанному плану.
+ */
+export type AdviceDecision = {
+    /**
+     * Modified To
+     */
+    modified_to?: {
+        [key: string]: unknown;
+    } | null;
+    /**
+     * Outcome
+     */
+    outcome: 'accepted' | 'modified' | 'ignored';
+};
+
+/**
+ * AdviceEventCreate
+ *
+ * Событие показа плана (волна 0, п. 0.6, `docs/model/telemetry_spec.md`).
+ */
+export type AdviceEventCreate = {
+    /**
+     * Advice
+     */
+    advice: {
+        [key: string]: unknown;
+    };
+    /**
+     * App Version
+     */
+    app_version: string;
+    /**
+     * Input Snapshot Hash
+     */
+    input_snapshot_hash: string;
+    /**
+     * Model Version
+     */
+    model_version: string;
+};
+
+/**
+ * AdviceEventResponse
+ */
+export type AdviceEventResponse = {
+    /**
+     * Advice
+     */
+    advice: {
+        [key: string]: unknown;
+    };
+    /**
+     * App Version
+     */
+    app_version: string;
+    /**
+     * Decided At
+     */
+    decided_at?: string | null;
+    /**
+     * Id
+     */
+    id: number;
+    /**
+     * Input Snapshot Hash
+     */
+    input_snapshot_hash: string;
+    /**
+     * Model Version
+     */
+    model_version: string;
+    /**
+     * Modified To
+     */
+    modified_to?: {
+        [key: string]: unknown;
+    } | null;
+    /**
+     * Outcome
+     */
+    outcome?: string | null;
+    /**
+     * Plan Id
+     */
+    plan_id: string;
+    /**
+     * Shown At
+     */
+    shown_at: string;
+};
+
+/**
  * AllocationDTO
  */
 export type AllocationDto = {
@@ -50,6 +144,140 @@ export type AllocationDto = {
      * To Reserve
      */
     to_reserve: number;
+};
+
+/**
+ * Alternative
+ */
+export type Alternative = {
+    /**
+     * Dt New
+     */
+    Dt_new?: number | null;
+    /**
+     * Lt New
+     */
+    Lt_new?: number | null;
+    /**
+     * Rt New
+     */
+    Rt_new?: number | null;
+    /**
+     * Si
+     */
+    Si?: number | null;
+    avalanche_detail?: AvalancheDetail | null;
+    /**
+     * Description
+     */
+    description?: string | null;
+    explanation?: Explanation | null;
+    /**
+     * Floor Level
+     */
+    floor_level?: number | null;
+    /**
+     * Goal Allocation
+     */
+    goal_allocation?: {
+        [key: string]: number;
+    };
+    /**
+     * Goal Breakdown
+     */
+    goal_breakdown?: Array<GoalBreakdownItem>;
+    /**
+     * Id
+     */
+    id: string;
+    investment_tranche?: InvestmentTranche | null;
+    /**
+     * Is Admissible
+     */
+    is_admissible?: boolean | null;
+    /**
+     * Is Recommended
+     */
+    is_recommended?: boolean | null;
+    /**
+     * Name
+     */
+    name?: string;
+    /**
+     * Obligation Allocation
+     */
+    obligation_allocation?: Array<ObligationAllocationItem>;
+    scores?: AlternativeScores | null;
+    /**
+     * Utility
+     */
+    utility?: number | null;
+    /**
+     * Violations
+     */
+    violations?: Array<string>;
+    weighted_scores?: WeightedScores | null;
+    /**
+     * X Goals
+     */
+    x_goals?: number;
+    /**
+     * X Goals Unused
+     */
+    x_goals_unused?: number | null;
+    /**
+     * X Obl Effective
+     */
+    x_obl_effective?: number | null;
+    /**
+     * X Obl Unused
+     */
+    x_obl_unused?: number | null;
+    /**
+     * X Obligations
+     */
+    x_obligations?: number;
+    /**
+     * X Remain
+     */
+    x_remain?: number | null;
+    /**
+     * X Reserve
+     */
+    x_reserve?: number;
+    /**
+     * X Reserve Effective
+     */
+    x_reserve_effective?: number | null;
+};
+
+/**
+ * AlternativeScores
+ *
+ * Нормализованные (min-max) значения критериев внутри множества
+ * альтернатив — app/core/ranking.py::rank_alternatives.
+ */
+export type AlternativeScores = {
+    /**
+     * Dt Norm
+     */
+    Dt_norm: number;
+    /**
+     * Lt Capped
+     */
+    Lt_capped: number;
+    /**
+     * Lt Norm
+     */
+    Lt_norm: number;
+    /**
+     * Rt Norm
+     */
+    Rt_norm: number;
+    /**
+     * Si Norm
+     */
+    Si_norm: number;
 };
 
 /**
@@ -120,6 +348,72 @@ export type AuthResponse = {
 };
 
 /**
+ * AvalancheDetail
+ */
+export type AvalancheDetail = {
+    /**
+     * Delta Payment
+     */
+    delta_payment?: number;
+    /**
+     * Passed
+     */
+    passed?: Array<AvalanchePassed>;
+    /**
+     * R Bench
+     */
+    r_bench: number;
+    /**
+     * Skipped
+     */
+    skipped?: Array<AvalancheSkipped>;
+    /**
+     * X Unused To Goals
+     */
+    x_unused_to_goals?: number;
+};
+
+/**
+ * AvalanchePassed
+ */
+export type AvalanchePassed = {
+    /**
+     * Closed
+     */
+    closed?: boolean;
+    /**
+     * Interest Rate
+     */
+    interest_rate?: number;
+    /**
+     * Name
+     */
+    name?: string;
+    /**
+     * Paid In
+     */
+    paid_in?: number;
+    /**
+     * Payment Saved
+     */
+    payment_saved?: number;
+};
+
+/**
+ * AvalancheSkipped
+ */
+export type AvalancheSkipped = {
+    /**
+     * Interest Rate
+     */
+    interest_rate?: number;
+    /**
+     * Name
+     */
+    name?: string;
+};
+
+/**
  * BLRStatus
  */
 export type BlrStatus = {
@@ -131,6 +425,24 @@ export type BlrStatus = {
      * Level
      */
     level: string;
+};
+
+/**
+ * BliqPreallocation
+ */
+export type BliqPreallocation = {
+    /**
+     * Bliq Remaining
+     */
+    bliq_remaining?: number;
+    /**
+     * Bliq Used
+     */
+    bliq_used?: number;
+    /**
+     * Closed Goals
+     */
+    closed_goals?: Array<ClosedGoal>;
 };
 
 /**
@@ -284,6 +596,24 @@ export type ChangePasswordRequest = {
 };
 
 /**
+ * ClosedGoal
+ */
+export type ClosedGoal = {
+    /**
+     * Amount
+     */
+    amount?: number;
+    /**
+     * Id
+     */
+    id?: unknown | null;
+    /**
+     * Name
+     */
+    name?: string;
+};
+
+/**
  * ConvertRequest
  */
 export type ConvertRequest = {
@@ -299,6 +629,39 @@ export type ConvertRequest = {
      * To Currency
      */
     to_currency: string;
+};
+
+/**
+ * Counterfactual
+ *
+ * Что изменилось бы, чтобы победил другой вариант (батч 0.4, Волна 0).
+ *
+ * Сравнение с реально посчитанным следующим по рангу вариантом из того же
+ * ranked[] — не гипотетический сценарий. `dominant_criterion` здесь —
+ * служебный ключ (Rt/Lt/Dt/Si), как у существующего `delta`; человеческая
+ * формулировка — в `text` (без формульной нотации, FR-01/UX-02).
+ */
+export type Counterfactual = {
+    /**
+     * Alternative Id
+     */
+    alternative_id?: string | null;
+    /**
+     * Available
+     */
+    available?: boolean;
+    /**
+     * Dominant Criterion
+     */
+    dominant_criterion?: string | null;
+    /**
+     * Text
+     */
+    text?: string | null;
+    /**
+     * Utility Gap
+     */
+    utility_gap?: number | null;
 };
 
 /**
@@ -333,6 +696,52 @@ export type DebtDto = {
      * Term Months
      */
     term_months?: number;
+};
+
+/**
+ * DebtSchedule
+ *
+ * Помесячный график погашения долга — baseline vs накопительная лавина
+ * (ADR-016, канон v3.8.0, §10.5). Диагностика победившей альтернативы, не
+ * влияет на допустимость/ранжирование/кризисный режим.
+ */
+export type DebtSchedule = {
+    /**
+     * Accelerated Months
+     */
+    accelerated_months: number;
+    /**
+     * Accelerated Total Interest
+     */
+    accelerated_total_interest: number;
+    /**
+     * Baseline Months
+     */
+    baseline_months: number;
+    /**
+     * Baseline Total Interest
+     */
+    baseline_total_interest: number;
+    /**
+     * Horizon Capped
+     */
+    horizon_capped: boolean;
+    /**
+     * Interest Saved
+     */
+    interest_saved: number;
+    /**
+     * Months Saved
+     */
+    months_saved: number;
+    /**
+     * Negative Amortization
+     */
+    negative_amortization: boolean;
+    /**
+     * Qualifying Debt Count
+     */
+    qualifying_debt_count: number;
 };
 
 /**
@@ -438,6 +847,48 @@ export type ExperimentUpdate = {
 };
 
 /**
+ * Explanation
+ */
+export type Explanation = {
+    /**
+     * Costs
+     */
+    costs?: Array<string>;
+    counterfactual?: Counterfactual | null;
+    delta: ExplanationDelta;
+    /**
+     * Dominant Criterion
+     */
+    dominant_criterion?: string | null;
+    /**
+     * Gains
+     */
+    gains?: Array<string>;
+    /**
+     * Insight
+     */
+    insight?: string;
+};
+
+/**
+ * ExplanationDelta
+ */
+export type ExplanationDelta = {
+    /**
+     * Dt
+     */
+    Dt: number;
+    /**
+     * Lt
+     */
+    Lt: number;
+    /**
+     * Rt
+     */
+    Rt: number;
+};
+
+/**
  * ForecastRequest
  */
 export type ForecastRequest = {
@@ -445,6 +896,12 @@ export type ForecastRequest = {
      * Horizon
      */
     horizon?: number;
+    /**
+     * R Bench
+     *
+     * Сценарий «что если»: ставка капитализации вместо реальной OCR
+     */
+    r_bench?: number | null;
 };
 
 /**
@@ -487,6 +944,52 @@ export type FxRateUpsert = {
      * Rate To Usd
      */
     rate_to_usd: number;
+};
+
+/**
+ * GoalBreakdownItem
+ */
+export type GoalBreakdownItem = {
+    /**
+     * Amount
+     */
+    amount?: number;
+    /**
+     * Category
+     */
+    category?: string;
+    /**
+     * Id
+     */
+    id?: unknown | null;
+    /**
+     * Months Left
+     */
+    months_left?: number | null;
+    /**
+     * Name
+     */
+    name?: string;
+    /**
+     * Priority
+     */
+    priority?: number;
+    /**
+     * Remaining
+     */
+    remaining?: number;
+    /**
+     * Share
+     */
+    share?: number;
+    /**
+     * Urgency
+     */
+    urgency?: number;
+    /**
+     * Weight
+     */
+    weight?: number;
 };
 
 /**
@@ -630,6 +1133,26 @@ export type GoalResponse = {
 };
 
 /**
+ * GrowthIllustrationPoint
+ *
+ * Иллюстрация сложного процента — НЕ прогноз, НЕ рекомендация инструмента.
+ */
+export type GrowthIllustrationPoint = {
+    /**
+     * Future Value
+     */
+    future_value: number;
+    /**
+     * Rate
+     */
+    rate: number;
+    /**
+     * Years
+     */
+    years: number;
+};
+
+/**
  * HTTPValidationError
  */
 export type HttpValidationError = {
@@ -765,6 +1288,22 @@ export type HouseholdUpdate = {
 };
 
 /**
+ * IISDeductionEstimate
+ *
+ * Реальный вычет ИИС типа А (ADR-017) — только когда применимо, иначе None.
+ */
+export type IisDeductionEstimate = {
+    /**
+     * Deduction
+     */
+    deduction: number;
+    /**
+     * Eligible Amount
+     */
+    eligible_amount: number;
+};
+
+/**
  * IndicatorsResponse
  */
 export type IndicatorsResponse = {
@@ -809,6 +1348,102 @@ export type IndicatorsResponse = {
      * Sigmap
      */
     SigmaP?: number | null;
+};
+
+/**
+ * InputSummary
+ */
+export type InputSummary = {
+    /**
+     * Bliq
+     */
+    bliq: number;
+    /**
+     * Expense
+     */
+    expense: number;
+    /**
+     * Goals Count
+     */
+    goals_count: number;
+    /**
+     * Income
+     */
+    income: number;
+    /**
+     * L Min
+     */
+    l_min: number;
+    /**
+     * Liquid Assets Count
+     */
+    liquid_assets_count: number;
+    /**
+     * Obligations Count
+     */
+    obligations_count: number;
+    /**
+     * R Bench
+     */
+    r_bench: number;
+    /**
+     * R Bench Source
+     */
+    r_bench_source: string;
+    /**
+     * Risk Tolerance
+     */
+    risk_tolerance: number;
+    /**
+     * Transactions Count
+     */
+    transactions_count: number;
+};
+
+/**
+ * InvestmentTranche
+ */
+export type InvestmentTranche = {
+    /**
+     * Amount
+     */
+    amount: number;
+    /**
+     * Cushion Part
+     */
+    cushion_part?: number;
+    /**
+     * Equity Share
+     */
+    equity_share?: number;
+    /**
+     * Growth Illustration
+     */
+    growth_illustration?: Array<GrowthIllustrationPoint> | null;
+    iis_deduction_estimate?: IisDeductionEstimate | null;
+    /**
+     * Note
+     */
+    note?: string;
+    split: InvestmentTrancheSplit;
+};
+
+/**
+ * InvestmentTrancheSplit
+ */
+export type InvestmentTrancheSplit = {
+    /**
+     * Bonds
+     */
+    bonds?: number;
+    /**
+     * Deposits
+     */
+    deposits?: number;
+    /**
+     * Equity
+     */
+    equity?: number;
 };
 
 /**
@@ -1032,6 +1667,32 @@ export type NotificationOut = {
 };
 
 /**
+ * ObligationAllocationItem
+ */
+export type ObligationAllocationItem = {
+    /**
+     * Id
+     */
+    id?: unknown | null;
+    /**
+     * Interest Rate
+     */
+    interest_rate?: number;
+    /**
+     * Name
+     */
+    name?: string;
+    /**
+     * New Amount
+     */
+    new_amount?: number;
+    /**
+     * New Payment
+     */
+    new_payment?: number;
+};
+
+/**
  * ObligationCreate
  */
 export type ObligationCreate = {
@@ -1181,6 +1842,115 @@ export type PlanHistorySave = {
      * Risk Tolerance
      */
     risk_tolerance?: number | null;
+};
+
+/**
+ * PlanningCalculateResponse
+ *
+ * Ответ POST /planning/calculate.
+ */
+export type PlanningCalculateResponse = {
+    /**
+     * Admissible Count
+     */
+    admissible_count: number;
+    /**
+     * Alternatives Total
+     */
+    alternatives_total: number;
+    best?: Alternative | null;
+    bliq_preallocation: BliqPreallocation;
+    /**
+     * Crisis Plan
+     */
+    crisis_plan?: {
+        [key: string]: unknown;
+    } | null;
+    indicators: PlanningIndicators;
+    input_summary: InputSummary;
+    /**
+     * Ranked
+     */
+    ranked?: Array<Alternative>;
+    /**
+     * Rejected
+     */
+    rejected?: Array<Alternative>;
+    /**
+     * Rejected Count
+     */
+    rejected_count: number;
+    /**
+     * Risk Profile
+     */
+    risk_profile: string;
+    /**
+     * Surplus Plan
+     */
+    surplus_plan?: {
+        [key: string]: unknown;
+    } | null;
+    /**
+     * Top3
+     */
+    top3?: Array<Alternative>;
+    weights: Weights;
+};
+
+/**
+ * PlanningIndicators
+ */
+export type PlanningIndicators = {
+    /**
+     * Blr
+     */
+    BLR?: number | null;
+    BLR_status?: BlrStatus | null;
+    /**
+     * Bliq
+     */
+    Bliq?: number | null;
+    /**
+     * Bt
+     */
+    Bt?: number | null;
+    /**
+     * Cft
+     */
+    CFt?: number | null;
+    /**
+     * Dt
+     */
+    Dt: number;
+    /**
+     * Dt Alert
+     */
+    Dt_alert?: boolean;
+    /**
+     * Et
+     */
+    Et?: number | null;
+    /**
+     * It
+     */
+    It?: number | null;
+    /**
+     * Lt
+     */
+    Lt: number;
+    /**
+     * Rt
+     */
+    Rt: number;
+    /**
+     * Sigmap
+     */
+    SigmaP?: number | null;
+    debt_schedule?: DebtSchedule | null;
+    /**
+     * Income Cv
+     */
+    income_cv?: number | null;
 };
 
 /**
@@ -1590,6 +2360,14 @@ export type UserPrefsResponse = {
      */
     id: number;
     /**
+     * Iis Contributed This Year
+     */
+    iis_contributed_this_year?: number;
+    /**
+     * Iis Type
+     */
+    iis_type?: 'none' | 'A' | 'B' | 'three';
+    /**
      * L Min
      */
     l_min: number;
@@ -1615,6 +2393,14 @@ export type UserPrefsUpdate = {
      * Horizon
      */
     horizon?: number | null;
+    /**
+     * Iis Contributed This Year
+     */
+    iis_contributed_this_year?: number | null;
+    /**
+     * Iis Type
+     */
+    iis_type?: 'none' | 'A' | 'B' | 'three' | null;
     /**
      * L Min
      */
@@ -1695,6 +2481,59 @@ export type VariantIn = {
      * Weight
      */
     weight: number;
+};
+
+/**
+ * WeightedScores
+ *
+ * Вклад каждого критерия SAW в utility: w_x * x_norm (батч 0.3, Волна 0).
+ *
+ * Аддитивно к `scores` — сумма полей равна `utility` с точностью округления.
+ * Не влияет на ранжирование (сортировка по floor_level/utility не менялась).
+ */
+export type WeightedScores = {
+    /**
+     * Dt
+     */
+    Dt: number;
+    /**
+     * Lt
+     */
+    Lt: number;
+    /**
+     * Rt
+     */
+    Rt: number;
+    /**
+     * Si
+     */
+    Si: number;
+};
+
+/**
+ * Weights
+ */
+export type Weights = {
+    /**
+     * Lt Target
+     */
+    lt_target: number;
+    /**
+     * W Dt
+     */
+    w_dt: number;
+    /**
+     * W Goals
+     */
+    w_goals: number;
+    /**
+     * W Lt
+     */
+    w_lt: number;
+    /**
+     * W Rt
+     */
+    w_rt: number;
 };
 
 /**
@@ -4153,13 +4992,9 @@ export type CalculatePlanApiPlanningCalculatePostError = CalculatePlanApiPlannin
 
 export type CalculatePlanApiPlanningCalculatePostResponses = {
     /**
-     * Response Calculate Plan Api Planning Calculate Post
-     *
      * Successful Response
      */
-    200: {
-        [key: string]: unknown;
-    };
+    200: PlanningCalculateResponse;
 };
 
 export type CalculatePlanApiPlanningCalculatePostResponse = CalculatePlanApiPlanningCalculatePostResponses[keyof CalculatePlanApiPlanningCalculatePostResponses];
@@ -4703,6 +5538,61 @@ export type TelegramWebhookApiTelegramWebhookPostResponses = {
 
 export type TelegramWebhookApiTelegramWebhookPostResponse = TelegramWebhookApiTelegramWebhookPostResponses[keyof TelegramWebhookApiTelegramWebhookPostResponses];
 
+export type CreateAdviceEventEndpointApiTelemetryAdviceEventsPostData = {
+    body: AdviceEventCreate;
+    path?: never;
+    query?: never;
+    url: '/api/telemetry/advice-events';
+};
+
+export type CreateAdviceEventEndpointApiTelemetryAdviceEventsPostErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type CreateAdviceEventEndpointApiTelemetryAdviceEventsPostError = CreateAdviceEventEndpointApiTelemetryAdviceEventsPostErrors[keyof CreateAdviceEventEndpointApiTelemetryAdviceEventsPostErrors];
+
+export type CreateAdviceEventEndpointApiTelemetryAdviceEventsPostResponses = {
+    /**
+     * Successful Response
+     */
+    201: AdviceEventResponse;
+};
+
+export type CreateAdviceEventEndpointApiTelemetryAdviceEventsPostResponse = CreateAdviceEventEndpointApiTelemetryAdviceEventsPostResponses[keyof CreateAdviceEventEndpointApiTelemetryAdviceEventsPostResponses];
+
+export type RecordAdviceDecisionEndpointApiTelemetryAdviceEventsPlanIdDecisionPatchData = {
+    body: AdviceDecision;
+    path: {
+        /**
+         * Plan Id
+         */
+        plan_id: string;
+    };
+    query?: never;
+    url: '/api/telemetry/advice-events/{plan_id}/decision';
+};
+
+export type RecordAdviceDecisionEndpointApiTelemetryAdviceEventsPlanIdDecisionPatchErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type RecordAdviceDecisionEndpointApiTelemetryAdviceEventsPlanIdDecisionPatchError = RecordAdviceDecisionEndpointApiTelemetryAdviceEventsPlanIdDecisionPatchErrors[keyof RecordAdviceDecisionEndpointApiTelemetryAdviceEventsPlanIdDecisionPatchErrors];
+
+export type RecordAdviceDecisionEndpointApiTelemetryAdviceEventsPlanIdDecisionPatchResponses = {
+    /**
+     * Successful Response
+     */
+    200: AdviceEventResponse;
+};
+
+export type RecordAdviceDecisionEndpointApiTelemetryAdviceEventsPlanIdDecisionPatchResponse = RecordAdviceDecisionEndpointApiTelemetryAdviceEventsPlanIdDecisionPatchResponses[keyof RecordAdviceDecisionEndpointApiTelemetryAdviceEventsPlanIdDecisionPatchResponses];
+
 export type GetTransactionsEndpointApiTransactionsGetData = {
     body?: never;
     path?: never;
@@ -4957,22 +5847,6 @@ export type ReadDashboardDashboardGetResponses = {
 
 export type ReadDashboardDashboardGetResponse = ReadDashboardDashboardGetResponses[keyof ReadDashboardDashboardGetResponses];
 
-export type ReadForgotPasswordForgotPasswordGetData = {
-    body?: never;
-    path?: never;
-    query?: never;
-    url: '/forgot-password';
-};
-
-export type ReadForgotPasswordForgotPasswordGetResponses = {
-    /**
-     * Successful Response
-     */
-    200: string;
-};
-
-export type ReadForgotPasswordForgotPasswordGetResponse = ReadForgotPasswordForgotPasswordGetResponses[keyof ReadForgotPasswordForgotPasswordGetResponses];
-
 export type ReadGoalsGoalsGetData = {
     body?: never;
     path?: never;
@@ -5116,52 +5990,6 @@ export type ReadPlanningPlanningGetResponses = {
 };
 
 export type ReadPlanningPlanningGetResponse = ReadPlanningPlanningGetResponses[keyof ReadPlanningPlanningGetResponses];
-
-export type ReadProfileProfileGetData = {
-    body?: never;
-    path?: never;
-    query?: never;
-    url: '/profile';
-};
-
-export type ReadProfileProfileGetResponses = {
-    /**
-     * Successful Response
-     */
-    200: string;
-};
-
-export type ReadProfileProfileGetResponse = ReadProfileProfileGetResponses[keyof ReadProfileProfileGetResponses];
-
-export type ReadResetPasswordResetPasswordGetData = {
-    body?: never;
-    path?: never;
-    query?: {
-        /**
-         * Token
-         */
-        token?: string;
-    };
-    url: '/reset-password';
-};
-
-export type ReadResetPasswordResetPasswordGetErrors = {
-    /**
-     * Validation Error
-     */
-    422: HttpValidationError;
-};
-
-export type ReadResetPasswordResetPasswordGetError = ReadResetPasswordResetPasswordGetErrors[keyof ReadResetPasswordResetPasswordGetErrors];
-
-export type ReadResetPasswordResetPasswordGetResponses = {
-    /**
-     * Successful Response
-     */
-    200: string;
-};
-
-export type ReadResetPasswordResetPasswordGetResponse = ReadResetPasswordResetPasswordGetResponses[keyof ReadResetPasswordResetPasswordGetResponses];
 
 export type ReadTransactionsTransactionsGetData = {
     body?: never;

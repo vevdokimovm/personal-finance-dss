@@ -121,6 +121,9 @@ class PlanningRequest(BaseModel):
 
 class ForecastRequest(BaseModel):
     horizon: int = Field(6, ge=1, le=24)
+    r_bench: Optional[float] = Field(
+        None, ge=0.0, le=1.0,
+        description="Сценарий «что если»: ставка капитализации вместо реальной OCR")
 
 
 class ScenarioSave(BaseModel):
@@ -525,7 +528,22 @@ def get_forecast(
     # → тренд по данным (Holt). Тоталы выше уже за текущий месяц (prepare_data).
     hist = build_monthly_history(transactions, months=8)
 
-    return forecast_indicators(
+    # r_bench: явный из запроса (сценарий «что если») → реальная OCR (ключевая ЦБ
+    # после НДФЛ, тот же источник и fallback, что раньше был зашит безусловно).
+    # Тот же паттерн, что PlanningRequest.r_bench в _compute_plan. `real_r_bench` считается
+    # ВСЕГДА (не только при отсутствии override) — иначе после override фронту неоткуда
+    # взять настоящую ставку для кнопки «сбросить к реальной»: `r_bench` в ответе echo'ит
+    # именно ПРИМЕНЁННУЮ ставку (override или реальную), не обе сразу.
+    ocr = get_opportunity_cost_rate(fallback=0.14)
+    real_r_bench = float(ocr["r_bench"])
+    if payload.r_bench is not None:
+        r_bench = payload.r_bench
+        r_bench_source = "request"
+    else:
+        r_bench = real_r_bench
+        r_bench_source = str(ocr["source"])
+
+    result = forecast_indicators(
         balance=balance,
         rt=rt,
         lt=lt,
@@ -538,8 +556,12 @@ def get_forecast(
         expense_history=hist["expense"] or None,
         recurring_income=recurring_income,
         recurring_expense=recurring_expense,
-        r_bench=float(get_opportunity_cost_rate(fallback=0.14)["r_bench"]),
+        r_bench=r_bench,
     )
+    result["r_bench"] = r_bench
+    result["r_bench_source"] = r_bench_source
+    result["real_r_bench"] = real_r_bench
+    return result
 
 
 @router.post("/scenarios", summary="Сохранить сценарий что-если (LOG-06)")
