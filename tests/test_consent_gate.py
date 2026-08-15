@@ -35,7 +35,7 @@ class TestGateClosed:
         assert detail["document"]["url"]
 
     @pytest.mark.parametrize("path", ["/api/transactions", "/api/obligations",
-                                      "/api/goals", "/api/liquid-assets"])
+                                      "/api/goals", "/api/liquid-assets", "/api/budgets"])
     def test_every_financial_router_is_gated(self, client, path):
         assert client.get(path, headers=_headers(client)).status_code == 403
 
@@ -64,6 +64,6 @@ class TestAnonymousIsNotGated:
     """
 
     @pytest.mark.parametrize("path", ["/api/transactions", "/api/obligations",
-                                      "/api/goals", "/api/liquid-assets"])
+                                      "/api/goals", "/api/liquid-assets", "/api/budgets"])
     def test_anonymous_passes(self, client, path):
         assert client.get(path).status_code != 403

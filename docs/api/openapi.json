@@ -4280,7 +4280,7 @@
   },
   "info": {
     "title": "FINPILOT",
-    "version": "8.23.0"
+    "version": "8.24.0"
   },
   "openapi": "3.1.0",
   "paths": {
@@ -5675,6 +5675,48 @@
           }
         },
         "summary": "Удалить бюджет",
+        "tags": [
+          "Бюджеты"
+        ]
+      }
+    },
+    "/api/budgets/{budget_id}/restore": {
+      "post": {
+        "operationId": "restore_budget_endpoint_api_budgets__budget_id__restore_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "budget_id",
+            "required": true,
+            "schema": {
+              "title": "Budget Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BudgetResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Восстановить удалённый бюджет (undo)",
         "tags": [
           "Бюджеты"
         ]

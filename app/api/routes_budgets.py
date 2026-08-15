@@ -8,6 +8,7 @@ from app.database.crud import (
     delete_budget,
     get_budget_status,
     get_budgets,
+    restore_budget,
 )
 from app.dependencies import get_current_user_id, get_db
 from app.schemas.budget import BudgetCreate, BudgetResponse
@@ -64,3 +65,22 @@ def remove_budget(
     if not delete_budget(db, budget_id, user_id=user_id):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Бюджет не найден.")
     log_event("budget_deleted", {"budget_id": budget_id})
+
+
+@router.post(
+    "/{budget_id}/restore",
+    response_model=BudgetResponse,
+    summary="Восстановить удалённый бюджет (undo)",
+)
+def restore_budget_endpoint(
+    budget_id: int,
+    db: Session = Depends(get_db),
+    user_id: str | None = Depends(get_current_user_id),
+) -> BudgetResponse:
+    budget = restore_budget(db, budget_id, user_id=user_id)
+    if budget is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Удалённый бюджет не найден."
+        )
+    log_event("budget_restored", {"budget_id": budget_id})
+    return budget

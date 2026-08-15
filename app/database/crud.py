@@ -314,7 +314,9 @@ def get_spending_by_category(
 
 
 def get_budgets(db: Session, user_id: Optional[str] = None) -> list[Budget]:
-    query = _owner_filter(db.query(Budget), Budget, user_id)
+    query = _owner_filter(db.query(Budget), Budget, user_id).filter(
+        Budget.is_deleted.is_(False)
+    )
     return query.order_by(Budget.category).all()
 
 
@@ -325,12 +327,20 @@ def create_budget(
     user_id: Optional[str] = None,
     household_id: Optional[int] = None,
 ) -> Budget:
-    """Создаёт бюджет; при существующей категории у того же владельца — обновляет лимит (FR-22)."""
+    """Создаёт бюджет; при существующей категории у того же владельца — обновляет лимит (FR-22).
+
+    `category` уникальна на уровне БД (глобально, не только у владельца) — существующая
+    строка ищется БЕЗ фильтра по `is_deleted`: иначе повторное создание категории после
+    мягкого удаления упёрлось бы в UNIQUE-конфликт со старой удалённой строкой вместо
+    того, чтобы её оживить. Оживление здесь и есть корректный смысл upsert (P1.7).
+    """
     existing = _owner_filter(
         db.query(Budget).filter(Budget.category == category), Budget, user_id
     ).first()
     if existing is not None:
         existing.limit_amount = to_money(limit_amount)
+        existing.is_deleted = False
+        existing.deleted_at = None
         db.commit()
         db.refresh(existing)
         return existing
@@ -347,12 +357,26 @@ def create_budget(
 
 
 def delete_budget(db: Session, budget_id: int, user_id: Optional[str] = None) -> bool:
+    """Мягкое удаление (P1.7), симметрично obligations/goals/liquid_assets."""
     budget = db.get(Budget, budget_id)
-    if budget is None or budget.user_id != user_id:
+    if budget is None or budget.is_deleted or budget.user_id != user_id:
         return False
-    db.delete(budget)
+    budget.is_deleted = True
+    budget.deleted_at = utcnow()
     db.commit()
     return True
+
+
+def restore_budget(db: Session, budget_id: int, user_id: Optional[str] = None) -> Optional[Budget]:
+    """Восстановление мягко удалённого бюджета (P1.7)."""
+    budget = db.get(Budget, budget_id)
+    if budget is None or not budget.is_deleted or budget.user_id != user_id:
+        return None
+    budget.is_deleted = False
+    budget.deleted_at = None
+    db.commit()
+    db.refresh(budget)
+    return budget
 
 
 def save_scenario(
@@ -396,7 +420,10 @@ def get_budget_status(db: Session, days: int = 30, user_id: Optional[str] = None
     since = utcnow() - timedelta(days=days)
     owner = Transaction.user_id == user_id if user_id is not None else Transaction.user_id.is_(None)
     statuses = []
-    for b in _owner_filter(db.query(Budget), Budget, user_id).order_by(Budget.category).all():
+    budgets_query = _owner_filter(db.query(Budget), Budget, user_id).filter(
+        Budget.is_deleted.is_(False)
+    )
+    for b in budgets_query.order_by(Budget.category).all():
         spent = (
             db.query(func.sum(Transaction.amount))
             .filter(

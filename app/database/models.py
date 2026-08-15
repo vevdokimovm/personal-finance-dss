@@ -284,6 +284,8 @@ class Budget(Base):
     limit_amount: Mapped[Decimal] = mapped_column(
         Numeric(14, 2), nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=utcnow)
+    is_deleted: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False, index=True)
+    deleted_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
 
 
 class Scenario(Base):

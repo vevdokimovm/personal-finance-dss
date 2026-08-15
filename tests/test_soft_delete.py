@@ -1,7 +1,7 @@
 """Гард мягкого удаления и восстановления (P1.7).
 
 Транзакции уже имели soft-delete (BUG-03); здесь фиксируется симметричное поведение
-для обязательств, целей и ликвидных активов:
+для обязательств, целей, ликвидных активов и бюджетов:
   - delete помечает запись (is_deleted=True) и убирает её из выборок get_*, но строка
     физически остаётся (дочерняя история сохранена для восстановления);
   - restore возвращает запись в выборки;
@@ -46,6 +46,10 @@ def _mk_asset(db, uid):
     )
 
 
+def _mk_budget(db, uid, category="Продукты"):
+    return crud.create_budget(db, category=category, limit_amount=15000.0, user_id=uid)
+
+
 def test_obligation_soft_delete_and_restore(db_session) -> None:
     uid = _user(db_session, "u-o")
     obl = _mk_obligation(db_session, uid)
@@ -71,6 +75,28 @@ def test_asset_soft_delete_and_restore(db_session) -> None:
     assert asset.id not in [a.id for a in crud.get_liquid_assets(db_session, user_id=uid)]
     assert crud.restore_liquid_asset(db_session, asset.id, user_id=uid).is_deleted is False
     assert asset.id in [a.id for a in crud.get_liquid_assets(db_session, user_id=uid)]
+
+
+def test_budget_soft_delete_and_restore(db_session) -> None:
+    uid = _user(db_session, "u-b")
+    budget = _mk_budget(db_session, uid)
+    assert crud.delete_budget(db_session, budget.id, user_id=uid) is True
+    assert budget.id not in [b.id for b in crud.get_budgets(db_session, user_id=uid)]
+    assert crud.restore_budget(db_session, budget.id, user_id=uid).is_deleted is False
+    assert budget.id in [b.id for b in crud.get_budgets(db_session, user_id=uid)]
+
+
+def test_budget_recreate_after_delete_revives_same_category(db_session) -> None:
+    """`create_budget` — упсерт по категории (FR-22): категория глобально уникальна
+    (UNIQUE на уровне БД), поэтому после мягкого удаления новый POST той же категории
+    обязан ожить, а не упереться в UNIQUE-конфликт со старой удалённой строкой."""
+    uid = _user(db_session, "u-b2")
+    budget = _mk_budget(db_session, uid, category="Кафе")
+    crud.delete_budget(db_session, budget.id, user_id=uid)
+    revived = crud.create_budget(db_session, category="Кафе", limit_amount=5000.0, user_id=uid)
+    assert revived.id == budget.id
+    assert revived.is_deleted is False
+    assert revived.limit_amount == 5000.0
 
 
 def test_cross_user_cannot_delete_or_restore(db_session) -> None:
@@ -107,3 +133,18 @@ def test_obligation_delete_restore_via_api(client: TestClient) -> None:
     restored = client.post(f"/api/obligations/{oid}/restore")
     assert restored.status_code == 200
     assert any(o["id"] == oid for o in client.get("/api/obligations").json())
+
+
+def test_budget_delete_restore_via_api(client: TestClient) -> None:
+    created = client.post("/api/budgets", json={
+        "category": "Транспорт", "limit_amount": 6000,
+    }).json()
+    bid = created["id"]
+    assert any(b["id"] == bid for b in client.get("/api/budgets").json())
+
+    assert client.delete(f"/api/budgets/{bid}").status_code == 204
+    assert not any(b["id"] == bid for b in client.get("/api/budgets").json())
+
+    restored = client.post(f"/api/budgets/{bid}/restore")
+    assert restored.status_code == 200
+    assert any(b["id"] == bid for b in client.get("/api/budgets").json())

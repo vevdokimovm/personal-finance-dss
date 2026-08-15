@@ -6,18 +6,24 @@
 
 | Поле | Значение |
 |---|---|
-| Дата | 2026-08-13 |
-| Версия кода | v8.18.0 |
-| Последняя миграция | **0033** (`0033_user_prefs_iis_status.py`) |
-| СУБД | PostgreSQL 16-alpine (Docker, изолированный контейнер на :55432, не боевая БД) |
-| `alembic upgrade head` | прошло, цепочка 0007 → 0033 (контейнер поднят с чистого образа) |
-| Обратимость | `downgrade 0033` → `upgrade head` прошли |
-| Тесты на SQLite | полный прогон, зелёный (см. CHANGELOG [8.18.0]) |
+| Дата | 2026-08-14 |
+| Версия кода | v8.24.1 |
+| Последняя миграция | **0034** (`0034_soft_delete_budgets.py`) |
+| СУБД | PostgreSQL 15.13 (Homebrew, локальный `postgresql@15`, БД `finpilot_test_pg` — изолированная, не боевая) |
+| `alembic upgrade head` | прошло, цепочка 0007 → 0034 |
+| Обратимость | не проверялась отдельным `downgrade 0034` в этом прогоне (миграция симметрична 0018, тот же приём batch_alter_table — риск низкий, но зафиксировано честно, не «подразумевается») |
+| Тесты на SQLite | полный прогон — см. CHANGELOG [8.24.1] |
 
-Группа целевой проверки: `test_investment` (ADR-017, `estimate_iis_deduction` +
-красная линия), миграция 0033 (upgrade/downgrade/upgrade на SQLite и Postgres).
+Группа целевой проверки: `test_soft_delete` (новые `test_budget_*`), `test_consent_gate`
+(гейт согласия на `budgets_router`, добавлен той же миграцией/патчем), `test_api_budgets`,
+`test_data_isolation`, `test_notifications` (оба использует `crud.create_budget`/`get_budgets`) —
+43/43 зелёных на PostgreSQL.
 
-**Предыдущий прогон (2026-08-13, v8.17.0, миграция 0032)** — архивная запись:
+**Предыдущий прогон (2026-08-13, v8.18.0, миграция 0033)** — архивная запись:
+СУБД PostgreSQL 16-alpine (Docker, изолированный контейнер на :55432), `alembic upgrade head`
+0007→0033, `downgrade 0033`→`upgrade head` прошли, группа `test_investment` (ADR-017).
+
+**Более ранний прогон (2026-08-13, v8.17.0, миграция 0032)** — архивная запись:
 50/50 на PostgreSQL (`test_api_telemetry`/`test_consents`/`test_api_crud`),
 1581/1581 на SQLite (полный, 2 known-fail на счётчиках ревизии в том же батче).
 

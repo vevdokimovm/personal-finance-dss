@@ -137,7 +137,7 @@ LEGACY_CONTEXT_MARKERS = (
 # openapi_paths 111 (v8.23.0): -3 — снесены /profile, /forgot-password, /reset-password
 # (Jinja-роуты с подтверждённым паритетом в React, docs/reports/decisions/
 # 2026-08-14_jinja_frontend_removal.md); снимок пересобран `tools/api_snapshot/dump_openapi.py`.
-EXPECTED_COUNTS = {"tables": 30, "migrations": 33, "openapi_paths": 111}
+EXPECTED_COUNTS = {"tables": 30, "migrations": 34, "openapi_paths": 112}
 
 
 # Канарейка CJK: редкий токен-глюк генерации ассистентов — иероглиф вместо

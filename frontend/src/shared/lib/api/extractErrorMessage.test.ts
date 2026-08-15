@@ -31,4 +31,37 @@ describe("extractErrorMessage — текст ошибки API для польз�
     expect(extractErrorMessage({ detail: "" }, "запасной текст")).toBe("запасной текст");
     expect(extractErrorMessage({ detail: [] }, "запасной текст")).toBe("запасной текст");
   });
+
+  it("гейт согласия (403, detail — объект {code, consent_type, document, message}) — message + ссылка на документ", () => {
+    expect(
+      extractErrorMessage(
+        {
+          detail: {
+            code: "consent_required",
+            consent_type: "financial_data",
+            document: { title: "Согласие на обработку финансовых данных", version: "1.0", url: "/legal/financial-consent" },
+            message: "Для работы с финансовыми данными нужно отдельное согласие на их обработку. Его можно дать в настройках профиля.",
+          },
+        },
+        "запасной текст",
+      ),
+    ).toBe(
+      "Для работы с финансовыми данными нужно отдельное согласие на их обработку. Его можно дать в настройках профиля. (/legal/financial-consent)",
+    );
+  });
+
+  it("объектный detail без document.url — только message, без хвоста в скобках", () => {
+    expect(
+      extractErrorMessage(
+        { detail: { code: "consent_required", message: "Нужно согласие." } },
+        "запасной текст",
+      ),
+    ).toBe("Нужно согласие.");
+  });
+
+  it("объектный detail без message — запасной текст, не «[object Object]»", () => {
+    expect(
+      extractErrorMessage({ detail: { code: "consent_required" } }, "запасной текст"),
+    ).toBe("запасной текст");
+  });
 });
