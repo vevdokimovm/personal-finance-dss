@@ -99,6 +99,38 @@ def test_budget_recreate_after_delete_revives_same_category(db_session) -> None:
     assert revived.limit_amount == 5000.0
 
 
+def test_obligation_update_partial(db_session) -> None:
+    uid = _user(db_session, "u-ou")
+    obl = _mk_obligation(db_session, uid)
+    updated = crud.update_obligation(db_session, obl.id, user_id=uid, monthly_payment=777.0)
+    assert updated is not None
+    assert updated.monthly_payment == 777.0
+    assert updated.amount == 5000.0  # не переданное поле не тронуто
+
+
+def test_obligation_update_cross_user_forbidden(db_session) -> None:
+    owner = _user(db_session, "owner-ou")
+    _user(db_session, "intruder-ou")
+    obl = _mk_obligation(db_session, owner)
+    assert crud.update_obligation(db_session, obl.id, user_id="intruder-ou", name="X") is None
+
+
+def test_asset_update_partial(db_session) -> None:
+    uid = _user(db_session, "u-au")
+    asset = _mk_asset(db_session, uid)
+    updated = crud.update_liquid_asset(db_session, asset.id, user_id=uid, amount=20000.0)
+    assert updated is not None
+    assert updated.amount == 20000.0
+    assert float(updated.interest_rate) == 0.16  # не переданное поле не тронуто (Decimal-колонка)
+
+
+def test_asset_update_cross_user_forbidden(db_session) -> None:
+    owner = _user(db_session, "owner-au")
+    _user(db_session, "intruder-au")
+    asset = _mk_asset(db_session, owner)
+    assert crud.update_liquid_asset(db_session, asset.id, user_id="intruder-au", name="X") is None
+
+
 def test_cross_user_cannot_delete_or_restore(db_session) -> None:
     owner = _user(db_session, "owner")
     _user(db_session, "intruder")

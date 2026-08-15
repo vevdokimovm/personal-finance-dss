@@ -1,0 +1,115 @@
+.fp-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: var(--c-overlay);
+  z-index: var(--z-overlay);
+}
+.fp-modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+  /* min() со вторым пределом — на самом узком экране (320px) остаётся боковой отступ
+     вместо модалки встык к краям (design-critic, Батч 1). */
+  max-width: min(
+    40ch,
+    calc(100vw - 2 * var(--sp-4))
+  ); /* та же читаемая ширина, что .fp-auth-card */
+  max-height: 90vh;
+  overflow-y: auto;
+  background: var(
+    --c-surface
+  ); /* НЕ --c-surface-up — тем же слоем, что поля формы внутри
+     (entityForm.css), лестница возвышения ломается (design-critic, Батч 1); тот же приём,
+     что AuthLayout.css: карточка --c-surface, инпуты --c-surface-up. */
+  border: var(--border-w) solid var(--c-border);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-card);
+  padding: var(--sp-5);
+  z-index: var(--z-modal);
+}
+.fp-modal__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  margin-bottom: var(--sp-4);
+}
+.fp-modal__title {
+  font-size: var(--fs-lg);
+  font-weight: 600;
+  color: var(--c-text);
+  margin: 0;
+}
+.fp-modal__close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: var(--tap-target-min); /* A11Y-09 — было заметно меньше 44 (design-critic, Батч 1) */
+  min-height: var(--tap-target-min);
+  margin: calc(var(--tap-target-min) * -0.3); /* компенсирует раздутие шапки оптически */
+  background: none;
+  border: none;
+  color: var(--c-text3);
+  cursor: pointer;
+  border-radius: var(--r-sm);
+}
+.fp-modal__close:hover {
+  color: var(--c-text);
+}
+.fp-modal__close:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: var(--focus-ring-offset);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .fp-modal-overlay[data-state="open"] {
+    animation: fp-modal-overlay-in var(--motion-fast) var(--ease);
+  }
+  .fp-modal-overlay[data-state="closed"] {
+    animation: fp-modal-overlay-out var(--motion-fast) var(--ease);
+  }
+  .fp-modal[data-state="open"] {
+    animation: fp-modal-in var(--motion-base) var(--ease);
+  }
+  .fp-modal[data-state="closed"] {
+    animation: fp-modal-out var(--motion-fast) var(--ease);
+  }
+}
+@keyframes fp-modal-overlay-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes fp-modal-overlay-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+@keyframes fp-modal-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+@keyframes fp-modal-out {
+  from {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.96);
+  }
+}

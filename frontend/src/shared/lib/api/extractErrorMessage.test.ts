@@ -39,8 +39,13 @@ describe("extractErrorMessage — текст ошибки API для польз�
           detail: {
             code: "consent_required",
             consent_type: "financial_data",
-            document: { title: "Согласие на обработку финансовых данных", version: "1.0", url: "/legal/financial-consent" },
-            message: "Для работы с финансовыми данными нужно отдельное согласие на их обработку. Его можно дать в настройках профиля.",
+            document: {
+              title: "Согласие на обработку финансовых данных",
+              version: "1.0",
+              url: "/legal/financial-consent",
+            },
+            message:
+              "Для работы с финансовыми данными нужно отдельное согласие на их обработку. Его можно дать в настройках профиля.",
           },
         },
         "запасной текст",
@@ -60,8 +65,8 @@ describe("extractErrorMessage — текст ошибки API для польз�
   });
 
   it("объектный detail без message — запасной текст, не «[object Object]»", () => {
-    expect(
-      extractErrorMessage({ detail: { code: "consent_required" } }, "запасной текст"),
-    ).toBe("запасной текст");
+    expect(extractErrorMessage({ detail: { code: "consent_required" } }, "запасной текст")).toBe(
+      "запасной текст",
+    );
   });
 });

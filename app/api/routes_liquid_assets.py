@@ -8,9 +8,10 @@ from app.database.crud import (
     delete_liquid_asset,
     get_liquid_assets,
     restore_liquid_asset,
+    update_liquid_asset,
 )
 from app.dependencies import get_current_user_id, get_db
-from app.schemas.liquid_asset import LiquidAssetCreate, LiquidAssetResponse
+from app.schemas.liquid_asset import LiquidAssetCreate, LiquidAssetResponse, LiquidAssetUpdate
 from app.services.event_logger import log_event
 
 router = APIRouter(prefix="/liquid-assets", tags=["Ликвидные активы"])
@@ -45,6 +46,26 @@ def add_asset(
         currency=payload.currency,
         user_id=user_id,
     )
+
+
+@router.put(
+    "/{asset_id}",
+    response_model=LiquidAssetResponse,
+    summary="Изменить ликвидный актив (частично, только переданные поля)",
+)
+def update_asset(
+    asset_id: int,
+    payload: LiquidAssetUpdate,
+    db: Session = Depends(get_db),
+    user_id: str | None = Depends(get_current_user_id),
+) -> LiquidAssetResponse:
+    asset = update_liquid_asset(
+        db, asset_id, user_id=user_id, **payload.model_dump(exclude_unset=True)
+    )
+    if asset is None:
+        raise HTTPException(status_code=404, detail="Актив не найден")
+    log_event("liquid_asset_updated", {"asset_id": asset_id})
+    return asset
 
 
 @router.delete("/{asset_id}", summary="Удалить ликвидный актив")

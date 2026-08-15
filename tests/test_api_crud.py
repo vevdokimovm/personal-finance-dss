@@ -68,6 +68,33 @@ class TestObligationsCRUD:
 
         assert client.delete(f"/api/obligations/{oid}").status_code in (200, 204)
 
+    def test_update_changes_fields(self, client: TestClient) -> None:
+        created = client.post("/api/obligations", json={
+            "name": "Кредит", "amount": 300000, "term": 24,
+            "monthly_payment": 15000, "interest_rate": 0.15}).json()
+        oid = created["id"]
+
+        updated = client.put(f"/api/obligations/{oid}", json={
+            "name": "Кредит (рефинансирован)", "monthly_payment": 12000})
+        assert updated.status_code == 200
+        body = updated.json()
+        assert body["name"] == "Кредит (рефинансирован)"
+        assert body["monthly_payment"] == 12000
+        # Не переданные поля не трогает (partial update)
+        assert body["amount"] == 300000
+        assert body["interest_rate"] == 0.15
+
+    def test_update_missing_returns_404(self, client: TestClient) -> None:
+        r = client.put("/api/obligations/999999", json={"name": "x"})
+        assert r.status_code == 404
+
+    def test_update_rejects_negative_amount(self, client: TestClient) -> None:
+        created = client.post("/api/obligations", json={
+            "name": "Кредит", "amount": 300000, "term": 24,
+            "monthly_payment": 15000, "interest_rate": 0.15}).json()
+        r = client.put(f"/api/obligations/{created['id']}", json={"amount": -100})
+        assert r.status_code == 422
+
 
 class TestLiquidAssetsCRUD:
     def test_create_list_delete(self, client: TestClient) -> None:
@@ -78,6 +105,23 @@ class TestLiquidAssetsCRUD:
         assert any(a["id"] == aid for a in client.get("/api/liquid-assets").json())
 
         assert client.delete(f"/api/liquid-assets/{aid}").status_code in (200, 204)
+
+    def test_update_changes_fields(self, client: TestClient) -> None:
+        created = client.post("/api/liquid-assets", json={
+            "name": "Вклад", "amount": 100000, "interest_rate": 0.16, "type": "deposit"}).json()
+        aid = created["id"]
+
+        updated = client.put(f"/api/liquid-assets/{aid}", json={"amount": 150000})
+        assert updated.status_code == 200
+        body = updated.json()
+        assert body["amount"] == 150000
+        # Не переданные поля не трогает (partial update)
+        assert body["name"] == "Вклад"
+        assert body["interest_rate"] == 0.16
+
+    def test_update_missing_returns_404(self, client: TestClient) -> None:
+        r = client.put("/api/liquid-assets/999999", json={"amount": 100})
+        assert r.status_code == 404
 
 
 class TestValidation:

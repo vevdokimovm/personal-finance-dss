@@ -7,6 +7,17 @@
   font-size: var(--fs-xl);
   margin: 0 0 var(--sp-5);
 }
+.fp-obligations__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  margin-bottom: var(--sp-5);
+  flex-wrap: wrap;
+}
+.fp-obligations__head h1 {
+  margin: 0; /* отступ снизу даёт flex-контейнер __head, не сам заголовок */
+}
 .fp-obligations__list {
   list-style: none;
   margin: 0;
@@ -32,8 +43,11 @@
 .fp-obligation-row__name {
   font-weight: 600;
 }
-.fp-obligation-row__payment {
+/* Остаток долга — главное число строки (design-critic, Батч 1): форма делает его первым
+   обязательным полем, строка списка обязана дать его проверить, не только платёж. */
+.fp-obligation-row__amount {
   font-weight: 700;
+  font-size: var(--fs-md);
   flex-shrink: 0;
 }
 .fp-obligation-row__payment-unit {
@@ -47,6 +61,7 @@
   color: var(--c-text3);
   font-size: var(--fs-xs);
   margin-bottom: var(--sp-3);
+  flex-wrap: wrap;
 }
 .fp-obligation-row__bar {
   height: var(--sp-1);
@@ -63,4 +78,10 @@
   height: 100%;
   background: var(--c-accent);
   border-radius: var(--r-full);
+}
+.fp-obligation-row__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--sp-2);
+  margin-top: var(--sp-3);
 }

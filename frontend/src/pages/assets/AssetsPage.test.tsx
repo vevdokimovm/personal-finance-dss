@@ -5,12 +5,23 @@ import type { UseQueryResult } from "@tanstack/react-query";
 import { AssetsPage } from "./AssetsPage";
 import type { LiquidAsset } from "@entities/assets";
 
-const { useLiquidAssetsMock } = vi.hoisted(() => ({ useLiquidAssetsMock: vi.fn() }));
-
-vi.mock("@entities/assets", async () => {
-  const actual = await vi.importActual<typeof import("@entities/assets")>("@entities/assets");
-  return { ...actual, useLiquidAssets: useLiquidAssetsMock };
+const useLiquidAssetsMock = vi.fn();
+const createMutateAsyncMock = vi.fn();
+const updateMutateAsyncMock = vi.fn();
+const restoreMutateMock = vi.fn();
+// Мутация удаления реально вызывает onSuccess — иначе не проверить перенос фокуса
+// (a11y-auditor, Батч 1), тот же приём, что в ObligationsPage.test.tsx.
+const deleteMutateMock = vi.fn((_id: number, opts?: { onSuccess?: () => void }) => {
+  opts?.onSuccess?.();
 });
+
+vi.mock("@entities/assets", () => ({
+  useLiquidAssets: () => useLiquidAssetsMock(),
+  useCreateAsset: () => ({ mutateAsync: createMutateAsyncMock, isPending: false, error: null }),
+  useUpdateAsset: () => ({ mutateAsync: updateMutateAsyncMock, isPending: false, error: null }),
+  useDeleteAsset: () => ({ mutate: deleteMutateMock, isPending: false }),
+  useRestoreAsset: () => ({ mutate: restoreMutateMock, isPending: false }),
+}));
 
 function queryResult(
   partial: Partial<UseQueryResult<LiquidAsset[]>>,
@@ -51,10 +62,11 @@ describe("AssetsPage", () => {
     expect(refetch).toHaveBeenCalledOnce();
   });
 
-  it("показывает пустое состояние без активов", () => {
+  it("показывает пустое состояние без активов, с кнопкой добавления внутри панели", () => {
     useLiquidAssetsMock.mockReturnValue(queryResult({ data: [] }));
     render(<AssetsPage />);
     expect(screen.getByText("Активов пока нет")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Добавить актив" })).toBeInTheDocument();
   });
 
   it("рендерит актив — сумму и ставку как долю, не проценты сырого числа", () => {
@@ -65,6 +77,40 @@ describe("AssetsPage", () => {
     expect(screen.getByText("300 000 ₽")).toBeInTheDocument(); // >100k — без копеек
     // Регресс-тест: interest_rate=0.14 должен читаться "14,0%", не "0,1%"
     // (баг с делением на 100 пойман и исправлен до отправки, до этого теста).
-    expect(screen.getByText("14,0%")).toBeInTheDocument();
+    expect(screen.getByText(/14,0%/)).toBeInTheDocument();
+    expect(screen.getByText("годовых")).toBeInTheDocument(); // видимая единица, не только sr-only
+  });
+
+  it("кнопка «Добавить актив» открывает форму создания (пустые поля)", async () => {
+    useLiquidAssetsMock.mockReturnValue(queryResult({ data: [ASSET] }));
+    render(<AssetsPage />);
+    await userEvent.click(screen.getByRole("button", { name: "Добавить актив" }));
+    expect(screen.getByRole("heading", { name: "Новый актив" })).toBeInTheDocument();
+    expect(screen.getByLabelText("Название *")).toHaveValue("");
+  });
+
+  it("кнопка «Изменить» на строке открывает форму, поля предзаполнены", async () => {
+    useLiquidAssetsMock.mockReturnValue(queryResult({ data: [ASSET] }));
+    render(<AssetsPage />);
+    await userEvent.click(screen.getAllByRole("button", { name: "Изменить" })[0]);
+    expect(screen.getByRole("heading", { name: "Изменить актив" })).toBeInTheDocument();
+    expect(screen.getByLabelText("Название *")).toHaveValue("Подушка безопасности");
+  });
+
+  it("пустое название не отправляет форму — видна ошибка у поля", async () => {
+    useLiquidAssetsMock.mockReturnValue(queryResult({ data: [ASSET] }));
+    render(<AssetsPage />);
+    await userEvent.click(screen.getByRole("button", { name: "Добавить актив" }));
+    await userEvent.click(screen.getByRole("button", { name: "Добавить" }));
+    expect(screen.getByText("Укажите название.")).toBeInTheDocument();
+    expect(createMutateAsyncMock).not.toHaveBeenCalled();
+  });
+
+  it("кнопка «Удалить» вызывает мутацию удаления и переносит фокус на «Добавить»", async () => {
+    useLiquidAssetsMock.mockReturnValue(queryResult({ data: [ASSET] }));
+    render(<AssetsPage />);
+    await userEvent.click(screen.getByRole("button", { name: "Удалить «Подушка безопасности»" }));
+    expect(deleteMutateMock).toHaveBeenCalledWith(1, expect.any(Object));
+    expect(screen.getByRole("button", { name: "Добавить актив" })).toHaveFocus();
   });
 });

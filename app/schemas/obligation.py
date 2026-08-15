@@ -23,6 +23,19 @@ class ObligationCreate(BaseModel):
     household_id: Optional[int] = None
 
 
+class ObligationUpdate(BaseModel):
+    name: Optional[str] = None
+    amount: Optional[float] = Field(default=None, ge=0)
+    interest_rate: Optional[float] = Field(default=None, ge=0)
+    term: Optional[int] = None
+    monthly_payment: Optional[float] = Field(default=None, ge=0)
+    payment_day: Optional[int] = None
+    comment: Optional[str] = None
+    bank: Optional[str] = None
+    type: Optional[str] = None
+    start_date: Optional[datetime] = None
+
+
 class ObligationResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 

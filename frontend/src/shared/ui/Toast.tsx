@@ -4,6 +4,9 @@ import { useToastStore } from "./toastStore";
 import "./Toast.css";
 
 const SUCCESS_DURATION_MS = 4000;
+// Undo-тост (действие «Вернуть») держим дольше обычного success — короткого окна не хватает,
+// чтобы прочитать текст, понять, что произошло, и успеть нажать кнопку.
+const UNDO_DURATION_MS = 8000;
 
 /**
  * Единая система уведомлений (FB-04, `docs/ui_ux_design_standard.md`) — первое реальное
@@ -24,14 +27,28 @@ export function ToastProvider({ children }: { children: ReactNode }) {
       {toasts.map((t) => (
         <RadixToast.Root
           key={t.id}
-          className={`fp-toast fp-toast--${t.variant}`}
+          // Undo — не «успех» (действие только что отменило другое действие), отдельный
+          // нейтральный вид, не зелёная полоса success (design-critic, Батч 1: два акцента —
+          // полоса и кнопка «Вернуть» — на событии, которое не является подтверждением).
+          className={`fp-toast fp-toast--${t.variant}${t.action ? " fp-toast--undo" : ""}`}
           type={t.variant === "error" ? "foreground" : "background"}
-          duration={t.variant === "success" ? SUCCESS_DURATION_MS : Infinity}
+          duration={
+            t.variant !== "success" ? Infinity : t.action ? UNDO_DURATION_MS : SUCCESS_DURATION_MS
+          }
           onOpenChange={(open) => {
             if (!open) dismiss(t.id);
           }}
         >
           <RadixToast.Description>{t.message}</RadixToast.Description>
+          {t.action && (
+            <RadixToast.Action
+              className="fp-toast__action"
+              altText={t.action.label}
+              onClick={t.action.onClick}
+            >
+              {t.action.label}
+            </RadixToast.Action>
+          )}
           <RadixToast.Close
             className="fp-toast__close"
             aria-label={

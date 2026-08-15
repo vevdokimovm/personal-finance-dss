@@ -1,11 +1,34 @@
+import { useRef, useState } from "react";
 import { ListSkeleton, StatePanel, Button } from "@shared/ui";
 import { t } from "@shared/lib/i18n/t";
-import { useObligations } from "@entities/obligations";
+import { useObligations, type Obligation } from "@entities/obligations";
 import { ObligationRow } from "./ui/ObligationRow";
+import { ObligationForm } from "./ui/ObligationForm";
 import "./ObligationsPage.css";
 
 export function ObligationsPage() {
   const query = useObligations();
+  // undefined — модалка закрыта; null — создание; объект — правка этой записи.
+  const [editing, setEditing] = useState<Obligation | null | undefined>(undefined);
+  const addButtonRef = useRef<HTMLButtonElement>(null);
+
+  const addButton = (
+    <Button ref={addButtonRef} variant="primary" onClick={() => setEditing(null)}>
+      {t("Добавить обязательство")}
+    </Button>
+  );
+  const modal = (
+    // key форсирует remount при смене цели редактирования (или create→edit) — ObligationForm
+    // держит поля в useState, инициализированном ИЗ obligation только при монтировании;
+    // без key одна и та же форма переживает смену пропа и не сбрасывает значения (найдено
+    // тестом при переключении между "новое" и "изменить").
+    <ObligationForm
+      key={editing?.id ?? "new"}
+      open={editing !== undefined}
+      onOpenChange={(open) => !open && setEditing(undefined)}
+      obligation={editing ?? undefined}
+    />
+  );
 
   if (query.isLoading) {
     return (
@@ -41,21 +64,31 @@ export function ObligationsPage() {
     return (
       <main className="fp-obligations">
         <h1>{t("Кредиты и обязательства")}</h1>
-        <StatePanel title={t("Обязательств нет")}>
+        <StatePanel title={t("Обязательств нет")} action={addButton}>
           {t("Если есть кредиты или рассрочки — добавьте их, план распределения учтёт платежи.")}
         </StatePanel>
+        {modal}
       </main>
     );
   }
 
   return (
     <main className="fp-obligations">
-      <h1>{t("Кредиты и обязательства")}</h1>
+      <div className="fp-obligations__head">
+        <h1>{t("Кредиты и обязательства")}</h1>
+        {addButton}
+      </div>
       <ul className="fp-obligations__list">
         {obligations.map((ob) => (
-          <ObligationRow key={ob.id} obligation={ob} />
+          <ObligationRow
+            key={ob.id}
+            obligation={ob}
+            onEdit={() => setEditing(ob)}
+            onDeleted={() => addButtonRef.current?.focus()}
+          />
         ))}
       </ul>
+      {modal}
     </main>
   );
 }

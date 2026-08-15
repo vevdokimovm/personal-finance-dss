@@ -4,7 +4,7 @@ import secrets
 import string
 from collections import Counter
 from datetime import datetime, timedelta
-from typing import Optional
+from typing import Any, Optional
 
 from sqlalchemy import delete, func
 from sqlalchemy.orm import Session
@@ -692,6 +692,24 @@ def create_obligation(
     return obligation
 
 
+_MONEY_FIELDS = {"amount", "monthly_payment"}
+
+
+def update_obligation(
+    db: Session, obligation_id: int, user_id: Optional[str] = None, **fields: Any
+) -> Optional[Obligation]:
+    """Частичное обновление (PUT, только переданные поля — `fields` уже отфильтрован
+    вызывающей стороной через `exclude_unset`, отсутствие ключа ≠ значение None)."""
+    obligation = db.get(Obligation, obligation_id)
+    if obligation is None or obligation.is_deleted or obligation.user_id != user_id:
+        return None
+    for key, value in fields.items():
+        setattr(obligation, key, to_money(value) if key in _MONEY_FIELDS else value)
+    db.commit()
+    db.refresh(obligation)
+    return obligation
+
+
 def get_obligations(
     db: Session, active_only: bool = False, user_id: Optional[str] = None
 ) -> list[Obligation]:
@@ -916,6 +934,20 @@ def get_liquid_assets(db: Session, user_id: Optional[str] = None) -> list[Liquid
     query = db.query(LiquidAsset).filter(LiquidAsset.is_deleted.is_(False))
     query = _owner_filter(query, LiquidAsset, user_id)
     return query.order_by(LiquidAsset.id.desc()).all()
+
+
+def update_liquid_asset(
+    db: Session, asset_id: int, user_id: Optional[str] = None, **fields: Any
+) -> Optional[LiquidAsset]:
+    """Частичное обновление (PUT, только переданные поля, симметрично update_obligation)."""
+    asset = db.get(LiquidAsset, asset_id)
+    if asset is None or asset.is_deleted or asset.user_id != user_id:
+        return None
+    for key, value in fields.items():
+        setattr(asset, key, to_money(value) if key == "amount" else value)
+    db.commit()
+    db.refresh(asset)
+    return asset
 
 
 def delete_liquid_asset(

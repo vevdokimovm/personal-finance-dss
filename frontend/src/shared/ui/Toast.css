@@ -7,7 +7,10 @@
   gap: var(--sp-2);
   width: 100%;
   max-width: 32ch; /* та же читаемая ширина, что .fp-tooltip (Tooltip.css) */
-  z-index: 100;
+  z-index: var(
+    --z-toast
+  ); /* выше модалки (--z-modal) — undo-тост при открытой форме не должен
+     прятаться под затемнением (design-critic, Батч 1). */
   list-style: none;
   margin: 0;
   padding: 0;
@@ -32,17 +35,52 @@
 .fp-toast--error {
   border-left: calc(var(--border-w) * 3) solid var(--c-red);
 }
+/* Undo — нейтральный вид, не «успех» (design-critic, Батч 1): перекрывает зелёную полосу
+   --fp-toast--success выше по каскаду (правило идёт позже — тот же приоритет специфичности). */
+.fp-toast--undo {
+  border-left: calc(var(--border-w) * 3) solid var(--c-border-hl);
+}
+.fp-toast__action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--tap-target-min); /* A11Y-09 — было заметно меньше 44 (design-critic, Батч 1) */
+  padding: var(--sp-2) var(--sp-0);
+  background: none;
+  border: none;
+  color: var(--c-accent);
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.fp-toast__action:hover {
+  text-decoration: underline;
+}
+.fp-toast__action:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: var(--focus-ring-offset);
+}
 .fp-toast__close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: var(--tap-target-min); /* A11Y-09 — было заметно меньше 44 (design-critic, Батч 1) */
+  min-height: var(--tap-target-min);
+  margin: calc(var(--tap-target-min) * -0.25); /* компенсирует раздутие плашки оптически */
   background: none;
   border: none;
   color: var(--c-text3);
   font-size: var(--fs-md);
   line-height: 1;
   cursor: pointer;
-  padding: var(--sp-0);
 }
 .fp-toast__close:hover {
   color: var(--c-text);
+}
+.fp-toast__close:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: var(--focus-ring-offset);
 }
 
 @media (prefers-reduced-motion: no-preference) {

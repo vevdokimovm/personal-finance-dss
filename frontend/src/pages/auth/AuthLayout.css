@@ -1,3 +1,5 @@
+@import "@shared/ui/field.css";
+
 .fp-auth {
   min-height: calc(100vh - var(--sp-8));
   display: flex;
@@ -32,66 +34,13 @@
 }
 
 /* ── Форма: общие классы для login/register/forgot-password/reset-password ──
-   FRM-02 (docs/ui_ux_design_standard.md): видимый постоянный label, не только placeholder. */
+   FRM-02 (docs/ui_ux_design_standard.md): видимый постоянный label, не только placeholder.
+   Стили самих полей (.fp-auth-field/.fp-auth-banner) — в shared/ui/field.css, общий источник
+   с формами сущностей (entityForm.css), CMP-01. */
 .fp-auth-form {
   display: flex;
   flex-direction: column;
   gap: var(--sp-4);
-}
-.fp-auth-field {
-  display: flex;
-  flex-direction: column;
-  gap: var(--sp-1);
-}
-.fp-auth-field label {
-  font-size: var(--fs-sm);
-  font-weight: 600;
-  color: var(--c-text2);
-}
-.fp-auth-field input {
-  font: inherit;
-  font-size: var(--fs-base);
-  color: var(--c-text);
-  background: var(--c-surface-up);
-  border: var(--border-w) solid var(--c-border-hl);
-  border-radius: var(--r-sm);
-  padding: var(--sp-3);
-  min-height: var(--tap-target-min);
-}
-.fp-auth-field input:focus-visible {
-  outline: var(--focus-ring);
-  outline-offset: var(--focus-ring-offset);
-}
-.fp-auth-field input[aria-invalid="true"] {
-  border-color: var(--c-red);
-}
-.fp-auth-field__hint {
-  font-size: var(--fs-xs);
-  color: var(--c-text3);
-  margin: 0;
-}
-.fp-auth-field__error {
-  font-size: var(--fs-xs);
-  color: var(--c-red);
-  margin: 0;
-}
-/* FRM-04: ошибка не только цветом — иконка-символ текстом перед сообщением. */
-.fp-auth-field__error::before {
-  content: "! ";
-  font-weight: 700;
-}
-
-.fp-auth-banner {
-  font-size: var(--fs-sm);
-  padding: var(--sp-3) var(--sp-4);
-  border-radius: var(--r-sm);
-  border: var(--border-w) solid var(--c-red);
-  background: var(--c-red-bg);
-  color: var(--c-text);
-}
-.fp-auth-banner--success {
-  border-color: var(--c-accent);
-  background: var(--c-accent-bg);
 }
 
 .fp-auth-consent {

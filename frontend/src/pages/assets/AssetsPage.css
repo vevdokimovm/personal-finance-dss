@@ -5,7 +5,20 @@
 }
 .fp-assets h1 {
   font-size: var(--fs-xl);
-  margin: 0 0 var(--sp-2);
+  margin: 0 0 var(--sp-5);
+}
+.fp-assets__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  margin-bottom: var(--sp-2);
+  flex-wrap: wrap;
+}
+.fp-assets__head h1 {
+  margin: 0; /* отступ снизу даёт flex-контейнер __head, не сам заголовок — тот же приём,
+    что ObligationsPage.css (design-critic, Батч 1: ритм шапки был разным на двух
+    экранах-двойниках одного батча). */
 }
 .fp-assets__lede {
   color: var(--c-text2);
@@ -50,8 +63,16 @@
   font-size: var(--fs-sm);
   flex-shrink: 0;
 }
+.fp-asset-row__rate-unit {
+  font-size: var(--fs-xs);
+}
 .fp-asset-row__amount {
   font-weight: 700;
+  flex-shrink: 0;
+}
+.fp-asset-row__actions {
+  display: flex;
+  gap: var(--sp-2);
   flex-shrink: 0;
 }
 

@@ -1,0 +1,74 @@
+/* Общее поле формы (label + input/select/textarea) — ОДИН источник для двух семейств:
+   .fp-auth-field (AuthLayout.css, экраны входа/регистрации) и .fp-entity-form__field
+   (entityForm.css, формы сущностей CRUD, Батч 1). CMP-01 (Must): не дублировать реализацию
+   одного компонента — раньше значения были скопированы в оба файла дословно, что уже
+   разошлось (у entityForm не было состояния ошибки). Разные имена классов оставлены
+   осознанно (домены разные, семантика класса читается на месте использования), но
+   декларация одна — правка здесь применяется сразу везде. FRM-02: видимый постоянный label,
+   не только placeholder. */
+.fp-auth-field,
+.fp-entity-form__field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-1);
+}
+.fp-auth-field label,
+.fp-entity-form__field label {
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  color: var(--c-text2);
+}
+.fp-auth-field input,
+.fp-entity-form__field input,
+.fp-entity-form__field select {
+  font: inherit;
+  font-size: var(--fs-base);
+  color: var(--c-text);
+  background: var(--c-surface-up);
+  border: var(--border-w) solid var(--c-border-hl);
+  border-radius: var(--r-sm);
+  padding: var(--sp-3);
+  min-height: var(--tap-target-min);
+}
+.fp-auth-field input:focus-visible,
+.fp-entity-form__field input:focus-visible,
+.fp-entity-form__field select:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: var(--focus-ring-offset);
+}
+.fp-auth-field input[aria-invalid="true"],
+.fp-entity-form__field input[aria-invalid="true"] {
+  border-color: var(--c-red);
+}
+.fp-auth-field__hint,
+.fp-entity-form__hint {
+  font-size: var(--fs-xs);
+  color: var(--c-text3);
+  margin: 0;
+}
+.fp-auth-field__error,
+.fp-entity-form__error {
+  font-size: var(--fs-xs);
+  color: var(--c-red);
+  margin: 0;
+}
+/* FRM-04: ошибка не только цветом — символ перед текстом. */
+.fp-auth-field__error::before,
+.fp-entity-form__error::before {
+  content: "! ";
+  font-weight: 700;
+}
+
+.fp-auth-banner,
+.fp-entity-form__banner {
+  font-size: var(--fs-sm);
+  padding: var(--sp-3) var(--sp-4);
+  border-radius: var(--r-sm);
+  border: var(--border-w) solid var(--c-red);
+  background: var(--c-red-bg);
+  color: var(--c-text);
+}
+.fp-auth-banner--success {
+  border-color: var(--c-accent);
+  background: var(--c-accent-bg);
+}

@@ -33,3 +33,25 @@
   color: var(--c-text);
   border-color: var(--c-accent);
 }
+
+/* Удаление — деструктивное действие, не может выглядеть как правка (design-critic, Батч 1:
+   ghost-кнопка «Удалить» наводкой красилась в акцентный зелёный — CMP-02, бриф §1.1: акцент
+   занят позитивом/действием, не удалением). */
+.fp-button--danger {
+  background: transparent;
+  border-color: var(--c-border);
+  color: var(--c-red);
+}
+.fp-button--danger:hover {
+  background: var(--c-red-bg);
+  border-color: var(--c-red);
+}
+
+/* pointer-events: none — наведение мышью не может больше сработать на отключённой кнопке,
+   поэтому :hover-правила выше безопасны сами по себе (design-critic, Батч 1: submit/delete
+   не показывали никакого признака, что клик принят, до прихода тоста — FB-01/FB-02). */
+.fp-button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  pointer-events: none;
+}

@@ -1533,6 +1533,32 @@ export type LiquidAssetResponse = {
 };
 
 /**
+ * LiquidAssetUpdate
+ */
+export type LiquidAssetUpdate = {
+    /**
+     * Amount
+     */
+    amount?: number | null;
+    /**
+     * Comment
+     */
+    comment?: string | null;
+    /**
+     * Interest Rate
+     */
+    interest_rate?: number | null;
+    /**
+     * Name
+     */
+    name?: string | null;
+    /**
+     * Type
+     */
+    type?: string | null;
+};
+
+/**
  * LoginRequest
  */
 export type LoginRequest = {
@@ -1814,6 +1840,52 @@ export type ObligationResponse = {
      * Type
      */
     type?: string;
+};
+
+/**
+ * ObligationUpdate
+ */
+export type ObligationUpdate = {
+    /**
+     * Amount
+     */
+    amount?: number | null;
+    /**
+     * Bank
+     */
+    bank?: string | null;
+    /**
+     * Comment
+     */
+    comment?: string | null;
+    /**
+     * Interest Rate
+     */
+    interest_rate?: number | null;
+    /**
+     * Monthly Payment
+     */
+    monthly_payment?: number | null;
+    /**
+     * Name
+     */
+    name?: string | null;
+    /**
+     * Payment Day
+     */
+    payment_day?: number | null;
+    /**
+     * Start Date
+     */
+    start_date?: string | null;
+    /**
+     * Term
+     */
+    term?: number | null;
+    /**
+     * Type
+     */
+    type?: string | null;
 };
 
 /**
@@ -3611,6 +3683,36 @@ export type RemoveBudgetApiBudgetsBudgetIdDeleteResponses = {
 
 export type RemoveBudgetApiBudgetsBudgetIdDeleteResponse = RemoveBudgetApiBudgetsBudgetIdDeleteResponses[keyof RemoveBudgetApiBudgetsBudgetIdDeleteResponses];
 
+export type RestoreBudgetEndpointApiBudgetsBudgetIdRestorePostData = {
+    body?: never;
+    path: {
+        /**
+         * Budget Id
+         */
+        budget_id: number;
+    };
+    query?: never;
+    url: '/api/budgets/{budget_id}/restore';
+};
+
+export type RestoreBudgetEndpointApiBudgetsBudgetIdRestorePostErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type RestoreBudgetEndpointApiBudgetsBudgetIdRestorePostError = RestoreBudgetEndpointApiBudgetsBudgetIdRestorePostErrors[keyof RestoreBudgetEndpointApiBudgetsBudgetIdRestorePostErrors];
+
+export type RestoreBudgetEndpointApiBudgetsBudgetIdRestorePostResponses = {
+    /**
+     * Successful Response
+     */
+    200: BudgetResponse;
+};
+
+export type RestoreBudgetEndpointApiBudgetsBudgetIdRestorePostResponse = RestoreBudgetEndpointApiBudgetsBudgetIdRestorePostResponses[keyof RestoreBudgetEndpointApiBudgetsBudgetIdRestorePostResponses];
+
 export type ListCategoriesApiCategoriesGetData = {
     body?: never;
     path?: never;
@@ -4649,6 +4751,36 @@ export type RemoveAssetApiLiquidAssetsAssetIdDeleteResponses = {
     200: unknown;
 };
 
+export type UpdateAssetApiLiquidAssetsAssetIdPutData = {
+    body: LiquidAssetUpdate;
+    path: {
+        /**
+         * Asset Id
+         */
+        asset_id: number;
+    };
+    query?: never;
+    url: '/api/liquid-assets/{asset_id}';
+};
+
+export type UpdateAssetApiLiquidAssetsAssetIdPutErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type UpdateAssetApiLiquidAssetsAssetIdPutError = UpdateAssetApiLiquidAssetsAssetIdPutErrors[keyof UpdateAssetApiLiquidAssetsAssetIdPutErrors];
+
+export type UpdateAssetApiLiquidAssetsAssetIdPutResponses = {
+    /**
+     * Successful Response
+     */
+    200: LiquidAssetResponse;
+};
+
+export type UpdateAssetApiLiquidAssetsAssetIdPutResponse = UpdateAssetApiLiquidAssetsAssetIdPutResponses[keyof UpdateAssetApiLiquidAssetsAssetIdPutResponses];
+
 export type RestoreAssetApiLiquidAssetsAssetIdRestorePostData = {
     body?: never;
     path: {
@@ -4894,6 +5026,36 @@ export type DeleteObligationEndpointApiObligationsObligationIdDeleteResponses = 
      */
     200: unknown;
 };
+
+export type UpdateObligationEndpointApiObligationsObligationIdPutData = {
+    body: ObligationUpdate;
+    path: {
+        /**
+         * Obligation Id
+         */
+        obligation_id: number;
+    };
+    query?: never;
+    url: '/api/obligations/{obligation_id}';
+};
+
+export type UpdateObligationEndpointApiObligationsObligationIdPutErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type UpdateObligationEndpointApiObligationsObligationIdPutError = UpdateObligationEndpointApiObligationsObligationIdPutErrors[keyof UpdateObligationEndpointApiObligationsObligationIdPutErrors];
+
+export type UpdateObligationEndpointApiObligationsObligationIdPutResponses = {
+    /**
+     * Successful Response
+     */
+    200: ObligationResponse;
+};
+
+export type UpdateObligationEndpointApiObligationsObligationIdPutResponse = UpdateObligationEndpointApiObligationsObligationIdPutResponses[keyof UpdateObligationEndpointApiObligationsObligationIdPutResponses];
 
 export type RestoreObligationEndpointApiObligationsObligationIdRestorePostData = {
     body?: never;

@@ -8,9 +8,10 @@ from app.database.crud import (
     delete_obligation,
     get_obligations,
     restore_obligation,
+    update_obligation,
 )
 from app.dependencies import get_current_user_id, get_db
-from app.schemas.obligation import ObligationCreate, ObligationResponse
+from app.schemas.obligation import ObligationCreate, ObligationResponse, ObligationUpdate
 from app.services.event_logger import log_event
 
 router = APIRouter(tags=["Обязательства"])
@@ -60,6 +61,28 @@ def create_obligation_endpoint(
         "amount": payload.amount,
         "interest_rate": payload.interest_rate,
     })
+    return obligation
+
+
+@router.put(
+    "/obligations/{obligation_id}",
+    response_model=ObligationResponse,
+    summary="Изменить обязательство (частично, только переданные поля)",
+)
+def update_obligation_endpoint(
+    obligation_id: int,
+    payload: ObligationUpdate,
+    db: Session = Depends(get_db),
+    user_id: str | None = Depends(get_current_user_id),
+) -> ObligationResponse:
+    obligation = update_obligation(
+        db, obligation_id, user_id=user_id, **payload.model_dump(exclude_unset=True)
+    )
+    if obligation is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Обязательство не найдено."
+        )
+    log_event("obligation_updated", {"obligation_id": obligation_id})
     return obligation
 
 

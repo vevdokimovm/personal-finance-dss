@@ -4,7 +4,7 @@ import clsx from "clsx";
 import "./Button.css";
 
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: "primary" | "ghost";
+  variant?: "primary" | "ghost" | "danger";
   asChild?: boolean;
 }
 
