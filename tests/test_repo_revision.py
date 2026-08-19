@@ -27,6 +27,28 @@ class TestRepoRevisionGate:
         result = LinkChecker(REPO_ROOT).run()
         assert result.ok, "Битые ссылки в живых доках:\n" + _fmt(result)
 
+    def test_link_checker_catches_case_mismatch_even_on_case_insensitive_fs(
+        self, tmp_path
+    ) -> None:
+        # Реальный класс бага (этот батч): docs/GLOSSARY.md vs docs/glossary.md.
+        # Path.exists() схлопывает регистр на APFS/NTFS (macOS/Windows) — молча
+        # резолвит "docs/GLOSSARY.md" в реально лежащий "docs/glossary.md" и
+        # считает ссылку живой. В Docker/CI (регистрочувствительная Linux-ФС)
+        # та же ссылка бьётся. В отличие от CaseCollisionChecker (два файла
+        # одновременно) здесь нет коллизии на диске — только ссылка не в том
+        # регистре, поэтому воспроизводится реальными файлами, не инъекцией.
+        (tmp_path / "docs").mkdir()
+        (tmp_path / "docs" / "glossary.md").write_text("термины", encoding="utf-8")
+        (tmp_path / "note.md").write_text(
+            "См. docs/GLOSSARY.md за определениями.", encoding="utf-8"
+        )
+        result = LinkChecker(tmp_path).run()
+        assert not result.ok
+        assert any(
+            "docs/GLOSSARY.md" in f.detail and f.location == "note.md"
+            for f in result.failures
+        )
+
     def test_no_legacy_model_leak(self) -> None:
         result = LegacyModelChecker(REPO_ROOT).run()
         assert result.ok, "Legacy мат-модели в живых доках:\n" + _fmt(result)

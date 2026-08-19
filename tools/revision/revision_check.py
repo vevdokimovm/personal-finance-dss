@@ -21,6 +21,7 @@
 from __future__ import annotations
 
 import json
+import os
 import re
 import subprocess
 from dataclasses import dataclass, field
@@ -193,6 +194,27 @@ class _MarkdownScanner:
         return path.relative_to(self._root).as_posix()
 
 
+def _exists_with_matching_case(root: Path, ref: str) -> bool:
+    """Как Path.exists(), но регистрочувствительно даже на APFS/NTFS.
+
+    (root / ref).exists() схлопывает docs/GLOSSARY.md в реально лежащий
+    docs/glossary.md на регистронезависимой ФС (macOS/Windows) — ссылка
+    считается живой локально и бьётся в Docker/CI (регистрочувствительный
+    Linux). Сверяем каждый сегмент пути с os.listdir() родительского
+    каталога — то, что видит Linux, а не то, что резолвит ОС.
+    """
+    current = root
+    for part in Path(ref).parts:
+        try:
+            entries = os.listdir(current)
+        except OSError:
+            return False
+        if part not in entries:
+            return False
+        current = current / part
+    return True
+
+
 class LinkChecker:
     name = "Битые ссылки"
 
@@ -209,7 +231,7 @@ class LinkChecker:
             text = path.read_text(encoding="utf-8", errors="ignore")
             for match in REF_PATTERN.finditer(text):
                 ref = match.group(1).rstrip(".,);:").split("#")[0]
-                if (self._root / ref).exists():
+                if _exists_with_matching_case(self._root, ref):
                     continue
                 if self._scanner.is_frozen(rel):
                     frozen_broken += 1

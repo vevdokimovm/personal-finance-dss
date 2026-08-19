@@ -2,6 +2,30 @@
 
 Формат: [Keep a Changelog](https://keepachangelog.com/ru/1.0.0/). Версионирование — [SemVer](https://semver.org/lang/ru/).
 
+## [8.25.1] — 2026-08-19 — LinkChecker: регистрочувствительность на macOS/Windows (PATCH)
+
+`python -m tools.preflight` падал на Linux/CI (`exit 1`, битая ссылка `docs/GLOSSARY.md` в
+`docs/WATCHLOG.md`), но был зелёным на macOS. Причина: `LinkChecker` проверял ссылки через
+`Path.exists()`, а APFS (macOS) регистронезависима — `docs/GLOSSARY.md` молча резолвился в
+реально лежащий `docs/glossary.md`, тот же класс бага, что чинился в v8.4.1 для физических
+дублей пути (`CaseCollisionChecker`), только теперь для ссылки без второго файла на диске.
+
+### Починено
+- **`tools/revision/revision_check.py`** — новая `_exists_with_matching_case()` сверяет
+  каждый сегмент пути с `os.listdir()` родительского каталога вместо `Path.exists()`, так
+  результат одинаков на macOS/Windows и Linux. `LinkChecker.run()` переведён на неё.
+- **`docs/WATCHLOG.md` §3 (запись v8.4.1)** — историческое упоминание `` `docs/GLOSSARY.md` ``
+  переписано без заглавного пути одним токеном (`` `GLOSSARY.md` (в `docs/`) ``), смысл
+  сохранён, но текст больше не читается регэкспом `LinkChecker` как битая ссылка на
+  несуществующий путь.
+
+### Тесты
+- `tests/test_repo_revision.py::test_link_checker_catches_case_mismatch_even_on_case_insensitive_fs`
+  — регрессия: реальные файлы во `tmp_path` (не инъекция путей, в отличие от
+  `CaseCollisionChecker`-теста — здесь коллизии на диске нет, только ссылка не в том
+  регистре), до фикса `LinkChecker(tmp_path).run().ok` был `True` на macOS (red), после —
+  корректно `False` (green). Полный `tests/test_repo_revision.py` — 10/10.
+
 ## [8.25.0] — 2026-08-15 — CRUD-паритет, батч 1: Обязательство + Актив (MINOR)
 
 React-экраны «Обязательства» и «Ликвидные активы» были read-only — единственный способ
