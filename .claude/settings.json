@@ -60,6 +60,11 @@
             "type": "command",
             "command": "\"$CLAUDE_PROJECT_DIR/.claude/hooks/tests-gate.sh\"",
             "timeout": 120
+          },
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR/.claude/hooks/checkpoint-gate.sh\"",
+            "timeout": 30
           }
         ]
       }

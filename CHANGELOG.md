@@ -2,6 +2,34 @@
 
 Формат: [Keep a Changelog](https://keepachangelog.com/ru/1.0.0/). Версионирование — [SemVer](https://semver.org/lang/ru/).
 
+## [8.25.2] — 2026-08-19 — CI: первый прогон PostgreSQL-матрицы, зависший E2E-smoke, гейты без таймаута (PATCH)
+
+Код v8.20.0–v8.25.1 впервые дошёл до реальных тестов на CI (фикс `preflight` в v8.25.1) — джоба
+«Быстрые тесты + покрытие» на PostgreSQL прошла чисто. Следующий шаг «E2E-smoke (chromium)» завис
+на 60+ минут на обоих независимых прогонах (main + тег `v8.25.1`) одновременно. Разбор —
+`docs/reports/investigations/ci_full_pg_matrix_hang_investigation.md` (INV-CI-PG-HANG).
+
+### Найдено и починено
+- **Зависание — внешняя причина, не код.** `playwright install --with-deps chromium` встал на
+  `apt-get`-загрузке зеркала `archive.ubuntu.com` (сетевой флюк GitHub-раннера) — ни одной новой
+  строки лога за час, `pytest -m e2e` не стартовал вообще. Дефекта в продуктовом коде нет.
+- **Попутный реальный дефект CI-конфигурации:** health-check Postgres-сервиса
+  `pg_isready -U finpilot` (без `-d`) проверял несуществующую базу «finpilot» вместо
+  `finpilot_test` — никогда не был «healthy» за всё время жизни контейнера, хотя реальным тестам
+  (явный `DATABASE_URL`) это не мешало. Починено: `pg_isready -U finpilot -d finpilot_test`.
+- **Ни у одной из шести джоб `ci.yml` не было `timeout-minutes`** — зависание, как в этом случае,
+  ждало бы дефолтные 6 часов GitHub, прежде чем открыть логи. Добавлены таймауты по ожидаемой
+  длительности: `preflight` 5, `fast` 25, `frontend` 15, `lint` 10, `full` 60, `deep` 90 минут.
+- **`|| true` на smoke-locust в тире `full`** снят (ROADMAP §9.0) — раньше физически не мог
+  провалить сборку, даже дойдя до выполнения; теперь нагрузочный smoke — настоящий гейт.
+
+### Роадмап
+- `docs/ROADMAP.md` §9.0 — новый раздел: обязательный полный прогон ВСЕХ видов тестов перед
+  реальным деплоем (не только блокирующий `fast`), устранение декоративности гейта `full`,
+  список уже найденных находок тира `full` на v8.20–v8.25.1 (модалка `#goal-form` в
+  firefox/webkit, `/planning`-таймаут в firefox, отсутствующие visual-regression baseline для
+  firefox/webkit) — на разбор и фикс отдельным заходом, не в этом патче.
+
 ## [8.25.1] — 2026-08-19 — LinkChecker: регистрочувствительность на macOS/Windows (PATCH)
 
 `python -m tools.preflight` падал на Linux/CI (`exit 1`, битая ссылка `docs/GLOSSARY.md` в
