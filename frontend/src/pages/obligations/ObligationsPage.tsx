@@ -1,7 +1,9 @@
 import { useRef, useState } from "react";
 import { ListSkeleton, StatePanel, Button } from "@shared/ui";
 import { t } from "@shared/lib/i18n/t";
+import { getConsentRequiredDetail } from "@shared/lib/api/extractErrorMessage";
 import { useObligations, type Obligation } from "@entities/obligations";
+import { ConsentRequiredPanel } from "@entities/consents";
 import { ObligationRow } from "./ui/ObligationRow";
 import { ObligationForm } from "./ui/ObligationForm";
 import "./ObligationsPage.css";
@@ -11,6 +13,10 @@ export function ObligationsPage() {
   // undefined — модалка закрыта; null — создание; объект — правка этой записи.
   const [editing, setEditing] = useState<Obligation | null | undefined>(undefined);
   const addButtonRef = useRef<HTMLButtonElement>(null);
+  // Фокус после успешной выдачи согласия (a11y-auditor, этот батч): ConsentRequiredPanel
+  // размонтируется вместе с кнопкой, на которой стоял фокус, — без явного переноса фокус
+  // проваливается в <body>. tabIndex={-1} — заголовок фокусируем программно, не таб-стопом.
+  const headingRef = useRef<HTMLHeadingElement>(null);
 
   const addButton = (
     <Button ref={addButtonRef} variant="primary" onClick={() => setEditing(null)}>
@@ -33,16 +39,34 @@ export function ObligationsPage() {
   if (query.isLoading) {
     return (
       <main className="fp-obligations">
-        <h1>{t("Кредиты и обязательства")}</h1>
+        <h1 ref={headingRef} tabIndex={-1}>
+          {t("Кредиты и обязательства")}
+        </h1>
         <ListSkeleton rows={4} />
       </main>
     );
   }
 
   if (query.isError) {
+    const consentDetail = getConsentRequiredDetail(query.error);
+    if (consentDetail) {
+      return (
+        <main className="fp-obligations">
+          <h1 ref={headingRef} tabIndex={-1}>
+            {t("Кредиты и обязательства")}
+          </h1>
+          <ConsentRequiredPanel
+            detail={consentDetail}
+            onGranted={() => void query.refetch().then(() => headingRef.current?.focus())}
+          />
+        </main>
+      );
+    }
     return (
       <main className="fp-obligations">
-        <h1>{t("Кредиты и обязательства")}</h1>
+        <h1 ref={headingRef} tabIndex={-1}>
+          {t("Кредиты и обязательства")}
+        </h1>
         <StatePanel
           title={t("Не получилось загрузить обязательства")}
           role="alert"
@@ -63,7 +87,9 @@ export function ObligationsPage() {
   if (obligations.length === 0) {
     return (
       <main className="fp-obligations">
-        <h1>{t("Кредиты и обязательства")}</h1>
+        <h1 ref={headingRef} tabIndex={-1}>
+          {t("Кредиты и обязательства")}
+        </h1>
         <StatePanel title={t("Обязательств нет")} action={addButton}>
           {t("Если есть кредиты или рассрочки — добавьте их, план распределения учтёт платежи.")}
         </StatePanel>
@@ -75,7 +101,9 @@ export function ObligationsPage() {
   return (
     <main className="fp-obligations">
       <div className="fp-obligations__head">
-        <h1>{t("Кредиты и обязательства")}</h1>
+        <h1 ref={headingRef} tabIndex={-1}>
+          {t("Кредиты и обязательства")}
+        </h1>
         {addButton}
       </div>
       <ul className="fp-obligations__list">

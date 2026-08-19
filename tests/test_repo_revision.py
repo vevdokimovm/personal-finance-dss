@@ -53,6 +53,23 @@ class TestRepoRevisionGate:
         result = LegacyModelChecker(REPO_ROOT).run()
         assert result.ok, "Legacy мат-модели в живых доках:\n" + _fmt(result)
 
+    def test_legacy_model_checker_scans_ts_tsx_py_not_only_markdown(self, tmp_path) -> None:
+        # Найдено 2026-08-19 (ROADMAP §9.0 «A»): три версии канона (v3.0.0/v3.5.0/v3.5.0)
+        # висели на одном и том же инварианте ПДН<=0.40 в .ts/.tsx/.py — LegacyModelChecker
+        # до этого ходил только по markdown, устаревший факт в коде проходил незамеченным.
+        # Собираем строки НЕ литералом — иначе сканирование .py-файлов подхватит сам этот
+        # тест как «утечку» при прогоне LegacyModelChecker на реальном репо (self-match,
+        # тот же класс, что CJK-канарейка ловит себя же — chr()-приём там, конкатенация тут).
+        old_default = "L_min" + " = 0" + ".30"  # старый дефолт до калибровки
+        old_count = "21" + " альтернатив"
+        (tmp_path / "core.py").write_text(old_default + "\n", encoding="utf-8")
+        (tmp_path / "Widget.tsx").write_text("// раскраска для " + old_count + "\n",
+                                             encoding="utf-8")
+        result = LegacyModelChecker(tmp_path).run()
+        assert not result.ok
+        assert any("core.py" in f.location for f in result.failures)
+        assert any("Widget.tsx" in f.location for f in result.failures)
+
     def test_structural_counts_match(self) -> None:
         result = CountChecker(REPO_ROOT).run()
         assert result.ok, "Рассинхрон счётчиков docs<->code:\n" + _fmt(result)

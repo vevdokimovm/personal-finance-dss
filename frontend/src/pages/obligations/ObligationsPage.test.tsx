@@ -15,6 +15,12 @@ const deleteMutateMock = vi.fn((_id: number, opts?: { onSuccess?: () => void }) 
   opts?.onSuccess?.();
 });
 
+vi.mock("@entities/consents", () => ({
+  ConsentRequiredPanel: ({ detail }: { detail: { message: string } }) => (
+    <div role="alert">{detail.message}</div>
+  ),
+}));
+
 vi.mock("@entities/obligations", () => ({
   useObligations: () => useObligationsMock(),
   useCreateObligation: () => ({
@@ -69,6 +75,24 @@ describe("ObligationsPage", () => {
     expect(screen.getByRole("alert")).toHaveTextContent("Не получилось загрузить обязательства");
     await userEvent.click(screen.getByRole("button", { name: "Повторить" }));
     expect(refetch).toHaveBeenCalledOnce();
+  });
+
+  it("403 гейт согласия — показывает ConsentRequiredPanel вместо общей ошибки соединения", () => {
+    useObligationsMock.mockReturnValue(
+      queryResult({
+        isError: true,
+        error: {
+          detail: {
+            code: "consent_required",
+            consent_type: "financial_data",
+            message: "Нужно согласие на финансовые данные.",
+          },
+        } as unknown as Error,
+      }),
+    );
+    render(<ObligationsPage />);
+    expect(screen.getByRole("alert")).toHaveTextContent("Нужно согласие на финансовые данные.");
+    expect(screen.queryByText("Не получилось загрузить обязательства")).not.toBeInTheDocument();
   });
 
   it("показывает пустое состояние без обязательств, с кнопкой добавления внутри панели", () => {

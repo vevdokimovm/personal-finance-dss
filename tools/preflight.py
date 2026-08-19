@@ -73,6 +73,14 @@ def version_file(repo: Path) -> str | None:
     return raw or None
 
 
+def readme_version(repo: Path) -> str | None:
+    """Значок версии в README.md. Отставал от реальной версии дважды (v7.7.0 — на 15
+    версий; v8.24.1 — README не входил в проверку версий вообще, третий повтор того же
+    класса — эскалация §1, recurrence_ledger.md)."""
+    match = re.search(r"badge/version-(\d+\.\d+\.\d+)-", _read(repo / "README.md"))
+    return match.group(1) if match else None
+
+
 def repo_id(repo: Path) -> str | None:
     """Стандарт 48: `.repo-id` — `<владелец>/<имя-репы>`, одна строка."""
     raw = _read(repo / ".repo-id").strip().splitlines()
@@ -161,7 +169,8 @@ def run(repo: Path) -> int:
     versions = {"app/config.py": app_version(repo),
                 "CHANGELOG.md": changelog_version(repo),
                 "WATCHLOG": watchlog_version(repo),
-                "VERSION": version_file(repo)}
+                "VERSION": version_file(repo),
+                "README.md": readme_version(repo)}
     if len(set(versions.values())) != 1 or None in versions.values():
         failures.append(f"версии расходятся: {versions}")
 

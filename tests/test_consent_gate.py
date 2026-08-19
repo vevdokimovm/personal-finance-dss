@@ -39,6 +39,26 @@ class TestGateClosed:
     def test_every_financial_router_is_gated(self, client, path):
         assert client.get(path, headers=_headers(client)).status_code == 403
 
+    @pytest.mark.parametrize("path", ["/api/analysis", "/api/export/report.pdf"])
+    def test_read_only_financial_portrait_routers_are_gated(self, client, path):
+        # Найдено 2026-08-19 (docs/legal/compliance_register.md §6): analysis/export читают
+        # те же get_transactions/get_obligations/get_goals/get_liquid_assets(user_id=...),
+        # что и уже гейтированные роутеры — «только чтение» не освобождает от 152-ФЗ
+        # согласия, расчёт финансового портрета — тоже обработка.
+        assert client.get(path, headers=_headers(client)).status_code == 403
+
+    def test_planning_calculate_is_gated(self, client):
+        r = client.post("/api/planning/calculate", json={}, headers=_headers(client))
+        assert r.status_code == 403
+
+    def test_planning_forecast_is_gated(self, client):
+        r = client.post("/api/planning/forecast", json={}, headers=_headers(client))
+        assert r.status_code == 403
+
+    def test_recommendation_is_gated(self, client):
+        r = client.post("/api/recommendation", headers=_headers(client))
+        assert r.status_code == 403
+
 
 class TestGateOpen:
     def test_granting_consent_opens_access(self, client):
@@ -64,6 +84,13 @@ class TestAnonymousIsNotGated:
     """
 
     @pytest.mark.parametrize("path", ["/api/transactions", "/api/obligations",
-                                      "/api/goals", "/api/liquid-assets", "/api/budgets"])
+                                      "/api/goals", "/api/liquid-assets", "/api/budgets",
+                                      "/api/analysis", "/api/export/report.pdf"])
     def test_anonymous_passes(self, client, path):
         assert client.get(path).status_code != 403
+
+    def test_anonymous_planning_calculate_passes(self, client):
+        assert client.post("/api/planning/calculate", json={}).status_code != 403
+
+    def test_anonymous_recommendation_passes(self, client):
+        assert client.post("/api/recommendation").status_code != 403

@@ -14,6 +14,27 @@
   padding: var(--sp-6);
   max-width: 60ch;
 }
+/* --sp-6 (32px), не --sp-5 — межблочный отступ должен быть заметнее внутреннего паддинга
+   карточки, иначе карточки визуально слипаются друг с другом (design-critic, этот батч,
+   бриф §1.3 «заметные интервалы между блоками»). */
+.fp-profile__card + .fp-profile__card {
+  margin-top: var(--sp-6);
+}
+.fp-profile__section-title {
+  font-size: var(--fs-md);
+  margin: 0 0 var(--sp-3);
+}
+/* Метрики действия принадлежат обёртке действия, не глобальному .fp-button (design-critic:
+   страница не должна дотягиваться до классов общего компонента — иначе правило применится
+   вслепую к любой будущей кнопке в любой карточке профиля). */
+.fp-profile__actions {
+  margin-top: var(--sp-4);
+}
+.fp-profile__hint {
+  color: var(--c-text3);
+  font-size: var(--fs-sm);
+  margin: 0;
+}
 .fp-profile__row {
   display: flex;
   justify-content: space-between;
@@ -55,4 +76,29 @@
   font-weight: 600;
   padding: var(--sp-0) var(--sp-2);
   border-radius: var(--r-full);
+}
+/* Бейдж-единственный контент значения (не хвост после текста, как у email) — без отступа слева. */
+.fp-profile__value > .fp-profile__badge:only-child {
+  margin-left: 0;
+}
+/* Дата выдачи согласия — второстепенное сведение, не должно нести вес основного значения
+   (design-critic: дата попадала в жирный fp-profile__value наравне с самим статусом). */
+.fp-profile__value-secondary {
+  font-weight: 400;
+  font-size: var(--fs-sm);
+  color: var(--c-text3);
+}
+/* Ссылка на документ согласия — нейтральная, отдельной строкой (design-critic: акцент
+   продублирован между primary-кнопкой и ссылкой в одном абзаце — бриф §1.1 «акцент —
+   дозированно»). См. также entities/consents/ui/ConsentRequiredPanel.css — тот же приём. */
+.fp-consent-doc-link {
+  margin: var(--sp-2) 0 0;
+  font-size: var(--fs-sm);
+}
+.fp-consent-doc-link a {
+  color: var(--c-text2);
+  text-decoration: underline;
+}
+.fp-consent-doc-link a:hover {
+  color: var(--c-text);
 }

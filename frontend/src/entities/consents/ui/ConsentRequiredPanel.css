@@ -1,0 +1,15 @@
+/* Ссылка на документ — нейтральная, не акцентный зелёный (design-critic, этот батч: акцент
+   продублирован между кнопкой primary и ссылкой в одном абзаце — глаз не знает, куда идти,
+   бриф §1.1/§7 «акцент — дозированно»). Отдельная строка (не внутри текста ошибки), кегль
+   базовый, подчёркивание — единственный визуальный сигнал «это ссылка», раз цвет уже не акцент. */
+.fp-consent-panel__doc-link {
+  display: block;
+  margin-top: var(--sp-2);
+}
+.fp-consent-panel__doc-link a {
+  color: var(--c-text2);
+  text-decoration: underline;
+}
+.fp-consent-panel__doc-link a:hover {
+  color: var(--c-text);
+}

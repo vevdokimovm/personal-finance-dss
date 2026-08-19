@@ -176,7 +176,15 @@ class TestEndpointProxy:
         r = client.post("/api/auth/register",
                         json={"email": email, "password": "password123", "consent": True})
         assert r.status_code == 201, r.text
-        return r.json()["access_token"]
+        token = r.json()["access_token"]
+        # planning_router под require_financial_consent с 2026-08-19 (было упущено —
+        # docs/legal/compliance_register.md §6, ROADMAP §9.0 «C») — без согласия
+        # POST /api/planning/scenarios отвечает 403 раньше, чем дойдёт до household-логики.
+        from app.core.legal import CONSENT_FINANCIAL_DATA
+        granted = client.post(f"/api/consents/{CONSENT_FINANCIAL_DATA}",
+                              headers={"Authorization": f"Bearer {token}"})
+        assert granted.status_code in (200, 201), granted.text
+        return token
 
     def _uid(self, email: str) -> str:
         from app.database.models import User

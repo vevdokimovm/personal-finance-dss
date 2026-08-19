@@ -1,25 +1,48 @@
+import { useRef } from "react";
 import { ListSkeleton, StatePanel, Button } from "@shared/ui";
 import { t } from "@shared/lib/i18n/t";
+import { getConsentRequiredDetail } from "@shared/lib/api/extractErrorMessage";
 import { useTransactions } from "@entities/transactions";
+import { ConsentRequiredPanel } from "@entities/consents";
 import { TransactionRow } from "./ui/TransactionRow";
 import "./TransactionsPage.css";
 
 export function TransactionsPage() {
   const query = useTransactions();
+  // Фокус после успешной выдачи согласия (a11y-auditor) — см. ObligationsPage.tsx.
+  const headingRef = useRef<HTMLHeadingElement>(null);
 
   if (query.isLoading) {
     return (
       <main className="fp-transactions">
-        <h1>{t("Операции")}</h1>
+        <h1 ref={headingRef} tabIndex={-1}>
+          {t("Операции")}
+        </h1>
         <ListSkeleton rows={6} />
       </main>
     );
   }
 
   if (query.isError) {
+    const consentDetail = getConsentRequiredDetail(query.error);
+    if (consentDetail) {
+      return (
+        <main className="fp-transactions">
+          <h1 ref={headingRef} tabIndex={-1}>
+            {t("Операции")}
+          </h1>
+          <ConsentRequiredPanel
+            detail={consentDetail}
+            onGranted={() => void query.refetch().then(() => headingRef.current?.focus())}
+          />
+        </main>
+      );
+    }
     return (
       <main className="fp-transactions">
-        <h1>{t("Операции")}</h1>
+        <h1 ref={headingRef} tabIndex={-1}>
+          {t("Операции")}
+        </h1>
         <StatePanel
           title={t("Не получилось загрузить операции")}
           role="alert"
@@ -40,7 +63,9 @@ export function TransactionsPage() {
   if (transactions.length === 0) {
     return (
       <main className="fp-transactions">
-        <h1>{t("Операции")}</h1>
+        <h1 ref={headingRef} tabIndex={-1}>
+          {t("Операции")}
+        </h1>
         <StatePanel title={t("Операций пока нет")}>
           {t("Добавьте доходы и расходы за 1–2 месяца — тогда СППР сможет построить план.")}
         </StatePanel>

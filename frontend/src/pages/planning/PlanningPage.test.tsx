@@ -16,6 +16,12 @@ vi.mock("@entities/plan-summary", async () => {
   return { ...actual, usePlan: usePlanMock, useForecast: useForecastMock };
 });
 
+vi.mock("@entities/consents", () => ({
+  ConsentRequiredPanel: ({ detail }: { detail: { message: string } }) => (
+    <div role="alert">{detail.message}</div>
+  ),
+}));
+
 function queryResult<T>(partial: Partial<UseQueryResult<T>>): UseQueryResult<T> {
   return {
     isLoading: false,
@@ -95,6 +101,25 @@ describe("PlanningPage", () => {
     await userEvent.click(screen.getByRole("button", { name: "Повторить" }));
     expect(refetchPlan).toHaveBeenCalledOnce();
     expect(refetchForecast).toHaveBeenCalledOnce();
+  });
+
+  it("403 гейт согласия — показывает ConsentRequiredPanel вместо общей ошибки соединения", () => {
+    const consentError = {
+      detail: {
+        code: "consent_required",
+        consent_type: "financial_data",
+        message: "Нужно согласие на финансовые данные.",
+      },
+    };
+    usePlanMock.mockReturnValue(
+      queryResult({ isError: true, error: consentError as unknown as Error }),
+    );
+    useForecastMock.mockReturnValue(
+      queryResult({ isError: true, error: consentError as unknown as Error }),
+    );
+    render(<PlanningPage />);
+    expect(screen.getByRole("alert")).toHaveTextContent("Нужно согласие на финансовые данные.");
+    expect(screen.queryByText("Не получилось загрузить план")).not.toBeInTheDocument();
   });
 
   it("показывает пустое состояние для нового пользователя", () => {

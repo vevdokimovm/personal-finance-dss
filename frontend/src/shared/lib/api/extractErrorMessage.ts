@@ -11,9 +11,10 @@
  * 403/409 в разных формах, не заведённых в типовой union конкретного эндпоинта. Поэтому
  * разбираем форму по факту, не по типу.
  *
- * Объектный detail — временный минимум ДО экрана согласия по 403 (ROADMAP §8.2, L3): просто
- * текст + ссылка на документ плоской строкой (toast — plain text, не рендерит ссылки), не
- * кликабельная кнопка «дать согласие». Полный экран заменит этот путь позже, не сейчас.
+ * Объектный detail (гейт согласия) здесь по-прежнему сводится к плоскому тексту — для мест
+ * без кнопки (инлайн-баннер формы). Там, где нужна кликабельная кнопка «Дать согласие» —
+ * `getConsentRequiredDetail()` ниже + `entities/consents/ui/ConsentRequiredPanel` (ROADMAP §8.2,
+ * рабочий минимум вместо полного экрана L3).
  */
 export function extractErrorMessage(error: unknown, fallback: string): string {
   if (error && typeof error === "object" && "detail" in error) {
@@ -39,4 +40,35 @@ export function extractErrorMessage(error: unknown, fallback: string): string {
     }
   }
   return fallback;
+}
+
+/** Структурная форма 403 гейта согласия (`app/api/_consent_guard.py`) — для мест, которым
+ * нужна кликабельная кнопка «Дать согласие» (`ConsentRequiredPanel`), не только текст.
+ * Возвращает `null` для любой другой формы ошибки — вызывающий код решает, что показать
+ * в этом случае (обычный `extractErrorMessage`), не эта функция. */
+export interface ConsentRequiredDetail {
+  consentType: string;
+  message: string;
+  documentTitle: string;
+  documentUrl: string;
+}
+
+export function getConsentRequiredDetail(error: unknown): ConsentRequiredDetail | null {
+  if (!error || typeof error !== "object" || !("detail" in error)) return null;
+  const detail = (error as { detail: unknown }).detail;
+  if (!detail || typeof detail !== "object") return null;
+  const { code, consent_type, message, document } = detail as {
+    code?: unknown;
+    consent_type?: unknown;
+    message?: unknown;
+    document?: { title?: unknown; url?: unknown };
+  };
+  if (code !== "consent_required") return null;
+  if (typeof consent_type !== "string" || typeof message !== "string") return null;
+  return {
+    consentType: consent_type,
+    message,
+    documentTitle: typeof document?.title === "string" ? document.title : "",
+    documentUrl: typeof document?.url === "string" ? document.url : "",
+  };
 }

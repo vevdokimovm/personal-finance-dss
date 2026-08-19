@@ -12,6 +12,7 @@ from tools.preflight import (
     app_version,
     changelog_version,
     grep_in_and_chain,
+    readme_version,
     repo_id,
     revision_check_failures,
     soft_hyphens,
@@ -41,6 +42,9 @@ def repo(tmp_path):
     (tmp_path / "docs" / "api").mkdir()
     (tmp_path / "docs" / "api" / "openapi.json").write_text(
         '{"paths": {}}', encoding="utf-8")
+    (tmp_path / "README.md").write_text(
+        "![version](https://img.shields.io/badge/version-1.2.3-blue)\n",
+        encoding="utf-8")
     return tmp_path
 
 
@@ -58,6 +62,25 @@ class TestVersionConsistency:
 
     def test_missing_source_is_none_not_crash(self, tmp_path):
         assert app_version(tmp_path) is None
+
+
+class TestReadmeVersion:
+    """README.md отставал от реальной версии дважды (v7.7.0 — на 15 версий; v8.24.1 —
+    следующий батч это уже не поймал бы, README не входил в проверку). Третий повтор
+    того же класса обязан ловиться кодом (§1 эскалации, recurrence_ledger.md)."""
+
+    def test_reads_version_from_badge(self, repo):
+        assert readme_version(repo) == "1.2.3"
+
+    def test_missing_readme_is_none_not_crash(self, tmp_path):
+        assert readme_version(tmp_path) is None
+
+    def test_stale_badge_is_detected(self, repo):
+        (repo / "README.md").write_text(
+            "![version](https://img.shields.io/badge/version-0.0.1-blue)\n",
+            encoding="utf-8")
+        assert readme_version(repo) == "0.0.1"
+        assert readme_version(repo) != app_version(repo)
 
 
 class TestWatchlogWindow:

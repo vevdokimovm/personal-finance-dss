@@ -1,7 +1,9 @@
 import { useRef, useState } from "react";
 import { ListSkeleton, StatePanel, Button } from "@shared/ui";
 import { t } from "@shared/lib/i18n/t";
+import { getConsentRequiredDetail } from "@shared/lib/api/extractErrorMessage";
 import { useLiquidAssets, type LiquidAsset } from "@entities/assets";
+import { ConsentRequiredPanel } from "@entities/consents";
 import { AssetRow } from "./ui/AssetRow";
 import { AssetForm } from "./ui/AssetForm";
 import "./AssetsPage.css";
@@ -11,6 +13,8 @@ export function AssetsPage() {
   // undefined — модалка закрыта; null — создание; объект — правка этой записи.
   const [editing, setEditing] = useState<LiquidAsset | null | undefined>(undefined);
   const addButtonRef = useRef<HTMLButtonElement>(null);
+  // Фокус после успешной выдачи согласия (a11y-auditor) — см. ObligationsPage.tsx.
+  const headingRef = useRef<HTMLHeadingElement>(null);
 
   const addButton = (
     <Button ref={addButtonRef} variant="primary" onClick={() => setEditing(null)}>
@@ -31,16 +35,34 @@ export function AssetsPage() {
   if (query.isLoading) {
     return (
       <main className="fp-assets">
-        <h1>{t("Ликвидные активы")}</h1>
+        <h1 ref={headingRef} tabIndex={-1}>
+          {t("Ликвидные активы")}
+        </h1>
         <ListSkeleton rows={3} />
       </main>
     );
   }
 
   if (query.isError) {
+    const consentDetail = getConsentRequiredDetail(query.error);
+    if (consentDetail) {
+      return (
+        <main className="fp-assets">
+          <h1 ref={headingRef} tabIndex={-1}>
+            {t("Ликвидные активы")}
+          </h1>
+          <ConsentRequiredPanel
+            detail={consentDetail}
+            onGranted={() => void query.refetch().then(() => headingRef.current?.focus())}
+          />
+        </main>
+      );
+    }
     return (
       <main className="fp-assets">
-        <h1>{t("Ликвидные активы")}</h1>
+        <h1 ref={headingRef} tabIndex={-1}>
+          {t("Ликвидные активы")}
+        </h1>
         <StatePanel
           title={t("Не получилось загрузить активы")}
           role="alert"
@@ -61,7 +83,9 @@ export function AssetsPage() {
   if (assets.length === 0) {
     return (
       <main className="fp-assets">
-        <h1>{t("Ликвидные активы")}</h1>
+        <h1 ref={headingRef} tabIndex={-1}>
+          {t("Ликвидные активы")}
+        </h1>
         <StatePanel title={t("Активов пока нет")} action={addButton}>
           {t(
             "Свободный резерв и подушка безопасности — депозиты, накопительные счета, наличные, не привязанные к конкретной цели.",
@@ -75,7 +99,9 @@ export function AssetsPage() {
   return (
     <main className="fp-assets">
       <div className="fp-assets__head">
-        <h1>{t("Ликвидные активы")}</h1>
+        <h1 ref={headingRef} tabIndex={-1}>
+          {t("Ликвидные активы")}
+        </h1>
         {addButton}
       </div>
       <p className="fp-assets__lede">

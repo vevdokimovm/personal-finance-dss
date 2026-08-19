@@ -12,6 +12,12 @@ vi.mock("@entities/goals", async () => {
   return { ...actual, useGoals: useGoalsMock };
 });
 
+vi.mock("@entities/consents", () => ({
+  ConsentRequiredPanel: ({ detail }: { detail: { message: string } }) => (
+    <div role="alert">{detail.message}</div>
+  ),
+}));
+
 function queryResult(partial: Partial<UseQueryResult<Goal[]>>): UseQueryResult<Goal[]> {
   return {
     isLoading: false,
@@ -46,6 +52,24 @@ describe("GoalsPage", () => {
     expect(screen.getByRole("alert")).toHaveTextContent("Не получилось загрузить цели");
     await userEvent.click(screen.getByRole("button", { name: "Повторить" }));
     expect(refetch).toHaveBeenCalledOnce();
+  });
+
+  it("403 гейт согласия — показывает ConsentRequiredPanel вместо общей ошибки соединения", () => {
+    useGoalsMock.mockReturnValue(
+      queryResult({
+        isError: true,
+        error: {
+          detail: {
+            code: "consent_required",
+            consent_type: "financial_data",
+            message: "Нужно согласие на финансовые данные.",
+          },
+        } as unknown as Error,
+      }),
+    );
+    render(<GoalsPage />);
+    expect(screen.getByRole("alert")).toHaveTextContent("Нужно согласие на финансовые данные.");
+    expect(screen.queryByText("Не получилось загрузить цели")).not.toBeInTheDocument();
   });
 
   it("показывает пустое состояние без целей", () => {

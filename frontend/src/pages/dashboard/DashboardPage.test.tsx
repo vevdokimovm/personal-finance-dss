@@ -16,6 +16,12 @@ vi.mock("@entities/plan-summary", async () => {
   return { ...actual, usePlan: usePlanMock, useForecast: useForecastMock };
 });
 
+vi.mock("@entities/consents", () => ({
+  ConsentRequiredPanel: ({ detail }: { detail: { message: string } }) => (
+    <div role="alert">{detail.message}</div>
+  ),
+}));
+
 function queryResult<T>(partial: Partial<UseQueryResult<T>>): UseQueryResult<T> {
   return {
     isLoading: false,
@@ -84,6 +90,44 @@ describe("DashboardPage", () => {
     await userEvent.click(screen.getByRole("button", { name: "Повторить" }));
     expect(refetchPlan).toHaveBeenCalledOnce();
     expect(refetchForecast).toHaveBeenCalledOnce();
+  });
+
+  it("403 гейт согласия — показывает ConsentRequiredPanel вместо общей ошибки соединения", () => {
+    const consentError = {
+      detail: {
+        code: "consent_required",
+        consent_type: "financial_data",
+        message: "Нужно согласие на финансовые данные.",
+      },
+    };
+    usePlanMock.mockReturnValue(
+      queryResult({ isError: true, error: consentError as unknown as Error }),
+    );
+    useForecastMock.mockReturnValue(
+      queryResult({ isError: true, error: consentError as unknown as Error }),
+    );
+    render(<DashboardPage />);
+    expect(screen.getByRole("alert")).toHaveTextContent("Нужно согласие на финансовые данные.");
+    expect(screen.queryByText("Не получилось загрузить обзор")).not.toBeInTheDocument();
+  });
+
+  it("403 гейт согласия — заголовок видимый (design-critic: панель без якоря раздела)", () => {
+    // На остальных состояниях dashboard h1 sr-only корректен — они сами себя называют
+    // видимым текстом («Пока нет данных для обзора» и т.п.). Панель согласия — нет
+    // («Нужно согласие», «Этот раздел...») — без видимого заголовка страницы это
+    // осиротевшая карточка без контекста (design-critic, батч 2026-08-19).
+    const consentError = {
+      detail: { code: "consent_required", consent_type: "financial_data", message: "Нужно." },
+    };
+    usePlanMock.mockReturnValue(
+      queryResult({ isError: true, error: consentError as unknown as Error }),
+    );
+    useForecastMock.mockReturnValue(
+      queryResult({ isError: true, error: consentError as unknown as Error }),
+    );
+    render(<DashboardPage />);
+    const heading = screen.getByRole("heading", { level: 1, name: "Финансовый обзор" });
+    expect(heading).not.toHaveClass("sr-only");
   });
 
   it("показывает пустое состояние, когда доход и расход равны нулю (новый пользователь)", () => {

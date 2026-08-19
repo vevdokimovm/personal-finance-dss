@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import type { UseQueryResult } from "@tanstack/react-query";
@@ -13,6 +13,41 @@ vi.mock("@entities/profile", async () => {
   const actual = await vi.importActual<typeof import("@entities/profile")>("@entities/profile");
   return { ...actual, useProfile: useProfileMock };
 });
+
+const useConsentsMock = vi.fn();
+const grantMutateMock = vi.fn();
+const withdrawMutateMock = vi.fn();
+
+vi.mock("@entities/consents", () => ({
+  useConsents: () => useConsentsMock(),
+  useGrantConsent: () => ({ mutate: grantMutateMock, isPending: false }),
+  useWithdrawConsent: () => ({ mutate: withdrawMutateMock, isPending: false }),
+}));
+
+const { toastErrorMock, toastUndoMock } = vi.hoisted(() => ({
+  toastErrorMock: vi.fn(),
+  toastUndoMock: vi.fn(),
+}));
+
+vi.mock("@shared/ui", async () => {
+  const actual = await vi.importActual<typeof import("@shared/ui")>("@shared/ui");
+  return {
+    ...actual,
+    toast: { ...actual.toast, error: toastErrorMock, undo: toastUndoMock },
+  };
+});
+
+const CONSENTS_NOT_GRANTED = {
+  financial_data: { granted: false, version: "1.0", granted_at: null, withdrawable: true },
+};
+const CONSENTS_GRANTED = {
+  financial_data: {
+    granted: true,
+    version: "1.0",
+    granted_at: "2026-08-19T12:00:00Z",
+    withdrawable: true,
+  },
+};
 
 vi.mock("@tanstack/react-router", async () => {
   const actual =
@@ -46,6 +81,18 @@ const PROFILE: UserProfile = {
 };
 
 describe("ProfilePage", () => {
+  beforeEach(() => {
+    useConsentsMock.mockReturnValue({
+      data: CONSENTS_NOT_GRANTED,
+      isLoading: false,
+      isError: false,
+    });
+    grantMutateMock.mockReset();
+    withdrawMutateMock.mockReset();
+    toastErrorMock.mockClear();
+    toastUndoMock.mockClear();
+  });
+
   it("показывает скелетон, пока данные грузятся", () => {
     useProfileMock.mockReturnValue(queryResult({ isLoading: true }));
     render(<ProfilePage />);
@@ -118,5 +165,115 @@ describe("ProfilePage", () => {
     useProfileMock.mockReturnValue(queryResult({ data: { ...PROFILE, display_name: null } }));
     render(<ProfilePage />);
     expect(screen.getByText("Не указано")).toBeInTheDocument();
+  });
+
+  describe("блок «Согласия»", () => {
+    it("согласие на финданные не дано — статус бейджем + кнопка «Дать согласие» + ссылка на документ", () => {
+      useProfileMock.mockReturnValue(queryResult({ data: PROFILE }));
+      render(<ProfilePage />);
+      // "Не дано" — такой же по важности сигнал, как "не подтверждён" у email
+      // (design-critic: раньше был обычным текстом, неотличимым от прочих значений).
+      const status = screen.getByText("Не дано");
+      expect(status).toHaveClass("fp-profile__badge");
+      expect(screen.getByRole("button", { name: "Дать согласие" })).toBeInTheDocument();
+      expect(
+        screen.getByRole("link", { name: /Согласие на обработку финансовых/ }),
+      ).toHaveAttribute("href", "/legal/financial-consent");
+    });
+
+    it("клик «Дать согласие» вызывает мутацию с типом financial_data", async () => {
+      useProfileMock.mockReturnValue(queryResult({ data: PROFILE }));
+      render(<ProfilePage />);
+      await userEvent.click(screen.getByRole("button", { name: "Дать согласие" }));
+      expect(grantMutateMock).toHaveBeenCalledWith("financial_data", expect.any(Object));
+    });
+
+    it("неудача выдачи согласия — тост с ошибкой (a11y-auditor: молча ничего не менялось)", async () => {
+      grantMutateMock.mockImplementation((_type: string, opts?: { onError?: () => void }) => {
+        opts?.onError?.();
+      });
+      useProfileMock.mockReturnValue(queryResult({ data: PROFILE }));
+      render(<ProfilePage />);
+      await userEvent.click(screen.getByRole("button", { name: "Дать согласие" }));
+      expect(toastErrorMock).toHaveBeenCalledOnce();
+    });
+
+    it("согласие дано — статус «Дано» текстом (не бейдж), дата вторым планом, кнопка «Отозвать» danger", () => {
+      useConsentsMock.mockReturnValue({
+        data: CONSENTS_GRANTED,
+        isLoading: false,
+        isError: false,
+      });
+      useProfileMock.mockReturnValue(queryResult({ data: PROFILE }));
+      render(<ProfilePage />);
+      expect(screen.getByText("Дано")).not.toHaveClass("fp-profile__badge");
+      const withdrawButton = screen.getByRole("button", { name: "Отозвать" });
+      expect(withdrawButton).toHaveClass("fp-button--danger");
+      expect(screen.queryByRole("button", { name: "Дать согласие" })).not.toBeInTheDocument();
+    });
+
+    it("клик «Отозвать» вызывает мутацию отзыва с типом financial_data", async () => {
+      useConsentsMock.mockReturnValue({
+        data: CONSENTS_GRANTED,
+        isLoading: false,
+        isError: false,
+      });
+      useProfileMock.mockReturnValue(queryResult({ data: PROFILE }));
+      render(<ProfilePage />);
+      await userEvent.click(screen.getByRole("button", { name: "Отозвать" }));
+      expect(withdrawMutateMock).toHaveBeenCalledWith("financial_data", expect.any(Object));
+    });
+
+    it("успешный отзыв — undo-тост (тот же паттерн, что удаление обязательства/актива)", async () => {
+      withdrawMutateMock.mockImplementation((_type: string, opts?: { onSuccess?: () => void }) => {
+        opts?.onSuccess?.();
+      });
+      useConsentsMock.mockReturnValue({
+        data: CONSENTS_GRANTED,
+        isLoading: false,
+        isError: false,
+      });
+      useProfileMock.mockReturnValue(queryResult({ data: PROFILE }));
+      render(<ProfilePage />);
+      await userEvent.click(screen.getByRole("button", { name: "Отозвать" }));
+      expect(toastUndoMock).toHaveBeenCalledOnce();
+    });
+
+    it("неудача отзыва — тост с ошибкой", async () => {
+      withdrawMutateMock.mockImplementation((_type: string, opts?: { onError?: () => void }) => {
+        opts?.onError?.();
+      });
+      useConsentsMock.mockReturnValue({
+        data: CONSENTS_GRANTED,
+        isLoading: false,
+        isError: false,
+      });
+      useProfileMock.mockReturnValue(queryResult({ data: PROFILE }));
+      render(<ProfilePage />);
+      await userEvent.click(screen.getByRole("button", { name: "Отозвать" }));
+      expect(toastErrorMock).toHaveBeenCalledOnce();
+    });
+
+    it("withdrawable=false — кнопки «Отозвать» нет, но есть объяснение почему", () => {
+      useConsentsMock.mockReturnValue({
+        data: {
+          financial_data: { ...CONSENTS_GRANTED.financial_data, withdrawable: false },
+        },
+        isLoading: false,
+        isError: false,
+      });
+      useProfileMock.mockReturnValue(queryResult({ data: PROFILE }));
+      render(<ProfilePage />);
+      expect(screen.queryByRole("button", { name: "Отозвать" })).not.toBeInTheDocument();
+      expect(screen.getByText(/нельзя отозвать/i)).toBeInTheDocument();
+    });
+
+    it("согласия ещё грузятся — блок не падает, кнопки нет", () => {
+      useConsentsMock.mockReturnValue({ data: undefined, isLoading: true, isError: false });
+      useProfileMock.mockReturnValue(queryResult({ data: PROFILE }));
+      render(<ProfilePage />);
+      expect(screen.queryByRole("button", { name: "Дать согласие" })).not.toBeInTheDocument();
+      expect(screen.queryByRole("button", { name: "Отозвать" })).not.toBeInTheDocument();
+    });
   });
 });

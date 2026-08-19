@@ -1,8 +1,10 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { usePlan, useForecast } from "@entities/plan-summary";
 import { ListSkeleton, StatePanel, Button, Formula } from "@shared/ui";
 import { formatMoney } from "@shared/lib/money/formatMoney";
 import { t } from "@shared/lib/i18n/t";
+import { getConsentRequiredDetail } from "@shared/lib/api/extractErrorMessage";
+import { ConsentRequiredPanel } from "@entities/consents";
 import { MetricsGrid } from "@widgets/metrics-grid";
 import { AllocationPanel } from "@widgets/allocation-panel";
 import { ForecastPanel } from "@widgets/forecast-panel";
@@ -20,24 +22,46 @@ export function PlanningPage() {
   const [horizon, setHorizon] = useState(12);
   const [rBench, setRBench] = useState<number | undefined>(undefined);
   const forecastQuery = useForecast(horizon, rBench);
+  // Фокус после успешной выдачи согласия (a11y-auditor) — см. ObligationsPage.tsx.
+  const headingRef = useRef<HTMLHeadingElement>(null);
 
   if (planQuery.isLoading || forecastQuery.isLoading) {
     return (
       <main className="fp-planning">
-        <h1>{t("План распределения")}</h1>
+        <h1 ref={headingRef} tabIndex={-1}>
+          {t("План распределения")}
+        </h1>
         <ListSkeleton rows={4} />
       </main>
     );
   }
 
   if (planQuery.isError || forecastQuery.isError) {
+    const consentDetail =
+      getConsentRequiredDetail(planQuery.error) ?? getConsentRequiredDetail(forecastQuery.error);
+    if (consentDetail) {
+      const onGranted = () => {
+        void planQuery.refetch();
+        void forecastQuery.refetch().then(() => headingRef.current?.focus());
+      };
+      return (
+        <main className="fp-planning">
+          <h1 ref={headingRef} tabIndex={-1}>
+            {t("План распределения")}
+          </h1>
+          <ConsentRequiredPanel detail={consentDetail} onGranted={onGranted} />
+        </main>
+      );
+    }
     const retry = () => {
       void planQuery.refetch();
       void forecastQuery.refetch();
     };
     return (
       <main className="fp-planning">
-        <h1>{t("План распределения")}</h1>
+        <h1 ref={headingRef} tabIndex={-1}>
+          {t("План распределения")}
+        </h1>
         <StatePanel
           title={t("Не получилось загрузить план")}
           role="alert"
@@ -58,7 +82,9 @@ export function PlanningPage() {
   if (!plan || !forecast) {
     return (
       <main className="fp-planning">
-        <h1>{t("План распределения")}</h1>
+        <h1 ref={headingRef} tabIndex={-1}>
+          {t("План распределения")}
+        </h1>
         <StatePanel
           title={t("Не получилось загрузить план")}
           role="alert"
@@ -79,7 +105,9 @@ export function PlanningPage() {
   if (isEmpty) {
     return (
       <main className="fp-planning">
-        <h1>{t("План распределения")}</h1>
+        <h1 ref={headingRef} tabIndex={-1}>
+          {t("План распределения")}
+        </h1>
         <StatePanel
           title={t("Пока нет данных для плана")}
           action={
@@ -99,7 +127,9 @@ export function PlanningPage() {
   return (
     <main className="fp-planning">
       <div className="fp-planning__head">
-        <h1>{t("План распределения")}</h1>
+        <h1 ref={headingRef} tabIndex={-1}>
+          {t("План распределения")}
+        </h1>
         <span className="fp-planning__risk-badge">
           <span className="sr-only">{t("Риск-профиль: ")}</span>
           {plan.risk_profile}

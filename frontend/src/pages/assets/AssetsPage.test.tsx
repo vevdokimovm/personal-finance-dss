@@ -15,6 +15,12 @@ const deleteMutateMock = vi.fn((_id: number, opts?: { onSuccess?: () => void }) 
   opts?.onSuccess?.();
 });
 
+vi.mock("@entities/consents", () => ({
+  ConsentRequiredPanel: ({ detail }: { detail: { message: string } }) => (
+    <div role="alert">{detail.message}</div>
+  ),
+}));
+
 vi.mock("@entities/assets", () => ({
   useLiquidAssets: () => useLiquidAssetsMock(),
   useCreateAsset: () => ({ mutateAsync: createMutateAsyncMock, isPending: false, error: null }),
@@ -60,6 +66,24 @@ describe("AssetsPage", () => {
     expect(screen.getByRole("alert")).toHaveTextContent("Не получилось загрузить активы");
     await userEvent.click(screen.getByRole("button", { name: "Повторить" }));
     expect(refetch).toHaveBeenCalledOnce();
+  });
+
+  it("403 гейт согласия — показывает ConsentRequiredPanel вместо общей ошибки соединения", () => {
+    useLiquidAssetsMock.mockReturnValue(
+      queryResult({
+        isError: true,
+        error: {
+          detail: {
+            code: "consent_required",
+            consent_type: "financial_data",
+            message: "Нужно согласие на финансовые данные.",
+          },
+        } as unknown as Error,
+      }),
+    );
+    render(<AssetsPage />);
+    expect(screen.getByRole("alert")).toHaveTextContent("Нужно согласие на финансовые данные.");
+    expect(screen.queryByText("Не получилось загрузить активы")).not.toBeInTheDocument();
   });
 
   it("показывает пустое состояние без активов, с кнопкой добавления внутри панели", () => {

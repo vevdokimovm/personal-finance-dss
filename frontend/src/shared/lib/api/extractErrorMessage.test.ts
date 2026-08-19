@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { extractErrorMessage } from "./extractErrorMessage";
+import { extractErrorMessage, getConsentRequiredDetail } from "./extractErrorMessage";
 
 describe("extractErrorMessage — текст ошибки API для пользователя", () => {
   it("HTTPException(detail=строка) — 400/401/403/409 — возвращает текст как есть", () => {
@@ -68,5 +68,60 @@ describe("extractErrorMessage — текст ошибки API для польз�
     expect(extractErrorMessage({ detail: { code: "consent_required" } }, "запасной текст")).toBe(
       "запасной текст",
     );
+  });
+});
+
+describe("getConsentRequiredDetail — структурная сверка 403 гейта согласия (не текст)", () => {
+  it("гейт согласия — возвращает consentType/message/documentTitle/documentUrl", () => {
+    expect(
+      getConsentRequiredDetail({
+        detail: {
+          code: "consent_required",
+          consent_type: "financial_data",
+          document: {
+            title: "Согласие на обработку финансовых данных",
+            version: "1.0",
+            url: "/legal/financial-consent",
+          },
+          message: "Нужно согласие.",
+        },
+      }),
+    ).toEqual({
+      consentType: "financial_data",
+      message: "Нужно согласие.",
+      documentTitle: "Согласие на обработку финансовых данных",
+      documentUrl: "/legal/financial-consent",
+    });
+  });
+
+  it("объектный detail без document — documentTitle/documentUrl пустые строки, не падает", () => {
+    expect(
+      getConsentRequiredDetail({
+        detail: { code: "consent_required", consent_type: "financial_data", message: "Нужно." },
+      }),
+    ).toEqual({
+      consentType: "financial_data",
+      message: "Нужно.",
+      documentTitle: "",
+      documentUrl: "",
+    });
+  });
+
+  it("другой код ошибки (не consent_required) — null", () => {
+    expect(getConsentRequiredDetail({ detail: { code: "other", message: "x" } })).toBeNull();
+  });
+
+  it("строковый detail (обычная HTTPException) — null", () => {
+    expect(getConsentRequiredDetail({ detail: "Неверный пароль." })).toBeNull();
+  });
+
+  it("сетевая ошибка / null / undefined — null, не падает", () => {
+    expect(getConsentRequiredDetail(new TypeError("Failed to fetch"))).toBeNull();
+    expect(getConsentRequiredDetail(null)).toBeNull();
+    expect(getConsentRequiredDetail(undefined)).toBeNull();
+  });
+
+  it("consent_required без consent_type/message — null (форма не годная для панели)", () => {
+    expect(getConsentRequiredDetail({ detail: { code: "consent_required" } })).toBeNull();
   });
 });

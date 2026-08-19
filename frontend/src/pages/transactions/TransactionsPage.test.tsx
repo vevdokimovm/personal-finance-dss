@@ -13,6 +13,12 @@ vi.mock("@entities/transactions", async () => {
   return { ...actual, useTransactions: useTransactionsMock };
 });
 
+vi.mock("@entities/consents", () => ({
+  ConsentRequiredPanel: ({ detail }: { detail: { message: string } }) => (
+    <div role="alert">{detail.message}</div>
+  ),
+}));
+
 function queryResult(
   partial: Partial<UseQueryResult<Transaction[]>>,
 ): UseQueryResult<Transaction[]> {
@@ -58,6 +64,24 @@ describe("TransactionsPage", () => {
     expect(screen.getByRole("alert")).toHaveTextContent("Не получилось загрузить операции");
     await userEvent.click(screen.getByRole("button", { name: "Повторить" }));
     expect(refetch).toHaveBeenCalledOnce();
+  });
+
+  it("403 гейт согласия — показывает ConsentRequiredPanel вместо общей ошибки соединения", () => {
+    useTransactionsMock.mockReturnValue(
+      queryResult({
+        isError: true,
+        error: {
+          detail: {
+            code: "consent_required",
+            consent_type: "financial_data",
+            message: "Нужно согласие на финансовые данные.",
+          },
+        } as unknown as Error,
+      }),
+    );
+    render(<TransactionsPage />);
+    expect(screen.getByRole("alert")).toHaveTextContent("Нужно согласие на финансовые данные.");
+    expect(screen.queryByText("Не получилось загрузить операции")).not.toBeInTheDocument();
   });
 
   it("показывает пустое состояние без операций", () => {

@@ -14,7 +14,7 @@ const SORTERS: Record<SortKey, (a: PlanAlternative, b: PlanAlternative) => numbe
   recommended: () => 0,
   Rt_new: (a, b) => b.Rt_new - a.Rt_new,
   Lt_new: (a, b) => b.Lt_new - a.Lt_new,
-  // ПДН — чем меньше, тем лучше (жёсткий инвариант канона v3.0.0: Dt <= 0.40).
+  // ПДН — чем меньше, тем лучше (жёсткий инвариант канона, docs/math_model.md §3: Dt <= 0.40).
   Dt_new: (a, b) => a.Dt_new - b.Dt_new,
 };
 

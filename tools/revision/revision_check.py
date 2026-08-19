@@ -39,7 +39,7 @@ SKIP_DIRS = frozenset({
     # выше по коду), только не пойман раньше, потому что dist/ обычно не существует на момент
     # прогона.
     "dist", "dist-ssr", "coverage", "playwright-report", "test-results", "blob-report",
-    ".tanstack",
+    ".tanstack", ".typecheck-tmp",
 })
 
 # Источник считается замороженным (ссылки были верны на своей версии — не чиним).
@@ -111,13 +111,20 @@ LEGACY_PATTERNS = (
     re.compile(r"95%\s*(?:интервал|CI|довер)"),
 )
 
-# Живые доки, где упоминание legacy легитимно (объяснение перехода v2 -> v3).
+# Живые доки/код, где упоминание legacy легитимно (объяснение перехода v2 -> v3,
+# регрессионный тест на ОТСУТСТВИЕ старого значения, или сам файл, определяющий эти
+# паттерны — после расширения на .ts/.tsx/.py, 2026-08-19, ROADMAP §9.0 «A»).
 LEGACY_ALLOWLIST_FILES = frozenset({
     "docs/model/history/math_model_v3_0_0.md",
     "docs/model/history/math_model_v3_1_0.md",
     "docs/model/model_history.md",  # сквозная история модели: legacy по назначению
     "docs/reference_profiles.md",
     "docs/reports/adr/adr_template.md",
+    "tools/revision/revision_check.py",  # определяет сами паттерны — неизбежное самосовпадение
+    "tools/survey_analysis/report.py",  # "95% доверительный интервал" — статистика опроса ЦА,
+    # не модельный CI прогноза; тот же текст, другой домен
+    "tests/test_frontend_static.py",  # регрессия на ОТСУТСТВИЕ "21 вариант"/"шаг 20%" в app.js —
+    # упоминание тут и есть цель теста, не утечка факта
 })
 
 # Маркеры «это старое / переход» в строке — упоминание legacy легитимно, не факт.
@@ -177,12 +184,19 @@ class CheckResult:
 
 
 class _MarkdownScanner:
-    def __init__(self, root: Path) -> None:
+    """Обход дерева по расширениям. По умолчанию только `.md` (для LinkChecker —
+    ссылки живут в прозе доков). LegacyModelChecker передаёт более широкий набор:
+    устаревший факт модели может утечь в комментарий кода, не только в докс."""
+
+    def __init__(self, root: Path, suffixes: tuple[str, ...] = (".md",)) -> None:
         self._root = root
+        self._suffixes = suffixes
 
     def files(self) -> list[Path]:
         return [
-            path for path in self._root.rglob("*.md")
+            path
+            for suffix in self._suffixes
+            for path in self._root.rglob(f"*{suffix}")
             if not any(part in SKIP_DIRS for part in path.parts)
         ]
 
@@ -249,7 +263,10 @@ class LegacyModelChecker:
 
     def __init__(self, root: Path) -> None:
         self._root = root
-        self._scanner = _MarkdownScanner(root)
+        # Не только markdown (2026-08-19, ROADMAP §9.0 «A»): устаревший факт модели
+        # утекал в код (комментарии .ts/.tsx/.py), где старый LinkChecker/CJK-стиль
+        # markdown-only обход его не видел вовсе.
+        self._scanner = _MarkdownScanner(root, suffixes=(".md", ".ts", ".tsx", ".py"))
 
     def run(self) -> CheckResult:
         result = CheckResult(self.name)
