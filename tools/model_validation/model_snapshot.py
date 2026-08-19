@@ -88,12 +88,15 @@ def build_snapshot() -> str:
 | `L_MIN` (мин. автономии, отсев) | {filtering.L_MIN} | `filtering.py` |
 | `B_MIN` (мин. остаточный ресурс) | {filtering.B_MIN} | `filtering.py` |
 | `RESERVE_FLOOR_MONTHS` (floor резерва) | {ranking.RESERVE_FLOOR_MONTHS} | `ranking.py` |
-| `TOXIC_FLOOR_MONTHS` (floor при токсичном долге, G8) | {ranking.TOXIC_FLOOR_MONTHS} | `ranking.py` |
+| `TOXIC_FLOOR_MONTHS` (floor при токсичном долге, G8) | \
+{ranking.TOXIC_FLOOR_MONTHS} | `ranking.py` |
 | `INCOME_VOLATILITY_THRESHOLD` (ADR-015) | {ranking.INCOME_VOLATILITY_THRESHOLD} | `ranking.py` |
 | `INCOME_VOLATILITY_MIN_MONTHS` (ADR-015) | {ranking.INCOME_VOLATILITY_MIN_MONTHS} | `ranking.py` |
-| `INCOME_VOLATILITY_FLOOR_BOOST_CAP` (ADR-015) | {ranking.INCOME_VOLATILITY_FLOOR_BOOST_CAP} | `ranking.py` |
+| `INCOME_VOLATILITY_FLOOR_BOOST_CAP` (ADR-015) | \
+{ranking.INCOME_VOLATILITY_FLOOR_BOOST_CAP} | `ranking.py` |
 | `GOAL_INFLATION_RATE` (ADR-013) | {goals_priority.GOAL_INFLATION_RATE} | `goals_priority.py` |
-| `GOAL_INFLATION_HORIZON_MONTHS` (ADR-013) | {goals_priority.GOAL_INFLATION_HORIZON_MONTHS} | `goals_priority.py` |
+| `GOAL_INFLATION_HORIZON_MONTHS` (ADR-013) | \
+{goals_priority.GOAL_INFLATION_HORIZON_MONTHS} | `goals_priority.py` |
 | `MAX_HORIZON_MONTHS` (график погашения, ADR-016) | {MAX_HORIZON_MONTHS} | `amortization.py` |
 | `HORIZON_SHORT_MONTHS` / `HORIZON_MID_MONTHS` (инвест-транш) | \
 {investment.HORIZON_SHORT_MONTHS} / {investment.HORIZON_MID_MONTHS} | `investment.py` |
