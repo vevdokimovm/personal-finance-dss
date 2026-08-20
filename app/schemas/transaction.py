@@ -17,6 +17,18 @@ class TransactionCreate(BaseModel):
     household_id: Optional[int] = None
 
 
+class TransactionUpdate(BaseModel):
+    """Правка операции. `mcc`/`currency` сознательно не выведены (владелец: служебные
+    поля импорта, продукт рублёвый) — лишние поля в теле запроса Pydantic молча
+    игнорирует, не 422."""
+
+    amount: Optional[float] = None
+    type: Optional[Literal["income", "expense"]] = None
+    date: Optional[datetime] = None
+    category: Optional[str] = None
+    description: Optional[str] = None
+
+
 class TransactionResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 

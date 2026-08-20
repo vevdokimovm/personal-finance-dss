@@ -145,7 +145,11 @@ LEGACY_CONTEXT_MARKERS = (
 # openapi_paths 111 (v8.23.0): -3 — снесены /profile, /forgot-password, /reset-password
 # (Jinja-роуты с подтверждённым паритетом в React, docs/reports/decisions/
 # 2026-08-14_jinja_frontend_removal.md); снимок пересобран `tools/api_snapshot/dump_openapi.py`.
-EXPECTED_COUNTS = {"tables": 30, "migrations": 34, "openapi_paths": 112}
+# openapi_paths 113 (батч 2 CRUD-паритета — Операция + Цель, ROADMAP §9.0 «B»): +1 —
+# новый путь POST /api/goals/{goal_id}/contributions. PUT /transactions/{id} и
+# PUT /goals/{id} НЕ добавляют путей — операции легли на уже существующие пути
+# (там уже были DELETE на тех же URL).
+EXPECTED_COUNTS = {"tables": 30, "migrations": 34, "openapi_paths": 113}
 
 
 # Канарейка CJK: редкий токен-глюк генерации ассистентов — иероглиф вместо

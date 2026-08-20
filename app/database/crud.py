@@ -453,6 +453,23 @@ def get_transactions(db: Session, user_id: Optional[str] = None) -> list[Transac
     return query.order_by(Transaction.date.desc()).all()
 
 
+_TRANSACTION_MONEY_FIELDS = {"amount"}
+
+
+def update_transaction(
+    db: Session, transaction_id: int, user_id: Optional[str] = None, **fields: Any
+) -> Optional[Transaction]:
+    """Частичное обновление (PUT, только переданные поля)."""
+    transaction = db.get(Transaction, transaction_id)
+    if transaction is None or transaction.is_deleted or transaction.user_id != user_id:
+        return None
+    for key, value in fields.items():
+        setattr(transaction, key, to_money(value) if key in _TRANSACTION_MONEY_FIELDS else value)
+    db.commit()
+    db.refresh(transaction)
+    return transaction
+
+
 def delete_transaction(
     db: Session, transaction_id: int, user_id: Optional[str] = None
 ) -> Optional[Transaction]:
@@ -845,6 +862,32 @@ def get_goals(
     return query.order_by(Goal.deadline.asc().nullslast()).all()
 
 
+_GOAL_MONEY_FIELDS = {"target_amount"}
+
+
+def update_goal(
+    db: Session, goal_id: int, user_id: Optional[str] = None, **fields: Any
+) -> Optional[Goal]:
+    """Частичное обновление (PUT, только переданные поля). `current_amount` сюда не
+    попадает — схема `GoalUpdate` его не принимает (владелец: прогресс только через
+    `add_goal_contribution`, не общий edit)."""
+    goal = db.get(Goal, goal_id)
+    if goal is None or goal.is_deleted or goal.user_id != user_id:
+        return None
+    for key, value in fields.items():
+        setattr(goal, key, to_money(value) if key in _GOAL_MONEY_FIELDS else value)
+    db.commit()
+    db.refresh(goal)
+    return goal
+
+
+def get_goal_by_id(db: Session, goal_id: int, user_id: Optional[str] = None) -> Optional[Goal]:
+    goal = db.get(Goal, goal_id)
+    if goal is None or goal.is_deleted or goal.user_id != user_id:
+        return None
+    return goal
+
+
 def delete_goal(db: Session, goal_id: int, user_id: Optional[str] = None) -> Optional[Goal]:
     """Мягкое удаление (P1.7): цель помечается удалённой, история взносов сохраняется."""
     goal = db.get(Goal, goal_id)
@@ -897,6 +940,26 @@ def record_goal_contribution(
     db.commit()
     db.refresh(contribution)
     return contribution
+
+
+def add_goal_contribution(
+    db: Session,
+    goal_id: int,
+    amount: float,
+    user_id: Optional[str] = None,
+    source: str = "manual",
+) -> Optional[Goal]:
+    """«Внести прогресс» (владелец): прибавляет к `current_amount`, не перезаписывает.
+    Вызывающая сторона (роут) обязана заранее отсечь цели с `linked_asset_id` — там
+    прогресс read-only и выводится из баланса актива, сюда такие не должны попадать."""
+    goal = db.get(Goal, goal_id)
+    if goal is None or goal.is_deleted or goal.user_id != user_id:
+        return None
+    record_goal_contribution(db, goal_id, amount, source=source)
+    goal.current_amount = to_money(goal.current_amount + to_money(amount))
+    db.commit()
+    db.refresh(goal)
+    return goal
 
 
 def get_goal_contributions(db: Session, goal_id: int) -> list[GoalContribution]:

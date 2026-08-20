@@ -7,22 +7,19 @@
   font-size: var(--fs-xl);
   margin: 0 0 var(--sp-5);
 }
-.fp-transactions__legend {
+/* Ритм шапки/списка — единый с GoalsPage/ObligationsPage (design-critic, Батч 2: два
+   экрана одного батча были собраны в разном ритме — то же правило CMP-01/§3, что уже
+   чинилось для дублирующихся стилей). */
+.fp-transactions__head {
   display: flex;
   align-items: center;
-  gap: var(--sp-2);
-  color: var(--c-text3);
-  font-size: var(--fs-xs);
-  margin: 0 0 var(--sp-4);
+  justify-content: space-between;
+  gap: var(--sp-3);
+  margin-bottom: var(--sp-5);
+  flex-wrap: wrap;
 }
-.fp-transactions__legend .fp-dot {
-  width: var(--sp-2);
-  height: var(--sp-2);
-  border-radius: 50%;
-  display: inline-block;
-}
-.fp-transactions__legend .fp-dot:not(:first-child) {
-  margin-left: var(--sp-3);
+.fp-transactions__head h1 {
+  margin: 0;
 }
 
 .fp-transactions__list {
@@ -31,7 +28,7 @@
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: var(--sp-2);
+  gap: var(--sp-3);
 }
 
 .fp-transaction-row {
@@ -46,8 +43,9 @@
 }
 .fp-transaction-row__main {
   display: flex;
+  flex: 1;
   flex-direction: column;
-  gap: var(--sp-0);
+  gap: var(--sp-1);
   min-width: 0;
 }
 .fp-transaction-row__category {
@@ -64,15 +62,31 @@
   color: var(--c-text3);
   font-size: var(--fs-sm);
   flex-shrink: 0;
+  min-width: 5em;
 }
+/* Расход — нейтральным цветом, не красным (бриф §2.2/§6: постоянный красный на каждой
+   строке расходов тревожит, против философии продукта; знак +/− и sr-only-слово уже
+   несут смысл без цвета). Доход остаётся зелёным — единственная цветовая роль на экране,
+   не конкурирует с danger-кнопкой удаления (design-critic, Батч 2). */
 .fp-transaction-row__amount--income {
   color: var(--c-green);
   font-weight: 700;
   flex-shrink: 0;
+  margin-left: auto;
+  text-align: right;
+  min-width: 6em;
 }
 .fp-transaction-row__amount--expense {
-  color: var(--c-red);
+  color: var(--c-text);
   font-weight: 700;
+  flex-shrink: 0;
+  margin-left: auto;
+  text-align: right;
+  min-width: 6em;
+}
+.fp-transaction-row__actions {
+  display: flex;
+  gap: var(--sp-2);
   flex-shrink: 0;
 }
 

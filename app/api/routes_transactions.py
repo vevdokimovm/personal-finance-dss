@@ -17,11 +17,12 @@ from app.database.crud import (
     get_transactions,
     restore_transaction,
     set_transaction_category,
+    update_transaction,
     upsert_category_rule,
 )
 from app.core.categorization import MIN_MATCH_TOKEN_LEN, normalize_match_key
 from app.dependencies import get_current_user_id, get_db
-from app.schemas.transaction import TransactionCreate, TransactionResponse
+from app.schemas.transaction import TransactionCreate, TransactionResponse, TransactionUpdate
 from app.services.event_logger import log_event
 from app.utils.time import utcnow
 
@@ -101,6 +102,28 @@ def create_transaction_endpoint(
         "category": payload.category,
         "amount": payload.amount,
     })
+    return transaction
+
+
+@router.put(
+    "/transactions/{transaction_id}",
+    response_model=TransactionResponse,
+    summary="Изменить операцию (частично, только переданные поля)",
+)
+def update_transaction_endpoint(
+    transaction_id: int,
+    payload: TransactionUpdate,
+    db: Session = Depends(get_db),
+    user_id: str | None = Depends(get_current_user_id),
+) -> TransactionResponse:
+    transaction = update_transaction(
+        db, transaction_id, user_id=user_id, **payload.model_dump(exclude_unset=True)
+    )
+    if transaction is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Транзакция не найдена."
+        )
+    log_event("transaction_updated", {"transaction_id": transaction_id})
     return transaction
 
 

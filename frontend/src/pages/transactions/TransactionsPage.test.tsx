@@ -5,18 +5,36 @@ import type { UseQueryResult } from "@tanstack/react-query";
 import { TransactionsPage } from "./TransactionsPage";
 import type { Transaction } from "@entities/transactions";
 
-const { useTransactionsMock } = vi.hoisted(() => ({ useTransactionsMock: vi.fn() }));
-
-vi.mock("@entities/transactions", async () => {
-  const actual =
-    await vi.importActual<typeof import("@entities/transactions")>("@entities/transactions");
-  return { ...actual, useTransactions: useTransactionsMock };
+const useTransactionsMock = vi.fn();
+const createMutateAsyncMock = vi.fn();
+const updateMutateAsyncMock = vi.fn();
+const restoreMutateMock = vi.fn();
+// Мутация удаления реально вызывает onSuccess — иначе не проверить перенос фокуса
+// (a11y-auditor, Батч 1: без этого фокус после удаления строки падает в <body>).
+const deleteMutateMock = vi.fn((_id: number, opts?: { onSuccess?: () => void }) => {
+  opts?.onSuccess?.();
 });
 
 vi.mock("@entities/consents", () => ({
   ConsentRequiredPanel: ({ detail }: { detail: { message: string } }) => (
     <div role="alert">{detail.message}</div>
   ),
+}));
+
+vi.mock("@entities/transactions", () => ({
+  useTransactions: () => useTransactionsMock(),
+  useCreateTransaction: () => ({
+    mutateAsync: createMutateAsyncMock,
+    isPending: false,
+    error: null,
+  }),
+  useUpdateTransaction: () => ({
+    mutateAsync: updateMutateAsyncMock,
+    isPending: false,
+    error: null,
+  }),
+  useDeleteTransaction: () => ({ mutate: deleteMutateMock, isPending: false }),
+  useRestoreTransaction: () => ({ mutate: restoreMutateMock, isPending: false }),
 }));
 
 function queryResult(
@@ -84,10 +102,12 @@ describe("TransactionsPage", () => {
     expect(screen.queryByText("Не получилось загрузить операции")).not.toBeInTheDocument();
   });
 
-  it("показывает пустое состояние без операций", () => {
+  it("показывает пустое состояние без операций, с кнопкой добавления внутри панели", () => {
     useTransactionsMock.mockReturnValue(queryResult({ data: [] }));
     render(<TransactionsPage />);
-    expect(screen.getByText("Операций пока нет")).toBeInTheDocument();
+    const panel = screen.getByText("Операций пока нет").closest(".fp-state-panel") as HTMLElement;
+    expect(panel).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Добавить операцию" })).toBeInTheDocument();
   });
 
   it("рендерит список операций — доход и расход с разным знаком/цветом", () => {
@@ -103,5 +123,29 @@ describe("TransactionsPage", () => {
     expect(income?.textContent).toContain("180");
     expect(expense?.textContent).toContain("−");
     expect(expense?.textContent).toContain("4");
+  });
+
+  it("кнопка «Добавить операцию» открывает форму создания (пустые поля)", async () => {
+    useTransactionsMock.mockReturnValue(queryResult({ data: [TX_EXPENSE] }));
+    render(<TransactionsPage />);
+    await userEvent.click(screen.getByRole("button", { name: "Добавить операцию" }));
+    expect(screen.getByRole("heading", { name: "Новая операция" })).toBeInTheDocument();
+    expect(screen.getByLabelText("Сумма, ₽ *")).toHaveValue(null);
+  });
+
+  it("кнопка «Изменить» на строке открывает форму, поля предзаполнены", async () => {
+    useTransactionsMock.mockReturnValue(queryResult({ data: [TX_EXPENSE] }));
+    render(<TransactionsPage />);
+    await userEvent.click(screen.getByRole("button", { name: "Изменить" }));
+    expect(screen.getByRole("heading", { name: "Изменить операцию" })).toBeInTheDocument();
+    expect(screen.getByLabelText("Описание (необязательно)")).toHaveValue("Пятёрочка");
+  });
+
+  it("кнопка «Удалить» вызывает мутацию удаления и переносит фокус на «Добавить операцию»", async () => {
+    useTransactionsMock.mockReturnValue(queryResult({ data: [TX_EXPENSE] }));
+    render(<TransactionsPage />);
+    await userEvent.click(screen.getByRole("button", { name: "Удалить «Пятёрочка»" }));
+    expect(deleteMutateMock).toHaveBeenCalledWith(2, expect.any(Object));
+    expect(screen.getByRole("button", { name: "Добавить операцию" })).toHaveFocus();
   });
 });

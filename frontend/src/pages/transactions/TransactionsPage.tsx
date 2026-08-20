@@ -1,16 +1,34 @@
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { ListSkeleton, StatePanel, Button } from "@shared/ui";
 import { t } from "@shared/lib/i18n/t";
 import { getConsentRequiredDetail } from "@shared/lib/api/extractErrorMessage";
-import { useTransactions } from "@entities/transactions";
+import { useTransactions, type Transaction } from "@entities/transactions";
 import { ConsentRequiredPanel } from "@entities/consents";
 import { TransactionRow } from "./ui/TransactionRow";
+import { TransactionForm } from "./ui/TransactionForm";
 import "./TransactionsPage.css";
 
 export function TransactionsPage() {
   const query = useTransactions();
+  // undefined — модалка закрыта; null — создание; объект — правка этой записи.
+  const [editing, setEditing] = useState<Transaction | null | undefined>(undefined);
+  const addButtonRef = useRef<HTMLButtonElement>(null);
   // Фокус после успешной выдачи согласия (a11y-auditor) — см. ObligationsPage.tsx.
   const headingRef = useRef<HTMLHeadingElement>(null);
+
+  const addButton = (
+    <Button ref={addButtonRef} variant="primary" onClick={() => setEditing(null)}>
+      {t("Добавить операцию")}
+    </Button>
+  );
+  const modal = (
+    <TransactionForm
+      key={editing?.id ?? "new"}
+      open={editing !== undefined}
+      onOpenChange={(open) => !open && setEditing(undefined)}
+      transaction={editing ?? undefined}
+    />
+  );
 
   if (query.isLoading) {
     return (
@@ -66,27 +84,33 @@ export function TransactionsPage() {
         <h1 ref={headingRef} tabIndex={-1}>
           {t("Операции")}
         </h1>
-        <StatePanel title={t("Операций пока нет")}>
+        <StatePanel title={t("Операций пока нет")} action={addButton}>
           {t("Добавьте доходы и расходы за 1–2 месяца — тогда СППР сможет построить план.")}
         </StatePanel>
+        {modal}
       </main>
     );
   }
 
   return (
     <main className="fp-transactions">
-      <h1>{t("Операции")}</h1>
-      <p className="fp-transactions__legend">
-        <span className="fp-dot" style={{ background: "var(--c-green)" }} />
-        {t("доходы")}
-        <span className="fp-dot" style={{ background: "var(--c-red)" }} />
-        {t("расходы")}
-      </p>
+      <div className="fp-transactions__head">
+        <h1 ref={headingRef} tabIndex={-1}>
+          {t("Операции")}
+        </h1>
+        {addButton}
+      </div>
       <ul className="fp-transactions__list">
         {transactions.map((tx) => (
-          <TransactionRow key={tx.id} transaction={tx} />
+          <TransactionRow
+            key={tx.id}
+            transaction={tx}
+            onEdit={() => setEditing(tx)}
+            onDeleted={() => addButtonRef.current?.focus()}
+          />
         ))}
       </ul>
+      {modal}
     </main>
   );
 }

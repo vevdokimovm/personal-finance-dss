@@ -13,13 +13,17 @@
   gap: var(--sp-1);
 }
 .fp-auth-field label,
-.fp-entity-form__field label {
+.fp-entity-form__field label,
+.fp-entity-form__label {
   font-size: var(--fs-sm);
   font-weight: 600;
   color: var(--c-text2);
 }
+/* :not([type="radio"]):not([type="checkbox"]) (design-critic, Батч 2) — до этого потомковый
+   селектор красил и нативные radio/checkbox под текстовое поле (padding+border+min-height),
+   в Chrome они растягивались в вытянутый овал вместо нативного кружка. */
 .fp-auth-field input,
-.fp-entity-form__field input,
+.fp-entity-form__field input:not([type="radio"]):not([type="checkbox"]),
 .fp-entity-form__field select {
   font: inherit;
   font-size: var(--fs-base);

@@ -1605,6 +1605,20 @@
         "title": "GoalCategory",
         "type": "string"
       },
+      "GoalContributionCreate": {
+        "properties": {
+          "amount": {
+            "exclusiveMinimum": 0.0,
+            "title": "Amount",
+            "type": "number"
+          }
+        },
+        "required": [
+          "amount"
+        ],
+        "title": "GoalContributionCreate",
+        "type": "object"
+      },
       "GoalCreate": {
         "properties": {
           "category": {
@@ -1837,6 +1851,103 @@
           "category"
         ],
         "title": "GoalResponse",
+        "type": "object"
+      },
+      "GoalUpdate": {
+        "description": "Правка цели. `current_amount` сознательно отсутствует (владелец: не общий edit\nдля прогресса — только через `POST /goals/{id}/contributions`); лишние поля в теле\nзапроса Pydantic молча игнорирует, не 422.",
+        "properties": {
+          "category": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/GoalCategory"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "comment": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Comment"
+          },
+          "deadline": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Deadline"
+          },
+          "linked_asset_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Linked Asset Id"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "priority": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Priority"
+          },
+          "savings_rate": {
+            "anyOf": [
+              {
+                "minimum": 0.0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Savings Rate"
+          },
+          "target_amount": {
+            "anyOf": [
+              {
+                "minimum": 0.0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Target Amount"
+          }
+        },
+        "title": "GoalUpdate",
         "type": "object"
       },
       "GrowthIllustrationPoint": {
@@ -4012,6 +4123,73 @@
         "title": "TransactionResponse",
         "type": "object"
       },
+      "TransactionUpdate": {
+        "description": "Правка операции. `mcc`/`currency` сознательно не выведены (владелец: служебные\nполя импорта, продукт рублёвый) — лишние поля в теле запроса Pydantic молча\nигнорирует, не 422.",
+        "properties": {
+          "amount": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Amount"
+          },
+          "category": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Category"
+          },
+          "date": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Date"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "type": {
+            "anyOf": [
+              {
+                "enum": [
+                  "income",
+                  "expense"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Type"
+          }
+        },
+        "title": "TransactionUpdate",
+        "type": "object"
+      },
       "UpdateProfileRequest": {
         "properties": {
           "display_name": {
@@ -4463,7 +4641,7 @@
   },
   "info": {
     "title": "FINPILOT",
-    "version": "8.24.1"
+    "version": "8.27.0"
   },
   "openapi": "3.1.0",
   "paths": {
@@ -6653,6 +6831,108 @@
           }
         },
         "summary": "Удалить цель",
+        "tags": [
+          "Цели"
+        ]
+      },
+      "put": {
+        "operationId": "update_goal_endpoint_api_goals__goal_id__put",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "goal_id",
+            "required": true,
+            "schema": {
+              "title": "Goal Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GoalUpdate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GoalResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Изменить цель (частично; current_amount — отдельным действием)",
+        "tags": [
+          "Цели"
+        ]
+      }
+    },
+    "/api/goals/{goal_id}/contributions": {
+      "post": {
+        "operationId": "add_goal_contribution_endpoint_api_goals__goal_id__contributions_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "goal_id",
+            "required": true,
+            "schema": {
+              "title": "Goal Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GoalContributionCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GoalResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Внести прогресс в цель (прибавляет к current_amount, не перезаписывает)",
         "tags": [
           "Цели"
         ]
@@ -9081,6 +9361,56 @@
           }
         },
         "summary": "Удалить транзакцию",
+        "tags": [
+          "Транзакции"
+        ]
+      },
+      "put": {
+        "operationId": "update_transaction_endpoint_api_transactions__transaction_id__put",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "transaction_id",
+            "required": true,
+            "schema": {
+              "title": "Transaction Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TransactionUpdate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TransactionResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Изменить операцию (частично, только переданные поля)",
         "tags": [
           "Транзакции"
         ]

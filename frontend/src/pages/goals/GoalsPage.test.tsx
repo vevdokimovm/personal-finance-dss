@@ -5,11 +5,15 @@ import type { UseQueryResult } from "@tanstack/react-query";
 import { GoalsPage } from "./GoalsPage";
 import type { Goal } from "@entities/goals";
 
-const { useGoalsMock } = vi.hoisted(() => ({ useGoalsMock: vi.fn() }));
-
-vi.mock("@entities/goals", async () => {
-  const actual = await vi.importActual<typeof import("@entities/goals")>("@entities/goals");
-  return { ...actual, useGoals: useGoalsMock };
+const useGoalsMock = vi.fn();
+const createMutateAsyncMock = vi.fn();
+const updateMutateAsyncMock = vi.fn();
+const contributeMutateAsyncMock = vi.fn();
+const restoreMutateMock = vi.fn();
+// Мутация удаления реально вызывает onSuccess — иначе не проверить перенос фокуса
+// (a11y-auditor, Батч 1: без этого фокус после удаления строки падает в <body>).
+const deleteMutateMock = vi.fn((_id: number, opts?: { onSuccess?: () => void }) => {
+  opts?.onSuccess?.();
 });
 
 vi.mock("@entities/consents", () => ({
@@ -17,6 +21,28 @@ vi.mock("@entities/consents", () => ({
     <div role="alert">{detail.message}</div>
   ),
 }));
+
+vi.mock("@entities/assets", () => ({
+  useLiquidAssets: () => ({ data: [], isLoading: false, isError: false }),
+}));
+
+vi.mock("@entities/goals", async () => {
+  const actual = await vi.importActual<typeof import("@entities/goals")>("@entities/goals");
+  return {
+    GOAL_CATEGORY_OPTIONS: actual.GOAL_CATEGORY_OPTIONS,
+    GOAL_CATEGORY_LABEL: actual.GOAL_CATEGORY_LABEL,
+    useGoals: () => useGoalsMock(),
+    useCreateGoal: () => ({ mutateAsync: createMutateAsyncMock, isPending: false, error: null }),
+    useUpdateGoal: () => ({ mutateAsync: updateMutateAsyncMock, isPending: false, error: null }),
+    useAddGoalContribution: () => ({
+      mutateAsync: contributeMutateAsyncMock,
+      isPending: false,
+      error: null,
+    }),
+    useDeleteGoal: () => ({ mutate: deleteMutateMock, isPending: false }),
+    useRestoreGoal: () => ({ mutate: restoreMutateMock, isPending: false }),
+  };
+});
 
 function queryResult(partial: Partial<UseQueryResult<Goal[]>>): UseQueryResult<Goal[]> {
   return {
@@ -32,10 +58,18 @@ function queryResult(partial: Partial<UseQueryResult<Goal[]>>): UseQueryResult<G
 const GOAL: Goal = {
   id: 1,
   name: "Подушка безопасности",
-  category: "reserve",
+  category: "safety",
   target_amount: 500000,
   current_amount: 125000,
   deadline: "2027-01-01",
+  linked_asset_id: null,
+};
+
+const LINKED_GOAL: Goal = {
+  ...GOAL,
+  id: 2,
+  name: "Отпуск (со вклада)",
+  linked_asset_id: 7,
 };
 
 describe("GoalsPage", () => {
@@ -72,10 +106,12 @@ describe("GoalsPage", () => {
     expect(screen.queryByText("Не получилось загрузить цели")).not.toBeInTheDocument();
   });
 
-  it("показывает пустое состояние без целей", () => {
+  it("показывает пустое состояние без целей, с кнопкой добавления внутри панели", () => {
     useGoalsMock.mockReturnValue(queryResult({ data: [] }));
     render(<GoalsPage />);
-    expect(screen.getByText("Целей пока нет")).toBeInTheDocument();
+    const panel = screen.getByText("Целей пока нет").closest(".fp-state-panel") as HTMLElement;
+    expect(panel).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Добавить цель" })).toBeInTheDocument();
   });
 
   it("рендерит цель с прогресс-баром (25%)", () => {
@@ -84,5 +120,52 @@ describe("GoalsPage", () => {
     expect(screen.getByText("Подушка безопасности")).toBeInTheDocument();
     const bar = screen.getByRole("progressbar", { name: /Подушка безопасности/ });
     expect(bar).toHaveAttribute("aria-valuenow", "25");
+  });
+
+  it("кнопка «Добавить цель» открывает форму создания (пустые поля)", async () => {
+    useGoalsMock.mockReturnValue(queryResult({ data: [GOAL] }));
+    render(<GoalsPage />);
+    await userEvent.click(screen.getByRole("button", { name: "Добавить цель" }));
+    expect(screen.getByRole("heading", { name: "Новая цель" })).toBeInTheDocument();
+    expect(screen.getByLabelText("Название *")).toHaveValue("");
+  });
+
+  it("кнопка «Изменить» открывает форму, поля предзаполнены (без current_amount)", async () => {
+    useGoalsMock.mockReturnValue(queryResult({ data: [GOAL] }));
+    render(<GoalsPage />);
+    await userEvent.click(screen.getByRole("button", { name: "Изменить" }));
+    expect(screen.getByRole("heading", { name: "Изменить цель" })).toBeInTheDocument();
+    expect(screen.getByLabelText("Название *")).toHaveValue("Подушка безопасности");
+    expect(screen.queryByLabelText(/current_amount/)).not.toBeInTheDocument();
+  });
+
+  it("кнопка «Внести прогресс» открывает форму с одним полем «сумма»", async () => {
+    useGoalsMock.mockReturnValue(queryResult({ data: [GOAL] }));
+    render(<GoalsPage />);
+    await userEvent.click(screen.getByRole("button", { name: "Внести прогресс" }));
+    expect(screen.getByRole("heading", { name: "Внести прогресс" })).toBeInTheDocument();
+    await userEvent.type(screen.getByLabelText("Сумма, ₽ *"), "5000");
+    await userEvent.click(screen.getByRole("button", { name: "Внести" }));
+    expect(contributeMutateAsyncMock).toHaveBeenCalledWith({
+      id: 1,
+      body: { amount: 5000 },
+    });
+  });
+
+  it("для цели с linked_asset_id нет кнопки «Внести прогресс» — есть пояснение", () => {
+    useGoalsMock.mockReturnValue(queryResult({ data: [LINKED_GOAL] }));
+    render(<GoalsPage />);
+    expect(screen.queryByRole("button", { name: "Внести прогресс" })).not.toBeInTheDocument();
+    expect(
+      screen.getByText("Прогресс выводится из баланса привязанного актива."),
+    ).toBeInTheDocument();
+  });
+
+  it("кнопка «Удалить» вызывает мутацию удаления и переносит фокус на «Добавить цель»", async () => {
+    useGoalsMock.mockReturnValue(queryResult({ data: [GOAL] }));
+    render(<GoalsPage />);
+    await userEvent.click(screen.getByRole("button", { name: "Удалить «Подушка безопасности»" }));
+    expect(deleteMutateMock).toHaveBeenCalledWith(1, expect.any(Object));
+    expect(screen.getByRole("button", { name: "Добавить цель" })).toHaveFocus();
   });
 });

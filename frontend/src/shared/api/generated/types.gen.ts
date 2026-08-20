@@ -998,6 +998,16 @@ export type GoalBreakdownItem = {
 export type GoalCategory = 'income_growth' | 'safety' | 'material' | 'emotional';
 
 /**
+ * GoalContributionCreate
+ */
+export type GoalContributionCreate = {
+    /**
+     * Amount
+     */
+    amount: number;
+};
+
+/**
  * GoalCreate
  */
 export type GoalCreate = {
@@ -1130,6 +1140,45 @@ export type GoalResponse = {
      * Target Amount
      */
     target_amount: number;
+};
+
+/**
+ * GoalUpdate
+ *
+ * Правка цели. `current_amount` сознательно отсутствует (владелец: не общий edit
+ * для прогресса — только через `POST /goals/{id}/contributions`); лишние поля в теле
+ * запроса Pydantic молча игнорирует, не 422.
+ */
+export type GoalUpdate = {
+    category?: GoalCategory | null;
+    /**
+     * Comment
+     */
+    comment?: string | null;
+    /**
+     * Deadline
+     */
+    deadline?: string | null;
+    /**
+     * Linked Asset Id
+     */
+    linked_asset_id?: number | null;
+    /**
+     * Name
+     */
+    name?: string | null;
+    /**
+     * Priority
+     */
+    priority?: number | null;
+    /**
+     * Savings Rate
+     */
+    savings_rate?: number | null;
+    /**
+     * Target Amount
+     */
+    target_amount?: number | null;
 };
 
 /**
@@ -2403,6 +2452,36 @@ export type TransactionResponse = {
      * Type
      */
     type: 'income' | 'expense';
+};
+
+/**
+ * TransactionUpdate
+ *
+ * Правка операции. `mcc`/`currency` сознательно не выведены (владелец: служебные
+ * поля импорта, продукт рублёвый) — лишние поля в теле запроса Pydantic молча
+ * игнорирует, не 422.
+ */
+export type TransactionUpdate = {
+    /**
+     * Amount
+     */
+    amount?: number | null;
+    /**
+     * Category
+     */
+    category?: string | null;
+    /**
+     * Date
+     */
+    date?: string | null;
+    /**
+     * Description
+     */
+    description?: string | null;
+    /**
+     * Type
+     */
+    type?: 'income' | 'expense' | null;
 };
 
 /**
@@ -4241,6 +4320,66 @@ export type DeleteGoalEndpointApiGoalsGoalIdDeleteResponses = {
     200: unknown;
 };
 
+export type UpdateGoalEndpointApiGoalsGoalIdPutData = {
+    body: GoalUpdate;
+    path: {
+        /**
+         * Goal Id
+         */
+        goal_id: number;
+    };
+    query?: never;
+    url: '/api/goals/{goal_id}';
+};
+
+export type UpdateGoalEndpointApiGoalsGoalIdPutErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type UpdateGoalEndpointApiGoalsGoalIdPutError = UpdateGoalEndpointApiGoalsGoalIdPutErrors[keyof UpdateGoalEndpointApiGoalsGoalIdPutErrors];
+
+export type UpdateGoalEndpointApiGoalsGoalIdPutResponses = {
+    /**
+     * Successful Response
+     */
+    200: GoalResponse;
+};
+
+export type UpdateGoalEndpointApiGoalsGoalIdPutResponse = UpdateGoalEndpointApiGoalsGoalIdPutResponses[keyof UpdateGoalEndpointApiGoalsGoalIdPutResponses];
+
+export type AddGoalContributionEndpointApiGoalsGoalIdContributionsPostData = {
+    body: GoalContributionCreate;
+    path: {
+        /**
+         * Goal Id
+         */
+        goal_id: number;
+    };
+    query?: never;
+    url: '/api/goals/{goal_id}/contributions';
+};
+
+export type AddGoalContributionEndpointApiGoalsGoalIdContributionsPostErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type AddGoalContributionEndpointApiGoalsGoalIdContributionsPostError = AddGoalContributionEndpointApiGoalsGoalIdContributionsPostErrors[keyof AddGoalContributionEndpointApiGoalsGoalIdContributionsPostErrors];
+
+export type AddGoalContributionEndpointApiGoalsGoalIdContributionsPostResponses = {
+    /**
+     * Successful Response
+     */
+    200: GoalResponse;
+};
+
+export type AddGoalContributionEndpointApiGoalsGoalIdContributionsPostResponse = AddGoalContributionEndpointApiGoalsGoalIdContributionsPostResponses[keyof AddGoalContributionEndpointApiGoalsGoalIdContributionsPostResponses];
+
 export type RestoreGoalEndpointApiGoalsGoalIdRestorePostData = {
     body?: never;
     path: {
@@ -5859,6 +5998,36 @@ export type DeleteTransactionEndpointApiTransactionsTransactionIdDeleteResponses
 };
 
 export type DeleteTransactionEndpointApiTransactionsTransactionIdDeleteResponse = DeleteTransactionEndpointApiTransactionsTransactionIdDeleteResponses[keyof DeleteTransactionEndpointApiTransactionsTransactionIdDeleteResponses];
+
+export type UpdateTransactionEndpointApiTransactionsTransactionIdPutData = {
+    body: TransactionUpdate;
+    path: {
+        /**
+         * Transaction Id
+         */
+        transaction_id: number;
+    };
+    query?: never;
+    url: '/api/transactions/{transaction_id}';
+};
+
+export type UpdateTransactionEndpointApiTransactionsTransactionIdPutErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type UpdateTransactionEndpointApiTransactionsTransactionIdPutError = UpdateTransactionEndpointApiTransactionsTransactionIdPutErrors[keyof UpdateTransactionEndpointApiTransactionsTransactionIdPutErrors];
+
+export type UpdateTransactionEndpointApiTransactionsTransactionIdPutResponses = {
+    /**
+     * Successful Response
+     */
+    200: TransactionResponse;
+};
+
+export type UpdateTransactionEndpointApiTransactionsTransactionIdPutResponse = UpdateTransactionEndpointApiTransactionsTransactionIdPutResponses[keyof UpdateTransactionEndpointApiTransactionsTransactionIdPutResponses];
 
 export type SetTransactionCategoryEndpointApiTransactionsTransactionIdCategoryPostData = {
     body: CategoryAssignRequest;

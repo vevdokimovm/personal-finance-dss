@@ -30,6 +30,25 @@ class GoalCreate(BaseModel):
     household_id: Optional[int] = None
 
 
+class GoalUpdate(BaseModel):
+    """Правка цели. `current_amount` сознательно отсутствует (владелец: не общий edit
+    для прогресса — только через `POST /goals/{id}/contributions`); лишние поля в теле
+    запроса Pydantic молча игнорирует, не 422."""
+
+    name: Optional[str] = None
+    target_amount: Optional[float] = Field(default=None, ge=0)
+    deadline: Optional[datetime] = None
+    category: Optional[GoalCategory] = None
+    comment: Optional[str] = None
+    priority: Optional[int] = None
+    savings_rate: Optional[float] = Field(default=None, ge=0)
+    linked_asset_id: Optional[int] = None
+
+
+class GoalContributionCreate(BaseModel):
+    amount: float = Field(gt=0)
+
+
 class GoalResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 

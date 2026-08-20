@@ -4,6 +4,8 @@
    (design-critic, Батч 1: копия значений уже разошлась с auth — там было состояние ошибки,
    здесь нет). Отдельный файл раскладки, не слияние с auth целиком: формы сущностей живут
    внутри Modal, не на всю страницу. */
+@import "./field.css";
+
 .fp-entity-form {
   display: flex;
   flex-direction: column;
@@ -31,4 +33,24 @@
   display: flex;
   gap: var(--sp-3);
   align-items: center;
+}
+
+/* Тип операции (Батч 2, ROADMAP §8.2) — два взаимоисключающих варианта, обычный
+   `<input type="radio">` даёт нативную клавиатурную навигацию/озвучку бесплатно,
+   без переизобретения на кнопках (в отличие от Modal, где выбор один — checkbox
+   тут неуместен). Специфичность у .fp-entity-form__radio-group label поднята явно
+   (двумя классами вместо одного) — без этого совпадала со специфичностью
+   .fp-entity-form__field label из field.css, и font-weight решался порядком склейки
+   CSS, а не намерением (design-critic, Батч 2). */
+.fp-entity-form__radio-group {
+  display: flex;
+  gap: var(--sp-4);
+}
+.fp-entity-form.fp-entity-form .fp-entity-form__radio-group label {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-1);
+  min-height: var(--tap-target-min);
+  font-weight: 400;
+  cursor: pointer;
 }

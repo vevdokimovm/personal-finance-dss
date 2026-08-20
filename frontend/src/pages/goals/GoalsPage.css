@@ -7,6 +7,17 @@
   font-size: var(--fs-xl);
   margin: 0 0 var(--sp-5);
 }
+.fp-goals__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  margin-bottom: var(--sp-5);
+  flex-wrap: wrap;
+}
+.fp-goals__head h1 {
+  margin: 0; /* отступ снизу даёт flex-контейнер __head, не сам заголовок */
+}
 .fp-goals__list {
   list-style: none;
   margin: 0;
@@ -37,10 +48,30 @@
   font-size: var(--fs-xs);
   flex-shrink: 0;
 }
+/* Просрочка — вторым признаком помимо цвета (текст «срок прошёл»), тон ровный, не тревожный
+   (design-critic, Батч 2: раньше просроченная и текущая цель выглядели одинаково). */
+.fp-goal-row__overdue {
+  color: var(--c-amber);
+}
+.fp-goal-row__category {
+  color: var(--c-text3);
+  font-size: var(--fs-xs);
+  margin: 0 0 var(--sp-2);
+}
 .fp-goal-row__amounts {
+  margin: 0 0 var(--sp-3);
+}
+/* Накопленная сумма — главный визуальный якорь строки (design-critic, Батч 2, бриф §2.2),
+   тот же приём, что остаток долга в ObligationsPage.css. */
+.fp-goal-row__amount-current {
+  color: var(--c-text);
+  font-weight: 700;
+  font-size: var(--fs-md);
+}
+.fp-goal-row__amount-secondary {
   color: var(--c-text2);
   font-size: var(--fs-sm);
-  margin: 0 0 var(--sp-3);
+  margin-left: var(--sp-1);
 }
 .fp-goal-row__bar {
   height: var(--sp-1);
@@ -55,6 +86,21 @@
 }
 .fp-goal-row__bar-fill {
   height: 100%;
-  background: var(--c-green);
+  /* --c-accent, не --c-green (design-critic, Батч 2): прогресс цели — не доход/успех,
+     тот же токен, что остаток обязательства в ObligationsPage.css. */
+  background: var(--c-accent);
   border-radius: var(--r-full);
+  transition: width 200ms ease-out;
+}
+.fp-goal-row__linked-hint {
+  color: var(--c-text3);
+  font-size: var(--fs-xs);
+  margin: var(--sp-2) 0 0;
+}
+.fp-goal-row__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--sp-2);
+  margin-top: var(--sp-3);
+  flex-wrap: wrap;
 }

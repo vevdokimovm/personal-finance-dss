@@ -4,14 +4,17 @@ from fastapi import APIRouter, Depends, HTTPException, Response, status
 from sqlalchemy.orm import Session
 
 from app.database.crud import (
+    add_goal_contribution,
     can_write_household,
     create_goal,
     delete_goal,
+    get_goal_by_id,
     get_goals,
     restore_goal,
+    update_goal,
 )
 from app.dependencies import get_current_user_id, get_db
-from app.schemas.goal import GoalCreate, GoalResponse
+from app.schemas.goal import GoalContributionCreate, GoalCreate, GoalResponse, GoalUpdate
 from app.services.event_logger import log_event
 
 router = APIRouter(prefix="/goals", tags=["Цели"])
@@ -63,6 +66,52 @@ def create_goal_endpoint(
         "shared": payload.household_id is not None,
     })
     return goal
+
+
+@router.put(
+    "/{goal_id}",
+    response_model=GoalResponse,
+    summary="Изменить цель (частично; current_amount — отдельным действием)",
+)
+def update_goal_endpoint(
+    goal_id: int,
+    payload: GoalUpdate,
+    db: Session = Depends(get_db),
+    user_id: str | None = Depends(get_current_user_id),
+) -> GoalResponse:
+    fields = payload.model_dump(exclude_unset=True)
+    if "category" in fields and fields["category"] is not None:
+        fields["category"] = fields["category"].value
+    goal = update_goal(db, goal_id, user_id=user_id, **fields)
+    if goal is None:
+        raise HTTPException(status_code=404, detail="Цель не найдена")
+    log_event("goal_updated", {"goal_id": goal_id})
+    return goal
+
+
+@router.post(
+    "/{goal_id}/contributions",
+    response_model=GoalResponse,
+    summary="Внести прогресс в цель (прибавляет к current_amount, не перезаписывает)",
+)
+def add_goal_contribution_endpoint(
+    goal_id: int,
+    payload: GoalContributionCreate,
+    db: Session = Depends(get_db),
+    user_id: str | None = Depends(get_current_user_id),
+) -> GoalResponse:
+    goal = get_goal_by_id(db, goal_id, user_id=user_id)
+    if goal is None:
+        raise HTTPException(status_code=404, detail="Цель не найдена")
+    if goal.linked_asset_id is not None:
+        raise HTTPException(
+            status_code=409,
+            detail="Прогресс цели с привязанным активом выводится из баланса актива "
+            "автоматически — вносить его вручную нельзя.",
+        )
+    updated = add_goal_contribution(db, goal_id, payload.amount, user_id=user_id)
+    log_event("goal_contribution_added", {"goal_id": goal_id, "amount": payload.amount})
+    return updated
 
 
 @router.delete(
