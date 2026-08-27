@@ -1,5 +1,11 @@
 # Changelog
 
+## [8.28.4] — 2026-08-27 — Ревизия: дерево функций (EN) разобрано (PATCH)
+
+Содержательная ревизия, METHOD_IMAGES.md: knowledge/science/articles/other/
+fig_function_tree_en.png — англоязычная версия дерева функций СППР для
+научной статьи.
+
 ## [8.28.3] — 2026-08-27 — Уточнение к разбору диаграмм: r_bench(OCR) — вероятно не опечатка (PATCH)
 
 docs/diagrams/raspoznavanie.md дополнен: живой интерфейс FINPILOT (см.
