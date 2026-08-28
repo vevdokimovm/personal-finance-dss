@@ -1,5 +1,16 @@
 # Changelog
 
+## [8.29.0] — 2026-08-28 — Команды запуска для Windows в README (MINOR)
+
+Закрывает `mission-control/BACKLOG.md` — бэклог FINPILOT от 24.07.2026 п.П2.
+README нёс только macOS/Linux вариант локального запуска без Docker.
+
+### Added
+- `README.md` §«Быстрый старт» — вариант PowerShell (`venv\Scripts\
+  Activate.ps1`, обход блокировки `Set-ExecutionPolicy`) и заметка про
+  `cmd.exe` (`venv\Scripts\activate.bat`). Docker-вариант не менялся —
+  кросс-платформенный как есть.
+
 ## [8.28.5] — 2026-08-27 — Ревизия: 4 иллюстрации статьи КИМ + 8 графиков опроса пользователей разобраны (PATCH)
 
 Содержательная ревизия, METHOD_IMAGES.md: knowledge/science/articles/kim/figures/

@@ -339,6 +339,19 @@ alembic upgrade head
 python3 -m uvicorn app.main:app --reload --port 8000
 ```
 
+**Или локально без Docker (Windows, PowerShell):**
+```powershell
+python -m venv venv
+venv\Scripts\Activate.ps1
+pip install -r requirements.txt -r requirements-dev.txt
+alembic upgrade head
+python -m uvicorn app.main:app --reload --port 8000
+```
+Если `Activate.ps1` блокируется политикой выполнения скриптов — один раз
+разрешить для текущего пользователя: `Set-ExecutionPolicy -Scope
+CurrentUser RemoteSigned`. В `cmd.exe` (не PowerShell) активация —
+`venv\Scripts\activate.bat`, остальные команды те же.
+
 ### Фронтенд — React SPA (чтобы увидеть текущее состояние вехи 8)
 
 В отдельном терминале, пока бэкенд крутится на :8000:
@@ -531,3 +544,22 @@ Dockerfile, docker-compose.yml, gunicorn_conf.py
 ## Лицензия
 
 [MIT](LICENSE) © 2025 Vasilii Evdokimov
+
+## Структура
+
+<!-- STRUCTURE:AUTO:START -->
+| Папка | Файлов | Что внутри |
+|---|---|---|
+| `alembic/` | 36 | TODO — заполнить вручную |
+| `app/` | 137 | TODO — заполнить вручную |
+| `deploy/` | 8 | TODO — заполнить вручную |
+| `docs/` | 523 | TODO — заполнить вручную |
+| `frontend/` | 242 | TODO — заполнить вручную |
+| `knowledge/` | 300 | TODO — заполнить вручную |
+| `loadtest/` | 2 | TODO — заполнить вручную |
+| `nginx/` | 3 | TODO — заполнить вручную |
+| `reports/` | 1 | TODO — заполнить вручную |
+| `scripts/` | 8 | TODO — заполнить вручную |
+| `tests/` | 134 | TODO — заполнить вручную |
+| `tools/` | 68 | TODO — заполнить вручную |
+<!-- STRUCTURE:AUTO:END -->

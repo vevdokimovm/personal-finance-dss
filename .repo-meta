@@ -1,0 +1,3 @@
+description=FINPILOT — СППР для личных финансов: многокритериальная оптимизация распределения свободного денежного потока между долгом, резервом и целями. Production-код, FastAPI + PostgreSQL.
+topics=decision-support-system,fastapi,fintech,personal-finance,python,sqlalchemy,algorithm,backend,jinja2,mcdm,rest-api,sqlite,finance
+private=true
