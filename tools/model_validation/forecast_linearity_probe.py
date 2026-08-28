@@ -15,10 +15,10 @@ from __future__ import annotations
 
 from app.services.forecasting import forecast_indicators
 
-Y = "\033[33m"   # прогресс
-G = "\033[32m"   # успех/утверждение
-R = "\033[31m"   # опровержение
-C = "\033[36m"   # заголовок
+Y = "\033[93m"   # прогресс
+G = "\033[92m"   # успех/утверждение
+R = "\033[91m"   # опровержение
+C = "\033[96m"   # заголовок
 X = "\033[0m"
 
 

@@ -30,6 +30,7 @@ from __future__ import annotations
 import argparse
 import os
 import re
+from urllib.parse import unquote
 import sys
 from pathlib import Path
 
@@ -48,6 +49,15 @@ FROZEN_DIRS = (
     "reports/audits",
 )
 FROZEN_FILES = ("CHANGELOG.md",)
+# Каталоги машинных выгрузок из внешних сервисов: содержимое — дословный
+# слепок источника, ссылки внутри отражают состояние ТАМ, а не здесь.
+# Каталоги ЧУЖИХ материалов: скачанные курсы, склонированные репозитории,
+# выгрузки сервисов. Их README ссылается на файлы, которых в нашей копии нет
+# (не все части курса скачаны, не весь репозиторий склонирован) — это факт
+# источника, а не дефект. Править чужой README нельзя: он перестанет быть
+# дословной копией, и следующая сверка с оригиналом покажет ложное расхождение.
+EXPORT_DIRS = ("notion-reflections", "md_files", "exports", "90-imported",
+               "old-before-claude", "deep-learning-school")
 LINK_SKIP_DIRS = ("templates",)  # шаблоны содержат намеренные плейсхолдеры-ссылки
 SKIP_DIRS = (".git", ".venv", "node_modules", "__pycache__")
 ARCHIVE_SUFFIXES = (".zip", ".tar", ".gz", ".7z", ".rar", ".dmg", ".iso")
@@ -117,7 +127,39 @@ def check_links(root: Path, files: list[Path], allowlist: set[str]) -> tuple[lis
         if path.suffix.lower() != ".md":
             continue
         rel = path.relative_to(root)
-        if is_frozen(rel) or rel.parts[0] in LINK_SKIP_DIRS:
+        # 🔴 28.08.2026: та же _base/-дыра, что в SECTION_DUPES_ALLOWLIST (PIT-153) —
+        # `rel.parts[0]` был «templates» только для base-repo; в любой другой репе
+        # шаблоны лежат под `_base/templates/`, и `rel.parts[0]` там — `_base`.
+        parts = rel.parts[1:] if rel.parts and rel.parts[0] == "_base" else rel.parts
+        # 🔴 `*.pdf.md` — МАШИННАЯ выжимка из PDF, не рукописный markdown.
+        # Найдено 29.08.2026 на `science/04-fields/stati-ml/2303.08797v3.pdf.md`:
+        # математика индикаторной функции `1( 1/2 ,1](t)x1` содержит `](`
+        # и читается регуляркой как ссылка на «t». Это не дефект документа —
+        # свойство экстракта: там формулы, переносы OCR, артефакты вёрстки.
+        # Править вручную бессмысленно вдвойне: файл перегенерируется из PDF,
+        # и правка исчезнет. В системе 929 таких файлов.
+        if path.name.endswith(".pdf.md"):
+            frozen_skipped += 1
+            continue
+        # 🔴 Машинные ВЫГРУЗКИ из внешних сервисов — тот же класс, что `.pdf.md`.
+        # Найдено 29.08.2026: экспорт Notion в `self-map`/`misc-vault` даёт
+        # **2088 «битых» ссылок** на картинки, которых сервис при выгрузке
+        # просто не отдал (проверено: `*.jpeg` в каталоге экспорта — 0 штук).
+        # Это факт исходной выгрузки, а не дефект репы; править вручную нельзя
+        # (файлы — дословный слепок источника, правка исказит первоисточник),
+        # а держать 2088 красных строк — гарантия, что гейт перестанут читать
+        # целиком (`PIT-085`: шум такого масштаба хуже молчания).
+        if any(p in EXPORT_DIRS for p in parts):
+            frozen_skipped += 1
+            continue
+        # `templates/` пропускается на ЛЮБОЙ глубине, не только в корне.
+        # Найдено 29.08.2026 в `misc-vault`: старая копия базы лежит внутри
+        # `01-documents/claude-instructions/…/04_ИНФРАСТРУКТУРА_base-repo/`,
+        # и её `templates/REPO_README_TEMPLATE.md` несёт намеренные
+        # плейсхолдеры `./NN-folder` — ровно то, ради чего `LINK_SKIP_DIRS`
+        # и заведён. Проверка смотрела только `parts[0]` и вложенную копию
+        # не покрывала. Тот же класс `_base/`-дыры, что чинился в `PIT-153`.
+        if is_frozen(rel) or any(p in LINK_SKIP_DIRS for p in parts):
             frozen_skipped += 1
             continue
         text = strip_code_fences(path.read_text(encoding="utf-8", errors="replace"))
@@ -128,9 +170,41 @@ def check_links(root: Path, files: list[Path], allowlist: set[str]) -> tuple[lis
                 continue
             if raw in allowlist or target in allowlist:
                 continue
+            # `...` в пути — ПРИМЕР синтаксиса, а не адрес. Найдено 29.08.2026:
+            # `![Рисунок 4](../figures/...)` в инструкции о том, как оформлять
+            # ссылки на рисунки. Многоточие надёжно отличает образец от пути:
+            # в реальном имени файла его не бывает.
+            if "..." in target:
+                continue
             checked += 1
+            # 🔴 URL-кодирование в ссылке — норма markdown, не дефект.
+            # Найдено 29.08.2026 в `portrait-of-taste`: **315 «битых» ссылок**
+            # вида `../photos/A_%D0%92%D0%B5%D1%80%D0%B0/A_01.jpg` при том,
+            # что каталог `photos/A_Вера/` существует и файл на месте.
+            # Редакторы markdown кодируют кириллицу в путях автоматически;
+            # проверка сравнивала закодированную строку с именем на диске
+            # и не находила совпадения. Декодируем перед сверкой.
+            target = unquote(target)
             candidate = (path.parent / target).resolve()
             if not candidate.exists():
+                # 🔴 28.08.2026: `_base/` переименовывает `VERSION` → `BASE_VERSION`
+                # при раздаче (`sync-base.sh`, во избежание путаницы с VERSION самой
+                # репы-хозяина) — ссылка `./VERSION` внутри `_base/README.md` живая
+                # в base-repo и осознанно битая после раздачи. Не общий allowlist:
+                # только эта конкретная, документированная замена имени.
+                if ("_base" in rel.parts and candidate.name == "VERSION"
+                        and (candidate.parent / "BASE_VERSION").is_file()):
+                    continue
+                # 🔴 28.08.2026, тот же класс: файлы, которые в `_base/` НЕ
+                # раздаются по замыслу — журнал и задачи у каждой репы свои,
+                # копировать их из канона значило бы подменить состояние репы
+                # состоянием базы. Ссылки на них внутри `_base/README.md` живые
+                # в base-repo и осознанно битые после раздачи. Замер: 54 репы,
+                # то есть ВСЯ система, — жалоба была на конвенцию, не на дефект.
+                if ("_base" in rel.parts
+                        and candidate.name in {"WATCHLOG.md", "TASKS.md", "ROADMAP.md"}
+                        and not candidate.exists()):
+                    continue
                 broken.append(f"{rel}: битая ссылка -> {raw}")
                 continue
             # PIT-076: APFS (macOS, единственная платформа разработки этой системы)
@@ -211,9 +285,12 @@ def selftest_cjk() -> bool:
 
 MIXED_CYR = re.compile(r"[А-Яа-яЁё]")
 MIXED_LAT = re.compile(r"[A-Za-z]")
+# разделители слов внутри имени файла: всё, что не буква и не цифра
+MIXED_SPLIT = re.compile(r"[^0-9A-Za-zА-Яа-яЁё]+")
 
 
-def check_mixed_script_names(root: Path, files: list[Path]) -> list[str]:
+def check_mixed_script_names(root: Path, files: list[Path],
+                             allowlist: set[str] | None = None) -> list[str]:
     """Кириллица и латиница в ОДНОМ имени файла — почти всегда слип, а не замысел.
 
     Нейминг системы: имена латиницей, кириллица только внутри содержимого
@@ -222,12 +299,68 @@ def check_mixed_script_names(root: Path, files: list[Path]) -> list[str]:
     предпросмотр у части инструментов (PIT-085). Поймано на живом случае:
     файл ситуации-репорта был создан с кириллическим слогом внутри латинского имени.
     """
+    allowlist = allowlist or set()
     bad = []
     for path in files:
-        name = path.name
-        if MIXED_CYR.search(name) and MIXED_LAT.search(name):
-            bad.append(str(path.relative_to(root)))
+        rel = str(path.relative_to(root))
+        # Осознанное исключение с записанной причиной — `.revision_allowlist`.
+        # Нужно для имён исходных документов (чужая фамилия, версия «V1»),
+        # которые переименовывать нельзя: это не наш артефакт.
+        if rel in allowlist or path.name in allowlist:
+            continue
+        # 🔴 Смешение считается ВНУТРИ одного слова, а не по всему имени.
+        # Замерено 28.08.2026 по всем 63 репам: правило «есть кириллица и есть
+        # латиница где-нибудь в имени» давало **2659 срабатываний, из которых
+        # реальным был 1** (точность 0.04 %). Шумели два законных класса:
+        #   · расширение — оно ВСЕГДА латиницей (`Синергии_генотипов.docx`),
+        #     2117 срабатываний;
+        #   · латинская аббревиатура или имя собственное отдельным словом
+        #     (`ВКР_магистра_FINPILOT`, `02_IDEF0_новый_стиль`, `README-…`),
+        #     ещё ~540.
+        # Ни то, ни другое не является слипом. Дефект, ради которого карточка
+        # заводилась, другой: кириллический слог ВНУТРИ латинского слова —
+        # `README-revizия` (`reviz` + `ия`), глазами неотличимо. Новое правило
+        # ловит ровно его. Гейт, который кричит 2659 раз, чтобы быть правым
+        # однажды, не читают вовсе — шум такого масштаба хуже молчания.
+        stem = path.name
+        while "." in stem[1:]:
+            stem = stem.rsplit(".", 1)[0]
+        for token in MIXED_SPLIT.split(stem):
+            if token and MIXED_CYR.search(token) and MIXED_LAT.search(token):
+                bad.append(f"{path.relative_to(root)} (слово «{token}»)")
+                break
     return bad
+
+
+def selftest_mixed_script() -> bool:
+    """Канарейка `PIT-085`: слип внутри слова ловится, законное соседство — нет.
+
+    Проверяется РАЗЛИЧЕНИЕ. Ужесточение обратно до «есть оба алфавита где-нибудь
+    в имени» уронит канарейку на законных именах; ослабление до «никогда» —
+    на настоящем слипе.
+    """
+    import tempfile
+
+    must_flag = [
+        "README-revizия.md",          # reviz + кириллическое «ия» — живой случай
+        "otchёt.md",                  # ё внутри латинского слова
+        "sитуация.md",
+    ]
+    must_pass = [
+        "Синергии_генотипов_Евдокимов.docx",   # латиница только в расширении
+        "ВКР_магистра_FINPILOT.docx.md",       # аббревиатура отдельным словом
+        "02_IDEF0_новый_стиль.png",
+        "README-происхождение.md",
+        "plain-latin-name.md",
+        "полностью_кириллица.md",
+    ]
+    with tempfile.TemporaryDirectory() as tmp:
+        root = Path(tmp)
+        for n in must_flag + must_pass:
+            (root / n).write_text("x", encoding="utf-8")
+        files = [root / n for n in must_flag + must_pass]
+        flagged = {r.split(" (")[0] for r in check_mixed_script_names(root, files)}
+    return flagged == set(must_flag)
 
 
 def check_names(root: Path, files: list[Path]) -> list[str]:
@@ -371,6 +504,19 @@ def check_repos_map_sync(root: Path) -> tuple[list[str], list[str]]:
     map_file = root / "repos-map.md"
     if not map_file.is_file():
         return ([], [])
+    # 🔴 Карта системы — ОДНА, и она принадлежит `base-repo`. Найдено 28.08.2026:
+    # проверка запускалась в любой репе, у которой при корне оказался файл с этим
+    # именем, — и сравнивала с диском устаревшие снимки карты, лежавшие в корне
+    # `academic-portfolio`/`it-base`/`portrait-of-taste` с ранней эпохи. Гейт
+    # честно краснел («не хватает 46–54»), но требовал невозможного: чтобы
+    # каждая репа вела полную карту системы. Это ровно тот второй источник
+    # правды, который ADR запрещает. Шестой случай класса «гейт под один
+    # частный мир» (PIT-153/157/158/159).
+    repo_id = root / ".repo-id"
+    if repo_id.is_file():
+        owner = repo_id.read_text(encoding="utf-8", errors="replace").strip()
+        if not owner.endswith("/base-repo"):
+            return ([], [])
 
     text = map_file.read_text(encoding="utf-8", errors="replace")
     # Нежадный `[^\n]*?` — у temp-класса в заголовке два backtick-токена
@@ -472,7 +618,7 @@ def check_watchlog(root: Path) -> list[str]:
     return []
 
 
-def check_resume_point_content(root: Path) -> list[str]:
+def check_resume_point_content(root: Path, allowlist: set[str] | None = None) -> list[str]:
     """Точка входа не только совпадает по версии, но и остаётся ТОЧКОЙ ВХОДА.
 
     PIT-116, найдено владельцем 22.08.2026: «мы сто тысяч гейтов сделали, чтобы точка
@@ -506,7 +652,16 @@ def check_resume_point_content(root: Path) -> list[str]:
     if not watchlog.is_file():
         return []
     text = watchlog.read_text(encoding="utf-8")
-    m = re.search(r"^## §0\..*?(?=^## §1\.)", text, re.M | re.S)
+    # 🔴 Обе конвенции заголовка равноправны: `## §0. Где стоим` и `## §0 — Где стоим`.
+    # Замерено 28.08.2026: 53 репы пишут с точкой, **8 — через тире**
+    # (`biology`, `chemistry`, `history`, `mathematics`, `nationality`, `physics`,
+    # `salvation`, `speed-reading`). Прежняя регулярка требовала точку и для этих
+    # восьми возвращала «в WATCHLOG нет секции §0 — точки входа не существует»,
+    # хотя §0 у них есть и заполнен. Диагноз был не просто ложным, а
+    # противоположным факту, и в том же выводе соседняя проверка сообщала
+    # «WATCHLOG §0 совпадает с VERSION» — гейт противоречил сам себе.
+    # Тот же класс, что PIT-153/157/158/159/160/085.
+    m = re.search(r"^## §0[.\s].*?(?=^## §1[.\s])", text, re.M | re.S)
     if not m:
         return ["в WATCHLOG нет секции §0 — точки входа не существует"]
     body = m.group(0)
@@ -533,16 +688,75 @@ def check_resume_point_content(root: Path) -> list[str]:
             continue
         if any(True for _ in root.rglob(name)):
             continue
+        # 🔴 Ссылка на ЧУЖУЮ репу — не висячая. Найдено 28.08.2026 на пятом
+        # подряд срабатывании: `mission-control/BACKLOG.md` в §0 у
+        # `dota-dossier`/`health-vault`/`legal-knowledge-base` — это законная
+        # кросс-репная ссылка (репы живут рядом в `~/repos/`), а проверка
+        # искала файл ВНУТРИ текущей репы и жаловалась. Вахта четыре раза
+        # переписывала прозу, чтобы обойти гейт, — то есть чинила журнал под
+        # инструмент вместо инструмента. Тот же класс, что PIT-153/157/158.
+        first = ref.split("/")[0]
+        if first != root.name and (root.parent / first).is_dir():
+            sibling = root.parent / ref
+            if sibling.exists() or any(True for _ in (root.parent / first).rglob(name)):
+                continue
+        # Документ базы, названный коротким именем. Так на него ссылаются ВСЕ репы:
+        # `83-project-maturity-levels.md`, `71-fail-loud-and-sourcing.md` — это
+        # канон, живущий в `base-repo/00-infrastructure/`, и цитировать его
+        # коротко — конвенция системы, а не висячая ссылка. Найдено 28.08.2026
+        # на `salvation` (продуктовая репа, `_base/` в неё не раздаётся, поэтому
+        # локально документа нет и быть не должно).
+        base_repo = root.parent / "base-repo"
+        if base_repo.is_dir() and base_repo != root:
+            if any(True for _ in base_repo.rglob(name)):
+                continue
+        if ref in (allowlist or set()):
+            continue
+        # 🔴 Утверждение об ОТСУТСТВИИ — не ссылка. Найдено 29.08.2026 сразу
+        # в 6 репах: «импорт разобран, `90-imported/` растворён», «`_base/`
+        # наружу не идёт». Журнал обязан фиксировать, что каталога больше нет,
+        # — иначе следующая вахта будет искать его заново. Гейт же читал такую
+        # фразу как висячую ссылку и требовал вернуть то, что осознанно удалено.
+        # Признак берём из САМОГО предложения, а не из списка путей: рядом с
+        # упоминанием стоит слово, означающее исчезновение.
+        GONE = ("раствор", "удал", "не существует", "больше нет", "снят",
+                "наружу не идёт", "упразднён", "расформирован")
+        line = next((l for l in body.splitlines() if f"`{ref}`" in l), "")
+        if any(w in line.lower() for w in GONE):
+            continue
         problems.append(f"§0 ссылается на несуществующее: `{ref}` (PIT-116)")
 
     # отставшие версии
+    #
+    # 🔴 Версия считается СВОЕЙ, только если строка не говорит о чужой репе.
+    # Прежняя редакция собирала все `vN.M.x` из §0 подряд и на историческую прозу
+    # («`family` → 1.0.0», «`control-panel` [0.13.0]») отвечала «эта репа отстала
+    # на 70 минорных». Пункт полгода стоял в ROADMAP как «осознанно не чинится:
+    # надёжный regex рискует замолчать реальный дрейф» — но regex и не нужен:
+    # список соседних реп лежит на диске, и упоминание чужого имени в строке —
+    # факт, а не догадка. Починено 28.08.2026 по прямому вопросу владельца
+    # («все ли питфолы обросли сторожами… чтобы не просто сухая теория была»).
+    # Седьмой случай класса PIT-153/157/158/159/160/085.
     if version_file.is_file():
         cur = version_file.read_text(encoding="utf-8").strip()
         cm = re.match(r"(\d+)\.(\d+)\.", cur)
         if cm:
             cur_major, cur_minor = int(cm.group(1)), int(cm.group(2))
-            for vmaj, vmin in {(int(a), int(b)) for a, b in
-                               re.findall(r"v(\d+)\.(\d+)\.\d+", body)}:
+            siblings = {d.name for d in root.parent.iterdir()
+                        if d.is_dir() and d.name != root.name} if root.parent.is_dir() else set()
+            own = set()
+            for line in body.splitlines():
+                if any(s in line for s in siblings):
+                    continue          # строка про чужую репу — её версии не наши
+                # `[3.61.0]` в квадратных скобках — ЦИТАТА секции CHANGELOG,
+                # а не заявление о текущей точке. Это устоявшаяся конвенция
+                # системы: «кампания закрыта [3.61.0]» отсылает к записи, где
+                # это описано. Требовать от неё свежести — требовать, чтобы
+                # журнал не ссылался на собственную историю.
+                stripped = re.sub(r"\[\d+\.\d+\.\d+\]", "", line)
+                found = re.findall(r"v?(\d+)\.(\d+)\.\d+", stripped)
+                own |= {(int(a), int(b)) for a, b in found}
+            for vmaj, vmin in own:
                 if vmaj == cur_major and cur_minor - vmin > 10:
                     problems.append(
                         f"§0 говорит о v{vmaj}.{vmin}.x при текущей {cur} — "
@@ -618,9 +832,15 @@ def check_living_documents(root: Path) -> list[str]:
     roadmap = root / "ROADMAP.md"
     if roadmap.is_file():
         rm = roadmap.read_text(encoding="utf-8")
-        if "СЛЕДУЮЩАЯ ЗАДАЧА" not in rm:
+        # Указатель принимается и по-английски: публичные витринные репы
+        # (`claude-usage` и др.) ведутся на английском по замыслу — там стоит
+        # «NEXT TASK:», и это тот же указатель, а не его отсутствие. Найдено
+        # 28.08.2026 при сплошной проверке: 1 репа из 63 фейлилась по языку,
+        # а не по существу. Тот же класс, что PIT-153/157/158 — проверка,
+        # откалиброванная под один частный мир (здесь: под русский язык).
+        if not any(k in rm for k in ("СЛЕДУЮЩАЯ ЗАДАЧА", "NEXT TASK")):
             problems.append(
-                "ROADMAP.md без указателя «СЛЕДУЮЩАЯ ЗАДАЧА» — "
+                "ROADMAP.md без указателя «СЛЕДУЮЩАЯ ЗАДАЧА» / «NEXT TASK» — "
                 "непонятно, с чего продолжать (30-roadmap-protocol.md)")
 
     # --- 5. Реестр ADR совпадает с каталогом ----------------------------------
@@ -1002,6 +1222,79 @@ def selftest_dangling_refs() -> bool:
         return check_dangling_registry_refs(root, [doc]) == []
 
 
+def selftest_resume_point_refs() -> bool:
+    """Канарейка §0-ссылок: кросс-репные проходят, настоящие висячие — краснеют.
+
+    🔴 Заведена 28.08.2026 после ПЯТОГО подряд ложного срабатывания. §0 у
+    `dota-dossier`/`health-vault`/`legal-knowledge-base` законно ссылался на
+    `mission-control/BACKLOG.md` — репы лежат рядом в `~/repos/`, — а проверка
+    искала файл внутри текущей репы. Вахта четыре раза переписывала прозу
+    журнала, чтобы обойти гейт: чинила журнал под инструмент вместо инструмента.
+
+    Проверяется РАЗЛИЧЕНИЕ, а не «не падает»: смягчение обязано пропустить
+    существующий соседний файл и при этом **не ослепнуть** ни к
+    несуществующему у соседа, ни к несуществующему у себя.
+    """
+    import tempfile
+
+    body = (
+        "## §0. Где стоим\n\n"
+        "**Версия:** 1.0.0 · **Дата:** 2026-08-28 · Текущая точка: v1.0.0\n\n"
+        "- сосед, файл есть: `otherrepo/REAL.md`\n"
+        "- сосед, файла нет: `otherrepo/NOPE.md`\n"
+        "- своя репа, файла нет: `local-missing.md`\n\n"
+        "## §1. Дальше\nпусто\n"
+    )
+    with tempfile.TemporaryDirectory() as tmp:
+        workspace = Path(tmp).resolve()
+        me = workspace / "myrepo"
+        other = workspace / "otherrepo"
+        me.mkdir()
+        other.mkdir()
+        (other / "REAL.md").write_text("x", encoding="utf-8")
+        (me / "VERSION").write_text("1.0.0\n", encoding="utf-8")
+        (me / "WATCHLOG.md").write_text(body, encoding="utf-8")
+
+        found = {
+            p.split("`")[1]
+            for p in check_resume_point_content(me)
+            if "несуществующее" in p
+        }
+        # сосед с живым файлом обязан молчать; оба отсутствующих — краснеть
+        return found == {"otherrepo/NOPE.md", "local-missing.md"}
+
+
+def selftest_stale_version_prose() -> bool:
+    """Канарейка `PIT-116`-версий: чужое и цитаты молчат, своё отставание — краснеет.
+
+    Проверяется РАЗЛИЧЕНИЕ трёх случаев в одном §0:
+      · `family` → 1.0.0        — чужая репа, молчит
+      · закрыто [3.61.0]        — цитата секции CHANGELOG, молчит
+      · стоим на v3.10.0        — своё заявление, при текущей 3.95.0 краснеет
+    Возврат к «собирать все версии подряд» уронит канарейку на первых двух;
+    ослабление до «никогда» — на третьем.
+    """
+    import tempfile
+
+    with tempfile.TemporaryDirectory() as tmp:
+        ws = Path(tmp).resolve()
+        (ws / "family").mkdir()
+        me = ws / "myrepo"
+        me.mkdir()
+        (me / "VERSION").write_text("3.95.0\n", encoding="utf-8")
+        (me / "WATCHLOG.md").write_text(
+            "## §0. Где стоим\n\n"
+            "**Версия:** 3.95.0 · Текущая точка: v3.95.0\n\n"
+            "- `family` доведена до 1.0.0 — чужая версия в рассказе о батче\n"
+            "- кампания синтеза закрыта [3.61.0] — цитата секции CHANGELOG\n"
+            "- ранее стояли на v3.10.0 и это реальное отставание\n\n"
+            "## §1. Дальше\nпусто\n",
+            encoding="utf-8")
+        got = [p for p in check_resume_point_content(me) if "отставание" in p]
+    # ровно одна жалоба, и именно про 3.10
+    return len(got) == 1 and "v3.10" in got[0]
+
+
 def check_card_heading_levels(root: Path) -> list[str]:
     """Карточка реестра написана на том уровне заголовка, который видит гейт.
 
@@ -1083,19 +1376,29 @@ def check_prose_counts(root: Path) -> list[str]:
     problems: list[str] = []
     for label, counter, pattern in PROSE_COUNTS:
         actual = counter(root)
-        if actual < 0:
-            problems.append(f"{label}: источник для подсчёта не найден")
-            continue
         rx = re.compile(pattern)
+        # PIT-091-родня, найдено 28.08.2026: `actual < 0` раньше проваливал гейт
+        # безусловно, даже для реп, у которых просто нет своего реестра PIT/SYN
+        # (например `mission-control` — этот реестр ведёт `base-repo`, а прозы,
+        # заявляющей число карточек, у неё нет вовсе). Правильный вопрос —
+        # «проза заявляет число, которое нельзя проверить?», не «источник вообще
+        # существует?». Собираем совпадения сначала, жалуемся на «источник не
+        # найден» только если хоть одно реально нашлось.
+        found_claim = False
         for rel in PROSE_FILES:
             path = root / rel
             if not path.is_file():
                 continue
             for i, line in enumerate(path.read_text(encoding="utf-8", errors="replace").splitlines(), 1):
                 for m in rx.finditer(line):
+                    found_claim = True
+                    if actual < 0:
+                        continue  # ниже отдельным problem, не дублировать на каждую строку
                     if int(m.group(1)) != actual:
                         problems.append(
                             f"{rel}:{i} — {label}: в прозе {m.group(1)}, на диске {actual}")
+        if actual < 0 and found_claim:
+            problems.append(f"{label}: источник для подсчёта не найден")
     return problems
 
 
@@ -1131,6 +1434,16 @@ def selftest_prose_counts() -> bool:
         (root / "README.md").write_text(
             "**2 карточки `PIT-NNN`** и **1 карточка `SYN-NNN`** и **3 документа**\n",
             encoding="utf-8")
+        if check_prose_counts(root) != []:
+            return False
+
+        # PIT-091-родня, 28.08.2026: репа без собственного реестра PIT/SYN
+        # (реестр только у base-repo) и без прозы, заявляющей число, — не
+        # проблема, «источник для подсчёта не найден» не должно всплывать
+        # безусловно. Живой пример поймал `mission-control`.
+        (root / "reports" / "pitfalls.md").unlink()
+        (root / "05-infra-synthesis-lab" / "PITFALLS.md").unlink()
+        (root / "README.md").write_text("ничего про карточки здесь нет\n", encoding="utf-8")
         return check_prose_counts(root) == []
 
 
@@ -1142,6 +1455,13 @@ def check_allowlist_rot(root: Path) -> list[str]:
     родится уже без проверки. Поэтому каждое исключение обязано указывать
     на существующий файл (21-revision-protocol.md §4а, календарные мины).
     """
+    # 🔴 28.08.2026: реп без `_base/` вовсе (публичные — база им не раздаётся,
+    # `sync-base.sh` пропускает по `isPrivate`) этот список в принципе не касается.
+    # Раньше каждая из 4 записей рапортовала «указывает в пустоту» для такой репы —
+    # технически верно, но вводит в заблуждение: не «протухло», а «неприменимо».
+    has_own_copy = any((root / rel).is_file() for rel in SECTION_DUPES_ALLOWLIST)
+    if not has_own_copy and not (root / "_base").is_dir():
+        return []
     problems: list[str] = []
     for rel, reason in SECTION_DUPES_ALLOWLIST.items():
         # 🔴 28.08.2026: вне base-repo эти файлы лежат под `_base/` (раздача 1-в-1) —
@@ -1183,14 +1503,19 @@ def main() -> int:
     else:
         print("[OK] Имена файлов (нет #Uxxxx-порчи)")
 
-    mixed = check_mixed_script_names(root, files)
+    mixed = check_mixed_script_names(root, files, allowlist)
     if mixed:
         failures.extend(mixed)
-        print(f"[FAIL] Кириллица+латиница в одном имени (PIT-085): {len(mixed)}")
+        print(f"[FAIL] Кириллица+латиница ВНУТРИ одного слова (PIT-085): {len(mixed)}")
         for line in mixed:
             print(f"    · {line}")
     else:
-        print("[OK] Имена без смешения кириллицы и латиницы")
+        if selftest_mixed_script():
+            print("[OK] Имена без смешения кириллицы и латиницы внутри слова")
+        else:
+            failures.append("канарейка PIT-085 сломана")
+            print("[FAIL] Канарейка PIT-085: слип внутри слова и законное "
+                  "соседство алфавитов не различаются")
 
     dupes = check_registry_dupes(root)
     if dupes:
@@ -1327,14 +1652,20 @@ def main() -> int:
         label = "WARN"
     print(f"[{label}] Размер дерева: {total_mb:.1f} МБ (цель {REPO_TARGET_MB} / мягкий {REPO_SOFT_MB} / жёсткий {REPO_HARD_MB})")
 
-    rp_problems = check_resume_point_content(root)
+    rp_problems = check_resume_point_content(root, allowlist)
     if rp_problems:
         failures.extend(rp_problems)
         print("[FAIL] Точка входа: содержание протухло (PIT-116)")
         for line in rp_problems:
             print(f"    · {line}")
     else:
-        print("[OK] Точка входа §0: размер, ссылки и версии свежие")
+        canaries_ok = selftest_resume_point_refs() and selftest_stale_version_prose()
+        if canaries_ok:
+            print("[OK] Точка входа §0: размер, ссылки и версии свежие")
+        else:
+            failures.append("канарейка §0 сломана")
+            print("[FAIL] Канарейка §0: кросс-репные ссылки/чужие версии/цитаты "
+                  "CHANGELOG не отличаются от своих — смягчение ослепило проверку")
 
     lv_problems = check_living_documents(root)
     if lv_problems:

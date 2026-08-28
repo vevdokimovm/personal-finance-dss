@@ -32,10 +32,10 @@ from app.core.alternatives import evaluate_alternative, generate_alternatives
 from app.core.filtering import DT_MAX, filter_alternatives
 from app.core.ranking import rank_alternatives
 
-Y = "\033[33m"
-G = "\033[32m"
-R = "\033[31m"
-C = "\033[36m"
+Y = "\033[93m"
+G = "\033[92m"
+R = "\033[91m"
+C = "\033[96m"
 X = "\033[0m"
 
 DATASET = Path("knowledge/model_validation/portraits_v2_seed20260702.jsonl.gz")

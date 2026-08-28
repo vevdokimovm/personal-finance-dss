@@ -1,5 +1,10 @@
 # FINPILOT — СППР для персональных финансов
 
+<!-- STATUS -->
+> **Сейчас:** `v8.29.2` · 2026-08-29 · Битые ссылки починены по существу
+> где стоим — [`WATCHLOG.md`](WATCHLOG.md) §0.
+<!-- /STATUS -->
+
 [![CI](https://github.com/vevdokimovm/personal-finance-dss/actions/workflows/ci.yml/badge.svg)](https://github.com/vevdokimovm/personal-finance-dss/actions/workflows/ci.yml)
 ![version](https://img.shields.io/badge/version-8.28.0-blue)
 ![python](https://img.shields.io/badge/python-3.13-blue)

@@ -79,12 +79,31 @@ def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("repo")
     ap.add_argument("--update-readme", action="store_true")
+    ap.add_argument("--force", action="store_true", help="вписать блок даже в product/profile-репу")
     a = ap.parse_args()
 
     repo = Path(a.repo).expanduser().resolve()
     if not repo.is_dir():
         print(f"нет такой репы: {repo}")
         return 2
+
+    # PIT-156-родня, найдено 28.08.2026: блок «Структура» — служебная
+    # навигация для личных репов, но был вписан и в публичные продукты
+    # (`vevdokimovm.github.io`, `finpilot`, `algorithms-site`, `vk-graph`,
+    # `salvation`, `game-analytics-engine`, `claude-usage`) — «TODO —
+    # заполнить вручную» на живой странице выглядит как незаконченный
+    # продукт перед работодателем/рекрутером. `.repo-class` — `product`
+    # или `profile` — блокирует --update-readme без явного --force.
+    if a.update_readme:
+        class_file = repo / ".repo-class"
+        repo_class = class_file.read_text(encoding="utf-8").strip() if class_file.is_file() else ""
+        if repo_class in {"product", "profile"} and not a.force:
+            print(
+                f"{repo.name}: .repo-class = {repo_class} — публичный/витринный класс. "
+                f"«Структура» — служебный блок для личных репов, на публичной странице "
+                f"выглядит незаконченным. Добавь --force, если действительно нужно."
+            )
+            return 2
 
     readme = repo / "README.md"
     existing_notes: dict[str, str] = {}

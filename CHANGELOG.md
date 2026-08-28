@@ -1,5 +1,31 @@
 # Changelog
 
+## [8.29.2] — 2026-08-29 — Битые ссылки починены по существу (PATCH)
+
+### Fixed
+Битые ссылки, найденные сплошным прогоном гейта по системе. Разобрано по
+существу, не заглушено: часть ссылок вела на реально существующие файлы
+(лишний префикс пути или уровень `../`), часть — на документы базы, которые
+раздаются в `_base/`, а не в корень.
+
+Полный разбор класса и решения по каждому подклассу — `base-repo` [3.105.0].
+
+## [8.29.1] — 2026-08-28 — Яркие ANSI-коды вместо тёмных в CLI-инструментах (PATCH)
+
+Закрывает `mission-control/BACKLOG.md` — бэклог FINPILOT от 24.07.2026, П1
+«Не виден чёрный текст в Claude Code». Причина не в Claude Code: семь
+файлов CLI-инструментов задавали цвет тёмными кодами 31–37 вместо ярких
+90–97, нечитаемых на тёмном фоне терминала.
+
+### Fixed
+- `tools/model_validation/debt_avalanche_benchmark.py`,
+  `forecast_linearity_probe.py`, `goal_inflation_benchmark.py`,
+  `goal_remainder_reroute_benchmark.py`, `grid_step_benchmark.py`,
+  `income_volatility_benchmark.py` — `\033[31/32/33/36m` →
+  `\033[91/92/93/96m`.
+- `tools/statement_audit/reconcile.py` — `RED/GREEN/YELLOW` та же замена
+  (31→91, 32→92, 33→93); `RESET`/`BOLD` не тронуты — не цветовые коды.
+
 ## [8.29.0] — 2026-08-28 — Команды запуска для Windows в README (MINOR)
 
 Закрывает `mission-control/BACKLOG.md` — бэклог FINPILOT от 24.07.2026 п.П2.
