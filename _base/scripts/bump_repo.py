@@ -71,10 +71,21 @@ def current_watch() -> str:
         email = (d.get("oauthAccount") or {}).get("emailAddress") or ""
     except Exception:
         return "?"
-    return {
-        "vevdokimovm@gmail.com": "V",
-        "finpilot.support@proton.me": "A",
-    }.get(email, "?")
+    if not email:
+        return "?"
+    # 🔴 29.08.2026: здесь стоял ПЕРЕЧЕНЬ из двух вахт — тот же дефект, что
+    # литеральное «V» до него, только мягче: две вахты работали, три молча
+    # получали «?». Поймано на вахте S (`gertab95@gmail.com`) сразу после
+    # `/login`. Перечень покрывает ровно то, что кто-то однажды вписал;
+    # правило читает реестр, который и так обязан быть верным.
+    registry = _P(__file__).resolve().parent.parent / "00-infrastructure" / "84-claude-accounts.md"
+    if registry.is_file():
+        for line in registry.read_text(encoding="utf-8", errors="replace").splitlines():
+            if email in line:
+                m = re.search(r"\*\*([VJMSA])\*\*", line)
+                if m:
+                    return m.group(1)
+    return "?"
 
 
 def bump(v: str, kind: str) -> str:
