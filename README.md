@@ -1,7 +1,7 @@
 # FINPILOT — СППР для персональных финансов
 
 <!-- STATUS -->
-> **Сейчас:** `v8.29.4` · 2026-08-29 · Указатель очищен от состояния, вписанного подъёмом версии
+> **Сейчас:** `v8.29.5` · 2026-08-29 · README приведён к стандарту 98
 > где стоим — [`WATCHLOG.md`](WATCHLOG.md) §0.
 <!-- /STATUS -->
 
@@ -484,6 +484,16 @@ Pydantic, CSRF-защита, security-заголовки, rate-limit на чув
 
 ---
 
+## Что здесь можно узнать
+
+- **app/** — Fonts
+- **frontend/** — entities/
+- **knowledge/** — knowledge/ — база знаний проекта FINPILOT
+- **loadtest/** — FINPILOT — Нагрузочное тестирование (P0.4)
+- **tools/** — tools/ — вспомогательные скрипты и программы
+
+_Собрано из заголовков самих документов — это и есть вопросы, на которые они отвечают._
+
 ## Структура проекта
 
 ```
@@ -553,18 +563,19 @@ Dockerfile, docker-compose.yml, gunicorn_conf.py
 ## Структура
 
 <!-- STRUCTURE:AUTO:START -->
-| Папка | Файлов | Что внутри |
+| Папка | Файлов | Что внутри по существу |
 |---|---|---|
-| `alembic/` | 36 | 35 скриптов Python, 1 шаблон |
-| `app/` | 137 | 117 скриптов Python, 7 заметок, 4 PDF, 9 подкаталогов |
-| `deploy/` | 8 | 6 юнитов systemd, 1 образец конфигурации, 1 скрипт оболочки, 2 подкаталога |
-| `docs/` | 523 | FINPILOT — Документация и стандарты проекта |
-| `frontend/` | 242 | 89 скриптов JS, 87 компонентов React, 31 файл стилей, 5 подкаталогов |
-| `knowledge/` | 300 | база знаний проекта FINPILOT |
-| `loadtest/` | 2 | FINPILOT — Нагрузочное тестирование (P0.4) |
-| `nginx/` | 3 | 1 файл без расширения, 1 шаблон, 2 подкаталога |
-| `reports/` | 1 | 1 таблица CSV |
-| `scripts/` | 8 | 6 скриптов оболочки, 1 скрипт Python, 1 заметка |
-| `tests/` | 134 | 132 скрипта Python, 1 файл XML, 1 скрипт JS, 4 подкаталога |
-| `tools/` | 68 | вспомогательные скрипты и программы |
+| [`alembic/`](alembic/) | 36 | _описания нет — ни в `MANIFEST.md` §3, ни в заголовках файлов_ |
+| [`app/`](app/) | 137 | Fonts · Эталонные шаблоны банковских выписок · raiffeisen — выжимка · sber — выжимка |
+| [`deploy/`](deploy/) | 8 | _описания нет — ни в `MANIFEST.md` §3, ни в заголовках файлов_ |
+| [`docs/`](docs/) | 524 | Как разрабатывать FINPILOT (CONTRIBUTING) · FINPILOT — деплой на VPS (production) · QA-регламент FINPILOT · FINPILOT — Документация и стандарты проекта |
+| [`frontend/`](frontend/) | 242 | entities/ · features/ · pages/ · widgets/ |
+| [`knowledge/`](knowledge/) | 300 | knowledge/ — база знаний проекта FINPILOT · FINPILOT — Logo Generation Spec (v1) · FINPILOT — Паспорт логотипа (Logo Guideline) v3.0 · FINPILOT → Android: пайплайн вывода веб-приложения в Google Play |
+| [`loadtest/`](loadtest/) | 2 | FINPILOT — Нагрузочное тестирование (P0.4) |
+| [`nginx/`](nginx/) | 3 | _описания нет — ни в `MANIFEST.md` §3, ни в заголовках файлов_ |
+| [`reports/`](reports/) | 1 | _описания нет — ни в `MANIFEST.md` §3, ни в заголовках файлов_ |
+| [`scripts/`](scripts/) | 8 | scripts/ |
+| [`tools/`](tools/) | 68 | tools/ — вспомогательные скрипты и программы · Публичные release notes зеркала `finpilot` (private-only источник) |
+
+_Столбец «что внутри» собран из `MANIFEST.md` §3, где он есть, иначе из заголовков самих файлов. Ничего не сочинено: где описания нет — так и написано._
 <!-- STRUCTURE:AUTO:END -->
