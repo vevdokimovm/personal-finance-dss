@@ -826,7 +826,11 @@ export const listCasesApiDemoCasesGetOptions = (options?: Options<ListCasesApiDe
 });
 
 /**
- * Очистить все данные
+ * Очистить демо-данные гостевого режима
+ *
+ * Очищает гостевую песочницу. Тот же гард, что у близнеца `/demo/load`: для
+ * авторизованного это был бы жёсткий SQL `delete()` по всему его финансовому
+ * портрету — мимо soft-delete/undo (миграция 0034) и без возможности вернуть.
  */
 export const clearDemoApiDemoClearPostMutation = (options?: Partial<Options<ClearDemoApiDemoClearPostData>>): UseMutationOptions<ClearDemoApiDemoClearPostResponse, DefaultError, Options<ClearDemoApiDemoClearPostData>> => {
     const mutationOptions: UseMutationOptions<ClearDemoApiDemoClearPostResponse, DefaultError, Options<ClearDemoApiDemoClearPostData>> = {

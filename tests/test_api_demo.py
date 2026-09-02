@@ -120,3 +120,48 @@ def test_demo_preview_matches_planning_forecast(client: TestClient) -> None:
     assert len(deltas(planning)) > 1, "прогноз планирования не должен быть прямой с одной дельтой"
     assert (preview[-1] - preview[0]) * (planning[-1] - planning[0]) > 0, \
         "витрина и планирование должны показывать прогноз в одну сторону"
+
+
+class TestClearIsGuestOnly:
+    """`POST /demo/clear` для авторизованного = безвозвратная потеря его данных.
+
+    `_clear_all` — жёсткий SQL `delete()` по Transaction/Obligation/Goal/LiquidAsset,
+    мимо soft-delete/undo, ради которого делалась миграция 0034. Близнец `/demo/load`
+    отдаёт авторизованному 403 («песочница не смешивается с данными реального
+    аккаунта») с самого начала — `/demo/clear` того же гарда не получил.
+    Найдено adversarial-verify гипотезы H3b independent-expert
+    (`docs/research/raw/12_independent_expert_milestone8_gap_2026-08-19.md`).
+    """
+
+    @staticmethod
+    def _authorized(client: TestClient, email: str = "democlear@fp.io") -> dict[str, str]:
+        token = client.post("/api/auth/register", json={
+            "email": email, "password": "strongpass1", "consent": True,
+        }).json()["access_token"]
+        headers = {"Authorization": f"Bearer {token}"}
+        client.post("/api/consents/financial_data", headers=headers)
+        return headers
+
+    def test_authorized_user_is_refused(self, client: TestClient) -> None:
+        resp = client.post("/api/demo/clear", headers=self._authorized(client))
+        assert resp.status_code == 403
+
+    def test_authorized_user_data_survives(self, client: TestClient) -> None:
+        headers = self._authorized(client, "democlear2@fp.io")
+        created = client.post("/api/transactions", headers=headers, json={
+            "amount": 1000, "category": "Продукты", "type": "expense",
+            "date": "2026-06-01T00:00:00",
+        })
+        assert created.status_code in (200, 201), created.text
+
+        client.post("/api/demo/clear", headers=headers)
+
+        survived = client.get("/api/transactions", headers=headers).json()
+        assert len(survived) == 1, "данные авторизованного пользователя не должны стираться"
+
+    def test_guest_can_still_clear(self, client: TestClient) -> None:
+        """Гард не должен ломать гостевую песочницу — ровно её `/demo/clear` и обслуживает."""
+        client.post("/api/demo/load?case=anna")
+        assert len(client.get("/api/transactions").json()) > 0
+        assert client.post("/api/demo/clear").status_code == 200
+        assert len(client.get("/api/transactions").json()) == 0

@@ -1,0 +1,88 @@
+/* Секция «Бюджеты по категориям» (Батч 3 CRUD-паритета, ROADMAP §8.2) — карточка-обёртка
+   .fp-panel (@shared/ui/panel.css) уже даёт фон/бордер/паддинг и стиль h2/.fp-lede,
+   здесь только раскладка списка строк, тот же паттерн, что ObligationsPage.css. */
+.fp-budgets__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  margin-bottom: var(--sp-5);
+  flex-wrap: wrap;
+}
+.fp-budgets__head h2 {
+  margin: 0; /* отступ снизу даёт flex-контейнер __head, не сам заголовок */
+}
+.fp-budgets__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+}
+
+.fp-budget-row {
+  background: var(--c-surface-up);
+  border: var(--border-w) solid var(--c-border);
+  border-radius: var(--r-md);
+  padding: var(--sp-4);
+}
+.fp-budget-row__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--sp-3);
+  margin-bottom: var(--sp-2);
+}
+.fp-budget-row__category {
+  font-weight: 600;
+}
+.fp-budget-row__spent {
+  font-weight: 700;
+  font-size: var(--fs-md);
+  flex-shrink: 0;
+}
+.fp-budget-row__meta {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-4);
+  color: var(--c-text3);
+  font-size: var(--fs-xs);
+  margin-bottom: var(--sp-3);
+  flex-wrap: wrap;
+}
+.fp-budget-row__badge {
+  display: inline-block;
+  padding: 0 var(--sp-2);
+  border-radius: var(--r-full);
+  font-weight: 600;
+}
+.fp-budget-row__badge--over {
+  color: var(--c-red);
+  background: var(--c-red-bg);
+}
+.fp-budget-row__bar {
+  height: var(--sp-1);
+  background: var(--c-bg2);
+  /* Контур трека контрастным токеном, не заливкой (WCAG 1.4.11 — то же решение, что
+     ObligationsPage.css .fp-obligation-row__bar). */
+  border: var(--border-w) solid var(--c-text3);
+  border-radius: var(--r-full);
+  overflow: hidden;
+}
+.fp-budget-row__bar-fill {
+  height: 100%;
+  background: var(--c-accent);
+  border-radius: var(--r-full);
+}
+/* Превышение лимита — тот же токен, что бейдж «Превышен», а не только текст рядом
+   (design-critic, правило 7: условная информация не держится на одном слабом признаке). */
+.fp-budget-row__bar[data-over="true"] .fp-budget-row__bar-fill {
+  background: var(--c-red);
+}
+.fp-budget-row__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--sp-2);
+  margin-top: var(--sp-3);
+}

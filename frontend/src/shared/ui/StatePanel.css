@@ -7,7 +7,8 @@
   max-width: 62ch;
   margin: var(--sp-8) auto;
 }
-.fp-state-panel h2 {
+.fp-state-panel h2,
+.fp-state-panel h3 {
   font-size: var(--fs-xl);
   margin: 0 0 var(--sp-3);
 }

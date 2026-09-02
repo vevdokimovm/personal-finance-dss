@@ -44,6 +44,16 @@
 .fp-entity-form__field input[aria-invalid="true"] {
   border-color: var(--c-red);
 }
+/* Батч 3 (Бюджет CRUD, ROADMAP §8.2): первое поле в семье entity-form, заблокированное
+   намеренно (категория неизменяема при правке — бэк upsert'ит по ней, не переименовывает).
+   Тот же язык, что .fp-button:disabled — приглушение+cursor, без него дизейбл поля выглядит
+   как обычное активное с застрявшим значением. */
+.fp-auth-field input:disabled,
+.fp-entity-form__field input:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background: var(--c-bg2);
+}
 .fp-auth-field__hint,
 .fp-entity-form__hint {
   font-size: var(--fs-xs);

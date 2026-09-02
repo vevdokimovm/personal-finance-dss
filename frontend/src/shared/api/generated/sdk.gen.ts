@@ -359,7 +359,11 @@ export const analyzeDemoApiDemoAnalyzePost = <ThrowOnError extends boolean = fal
 export const listCasesApiDemoCasesGet = <ThrowOnError extends boolean = false>(options?: Options<ListCasesApiDemoCasesGetData, ThrowOnError>) => (options?.client ?? client).get<ListCasesApiDemoCasesGetResponses, unknown, ThrowOnError>({ url: '/api/demo/cases', ...options });
 
 /**
- * Очистить все данные
+ * Очистить демо-данные гостевого режима
+ *
+ * Очищает гостевую песочницу. Тот же гард, что у близнеца `/demo/load`: для
+ * авторизованного это был бы жёсткий SQL `delete()` по всему его финансовому
+ * портрету — мимо soft-delete/undo (миграция 0034) и без возможности вернуть.
  */
 export const clearDemoApiDemoClearPost = <ThrowOnError extends boolean = false>(options?: Options<ClearDemoApiDemoClearPostData, ThrowOnError>) => (options?.client ?? client).post<ClearDemoApiDemoClearPostResponses, unknown, ThrowOnError>({ url: '/api/demo/clear', ...options });
 

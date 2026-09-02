@@ -7,7 +7,15 @@ exclude = .venv, venv, __pycache__, .mypy_cache, .pytest_cache, alembic, build, 
     docs/model/expert_certification/iterations,
     # frontend/node_modules — вендоренный JS-стек (Э2 плана вехи 8); часть пакетов (katex,
     # flatted) несёт с собой служебные .py-скрипты не нашего авторства — не наш код, не линтуется
-    frontend/node_modules
+    frontend/node_modules,
+    # _base — read-only зеркало системы «база», инжектируется на 63 репозитория и целиком
+    # перезаписывается `_base/scripts/sync_base_local.py` (см. `_base/DO-NOT-EDIT.md`).
+    # Не наш код и править его здесь нельзя: правка не переживёт следующую раздачу канона.
+    # Без исключения `flake8 .` (команда из CLAUDE.md, «должно быть чисто») давал 163
+    # нарушения, все до одного в `_base/`, в коде проекта — ноль. Тот же класс
+    # гейта-с-ложной-уверенностью, что чинили в v8.30.1 для `revision_check.py::SKIP_DIRS`:
+    # гейт спотыкается о чужое дерево и обесценивается ровно тем, что всегда красный.
+    _base
 # render_portrait_cards.py — research/рендер-скрипт: строки >100 это дословные выходные
 # литералы досье-карточек и легенды (строки таблиц, проза), уходящие экспертам через
 # knowledge/survey_auditory/. Перенос менял бы вывод; per-file-ignore вместо реформата

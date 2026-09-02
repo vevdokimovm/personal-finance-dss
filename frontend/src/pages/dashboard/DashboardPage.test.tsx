@@ -22,6 +22,22 @@ vi.mock("@entities/consents", () => ({
   ),
 }));
 
+// BudgetsSection (Батч 3) — самостоятельный запрос, для тестов DashboardPage не относящихся
+// к бюджетам достаточно фиксированного пустого состояния; собственные состояния секции
+// (загрузка/ошибка/согласие/список) покрыты BudgetsSection.test.tsx отдельно.
+vi.mock("@entities/budgets", () => ({
+  useBudgetStatus: () => ({
+    isLoading: false,
+    isError: false,
+    data: [],
+    error: null,
+    refetch: vi.fn(),
+  }),
+  useCreateBudget: () => ({ mutateAsync: vi.fn(), isPending: false, error: null }),
+  useDeleteBudget: () => ({ mutate: vi.fn(), isPending: false }),
+  useRestoreBudget: () => ({ mutate: vi.fn(), isPending: false }),
+}));
+
 function queryResult<T>(partial: Partial<UseQueryResult<T>>): UseQueryResult<T> {
   return {
     isLoading: false,

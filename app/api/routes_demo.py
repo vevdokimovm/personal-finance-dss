@@ -748,11 +748,21 @@ def analyze_demo(payload: AnalyzePortrait) -> dict[str, Any]:
     )
 
 
-@router.post("/demo/clear", summary="Очистить все данные")
+@router.post("/demo/clear", summary="Очистить демо-данные гостевого режима")
 def clear_demo(
     db: Session = Depends(get_db),
     user_id: str | None = Depends(get_current_user_id),
 ) -> dict[str, str]:
+    """
+    Очищает гостевую песочницу. Тот же гард, что у близнеца `/demo/load`: для
+    авторизованного это был бы жёсткий SQL `delete()` по всему его финансовому
+    портрету — мимо soft-delete/undo (миграция 0034) и без возможности вернуть.
+    """
+    if user_id is not None:
+        raise HTTPException(
+            status_code=403,
+            detail="Демо-портреты доступны только в гостевом режиме (без входа в аккаунт).",
+        )
     _clear_all(db, user_id=user_id)
     db.commit()
     return {"detail": "Все данные удалены."}

@@ -19,9 +19,12 @@ import "./ConsentRequiredPanel.css";
 export function ConsentRequiredPanel({
   detail,
   onGranted,
+  headingLevel,
 }: {
   detail: ConsentRequiredDetail;
   onGranted: () => void;
+  /** См. StatePanel — по умолчанию h2 (панель прямо под h1 страницы). */
+  headingLevel?: 2 | 3;
 }) {
   const grant = useGrantConsent();
 
@@ -37,6 +40,7 @@ export function ConsentRequiredPanel({
     <StatePanel
       title={t("Нужно согласие на финансовые данные")}
       role="alert"
+      headingLevel={headingLevel}
       action={
         <Button
           variant="primary"

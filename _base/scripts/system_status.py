@@ -60,6 +60,7 @@ import datetime as dt
 import re
 import subprocess
 import sys
+import time
 from pathlib import Path
 
 # Корень определяется общим модулем: скрипт может быть запущен и из базы,
@@ -87,6 +88,10 @@ THRESHOLDS = {
     # 208 замеров). 120 взято заметно выше, чтобы длинный честный батч
     # не поднимал ложную тревогу: ложная тревога дороже позднего замечания.
     "минут тишины": 120,
+    # Крупный транскрипт стирается сам через 30 дней, и продлить срок нельзя —
+    # места на диске нет (99-claude-code-sessions.md §4). Порог 1: одна долгая
+    # вахта на грани — уже повод вынуть из неё ценное в репу, пока она есть.
+    "сессий на грани удаления": 1,
 }
 
 # 🔴 ОБРАТНЫЕ ПОРОГИ: тревога при значении НИЖЕ порога, а не выше.
@@ -298,6 +303,51 @@ def broken_archives() -> tuple[int, list[str]]:
     return 0, []
 
 
+def sessions_expiring() -> tuple[int, list[str]]:
+    """Крупные транскрипты, которым осталось меньше недели до автоудаления.
+
+    Claude Code сам стирает сессии старше `cleanupPeriodDays` (дефолт 30).
+    Продлить срок нельзя — при темпе 70 МБ в день и 7.4 ГБ свободного диска
+    даже 180 дней не умещаются (`00-infrastructure/99-claude-code-sessions.md` §4).
+    Значит остаётся одно: предупредить, пока ценное ещё можно вынуть в репу.
+
+    🔴 Считаются только КРУПНЫЕ сессии (≥10 МБ). Мелкие истекают постоянно,
+    это норма, и тревога на них была бы шумом, который научит её не читать.
+    Крупная сессия — долгая вахта: разборы, отменённые решения, обоснования.
+    В `WATCHLOG` попадает решение, в транскрипт — путь к нему.
+    """
+    import json as _json
+    projects = Path.home() / ".claude" / "projects"
+    if not projects.is_dir():
+        return 0, []
+    period = 30
+    for cfg in (Path.home() / ".claude" / "settings.json",
+                BASE_REPO / ".claude" / "settings.json"):
+        try:
+            v = _json.loads(cfg.read_text()).get("cleanupPeriodDays")
+        except (OSError, ValueError):
+            continue
+        if isinstance(v, int) and v > 0:
+            period = v
+    now = time.time()
+    doomed = []
+    for f in projects.glob("*/*.jsonl"):
+        try:
+            st = f.stat()
+        except OSError:
+            continue
+        mb = st.st_size / 1024 / 1024
+        if mb < 10:
+            continue
+        left = period - (now - st.st_mtime) / 86400
+        if left <= 7:
+            doomed.append((left, mb, f))
+    doomed.sort()
+    lines = [f"{mb:.0f} МБ, осталось {left:.0f} дн: {f.parent.name[:44]}"
+             for left, mb, f in doomed[:5]]
+    return len(doomed), lines
+
+
 CHECKS = (
     ("отставших от канона", canon_lag),
     ("повреждённых архивов", broken_archives),
@@ -306,6 +356,7 @@ CHECKS = (
     ("просроченных задач", overdue_tasks),
     ("дней без архива", archive_age),
     ("хуков без +x", hooks_executable),
+    ("сессий на грани удаления", sessions_expiring),
 )
 
 

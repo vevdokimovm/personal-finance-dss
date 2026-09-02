@@ -1,0 +1,1 @@
+import{t as e}from"./jsx-runtime-Cx0BB4qO.js";import{t}from"./katex.min-B9bfhHD-.js";var n=e();function r({tex:e,display:r=!1}){let i=t.renderToString(e,{throwOnError:!1,displayMode:r});return(0,n.jsx)(`span`,{dangerouslySetInnerHTML:{__html:i}})}export{r as FormulaBody};

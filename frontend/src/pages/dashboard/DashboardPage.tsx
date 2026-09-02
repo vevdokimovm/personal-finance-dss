@@ -10,6 +10,7 @@ import { Hero } from "./ui/Hero";
 import { MetricsGrid } from "@widgets/metrics-grid";
 import { AllocationPanel } from "@widgets/allocation-panel";
 import { ForecastPanel } from "@widgets/forecast-panel";
+import { BudgetsSection } from "./ui/BudgetsSection";
 import "./DashboardPage.css";
 
 export function DashboardPage() {
@@ -76,6 +77,7 @@ export function DashboardPage() {
       <MetricsGrid indicators={plan.indicators} />
       <AllocationPanel best={plan.top3[0] ?? null} alternatives={plan.ranked} />
       <ForecastPanel forecast={forecast} />
+      <BudgetsSection />
     </main>
   );
 }
