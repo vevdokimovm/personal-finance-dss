@@ -33,6 +33,21 @@ vi.mock("@tanstack/react-router", async () => {
   };
 });
 
+// PlanHistorySection (v8.34.0) — самостоятельный запрос истории; для тестов
+// PlanningPage, не относящихся к истории, достаточно фиксированного пустого состояния.
+// Собственные состояния секции (загрузка/ошибка/согласие/список/удаление) покрыты
+// PlanHistorySection.test.tsx отдельно — тот же приём, что с BudgetsSection на дашборде.
+vi.mock("@entities/plan-history", () => ({
+  usePlanHistory: () => ({
+    data: { items: [], count: 0 },
+    error: null,
+    isLoading: false,
+    refetch: vi.fn(),
+  }),
+  useSavePlanSnapshot: () => ({ mutate: vi.fn(), isPending: false }),
+  useDeletePlanSnapshot: () => ({ mutate: vi.fn(), isPending: false }),
+}));
+
 vi.mock("@entities/consents", () => ({
   ConsentRequiredPanel: ({ detail }: { detail: { message: string } }) => (
     <div role="alert">{detail.message}</div>

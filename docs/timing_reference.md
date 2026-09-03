@@ -57,15 +57,16 @@ python -m tools.timing_lab.record report --update-doc
 <!-- TIMINGS:BEGIN -->
 | набор | спокойный прогон | худший | прогонов | тестов |
 |---|---|---|---|---|
-| `pytest-full` | 14.7 мин | 24.5 мин | 2 | 1668 |
+| `pytest-full` | 15 мин | 24.5 мин | 5 | 1691 |
+| `pytest-slice-planning` | — только под нагрузкой | 1.6 мин | 1 | 120 |
 | `pytest-slice-affected` | 48 с | 48 с | 1 | 63 |
 | `pytest-slice-api-demo` | 42 с | 83 с | 3 | 31 |
 | `playwright-e2e-full` | 41 с | 72 с | 6 | 39 |
-| `vitest-full` | 38 с | 89 с | 12 | 273 |
+| `vitest-full` | 38 с | 2 мин | 14 | 294 |
 | `pytest-slice-consent-gate` | 37 с | 37 с | 1 | 30 |
 | `playwright-e2e-slice` | 25 с | 28 с | 2 | 7 |
 | `preflight` | 8 с | 8 с | 1 | — |
-| `vitest-slice-widget` | 5 с | 7 с | 3 | 41 |
+| `vitest-slice-widget` | 5 с | 14 с | 4 | 41 |
 | `vite-build` | 1 с | 1 с | 2 | — |
 | `pytest-slice-timing-lab` | 0 с | 8 с | 2 | 11 |
 | `pytest-slice-money-format` | 0 с | 0 с | 1 | 12 |

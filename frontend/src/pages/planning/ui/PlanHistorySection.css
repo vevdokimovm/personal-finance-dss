@@ -1,0 +1,136 @@
+/* Секция — обычная панель продукта (.fp-panel из shared/ui/panel.css), как все четыре
+   соседа на этом экране. До правки она висела плоским текстом на фоне страницы, а её
+   карточки лежали прямо на --c-bg: экран заканчивался блоком, выглядевшим приложенным
+   сбоку (design-critic). Здесь — только то, чего в общей панели нет. */
+
+/* Форма сохранения переносится на узком экране: подпись, поле и кнопка в одну строку
+   на 380 не помещаются ([A11Y-08], [CMP-07]). */
+.fp-plan-history__save {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--sp-3);
+  margin-bottom: var(--sp-5);
+}
+
+.fp-plan-history__field {
+  flex: 1 1 var(--plan-history-note-w);
+}
+
+.fp-plan-history__list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+  margin: 0 0 var(--sp-3);
+  padding: 0;
+  list-style: none;
+}
+
+/* Программная цель фокуса после удаления. Контур ВИДИМЫЙ, хотя это и не таб-стоп:
+   фокус приходит сюда в результате клавиатурного действия пользователя (подтвердил
+   удаление), и без индикатора он теряет ориентир, куда его перенесли (WCAG 2.4.7,
+   найдено a11y-аудитом — прежняя редакция гасила контур). `:focus-visible`, а не
+   `:focus`: после клика мышью рамка не нужна. */
+.fp-plan-history__list:focus {
+  outline: none;
+}
+.fp-plan-history__list:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: var(--focus-ring-offset);
+  border-radius: var(--r-md);
+}
+
+/* Карточка снимка вложена в панель, поэтому фон на ступень выше (--c-surface-up), а не
+   --c-surface: тот совпал бы с фоном самой панели. Паддинг --sp-4, как у строки бюджета
+   на дашборде, а не --sp-3 — бриф §1.3, воздух важнее плотности. */
+.fp-plan-history__item {
+  padding: var(--sp-4);
+  border: var(--border-w) solid var(--c-border);
+  border-radius: var(--r-md);
+  background: var(--c-surface-up);
+}
+
+.fp-plan-history__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--sp-2);
+  margin-bottom: var(--sp-3);
+}
+
+.fp-plan-history__date {
+  font-size: var(--fs-base);
+  font-weight: 700;
+  color: var(--c-text);
+}
+
+/* Чип риск-профиля на --c-bg2 сливался бы с --c-surface-up карточки в тёмной теме
+   (та же коллизия, о которой предупреждает комментарий в MetricsGrid.css). Поэтому
+   различие несёт рамка, а не заливка. */
+.fp-plan-history__profile {
+  padding: 0 var(--sp-2);
+  border: var(--border-w) solid var(--c-border-hl);
+  border-radius: var(--r-full);
+  color: var(--c-text2);
+  font-size: var(--fs-xs);
+  font-weight: 600;
+}
+
+.fp-plan-history__metrics {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(var(--plan-history-metric-w), 1fr));
+  gap: var(--sp-3);
+  margin: 0 0 var(--sp-3);
+}
+
+.fp-plan-history__metrics dt {
+  color: var(--c-text2);
+  font-size: var(--fs-xs);
+}
+
+.fp-plan-history__metrics dd {
+  margin: 0;
+  color: var(--c-text);
+  font-size: var(--fs-sm);
+  font-weight: 600;
+}
+
+/* Свободные деньги — якорь строки: та же величина, что главная на дашборде. */
+.fp-plan-history__money {
+  font-size: var(--fs-md);
+  font-weight: 700;
+}
+
+/* Превышенный порог ПДН: цвет ПЛЮС слово «выше порога» в разметке — смысл не передаётся
+   одним лишь цветом ([A11Y-07]). */
+.fp-plan-history__dti--over {
+  color: var(--c-red);
+}
+
+.fp-plan-history__over {
+  font-size: var(--fs-xs);
+  font-weight: 700;
+}
+
+/* Без курсива: на 14 пикселях он заметно снижает читаемость для аудитории 55+
+   (персона R01), а Manrope italic в проект не подключён — браузер синтезировал бы
+   наклон, и кириллица от этого дурнеет. Подпись отличается цветом и положением. */
+.fp-plan-history__note {
+  margin: 0 0 var(--sp-3);
+  color: var(--c-text2);
+  font-size: var(--fs-sm);
+}
+
+.fp-plan-history__confirm-target {
+  margin: 0 0 var(--sp-3);
+  color: var(--c-text);
+  font-size: var(--fs-sm);
+}
+
+.fp-plan-history__confirm {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--sp-2);
+  margin-top: var(--sp-3);
+}

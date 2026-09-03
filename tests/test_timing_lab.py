@@ -213,3 +213,38 @@ class TestSelfReviewFindings:
         ])
         assert code == 127
         assert load_measurements(ledger)[0].note == "exit=127"
+
+
+class TestLedgerRobustness:
+    """Журнал дописывается из РАЗНЫХ процессов (`record run` в фоне, `add` вручную),
+    поэтому битая строка в нём — вопрос времени, а не гипотеза: оборванная запись при
+    убитом процессе, ручная правка, конкурентный дозапись.
+
+    Проверено эмпирически до правки: одна строка с нечисловым `seconds` роняла
+    `load_measurements` целиком, то есть ВЕСЬ отчёт и обновление документа. Ценность
+    журнала в ряде замеров — терять двадцать девять хороших строк из-за одной плохой
+    неверно.
+    """
+
+    def test_corrupt_row_is_skipped_not_fatal(self, ledger: Path):
+        append_measurement(ledger, _m("хороший", 10.0))
+        with ledger.open("a", encoding="utf-8") as fh:
+            fh.write("2026-09-03,битый,НЕ-ЧИСЛО,5,2.0,8,\n")
+        append_measurement(ledger, _m("тоже хороший", 20.0))
+
+        got = load_measurements(ledger)
+        assert [m.suite for m in got] == ["хороший", "тоже хороший"]
+
+    def test_truncated_row_is_skipped(self, ledger: Path):
+        """Оборванная на середине запись — типичный след убитого процесса."""
+        append_measurement(ledger, _m("хороший", 10.0))
+        with ledger.open("a", encoding="utf-8") as fh:
+            fh.write("2026-09-03,обор")
+
+        assert [m.suite for m in load_measurements(ledger)] == ["хороший"]
+
+    def test_report_survives_corrupt_ledger(self, ledger: Path):
+        append_measurement(ledger, _m("живой", 10.0))
+        with ledger.open("a", encoding="utf-8") as fh:
+            fh.write("мусор,без,запятых\n")
+        assert "живой" in format_report(summarize(load_measurements(ledger)))

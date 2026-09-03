@@ -1938,6 +1938,22 @@ export type ObligationUpdate = {
 };
 
 /**
+ * PlanHistoryList
+ *
+ * Ответ списка истории.
+ */
+export type PlanHistoryList = {
+    /**
+     * Count
+     */
+    count: number;
+    /**
+     * Items
+     */
+    items: Array<PlanSnapshotSummary>;
+};
+
+/**
  * PlanHistorySave
  *
  * Параметры расчёта для сохранения снапшота плана в историю (P2.6).
@@ -1963,6 +1979,133 @@ export type PlanHistorySave = {
      * Risk Tolerance
      */
     risk_tolerance?: number | null;
+};
+
+/**
+ * PlanSnapshotBest
+ *
+ * Рекомендованное распределение снимка.
+ */
+export type PlanSnapshotBest = {
+    /**
+     * Name
+     */
+    name: string;
+    /**
+     * Utility
+     */
+    utility: number;
+    /**
+     * X Goals
+     */
+    x_goals: number;
+    /**
+     * X Obligations
+     */
+    x_obligations: number;
+    /**
+     * X Reserve
+     */
+    x_reserve: number;
+};
+
+/**
+ * PlanSnapshotDeleted
+ *
+ * Подтверждение удаления снимка.
+ */
+export type PlanSnapshotDeleted = {
+    /**
+     * Id
+     */
+    id: number;
+    /**
+     * Status
+     */
+    status: string;
+};
+
+/**
+ * PlanSnapshotDetail
+ *
+ * Снимок целиком — то же, что в списке, плюс альтернативы.
+ */
+export type PlanSnapshotDetail = {
+    best: PlanSnapshotBest;
+    /**
+     * Created At
+     */
+    created_at: string;
+    /**
+     * Id
+     */
+    id: number;
+    indicators: PlanSnapshotIndicators;
+    /**
+     * Note
+     */
+    note?: string | null;
+    /**
+     * Risk Profile
+     */
+    risk_profile: string;
+    /**
+     * Top3
+     */
+    top3?: Array<{
+        [key: string]: unknown;
+    }>;
+};
+
+/**
+ * PlanSnapshotIndicators
+ *
+ * Показатели плана на момент снимка.
+ */
+export type PlanSnapshotIndicators = {
+    /**
+     * Blr
+     */
+    BLR: number;
+    /**
+     * Dt
+     */
+    Dt: number;
+    /**
+     * Lt
+     */
+    Lt: number;
+    /**
+     * Rt
+     */
+    Rt: number;
+};
+
+/**
+ * PlanSnapshotSummary
+ *
+ * Строка списка истории. Без `top3` сознательно: список не должен таскать
+ * три альтернативы на каждую строку.
+ */
+export type PlanSnapshotSummary = {
+    best: PlanSnapshotBest;
+    /**
+     * Created At
+     */
+    created_at: string;
+    /**
+     * Id
+     */
+    id: number;
+    indicators: PlanSnapshotIndicators;
+    /**
+     * Note
+     */
+    note?: string | null;
+    /**
+     * Risk Profile
+     */
+    risk_profile: string;
 };
 
 /**
@@ -5460,13 +5603,9 @@ export type ListPlanHistoryApiPlanningHistoryGetError = ListPlanHistoryApiPlanni
 
 export type ListPlanHistoryApiPlanningHistoryGetResponses = {
     /**
-     * Response List Plan History Api Planning History Get
-     *
      * Successful Response
      */
-    200: {
-        [key: string]: unknown;
-    };
+    200: PlanHistoryList;
 };
 
 export type ListPlanHistoryApiPlanningHistoryGetResponse = ListPlanHistoryApiPlanningHistoryGetResponses[keyof ListPlanHistoryApiPlanningHistoryGetResponses];
@@ -5489,13 +5628,9 @@ export type SavePlanHistoryApiPlanningHistoryPostError = SavePlanHistoryApiPlann
 
 export type SavePlanHistoryApiPlanningHistoryPostResponses = {
     /**
-     * Response Save Plan History Api Planning History Post
-     *
      * Successful Response
      */
-    200: {
-        [key: string]: unknown;
-    };
+    200: PlanSnapshotDetail;
 };
 
 export type SavePlanHistoryApiPlanningHistoryPostResponse = SavePlanHistoryApiPlanningHistoryPostResponses[keyof SavePlanHistoryApiPlanningHistoryPostResponses];
@@ -5523,13 +5658,9 @@ export type DeletePlanHistoryApiPlanningHistorySnapshotIdDeleteError = DeletePla
 
 export type DeletePlanHistoryApiPlanningHistorySnapshotIdDeleteResponses = {
     /**
-     * Response Delete Plan History Api Planning History  Snapshot Id  Delete
-     *
      * Successful Response
      */
-    200: {
-        [key: string]: unknown;
-    };
+    200: PlanSnapshotDeleted;
 };
 
 export type DeletePlanHistoryApiPlanningHistorySnapshotIdDeleteResponse = DeletePlanHistoryApiPlanningHistorySnapshotIdDeleteResponses[keyof DeletePlanHistoryApiPlanningHistorySnapshotIdDeleteResponses];
@@ -5557,13 +5688,9 @@ export type GetPlanHistoryApiPlanningHistorySnapshotIdGetError = GetPlanHistoryA
 
 export type GetPlanHistoryApiPlanningHistorySnapshotIdGetResponses = {
     /**
-     * Response Get Plan History Api Planning History  Snapshot Id  Get
-     *
      * Successful Response
      */
-    200: {
-        [key: string]: unknown;
-    };
+    200: PlanSnapshotDetail;
 };
 
 export type GetPlanHistoryApiPlanningHistorySnapshotIdGetResponse = GetPlanHistoryApiPlanningHistorySnapshotIdGetResponses[keyof GetPlanHistoryApiPlanningHistorySnapshotIdGetResponses];

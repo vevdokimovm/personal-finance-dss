@@ -418,35 +418,86 @@ class PlanHistorySave(BaseModel):
     household_id: int | None = None  # P3.7: общий для семьи (если член household)
 
 
-def _snapshot_summary(s: Any) -> dict[str, Any]:
-    return {
-        "id": s.id,
-        "created_at": s.created_at.isoformat(),
-        "risk_profile": s.risk_profile,
-        "indicators": {"Rt": s.rt, "Lt": s.lt, "Dt": s.dt, "BLR": s.blr},
-        "best": {
-            "name": s.best_name,
-            "x_obligations": s.x_obligations,
-            "x_reserve": s.x_reserve,
-            "x_goals": s.x_goals,
-            "utility": s.utility,
-        },
-        "note": s.note,
-    }
+class PlanSnapshotIndicators(BaseModel):
+    """Показатели плана на момент снимка."""
+
+    Rt: float
+    Lt: float
+    Dt: float
+    BLR: float
 
 
-def _snapshot_detail(s: Any) -> dict[str, Any]:
-    data = _snapshot_summary(s)
-    data["top3"] = s.top3 or []
-    return data
+class PlanSnapshotBest(BaseModel):
+    """Рекомендованное распределение снимка."""
+
+    name: str
+    x_obligations: float
+    x_reserve: float
+    x_goals: float
+    utility: float
 
 
-@router.post("/history", summary="Сохранить снапшот плана в историю (P2.6)")
+class PlanSnapshotSummary(BaseModel):
+    """Строка списка истории. Без `top3` сознательно: список не должен таскать
+    три альтернативы на каждую строку."""
+
+    id: int
+    created_at: str
+    risk_profile: str
+    indicators: PlanSnapshotIndicators
+    best: PlanSnapshotBest
+    # Необязательно честно: подпись оставляет пользователь, и он вправе её не оставить.
+    note: str | None = None
+
+
+class PlanSnapshotDetail(PlanSnapshotSummary):
+    """Снимок целиком — то же, что в списке, плюс альтернативы."""
+
+    top3: list[dict[str, Any]] = Field(default_factory=list)
+
+
+class PlanHistoryList(BaseModel):
+    """Ответ списка истории."""
+
+    items: list[PlanSnapshotSummary]
+    count: int
+
+
+class PlanSnapshotDeleted(BaseModel):
+    """Подтверждение удаления снимка."""
+
+    status: str
+    id: int
+
+
+def _snapshot_summary(s: Any) -> PlanSnapshotSummary:
+    return PlanSnapshotSummary(
+        id=s.id,
+        created_at=s.created_at.isoformat(),
+        risk_profile=s.risk_profile,
+        indicators=PlanSnapshotIndicators(Rt=s.rt, Lt=s.lt, Dt=s.dt, BLR=s.blr),
+        best=PlanSnapshotBest(
+            name=s.best_name,
+            x_obligations=s.x_obligations,
+            x_reserve=s.x_reserve,
+            x_goals=s.x_goals,
+            utility=s.utility,
+        ),
+        note=s.note,
+    )
+
+
+def _snapshot_detail(s: Any) -> PlanSnapshotDetail:
+    return PlanSnapshotDetail(**_snapshot_summary(s).model_dump(), top3=s.top3 or [])
+
+
+@router.post("/history", summary="Сохранить снапшот плана в историю (P2.6)",
+             response_model=PlanSnapshotDetail)
 def save_plan_history(
     payload: PlanHistorySave,
     db: Session = Depends(get_db),
     user_id: str | None = Depends(get_current_user_id),
-) -> dict[str, Any]:
+) -> PlanSnapshotDetail:
     req = PlanningRequest(
         risk_tolerance=payload.risk_tolerance, l_min=payload.l_min, r_bench=payload.r_bench
     )
@@ -457,38 +508,41 @@ def save_plan_history(
     return _snapshot_detail(snap)
 
 
-@router.get("/history", summary="История сохранённых планов (P2.6)")
+@router.get("/history", summary="История сохранённых планов (P2.6)",
+            response_model=PlanHistoryList)
 def list_plan_history(
     limit: int = 50,
     db: Session = Depends(get_db),
     user_id: str | None = Depends(get_current_user_id),
-) -> dict[str, Any]:
+) -> PlanHistoryList:
     limit = max(1, min(limit, 100))
     snaps = get_plan_snapshots(db, user_id=user_id, limit=limit)
-    return {"items": [_snapshot_summary(s) for s in snaps], "count": len(snaps)}
+    return PlanHistoryList(items=[_snapshot_summary(s) for s in snaps], count=len(snaps))
 
 
-@router.get("/history/{snapshot_id}", summary="Снапшот плана по id (P2.6)")
+@router.get("/history/{snapshot_id}", summary="Снапшот плана по id (P2.6)",
+            response_model=PlanSnapshotDetail)
 def get_plan_history(
     snapshot_id: int,
     db: Session = Depends(get_db),
     user_id: str | None = Depends(get_current_user_id),
-) -> dict[str, Any]:
+) -> PlanSnapshotDetail:
     snap = get_plan_snapshot(db, snapshot_id, user_id=user_id)
     if snap is None:
         raise HTTPException(status_code=404, detail="Снапшот плана не найден")
     return _snapshot_detail(snap)
 
 
-@router.delete("/history/{snapshot_id}", summary="Удалить снапшот плана (P2.6)")
+@router.delete("/history/{snapshot_id}", summary="Удалить снапшот плана (P2.6)",
+               response_model=PlanSnapshotDeleted)
 def delete_plan_history(
     snapshot_id: int,
     db: Session = Depends(get_db),
     user_id: str | None = Depends(get_current_user_id),
-) -> dict[str, Any]:
+) -> PlanSnapshotDeleted:
     if not soft_delete_plan_snapshot(db, snapshot_id, user_id=user_id):
         raise HTTPException(status_code=404, detail="Снапшот плана не найден")
-    return {"status": "deleted", "id": snapshot_id}
+    return PlanSnapshotDeleted(status="deleted", id=snapshot_id)
 
 
 @router.post("/forecast", summary="Прогноз Rt/Lt/Dt на горизонт H (форм. 35 ВКР)")

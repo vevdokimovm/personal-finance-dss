@@ -3202,6 +3202,28 @@
         "title": "ObligationUpdate",
         "type": "object"
       },
+      "PlanHistoryList": {
+        "description": "Ответ списка истории.",
+        "properties": {
+          "count": {
+            "title": "Count",
+            "type": "integer"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/PlanSnapshotSummary"
+            },
+            "title": "Items",
+            "type": "array"
+          }
+        },
+        "required": [
+          "items",
+          "count"
+        ],
+        "title": "PlanHistoryList",
+        "type": "object"
+      },
       "PlanHistorySave": {
         "description": "Параметры расчёта для сохранения снапшота плана в историю (P2.6).",
         "properties": {
@@ -3263,6 +3285,182 @@
           }
         },
         "title": "PlanHistorySave",
+        "type": "object"
+      },
+      "PlanSnapshotBest": {
+        "description": "Рекомендованное распределение снимка.",
+        "properties": {
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "utility": {
+            "title": "Utility",
+            "type": "number"
+          },
+          "x_goals": {
+            "title": "X Goals",
+            "type": "number"
+          },
+          "x_obligations": {
+            "title": "X Obligations",
+            "type": "number"
+          },
+          "x_reserve": {
+            "title": "X Reserve",
+            "type": "number"
+          }
+        },
+        "required": [
+          "name",
+          "x_obligations",
+          "x_reserve",
+          "x_goals",
+          "utility"
+        ],
+        "title": "PlanSnapshotBest",
+        "type": "object"
+      },
+      "PlanSnapshotDeleted": {
+        "description": "Подтверждение удаления снимка.",
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "status",
+          "id"
+        ],
+        "title": "PlanSnapshotDeleted",
+        "type": "object"
+      },
+      "PlanSnapshotDetail": {
+        "description": "Снимок целиком — то же, что в списке, плюс альтернативы.",
+        "properties": {
+          "best": {
+            "$ref": "#/components/schemas/PlanSnapshotBest"
+          },
+          "created_at": {
+            "title": "Created At",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "indicators": {
+            "$ref": "#/components/schemas/PlanSnapshotIndicators"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          },
+          "risk_profile": {
+            "title": "Risk Profile",
+            "type": "string"
+          },
+          "top3": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Top3",
+            "type": "array"
+          }
+        },
+        "required": [
+          "id",
+          "created_at",
+          "risk_profile",
+          "indicators",
+          "best"
+        ],
+        "title": "PlanSnapshotDetail",
+        "type": "object"
+      },
+      "PlanSnapshotIndicators": {
+        "description": "Показатели плана на момент снимка.",
+        "properties": {
+          "BLR": {
+            "title": "Blr",
+            "type": "number"
+          },
+          "Dt": {
+            "title": "Dt",
+            "type": "number"
+          },
+          "Lt": {
+            "title": "Lt",
+            "type": "number"
+          },
+          "Rt": {
+            "title": "Rt",
+            "type": "number"
+          }
+        },
+        "required": [
+          "Rt",
+          "Lt",
+          "Dt",
+          "BLR"
+        ],
+        "title": "PlanSnapshotIndicators",
+        "type": "object"
+      },
+      "PlanSnapshotSummary": {
+        "description": "Строка списка истории. Без `top3` сознательно: список не должен таскать\nтри альтернативы на каждую строку.",
+        "properties": {
+          "best": {
+            "$ref": "#/components/schemas/PlanSnapshotBest"
+          },
+          "created_at": {
+            "title": "Created At",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "indicators": {
+            "$ref": "#/components/schemas/PlanSnapshotIndicators"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          },
+          "risk_profile": {
+            "title": "Risk Profile",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "created_at",
+          "risk_profile",
+          "indicators",
+          "best"
+        ],
+        "title": "PlanSnapshotSummary",
         "type": "object"
       },
       "PlanningCalculateResponse": {
@@ -4641,7 +4839,7 @@
   },
   "info": {
     "title": "FINPILOT",
-    "version": "8.31.1"
+    "version": "8.33.0"
   },
   "openapi": "3.1.0",
   "paths": {
@@ -8590,9 +8788,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response List Plan History Api Planning History Get",
-                  "type": "object"
+                  "$ref": "#/components/schemas/PlanHistoryList"
                 }
               }
             },
@@ -8631,9 +8827,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response Save Plan History Api Planning History Post",
-                  "type": "object"
+                  "$ref": "#/components/schemas/PlanSnapshotDetail"
                 }
               }
             },
@@ -8675,9 +8869,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response Delete Plan History Api Planning History  Snapshot Id  Delete",
-                  "type": "object"
+                  "$ref": "#/components/schemas/PlanSnapshotDeleted"
                 }
               }
             },
@@ -8717,9 +8909,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response Get Plan History Api Planning History  Snapshot Id  Get",
-                  "type": "object"
+                  "$ref": "#/components/schemas/PlanSnapshotDetail"
                 }
               }
             },

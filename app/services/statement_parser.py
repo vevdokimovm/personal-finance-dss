@@ -16,7 +16,7 @@ import io
 import re
 import unicodedata
 from datetime import datetime
-from typing import Any
+from typing import Callable, Any
 
 from app.utils.time import utcnow
 
@@ -741,7 +741,13 @@ def parse_bank_pdf(raw: bytes, bank_id: str = 'tinkoff') -> list[dict[str, Any]]
     return PDF_PARSERS.get(bank_id, parse_tinkoff_pdf)(raw)
 
 
-BANK_PARSERS = {
+# Аннотация обязательна: парсеры РАЗНОЙ арности — `parse_sber_csv(content)` берёт один
+# аргумент, `parse_tinkoff_csv`/`parse_universal_csv` — ещё и `report`. Без неё mypy
+# выводит тип значения как `object` и справедливо отказывается его вызывать
+# («Cannot call function of unknown type»). Разница арностей осознанная: `report`
+# принимают только парсеры, умеющие докладывать о пропущенных строках, — и ветвление
+# по этому признаку стоит ниже, в `parse_bank_csv`.
+BANK_PARSERS: dict[str, Callable[..., list[dict[str, Any]]]] = {
     'tinkoff': parse_tinkoff_csv,
     'sber': parse_sber_csv,
     'alfa': parse_universal_csv,

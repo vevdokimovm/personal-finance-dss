@@ -107,6 +107,7 @@ from pathlib import Path
 # и из копии кита в репе-наследнике (`_base/scripts/`). См. `_roots.py`.
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from _roots import resolve_roots  # noqa: E402
+import runtime_writes  # noqa: E402
 BASE_REPO, REPOS, FROM_KIT = resolve_roots(__file__)
 
 JUNK_DIRS = {".git", "__MACOSX", "__pycache__", ".ipynb_checkpoints", ".pytest_cache"}
@@ -248,15 +249,24 @@ def kit_fingerprint() -> str:
     Считается от **отсортированного** списка, иначе порядок обхода файловой
     системы менял бы отпечаток при неизменном содержимом.
     """
-    # 🔴 Исключаются файлы, которые меняет САМА раздача. Иначе отпечаток
+    # 🔴 ИСКЛЮЧАЕТСЯ ТО, ЧТО СИСТЕМА ПИШЕТ О СВОЕЙ РАБОТЕ. Иначе отпечаток
     # нестабилен по построению: посчитали → скопировали → записали журнал
     # живости → отпечаток стал другим, и следующая же проверка объявляет
     # расхождение сразу после успешной раздачи. Поймано первым прогоном
     # 29.08.2026: 54 репы «разошлись» через секунду после раздачи.
     #
-    # Свойство, а не список (`PIT-097`): в отпечаток не входит то, что
-    # операция пишет о самой себе. Сейчас такой файл один.
-    self_written = {Path("reports/infra-liveness.md")}
+    # 🔴 БЫЛ СПИСОК — СТАЛ ПРИЗНАК, 03.09.2026. Здесь стояло «свойство,
+    # а не список (PIT-097)» — и рядом лежал список из одного пути. Утром
+    # того же дня `ADR-007` добавил в него второй (`auto.log`), а вечером
+    # перепись по коду нашла СЕМЬ таких файлов: список врал впятеро.
+    #
+    # Теперь исключения объявляет тот каталог, чей инструмент пишет, —
+    # строкой в `<каталог>/.runtime-writes`. Заводя новый журнал, правишь
+    # тот же каталог, в котором его заводишь, а не вспоминаешь про раздачу
+    # (её-то и не вспоминают — `PIT-G`, 16 повторов).
+    #
+    # Разбор, формат и потолок признака — `scripts/runtime_writes.py`.
+    excluded = runtime_writes.declared(BASE_REPO, _distribute())
     # 🔴 ВТОРОЙ КЛАСС ИСКЛЮЧЕНИЙ, заведён 03.09.2026 вместе с решением
     # `ROADMAP` §P0-1. Причина другая, и потому набор другой, а не дополненный:
     # выше — то, что пишет САМА раздача, здесь — журналы, в которые система
@@ -277,7 +287,6 @@ def kit_fingerprint() -> str:
     # Что при этом ТЕРЯЕТСЯ: расхождение `auto.log` в копии больше не видно.
     # Потеря пустая — копия получает журнал прогона БАЗЫ, он ей не принадлежит
     # и сравнивать его не с чем.
-    run_journals = {Path("06-autonomous-mode-kit/runs/auto.log")}
     h = hashlib.sha256()
     for name in _distribute():
         src = BASE_REPO / name
@@ -288,7 +297,7 @@ def kit_fingerprint() -> str:
             rel = path.relative_to(BASE_REPO)
             if any(part in JUNK_DIRS or part in JUNK_NAMES for part in rel.parts):
                 continue
-            if rel in self_written or rel in run_journals:
+            if runtime_writes.is_declared(rel, excluded):
                 continue
             h.update(str(rel).encode("utf-8"))
             h.update(path.read_bytes())

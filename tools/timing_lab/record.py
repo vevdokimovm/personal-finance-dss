@@ -109,16 +109,26 @@ def load_measurements(ledger: Path) -> list[Measurement]:
     out: list[Measurement] = []
     with ledger.open(encoding="utf-8", newline="") as fh:
         for row in csv.DictReader(fh):
-            raw_tests = (row.get("tests") or "").strip()
-            out.append(Measurement(
-                date=row["date"],
-                suite=row["suite"],
-                seconds=float(row["seconds"]),
-                tests=int(raw_tests) if raw_tests else None,
-                load1=float(row["load1"]),
-                cores=int(row["cores"]),
-                note=row.get("note", ""),
-            ))
+            try:
+                raw_tests = (row.get("tests") or "").strip()
+                out.append(Measurement(
+                    date=row["date"],
+                    suite=row["suite"],
+                    seconds=float(row["seconds"]),
+                    tests=int(raw_tests) if raw_tests else None,
+                    load1=float(row["load1"]),
+                    cores=int(row["cores"]),
+                    note=row.get("note", ""),
+                ))
+            except (KeyError, TypeError, ValueError):
+                # Битая строка ПРОПУСКАЕТСЯ, а не роняет чтение. Журнал дописывается из
+                # разных процессов (`record run` в фоне, `add` вручную), поэтому
+                # оборванная запись — вопрос времени: убитый процесс, ручная правка,
+                # конкурентный дозапись. Проверено эмпирически: до этой правки одна
+                # строка с нечисловым `seconds` роняла ВЕСЬ отчёт. Ценность журнала
+                # в ряде замеров — терять двадцать девять хороших строк из-за одной
+                # плохой неверно.
+                continue
     return out
 
 

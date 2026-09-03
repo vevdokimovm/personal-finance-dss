@@ -10,6 +10,15 @@ export interface ModalProps {
    * (WCAG 4.1.2). Форма внутри обычно не даёт готового краткого описания диалога, поэтому
    * визуально скрыт по умолчанию, а не дублирует title. */
   description: string;
+  /**
+   * Куда вернуть фокус при закрытии. Нужен, когда модалка открывается ПРОПОМ `open`,
+   * а не `Dialog.Trigger`: тогда Radix не знает элемента-триггера и уводит фокус
+   * в `<body>` — клавиатурный пользователь теряет место на экране (WCAG 2.4.3).
+   * Поймано e2e на подтверждении удаления снимка плана (v8.34.0); у форм CRUD-батчей
+   * этой проблемы не было, потому что там модалка одна на экран и фокус возвращался
+   * на единственную кнопку по случайности разметки, а не по устройству.
+   */
+  returnFocusTo?: () => HTMLElement | null;
   children: ReactNode;
 }
 
@@ -17,7 +26,14 @@ export interface ModalProps {
  * первое применение `@radix-ui/react-dialog` в проекте (пакет стоял в package.json,
  * нигде не использовался, тот же случай, что `@radix-ui/react-toast` до Toast.tsx в v8.22.0).
  * Focus trap/Escape/клик по оверлею — из коробки Radix, не переизобретаем. */
-export function Modal({ open, onOpenChange, title, description, children }: ModalProps) {
+export function Modal({
+  open,
+  onOpenChange,
+  title,
+  description,
+  returnFocusTo,
+  children,
+}: ModalProps) {
   const contentRef = useRef<HTMLDivElement>(null);
 
   // Кнопка «×» стоит в DOM раньше формы (иначе не окажется в шапке визуально) — без этого
@@ -28,6 +44,28 @@ export function Modal({ open, onOpenChange, title, description, children }: Moda
     if (field) {
       e.preventDefault();
       field.focus();
+      return;
+    }
+    // Полей нет — значит это диалог подтверждения. Дефолт Radix поставил бы фокус на
+    // «×» (она первая в разметке), а APG для подтверждений требует наименее
+    // разрушительного действия: у диалога удаления это «Отмена». Найдено a11y-аудитом.
+    const firstAction = contentRef.current?.querySelector<HTMLElement>(
+      "button:not(.fp-modal__close)",
+    );
+    if (firstAction) {
+      e.preventDefault();
+      firstAction.focus();
+    }
+  }
+
+  // Возврат фокуса делается ИМЕННО здесь, а не в `onOpenChange` вызывающего кода:
+  // Radix переносит фокус в своём `onCloseAutoFocus` уже ПОСЛЕ него, и внешний вызов
+  // молча перетирается (проверено e2e — фокус оказывался в <body>).
+  function handleCloseAutoFocus(e: Event) {
+    const target = returnFocusTo?.();
+    if (target) {
+      e.preventDefault();
+      target.focus();
     }
   }
 
@@ -39,6 +77,7 @@ export function Modal({ open, onOpenChange, title, description, children }: Moda
           ref={contentRef}
           className="fp-modal"
           onOpenAutoFocus={handleOpenAutoFocus}
+          onCloseAutoFocus={handleCloseAutoFocus}
         >
           <div className="fp-modal__head">
             <RadixDialog.Title className="fp-modal__title">{title}</RadixDialog.Title>

@@ -262,7 +262,10 @@ def _vtb_parsed_by_processing_date(tables: list, text: str) -> dict[str, float]:
             if not txn:
                 continue
             processed = re.match(r'(\d{2}\.\d{2}\.\d{4})', str(row[1] or ''))
-            if processed and start:
+            # `end` проверяется наравне со `start`, хотя оба берутся из одного match:
+            # для mypy связь между ними невыразима, а для читателя явная проверка честнее
+            # молчаливого допущения «раз есть один, есть и второй».
+            if processed and start and end:
                 date = datetime.strptime(processed.group(1), '%d.%m.%Y')
                 if not start <= date <= end:
                     continue  # обработана вне периода — в итоги банка не входит
