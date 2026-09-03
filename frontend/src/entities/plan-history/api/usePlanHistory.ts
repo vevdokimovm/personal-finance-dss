@@ -3,6 +3,7 @@ import {
   listPlanHistoryApiPlanningHistoryGet,
   savePlanHistoryApiPlanningHistoryPost,
   deletePlanHistoryApiPlanningHistorySnapshotIdDelete,
+  restorePlanHistoryApiPlanningHistorySnapshotIdRestorePost,
 } from "@shared/api/generated";
 import type { PlanHistoryList } from "../model/types";
 
@@ -45,12 +46,34 @@ export function useSavePlanSnapshot() {
   });
 }
 
-/** DELETE /api/planning/history/{id} — мягкое удаление снимка. */
+/** DELETE /api/planning/history/{id} — мягкое удаление снимка (обратимое). */
 export function useDeletePlanSnapshot() {
   const invalidate = useInvalidateHistory();
   return useMutation({
     mutationFn: async (snapshotId: number) => {
       const { data } = await deletePlanHistoryApiPlanningHistorySnapshotIdDelete({
+        path: { snapshot_id: snapshotId },
+        throwOnError: true,
+      });
+      return data;
+    },
+    onSuccess: invalidate,
+  });
+}
+
+/**
+ * POST /api/planning/history/{id}/restore — отмена удаления.
+ *
+ * 🔴 Заведено в v8.38.0: удаление снимка было мягким и раньше, но вернуть его
+ * пользователь не мог никак — единственная сущность продукта без отмены, при том что
+ * у целей, активов, обязательств, операций и бюджетов она есть. Данные лежали в базе
+ * и были недостижимы: «сказали, что удалили, а на деле спрятали».
+ */
+export function useRestorePlanSnapshot() {
+  const invalidate = useInvalidateHistory();
+  return useMutation({
+    mutationFn: async (snapshotId: number) => {
+      const { data } = await restorePlanHistoryApiPlanningHistorySnapshotIdRestorePost({
         path: { snapshot_id: snapshotId },
         throwOnError: true,
       });

@@ -126,3 +126,34 @@ test("подпись снимка ограничена и связана с по
   await expect(input).toBeVisible();
   await expect(input).toHaveAttribute("maxlength", "500");
 });
+
+/* Удаление снимка обратимо с v8.38.0. Юнит-тест проверяет, что отмена ПРЕДЛОЖЕНА;
+   только браузер показывает, что кнопка «Вернуть» действительно доходит до
+   пользователя в тосте и что нажатие уходит на сервер. */
+test("удалённый снимок возвращается кнопкой «Вернуть» (v8.38.0)", async ({ page }) => {
+  await setup(page, [SNAPSHOT]);
+
+  let restoreCalled = false;
+  await page.route("**/api/planning/history/*/restore", async (route) => {
+    restoreCalled = true;
+    await route.fulfill({ json: SNAPSHOT });
+  });
+  await page.route("**/api/planning/history/*", async (route) => {
+    if (route.request().method() === "DELETE") {
+      return route.fulfill({ json: { status: "deleted", id: 7 } });
+    }
+    return route.fallback();
+  });
+
+  await page.goto("/planning");
+  await page.getByRole("button", { name: /Удалить снимок от 01.09.2026/ }).click();
+  await page
+    .getByRole("dialog")
+    .getByRole("button", { name: /Удалить снимок от 01.09.2026/ })
+    .click();
+
+  const undo = page.getByRole("button", { name: "Вернуть" });
+  await expect(undo).toBeVisible();
+  await undo.click();
+  await expect.poll(() => restoreCalled).toBe(true);
+});

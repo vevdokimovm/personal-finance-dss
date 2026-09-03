@@ -5777,6 +5777,36 @@ export type GetPlanHistoryApiPlanningHistorySnapshotIdGetResponses = {
 
 export type GetPlanHistoryApiPlanningHistorySnapshotIdGetResponse = GetPlanHistoryApiPlanningHistorySnapshotIdGetResponses[keyof GetPlanHistoryApiPlanningHistorySnapshotIdGetResponses];
 
+export type RestorePlanHistoryApiPlanningHistorySnapshotIdRestorePostData = {
+    body?: never;
+    path: {
+        /**
+         * Snapshot Id
+         */
+        snapshot_id: number;
+    };
+    query?: never;
+    url: '/api/planning/history/{snapshot_id}/restore';
+};
+
+export type RestorePlanHistoryApiPlanningHistorySnapshotIdRestorePostErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type RestorePlanHistoryApiPlanningHistorySnapshotIdRestorePostError = RestorePlanHistoryApiPlanningHistorySnapshotIdRestorePostErrors[keyof RestorePlanHistoryApiPlanningHistorySnapshotIdRestorePostErrors];
+
+export type RestorePlanHistoryApiPlanningHistorySnapshotIdRestorePostResponses = {
+    /**
+     * Successful Response
+     */
+    200: PlanSnapshotDetail;
+};
+
+export type RestorePlanHistoryApiPlanningHistorySnapshotIdRestorePostResponse = RestorePlanHistoryApiPlanningHistorySnapshotIdRestorePostResponses[keyof RestorePlanHistoryApiPlanningHistorySnapshotIdRestorePostResponses];
+
 export type KeyRateEndpointApiPlanningKeyRateGetData = {
     body?: never;
     path?: never;

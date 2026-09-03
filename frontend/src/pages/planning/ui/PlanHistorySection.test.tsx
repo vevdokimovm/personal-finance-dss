@@ -6,11 +6,27 @@ import { PlanHistorySection } from "./PlanHistorySection";
 const usePlanHistoryMock = vi.fn();
 const saveMock = vi.fn();
 const deleteMock = vi.fn();
+const restoreMock = vi.fn();
+
+// `vi.mock` поднимается выше объявлений, поэтому мок создаётся через `vi.hoisted`:
+// обычная `const` даёт ReferenceError до инициализации.
+const { undoMock } = vi.hoisted(() => ({ undoMock: vi.fn() }));
+// ToastProvider в юнит-тесте не смонтирован, поэтому кнопки «Вернуть» в DOM нет.
+// Проверяем контракт вызова: удаление ОБЯЗАНО предложить отмену и отдать в неё
+// восстановление именно этого снимка.
+vi.mock("@shared/ui", async () => {
+  const actual = await vi.importActual<typeof import("@shared/ui")>("@shared/ui");
+  return {
+    ...actual,
+    toast: { ...actual.toast, undo: undoMock, success: vi.fn(), error: vi.fn() },
+  };
+});
 
 vi.mock("@entities/plan-history", () => ({
   usePlanHistory: () => usePlanHistoryMock(),
   useSavePlanSnapshot: () => ({ mutate: saveMock, isPending: false }),
   useDeletePlanSnapshot: () => ({ mutate: deleteMock, isPending: false }),
+  useRestorePlanSnapshot: () => ({ mutate: restoreMock, isPending: false }),
 }));
 
 vi.mock("@entities/consents", () => ({
@@ -44,6 +60,8 @@ beforeEach(() => {
   });
   saveMock.mockClear();
   deleteMock.mockClear();
+  restoreMock.mockClear();
+  undoMock.mockClear();
 });
 
 describe("PlanHistorySection — история сохранённых планов", () => {
@@ -233,5 +251,27 @@ describe("PlanHistorySection — длинная история и ПДН", () =>
     const target = container.ownerDocument.querySelector(".fp-plan-history__confirm-target");
     expect(target).not.toBeNull();
     expect(target).toHaveTextContent(/01\.09\.2026, \d{2}:\d{2}/);
+  });
+  /* Удаление снимка обратимо с v8.38.0. До этого продукт говорил на двух языках:
+     у целей, активов, обязательств, операций и бюджетов «Вернуть» было, у истории
+     планов — нет, хотя данные в базе оставались. */
+  it("удаление предлагает «Вернуть», и отмена восстанавливает снимок", async () => {
+    deleteMock.mockImplementation((_id, opts) => opts?.onSuccess?.());
+    usePlanHistoryMock.mockReturnValue({
+      data: { items: [snapshot()], count: 1 },
+      error: null,
+      isLoading: false,
+      refetch: vi.fn(),
+    });
+    render(<PlanHistorySection />);
+    await userEvent.click(screen.getAllByRole("button", { name: /Удалить снимок/ })[0]);
+    const confirm = screen
+      .getAllByRole("button", { name: /Удалить снимок от 01\.09\.2026/ })
+      .at(-1)!;
+    await userEvent.click(confirm);
+
+    expect(undoMock).toHaveBeenCalledWith("Снимок удалён", expect.any(Function));
+    undoMock.mock.calls[0][1]();
+    expect(restoreMock.mock.calls[0][0]).toBe(7);
   });
 });

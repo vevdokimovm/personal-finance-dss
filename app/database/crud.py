@@ -1359,6 +1359,43 @@ def soft_delete_plan_snapshot(
     return True
 
 
+def restore_plan_snapshot(
+    db: Session, snapshot_id: int, user_id: Optional[str] = None
+) -> Optional[PlanSnapshot]:
+    """Восстановление мягко удалённого снимка плана (v8.38.0).
+
+    🔴 До этого продукт говорил на двух языках удаления: у целей, активов,
+    обязательств, операций и бюджетов удаление обратимо, а у снимков — только
+    помечалось. Данные лежали в базе, вернуть их пользователь не мог никак. Это
+    хуже обоих честных вариантов: не «удалили насовсем» и не «можно вернуть»,
+    а «сказали, что удалили, а на деле спрятали».
+
+    `get_plan_snapshot` отдаёт только живые снимки, поэтому здесь запрос свой:
+    ищем именно удалённый и именно свой. Восстанавливать живой нечего — `None`,
+    и роут отвечает 404, а не молчаливым успехом.
+    """
+    # Скоуп владения — ТОТ ЖЕ, что у удаления (`get_plan_snapshot`): гость работает
+    # со снимками без владельца, вошедший — со своими. Разойдись эти два условия, и
+    # удалить снимок было бы можно, а вернуть — нет.
+    owner = PlanSnapshot.user_id == user_id if user_id else PlanSnapshot.user_id.is_(None)
+    snap = (
+        db.query(PlanSnapshot)
+        .filter(
+            PlanSnapshot.id == snapshot_id,
+            owner,
+            PlanSnapshot.is_deleted == True,  # noqa: E712
+        )
+        .first()
+    )
+    if snap is None:
+        return None
+    snap.is_deleted = False
+    snap.deleted_at = None
+    db.commit()
+    db.refresh(snap)
+    return snap
+
+
 # ══════════════════════════════════════════════════════════════════════════
 # Household (P3.7) — совместный скоуп поверх персонального владения.
 #

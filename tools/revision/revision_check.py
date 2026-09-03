@@ -157,7 +157,10 @@ LEGACY_CONTEXT_MARKERS = (
 # новый путь POST /api/goals/{goal_id}/contributions. PUT /transactions/{id} и
 # PUT /goals/{id} НЕ добавляют путей — операции легли на уже существующие пути
 # (там уже были DELETE на тех же URL).
-EXPECTED_COUNTS = {"tables": 30, "migrations": 34, "openapi_paths": 113}
+# openapi_paths 114 (v8.38.0): +1 — `/api/planning/history/{snapshot_id}/restore`.
+# Отмена удаления снимка: у пяти прочих сущностей она была, у снимков плана нет,
+# хотя мягкое удаление уже работало и данные оставались в базе.
+EXPECTED_COUNTS = {"tables": 30, "migrations": 34, "openapi_paths": 114}
 
 
 # Канарейка CJK: редкий токен-глюк генерации ассистентов — иероглиф вместо

@@ -4951,7 +4951,7 @@
   },
   "info": {
     "title": "FINPILOT",
-    "version": "8.36.0"
+    "version": "8.37.0"
   },
   "openapi": "3.1.0",
   "paths": {
@@ -9039,6 +9039,49 @@
           }
         },
         "summary": "Снапшот плана по id (P2.6)",
+        "tags": [
+          "Планирование"
+        ]
+      }
+    },
+    "/api/planning/history/{snapshot_id}/restore": {
+      "post": {
+        "description": "Отмена удаления снимка (v8.38.0).\n\nУдаление снимка и раньше было мягким, но вернуть его пользователь не мог никак —\nединственная сущность продукта без отмены. Живой снимок восстанавливать нечего:\n404, а не молчаливый успех, иначе интерфейс покажет «восстановлено» там, где\nничего не произошло.",
+        "operationId": "restore_plan_history_api_planning_history__snapshot_id__restore_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "snapshot_id",
+            "required": true,
+            "schema": {
+              "title": "Snapshot Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlanSnapshotDetail"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Восстановить удалённый снимок плана",
         "tags": [
           "Планирование"
         ]

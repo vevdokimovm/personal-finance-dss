@@ -52,6 +52,7 @@ vi.mock("@entities/plan-history", () => ({
   }),
   useSavePlanSnapshot: () => ({ mutate: vi.fn(), isPending: false }),
   useDeletePlanSnapshot: () => ({ mutate: vi.fn(), isPending: false }),
+  useRestorePlanSnapshot: () => ({ mutate: vi.fn(), isPending: false }),
 }));
 
 vi.mock("@entities/consents", () => ({

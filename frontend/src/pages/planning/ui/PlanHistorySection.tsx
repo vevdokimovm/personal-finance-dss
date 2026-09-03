@@ -3,6 +3,7 @@ import {
   usePlanHistory,
   useSavePlanSnapshot,
   useDeletePlanSnapshot,
+  useRestorePlanSnapshot,
 } from "@entities/plan-history";
 import type { PlanSnapshotSummary } from "@entities/plan-history";
 import { ConsentRequiredPanel } from "@entities/consents";
@@ -38,6 +39,7 @@ export function PlanHistorySection() {
   const history = usePlanHistory();
   const save = useSavePlanSnapshot();
   const remove = useDeletePlanSnapshot();
+  const restore = useRestorePlanSnapshot();
   const [note, setNote] = useState("");
   const [expanded, setExpanded] = useState(false);
   const [pendingDelete, setPendingDelete] = useState<PlanSnapshotSummary | null>(null);
@@ -79,7 +81,16 @@ export function PlanHistorySection() {
         // Список тоже исчезает, если удалён последний снимок, поэтому запасной якорь —
         // кнопка сохранения: она на экране всегда.
         (listRef.current ?? saveButtonRef.current)?.focus();
-        toast.success(t("Снимок удалён"));
+        // Отмена, а не просто уведомление: удаление обратимо (v8.38.0), и продукт
+        // говорит об удалении одним языком на всех сущностях — у целей, активов,
+        // обязательств, операций и бюджетов «Вернуть» есть давно.
+        toast.undo(t("Снимок удалён"), () =>
+          restore.mutate(snapshot.id, {
+            onSuccess: () => toast.success(t("Снимок восстановлен")),
+            onError: () =>
+              toast.error(t("Не получилось восстановить снимок. Попробуйте ещё раз.")),
+          }),
+        );
       },
       onError: () => toast.error(t("Не получилось удалить снимок. Попробуйте ещё раз.")),
     });

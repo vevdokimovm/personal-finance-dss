@@ -32,6 +32,7 @@ from app.database.crud import (
     get_user_prefs,
     resolve_household_id,
     save_scenario,
+    restore_plan_snapshot,
     soft_delete_plan_snapshot,
 )
 from app.dependencies import get_current_user_id, get_db
@@ -543,6 +544,28 @@ def delete_plan_history(
     if not soft_delete_plan_snapshot(db, snapshot_id, user_id=user_id):
         raise HTTPException(status_code=404, detail="Снапшот плана не найден")
     return PlanSnapshotDeleted(status="deleted", id=snapshot_id)
+
+
+@router.post(
+    "/history/{snapshot_id}/restore",
+    summary="Восстановить удалённый снимок плана",
+)
+def restore_plan_history(
+    snapshot_id: int,
+    db: Session = Depends(get_db),
+    user_id: str | None = Depends(get_current_user_id),
+) -> PlanSnapshotDetail:
+    """Отмена удаления снимка (v8.38.0).
+
+    Удаление снимка и раньше было мягким, но вернуть его пользователь не мог никак —
+    единственная сущность продукта без отмены. Живой снимок восстанавливать нечего:
+    404, а не молчаливый успех, иначе интерфейс покажет «восстановлено» там, где
+    ничего не произошло.
+    """
+    snap = restore_plan_snapshot(db, snapshot_id, user_id=user_id)
+    if snap is None:
+        raise HTTPException(status_code=404, detail="Удалённый снимок плана не найден")
+    return _snapshot_detail(snap)
 
 
 @router.post("/forecast", summary="Прогноз Rt/Lt/Dt на горизонт H (форм. 35 ВКР)")

@@ -47,3 +47,5 @@ date,suite,seconds,tests,load1,cores,note
 2026-09-03,backend-full,777.81,,49.12,8,
 2026-09-03,backend-full,828.43,,4.6,8,
 2026-09-03,backend-full,960.95,,111.17,8,
+2026-09-03,backend-full,751.24,,14.91,8,exit=1
+2026-09-03,backend-full,764.18,,3.09,8,
