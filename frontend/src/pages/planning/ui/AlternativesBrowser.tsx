@@ -35,13 +35,26 @@ const PANEL_ID = "fp-alt-browser-panel";
  * полный ranked[] (до 66 при канонической сетке 10%) с сортировкой по критериям. Число в кнопке
  * и в списке — одно и то же `alternatives.length` (сам ranked), а не отдельный проп: два числа
  * из одного источника вместо двух источников, которые могли бы разойтись. */
-export function AlternativesBrowser({ alternatives }: { alternatives: PlanAlternative[] }) {
+/* Стабильная ссылка на пустой список: литерал `?? []` создавал бы новый массив на каждом
+   рендере, и `useMemo` ниже пересортировывал бы данные вхолостую при каждом обновлении
+   (поймано react-hooks/exhaustive-deps). */
+const EMPTY_ALTERNATIVES: PlanAlternative[] = [];
+
+export function AlternativesBrowser({
+  /* Опционально по контракту (`CalculatePlanResult.ranked` — вне `required` схемы
+     PlanningCalculateResponse). Пустой список у этого компонента уже был штатным
+     состоянием ниже, поэтому отсутствие данных сводится к нему, а не к падению. */
+  alternatives,
+}: {
+  alternatives?: PlanAlternative[];
+}) {
+  const alts = alternatives ?? EMPTY_ALTERNATIVES;
   const [expanded, setExpanded] = useState(false);
   const [sortKey, setSortKey] = useState<SortKey>("recommended");
 
-  const sorted = useMemo(() => [...alternatives].sort(SORTERS[sortKey]), [alternatives, sortKey]);
+  const sorted = useMemo(() => [...alts].sort(SORTERS[sortKey]), [alts, sortKey]);
 
-  if (alternatives.length === 0) {
+  if (alts.length === 0) {
     return null;
   }
 
@@ -59,7 +72,7 @@ export function AlternativesBrowser({ alternatives }: { alternatives: PlanAltern
             t("Свернуть")
           ) : (
             <>
-              {t("Показать все ({n})", { n: alternatives.length })}
+              {t("Показать все ({n})", { n: alts.length })}
               <span aria-hidden="true"> →</span>
             </>
           )}
@@ -91,7 +104,7 @@ export function AlternativesBrowser({ alternatives }: { alternatives: PlanAltern
 
           <ul
             className="fp-alt-browser__list"
-            aria-label={t("Варианты распределения, {n}", { n: alternatives.length })}
+            aria-label={t("Варианты распределения, {n}", { n: alts.length })}
           >
             {sorted.map((alt) => (
               <li key={alt.id} className="fp-alt-row">

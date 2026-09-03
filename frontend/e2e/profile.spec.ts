@@ -11,8 +11,12 @@ const PROFILE = {
 test("профиль показывает имя, email и дату регистрации", async ({ page }) => {
   await page.route("**/api/auth/me", (route) => route.fulfill({ json: PROFILE }));
   await page.goto("/profile");
-  await expect(page.getByText("Анна")).toBeVisible();
-  await expect(page.getByText("anna@example.com")).toBeVisible();
+  // Email показывается дважды — в топбаре аккаунта и в самом профиле. Проверяем
+  // именно карточку профиля: топбар это другой экран ответственности (AuthTopbarLink),
+  // у него свои тесты, и широкий локатор падал на strict mode.
+  const main = page.locator("#fp-main");
+  await expect(main.getByText("Анна")).toBeVisible();
+  await expect(main.getByText("anna@example.com")).toBeVisible();
 });
 
 // 401 — ожидаемый исход в гостевом режиме (auth/me требует аутентификации, в отличие

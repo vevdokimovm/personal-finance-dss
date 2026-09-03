@@ -69,7 +69,10 @@ test("план распределения показывает риск-проф
   await page.goto("/planning");
   await expect(page.getByText("Сбалансированный")).toBeVisible();
   await expect(page.getByText("12 опер. · 1 обяз. · 2 целей")).toBeVisible();
-  await expect(page.getByText(/Резерв/)).toBeVisible();
+  // Слово «Резерв» встречается дважды: в легенде столбца и в подсказке к ползункам
+  // «что если». Локатор сужен до легенды — там оно несёт сумму, ради которой тест
+  // и написан; широкий /Резерв/ ловил оба и падал на strict mode.
+  await expect(page.getByText(/^Резерв — /)).toBeVisible();
 });
 
 test("дефицит на /planning — fail-loud сообщение вместо аллокации", async ({ page }) => {

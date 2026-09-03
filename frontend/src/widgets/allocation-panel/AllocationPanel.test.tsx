@@ -180,3 +180,68 @@ describe("AllocationPanel — объяснение выбранного план
     expect(screen.queryByText(/Следующий по оценке вариант/)).not.toBeInTheDocument();
   });
 });
+
+describe("AllocationPanel — ответ без ranked не роняет экран", () => {
+  /* Найдено 2026-09-03 (v8.31.1) при разборе шести красных E2E. Контракт
+     (`docs/api/openapi.json`, схема PlanningCalculateResponse) НЕ держит `ranked`
+     в списке required — у поля `default_factory=list` в `app/schemas/planning.py:283`,
+     то есть по контракту его может не быть. Рукописный тип фронта
+     (`entities/plan-summary/model/types.ts:88`) объявлял его обязательным, поэтому
+     TypeScript молчал, а `hasNonZeroCategory` звал `.some()` по undefined и ронял
+     ВЕСЬ дашборд в error boundary: пользователь видел «Something went wrong!» вместо
+     финансового обзора. Экран не обязан работать в полном объёме без альтернатив —
+     он обязан не падать. */
+  const best = {
+    id: "a0100",
+    name: "Всё в резерв",
+    x_obligations: 0,
+    x_reserve: 39500,
+    x_goals: 0,
+    utility: 0.8,
+  } as PlanAlternative;
+
+  it("рендерит столбец распределения, когда alternatives не пришли вовсе", () => {
+    render(<AllocationPanel best={best} alternatives={undefined as unknown as PlanAlternative[]} />);
+    expect(screen.getByText(/Резерв/)).toBeInTheDocument();
+  });
+
+  it("не показывает ползунки «что если», когда выбирать не из чего", () => {
+    render(<AllocationPanel best={best} alternatives={undefined as unknown as PlanAlternative[]} />);
+    expect(screen.queryByRole("slider")).not.toBeInTheDocument();
+  });
+});
+
+describe("AllocationPanel — необязательные по контракту поля не роняют экран", () => {
+  /* Продолжение разбора v8.31.1. api-contract-guard нашёл ещё два поля того же класса,
+     что `ranked`: у схемы `Explanation` (docs/api/openapi.json) в `required` стоит ТОЛЬКО
+     `delta` — то есть `gains` и `costs` контрактно могут не прийти, а панель звала
+     `.length` по ним напрямую. Проверено на диске: required=['delta']. */
+  const baseAlt = {
+    id: "a0100",
+    name: "Всё в резерв",
+    x_obligations: 0,
+    x_reserve: 39500,
+    x_goals: 0,
+    utility: 0.8,
+    is_recommended: true,
+  };
+
+  it("рендерит объяснение, когда gains и costs не пришли", () => {
+    const best = {
+      ...baseAlt,
+      explanation: { insight: "Резерв закрывает подушку быстрее всего", delta: "+1,2 мес." },
+    } as unknown as PlanAlternative;
+    render(<AllocationPanel best={best} alternatives={[best]} />);
+    expect(screen.getByText("Резерв закрывает подушку быстрее всего")).toBeInTheDocument();
+  });
+
+  it("не показывает пустые разделы «Что улучшается» и «Чем жертвовать»", () => {
+    const best = {
+      ...baseAlt,
+      explanation: { insight: "Резерв закрывает подушку быстрее всего", delta: "+1,2 мес." },
+    } as unknown as PlanAlternative;
+    render(<AllocationPanel best={best} alternatives={[best]} />);
+    expect(screen.queryByText("Что улучшается")).not.toBeInTheDocument();
+    expect(screen.queryByText("Чем приходится жертвовать")).not.toBeInTheDocument();
+  });
+});

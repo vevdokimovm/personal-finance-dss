@@ -75,7 +75,7 @@ export function DashboardPage() {
       </h1>
       <Hero plan={plan} />
       <MetricsGrid indicators={plan.indicators} />
-      <AllocationPanel best={plan.top3[0] ?? null} alternatives={plan.ranked} />
+      <AllocationPanel best={plan.top3?.[0] ?? null} alternatives={plan.ranked} />
       <ForecastPanel forecast={forecast} />
       <BudgetsSection />
     </main>

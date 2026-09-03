@@ -1,10 +1,25 @@
 /**
- * Локальные типы для /api/planning/calculate и /api/planning/forecast — в OpenAPI-снимке
- * оба размечены `-> dict[str, Any]` (app/api/routes_planning.py), поэтому hey-api сгенерировал
- * их как `{[key: string]: unknown}`. Формы ниже сверены с реальным кодом бэкенда
- * (_compute_plan в routes_planning.py, forecast_indicators в services/forecasting.py), не
- * придуманы — если бэкенд обзаведётся строгой Pydantic-схемой для этих двух эндпоинтов,
- * этот файл станет не нужен.
+ * Локальные типы для /api/planning/calculate и /api/planning/forecast.
+ *
+ * 🔴 ОБНОВЛЕНО v8.31.1 — прежняя редакция этого комментария УСТАРЕЛА и вводила в
+ * заблуждение. Она утверждала, что оба эндпоинта размечены `-> dict[str, Any]` и потому
+ * не типизированы в снимке. Для `/forecast` это по-прежнему верно
+ * (`{[key: string]: unknown}` в `types.gen.ts`), а для **`/calculate` — уже нет**: в
+ * контракте есть полная схема `PlanningCalculateResponse` со вложенными `Alternative`,
+ * `PlanningIndicators`, `InputSummary`, `Weights`, `BliqPreallocation`.
+ *
+ * Из-за устаревшего комментария файл продолжали вести руками, и рукописные типы стали
+ * обещать БОЛЬШЕ, чем гарантирует схема (`ranked`, `top3`, `Explanation.gains/costs` —
+ * все вне `required`). TypeScript при этом молчал, потому что `usePlan.ts` делает
+ * `data as unknown as CalculatePlanResult` — каст выбрасывает сгенерированный тип и
+ * снимает всякую сверку с контрактом. Итог: экран падал в error boundary на ответе,
+ * который контракт разрешает.
+ *
+ * Правильное решение — генерировать этот тип из `PlanningCalculateResponse`, как уже
+ * сделано для `entities/goals`, `obligations`, `assets`, `transactions`, `profile`, `auth`
+ * (там простой реэкспорт сгенерированного типа, и расхождений нет). Это структурная
+ * замена, вынесена в ROADMAP §8.2 отдельным пунктом; здесь пока приведена в соответствие
+ * ОБЯЗАТЕЛЬНОСТЬ полей — то, из-за чего падал экран.
  */
 
 export interface PlanIndicators {
@@ -38,8 +53,12 @@ export interface Counterfactual {
 }
 
 export interface Explanation {
-  gains: string[];
-  costs: string[];
+  /* 🔴 `gains`/`costs` — необязательные по контракту: в схеме `Explanation`
+     (`docs/api/openapi.json`) в `required` стоит ТОЛЬКО `delta`. Пока здесь были
+     обязательные массивы, `AllocationPanel` звал `.length` напрямую и падал на
+     ответе без них — тот же класс, что `ranked` (v8.31.1). */
+  gains?: string[];
+  costs?: string[];
   insight: string;
   /** Служебный ключ доминирующего критерия — человеческая фраза уже вплетена в `insight`
    * («Решающим для оценки оказалось то, …»), отдельно рендерить не обязательно. */
@@ -78,14 +97,24 @@ export interface PlanInputSummary {
 
 export interface CalculatePlanResult {
   indicators: PlanIndicators;
-  top3: PlanAlternative[];
+  /* 🔴 Тоже вне `required` схемы `PlanningCalculateResponse` — проверено на диске.
+     `plan.top3[0] ?? null` защищал только результат индексации, но не сам массив:
+     на ответе без `top3` падало ещё до рендера панели, роняя и Dashboard, и Planning. */
+  top3?: PlanAlternative[];
   /** Все допустимые альтернативы (после фильтра §5), отсортированные по (floor_level, utility) —
    * до 66 при канонической сетке шага 10% (app/core/alternatives.py generate_alternatives).
    * top3 — НЕ буквально ranked[:3]: строится из distinct_ranked, дедуплицированного по
    * эффективному распределению (app/services/planning.py, _effective_signature), плюс
    * explanation. top3[0] и ranked[0] всегда совпадают (первый элемент дедупликация не
-   * выбрасывает), начиная со второго — позиции могут разойтись. */
-  ranked: PlanAlternative[];
+   * выбрасывает), начиная со второго — позиции могут разойтись.
+   *
+   * 🔴 ОПЦИОНАЛЬНОЕ, и это не осторожность, а контракт: в схеме
+   * `PlanningCalculateResponse` (`docs/api/openapi.json`) поля НЕТ в `required` —
+   * у него `default_factory=list` в `app/schemas/planning.py:283`. Пока здесь стояло
+   * обязательное `PlanAlternative[]`, рукописный тип обещал больше, чем гарантирует
+   * бэкенд: TypeScript молчал, а `AllocationPanel` звал `.some()` по undefined и ронял
+   * весь дашборд в error boundary. Найдено 2026-09-03, v8.31.1. */
+  ranked?: PlanAlternative[];
   admissible_count: number;
   alternatives_total: number;
   input_summary: PlanInputSummary;

@@ -106,8 +106,13 @@ export function AllocationPanel({
   alternatives,
 }: {
   best: PlanAlternative | null;
-  alternatives: PlanAlternative[];
+  /* Опционально по контракту (см. `CalculatePlanResult.ranked`). Без альтернатив панель
+     теряет ползунки «что если» — и только их: рекомендованное распределение приходит
+     отдельным полем `best` и показывается как обычно. Экран не обязан работать в полном
+     объёме без этих данных, он обязан не падать. */
+  alternatives?: PlanAlternative[];
 }) {
+  const alts = alternatives ?? [];
   const [detailed, setDetailed] = useState(false);
   const total = best ? best.x_obligations + best.x_reserve + best.x_goals : 0;
   const recommendedNotches = best ? notchesOf(best, total) : { debt: 0, goals: 0 };
@@ -145,8 +150,8 @@ export function AllocationPanel({
     );
   }
 
-  const hasDebtOption = hasNonZeroCategory(alternatives, "x_obligations");
-  const hasGoalsOption = hasNonZeroCategory(alternatives, "x_goals");
+  const hasDebtOption = hasNonZeroCategory(alts, "x_obligations");
+  const hasGoalsOption = hasNonZeroCategory(alts, "x_goals");
   const canShowWhatIf = hasDebtOption || hasGoalsOption;
 
   // Ползунки независимы, но их сумма не может превышать GRID_NOTCHES (резерв не может стать
@@ -166,7 +171,7 @@ export function AllocationPanel({
   }
 
   const reserveNotch = GRID_NOTCHES - debtNotch - goalsNotch;
-  const activeAlt = findMatchingAlternative(alternatives, total, debtNotch, goalsNotch);
+  const activeAlt = findMatchingAlternative(alts, total, debtNotch, goalsNotch);
 
   const debtAmount = (total * debtNotch) / GRID_NOTCHES;
   const reserveAmount = (total * reserveNotch) / GRID_NOTCHES;
@@ -201,20 +206,20 @@ export function AllocationPanel({
           {isRecommended ? (
             <>
               <p className="fp-alloc-explanation__insight">{best.explanation.insight}</p>
-              {best.explanation.gains.length > 0 && (
+              {(best.explanation.gains?.length ?? 0) > 0 && (
                 <div className="fp-alloc-explanation__group">
                   <p className="fp-alloc-explanation__group-label">{t("Что улучшается")}</p>
                   <ul
                     role="list"
                     className="fp-alloc-explanation__list fp-alloc-explanation__list--gains"
                   >
-                    {best.explanation.gains.map((g, i) => (
+                    {best.explanation.gains?.map((g, i) => (
                       <li key={i}>{g}</li>
                     ))}
                   </ul>
                 </div>
               )}
-              {best.explanation.costs.length > 0 && (
+              {(best.explanation.costs?.length ?? 0) > 0 && (
                 <div className="fp-alloc-explanation__group">
                   <p className="fp-alloc-explanation__group-label">
                     {t("Чем приходится жертвовать")}
@@ -223,7 +228,7 @@ export function AllocationPanel({
                     role="list"
                     className="fp-alloc-explanation__list fp-alloc-explanation__list--costs"
                   >
-                    {best.explanation.costs.map((c, i) => (
+                    {best.explanation.costs?.map((c, i) => (
                       <li key={i}>{c}</li>
                     ))}
                   </ul>
