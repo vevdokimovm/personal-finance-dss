@@ -89,7 +89,7 @@
   font-weight: 700;
   color: var(--c-text2);
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: var(--tracking-eyebrow);
 }
 
 .fp-household__members,
@@ -181,26 +181,6 @@
   color: var(--c-text);
   font-size: var(--fs-sm);
   font-weight: 700;
-}
-
-.fp-household__invite-row-new {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--sp-2);
-  margin-bottom: var(--sp-2);
-}
-
-.fp-household__invite-url {
-  flex: 1 1 var(--household-email-w);
-  min-width: 0;
-  min-height: var(--tap-target-min);
-  padding: var(--sp-2) var(--sp-3);
-  border: var(--border-w) solid var(--c-border-hl);
-  border-radius: var(--r-sm);
-  background: var(--c-surface);
-  color: var(--c-text);
-  font: inherit;
-  font-size: var(--fs-sm);
 }
 
 .fp-household__invite-hint {

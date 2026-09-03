@@ -1,0 +1,90 @@
+/* Приглашения друзей — секция профиля (v8.37.0). Карточку и заголовок берёт
+   у ProfilePage.css, поле со ссылкой — общий CopyLinkField; здесь только своё. */
+.fp-referral__lede {
+  margin: 0 0 var(--sp-4);
+  color: var(--c-text2);
+  font-size: var(--fs-sm);
+}
+
+.fp-referral__empty {
+  margin: 0;
+  color: var(--c-text2);
+  font-size: var(--fs-sm);
+}
+
+/* Число приглашённых — эмоциональный центр секции, поэтому оно якорь по весу,
+   а не строка формата «Email» (бриф §2.2). */
+.fp-referral__count {
+  display: flex;
+  align-items: baseline;
+  gap: var(--sp-2);
+  margin: 0 0 var(--sp-2);
+}
+
+.fp-referral__count-value {
+  color: var(--c-text);
+  font-size: var(--fs-xl);
+  font-weight: 700;
+  line-height: 1;
+}
+
+.fp-referral__count-label {
+  color: var(--c-text2);
+  font-size: var(--fs-sm);
+}
+
+.fp-referral__next {
+  margin: 0 0 var(--sp-4);
+  color: var(--c-text2);
+  font-size: var(--fs-sm);
+}
+
+.fp-referral__milestones-title {
+  margin: 0 0 var(--sp-2);
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  color: var(--c-text2);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-eyebrow);
+}
+
+.fp-referral__milestones {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Достигнутое отличается сплошной рамкой против пунктирной И словом «достигнуто»
+   в подписи. Рамка берёт --c-border-hl, а не --c-accent: акцентный зелёный в продукте
+   работает, только пока его мало, а достижений на экране до пяти (бриф §1.1).
+   Пунктир недостигнутого — --c-border-hl по той же причине, по которой этот токен
+   вообще заведён: --c-border даёт 1.26:1 и как признак не читается. */
+.fp-referral__milestone {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--sp-2);
+  padding: var(--sp-2) var(--sp-3);
+  border: var(--border-w) dashed var(--c-border-hl);
+  border-radius: var(--r-sm);
+}
+
+.fp-referral__milestone--reached {
+  border-style: solid;
+  background: var(--c-surface-up);
+}
+
+.fp-referral__milestone-title {
+  color: var(--c-text);
+  font-size: var(--fs-sm);
+  font-weight: 600;
+}
+
+.fp-referral__milestone-meta {
+  color: var(--c-text2);
+  font-size: var(--fs-xs);
+}

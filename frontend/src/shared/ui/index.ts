@@ -6,6 +6,7 @@ export { Tooltip, TooltipProvider } from "./Tooltip";
 export { ThemeToggle } from "./ThemeToggle";
 export { StatePanel } from "./StatePanel";
 export { ListSkeleton } from "./ListSkeleton";
+export { CopyLinkField } from "./CopyLinkField";
 export { Formula } from "./Formula";
 export { ToastProvider } from "./Toast";
 export { toast } from "./toastStore";

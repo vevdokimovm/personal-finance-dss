@@ -2348,6 +2348,88 @@ export type RecommendationResponse = {
 };
 
 /**
+ * ReferralMe
+ *
+ * Ответ `/referral/me`.
+ *
+ * Схема заведена ДО фронта (v8.37.0): раньше эндпоинт был размечен `-> dict`, то есть
+ * в OpenAPI попадал как `{[key: string]: unknown}`. Фронту оставалось бы писать
+ * рукописный тип и каст — ровно так родился дефект v8.31.1, когда рукописный тип
+ * пообещал поля, которых схема не требует, и экран упал в error boundary.
+ *
+ * `referred_by` и `next_milestone` необязательны честно: первый пуст у того, кто
+ * пришёл сам, второй — `None`, когда все вехи достигнуты.
+ */
+export type ReferralMe = {
+    /**
+     * Invite Url
+     */
+    invite_url: string;
+    /**
+     * Invited Count
+     */
+    invited_count: number;
+    /**
+     * Milestones
+     */
+    milestones: Array<ReferralMilestone>;
+    next_milestone?: ReferralNextMilestone | null;
+    /**
+     * Referral Code
+     */
+    referral_code: string;
+    /**
+     * Referred By
+     */
+    referred_by?: string | null;
+};
+
+/**
+ * ReferralMilestone
+ *
+ * Веха реферальной программы. `reward` зарезервирован под механику наград и
+ * пока всегда `None` — сознательно не выдумываем начисление до монетизации.
+ */
+export type ReferralMilestone = {
+    /**
+     * Reached
+     */
+    reached: boolean;
+    /**
+     * Reward
+     */
+    reward?: string | null;
+    /**
+     * Threshold
+     */
+    threshold: number;
+    /**
+     * Title
+     */
+    title: string;
+};
+
+/**
+ * ReferralNextMilestone
+ *
+ * Ближайшая недостигнутая веха и сколько приглашений до неё.
+ */
+export type ReferralNextMilestone = {
+    /**
+     * Remaining
+     */
+    remaining: number;
+    /**
+     * Threshold
+     */
+    threshold: number;
+    /**
+     * Title
+     */
+    title: string;
+};
+
+/**
  * RegisterRequest
  */
 export type RegisterRequest = {
@@ -5835,13 +5917,9 @@ export type MyReferralApiReferralMeGetData = {
 
 export type MyReferralApiReferralMeGetResponses = {
     /**
-     * Response My Referral Api Referral Me Get
-     *
      * Successful Response
      */
-    200: {
-        [key: string]: unknown;
-    };
+    200: ReferralMe;
 };
 
 export type MyReferralApiReferralMeGetResponse = MyReferralApiReferralMeGetResponses[keyof MyReferralApiReferralMeGetResponses];

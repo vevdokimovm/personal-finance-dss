@@ -12,7 +12,9 @@ export function RegisterPage() {
   const navigate = useNavigate();
   // Куда вернуть после успеха. Пусто — на дашборд; `/join?token=...` — обратно
   // к приглашению, иначе приглашённый терял ссылку на входе (v8.36.0).
-  const search = useSearch({ strict: false }) as { redirect?: string };
+  // `redirect` — возврат к приглашению после регистрации; `ref` — реферальный код
+  // из ссылки `/register?ref=...`, которую строит `routes_referral.py`.
+  const search = useSearch({ strict: false }) as { redirect?: string; ref?: string };
   const register = useRegister();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -29,6 +31,13 @@ export function RegisterPage() {
         display_name: displayName || undefined,
         consent,
         newsletter_opt_in: newsletterOptIn,
+        // 🔴 Код из адреса обязан доехать до тела запроса. Бэкенд принимает
+        // `referral_code` и проверяет его существование сам (`routes_auth.py`:
+        // несуществующий код просто игнорируется), а фронт не слал его никогда —
+        // реферальная ссылка открывалась, регистрация проходила и не засчитывалась
+        // никому. Тот же класс, что мёртвый `/join`, но незаметный: всё выглядит
+        // рабочим.
+        referral_code: search.ref?.trim() || undefined,
       });
       toast.success(t("Готово! Проверьте почту, чтобы подтвердить email."));
       navigate({ to: safeRedirect(search.redirect) ?? "/" });
@@ -55,10 +64,17 @@ export function RegisterPage() {
       footer={
         <p>
           {t("Уже есть аккаунт? ")}
-          <Link to="/login">{t("Войти")}</Link>
+          <Link to="/login" search={{ ref: search.ref }}>{t("Войти")}</Link>
         </p>
       }
     >
+      {search.ref && (
+        /* Иначе починка невидима: код уходит в запрос, но ни приглашённый, ни
+           пригласивший не видят, что регистрация идёт по приглашению ([FB-01]). */
+        <p className="fp-auth-banner fp-auth-banner--info" role="status">
+          {t("Вы регистрируетесь по приглашению — оно засчитается пригласившему.")}
+        </p>
+      )}
       <form className="fp-auth-form" onSubmit={handleSubmit}>
         {errorMessage && (
           <p className="fp-auth-banner" role="alert">

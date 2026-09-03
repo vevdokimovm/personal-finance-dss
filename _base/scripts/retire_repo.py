@@ -85,6 +85,9 @@ def find_references(name: str) -> list[str]:
     return hits
 
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from _roots import artifacts_dir  # noqa: E402
+
 def main() -> int:
     ap = argparse.ArgumentParser(description="Расформировать репу по канону")
     ap.add_argument("name", help="имя репы")
@@ -122,7 +125,7 @@ def main() -> int:
         problems.append(f"на репу ссылаются {len(refs)} документов — "
                         f"снос даст ссылки в пустоту")
 
-    archives = sorted((Path.home() / "Downloads").glob(f"{args.name}-v*.zip"))
+    archives = sorted(artifacts_dir().glob(f"{args.name}-v*.zip"))
 
     print(f"Расформировать «{args.name}» · класс {cls}\n")
     print(f"  на GitHub:        {'🟢 есть' if on_github else '🔴 НЕТ'}")
@@ -166,7 +169,7 @@ def main() -> int:
         print(f"  🟢 каталог снесён: {target}")
 
     # ── ПОСТУСЛОВИЕ: инвариант об архивах проверяется, а не подразумевается
-    left = sorted((Path.home() / "Downloads").glob(f"{args.name}-v*.zip"))
+    left = sorted(artifacts_dir().glob(f"{args.name}-v*.zip"))
     if len(left) != len(archives):
         print(f"  🔴 ИНВАРИАНТ НАРУШЕН: архивов было {len(archives)}, "
               f"стало {len(left)}", file=sys.stderr)

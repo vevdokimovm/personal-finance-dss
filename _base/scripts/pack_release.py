@@ -54,7 +54,13 @@ if FORCE_STUBS:
     sys.argv.remove("--force-stubs")
 REPO = Path(sys.argv[1]).expanduser().resolve() if len(sys.argv) > 1 \
     else Path(os.environ.get("BASE_REPO", Path(__file__).resolve().parent.parent)).expanduser()
-OUT_DIR = Path.home() / "Downloads"
+# 🔴 03.09.2026: было `Path.home()/"Downloads"` жёстко. Теперь путь спрашивается
+# у `_roots`, потому что его знают ПЯТЬ скриптов, и пятая копия литерала
+# разошлась бы с остальными на первой же правке (`PIT-178`: список вместо
+# признака). Переопределяется `BASE_ARTIFACTS` — на этом держатся тесты.
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from _roots import artifacts_dir  # noqa: E402
+OUT_DIR = artifacts_dir()
 NAME = REPO.name
 
 JUNK_NAMES = {".DS_Store", "Thumbs.db"}

@@ -12,7 +12,7 @@ import {
 } from "@entities/households";
 import type { HouseholdResponse } from "@entities/households";
 import { useProfile } from "@entities/profile";
-import { Button, ListSkeleton, StatePanel, Modal, toast } from "@shared/ui";
+import { Button, CopyLinkField, ListSkeleton, StatePanel, Modal, toast } from "@shared/ui";
 import { formatDate } from "@shared/lib/date/formatDate";
 import { t } from "@shared/lib/i18n/t";
 import "@shared/ui/entityForm.css";
@@ -250,17 +250,6 @@ function HouseholdCard({
     );
   }
 
-  async function copyInvite(url: string) {
-    try {
-      await navigator.clipboard.writeText(url);
-      toast.success(t("Ссылка скопирована"));
-    } catch {
-      // Буфер недоступен (нет разрешения, http, старый браузер) — не молчим и не
-      // притворяемся, что скопировали: говорим, что делать руками ([FB-01]).
-      toast.error(t("Не получилось скопировать. Выделите ссылку и скопируйте вручную."));
-    }
-  }
-
   return (
     <section className="fp-household" aria-labelledby={nameId}>
       <div className="fp-household__head">
@@ -392,25 +381,13 @@ function HouseholdCard({
               <p className="fp-household__invite-title">
                 {t("Ссылка приглашения — показывается только сейчас")}
               </p>
-              {inviteUrls.map((url, index) => (
-                <div key={url} className="fp-household__invite-row-new">
-                  <label
-                    className="sr-only"
-                    htmlFor={`fp-invite-${household.id}-${index}`}
-                  >
-                    {t("Ссылка приглашения")}
-                  </label>
-                  <input
-                    id={`fp-invite-${household.id}-${index}`}
-                    className="fp-household__invite-url"
-                    readOnly
-                    value={url}
-                    onFocus={(e) => e.currentTarget.select()}
-                  />
-                  <Button variant="primary" onClick={() => void copyInvite(url)}>
-                    {t("Скопировать")}
-                  </Button>
-                </div>
+              {inviteUrls.map((url) => (
+                <CopyLinkField
+                  key={url}
+                  label={t("Ссылка приглашения в семейный доступ")}
+                  url={url}
+                  variant="primary"
+                />
               ))}
               <p className="fp-household__invite-hint">
                 {t(

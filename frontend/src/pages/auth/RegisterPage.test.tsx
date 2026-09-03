@@ -79,4 +79,25 @@ describe("RegisterPage — регистрация (FRM/FB, 152-ФЗ)", () => {
     expect(newsletter).not.toBeRequired();
     expect(newsletter).not.toBeChecked();
   });
+  /* 🔴 Реферальная ссылка — `/register?ref=CODE`, её строит `routes_referral.py`.
+     Страница открывалась, но параметр не читался и в тело запроса не попадал: бэкенд
+     принимает `referral_code`, фронт его не слал НИКОГДА. То есть приглашение
+     открывалось, регистрация проходила — и не засчитывалась никому. Тот же класс, что
+     мёртвый `/join` (v8.36.0), только злее: там пользователь упирался в пустоту и это
+     было заметно, здесь всё выглядит рабочим. */
+  it("реферальный код из адреса уходит в запрос — иначе приглашение не засчитается", async () => {
+    searchMock.mockReturnValue({ ref: "ABC123" });
+    // Вызовы накапливаются по всему файлу — сверяем последний, а не первый:
+    // `calls[0]` принадлежал бы соседнему тесту.
+    mutateAsyncMock.mockClear();
+    mutateAsyncMock.mockResolvedValue({ id: "u1" });
+    useRegisterMock.mockReturnValue(baseState());
+    render(<RegisterPage />);
+    await userEvent.type(screen.getByLabelText("Email"), "a@b.ru");
+    await userEvent.type(screen.getByLabelText("Пароль"), "Passw0rd!");
+    await userEvent.click(screen.getByLabelText(/согласие|обработку/i));
+    await userEvent.click(screen.getByRole("button", { name: "Зарегистрироваться" }));
+    expect(mutateAsyncMock.mock.calls.at(-1)?.[0]).toMatchObject({ referral_code: "ABC123" });
+    searchMock.mockReturnValue({});
+  });
 });

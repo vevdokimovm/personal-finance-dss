@@ -9,6 +9,14 @@ import type { UserProfile } from "@entities/profile";
 const { useProfileMock } = vi.hoisted(() => ({ useProfileMock: vi.fn() }));
 let searchMock: { verified?: string } = {};
 
+// Рефералка — своя секция со своим запросом; здесь проверяется профиль, поэтому
+// секция заглушена (её собственные тесты — ReferralSection.test.tsx).
+vi.mock("@entities/referral", () => ({
+  // Ни загрузки, ни данных: секция рендерит пустоту и не приносит на страницу
+  // второй `role="status"` (скелетон), из-за которого тест баннера видел два.
+  useReferral: () => ({ data: undefined, error: null, isLoading: false, refetch: vi.fn() }),
+}));
+
 vi.mock("@entities/profile", async () => {
   const actual = await vi.importActual<typeof import("@entities/profile")>("@entities/profile");
   return { ...actual, useProfile: useProfileMock };

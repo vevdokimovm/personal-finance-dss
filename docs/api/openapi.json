@@ -3896,6 +3896,118 @@
         "title": "RecommendationResponse",
         "type": "object"
       },
+      "ReferralMe": {
+        "description": "Ответ `/referral/me`.\n\nСхема заведена ДО фронта (v8.37.0): раньше эндпоинт был размечен `-> dict`, то есть\nв OpenAPI попадал как `{[key: string]: unknown}`. Фронту оставалось бы писать\nрукописный тип и каст — ровно так родился дефект v8.31.1, когда рукописный тип\nпообещал поля, которых схема не требует, и экран упал в error boundary.\n\n`referred_by` и `next_milestone` необязательны честно: первый пуст у того, кто\nпришёл сам, второй — `None`, когда все вехи достигнуты.",
+        "properties": {
+          "invite_url": {
+            "title": "Invite Url",
+            "type": "string"
+          },
+          "invited_count": {
+            "title": "Invited Count",
+            "type": "integer"
+          },
+          "milestones": {
+            "items": {
+              "$ref": "#/components/schemas/ReferralMilestone"
+            },
+            "title": "Milestones",
+            "type": "array"
+          },
+          "next_milestone": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ReferralNextMilestone"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "referral_code": {
+            "title": "Referral Code",
+            "type": "string"
+          },
+          "referred_by": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Referred By"
+          }
+        },
+        "required": [
+          "referral_code",
+          "invite_url",
+          "invited_count",
+          "milestones"
+        ],
+        "title": "ReferralMe",
+        "type": "object"
+      },
+      "ReferralMilestone": {
+        "description": "Веха реферальной программы. `reward` зарезервирован под механику наград и\nпока всегда `None` — сознательно не выдумываем начисление до монетизации.",
+        "properties": {
+          "reached": {
+            "title": "Reached",
+            "type": "boolean"
+          },
+          "reward": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reward"
+          },
+          "threshold": {
+            "title": "Threshold",
+            "type": "integer"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "threshold",
+          "title",
+          "reached"
+        ],
+        "title": "ReferralMilestone",
+        "type": "object"
+      },
+      "ReferralNextMilestone": {
+        "description": "Ближайшая недостигнутая веха и сколько приглашений до неё.",
+        "properties": {
+          "remaining": {
+            "title": "Remaining",
+            "type": "integer"
+          },
+          "threshold": {
+            "title": "Threshold",
+            "type": "integer"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "threshold",
+          "title",
+          "remaining"
+        ],
+        "title": "ReferralNextMilestone",
+        "type": "object"
+      },
       "RegisterRequest": {
         "properties": {
           "consent": {
@@ -4839,7 +4951,7 @@
   },
   "info": {
     "title": "FINPILOT",
-    "version": "8.33.0"
+    "version": "8.36.0"
   },
   "openapi": "3.1.0",
   "paths": {
@@ -9125,9 +9237,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response My Referral Api Referral Me Get",
-                  "type": "object"
+                  "$ref": "#/components/schemas/ReferralMe"
                 }
               }
             },

@@ -2,6 +2,7 @@ import { useRef } from "react";
 import { useSearch, Link } from "@tanstack/react-router";
 import { ListSkeleton, StatePanel, Button, toast } from "@shared/ui";
 import { t } from "@shared/lib/i18n/t";
+import { ReferralSection } from "./ReferralSection";
 import { formatDate } from "@shared/lib/date/formatDate";
 import { useProfile, NotAuthenticatedError } from "@entities/profile";
 import { useConsents, useGrantConsent, useWithdrawConsent } from "@entities/consents";
@@ -214,6 +215,7 @@ export function ProfilePage() {
           </div>
         )}
       </section>
+      <ReferralSection />
       <ConsentsSection />
     </main>
   );

@@ -86,3 +86,10 @@
   border-color: var(--c-accent);
   background: var(--c-accent-bg);
 }
+
+/* Сообщение-контекст, а не успех и не ошибка: «вы пришли по приглашению». Нейтральная
+   рамка — потому что ничего ещё не произошло, это признак состояния формы. */
+.fp-auth-banner--info {
+  border-color: var(--c-border-hl);
+  background: var(--c-surface-up);
+}

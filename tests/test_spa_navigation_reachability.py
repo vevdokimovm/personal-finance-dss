@@ -24,6 +24,7 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 ROUTES_DIR = REPO_ROOT / "frontend" / "src" / "routes"
+SRC_DIR = REPO_ROOT / "frontend" / "src"
 NAV_ITEMS = REPO_ROOT / "frontend" / "src" / "widgets" / "app-nav" / "navItems.ts"
 APP_NAV = REPO_ROOT / "frontend" / "src" / "widgets" / "app-nav" / "AppNav.tsx"
 
@@ -175,6 +176,8 @@ BACKEND_URL_SOURCES = (
 # `/api/...` — обращения к самому бэкенду, во фронт они не ведут и роутом SPA быть
 # не обязаны (напр. `/api/auth/verify?token=` — серверный эндпоинт подтверждения).
 _FRONTEND_URL_RE = re.compile(r'\+\s*f?"(/[a-z][a-z0-9\-/]*)')
+# Тот же адрес, но вместе с именем query-параметра: `/join?token=`, `/register?ref=`.
+_BACKEND_PARAM_RE = re.compile(r'\+\s*f?"(/[a-z][a-z0-9\-/]*)\?([a-z_]+)=')
 
 
 def _backend_built_frontend_paths() -> dict[str, str]:
@@ -220,4 +223,53 @@ def test_backend_built_links_point_to_existing_screens():
         "Бэкенд строит ссылки на несуществующие экраны: "
         + ", ".join(f"{path} ({source})" for path, source in sorted(dead.items()))
         + ". Пользователь получит такую ссылку письмом и упрётся в пустоту."
+    )
+
+
+def _backend_built_params() -> dict[str, tuple[str, str]]:
+    """`{путь: (имя параметра, файл-источник)}` для ссылок вида `/join?token=...`."""
+    found: dict[str, tuple[str, str]] = {}
+    for source in BACKEND_URL_SOURCES:
+        if not source.exists():
+            continue
+        for match in _BACKEND_PARAM_RE.finditer(source.read_text(encoding="utf-8")):
+            path, param = match.group(1), match.group(2)
+            if path.startswith("/api/"):
+                continue
+            found.setdefault(path, (param, source.name))
+    return found
+
+
+def test_backend_built_link_params_are_read_by_the_screen():
+    """Мало, чтобы экран СУЩЕСТВОВАЛ — он обязан ЧИТАТЬ параметр из ссылки.
+
+    🔴 Найдено 2026-09-03 при выносе рефералки: `routes_referral.py` строит
+    `/register?ref=CODE`, роут `/register` существует и открывается — а `RegisterPage`
+    параметр `ref` не читал вовсе и `referral_code` в запрос не клал. То есть
+    приглашение открывалось, регистрация проходила и не засчитывалась НИКОМУ.
+
+    Это злее мёртвой ссылки: мёртвую видно сразу (человек упирается в пустоту), а здесь
+    всё выглядит рабочим — дефект обнаруживается только тем, что счётчик приглашений
+    у всех остаётся нулём. Предыдущий гейт (существование роута) такое пропускает
+    по построению, поэтому проверок две, а не одна.
+    """
+    unread: list[str] = []
+    for path, (param, source) in _backend_built_params().items():
+        route_file = ROUTES_DIR / f"{path.lstrip('/')}.tsx"
+        if not route_file.exists():
+            continue  # мёртвый роут ловит соседний тест, здесь не дублируем
+        # Экран роута может быть тонкой обёрткой над страницей — ищем по всему `src`,
+        # но только в исходниках, не в сгенерированном клиенте.
+        hits = [
+            candidate
+            for candidate in SRC_DIR.rglob("*.tsx")
+            if "generated" not in candidate.parts
+            and f"{param}?" in candidate.read_text(encoding="utf-8")
+        ]
+        if not hits:
+            unread.append(f"{path}?{param}= ({source})")
+    assert not unread, (
+        "Бэкенд кладёт параметр в ссылку, а экран его не читает: "
+        + ", ".join(sorted(unread))
+        + ". Ссылка открывается, всё выглядит рабочим — и не срабатывает."
     )

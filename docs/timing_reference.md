@@ -58,6 +58,7 @@ python -m tools.timing_lab.record report --update-doc
 | набор | спокойный прогон | худший | прогонов | тестов |
 |---|---|---|---|---|
 | `pytest-full` | 15 мин | 24.5 мин | 6 | 1691 |
+| `backend-full` | 13.8 мин | 13.8 мин | 2 | — |
 | `pytest-slice-planning` | — только под нагрузкой | 1.6 мин | 1 | 120 |
 | `pytest-slice-affected` | 48 с | 48 с | 1 | 63 |
 | `pytest-slice-api-demo` | 42 с | 83 с | 3 | 31 |

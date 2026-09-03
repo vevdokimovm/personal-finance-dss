@@ -54,7 +54,9 @@ import sys as _sys
 _sys.path.insert(0, str(Path(__file__).resolve().parent))
 from _roots import resolve_roots  # noqa: E402
 BASE_REPO, REPOS, FROM_KIT = resolve_roots(__file__)
-DOWNLOADS = Path.home() / "Downloads"
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from _roots import artifacts_dir  # noqa: E402
+DOWNLOADS = artifacts_dir()
 
 HARD_FILE = 100 * 2**20      # push отклоняется
 WARN_FILE = 50 * 2**20       # предупреждение GitHub
