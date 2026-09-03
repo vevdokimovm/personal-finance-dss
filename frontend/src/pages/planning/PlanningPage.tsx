@@ -7,6 +7,7 @@ import { t } from "@shared/lib/i18n/t";
 import { getConsentRequiredDetail } from "@shared/lib/api/extractErrorMessage";
 import { ConsentRequiredPanel } from "@entities/consents";
 import { MetricsGrid } from "@widgets/metrics-grid";
+import { PlanExportSection } from "./ui/PlanExportSection";
 import { PlanHistorySection } from "./ui/PlanHistorySection";
 import { AllocationPanel } from "@widgets/allocation-panel";
 import { ForecastPanel } from "@widgets/forecast-panel";
@@ -174,6 +175,10 @@ export function PlanningPage() {
         onRBenchChange={setRBench}
         isFetching={forecastQuery.isFetching}
       />
+      {/* Выгрузка — перед историей: она про ТЕКУЩИЙ план, который выше, а история про
+          прошлое. Обе живут здесь, а не отдельными экранами: и сохранять снимок, и
+          выгружать файл осмысленно ровно там, где виден результат. */}
+      <PlanExportSection />
       {/* История — последней секцией: она про прошлое, а экран начинается с сегодняшнего
           плана. Живёт здесь, а не отдельным экраном, потому что сохранять снимок
           осмысленно ровно там, где виден результат, который сохраняешь; отдельный экран

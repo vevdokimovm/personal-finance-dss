@@ -37,6 +37,12 @@ vi.mock("@tanstack/react-router", async () => {
 // PlanningPage, не относящихся к истории, достаточно фиксированного пустого состояния.
 // Собственные состояния секции (загрузка/ошибка/согласие/список/удаление) покрыты
 // PlanHistorySection.test.tsx отдельно — тот же приём, что с BudgetsSection на дашборде.
+// PlanExportSection (v8.35.0) — своё состояние скачивания и своя панель согласия;
+// для тестов PlanningPage достаточно заглушки, поведение секции покрыто отдельно.
+vi.mock("./ui/PlanExportSection", () => ({
+  PlanExportSection: () => <section aria-label="Выгрузить план" />,
+}));
+
 vi.mock("@entities/plan-history", () => ({
   usePlanHistory: () => ({
     data: { items: [], count: 0 },

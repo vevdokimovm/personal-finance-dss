@@ -309,7 +309,7 @@ export function PlanHistorySection() {
 /**
  * Дата и время снимка.
  *
- * 🔴 Бэкенд отдаёт НАИВНЫЙ UTC — `created_at.isoformat()` без суффикса `Z`
+ * Бэкенд отдаёт НАИВНЫЙ UTC — `created_at.isoformat()` без суффикса `Z`
  * (`app/api/routes_planning.py`). `new Date("2026-09-01T10:00:00")` по спецификации
  * читает такую строку как ЛОКАЛЬНОЕ время, поэтому суффикс приходится дописывать
  * самим. Общий `shared/lib/date/formatDate` этого не делает: он пинит `timeZone: "UTC"`
