@@ -1,4 +1,5 @@
 import type { Ref } from "react";
+import { Link } from "@tanstack/react-router";
 import { Button, StatePanel } from "@shared/ui";
 import { t } from "@shared/lib/i18n/t";
 
@@ -14,7 +15,7 @@ export function DashboardEmpty({ mainRef }: { mainRef?: Ref<HTMLElement> }) {
         title={t("Пока нет данных для обзора")}
         action={
           <Button asChild variant="primary">
-            <a href="/transactions">{t("Внести операции →")}</a>
+            <Link to="/transactions">{t("Внести операции →")}</Link>
           </Button>
         }
       >

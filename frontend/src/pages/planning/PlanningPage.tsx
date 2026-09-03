@@ -1,4 +1,5 @@
 import { useRef, useState } from "react";
+import { Link } from "@tanstack/react-router";
 import { usePlan, useForecast } from "@entities/plan-summary";
 import { ListSkeleton, StatePanel, Button, Formula } from "@shared/ui";
 import { formatMoney } from "@shared/lib/money/formatMoney";
@@ -112,7 +113,7 @@ export function PlanningPage() {
           title={t("Пока нет данных для плана")}
           action={
             <Button asChild variant="primary">
-              <a href="/transactions">{t("Внести операции →")}</a>
+              <Link to="/transactions">{t("Внести операции →")}</Link>
             </Button>
           }
         >

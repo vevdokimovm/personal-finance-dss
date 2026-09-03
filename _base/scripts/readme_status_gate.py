@@ -123,8 +123,26 @@ def summary_at_head(root: Path) -> str | None:
     return previous.summary if previous else None
 
 
+def repo_class(root: Path) -> str:
+    """Класс репы из `.repo-class`; пусто, если файла нет."""
+    path = root / ".repo-class"
+    try:
+        return path.read_text(encoding="utf-8").strip()
+    except OSError:
+        return ""
+
+
 def check(root: Path, staged_mode: bool) -> list[str]:
     problems: list[str] = []
+
+    # 🔴 02.09.2026. Гейт не знал про классы вовсе и требовал служебный блок
+    # «Сейчас: v1.1.2 · Пересборка: архив содержал устаревший канон» в README
+    # спецрепы профиля — то есть на публичной странице найма, которую читает
+    # рекрутёр. Владелец увидел это в браузере раньше, чем любая проверка.
+    # STATUS существует, чтобы ВЛАДЕЛЕЦ за десять секунд понял состояние репы;
+    # у витрины человека читатель другой, и внутренняя версия ему не адресована.
+    if repo_class(root) == "profile":
+        return []
 
     version_text = read_text(root, VERSION_FILE)
     if version_text is None:

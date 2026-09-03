@@ -16,6 +16,23 @@ vi.mock("@entities/plan-summary", async () => {
   return { ...actual, usePlan: usePlanMock, useForecast: useForecastMock };
 });
 
+vi.mock("@tanstack/react-router", async () => {
+  // Экран получил <Link> вместо сырого <a href> (H13, v8.31.0). Настоящий Link требует
+  // контекст роутера, которого в юнит-тесте страницы нет и быть не должно: сюда он попал
+  // как деталь вёрстки CTA, а не как предмет проверки. Мок отдаёт <a href> — ровно то,
+  // на что тесты и смотрели раньше, поэтому их утверждения не менялись.
+  const actual =
+    await vi.importActual<typeof import("@tanstack/react-router")>("@tanstack/react-router");
+  return {
+    ...actual,
+    Link: ({ to, children, ...rest }: { to: string; children: React.ReactNode }) => (
+      <a href={to} {...rest}>
+        {children}
+      </a>
+    ),
+  };
+});
+
 vi.mock("@entities/consents", () => ({
   ConsentRequiredPanel: ({ detail }: { detail: { message: string } }) => (
     <div role="alert">{detail.message}</div>

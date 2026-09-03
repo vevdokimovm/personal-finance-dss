@@ -1,3 +1,4 @@
+import { Link } from "@tanstack/react-router";
 import { Button } from "@shared/ui";
 import { formatMoney } from "@shared/lib/money/formatMoney";
 import { t } from "@shared/lib/i18n/t";
@@ -29,7 +30,7 @@ export function Hero({ plan }: { plan: CalculatePlanResult }) {
         </div>
       </div>
       <Button asChild variant="primary" className="fp-hero-cta">
-        <a href="/planning">{t("Построить план распределения →")}</a>
+        <Link to="/planning">{t("Построить план распределения →")}</Link>
       </Button>
     </section>
   );

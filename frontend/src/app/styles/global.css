@@ -24,6 +24,15 @@ a {
   color: var(--c-accent);
 }
 
+/* Шапка приложения: топбар (аккаунт/тема) + навигационный каркас под ним.
+   Отделена от контента нижней границей — иначе на дашборде каркас визуально
+   сливался с первой карточкой и не читался как постоянная область ([IA-02]). */
+.fp-app-header {
+  border-bottom: var(--border-w) solid var(--c-border);
+  padding-bottom: var(--sp-3);
+  margin-bottom: var(--sp-4);
+}
+
 .fp-app-topbar {
   display: flex;
   align-items: center;
@@ -64,4 +73,36 @@ a {
     transition-duration: 0.001ms !important;
     scroll-behavior: auto !important;
   }
+}
+
+/* Skip-link (WCAG 2.4.1 Bypass Blocks). Видим только при клавиатурном фокусе: мышью
+   он не нужен, а постоянно видимая ссылка заняла бы место в шапке у всех.
+   Не `display:none` и не `visibility:hidden` — оба убирают элемент из tab-порядка,
+   то есть ровно отменяют смысл ссылки. */
+.fp-skip-link {
+  position: absolute;
+  left: var(--sp-5);
+  top: calc(-1 * var(--tap-target-min));
+  z-index: var(--z-skip-link);
+  display: flex;
+  align-items: center;
+  min-height: var(--tap-target-min);
+  padding: 0 var(--sp-4);
+  border-radius: var(--r-sm);
+  background: var(--c-surface);
+  color: var(--c-text);
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  text-decoration: none;
+  box-shadow: var(--shadow-card);
+  transition: top var(--motion-fast) var(--ease);
+}
+.fp-skip-link:focus-visible {
+  top: var(--sp-2);
+}
+
+/* Якорь skip-link. Программная цель фокуса — не таб-стоп, поэтому без видимого
+   контура: рамка на всей области контента читалась бы как ошибка. */
+.fp-main-anchor:focus {
+  outline: none;
 }

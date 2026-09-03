@@ -1,0 +1,80 @@
+/* Навигационный каркас. Переносится по строкам, а не скроллится горизонтально:
+   у персоны R01 (56 лет, docs/ui_ux_design_standard.md §0.5) горизонтальная прокрутка
+   меню — источник промахов, а все семь подписей полные по [CMP-03]. */
+.fp-app-nav {
+  max-width: var(--content-max);
+  margin: 0 auto;
+  padding: var(--sp-3) var(--sp-5) 0;
+}
+
+.fp-app-nav__list {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  /* Зазор между строками НЕ меньше, чем между колонками: три ряда 44-пиксельных целей
+     с тесным вертикальным зазором сливаются в монолит и дают промахи (design-critic). */
+  gap: var(--sp-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.fp-app-nav__link {
+  display: flex;
+  align-items: center;
+  /* Цель касания — тот же токен, что у Button ([A11Y-09]). Через min-height, а не
+     вертикальный паддинг: паддинг сложился бы с line-height и поехал при zoom 200%. */
+  min-height: var(--tap-target-min);
+  padding: 0 var(--sp-3);
+  border-radius: var(--r-sm);
+  color: var(--c-text2);
+  font-size: var(--fs-sm);
+  /* 🔴 Вес НЕ меняется в активном состоянии, и это не косметика. В flex-wrap-раскладке
+     переход 600 → 700 расширяет пункт («Кредиты и обязательства» — заметно шире),
+     чего хватает, чтобы на части ширин пункт переехал в соседнюю строку: постоянный
+     каркас перестраивался бы при каждом переходе и ломал мышечную память ([IA-02]).
+     Состояние несут заливка и полоса, они геометрию не трогают. */
+  font-weight: 600;
+  text-decoration: none;
+  transition:
+    background-color var(--motion-fast) var(--ease),
+    color var(--motion-fast) var(--ease);
+}
+
+/* 🔴 Фон наведения — --c-bg2, а НЕ --c-surface-up. В светлой теме --c-surface-up
+   совпадает с чисто белым, а каркас лежит на --c-bg: контраст выходит 1.03:1, то есть
+   hover физически отсутствовал в половине тем при живом правиле [IA-05].
+   Посчитано по формуле WCAG, не на глаз. */
+.fp-app-nav__link:hover {
+  background-color: var(--c-bg2);
+  color: var(--c-text);
+}
+
+/* Глобальное `:focus-visible` (global.css) той же специфичности задаёт border-radius
+   --r-xs и импортируется ПОЗЖЕ этого файла — без строки ниже скругление таблетки
+   схлопывалось бы до размера --r-xs в момент фокуса. Сам outline не переопределяем:
+   он там и должен жить в одном месте ([TOK-07]). */
+.fp-app-nav__link:focus-visible {
+  border-radius: var(--r-sm);
+}
+
+/* Активный раздел различается НЕ ТОЛЬКО цветом ([A11Y-07]): заливка + акцентная полоса
+   снизу + программный aria-current из компонента.
+   🔴 Заливка нейтральная, акцент оставлен только полосе. Бриф §1.1 — «акцент работает,
+   только если его мало»; индикатор позиции это хром, а не действие, и постоянный
+   зелёный в шапке на каждом экране конкурировал бы с primary-CTA за то же внимание.
+   Толщина полосы выведена из --border-w: своего токена под индикатор в системе нет. */
+.fp-app-nav__link[aria-current="page"] {
+  background-color: var(--c-bg2);
+  color: var(--c-text);
+  box-shadow: inset 0 calc(-1 * var(--border-w) * 2) 0 0 var(--c-accent);
+}
+
+/* Windows High Contrast и forced-colors игнорируют background-color и box-shadow —
+   без этого правила активный пункт там ничем не отличался бы от остальных. */
+@media (forced-colors: active) {
+  .fp-app-nav__link[aria-current="page"] {
+    outline: var(--border-w) solid currentColor;
+    outline-offset: calc(-1 * var(--border-w) * 2);
+  }
+}
