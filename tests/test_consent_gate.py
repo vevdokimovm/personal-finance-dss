@@ -94,3 +94,59 @@ class TestAnonymousIsNotGated:
 
     def test_anonymous_recommendation_passes(self, client):
         assert client.post("/api/recommendation").status_code != 403
+
+
+class TestNotificationsGate:
+    """Уведомления несут СУММЫ — значит попадают под тот же гейт (H3c, v8.32.0).
+
+    Найдено independent-expert (гипотеза H3), подтверждено чтением кода в v8.30.2:
+    `app/services/notifications.py` кладёт в тело in-app уведомления строку вида
+    «Сводка за {месяц}: доход …, расход …, чистыми …», и та же сводка уходит письмом
+    и в Telegram. То есть лента отдавала финансовый портрет пользователя БЕЗ согласия
+    на его обработку, тогда как ручное добавление одной операции согласия требовало.
+
+    🔴 Гейт поставлен ПОЭНДПОИНТНО, а не на роутер целиком, и это не осторожность:
+    `POST /notifications/run` — это cron-рассылка под `require_admin`, она ходит от
+    служебного администратора и обслуживает ВСЕХ пользователей. Роутерный `_FIN`
+    потребовал бы согласия от админа на чужие данные и остановил бы рассылку совсем.
+    """
+
+    @pytest.mark.parametrize("path", ["/api/notifications/feed",
+                                      "/api/notifications/unread-count"])
+    def test_feed_and_counter_are_gated(self, client, path):
+        assert client.get(path, headers=_headers(client)).status_code == 403
+
+    def test_refusal_is_machine_readable(self, client):
+        r = client.get("/api/notifications/feed", headers=_headers(client))
+        detail = r.json()["detail"]
+        assert detail["code"] == "consent_required"
+        assert detail["consent_type"] == CONSENT_FINANCIAL_DATA
+
+    def test_mark_read_is_gated(self, client):
+        r = client.post("/api/notifications/1/read", headers=_headers(client))
+        assert r.status_code == 403
+
+    def test_mark_all_read_is_gated(self, client):
+        r = client.post("/api/notifications/read-all", headers=_headers(client))
+        assert r.status_code == 403
+
+    def test_granting_consent_opens_the_feed(self, client):
+        headers = _headers(client)
+        client.post(f"/api/consents/{CONSENT_FINANCIAL_DATA}", headers=headers)
+        r = client.get("/api/notifications/feed", headers=headers)
+        assert r.status_code == 200
+        assert r.json()["unread_count"] == 0
+
+    def test_cron_endpoint_is_NOT_gated(self, client):
+        """Регрессионная защита: роутерный `_FIN` сломал бы cron-рассылку молча —
+        она бы просто перестала ходить, и никто бы не узнал до жалобы пользователя."""
+        r = client.post("/api/notifications/run", headers=_headers(client))
+        # 403 здесь допустим ТОЛЬКО от require_admin (обычный пользователь не админ),
+        # но не от гейта согласия — различаем по машиночитаемому телу.
+        if r.status_code == 403:
+            detail = r.json().get("detail")
+            code = detail.get("code") if isinstance(detail, dict) else None
+            assert code != "consent_required", (
+                "cron-рассылка не должна требовать согласия на финданные — "
+                "она ходит от админа и обслуживает всех пользователей"
+            )

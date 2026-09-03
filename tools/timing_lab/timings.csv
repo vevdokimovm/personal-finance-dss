@@ -1,0 +1,31 @@
+date,suite,seconds,tests,load1,cores,note
+2026-09-03,pytest-full,1471.2,1632,57.8,8,INV-MACHINE-LOAD эп.5: чистка тулчейна + iTerm2
+2026-09-03,pytest-slice-api-demo,43.5,31,3.0,8,
+2026-09-03,pytest-slice-api-demo,40.8,31,3.0,8,
+2026-09-03,pytest-slice-api-demo,83.4,31,74.3,8,"перегрузка хоста, код не менялся"
+2026-09-03,pytest-slice-consent-gate,36.8,30,4.0,8,
+2026-09-03,pytest-slice-money-format,0.11,12,3.0,8,
+2026-09-03,pytest-slice-nav-reachability,0.06,4,3.0,8,
+2026-09-03,pytest-slice-timing-lab,0.13,11,3.0,8,
+2026-09-03,vitest-full,38.8,252,4.0,8,
+2026-09-03,vitest-full,38.4,252,4.0,8,
+2026-09-03,vitest-full,45.4,252,5.0,8,
+2026-09-03,vitest-full,44.8,252,5.0,8,
+2026-09-03,vitest-full,40.2,256,4.0,8,
+2026-09-03,vitest-full,32.3,254,3.0,8,
+2026-09-03,vitest-full,35.8,254,3.0,8,
+2026-09-03,vitest-full,37.0,267,4.0,8,
+2026-09-03,vitest-full,86.8,271,21.5,8,параллельно шёл полный pytest
+2026-09-03,vitest-slice-widget,7.3,14,3.0,8,app-nav
+2026-09-03,vitest-slice-widget,5.4,15,3.0,8,notification-bell
+2026-09-03,vitest-slice-widget,5.3,41,3.0,8,allocation-panel
+2026-09-03,playwright-e2e-full,23.2,32,4.0,8,
+2026-09-03,playwright-e2e-full,24.1,32,4.0,8,
+2026-09-03,playwright-e2e-full,57.9,32,6.0,8,
+2026-09-03,playwright-e2e-full,72.0,32,8.0,8,после переписывания колокольчика
+2026-09-03,playwright-e2e-slice,23.1,7,4.0,8,navigation.spec
+2026-09-03,playwright-e2e-slice,27.7,4,4.0,8,"navigation.spec, первый прогон"
+2026-09-03,vite-build,0.9,,3.0,8,
+2026-09-03,vite-build,0.6,,3.0,8,
+2026-09-03,preflight,8.0,,3.0,8,"оценка по наблюдению, не по секундомеру"
+2026-09-03,pytest-slice-timing-lab,8.5,11,17.81,8,

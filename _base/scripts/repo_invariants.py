@@ -396,14 +396,44 @@ def main() -> int:
         return selftest()
 
     if a.all:
-        repos = sorted(p for p in REPOS.iterdir()
-                       if p.is_dir() and (p / ".repo-class").is_file())
+        # 🔴 НАЙДЕНО ВЛАДЕЛЬЦЕМ 03.09.2026 одним вопросом: «так сейчас же
+        # 64 репы, не? мы же миграцию делали».
+        #
+        # Отбор шёл по `.repo-class`, и каталог без него просто НЕ ПОПАДАЛ
+        # в список — молча. На диске 64 каталога, инвариант печатал «63 реп»,
+        # и разница нигде не называлась: `finpilot` (витринное зеркало
+        # по ADR-009, публикуется из другой репы и своих служебных файлов
+        # не имеет) был невидим для всех проверок разом.
+        #
+        # Это ровно тот класс, что `PIT-172`: отсутствие в срезе принимается
+        # за отсутствие в системе. Инструмент отвечал на вопрос «что
+        # с размеченными репами», а читался как «что с системой».
+        #
+        # Молчание тут хуже ошибки: репа, выпавшая из проверок, не станет
+        # красной — она перестанет существовать для инструмента.
+        all_dirs = sorted(p for p in REPOS.iterdir()
+                          if p.is_dir() and not p.name.startswith("."))
+        repos = [p for p in all_dirs if (p / ".repo-class").is_file()]
+        unmarked = [p for p in all_dirs if not (p / ".repo-class").is_file()]
+
         bad = 0
         for r in repos:
             viol = check(r, phase=a.phase)
             render(r, viol, quiet_ok=a.quiet_ok)
             bad += bool(viol)
-        print(f"\nИТОГ: {len(repos)} реп · с нарушениями {bad} · чистых {len(repos) - bad}")
+
+        if unmarked:
+            print(f"\n🟡 ВНЕ ПРОВЕРКИ: {len(unmarked)} каталог(ов) без `.repo-class`")
+            for p in unmarked:
+                print(f"   · {p.name} — инвариант его не смотрит вовсе")
+            print("   Так и задумано только для витринных зеркал (ADR-009):")
+            print("   они публикуются из другой репы и своих служебных файлов")
+            print("   не имеют. Любой другой каталог здесь — пропущенная разметка.")
+
+        print(f"\nИТОГ: {len(all_dirs)} каталог(ов) на диске · "
+              f"{len(repos)} размечено · с нарушениями {bad} · "
+              f"чистых {len(repos) - bad}"
+              + (f" · вне проверки {len(unmarked)}" if unmarked else ""))
         return 1 if bad else 0
 
     if not a.repo:

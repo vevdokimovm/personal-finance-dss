@@ -36,7 +36,19 @@ def _register(client, email: str) -> str:
         json={"email": email, "password": "password123", "consent": True},
     )
     assert r.status_code == 201, r.text
-    return r.json()["access_token"]
+    token = r.json()["access_token"]
+
+    # Согласие на обработку финансовых данных выдаётся в setup с v8.32.0: лента
+    # уведомлений попала под `_FIN`, потому что несёт суммы («Сводка за месяц:
+    # доход …, расход …»). Тесты ниже проверяют ПОВЕДЕНИЕ ленты, а не гейт —
+    # сам гейт покрыт отдельно в `test_consent_gate.py::TestNotificationsGate`,
+    # включая регрессию на то, что cron-эндпоинт `/run` гейтом НЕ закрыт.
+    granted = client.post(
+        "/api/consents/financial_data",
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    assert granted.status_code in (200, 201), granted.text
+    return token
 
 
 def _h(token: str) -> dict:

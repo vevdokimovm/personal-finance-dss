@@ -1,0 +1,176 @@
+/* Цель нажатия триггера: у ghost-кнопки паддинг узкий, и без min-width колокольчик
+   выходил примерно 35 по ширине при 44 по высоте — цель меньше нормы ([A11Y-09]). */
+.fp-bell__trigger {
+  position: relative;
+  min-width: var(--tap-target-min);
+  padding: 0 var(--sp-2);
+}
+
+.fp-bell__icon {
+  display: block;
+}
+
+/* Резерв места, пока грузится счётчик: иначе появление виджета сдвигает соседние
+   контролы топбара на каждом холодном старте. */
+.fp-bell__placeholder {
+  display: inline-block;
+  width: var(--tap-target-min);
+  height: var(--tap-target-min);
+}
+
+/* Бейдж непрочитанного. Нейтральный акцентный фон, а не --c-red: красный в системе
+   означает ошибку и расход, а количество новых уведомлений — не тревога
+   (бриф §1.1, §2.2 «постоянный красный тревожит»). Чернила — --c-accent-ink, токен,
+   заведённый ровно для текста поверх акцентной плашки. */
+.fp-bell__badge {
+  position: absolute;
+  top: var(--sp-1);
+  right: 0;
+  min-width: var(--sp-5);
+  padding: 0 var(--sp-1);
+  border-radius: var(--r-full);
+  background: var(--c-accent-strong);
+  color: var(--c-accent-ink);
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  line-height: var(--sp-5);
+  text-align: center;
+}
+
+/* Панель. Позиционированием и обходом края экрана управляет Radix Popover
+   (align/sideOffset/collisionPadding в компоненте) — здесь только размеры и вид.
+   Ширина ограничена вьюпортом на случай узкого экрана. */
+.fp-bell__panel {
+  width: min(var(--bell-panel-w), calc(100vw - var(--sp-6)));
+  max-height: var(--bell-panel-h);
+  overflow-y: auto;
+  /* Докрутив список до конца, не начинаем скроллить страницу под панелью. */
+  overscroll-behavior: contain;
+  padding: var(--sp-3);
+  border: var(--border-w) solid var(--c-border);
+  border-radius: var(--r-md);
+  background: var(--c-surface);
+  box-shadow: var(--shadow-float);
+  animation: fp-bell-in var(--motion-fast) var(--ease);
+}
+
+@keyframes fp-bell-in {
+  from {
+    opacity: 0;
+    transform: translateY(calc(-1 * var(--sp-1)));
+  }
+}
+
+.fp-bell__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-2);
+  margin-bottom: var(--sp-2);
+}
+
+.fp-bell__title {
+  margin: 0;
+  font-size: var(--fs-base);
+  font-weight: 700;
+  color: var(--c-text);
+}
+
+/* Массовое действие подчинено заголовку: это не primary-CTA панели, а служебная
+   команда ([CMP-02]). Полноразмерная pill-кнопка рядом с заголовком читалась бы
+   как главное действие экрана. */
+.fp-bell__mark-all {
+  padding: 0 var(--sp-2);
+  font-size: var(--fs-sm);
+}
+
+.fp-bell__list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.fp-bell__item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-1);
+  width: 100%;
+  min-height: var(--tap-target-min);
+  padding: var(--sp-2);
+  border: var(--border-w) solid transparent;
+  border-radius: var(--r-sm);
+  background: none;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color var(--motion-fast) var(--ease);
+}
+
+.fp-bell__item:hover {
+  background: var(--c-bg2);
+}
+
+.fp-bell__item:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: var(--focus-ring-offset);
+  border-radius: var(--r-sm);
+}
+
+/* Непрочитанное: нейтральная плотность фона вместо акцентной заливки на КАЖДОЙ строке
+   (бриф §1.1 — акцента должно быть мало, а непрочитанное это не действие и не позитив).
+   Различие несёт метка «новое» словом — она и есть нецветовой признак для зрячего
+   пользователя, которого раньше не было вовсе ([A11Y-07]). */
+.fp-bell__item--unread {
+  background: var(--c-bg2);
+}
+
+.fp-bell__item-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--sp-2);
+}
+
+.fp-bell__item-title {
+  font-size: var(--fs-base);
+  font-weight: 600;
+  color: var(--c-text);
+}
+
+.fp-bell__new {
+  flex-shrink: 0;
+  padding: 0 var(--sp-1);
+  border-radius: var(--r-xs);
+  background: var(--c-accent-bg);
+  color: var(--c-accent);
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  text-transform: lowercase;
+}
+
+.fp-bell__item-body {
+  font-size: var(--fs-sm);
+  color: var(--c-text2);
+}
+
+.fp-bell__item-date {
+  font-size: var(--fs-xs);
+  color: var(--c-text3);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fp-bell__panel {
+    animation: none;
+  }
+  .fp-bell__item {
+    transition: none;
+  }
+}
+
+@media (forced-colors: active) {
+  .fp-bell__item--unread {
+    outline: var(--border-w) solid currentColor;
+  }
+}

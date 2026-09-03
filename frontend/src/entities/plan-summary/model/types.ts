@@ -1,7 +1,7 @@
 /**
  * Локальные типы для /api/planning/calculate и /api/planning/forecast.
  *
- * 🔴 ОБНОВЛЕНО v8.31.1 — прежняя редакция этого комментария УСТАРЕЛА и вводила в
+ * ОБНОВЛЕНО v8.31.1 — прежняя редакция этого комментария УСТАРЕЛА и вводила в
  * заблуждение. Она утверждала, что оба эндпоинта размечены `-> dict[str, Any]` и потому
  * не типизированы в снимке. Для `/forecast` это по-прежнему верно
  * (`{[key: string]: unknown}` в `types.gen.ts`), а для **`/calculate` — уже нет**: в
@@ -53,7 +53,7 @@ export interface Counterfactual {
 }
 
 export interface Explanation {
-  /* 🔴 `gains`/`costs` — необязательные по контракту: в схеме `Explanation`
+  /* `gains`/`costs` — необязательные по контракту: в схеме `Explanation`
      (`docs/api/openapi.json`) в `required` стоит ТОЛЬКО `delta`. Пока здесь были
      обязательные массивы, `AllocationPanel` звал `.length` напрямую и падал на
      ответе без них — тот же класс, что `ranked` (v8.31.1). */
@@ -97,7 +97,7 @@ export interface PlanInputSummary {
 
 export interface CalculatePlanResult {
   indicators: PlanIndicators;
-  /* 🔴 Тоже вне `required` схемы `PlanningCalculateResponse` — проверено на диске.
+  /* Тоже вне `required` схемы `PlanningCalculateResponse` — проверено на диске.
      `plan.top3[0] ?? null` защищал только результат индексации, но не сам массив:
      на ответе без `top3` падало ещё до рендера панели, роняя и Dashboard, и Planning. */
   top3?: PlanAlternative[];
@@ -108,7 +108,7 @@ export interface CalculatePlanResult {
    * explanation. top3[0] и ranked[0] всегда совпадают (первый элемент дедупликация не
    * выбрасывает), начиная со второго — позиции могут разойтись.
    *
-   * 🔴 ОПЦИОНАЛЬНОЕ, и это не осторожность, а контракт: в схеме
+   * ОПЦИОНАЛЬНОЕ, и это не осторожность, а контракт: в схеме
    * `PlanningCalculateResponse` (`docs/api/openapi.json`) поля НЕТ в `required` —
    * у него `default_factory=list` в `app/schemas/planning.py:283`. Пока здесь стояло
    * обязательное `PlanAlternative[]`, рукописный тип обещал больше, чем гарантирует

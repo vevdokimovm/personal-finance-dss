@@ -11,6 +11,7 @@ from datetime import datetime, timedelta
 
 from sqlalchemy.orm import Session
 
+from app.core.money import format_money
 from app.database.crud import create_notification, get_budget_status, get_goals, get_transactions
 from app.database.models import Goal, NotificationLog, User
 from app.services.email_service import email_service
@@ -161,9 +162,14 @@ def run_user_notifications(db: Session, user: User) -> dict[str, int]:
             create_notification(
                 db, user_id=user.id, type="digest",
                 title="Месячный отчёт готов",
+                # Суммы — через канон форматирования, не `:.0f`. Раньше здесь было
+                # «доход 125000»: единственное место продукта, где пользователю
+                # показывалось голое машинное число (найдено design-critic, v8.32.0).
+                # То же тело уходит письмом и в Telegram, поэтому формат общий.
                 body=(
-                    f"Сводка за {prev}: доход {digest['income']:.0f}, "
-                    f"расход {digest['expense']:.0f}, чистыми {digest['net']:.0f}"
+                    f"Сводка за {prev}: доход {format_money(digest['income'])}, "
+                    f"расход {format_money(digest['expense'])}, "
+                    f"чистыми {format_money(digest['net'])}"
                 ),
                 link="/planning",
             )

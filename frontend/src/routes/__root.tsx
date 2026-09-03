@@ -6,6 +6,7 @@ import { watchSystemTheme } from "@shared/lib/theme/useThemeStore";
 import { t } from "@shared/lib/i18n/t";
 import { AuthTopbarLink } from "@widgets/auth-topbar";
 import { AppNav } from "@widgets/app-nav";
+import { NotificationBell } from "@widgets/notification-bell";
 
 export const Route = createRootRoute({
   component: RootLayout,
@@ -28,6 +29,9 @@ function RootLayout() {
         </a>
         <header className="fp-app-header">
           <div className="fp-app-topbar">
+            {/* Колокольчик прячется сам при отозванном согласии и у гостя (403/401),
+                поэтому здесь без условий — состояние знает виджет, не раскладка. */}
+            <NotificationBell />
             <AuthTopbarLink />
             <ThemeToggle />
           </div>
