@@ -53,6 +53,21 @@ export interface ConsentRequiredDetail {
   documentUrl: string;
 }
 
+/**
+ * Требуется ли согласие — по одному лишь коду отказа.
+ *
+ * Отдельно от `getConsentRequiredDetail`, который собирает ПОЛНУЮ карточку для панели
+ * согласия и потому требует `message` и `document`. Виджету, которому надо только решить
+ * «показывать себя или нет», полнота тела не нужна — и зависеть от неё опасно: e2e поймал
+ * ровно это, колокольчик оставался видимым при 403 с сокращённым телом (v8.32.0).
+ */
+export function isConsentRequired(error: unknown): boolean {
+  if (!error || typeof error !== "object" || !("detail" in error)) return false;
+  const detail = (error as { detail: unknown }).detail;
+  if (!detail || typeof detail !== "object") return false;
+  return (detail as { code?: unknown }).code === "consent_required";
+}
+
 export function getConsentRequiredDetail(error: unknown): ConsentRequiredDetail | null {
   if (!error || typeof error !== "object" || !("detail" in error)) return null;
   const detail = (error as { detail: unknown }).detail;

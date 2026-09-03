@@ -37,6 +37,11 @@ a {
   display: flex;
   align-items: center;
   justify-content: flex-end;
+  /* Переносится на узком экране: с колокольчиком в строке четыре элемента —
+     иконка, email, «Выйти», селект темы, — и на 380 они уже не помещались
+     ([A11Y-08] reflow, [CMP-07]). */
+  flex-wrap: wrap;
+  gap: var(--sp-2);
   gap: var(--sp-4);
   padding: var(--sp-4) var(--sp-5) 0;
   max-width: var(--content-max);

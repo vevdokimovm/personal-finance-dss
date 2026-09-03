@@ -10,7 +10,8 @@ import {
 import type { NotificationOut } from "@entities/notifications";
 import { Button, ListSkeleton, StatePanel, toast } from "@shared/ui";
 import { t } from "@shared/lib/i18n/t";
-import { getConsentRequiredDetail } from "@shared/lib/api/extractErrorMessage";
+import { isConsentRequired } from "@shared/lib/api/extractErrorMessage";
+import { useProfile } from "@entities/profile";
 import "./NotificationBell.css";
 
 /**
@@ -36,27 +37,36 @@ import "./NotificationBell.css";
 export function NotificationBell() {
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
+  // Авторизация определяется тем же способом, что в навигационном каркасе и топбаре:
+  // отдельным запросом профиля, а не угадыванием статуса брошенной ошибки. Клиент
+  // статус на ошибку не кладёт — попытка ловить 401 по нему молча не работала.
+  const profile = useProfile();
   const unread = useUnreadCount();
   // Лента тянется только когда панель открыта: закрытому бейджу хватает счётчика.
   const feed = useNotificationsFeed(open);
   const markRead = useMarkRead();
   const markAllRead = useMarkAllRead();
 
-  if (unread.isLoading) {
+  if (profile.isLoading || unread.isLoading) {
     // Место резервируется, а не схлопывается: иначе появление виджета сдвигало бы
     // соседние контролы топбара на каждом холодном старте.
     return <span className="fp-bell__placeholder" aria-hidden="true" />;
   }
 
-  // Прячем ТОЛЬКО на отсутствии согласия и на неавторизованности — это штатные
-  // состояния, у которых есть свой путь решения. Авария бэкенда или сеть прячут виджет
-  // бесследно и без пути восстановления, поэтому там колокольчик остаётся и честно
-  // говорит об ошибке ([ST-04]).
-  if (unread.error) {
-    const status = (unread.error as { status?: number }).status;
-    const isConsent = getConsentRequiredDetail(unread.error) !== null || status === 403;
-    if (isConsent || status === 401) return null;
-  }
+  // Гость: уведомлений у него нет по определению. Условие дословно то же, что в
+  // `AppNav` и `AuthTopbarLink` — включая проверку `error` рядом с `data`, потому что
+  // TanStack Query держит последние успешные данные при упавшем рефетче.
+  if (!profile.data || profile.error) return null;
+
+  // Согласие не выдано — виджет исчезает: панель согласия в топбаре повторялась бы на
+  // каждом экране, что хуже молчания, а путь к согласию есть в «Профиле».
+  // Проверка по КОДУ отказа, а не по полноте тела: e2e поймал, что зависимость от
+  // необязательных полей оставляла колокольчик видимым при 403.
+  if (isConsentRequired(unread.error)) return null;
+
+  // Всё остальное — авария бэкенда или сеть. Там колокольчик ОСТАЁТСЯ: у 403 есть путь
+  // решения, у 500 его нет, и молча стирать функцию значило бы оставить пользователя
+  // без пути назад ([ST-04]).
 
   const count = unread.data ?? 0;
   const label = count > 0 ? t("Уведомления, непрочитанных: {n}", { n: count }) : t("Уведомления");
@@ -79,7 +89,15 @@ export function NotificationBell() {
   return (
     <Popover.Root open={open} onOpenChange={setOpen}>
       <Popover.Trigger asChild>
-        <Button variant="ghost" className="fp-bell__trigger" aria-label={label}>
+        <Button
+          variant="ghost"
+          className="fp-bell__trigger"
+          aria-label={label}
+          /* Смена числа непрочитанных объявляется скринридеру: без этого новое
+             уведомление меняло доступное имя кнопки молча, и узнать о нём можно было,
+             только вернувшись на неё фокусом ([FB-05]). */
+          aria-live="polite"
+        >
           <BellIcon />
           {/* Число, а не точка: «сколько именно» — часть смысла, и оно продублировано
               в доступном имени кнопки ([A11Y-07]). */}

@@ -173,3 +173,43 @@ class TestDocUpdate:
         doc.write_text("# Без маркеров\n", encoding="utf-8")
         with pytest.raises(ValueError, match="TIMINGS:BEGIN"):
             update_doc(doc, "таблица")
+
+
+class TestSelfReviewFindings:
+    """Три дефекта, найденных перечитыванием инструмента, пока шёл полный прогон.
+
+    Не заменяет `/code-review` (тот упал на лимите сессии и остался долгом в ROADMAP
+    §8.5) — но эти три видны на чтении и закрыты тестами здесь, чтобы не разойтись
+    снова.
+    """
+
+    def test_zero_median_suite_is_not_sorted_by_worst(self, ledger: Path):
+        """`calm_median or worst` проваливался на нулевой медиане: у быстрого набора
+        она бывает 0.0, и набор уезжал в сортировке на своё худшее значение."""
+        append_measurement(ledger, _m("быстрый", 0.0))
+        append_measurement(ledger, _m("быстрый", 0.0, load=99.0))
+        append_measurement(ledger, _m("медленный", 30.0))
+        report = format_report(summarize(load_measurements(ledger)))
+        # Медленный набор обязан стоять выше быстрого.
+        assert report.index("медленный") < report.index("быстрый")
+
+    def test_ninety_second_boundary_is_not_a_cliff(self, ledger: Path):
+        """До правки 89.6 с показывалось «90 с», а 90.0 с — «2 мин»: два соседних
+        замера выглядели разошедшимися вдвое. Инвариант — не конкретная строка,
+        а отсутствие скачка: значения по обе стороны порога читаются одинаково."""
+        from tools.timing_lab.record import _human
+
+        assert _human(89.4) == "89 с"          # ниже порога — секунды
+        assert _human(89.6) == _human(90.0)    # по обе стороны — одно и то же
+        assert _human(90.0) == "1.5 мин"       # и это полторы минуты, не две
+
+    def test_missing_command_does_not_crash_the_tool(self, ledger: Path, capsys):
+        """Опечатка в команде роняла инструмент трейсбеком вместо записи замера."""
+        from tools.timing_lab.record import main
+
+        code = main([
+            "--ledger", str(ledger), "run", "--suite", "опечатка",
+            "--", "этой-команды-точно-нет",
+        ])
+        assert code == 127
+        assert load_measurements(ledger)[0].note == "exit=127"

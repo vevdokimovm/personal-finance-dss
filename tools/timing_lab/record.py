@@ -149,9 +149,12 @@ def summarize(measurements: list[Measurement]) -> dict[str, SuiteStats]:
 
 
 def _human(seconds: float) -> str:
-    if seconds < 90:
+    """Секунды до минуты с половиной, дальше минуты. Порог сравнивается ПОСЛЕ
+    округления: иначе 89.6 показывалось бы как «90 с», а 90.0 — как «2 мин»,
+    и два соседних замера выглядели бы разошедшимися вдвое."""
+    if round(seconds) < 90:
         return f"{seconds:.0f} с"
-    return f"{seconds / 60:.0f} мин"
+    return f"{seconds / 60:.1f} мин".replace(".0 мин", " мин")
 
 
 def format_report(stats: dict[str, SuiteStats]) -> str:
@@ -162,7 +165,14 @@ def format_report(stats: dict[str, SuiteStats]) -> str:
         "| набор | спокойный прогон | худший | прогонов | тестов |",
         "|---|---|---|---|---|",
     ]
-    for suite in sorted(stats, key=lambda s: -(stats[s].calm_median or stats[s].worst)):
+
+    def _sort_key(name: str) -> float:
+        st = stats[name]
+        # Явная проверка на None, а не `or`: у быстрого набора медиана бывает 0.0,
+        # и `or` провалился бы на худшее значение — набор уехал бы не на своё место.
+        return -(st.worst if st.calm_median is None else st.calm_median)
+
+    for suite in sorted(stats, key=_sort_key):
         st = stats[suite]
         if st.calm_median is None:
             # Не подставляем худшее как норму: «медианы спокойного прогона нет»
@@ -206,7 +216,13 @@ def _cmd_run(args: argparse.Namespace) -> int:
         return 2
     load1, cores = host_load()
     started = time.monotonic()
-    proc = subprocess.run(args.command)
+    try:
+        returncode = subprocess.run(args.command).returncode
+    except OSError as exc:
+        # Опечатка в команде не должна ронять инструмент трейсбеком: замер всё равно
+        # состоялся (ноль секунд), и записать его честнее, чем промолчать.
+        print(f"не удалось запустить {args.command[0]!r}: {exc}", file=sys.stderr)
+        returncode = 127
     elapsed = round(time.monotonic() - started, 2)
 
     append_measurement(Path(args.ledger), Measurement(
@@ -218,10 +234,10 @@ def _cmd_run(args: argparse.Namespace) -> int:
         cores=cores,
         # Провал тоже записывается: упавший прогон занимает время так же, как
         # успешный, и при планировании это время всё равно тратится.
-        note=args.note or ("" if proc.returncode == 0 else f"exit={proc.returncode}"),
+        note=args.note or ("" if returncode == 0 else f"exit={returncode}"),
     ))
     print(f"замер: {args.suite} — {_human(elapsed)} (load {load1} на {cores} ядрах)")
-    return proc.returncode
+    return returncode
 
 
 def _cmd_add(args: argparse.Namespace) -> int:

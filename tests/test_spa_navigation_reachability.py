@@ -120,3 +120,38 @@ def test_navigation_labels_match_screen_headings():
         "Подписи разделов разошлись с заголовками экранов — "
         "frontend/src/widgets/app-nav/navItems.ts"
     )
+
+
+NOTIFICATIONS = REPO_ROOT / "app" / "services" / "notifications.py"
+
+
+def _notification_links() -> set[str]:
+    """Значения `link=` из уведомлений, которые создаёт бэкенд."""
+    text = NOTIFICATIONS.read_text(encoding="utf-8")
+    return set(re.findall(r'link="([^"]+)"', text))
+
+
+def test_notification_links_point_to_existing_screens():
+    """Уведомление ведёт туда, где экран есть (гипотеза H12 independent-expert).
+
+    Найдено 2026-09-03 при выносе уведомлений на фронт (v8.32.0): бэкенд ставил
+    `link="/budgets"`, а роута `/budgets` в SPA нет вовсе — бюджеты живут секцией
+    на дашборде (`BudgetsSection`, v8.30.0). До этого батча промах был невидим:
+    ссылку никто не открывал, потому что ленты на фронте не существовало. С
+    колокольчиком клик по такому уведомлению уводил бы пользователя в никуда —
+    причём по уведомлению «Превышен бюджет», то есть ровно там, где он ждёт помощи.
+
+    Тест сравнивает адреса из `app/services/notifications.py` с реальными файлами
+    роутов, а не со списком в голове: список разойдётся, файлы — нет.
+    """
+    all_routes = {
+        "/" if path.name == "index.tsx" else f"/{path.stem}"
+        for path in ROUTES_DIR.glob("*.tsx")
+        if path.name not in LAYOUT_ROUTE_FILES
+    }
+    dead = _notification_links() - all_routes
+    assert not dead, (
+        f"Уведомления ведут на несуществующие экраны: {sorted(dead)} — "
+        f"app/services/notifications.py. Клик по такому уведомлению уводит "
+        f"пользователя в никуда."
+    )

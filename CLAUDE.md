@@ -20,7 +20,15 @@ Radix через shadcn/ui · Recharts + visx · KaTeX · Vitest · Playwright.
 python -m tools.preflight          # перед сдачей батча, он же блокирующий job CI
 pytest -q --junitxml=out.xml       # результаты читать через XML, не через grep
 flake8 . && mypy app               # должно быть чисто
+python -m tools.timing_lab.record run --suite <имя> -- <команда>   # замерить прогон
+python -m tools.timing_lab.record report                            # что сколько стоит
 ```
+
+**Сколько это займёт по времени** — `docs/timing_reference.md` (полный pytest ~25 мин,
+vitest ~40 с, срез бэкенда ~40 с, срез фронта ~5 с). Числа там не абсолютны: длительность
+без нагрузки хоста бессмысленна, один и тот же срез шёл 40.8 с и 83.4 с без правок кода.
+Перед долгим прогоном — `uptime`; load average выше числа ядер удваивает время, и это
+не повод чинить код (`INV-MACHINE-LOAD`, пять эпизодов).
 
 ## Правила
 1. TDD: сначала тест (red), потом реализация (green), потом гейты. Ничего не отдавать до зелёного.

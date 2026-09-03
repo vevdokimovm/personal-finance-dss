@@ -19,6 +19,14 @@ export function useNotificationsFeed(enabled: boolean) {
   return useQuery({
     queryKey: FEED_KEY,
     enabled,
+    // Тот же запрет ретрая, что у счётчика, и по той же причине: если согласие отозвали
+    // при открытой панели, лента ответит 403, и три повтора превратятся в три отказа
+    // подряд. Повторять имеет смысл сетевой сбой, а не осознанный отказ сервера.
+    retry: (count, error) => {
+      const status = (error as { status?: number } | null)?.status;
+      if (status === 403 || status === 401) return false;
+      return count < 2;
+    },
     queryFn: async () => {
       const { data } = await notificationsFeedApiNotificationsFeedGet({ throwOnError: true });
       return data as NotificationFeed;

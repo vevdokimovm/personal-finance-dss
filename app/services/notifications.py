@@ -144,7 +144,13 @@ def run_user_notifications(db: Session, user: User) -> dict[str, int]:
             db, user_id=user.id, type="budget_overrun",
             title="Превышен бюджет",
             body=f"Расходы по категории «{budget['category']}» превысили лимит",
-            link="/budgets",
+            # Роута `/budgets` в SPA НЕТ: бюджеты живут секцией `BudgetsSection`
+            # на дашборде с v8.30.0. Пока ленты на фронте не было, промах был невидим —
+            # ссылку никто не открывал. С колокольчиком (v8.32.0) клик уводил бы в никуда
+            # по уведомлению «Превышен бюджет», то есть ровно там, где пользователь ждёт
+            # помощи. Гипотеза H12 independent-expert, подтверждена; гейт —
+            # `tests/test_spa_navigation_reachability.py`.
+            link="/",
         )
         notify_telegram_if_linked(
             user, f"Превышен бюджет по категории «{budget['category']}»"

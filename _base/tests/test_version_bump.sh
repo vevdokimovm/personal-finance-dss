@@ -48,6 +48,12 @@ printf 'description=песочница\nprivate=true\ntopics=\n' > "$SB/.repo-me
 BUMP="$SB/scripts/bump_repo.py"
 PACK="$SB/scripts/pack_release.py"
 
+# Кит авто-режима: `bump_repo.py` оставляет в нём признак жизни для watchdog
+# (`ADR-007`). Без него подъём проходит, но печатает `⚠` — это тоже проверяется.
+mkdir -p "$SB/06-autonomous-mode-kit/bin" "$SB/06-autonomous-mode-kit/runs"
+cp "$BASE/06-autonomous-mode-kit/bin/auto_log.py" "$SB/06-autonomous-mode-kit/bin/"
+AUTOLOG="$SB/06-autonomous-mode-kit/runs/auto.log"
+
 # --- фабрика репы -------------------------------------------------------------
 make_repo(){
   local name="$1" ver="$2"
@@ -183,6 +189,49 @@ n="$(grep -c "	1\.0\.0	" "$R/reports/releases/LEDGER.tsv" 2>/dev/null || echo 0)
 [ ! -f "$REAL_HOME/Downloads/rel-alpha-v1.0.0.zip" ] \
   && ok "настоящий ~/Downloads не тронут" \
   || bad "настоящий ~/Downloads не тронут" "тест негерметичен — убрать файл вручную"
+
+# =============================================================================
+case_ V6 "подъём версии оставляет признак жизни для watchdog (ROADMAP §P0-1)"
+# =============================================================================
+# 🔴 ПОВОД — `PIT-174`. Признак жизни `batch_silence()` писал только ритуал,
+# и вахта, закрывавшая батчи поштучно, девять часов держала watchdog слепым.
+# Проверяется НЕ «строка появилась», а три различающих утверждения:
+# пишется · не двоится от ритуала · отказ журнала не валит подъём.
+J="$(make_repo journal-alpha 2.0.0)"
+body | python3 "$BUMP" journal-alpha --minor --title "признак жизни" --body-stdin >/dev/null 2>&1
+
+grep -q "	journal-alpha	batch	v2\.1\.0: признак жизни" "$AUTOLOG" 2>/dev/null \
+  && ok "подъём версии записал строку batch (PIT-174)" \
+  || bad "подъём версии записал строку batch" "$(tail -3 "$AUTOLOG" 2>&1)"
+
+# Ритуал зовёт журнал следом ТЕМ ЖЕ вызовом — двух батчей на одну версию быть
+# не может: счёт батчей идёт в статистику темпа (`analyst`), и дубль её врёт.
+python3 "$SB/06-autonomous-mode-kit/bin/auto_log.py" \
+  --repo journal-alpha --type batch --note "v2.1.0: признак жизни" >/dev/null 2>&1
+n="$(grep -c "	journal-alpha	batch	v2\.1\.0: " "$AUTOLOG" 2>/dev/null || echo 0)"
+[ "$n" = "1" ] && ok "повторный вызов ритуала не задвоил строку" \
+               || bad "повторный вызов ритуала не задвоил строку" "строк: $n"
+
+# --force остаётся: защита не должна становиться запретом.
+python3 "$SB/06-autonomous-mode-kit/bin/auto_log.py" \
+  --repo journal-alpha --type batch --note "v2.1.0: признак жизни" --force >/dev/null 2>&1
+n="$(grep -c "	journal-alpha	batch	v2\.1\.0: " "$AUTOLOG" 2>/dev/null || echo 0)"
+[ "$n" = "2" ] && ok "--force пишет повтор осознанно" \
+               || bad "--force пишет повтор осознанно" "строк: $n"
+
+# 🔴 ГЛАВНОЕ РАЗЛИЧАЮЩЕЕ. Журнал — след, а не предусловие: из копии кита,
+# где `auto_log.py` нет вовсе, репа обязана подниматься.
+mv "$SB/06-autonomous-mode-kit/bin/auto_log.py" "$SB/06-autonomous-mode-kit/bin/hidden"
+out="$(body | python3 "$BUMP" journal-alpha --patch --title "журнала нет" --body-stdin 2>&1)"
+rc=$?
+mv "$SB/06-autonomous-mode-kit/bin/hidden" "$SB/06-autonomous-mode-kit/bin/auto_log.py"
+[ "$rc" = "0" ] && ok "отказ журнала НЕ валит подъём версии" \
+                || bad "отказ журнала НЕ валит подъём версии" "код $rc"
+[ "$(cat "$J/VERSION")" = "2.1.1" ] && ok "версия поднялась и без журнала" \
+                || bad "версия поднялась и без журнала" "$(cat "$J/VERSION")"
+printf '%s' "$out" | grep -q '⚠' \
+  && ok "об отказе журнала сказано вслух, а не молча (71 §7ж)" \
+  || bad "об отказе журнала сказано вслух" "$out"
 
 # =============================================================================
 printf '\n\033[1mИТОГ:\033[0m пройдено %d · провалено %d\n' "$PASS" "$FAIL"

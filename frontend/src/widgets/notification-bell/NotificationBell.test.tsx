@@ -12,6 +12,9 @@ vi.mock("@tanstack/react-router", () => ({ useNavigate: () => navigateMock }));
 
 const navigateMock = vi.fn();
 
+const useProfileMock = vi.fn();
+vi.mock("@entities/profile", () => ({ useProfile: () => useProfileMock() }));
+
 vi.mock("@entities/notifications", () => ({
   useUnreadCount: () => useUnreadCountMock(),
   useNotificationsFeed: () => useNotificationsFeedMock(),
@@ -31,6 +34,11 @@ const item = (over: Partial<Record<string, unknown>> = {}) => ({
 });
 
 beforeEach(() => {
+  useProfileMock.mockReturnValue({
+    data: { email: "anna@example.com" },
+    error: null,
+    isLoading: false,
+  });
   useUnreadCountMock.mockReturnValue({ data: 0, error: null, isLoading: false });
   useNotificationsFeedMock.mockReturnValue({
     data: undefined,
@@ -69,7 +77,7 @@ describe("NotificationBell — колокольчик в топбаре", () => 
   it("согласие не выдано (403) — колокольчика нет вовсе, а не панель согласия в топбаре", () => {
     useUnreadCountMock.mockReturnValue({
       data: undefined,
-      error: { status: 403 },
+      error: { detail: { code: "consent_required", consent_type: "financial_data" } },
       isLoading: false,
     });
     const { container } = render(<NotificationBell />);
@@ -88,7 +96,7 @@ describe("NotificationBell — колокольчик в топбаре", () => 
   it("авария бэкенда (500) НЕ прячет колокольчик — иначе функция исчезает без пути назад", () => {
     useUnreadCountMock.mockReturnValue({
       data: undefined,
-      error: { status: 500 },
+      error: { detail: "internal error" },
       isLoading: false,
     });
     render(<NotificationBell />);
@@ -201,5 +209,25 @@ describe("NotificationBell — колокольчик в топбаре", () => 
     await userEvent.click(screen.getByRole("button", { name: /Уведомления/ }));
     await userEvent.click(screen.getByRole("button", { name: /Превышен бюджет/ }));
     expect(markReadMock).not.toHaveBeenCalled();
+  });
+});
+
+describe("NotificationBell — гость", () => {
+  it("неавторизованному колокольчик не показывается", () => {
+    useProfileMock.mockReturnValue({ data: undefined, error: new Error("401"), isLoading: false });
+    const { container } = render(<NotificationBell />);
+    expect(container.textContent).toBe("");
+  });
+
+  it("stale-if-error: старые data профиля при упавшем рефетче — колокольчика нет", () => {
+    // Тот же класс, что баг топбара: TanStack Query держит последние успешные data,
+    // когда рефетч упал на 401, поэтому `data` в одиночку проверять нельзя.
+    useProfileMock.mockReturnValue({
+      data: { email: "anna@example.com" },
+      error: new Error("401"),
+      isLoading: false,
+    });
+    const { container } = render(<NotificationBell />);
+    expect(container.textContent).toBe("");
   });
 });
