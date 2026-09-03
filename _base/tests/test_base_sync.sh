@@ -61,7 +61,13 @@ cat > "$SANDBOX/bin/gh" <<'GHEOF'
 #!/usr/bin/env bash
 # Стаб. Приватные: priv-repo. Публичные: pub-repo. Прочих на GitHub нет.
 if [ "${1:-}" = "repo" ] && [ "${2:-}" = "list" ]; then
-  printf '[{"name":"priv-repo","visibility":"PRIVATE"},{"name":"pub-repo","visibility":"PUBLIC"}]\n'
+  # 🔴 `isPrivate` — ровно то поле, что запрашивает `private_repo_names`
+  # (`--json name,isPrivate`). Здесь стояло `visibility`, и стаб был ЛОЖНЫМ:
+  # раздача читает `r.get("isPrivate")` → None → множество приватных пусто.
+  # Набор этого не ловил, потому что ветку `--all` не вызывал НИ РАЗУ —
+  # а это путь шестого шага ритуала, то есть каждого батча базы.
+  # Найдено 03.09.2026 при заведении `test_batch_state.sh`.
+  printf '[{"name":"priv-repo","isPrivate":true},{"name":"pub-repo","isPrivate":false}]\n'
   exit 0
 fi
 exit 1

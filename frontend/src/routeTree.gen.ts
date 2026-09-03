@@ -13,6 +13,8 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as BanksRouteImport } from './routes/banks'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as GoalsRouteImport } from './routes/goals'
+import { Route as HouseholdRouteImport } from './routes/household'
+import { Route as JoinRouteImport } from './routes/join'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as ObligationsRouteImport } from './routes/obligations'
 import { Route as PlanningRouteImport } from './routes/planning'
@@ -39,6 +41,16 @@ const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
 const GoalsRoute = GoalsRouteImport.update({
   id: '/goals',
   path: '/goals',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HouseholdRoute = HouseholdRouteImport.update({
+  id: '/household',
+  path: '/household',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const JoinRoute = JoinRouteImport.update({
+  id: '/join',
+  path: '/join',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginRoute = LoginRouteImport.update({
@@ -82,6 +94,8 @@ export interface FileRoutesByFullPath {
   '/banks': typeof BanksRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/goals': typeof GoalsRoute
+  '/household': typeof HouseholdRoute
+  '/join': typeof JoinRoute
   '/login': typeof LoginRoute
   '/obligations': typeof ObligationsRoute
   '/planning': typeof PlanningRoute
@@ -95,6 +109,8 @@ export interface FileRoutesByTo {
   '/banks': typeof BanksRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/goals': typeof GoalsRoute
+  '/household': typeof HouseholdRoute
+  '/join': typeof JoinRoute
   '/login': typeof LoginRoute
   '/obligations': typeof ObligationsRoute
   '/planning': typeof PlanningRoute
@@ -109,6 +125,8 @@ export interface FileRoutesById {
   '/banks': typeof BanksRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/goals': typeof GoalsRoute
+  '/household': typeof HouseholdRoute
+  '/join': typeof JoinRoute
   '/login': typeof LoginRoute
   '/obligations': typeof ObligationsRoute
   '/planning': typeof PlanningRoute
@@ -124,6 +142,8 @@ export interface FileRouteTypes {
     | '/banks'
     | '/forgot-password'
     | '/goals'
+    | '/household'
+    | '/join'
     | '/login'
     | '/obligations'
     | '/planning'
@@ -137,6 +157,8 @@ export interface FileRouteTypes {
     | '/banks'
     | '/forgot-password'
     | '/goals'
+    | '/household'
+    | '/join'
     | '/login'
     | '/obligations'
     | '/planning'
@@ -150,6 +172,8 @@ export interface FileRouteTypes {
     | '/banks'
     | '/forgot-password'
     | '/goals'
+    | '/household'
+    | '/join'
     | '/login'
     | '/obligations'
     | '/planning'
@@ -164,6 +188,8 @@ export interface RootRouteChildren {
   BanksRoute: typeof BanksRoute
   ForgotPasswordRoute: typeof ForgotPasswordRoute
   GoalsRoute: typeof GoalsRoute
+  HouseholdRoute: typeof HouseholdRoute
+  JoinRoute: typeof JoinRoute
   LoginRoute: typeof LoginRoute
   ObligationsRoute: typeof ObligationsRoute
   PlanningRoute: typeof PlanningRoute
@@ -201,6 +227,20 @@ declare module '@tanstack/react-router' {
       path: '/goals'
       fullPath: '/goals'
       preLoaderRoute: typeof GoalsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/household': {
+      id: '/household'
+      path: '/household'
+      fullPath: '/household'
+      preLoaderRoute: typeof HouseholdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/join': {
+      id: '/join'
+      path: '/join'
+      fullPath: '/join'
+      preLoaderRoute: typeof JoinRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/login': {
@@ -260,6 +300,8 @@ const rootRouteChildren: RootRouteChildren = {
   BanksRoute: BanksRoute,
   ForgotPasswordRoute: ForgotPasswordRoute,
   GoalsRoute: GoalsRoute,
+  HouseholdRoute: HouseholdRoute,
+  JoinRoute: JoinRoute,
   LoginRoute: LoginRoute,
   ObligationsRoute: ObligationsRoute,
   PlanningRoute: PlanningRoute,

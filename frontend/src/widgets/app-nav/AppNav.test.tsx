@@ -47,7 +47,7 @@ describe("AppNav — постоянный навигационный карка�
     },
   );
 
-  it("залогинен: покрыты ВСЕ семь экранов продукта — недостижимого кликом раздела не осталось", () => {
+  it("залогинен: покрыты ВСЕ экраны продукта — недостижимого кликом раздела не осталось", () => {
     useProfileMock.mockReturnValue(authorized);
     render(<AppNav />);
     const hrefs = screen
@@ -55,7 +55,7 @@ describe("AppNav — постоянный навигационный карка�
       .map((a) => a.getAttribute("href"))
       .sort();
     expect(hrefs).toEqual(
-      ["/", "/planning", "/transactions", "/obligations", "/goals", "/banks", "/profile"].sort(),
+      ["/", "/planning", "/transactions", "/obligations", "/goals", "/banks", "/household", "/profile"].sort(),
     );
   });
 
@@ -99,6 +99,7 @@ describe("AppNav — постоянный навигационный карка�
       "Кредиты и обязательства",
       "Цели",
       "Ликвидные активы",
+      "Семейный доступ",
       "Профиль",
     ]);
   });

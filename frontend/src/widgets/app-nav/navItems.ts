@@ -17,5 +17,6 @@ export const APP_NAV_ITEMS = [
   { to: "/obligations", label: "Кредиты и обязательства" },
   { to: "/goals", label: "Цели" },
   { to: "/banks", label: "Ликвидные активы" },
+  { to: "/household", label: "Семейный доступ" },
   { to: "/profile", label: "Профиль" },
 ] as const;

@@ -82,7 +82,7 @@ import argparse
 import re
 import subprocess
 import sys
-from datetime import date
+from datetime import date, datetime
 from pathlib import Path
 
 # Корень определяется общим модулем: скрипт может быть запущен и из базы,
@@ -93,6 +93,14 @@ BASE_REPO, REPOS, FROM_KIT = resolve_roots(__file__)
 # Единственная точка связи с китом авто-режима: переедет журнал — правится здесь.
 AUTO_LOG = BASE_REPO / "06-autonomous-mode-kit" / "bin" / "auto_log.py"
 TODAY = date.today().isoformat()
+# 🔴 ВРЕМЯ, А НЕ ТОЛЬКО ДАТА — заказ владельца 03.09.2026 21:29.
+# За сутки система закрывает до десяти версий; по одной дате порядок событий
+# внутри дня восстанавливается только по номеру версии, а у отчётов и разборов
+# номера нет вовсе. Время — часть показания (`00-infrastructure/94` §3).
+# Минуты без секунд: секундная точность в заголовке ничего не различает,
+# а глазу мешает. В журналах СОБЫТИЙ секунды остаются — там их пишет машина.
+NOW = datetime.now().strftime("%H:%M")
+STAMP = f"{TODAY} {NOW}"
 
 # Как читает версию сам deploy.sh — сверяемся ровно этим выражением, а не похожим.
 WL_VERSION = re.compile(r"\*\*Версия:\*\*\s*([0-9][0-9.]*)")
@@ -221,17 +229,33 @@ def write_watchlog(repo: Path, new: str) -> str:
     wl = follow_pointer(repo / "WATCHLOG.md")
     if not wl.is_file():
         wl.write_text(f"# {repo.name} — Вахтенный журнал\n\n"
-                      f"**Версия:** {new} · **Дата:** {TODAY} · **Вахта:** {current_watch()}\n",
+                      f"**Версия:** {new} · **Дата:** {STAMP} · **Вахта:** {current_watch()}\n",
                       encoding="utf-8")
         return "журнал создан"
     t = wl.read_text(encoding="utf-8")
     m = WL_VERSION.search(t)
     if m:
-        wl.write_text(t[:m.start(1)] + new + t[m.end(1):], encoding="utf-8")
+        t = t[:m.start(1)] + new + t[m.end(1):]
+        # 🔴 ДАТА ОБНОВЛЯЕТСЯ ВМЕСТЕ С ВЕРСИЕЙ — найдено тестом V7 03.09.2026.
+        # Здесь менялась ТОЛЬКО версия, и §0 нёс дату первого подъёма навсегда.
+        # Замер на живых репах в день находки: `science` — §0 «2026-08-04»
+        # при верхней записи CHANGELOG от 2026-09-03, расхождение в МЕСЯЦ;
+        # `chess`, `war`, `style` — по два дня.
+        #
+        # Дефект тихий и того же класса, что весь этот батч: точка входа
+        # выглядит заполненной и врёт о том, когда репу трогали в последний раз.
+        # Правило §3 WATCHLOG требует «в любой момент отражать текущую точку» —
+        # исполнителя у него не было.
+        #
+        # Поля `**Дата:**` может не быть — тогда НЕ выдумываем: строка написана
+        # не нами, и дописывать в неё поле значит менять чужой формат.
+        t = re.sub(r"(\*\*Дата:\*\*\s*)\d{4}-\d{2}-\d{2}(?:\s+\d{2}:\d{2})?",
+                   rf"\g<1>{STAMP}", t, count=1)
+        wl.write_text(t, encoding="utf-8")
         return "строка обновлена"
     head = re.search(r"^#\s+.*$", t, re.M)
     i = t.index("\n", head.end()) if head else 0
-    wl.write_text(t[:i] + f"\n\n**Версия:** {new} · **Дата:** {TODAY} · **Вахта:** {current_watch()}\n"
+    wl.write_text(t[:i] + f"\n\n**Версия:** {new} · **Дата:** {STAMP} · **Вахта:** {current_watch()}\n"
                   + t[i:], encoding="utf-8")
     return "строка добавлена"
 
@@ -268,9 +292,13 @@ def sync_readme_status(repo: Path, new: str, title: str) -> str | None:
     t = rm.read_text(encoding="utf-8")
     if "<!-- STATUS -->" not in t:
         return None
+    # 🔴 Старая дата съедается ВМЕСТЕ с возможным временем: иначе при повторном
+    # подъёме `\d{4}-\d{2}-\d{2}` совпал бы с датой, а `( · )` упёрся бы
+    # в ` 21:38 · ` — замена не сработала бы, и гейт нашёл бы отставший README
+    # ПОСЛЕ подъёма версии, то есть в состоянии «версия новая, витрина старая».
     new_t, n = re.subn(
-        r"(> \*\*Сейчас:\*\* )`v[\d.]+`( · )\d{4}-\d{2}-\d{2}( · ).*",
-        rf"\g<1>`v{new}`\g<2>{TODAY}\g<3>{title}", t, count=1)
+        r"(> \*\*Сейчас:\*\* )`v[\d.]+`( · )\d{4}-\d{2}-\d{2}(?:\s+\d{2}:\d{2})?( · ).*",
+        rf"\g<1>`v{new}`\g<2>{STAMP}\g<3>{title}", t, count=1)
     if n:
         rm.write_text(new_t, encoding="utf-8")
         return "README-статус обновлён"
@@ -380,7 +408,7 @@ def main() -> int:
 
     # 1. CHANGELOG
     cf = repo / "CHANGELOG.md"
-    section = f"## [{new}] — {TODAY} — {a.title} ({tag})\n\n{body.rstrip()}\n\n"
+    section = f"## [{new}] — {STAMP} — {a.title} ({tag})\n\n{body.rstrip()}\n\n"
     if cf.is_file():
         t = cf.read_text(encoding="utf-8")
         m = re.search(r"^#\s+.*$", t, re.M)

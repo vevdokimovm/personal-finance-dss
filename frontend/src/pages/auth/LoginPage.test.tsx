@@ -4,8 +4,11 @@ import userEvent from "@testing-library/user-event";
 import { LoginPage } from "./LoginPage";
 
 const navigateMock = vi.fn();
+// Параметр `?redirect=` — возврат туда, откуда пришли (приглашение в семейный доступ).
+const searchMock = vi.fn(() => ({}) as Record<string, string>);
 vi.mock("@tanstack/react-router", () => ({
   useNavigate: () => navigateMock,
+  useSearch: () => searchMock(),
   Link: ({ to, children }: { to: string; children: React.ReactNode }) => (
     <a href={to}>{children}</a>
   ),
@@ -80,5 +83,31 @@ describe("LoginPage — вход (FRM/FB, ui_ux_design_standard.md)", () => {
       "href",
       "/forgot-password",
     );
+  });
+  /* Приглашение в семейный доступ приводит гостя на `/login?redirect=/join?token=...`.
+     До v8.36.0 вход всегда уводил на `/`, и токен приглашения терялся: человек
+     оказывался на дашборде без семьи и шёл искать ссылку заново в переписке. */
+  it("после входа возвращает туда, откуда пришли", async () => {
+    searchMock.mockReturnValue({ redirect: "/join?token=abc123" });
+    mutateAsyncMock.mockResolvedValue({ access_token: "t", mfa_required: false });
+    useLoginMock.mockReturnValue(baseLoginState());
+    render(<LoginPage />);
+    await userEvent.type(screen.getByLabelText("Email"), "a@b.ru");
+    await userEvent.type(screen.getByLabelText("Пароль"), "Passw0rd!");
+    await userEvent.click(screen.getByRole("button", { name: "Войти" }));
+    expect(navigateMock).toHaveBeenCalledWith({ to: "/join?token=abc123" });
+    searchMock.mockReturnValue({});
+  });
+
+  it("чужой адрес в redirect игнорируется — открытый редирект это фишинг", async () => {
+    searchMock.mockReturnValue({ redirect: "https://evil.example" });
+    mutateAsyncMock.mockResolvedValue({ access_token: "t", mfa_required: false });
+    useLoginMock.mockReturnValue(baseLoginState());
+    render(<LoginPage />);
+    await userEvent.type(screen.getByLabelText("Email"), "a@b.ru");
+    await userEvent.type(screen.getByLabelText("Пароль"), "Passw0rd!");
+    await userEvent.click(screen.getByRole("button", { name: "Войти" }));
+    expect(navigateMock).toHaveBeenCalledWith({ to: "/" });
+    searchMock.mockReturnValue({});
   });
 });

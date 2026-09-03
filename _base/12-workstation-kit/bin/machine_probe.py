@@ -91,6 +91,119 @@ def hardware() -> dict:
     }
 
 
+def firmware(full_serial: bool = False, check_updates: bool = False) -> dict:
+    """Прошивка и базовое ПО — то, что на PC зовётся BIOS/UEFI.
+
+    🔴 ЗАКАЗ ВЛАДЕЛЬЦА 03.09.2026: *«пусть machine также считывает версию
+    операционки, какой биос, какие все настройки самой базовой программы
+    на компьютерах… и установщики операционных систем»*.
+
+    **На Mac BIOS в привычном виде нет** — и это не придирка к слову, а разница
+    в устройстве, меняющая ответ. У Intel-Mac роль прошивки играют:
+
+      · `System Firmware Version` — EFI, ближайший аналог BIOS;
+      · `OS Loader Version` — загрузчик;
+      · чип **Apple T2** со своей прошивкой — на нём проверка загрузки,
+        шифрование диска и Secure Boot. У этой машины он есть (MacBookPro15,2).
+
+    В прошивку **нельзя зайти по F2** и там нечего настраивать: политики
+    задаёт macOS, а меняются они из Recovery. Поэтому раздел показывает
+    **состояние**, а не «настройки», которых нет.
+
+    Настройки базового ПО, которые реально существуют и имеют значение:
+
+      · **SIP** — защита системных файлов от изменения даже под root;
+      · **Gatekeeper** — проверка подписи запускаемых программ;
+      · **FileVault** — шифрование диска. 🔴 Для владельца без бэкапов это
+        не отвлечённая строка: при отказе диска зашифрованные данные
+        не вытащить из накопителя напрямую;
+      · **XProtect / MRT** — антивирусные определения Apple, обновляются молча;
+      · **автообновления** — включены ли скачивание и критические патчи.
+
+    🔴 ЧЕГО НЕ ПОКАЗЫВАЕТ (`71` §7г-бис):
+      · **политику Secure Boot** чипа T2 — читается только `bputil` из Recovery;
+      · **доступные обновления** — `softwareupdate -l` ходит в сеть и занимает
+        десятки секунд. Вынесено под `--updates`, чтобы обычный замер
+        не превращался в сетевую операцию;
+      · **серийный номер** маскируется: он опознаёт устройство, а замер
+        попадает в отчёты. Полностью — только под `--full-serial`.
+    """
+    hw = sh(["system_profiler", "SPHardwareDataType"], timeout=30)
+    ibr = sh(["system_profiler", "SPiBridgeDataType"], timeout=30)
+
+    def grab(text: str, label: str) -> str:
+        m = re.search(rf"{label}:\s*(.+)", text)
+        return m.group(1).strip() if m else "недоступно"
+
+    serial = grab(hw, r"Serial Number \(system\)")
+    if not full_serial and serial != "недоступно" and len(serial) > 4:
+        serial = "…" + serial[-4:]          # хвоста хватает, чтобы отличить машину
+
+    sip = sh(["csrutil", "status"]).strip()
+    gate = sh(["spctl", "--status"]).strip()
+    vault = sh(["fdesetup", "status"]).strip()
+
+    def xprotect() -> str:
+        for b in ("/Library/Apple/System/Library/CoreServices/XProtect.bundle",
+                  "/System/Library/CoreServices/XProtect.bundle"):
+            v = sh(["defaults", "read", f"{b}/Contents/Info",
+                    "CFBundleShortVersionString"]).strip()
+            if v:
+                return v
+        return "недоступно"
+
+    su = sh(["defaults", "read", "/Library/Preferences/com.apple.SoftwareUpdate"])
+    def flag(key: str) -> str:
+        m = re.search(rf"{key}\s*=\s*(\d)", su)
+        return {"1": "вкл", "0": "выкл"}.get(m.group(1), "?") if m else "недоступно"
+
+    # Установщики macOS: их держат ради переустановки без сети, весят 12+ ГБ,
+    # и о них забывают — при диске на 7 % свободного это заметная величина.
+    installers = []
+    for d in (Path("/Applications"), Path.home() / "Applications"):
+        if d.is_dir():
+            for app in sorted(d.glob("Install macOS*.app")):
+                size = sum(f.stat().st_size for f in app.rglob("*")
+                           if f.is_file()) // 1024**2
+                installers.append({"имя": app.name, "мб": size})
+
+    return {
+        "macos": f"{platform.mac_ver()[0]} ({sh(['sw_vers', '-buildVersion']).strip()})",
+        "ядро": platform.release(),
+        "прошивка_efi": grab(hw, "System Firmware Version"),
+        "загрузчик": grab(hw, "OS Loader Version"),
+        "чип_безопасности": grab(ibr, "Model Name"),
+        "прошивка_чипа": grab(ibr, "Firmware Version"),
+        "блокировка_активации": grab(hw, "Activation Lock Status"),
+        "серийный": serial,
+        "sip": "включён" if "enabled" in sip else ("выключен" if sip else "недоступно"),
+        "gatekeeper": "включён" if "assessments enabled" in gate else
+                      ("выключен" if gate else "недоступно"),
+        "filevault": "включён" if "FileVault is On" in vault else
+                     ("выключен" if vault else "недоступно"),
+        "xprotect": xprotect(),
+        "автообновление_скачивание": flag("AutomaticDownload"),
+        "автообновление_критические": flag("CriticalUpdateInstall"),
+        "установщики_macos": installers,
+        # 🔴 Только по флагу: `softwareupdate -l` ходит в сеть. Обычный замер
+        # обязан оставаться локальным — иначе он перестаёт работать без сети
+        # и начинает зависеть от чужого сервера (`71` §7ж).
+        "обновления": _updates() if check_updates else "не спрашивались (--updates)",
+    }
+
+
+def _updates() -> str:
+    """Доступные обновления macOS. Отдельно — потому что это сетевой вызов."""
+    out = sh(["softwareupdate", "-l"], timeout=180)
+    if not out.strip():
+        return "недоступно (нет ответа)"
+    if "No new software available" in out:
+        return "нет доступных"
+    found = [l.strip("* ").strip() for l in out.splitlines()
+             if l.strip().startswith("*") or "Label:" in l]
+    return "; ".join(found[:5]) if found else "ответ не разобран"
+
+
 def load() -> dict:
     top = sh(["top", "-l1", "-n0"], timeout=20)
     m = re.search(r"Load Avg:\s*([\d.]+),\s*([\d.]+),\s*([\d.]+)", top)
@@ -669,8 +782,27 @@ def diagnose(snap: dict) -> list[str]:
     if isinstance(bh, (int, float)) and bh <= THRESHOLDS["battery_health_pct"]:
         bad.append(f"здоровье батареи {bh} % (порог {THRESHOLDS['battery_health_pct']} %) — "
                    f"{snap['батарея'].get('циклов')} циклов")
-    if snap["диск"]["smart"].get("состояние") not in ("Verified", "недоступно"):
-        bad.append(f"SMART диска: {snap['диск']['smart'].get('состояние')}")
+    # 🔴 «Данных нет» ≠ «диск сломан». Найдено канарейкой 03.09.2026: при
+    # отсутствующем ключе `.get()` возвращает None, None не входил в список
+    # исправных состояний — и снимок без данных SMART выдавал тревогу
+    # «SMART диска: None». Ложная тревога обучает не читать вывод, а это
+    # дороже позднего замечания (тот же довод, что у порога «минут тишины»).
+    smart = snap["диск"]["smart"].get("состояние")
+    if smart not in ("Verified", "недоступно", None, ""):
+        bad.append(f"SMART диска: {smart}")
+
+    # 🔴 Защита системы. Порог — «выключено», а не число: у этих настроек
+    # два состояния, и одно из них дефект. Молчать о выключенном FileVault
+    # при отсутствии бэкапов особенно нельзя: при отказе диска данные
+    # не вытащить напрямую из накопителя — а он тут распаян.
+    f = snap.get("прошивка", {})
+    for ключ, имя in (("filevault", "FileVault — шифрование диска"),
+                      ("sip", "SIP — защита системных файлов"),
+                      ("gatekeeper", "Gatekeeper — проверка подписи программ")):
+        if f.get(ключ) == "выключен":
+            bad.append(f"🔴 {имя} ВЫКЛЮЧЕН")
+    if f.get("автообновление_критические") == "выкл":
+        bad.append("критические обновления безопасности не ставятся автоматически")
 
     b = snap.get("бэкап", {})
     if b.get("последняя_копия", "").startswith("🔴"):
@@ -860,7 +992,55 @@ def health() -> dict:
     }
 
 
-def collect(measure_net: bool = False) -> dict:
+def selftest_protection() -> bool:
+    """Канарейка порогов защиты: различают ли они включённое и выключенное.
+
+    🔴 Проверка, которую нельзя провалить, — не проверка (`71` §7в). Поэтому
+    оба направления: на выключенном FileVault тревога обязана быть, на
+    включённом — обязана отсутствовать. Одного первого мало: проверка,
+    кричащая всегда, тоже «ловит».
+
+    Проверяется `diagnose()` — та самая функция, что работает на живом снимке,
+    а не её копия: иначе канарейка сторожила бы саму себя.
+    """
+    пусто = {"нагрузка": {}, "память": {}, "диск": {"smart": {}},
+             "батарея": {}, "бэкап": {}}
+
+    выкл = dict(пусто, прошивка={"filevault": "выключен", "sip": "включён",
+                                 "gatekeeper": "включён",
+                                 "автообновление_критические": "вкл"})
+    if not any("FileVault" in b for b in diagnose(выкл)):
+        print("🔴 канарейка: выключенный FileVault НЕ поднял тревогу", file=sys.stderr)
+        return False
+
+    вкл = dict(пусто, прошивка={"filevault": "включён", "sip": "включён",
+                                "gatekeeper": "включён",
+                                "автообновление_критические": "вкл"})
+    if any("FileVault" in b or "SIP" in b for b in diagnose(вкл)):
+        print("🔴 канарейка: тревога при исправной защите", file=sys.stderr)
+        return False
+
+    # «недоступно» — не «выключено». Машина без прав на чтение настройки
+    # не должна выглядеть незащищённой: это ложная тревога, а она обучает
+    # не читать вывод.
+    # 🔴 «Недоступно» — не «выключено», и «данных нет» — не «сломано».
+    # Машина, где настройку не удалось прочитать, не должна выглядеть
+    # незащищённой: ложная тревога обучает не читать вывод.
+    # Эта проверка на первом же прогоне нашла настоящий дефект — пустой
+    # снимок выдавал «SMART диска: None».
+    нет = dict(пусто, прошивка={"filevault": "недоступно", "sip": "недоступно",
+                                "gatekeeper": "недоступно",
+                                "автообновление_критические": "недоступно"})
+    шум = diagnose(нет)
+    if шум:
+        print(f"🔴 канарейка: ложная тревога на снимке без данных: {шум}",
+              file=sys.stderr)
+        return False
+    return True
+
+
+def collect(measure_net: bool = False, full_serial: bool = False,
+            check_updates: bool = False) -> dict:
     snap = {
         "снято": datetime.now().isoformat(timespec="seconds"),
         "здоровье": health(),
@@ -870,6 +1050,7 @@ def collect(measure_net: bool = False) -> dict:
         "vpn": vpn_state(),
         "открытые_приложения": open_apps(),
         "железо": hardware(),
+        "прошивка": firmware(full_serial, check_updates),
         "нагрузка": load(),
         "память": memory(),
         "диск": disks(),
@@ -967,6 +1148,39 @@ def render(snap: dict) -> None:
     print("\nТОП ПО CPU")
     for p in snap["топ_процессов"]:
         print(f"   {p['cpu']:>5.1f}%  {p['rss_мб']:>5} МБ  {p['имя'][:44]}")
+    # 🔴 Прошивка и базовое ПО. Раздел печатается ВСЕГДА, а не по флагу:
+    # выключенный FileVault или SIP — состояние, о котором узнают тогда, когда
+    # уже поздно, и молчащая строка здесь ничем не лучше отсутствующей.
+    f = snap.get("прошивка", {})
+    if f:
+        print("\nПРОШИВКА И БАЗОВОЕ ПО")
+        print(f"   macOS        {f['macos']} · ядро {f['ядро']}")
+        print(f"   прошивка EFI {f['прошивка_efi']}")
+        print(f"                (аналог BIOS; настроек в ней нет — политики задаёт macOS)")
+        print(f"   загрузчик    {f['загрузчик']}")
+        if f["чип_безопасности"] != "недоступно":
+            print(f"   {f['чип_безопасности']} · прошивка {f['прошивка_чипа']}")
+        marks = {"включён": "🟢", "выключен": "🔴", "недоступно": "·"}
+        print(f"   SIP {marks.get(f['sip'], '·')} {f['sip']}"
+              f" · Gatekeeper {marks.get(f['gatekeeper'], '·')} {f['gatekeeper']}"
+              f" · FileVault {marks.get(f['filevault'], '·')} {f['filevault']}")
+        print(f"   XProtect {f['xprotect']} · автообновления: скачивание "
+              f"{f['автообновление_скачивание']}, критические "
+              f"{f['автообновление_критические']}")
+        print(f"   машина {f['серийный']} · блокировка активации "
+              f"{f['блокировка_активации']}")
+        if f["установщики_macos"]:
+            for i in f["установщики_macos"]:
+                print(f"   установщик   {i['имя']} — {i['мб']} МБ")
+        else:
+            print("   установщиков macOS на диске нет")
+        upd = f.get("обновления", "")
+        if upd and not upd.startswith("не спрашивались"):
+            print(f"   обновления   {upd}")
+
+        print("\n   не читается без Recovery: политика Secure Boot чипа T2 (`bputil`)")
+        print("   доступные обновления — только по `--updates` (сеть, десятки секунд)")
+
     h = snap.get("здоровье", {})
     if h:
         print("\nИЗНОС КОМПОНЕНТОВ")
@@ -1345,6 +1559,12 @@ def main() -> int:
         return 2
     ap = argparse.ArgumentParser(description="Снимок состояния Mac")
     ap.add_argument("--json", action="store_true", help="выдать JSON вместо текста")
+    ap.add_argument("--selftest", action="store_true",
+                    help="канарейка: различают ли пороги защиты состояния")
+    ap.add_argument("--updates", action="store_true",
+                    help="спросить доступные обновления macOS (сеть, десятки секунд)")
+    ap.add_argument("--full-serial", action="store_true",
+                    help="показать серийный номер целиком (по умолчанию маскирован)")
     ap.add_argument("--net", action="store_true",
                     help="замерить скорость сети (networkQuality, ~15 с)")
     ap.add_argument("--watch", action="store_true",
@@ -1366,7 +1586,12 @@ def main() -> int:
         # 🔴 --watch не пишет: он снимает показания каждые две секунды,
         # и журнал за час работы получил бы 1800 строк шума вместо истории.
         return watch(args.interval)
-    snap = collect(args.net)
+    if args.selftest:
+        ok = selftest_protection()
+        print("канарейка порогов защиты: " + ("🟢 зелёная" if ok else "🔴 красная"))
+        return 0 if ok else 1
+
+    snap = collect(args.net, args.full_serial, args.updates)
     if args.json:
         print(json.dumps(snap, ensure_ascii=False, indent=2))
     else:

@@ -1,0 +1,236 @@
+/* Семейный доступ (v8.36.0). Раскладка своя, но кегли, отступы и карточка — как
+   у остальных пяти CRUD-экранов: экран не должен опознаваться по тому, что на нём
+   заголовок крупнее ([CMP-01], [TOK-03]). */
+.fp-households {
+  max-width: var(--content-max);
+  margin: 0 auto;
+  padding: var(--sp-5);
+}
+
+.fp-households h1 {
+  font-size: var(--fs-xl);
+  margin: 0 0 var(--sp-5);
+}
+
+.fp-households__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  margin-bottom: var(--sp-3);
+  flex-wrap: wrap;
+}
+
+.fp-households__head h1 {
+  margin: 0; /* отступ снизу даёт flex-контейнер __head, не сам заголовок */
+}
+
+.fp-households__lede {
+  margin: 0 0 var(--sp-5);
+  max-width: var(--measure-w);
+  color: var(--c-text2);
+  font-size: var(--fs-sm);
+}
+
+/* Карточка семьи — элемент списка, а не секция дашборда: те же радиус и внутренний
+   отступ, что у строки цели (GoalsPage.css): панельные отступы на узком экране
+   съедают четверть доступной ширины. */
+.fp-household {
+  background: var(--c-surface);
+  border: var(--border-w) solid var(--c-border);
+  border-radius: var(--r-md);
+  padding: var(--sp-4);
+  margin-bottom: var(--sp-4);
+}
+
+.fp-household__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--sp-2);
+}
+
+.fp-household__head h2 {
+  font-size: var(--fs-lg);
+  font-weight: 700;
+  margin: 0 0 var(--sp-1);
+}
+
+/* Роль различается рамкой, а не заливкой: заливка --c-bg2 сливалась бы с фоном
+   карточки в тёмной теме (та же коллизия, о которой предупреждает MetricsGrid.css).
+   Владелец выделен сильнее: именно роль решает, увидит человек «Пригласить» или
+   «Покинуть», и вычитывать её мелким серым — значит прятать главный различитель. */
+.fp-household__role {
+  padding: 0 var(--sp-2);
+  border: var(--border-w) solid var(--c-border-hl);
+  border-radius: var(--r-full);
+  color: var(--c-text2);
+  font-size: var(--fs-sm);
+  font-weight: 600;
+}
+
+.fp-household__role--owner {
+  border-color: var(--c-accent);
+  color: var(--c-text);
+}
+
+.fp-household__meta {
+  margin: 0 0 var(--sp-4);
+  color: var(--c-text2);
+  font-size: var(--fs-sm);
+}
+
+/* Два списка подряд без подписей читались однородной стопкой строк: участник и
+   приглашение выглядели одинаково, а это разные вещи ([IA-02]). */
+.fp-household__section-title {
+  margin: 0 0 var(--sp-2);
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  color: var(--c-text2);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.fp-household__members,
+.fp-household__invites {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  margin: 0 0 var(--sp-4);
+  padding: 0;
+  list-style: none;
+}
+
+.fp-household__member,
+.fp-household__invite-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: var(--sp-2) var(--sp-3);
+  border: var(--border-w) solid var(--c-border);
+  border-radius: var(--r-sm);
+  background: var(--c-surface-up);
+}
+
+/* Приглашение — состояние «ещё не состоялось», а не человек в семье: пунктир и
+   отсутствие заливки отличают его от участника без опоры на один только текст. */
+.fp-household__invite-row {
+  border-style: dashed;
+  background: transparent;
+}
+
+/* min-width: 0 и перенос по буквам — иначе длинный корпоративный адрес не сжимается
+   (у flex-элемента min-width: auto) и раздвигает строку шире самого узкого экрана. */
+.fp-household__email {
+  flex: 1 1 var(--household-email-w);
+  min-width: 0;
+  overflow-wrap: anywhere;
+  color: var(--c-text);
+  font-size: var(--fs-sm);
+  font-weight: 600;
+}
+
+.fp-household__me {
+  color: var(--c-text2);
+  font-weight: 400;
+}
+
+.fp-household__member-role,
+.fp-household__invite-status {
+  color: var(--c-text2);
+  font-size: var(--fs-xs);
+}
+
+.fp-household__empty {
+  margin: 0 0 var(--sp-4);
+  color: var(--c-text2);
+  font-size: var(--fs-sm);
+}
+
+.fp-household__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--sp-3);
+  margin-bottom: var(--sp-4);
+}
+
+.fp-household__actions--footer {
+  margin-bottom: 0;
+}
+
+.fp-household__invite-role {
+  flex: 0 1 var(--household-field-w);
+}
+
+/* Ссылка приходит один раз и через минуту исчезнет — это предупреждение, а не успех.
+   Пара --c-accent + --c-accent-bg в продукте означает «получилось» (.fp-auth-banner--success),
+   и говорить ею про исчезающий секрет — врать цветом (design-critic). */
+.fp-household__invite {
+  margin-bottom: var(--sp-4);
+  padding: var(--sp-3);
+  border: var(--border-w) solid var(--c-amber);
+  border-radius: var(--r-sm);
+  background: var(--c-amber-bg);
+}
+
+.fp-household__invite-title {
+  margin: 0 0 var(--sp-2);
+  color: var(--c-text);
+  font-size: var(--fs-sm);
+  font-weight: 700;
+}
+
+.fp-household__invite-row-new {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+  margin-bottom: var(--sp-2);
+}
+
+.fp-household__invite-url {
+  flex: 1 1 var(--household-email-w);
+  min-width: 0;
+  min-height: var(--tap-target-min);
+  padding: var(--sp-2) var(--sp-3);
+  border: var(--border-w) solid var(--c-border-hl);
+  border-radius: var(--r-sm);
+  background: var(--c-surface);
+  color: var(--c-text);
+  font: inherit;
+  font-size: var(--fs-sm);
+}
+
+.fp-household__invite-hint {
+  margin: var(--sp-2) 0 0;
+  color: var(--c-text2);
+  font-size: var(--fs-xs);
+}
+
+.fp-household__confirm-target {
+  margin: 0 0 var(--sp-3);
+  color: var(--c-text);
+  font-size: var(--fs-sm);
+}
+
+.fp-household__confirm {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--sp-2);
+  margin-top: var(--sp-3);
+}
+
+/* Приём приглашения: две кнопки рядом — «Войти» и «Зарегистрироваться». Приглашённый
+   чаще всего в продукте впервые, и регистрация не должна прятаться за вход. */
+.fp-join__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-3);
+}
+
+.fp-join__result:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: var(--focus-ring-offset);
+}

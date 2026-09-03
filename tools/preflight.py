@@ -99,10 +99,22 @@ def watchlog_window(repo: Path) -> int:
     return len(re.findall(r"^- \*\*v\d", text[start:end], flags=re.M))
 
 
+# `_base/` — зеркало системы «база», инжектируемое в 63 репозитория снаружи. Судить его
+# нашими проверками нельзя: правку туда мы не вносим (следующая раздача её сотрёт), а провал
+# preflight по чужому файлу блокирует сдачу батча, не давая способа починки. Тот же вывод уже
+# сделан для ревизионного гейта (v8.30.1, `SKIP_DIRS`) и для flake8 (v8.32.0) — здесь он
+# доезжает до третьей проверки, которая о нём не знала. Правило «отмена доходит всюду».
+FOREIGN_DIRS = frozenset({".git", "_base"})
+
+
+def _foreign(path: Path) -> bool:
+    return any(part in FOREIGN_DIRS for part in path.parts)
+
+
 def soft_hyphens(repo: Path) -> list[str]:
     hits = []
     for path in repo.rglob("*.md"):
-        if ".git" in path.parts:
+        if _foreign(path):
             continue
         if SOFT_HYPHEN in _read(path):
             hits.append(str(path.relative_to(repo)))
@@ -115,7 +127,7 @@ def grep_in_and_chain(repo: Path) -> list[str]:
     pattern = re.compile(r"&&\s*grep\b")
     for suffix in ("*.sh", "*.zsh"):
         for path in repo.rglob(suffix):
-            if ".git" in path.parts:
+            if _foreign(path):
                 continue
             for number, line in enumerate(_read(path).splitlines(), 1):
                 if pattern.search(line) and "|| true" not in line:

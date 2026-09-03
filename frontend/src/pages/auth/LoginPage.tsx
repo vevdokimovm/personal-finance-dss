@@ -1,14 +1,18 @@
 import { useState, type FormEvent } from "react";
-import { useNavigate, Link } from "@tanstack/react-router";
+import { useNavigate, useSearch, Link } from "@tanstack/react-router";
 import { useLogin } from "@entities/auth";
 import { Button, toast } from "@shared/ui";
 import { t } from "@shared/lib/i18n/t";
+import { safeRedirect } from "@shared/lib/navigation/redirectTarget";
 import { extractErrorMessage } from "@shared/lib/api/extractErrorMessage";
 import { AuthLayout } from "./AuthLayout";
 import "./AuthLayout.css";
 
 export function LoginPage() {
   const navigate = useNavigate();
+  // Куда вернуть после успеха. Пусто — на дашборд; `/join?token=...` — обратно
+  // к приглашению, иначе приглашённый терял ссылку на входе (v8.36.0).
+  const search = useSearch({ strict: false }) as { redirect?: string };
   const login = useLogin();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -27,7 +31,7 @@ export function LoginPage() {
         return;
       }
       toast.success(t("Добро пожаловать!"));
-      navigate({ to: "/" });
+      navigate({ to: safeRedirect(search.redirect) ?? "/" });
     } catch {
       // Пароль не оставляем в поле после неверной попытки (общепринятая практика для
       // логин-форм) — email оставляем, его повторный ввод раздражает больше (FRM-06).

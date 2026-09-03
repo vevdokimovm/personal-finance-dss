@@ -102,6 +102,19 @@ class TestSoftHyphens:
     def test_clean_repo_reports_nothing(self, repo):
         assert soft_hyphens(repo) == []
 
+    def test_injected_base_is_not_our_file(self, repo):
+        """`_base/` — зеркало системы «база», инжектируемое в 63 репозитория.
+
+        Читать его как свой текст нельзя: правку туда мы не вносим, а провал
+        preflight по чужому файлу блокирует сдачу батча, не давая способа
+        починки. Тот же вывод уже сделан для flake8 (v8.32.0) и ревизионного
+        гейта (v8.30.1) — здесь он доезжает до третьей проверки.
+        """
+        base = repo / "_base" / "reports"
+        base.mkdir(parents=True)
+        (base / "pitfalls.md").write_text("сло\u00adво", encoding="utf-8")
+        assert soft_hyphens(repo) == []
+
 
 class TestGrepInAndChain:
     def test_pattern_is_flagged(self, repo):

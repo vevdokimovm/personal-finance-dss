@@ -1231,7 +1231,11 @@ def check_living_documents(root: Path) -> list[str]:
         text = watchlog.read_text(encoding="utf-8")
         section = find_batch_log(text)
         if section is not None:
-            entries = re.findall(r"^- \*\*\d{4}-\d{2}-\d{2}\*\*", section, re.M)
+            # Время опционально: записи до 03.09.2026 законны без него.
+            # Без `(?:...)?` запись со временем не считалась бы записью вовсе,
+            # и гейт объявил бы журнал неполным — ложь, выглядящая находкой.
+            entries = re.findall(
+                r"^- \*\*\d{4}-\d{2}-\d{2}(?:\s+\d{2}:\d{2})?\*\*", section, re.M)
             if len(entries) != 10:
                 problems.append(
                     f"журнал последних батчей держит {len(entries)} записей "
@@ -1655,6 +1659,39 @@ def selftest_campaign_log() -> bool:
         dec.write_text("старый прогон\n", encoding="utf-8")
         os.utime(dec, (old, old))
         return check_campaign_log(root) == []             # кампания не идёт — молчит
+
+
+def check_journals(root: Path) -> list[str]:
+    """Журналы системы: порядок событий и учёт (`00-infrastructure/94`).
+
+    🔴 ПОЧЕМУ ГЕЙТ, А НЕ ПРАВИЛО. Стандарт запрещает переставлять строки
+    журнала событий, но запрет без исполнителя есть обещание (`21` §4г).
+    Нарушение при этом невидимо глазом: журнал на 517 строк после сортировки
+    выглядит ровно так же, а производная — темп работы, ряд замеров, интервалы
+    между батчами — уже уничтожена.
+
+    Проверяет ПЕРЕСТАНОВКУ и УЧЁТ, не правдивость: полный разбор границ —
+    в докстроке `journal_audit.py`, здесь он не пересказывается, чтобы
+    не разойтись с ней.
+    """
+    if not (root / "scripts" / "journal_audit.py").is_file():
+        return []                       # не база — предмета нет
+    sys.path.insert(0, str(root / "scripts"))
+    try:
+        import journal_audit
+    except Exception as exc:            # noqa: BLE001
+        return [f"аудит журналов не запускается: {exc}"]
+    return journal_audit.audit()
+
+
+def selftest_journals(root: Path) -> bool:
+    """Канарейка: ловит ли проверка подсаженную перестановку."""
+    sys.path.insert(0, str(root / "scripts"))
+    try:
+        import journal_audit
+    except Exception:                   # noqa: BLE001
+        return True                     # модуля нет — сторожить нечего
+    return journal_audit.selftest()
 
 
 def check_runtime_writes(root: Path) -> list[str]:
@@ -3351,6 +3388,23 @@ def main() -> int:
     # списком, а перепись по коду нашла семь таких файлов. Гейт следит,
     # чтобы восьмой был объявлен, а не обнаружен через месяц по ложным
     # «разошедшимся» копиям. Разбор — `scripts/runtime_writes.py`.
+    # 🔴 Заведено 03.09.2026 вместе со стандартом `00-infrastructure/94`.
+    # Журналы — единственный механизм, дающий системе производную: не «как
+    # сейчас», а «как менялось». Перестановка строк уничтожает именно её,
+    # и заметить это глазами нельзя: файл на 517 строк выглядит так же.
+    jr = check_journals(root)
+    if jr:
+        failures.extend(jr)
+        print(f"[FAIL] Журналы: порядок или учёт нарушены (94): {len(jr)}")
+        for line in jr:
+            print(f"    · {line}")
+    else:
+        if selftest_journals(root):
+            print("[OK] Журналы: порядок событий не нарушен, все учтены")
+        else:
+            failures.append("канарейка журналов сломана")
+            print("[FAIL] Канарейка журналов: самопроверка не прошла")
+
     rw = check_runtime_writes(root)
     if rw:
         failures.extend(rw)

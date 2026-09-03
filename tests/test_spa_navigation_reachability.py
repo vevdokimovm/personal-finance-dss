@@ -40,6 +40,10 @@ AUTH_ROUTE_FILES = {
     "register.tsx",
     "forgot-password.tsx",
     "reset-password.tsx",
+    # `/join` — приём приглашения по ссылке из письма, а не раздел продукта. Пункта
+    # меню у него быть не должно: попасть туда осмысленно можно только по адресу
+    # с токеном, а без токена экран честно говорит, что ссылка неполная.
+    "join.tsx",
 }
 
 
@@ -112,6 +116,7 @@ def test_navigation_labels_match_screen_headings():
         "/obligations": "Кредиты и обязательства",
         "/goals": "Цели",
         "/banks": "Ликвидные активы",
+        "/household": "Семейный доступ",
         "/profile": "Профиль",
     }
     text = NAV_ITEMS.read_text(encoding="utf-8")
@@ -154,4 +159,65 @@ def test_notification_links_point_to_existing_screens():
         f"Уведомления ведут на несуществующие экраны: {sorted(dead)} — "
         f"app/services/notifications.py. Клик по такому уведомлению уводит "
         f"пользователя в никуда."
+    )
+
+
+# Бэкенд строит ссылки во ФРОНТ в нескольких местах: приглашение в household, сброс
+# пароля, реферальная ссылка. Все они уходят пользователю письмом или копированием —
+# то есть проверить их «глазами при разработке» невозможно, а сломанная ссылка
+# обнаруживается только жалобой.
+BACKEND_URL_SOURCES = (
+    REPO_ROOT / "app" / "api" / "routes_households.py",
+    REPO_ROOT / "app" / "api" / "routes_auth.py",
+    REPO_ROOT / "app" / "api" / "routes_referral.py",
+)
+
+# `/api/...` — обращения к самому бэкенду, во фронт они не ведут и роутом SPA быть
+# не обязаны (напр. `/api/auth/verify?token=` — серверный эндпоинт подтверждения).
+_FRONTEND_URL_RE = re.compile(r'\+\s*f?"(/[a-z][a-z0-9\-/]*)')
+
+
+def _backend_built_frontend_paths() -> dict[str, str]:
+    """Пути во фронт, которые бэкенд склеивает с `base_url`. Ключ — путь,
+    значение — файл, где он собран (чтобы сообщение теста называло адрес починки)."""
+    found: dict[str, str] = {}
+    for source in BACKEND_URL_SOURCES:
+        if not source.exists():
+            continue
+        for match in _FRONTEND_URL_RE.finditer(source.read_text(encoding="utf-8")):
+            path = match.group(1)
+            if path.startswith("/api/"):
+                continue
+            found.setdefault(path, source.name)
+    return found
+
+
+def test_backend_built_links_point_to_existing_screens():
+    """Ссылка, которую бэкенд кладёт в письмо или отдаёт для копирования, обязана вести
+    на существующий экран (гипотеза H12 independent-expert, второй случай класса).
+
+    Найдено 2026-09-03: `routes_households.py::_invite_url` строит `/join?token=...`,
+    а роута `/join` в SPA нет вовсе — приглашение в семейный доступ вело в никуда.
+    Первый случай того же класса (`link="/budgets"` в уведомлениях) был починен в
+    v8.34.0, и тогда гейт закрыл ТОЛЬКО уведомления. Класс шире: любая ссылка,
+    собранная на сервере, уходит пользователю письмом или копированием, и проверить
+    её при разработке глазами невозможно — сломанная обнаруживается жалобой.
+
+    Проверка идёт по РЕАЛЬНЫМ файлам роутов, а не по списку в голове: список
+    разойдётся с деревом, дерево — нет.
+    """
+    all_routes = {
+        "/" if path.name == "index.tsx" else f"/{path.stem}"
+        for path in ROUTES_DIR.glob("*.tsx")
+        if path.name not in LAYOUT_ROUTE_FILES
+    }
+    dead = {
+        path: source
+        for path, source in _backend_built_frontend_paths().items()
+        if path not in all_routes
+    }
+    assert not dead, (
+        "Бэкенд строит ссылки на несуществующие экраны: "
+        + ", ".join(f"{path} ({source})" for path, source in sorted(dead.items()))
+        + ". Пользователь получит такую ссылку письмом и упрётся в пустоту."
     )

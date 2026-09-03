@@ -4,8 +4,11 @@ import userEvent from "@testing-library/user-event";
 import { RegisterPage } from "./RegisterPage";
 
 const navigateMock = vi.fn();
+// Параметр `?redirect=` — возврат туда, откуда пришли (приглашение в семейный доступ).
+const searchMock = vi.fn(() => ({}) as Record<string, string>);
 vi.mock("@tanstack/react-router", () => ({
   useNavigate: () => navigateMock,
+  useSearch: () => searchMock(),
   Link: ({ to, children }: { to: string; children: React.ReactNode }) => (
     <a href={to}>{children}</a>
   ),

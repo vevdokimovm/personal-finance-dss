@@ -1,14 +1,18 @@
 import { useState, type FormEvent } from "react";
-import { useNavigate, Link } from "@tanstack/react-router";
+import { useNavigate, useSearch, Link } from "@tanstack/react-router";
 import { useRegister } from "@entities/auth";
 import { Button, toast } from "@shared/ui";
 import { t } from "@shared/lib/i18n/t";
+import { safeRedirect } from "@shared/lib/navigation/redirectTarget";
 import { extractErrorMessage } from "@shared/lib/api/extractErrorMessage";
 import { AuthLayout } from "./AuthLayout";
 import "./AuthLayout.css";
 
 export function RegisterPage() {
   const navigate = useNavigate();
+  // Куда вернуть после успеха. Пусто — на дашборд; `/join?token=...` — обратно
+  // к приглашению, иначе приглашённый терял ссылку на входе (v8.36.0).
+  const search = useSearch({ strict: false }) as { redirect?: string };
   const register = useRegister();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -27,7 +31,7 @@ export function RegisterPage() {
         newsletter_opt_in: newsletterOptIn,
       });
       toast.success(t("Готово! Проверьте почту, чтобы подтвердить email."));
-      navigate({ to: "/" });
+      navigate({ to: safeRedirect(search.redirect) ?? "/" });
     } catch {
       // Пароль не оставляем после неудачной попытки, email/имя/согласие — оставляем
       // (FRM-06): их повторный ввод раздражает больше, чем 8 символов пароля заново.

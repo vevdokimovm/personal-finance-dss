@@ -22,6 +22,7 @@ bash tests/test_readme_status.sh     # гейт свежести README
 bash tests/test_repo_lifecycle.sh    # 🆕 жизненный цикл репы: конструктор, инвариант, деструктор
 bash tests/test_version_bump.sh      # 🆕 подъём версии и выпуск: три файла одной операцией
 bash tests/test_base_sync.sh         # 🆕 раздача канона: rmtree по чужим репам
+bash tests/test_batch_state.sh       # 🆕 состояние батча: знает ли `--state` про все шесть шагов
 ```
 
 ### `test_base_sync.sh` — 6 кейсов / 21 проверка (заведён 03.09.2026)
