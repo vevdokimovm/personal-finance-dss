@@ -13,3 +13,4 @@ export type {
   PlanIndicators,
   WeightedScores,
 } from "./model/types";
+export { useKeyRate } from "./api/useKeyRate";

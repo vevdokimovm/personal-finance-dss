@@ -1565,6 +1565,38 @@ export type InviteAcceptResponse = {
 export type InviteRole = 'member' | 'viewer';
 
 /**
+ * KeyRate
+ *
+ * Ключевая ставка Банка России.
+ *
+ * Схема заведена ДО фронта (v8.42.0): раньше эндпоинт был размечен `-> dict[str, object]`.
+ * 🔴 Ошибка здесь была бы особенно тихой — поле называется `key_rate`, и рукописный тип
+ * с полем `rate` дал бы `undefined` без единого предупреждения компилятора.
+ *
+ * `source` говорит, откуда взято значение: `cbr` — живой запрос, `cache`/`cache_db` —
+ * сохранённое, `fallback` — резервное из настроек. Человек вправе знать, насколько
+ * свежа ставка, под которую ему считают план.
+ */
+export type KeyRate = {
+    /**
+     * As Of
+     */
+    as_of: string;
+    /**
+     * Detail
+     */
+    detail?: string;
+    /**
+     * Key Rate
+     */
+    key_rate: number;
+    /**
+     * Source
+     */
+    source: string;
+};
+
+/**
  * LegalDocument
  *
  * Один юридический документ.
@@ -5910,13 +5942,9 @@ export type KeyRateEndpointApiPlanningKeyRateGetData = {
 
 export type KeyRateEndpointApiPlanningKeyRateGetResponses = {
     /**
-     * Response Key Rate Endpoint Api Planning Key Rate Get
-     *
      * Successful Response
      */
-    200: {
-        [key: string]: unknown;
-    };
+    200: KeyRate;
 };
 
 export type KeyRateEndpointApiPlanningKeyRateGetResponse = KeyRateEndpointApiPlanningKeyRateGetResponses[keyof KeyRateEndpointApiPlanningKeyRateGetResponses];

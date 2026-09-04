@@ -1,0 +1,132 @@
+/* Параметры расчёта плана (v8.42.0). Панель стоит ПЕРЕД планом: сначала настройка,
+   потом результат — иначе непонятно, чем управляют эти ползунки. */
+.fp-plan-settings__group {
+  margin: 0 0 var(--sp-5);
+  padding: 0;
+  border: 0;
+}
+
+.fp-plan-settings__legend {
+  padding: 0;
+  margin-bottom: var(--sp-2);
+  color: var(--c-text);
+  font-size: var(--fs-sm);
+  font-weight: 600;
+}
+
+/* Пять профилей — ПОРЯДКОВАЯ шкала (`RISK_PROFILES`: lt_target от 6.0 к 3.0), поэтому
+   на узком экране они идут колонкой, а не рвутся на 2+2+1: рваные переносы ломают
+   ощущение шкалы. Комментарий первой редакции обещал колонку, а кода на неё не было
+   (design-critic). */
+.fp-plan-settings__risks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+}
+
+@media (max-width: 768px) {
+  .fp-plan-settings__risks {
+    flex-direction: column;
+  }
+}
+
+.fp-plan-settings__risk {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  min-height: var(--tap-target-min);
+  padding: 0 var(--sp-3);
+  border: var(--border-w) solid var(--c-border-hl);
+  border-radius: var(--r-sm);
+  color: var(--c-text);
+  font-size: var(--fs-sm);
+  /* Вес постоянный: менять его у выбранного значит менять ширину текста, и плашки
+     во flex-wrap перескакивали бы между строками при переборе стрелками. */
+  font-weight: 600;
+  cursor: pointer;
+  transition: background var(--motion-fast), border-color var(--motion-fast);
+}
+
+/* Аффорданс наведения — Must по [IA-05]; без него плашка выглядит как подпись. */
+.fp-plan-settings__risk:hover {
+  border-color: var(--c-text2);
+}
+
+/* Выбранный отличается не только цветом рамки: заливка плюс сама точка radio,
+   которую рисует браузер ([A11Y-07]).
+   🔴 `--c-bg2`, а не `--c-surface-up`: в СВЕТЛОЙ теме `--c-surface-up` равен
+   `--c-surface` (`tokens.css:180` — оба `#ffffff`), то есть обещанной заливки там
+   не существовало вовсе, и признак держался на одной рамке (design-critic). */
+.fp-plan-settings__risk:has(input:checked) {
+  border-color: var(--c-accent);
+  background: var(--c-bg2);
+}
+
+.fp-plan-settings__risk:has(input:focus-visible) {
+  outline: var(--focus-ring);
+  outline-offset: var(--focus-ring-offset);
+}
+
+.fp-plan-settings__field {
+  margin-bottom: var(--sp-5);
+}
+
+.fp-plan-settings__field label {
+  display: block;
+  margin-bottom: var(--sp-2);
+  color: var(--c-text);
+  font-size: var(--fs-sm);
+  font-weight: 600;
+}
+
+.fp-plan-settings__value {
+  display: inline-block;
+  margin-bottom: var(--sp-2);
+  color: var(--c-text);
+  font-size: var(--fs-base);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.fp-plan-settings__field input[type="range"] {
+  width: 100%;
+  min-height: var(--tap-target-min);
+  /* Иначе единственные ползунки на экране в системном синем: соседи (WhatIfSliders,
+     ForecastControls) красят свои явно. */
+  accent-color: var(--c-accent);
+}
+
+.fp-plan-settings__hint {
+  margin: var(--sp-2) 0 0;
+  max-width: var(--measure-w);
+  color: var(--c-text2);
+  font-size: var(--fs-sm);
+}
+
+.fp-plan-settings__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sp-3);
+}
+
+.fp-plan-settings__dirty {
+  /* Узел всегда в DOM и всегда занимает место: и чтобы live-регион не пересоздавался,
+     и чтобы соседние элементы не прыгали при смене текста. */
+  flex: 1 1 var(--measure-w);
+  margin: 0;
+  color: var(--c-text2);
+  font-size: var(--fs-sm);
+}
+
+/* Кнопка-ссылка «взять ключевую ставку»: это действие, а не переход, но по весу оно
+   равно окружающему тексту подсказки. */
+.fp-plan-settings__link {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--c-text);
+  font: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+}

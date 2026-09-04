@@ -2536,6 +2536,35 @@
         "title": "InviteRole",
         "type": "string"
       },
+      "KeyRate": {
+        "description": "Ключевая ставка Банка России.\n\nСхема заведена ДО фронта (v8.42.0): раньше эндпоинт был размечен `-> dict[str, object]`.\n🔴 Ошибка здесь была бы особенно тихой — поле называется `key_rate`, и рукописный тип\nс полем `rate` дал бы `undefined` без единого предупреждения компилятора.\n\n`source` говорит, откуда взято значение: `cbr` — живой запрос, `cache`/`cache_db` —\nсохранённое, `fallback` — резервное из настроек. Человек вправе знать, насколько\nсвежа ставка, под которую ему считают план.",
+        "properties": {
+          "as_of": {
+            "title": "As Of",
+            "type": "string"
+          },
+          "detail": {
+            "default": "",
+            "title": "Detail",
+            "type": "string"
+          },
+          "key_rate": {
+            "title": "Key Rate",
+            "type": "number"
+          },
+          "source": {
+            "title": "Source",
+            "type": "string"
+          }
+        },
+        "required": [
+          "key_rate",
+          "source",
+          "as_of"
+        ],
+        "title": "KeyRate",
+        "type": "object"
+      },
       "LegalDocument": {
         "description": "Один юридический документ.\n\n`version` и `effective_from` — не украшение: по 152-ФЗ согласие даётся на\nКОНКРЕТНУЮ редакцию, и интерфейс обязан показывать, на какую именно.",
         "properties": {
@@ -5059,7 +5088,7 @@
   },
   "info": {
     "title": "FINPILOT",
-    "version": "8.40.0"
+    "version": "8.41.0"
   },
   "openapi": "3.1.0",
   "paths": {
@@ -9200,9 +9229,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response Key Rate Endpoint Api Planning Key Rate Get",
-                  "type": "object"
+                  "$ref": "#/components/schemas/KeyRate"
                 }
               }
             },

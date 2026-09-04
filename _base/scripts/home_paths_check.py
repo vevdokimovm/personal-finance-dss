@@ -105,12 +105,68 @@ def check(repo: Path) -> tuple[int, int, list[str]]:
     return checked, bad, msgs
 
 
+def selftest() -> int:
+    """Канарейка: проверка обязана ловить подсаженное нарушение.
+
+    🔴 Без неё «нарушений 0» неотличимо от «проверка мертва» — ровно тот
+    случай, ради которого заведён мета-гейт (`69` §4г: гейт был красным
+    41 день, и никто не смотрел).
+    """
+    import tempfile
+    ok = True
+    with tempfile.TemporaryDirectory() as d:
+        repo = Path(d) / "probe"
+        (repo / "sub").mkdir(parents=True)
+        doc = repo / "sub" / "POINTER.md"
+        real = Path(d) / "store"
+        real.mkdir()
+
+        def decl(path: str) -> None:
+            (repo / DECL).write_text(
+                f"# проба\n{path}\tчто-то\tsub/POINTER.md\n", encoding="utf-8")
+
+        # 1. всё сходится — обязан молчать
+        doc.write_text(f"лежит в {real}\n", encoding="utf-8")
+        decl(str(real))
+        c, b, _ = check(repo)
+        print(f"   {'✅' if (c, b) == (1, 0) else '🔴'} согласованная пара: "
+              f"проверено {c}, нарушений {b}")
+        ok &= (c, b) == (1, 0)
+
+        # 2. каталога нет — обязан поймать
+        decl(str(real) + "-нет")
+        _, b2, _ = check(repo)
+        print(f"   {'✅' if b2 == 1 else '🔴'} хранилища нет на диске ловится")
+        ok &= b2 == 1
+
+        # 3. каталог есть, указатель молчит — исходный дефект 03.09
+        decl(str(real))
+        doc.write_text("здесь ничего не сказано про путь\n", encoding="utf-8")
+        _, b3, _ = check(repo)
+        print(f"   {'✅' if b3 == 1 else '🔴'} указатель не называет путь — ловится")
+        ok &= b3 == 1
+
+        # 4. нет декларации — проверять нечего, но и падать нельзя
+        (repo / DECL).unlink()
+        c4, b4, _ = check(repo)
+        print(f"   {'✅' if (c4, b4) == (0, 0) else '🔴'} без {DECL} молчит")
+        ok &= (c4, b4) == (0, 0)
+
+    print("selftest OK" if ok else "🔴 selftest ПРОВАЛЕН")
+    return 0 if ok else 1
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("repo", nargs="?", default="base-repo")
     ap.add_argument("--all", action="store_true", help="все репы системы")
+    ap.add_argument("--selftest", action="store_true",
+                    help="канарейка: ловит ли проверка подсаженное нарушение")
     args = ap.parse_args()
+
+    if args.selftest:
+        return selftest()
 
     _base, root, _ = resolve_roots(__file__)
     repos = ([d for d in sorted(root.iterdir())

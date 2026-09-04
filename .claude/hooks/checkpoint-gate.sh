@@ -38,6 +38,23 @@ artifacts="${BASE_ARTIFACTS:-${HOME}/Developer}"
 zip_name="personal-finance-dss-v${version}.zip"
 [ -f "$artifacts/$zip_name" ] && exit 0
 
+# 🔴 Архив мог быть УДАЛЁН ДЕПЛОЙЕРОМ — это его штатное поведение после успешной
+# публикации, и удаляет он только убедившись, что на GitHub есть и тег, и релиз,
+# и ассет (`deploy.sh`: «на GitHub есть всё, можно удалять»). То есть работа передана
+# НАДЁЖНЕЕ, чем локальным zip, а сторож этого не знал и блокировал каждый ход после
+# деплоя до самой смены версии (поймано 04.09.2026, v8.42.0).
+#
+# Признак — строка журнала прогона деплойера. Файл локальный: ни сети, ни `gh`.
+# Без `&& grep` в цепочке (PIT-001): здесь он был бы безопасен внутри `if`, но гейт
+# `tools.preflight` контекст не различает и не должен — паттерн запрещён целиком.
+deploy_log="$artifacts/deploy_last_run.log"
+deploy_mark="personal-finance-dss|v${version}|архив|удалён локально"
+if [ -f "$deploy_log" ]; then
+  if grep -Fq "$deploy_mark" "$deploy_log"; then
+    exit 0
+  fi
+fi
+
 reason=$(cat <<EOF
 Рабочее дерево не совпадает с последним коммитом (VERSION=${version}), а чекпоинт-архива
 ${artifacts}/${zip_name} нет. Правило 10 (CLAUDE.md) / docs/session_continuity.md: без архива
@@ -45,8 +62,9 @@ ${artifacts}/${zip_name} нет. Правило 10 (CLAUDE.md) / docs/session_co
   1. git ls-files -c -o --exclude-standard > /tmp/checkpoint_filelist.txt
   2. cd "${root}" && zip -q -X "${artifacts}/${zip_name}" -@ < /tmp/checkpoint_filelist.txt
      (без обёрточной директории — файлы прямо в корне архива)
-  3. cp docs/WATCHLOG.md "${artifacts}/WATCHLOG-personal-finance-dss-v${version}.md"
-  4. shasum -a 256 обоих файлов — sha256 в отчёт владельцу.
+  3. shasum -a 256 архива — sha256 в отчёт владельцу.
+     (Копию WATCHLOG отдельным файлом рядом класть НЕ надо — решение владельца
+      04.09.2026: журнал и так внутри архива, отдельный файл засорял каталог.)
 Если версия ещё не окончательная (черновик, не сдача батча) — обнови VERSION обратно на
 предыдущую сданную, тогда архив для неё уже существует и этот блок не сработает.
 EOF

@@ -680,14 +680,32 @@ def list_scenarios_endpoint(
     ]
 
 
+class KeyRate(BaseModel):
+    """Ключевая ставка Банка России.
+
+    Схема заведена ДО фронта (v8.42.0): раньше эндпоинт был размечен `-> dict[str, object]`.
+    🔴 Ошибка здесь была бы особенно тихой — поле называется `key_rate`, и рукописный тип
+    с полем `rate` дал бы `undefined` без единого предупреждения компилятора.
+
+    `source` говорит, откуда взято значение: `cbr` — живой запрос, `cache`/`cache_db` —
+    сохранённое, `fallback` — резервное из настроек. Человек вправе знать, насколько
+    свежа ставка, под которую ему считают план.
+    """
+
+    key_rate: float
+    source: str
+    as_of: str
+    detail: str = ""
+
+
 @router.get("/key-rate", summary="Текущая ключевая ставка ЦБ РФ")
-def key_rate_endpoint() -> dict[str, object]:
+def key_rate_endpoint() -> KeyRate:
     """Ключевая ставка Банка России (в долях) — ориентир для ставки накоплений.
     При недоступности cbr.ru возвращает резервное значение из настроек."""
     from app.config import settings
     from app.services.cbr_rate import get_key_rate
 
-    return get_key_rate(fallback=settings.CBR_KEY_RATE_FALLBACK)
+    return KeyRate(**get_key_rate(fallback=settings.CBR_KEY_RATE_FALLBACK))
 
 
 @router.get("/spending-advice", summary="Советы по расходам (анализ трат по категориям)")

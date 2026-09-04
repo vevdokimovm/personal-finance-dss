@@ -10,10 +10,24 @@ const { usePlanMock, useForecastMock } = vi.hoisted(() => ({
   useForecastMock: vi.fn(),
 }));
 
+// Панель параметров расчёта — свой запрос и свои тесты (PlanSettingsSection.test.tsx);
+// здесь проверяется сам план.
+vi.mock("@entities/user-prefs", () => ({
+  useUserPrefs: () => ({ data: undefined, error: null, isLoading: false, refetch: vi.fn() }),
+  useUpdateUserPrefs: () => ({ mutate: vi.fn(), isPending: false }),
+}));
+
 vi.mock("@entities/plan-summary", async () => {
   const actual =
     await vi.importActual<typeof import("@entities/plan-summary")>("@entities/plan-summary");
-  return { ...actual, usePlan: usePlanMock, useForecast: useForecastMock };
+  return {
+    ...actual,
+    usePlan: usePlanMock,
+    useForecast: useForecastMock,
+    // Ключевая ставка — запрос панели параметров; здесь проверяется сам план, и живой
+    // хук ушёл бы в сеть без QueryClient.
+    useKeyRate: () => ({ data: undefined }),
+  };
 });
 
 vi.mock("@tanstack/react-router", async () => {

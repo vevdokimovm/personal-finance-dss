@@ -121,6 +121,21 @@ class TestGrepInAndChain:
         (repo / "run.sh").write_text("ls && grep x file\n", encoding="utf-8")
         assert any("run.sh" in hit for hit in grep_in_and_chain(repo))
 
+    def test_comment_mentioning_the_pattern_is_not_a_violation(self, repo):
+        """🔴 Упоминание в комментарии — не нарушение.
+
+        Проверка судила ЛЮБУЮ строку и заблокировала сдачу батча на комментарии,
+        который объяснял, почему в коде рядом этого паттерна нет (v8.42.0). Гейт,
+        отвергающий прозу, судит не то, что заявлено, — тот же класс, что у гейта
+        шрифта в v8.39.0.
+        """
+        (repo / "run.sh").write_text(
+            "# без `&& grep` в цепочке (PIT-001): опасно при set -e\n"
+            "if grep -q x file; then echo ok; fi\n",
+            encoding="utf-8",
+        )
+        assert grep_in_and_chain(repo) == []
+
     def test_guarded_pattern_is_allowed(self, repo):
         (repo / "ok.sh").write_text("ls && grep x file || true\n",
                                     encoding="utf-8")

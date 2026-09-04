@@ -204,7 +204,20 @@ def test_b2b_analyze_with_api_key(client, monkeypatch):
 
 # ── FR-18: Plaid отключён без конфига ────────────────────────────────────
 def test_plaid_disabled_without_config(client):
+    """В РФ-сборке Plaid отвечает 404 «не активировано» — но ПОСЛЕ гейта согласия.
+
+    🔴 Обновлено в v8.42.0: `plaid_router` взят под `_FIN` (остаток H3). Порядок теперь
+    такой и он верен — отказ по согласию не должен раскрывать, включена ли интеграция:
+    без согласия человек не узнаёт о конфигурации сервера раньше, чем ему откажут
+    в обработке его же данных.
+    """
     header = {"Authorization": f"Bearer {_token(client)}"}
+
+    # Без согласия на финансовые данные первым отвечает гейт.
+    assert client.post("/api/plaid/sync", headers=header).status_code == 403
+
+    # С согласием доходим до самой ручки — и она честно говорит «не активировано».
+    client.post("/api/consents/financial_data", headers=header)
     r = client.post("/api/plaid/sync", headers=header)
     assert r.status_code == 404
 

@@ -59,7 +59,18 @@ router.include_router(analytics_router)
 router.include_router(referral_router)
 router.include_router(i18n_router)
 router.include_router(fx_router)
-router.include_router(plaid_router)
+# 🔴 Plaid обменивает public_token на access_token банка и тянет транзакции — финансовые
+# данные в самом прямом смысле. Периметр `_FIN` его не покрывал (H3, подтверждена v8.30.2).
+#
+# Решение владельца v8.27.0 требует ставить гейт ТОЛЬКО вместе с фронтом, иначе экран
+# отдаёт 403 без объяснения (SEV1 `CONSENT-GATE-NO-UI`). Проверено по диску
+# (`docs/reports/decisions/2026-09-04_h3_and_jinja_removal_order.md`): у `plaid_router`
+# фронта нет ВООБЩЕ — ни в `app.js`, ни в React, а в РФ-сборке он отвечает 404 на всё.
+# Оговорка защищает от отказа без объяснения; здесь защищать нечего.
+#
+# `banks_router` — другой случай: его зовёт `app.js` (импорт выписки), и гейт туда приедет
+# вместе с переносом импорта в React, в одном батче с ним.
+router.include_router(plaid_router, dependencies=_FIN)
 router.include_router(experiments_router)
 router.include_router(experiments_admin_router)
 router.include_router(telegram_router)

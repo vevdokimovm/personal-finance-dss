@@ -122,7 +122,14 @@ def soft_hyphens(repo: Path) -> list[str]:
 
 
 def grep_in_and_chain(repo: Path) -> list[str]:
-    """PIT-001: `grep` с нулём совпадений возвращает 1 и рвёт цепочку `&&`."""
+    """PIT-001: `grep` с нулём совпадений возвращает 1 и рвёт цепочку `&&`.
+
+    🔴 Строки-комментарии пропускаются. Проверка судила ЛЮБУЮ строку, включая ту, где
+    паттерн лишь упоминается — и заблокировала сдачу батча на комментарии, который
+    объяснял, почему в коде рядом этого паттерна нет (поймано 04.09.2026, v8.42.0).
+    Тот же класс, что у гейта шрифта в v8.39.0: проверка, удовлетворяемая или
+    отвергаемая прозой, судит не то, что заявлено.
+    """
     hits = []
     pattern = re.compile(r"&&\s*grep\b")
     for suffix in ("*.sh", "*.zsh"):
@@ -130,6 +137,8 @@ def grep_in_and_chain(repo: Path) -> list[str]:
             if _foreign(path):
                 continue
             for number, line in enumerate(_read(path).splitlines(), 1):
+                if line.lstrip().startswith("#"):
+                    continue
                 if pattern.search(line) and "|| true" not in line:
                     hits.append(f"{path.relative_to(repo)}:{number}")
     return hits

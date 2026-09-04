@@ -60,14 +60,28 @@ const FORECAST_ANNA = {
   forecast: [{ period: 12, Rt: 813519, Rt_p10: 682866, Rt_p90: 952920 }],
 };
 
+const PREFS_ANNA = {
+  id: 1,
+  l_min: 3,
+  risk_tolerance: 3,
+  horizon: 12,
+  r_bench: 0.16,
+  base_currency: "RUB",
+  iis_type: "none",
+  iis_contributed_this_year: 0,
+};
+
 test.beforeEach(async ({ page }) => {
   await page.route("**/api/planning/calculate", (route) => route.fulfill({ json: PLAN_ANNA }));
   await page.route("**/api/planning/forecast", (route) => route.fulfill({ json: FORECAST_ANNA }));
+  await page.route("**/api/user-prefs", (route) => route.fulfill({ json: PREFS_ANNA }));
 });
 
 test("план распределения показывает риск-профиль и входные данные", async ({ page }) => {
   await page.goto("/planning");
-  await expect(page.getByText("Сбалансированный")).toBeVisible();
+  // Метка профиля теперь встречается дважды: в панели параметров (выбор) и в самом
+  // плане (по чему он посчитан). Проверяем именно план — панель у неё свои тесты.
+  await expect(page.locator(".fp-planning__risk-badge")).toContainText("Сбалансированный");
   await expect(page.getByText("12 опер. · 1 обяз. · 2 целей")).toBeVisible();
   // Слово «Резерв» встречается дважды: в легенде столбца и в подсказке к ползункам
   // «что если». Локатор сужен до легенды — там оно несёт сумму, ради которой тест
@@ -100,5 +114,58 @@ test("дашборд → «Построить план распределени�
   await page.goto("/");
   await page.getByRole("link", { name: "Построить план распределения →" }).click();
   await expect(page).toHaveURL(/\/planning$/);
-  await expect(page.getByText("Сбалансированный")).toBeVisible();
+  // Метка профиля есть и в бейдже плана, и в панели параметров — проверяем бейдж.
+  await expect(page.locator(".fp-planning__risk-badge")).toContainText("Сбалансированный");
+});
+
+/* 🔴 Параметры расчёта (v8.42.0). До этого батча риск-профиль в React изменить было
+   нельзя вообще — контролы жили только в Jinja, и `planning.html` оставался единственным
+   способом настроить план. Юнит-тесты проверяют логику черновика; браузер показывает,
+   что цикл «выбрал → пересчитал → ушло на сервер» действительно замыкается. */
+test("риск-профиль выбирается и уходит на сервер по кнопке (v8.42.0)", async ({ page }) => {
+  let sent: Record<string, unknown> | null = null;
+  await page.route("**/api/user-prefs", async (route) => {
+    if (route.request().method() === "PATCH") {
+      sent = route.request().postDataJSON();
+      return route.fulfill({ json: { ...PREFS_ANNA, risk_tolerance: 5 } });
+    }
+    return route.fulfill({ json: PREFS_ANNA });
+  });
+
+  await page.goto("/planning");
+
+  const settings = page.getByRole("region", { name: "Параметры расчёта" });
+  await expect(settings.getByRole("radio", { name: "Сбалансированный" })).toBeChecked();
+
+  // Выбор сам по себе НЕ пересчитывает: пересчёт тяжёлый, дёргать его на каждый клик
+  // значит превратить настройку в подвисание.
+  await settings.getByRole("radio", { name: "Агрессивный", exact: true }).check();
+  expect(sent).toBeNull();
+  await expect(page.getByText(/по прежним параметрам/)).toBeVisible();
+
+  await settings.getByRole("button", { name: /Сохранить и пересчитать/ }).click();
+  await expect.poll(() => sent).not.toBeNull();
+  expect(sent).toMatchObject({ risk_tolerance: 5 });
+});
+
+test("ставка показана процентами, а уходит долей (v8.42.0)", async ({ page }) => {
+  let sent: Record<string, unknown> | null = null;
+  await page.route("**/api/user-prefs", async (route) => {
+    if (route.request().method() === "PATCH") {
+      sent = route.request().postDataJSON();
+      return route.fulfill({ json: PREFS_ANNA });
+    }
+    return route.fulfill({ json: PREFS_ANNA });
+  });
+
+  await page.goto("/planning");
+
+  const slider = page.getByLabel(/Ставка по накоплениям/);
+  await expect(slider).toHaveValue("16");
+  await slider.fill("20");
+  await page.getByRole("button", { name: /Сохранить и пересчитать/ }).click();
+
+  await expect.poll(() => sent).not.toBeNull();
+  // Ошибка преобразования дала бы 2000% или 0.2% — и то, и другое молча исказит расчёт.
+  expect(sent).toMatchObject({ r_bench: 0.2 });
 });

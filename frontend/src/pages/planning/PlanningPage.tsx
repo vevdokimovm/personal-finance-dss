@@ -10,6 +10,7 @@ import { MetricsGrid } from "@widgets/metrics-grid";
 import { PlanExportSection } from "./ui/PlanExportSection";
 import { PlanHistorySection } from "./ui/PlanHistorySection";
 import { AllocationPanel } from "@widgets/allocation-panel";
+import { PlanSettingsSection } from "./ui/PlanSettingsSection";
 import { ForecastPanel } from "@widgets/forecast-panel";
 import { AlternativesBrowser } from "./ui/AlternativesBrowser";
 import "./PlanningPage.css";
@@ -164,6 +165,15 @@ export function PlanningPage() {
           </dd>
         </div>
       </dl>
+      {/* Настройка идёт ПЕРЕД результатом: иначе непонятно, чем управляют ползунки.
+          До v8.42.0 этих контролов в React не было вовсе — риск-профиль, главный параметр
+          модели, менялся только в Jinja. */}
+      <PlanSettingsSection
+        /* Пересчёт после сохранения настроек идёт ЗДЕСЬ, а не внутри панели: без этого
+           признака панель объявляла успех по ответу PATCH — то есть до того, как план
+           реально пересчитан (design-critic). */
+        planPending={planQuery.isFetching || forecastQuery.isFetching}
+      />
       <MetricsGrid indicators={plan.indicators} />
       {/* 🔴 Дисклеймер 39-ФЗ — ПЕРЕД распределением, а не в подвале страницы (L5).
           Человек принимает решение о деньгах, глядя на рекомендацию; предупреждение,
