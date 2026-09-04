@@ -3,6 +3,7 @@ import { usePlan, useForecast } from "@entities/plan-summary";
 import { t } from "@shared/lib/i18n/t";
 import { getConsentRequiredDetail } from "@shared/lib/api/extractErrorMessage";
 import { ConsentRequiredPanel } from "@entities/consents";
+import { NotAuthenticatedError, useProfile } from "@entities/profile";
 import { DashboardSkeleton } from "./ui/DashboardSkeleton";
 import { DashboardEmpty } from "./ui/DashboardEmpty";
 import { DashboardErrorState } from "./ui/DashboardErrorState";
@@ -14,6 +15,11 @@ import { BudgetsSection } from "./ui/BudgetsSection";
 import "./DashboardPage.css";
 
 export function DashboardPage() {
+  /* Гостевой режим определяет страница, а не пустое состояние: она уже держит запросы
+     и знает контекст. `/auth/me` отвечает 401 гостю — это ожидаемый ответ, не сбой
+     (`entities/profile`). */
+  const profileQuery = useProfile();
+  const isGuest = profileQuery.error instanceof NotAuthenticatedError;
   const planQuery = usePlan();
   const forecastQuery = useForecast(12);
   // Фокус после успешной выдачи согласия (a11y-auditor, тот же паттерн, что
@@ -65,7 +71,7 @@ export function DashboardPage() {
   const { input_summary } = plan;
   const isEmpty = input_summary.income === 0 && input_summary.expense === 0;
   if (isEmpty) {
-    return <DashboardEmpty mainRef={headingRef} />;
+    return <DashboardEmpty mainRef={headingRef} isGuest={isGuest} />;
   }
 
   return (

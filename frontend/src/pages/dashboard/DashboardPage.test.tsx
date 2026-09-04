@@ -1,11 +1,12 @@
-import { describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import type { UseQueryResult } from "@tanstack/react-query";
 import { DashboardPage } from "./DashboardPage";
 import type { CalculatePlanResult, ForecastResult } from "@entities/plan-summary";
 
-const { usePlanMock, useForecastMock } = vi.hoisted(() => ({
+const { useProfileMock, usePlanMock, useForecastMock } = vi.hoisted(() => ({
+  useProfileMock: vi.fn(),
   usePlanMock: vi.fn(),
   useForecastMock: vi.fn(),
 }));
@@ -32,6 +33,22 @@ vi.mock("@tanstack/react-router", async () => {
     ),
   };
 });
+
+/* Профиль страница спрашивает ради ОДНОГО: гость сейчас или вошедший (от этого зависит,
+   показывать ли гостевую песочницу в пустом состоянии). Настоящий хук потянул бы
+   QueryClientProvider во все тесты страницы ради ветки, к их утверждениям отношения
+   не имеющей. По умолчанию — вошедший: гостевую ветку проверяет отдельный тест. */
+vi.mock("@entities/profile", async () => {
+  const actual = await vi.importActual<typeof import("@entities/profile")>("@entities/profile");
+  return { ...actual, useProfile: () => useProfileMock() };
+});
+
+/* Песочница — предмет своего файла тестов (`features/demo-sandbox`). Здесь она мокнута
+   маркером: проверяется только то, что страница её показывает и кому. */
+vi.mock("@features/demo-sandbox", () => ({
+  DemoSandbox: ({ isGuest }: { isGuest?: boolean }) =>
+    isGuest ? <div data-testid="demo-sandbox">песочница</div> : null,
+}));
 
 vi.mock("@entities/consents", () => ({
   ConsentRequiredPanel: ({ detail }: { detail: { message: string } }) => (
@@ -113,6 +130,14 @@ const FORECAST_ANNA: ForecastResult = {
   real_r_bench: 0.139,
   r_bench_source: "cbr_keyrate_post_tax",
 };
+
+/* Профиль по умолчанию — ВОШЕДШИЙ пользователь: гостевую ветку включает тот тест,
+   которому она нужна. Сбрасывается перед каждым тестом, иначе состояние протекает
+   между ними — первая редакция ставила гостя через `spyOn` и оставляла его следующему
+   тесту, где он ломал прямо противоположное утверждение. */
+beforeEach(() => {
+  useProfileMock.mockReturnValue({ data: { email: "user@test.io" }, error: null });
+});
 
 describe("DashboardPage", () => {
   it("показывает скелетон, пока данные грузятся", () => {
@@ -204,4 +229,36 @@ describe("DashboardPage", () => {
     render(<DashboardPage />);
     expect(screen.getByText("Плана распределения нет")).toBeInTheDocument();
   });
+
+  /* 🔴 Связка «гость + пустой дашборд → песочница». Без неё человек без своих данных
+     видит только предложение ввести сотню операций руками, хотя продукт умеет показать
+     себя на десяти готовых портретах (README: «Демо за 30 секунд»). Вход был в Jinja
+     и потерялся при переносе на React — найдено в v8.45.0. */
+  it("гостю с пустым дашбордом предлагает посмотреть на примере", async () => {
+    const { NotAuthenticatedError } = await vi.importActual<
+      typeof import("@entities/profile")
+    >("@entities/profile");
+    useProfileMock.mockReturnValue({ data: undefined, error: new NotAuthenticatedError() });
+
+    usePlanMock.mockReturnValue({
+      data: { ...PLAN_ANNA, input_summary: { ...PLAN_ANNA.input_summary, income: 0, expense: 0 } },
+      isLoading: false,
+      isError: false,
+    });
+    render(<DashboardPage />);
+    expect(screen.getByTestId("demo-sandbox")).toBeVisible();
+  });
+
+  /* Вошедшему песочница не нужна и вредна: сервер отдаёт ей 403, чтобы демо-данные
+     не смешались с настоящими. */
+  it("вошедшему с пустым дашбордом песочница не показывается", () => {
+    usePlanMock.mockReturnValue({
+      data: { ...PLAN_ANNA, input_summary: { ...PLAN_ANNA.input_summary, income: 0, expense: 0 } },
+      isLoading: false,
+      isError: false,
+    });
+    render(<DashboardPage />);
+    expect(screen.queryByTestId("demo-sandbox")).not.toBeInTheDocument();
+  });
 });
+

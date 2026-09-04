@@ -808,6 +808,89 @@ export type DebtSchedule = {
 };
 
 /**
+ * DemoCase
+ *
+ * Один демо-портрет для карточки выбора.
+ *
+ * Все поля обязательны: карточка строится из них целиком, и необязательное поле здесь
+ * означает `undefined` в вёрстке — пустая кнопка или портрет без описания, по которому
+ * нельзя понять, похож ли он на тебя. Ради этого выбора экран и существует.
+ */
+export type DemoCase = {
+    /**
+     * Accent
+     *
+     * Семантический цвет ярлыка: amber | green | red | blue.
+     */
+    accent: string;
+    /**
+     * Expect
+     *
+     * Что покажет алгоритм и почему — до нажатия.
+     */
+    expect: string;
+    /**
+     * Key
+     *
+     * Ключ кейса для `/demo/load?case=`.
+     */
+    key: string;
+    /**
+     * N
+     *
+     * Порядковый номер в списке (строкой, как в разметке).
+     */
+    n: string;
+    /**
+     * Name
+     *
+     * Имя и возраст: «Анна Петрова, 36».
+     */
+    name: string;
+    /**
+     * Role
+     *
+     * Занятие и город: «Маркетолог · Москва».
+     */
+    role: string;
+    /**
+     * Situation
+     *
+     * Исходные данные портрета человеческим языком.
+     */
+    situation: string;
+    /**
+     * Tag
+     *
+     * Ярлык ситуации: «Пограничный», «Критический».
+     */
+    tag: string;
+};
+
+/**
+ * DemoCases
+ *
+ * Ответ `/demo/cases`.
+ *
+ * Схема заведена ДО фронта (v8.46.0): раньше эндпоинт был размечен `-> dict[str, Any]`
+ * и приезжал в контракт как `{[key: string]: unknown}`. Гостевая песочница — первый
+ * экран, который видит человек без своих данных, и рукописный тип под него означал бы
+ * пустые карточки на первом же расхождении (урок v8.31.1).
+ */
+export type DemoCases = {
+    /**
+     * Cases
+     */
+    cases: Array<DemoCase>;
+    /**
+     * Keys
+     *
+     * Только ключи — для мест, где метаданные не нужны.
+     */
+    keys: Array<string>;
+};
+
+/**
  * ExchangeRequest
  */
 export type ExchangeRequest = {
@@ -3298,22 +3381,6 @@ export type ObligationResponseWritable = {
     type?: string;
 };
 
-export type ReadDashboardGetData = {
-    body?: never;
-    path?: never;
-    query?: never;
-    url: '/';
-};
-
-export type ReadDashboardGetResponses = {
-    /**
-     * Successful Response
-     */
-    200: string;
-};
-
-export type ReadDashboardGetResponse = ReadDashboardGetResponses[keyof ReadDashboardGetResponses];
-
 export type ListExperimentsEndpointApiAdminExperimentsGetData = {
     body?: never;
     headers?: {
@@ -4449,13 +4516,9 @@ export type ListCasesApiDemoCasesGetData = {
 
 export type ListCasesApiDemoCasesGetResponses = {
     /**
-     * Response List Cases Api Demo Cases Get
-     *
      * Successful Response
      */
-    200: {
-        [key: string]: unknown;
-    };
+    200: DemoCases;
 };
 
 export type ListCasesApiDemoCasesGetResponse = ListCasesApiDemoCasesGetResponses[keyof ListCasesApiDemoCasesGetResponses];
@@ -6621,22 +6684,6 @@ export type PatchPrefsApiUserPrefsPatchResponses = {
 
 export type PatchPrefsApiUserPrefsPatchResponse = PatchPrefsApiUserPrefsPatchResponses[keyof PatchPrefsApiUserPrefsPatchResponses];
 
-export type ReadBanksBanksGetData = {
-    body?: never;
-    path?: never;
-    query?: never;
-    url: '/banks';
-};
-
-export type ReadBanksBanksGetResponses = {
-    /**
-     * Successful Response
-     */
-    200: string;
-};
-
-export type ReadBanksBanksGetResponse = ReadBanksBanksGetResponses[keyof ReadBanksBanksGetResponses];
-
 export type ReadContactsContactsGetData = {
     body?: never;
     path?: never;
@@ -6652,182 +6699,6 @@ export type ReadContactsContactsGetResponses = {
 };
 
 export type ReadContactsContactsGetResponse = ReadContactsContactsGetResponses[keyof ReadContactsContactsGetResponses];
-
-export type ReadDashboardDashboardGetData = {
-    body?: never;
-    path?: never;
-    query?: never;
-    url: '/dashboard';
-};
-
-export type ReadDashboardDashboardGetResponses = {
-    /**
-     * Successful Response
-     */
-    200: string;
-};
-
-export type ReadDashboardDashboardGetResponse = ReadDashboardDashboardGetResponses[keyof ReadDashboardDashboardGetResponses];
-
-export type ReadGoalsGoalsGetData = {
-    body?: never;
-    path?: never;
-    query?: never;
-    url: '/goals';
-};
-
-export type ReadGoalsGoalsGetResponses = {
-    /**
-     * Successful Response
-     */
-    200: string;
-};
-
-export type ReadGoalsGoalsGetResponse = ReadGoalsGoalsGetResponses[keyof ReadGoalsGoalsGetResponses];
-
-export type ReadLegalConsentLegalConsentGetData = {
-    body?: never;
-    path?: never;
-    query?: never;
-    url: '/legal/consent';
-};
-
-export type ReadLegalConsentLegalConsentGetResponses = {
-    /**
-     * Successful Response
-     */
-    200: string;
-};
-
-export type ReadLegalConsentLegalConsentGetResponse = ReadLegalConsentLegalConsentGetResponses[keyof ReadLegalConsentLegalConsentGetResponses];
-
-export type ReadLegalCookiesLegalCookiesGetData = {
-    body?: never;
-    path?: never;
-    query?: never;
-    url: '/legal/cookies';
-};
-
-export type ReadLegalCookiesLegalCookiesGetResponses = {
-    /**
-     * Successful Response
-     */
-    200: string;
-};
-
-export type ReadLegalCookiesLegalCookiesGetResponse = ReadLegalCookiesLegalCookiesGetResponses[keyof ReadLegalCookiesLegalCookiesGetResponses];
-
-export type ReadLegalFinancialConsentLegalFinancialConsentGetData = {
-    body?: never;
-    path?: never;
-    query?: never;
-    url: '/legal/financial-consent';
-};
-
-export type ReadLegalFinancialConsentLegalFinancialConsentGetResponses = {
-    /**
-     * Successful Response
-     */
-    200: string;
-};
-
-export type ReadLegalFinancialConsentLegalFinancialConsentGetResponse = ReadLegalFinancialConsentLegalFinancialConsentGetResponses[keyof ReadLegalFinancialConsentLegalFinancialConsentGetResponses];
-
-export type ReadLegalMarketingConsentLegalMarketingConsentGetData = {
-    body?: never;
-    path?: never;
-    query?: never;
-    url: '/legal/marketing-consent';
-};
-
-export type ReadLegalMarketingConsentLegalMarketingConsentGetResponses = {
-    /**
-     * Successful Response
-     */
-    200: string;
-};
-
-export type ReadLegalMarketingConsentLegalMarketingConsentGetResponse = ReadLegalMarketingConsentLegalMarketingConsentGetResponses[keyof ReadLegalMarketingConsentLegalMarketingConsentGetResponses];
-
-export type ReadLegalPrivacyLegalPrivacyGetData = {
-    body?: never;
-    path?: never;
-    query?: never;
-    url: '/legal/privacy';
-};
-
-export type ReadLegalPrivacyLegalPrivacyGetResponses = {
-    /**
-     * Successful Response
-     */
-    200: string;
-};
-
-export type ReadLegalPrivacyLegalPrivacyGetResponse = ReadLegalPrivacyLegalPrivacyGetResponses[keyof ReadLegalPrivacyLegalPrivacyGetResponses];
-
-export type ReadLegalTermsLegalTermsGetData = {
-    body?: never;
-    path?: never;
-    query?: never;
-    url: '/legal/terms';
-};
-
-export type ReadLegalTermsLegalTermsGetResponses = {
-    /**
-     * Successful Response
-     */
-    200: string;
-};
-
-export type ReadLegalTermsLegalTermsGetResponse = ReadLegalTermsLegalTermsGetResponses[keyof ReadLegalTermsLegalTermsGetResponses];
-
-export type ReadObligationsObligationsGetData = {
-    body?: never;
-    path?: never;
-    query?: never;
-    url: '/obligations';
-};
-
-export type ReadObligationsObligationsGetResponses = {
-    /**
-     * Successful Response
-     */
-    200: string;
-};
-
-export type ReadObligationsObligationsGetResponse = ReadObligationsObligationsGetResponses[keyof ReadObligationsObligationsGetResponses];
-
-export type ReadPlanningPlanningGetData = {
-    body?: never;
-    path?: never;
-    query?: never;
-    url: '/planning';
-};
-
-export type ReadPlanningPlanningGetResponses = {
-    /**
-     * Successful Response
-     */
-    200: string;
-};
-
-export type ReadPlanningPlanningGetResponse = ReadPlanningPlanningGetResponses[keyof ReadPlanningPlanningGetResponses];
-
-export type ReadTransactionsTransactionsGetData = {
-    body?: never;
-    path?: never;
-    query?: never;
-    url: '/transactions';
-};
-
-export type ReadTransactionsTransactionsGetResponses = {
-    /**
-     * Successful Response
-     */
-    200: string;
-};
-
-export type ReadTransactionsTransactionsGetResponse = ReadTransactionsTransactionsGetResponses[keyof ReadTransactionsTransactionsGetResponses];
 
 export type AnalyzeV1AnalyzePostData = {
     body: SnapshotDto;

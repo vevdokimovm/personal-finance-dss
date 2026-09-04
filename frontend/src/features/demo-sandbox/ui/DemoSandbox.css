@@ -1,0 +1,151 @@
+/* Гостевая песочница: выбор одного из десяти портретов.
+
+   Карточки — сетка, а не список: десять вариантов колонкой требуют прокрутки на весь
+   экран, и сравнить их между собой невозможно, а весь смысл в сравнении. */
+
+@import "@shared/ui/panel.css";
+
+.fp-demo__list {
+  list-style: none;
+  padding: 0;
+  margin: var(--sp-5) 0 0;
+  display: grid;
+  gap: var(--sp-3);
+  /* `auto-fill` вместо фиксированного числа колонок: на узком экране карточки встают
+     в одну колонку сами, без брейкпоинта под каждое число. */
+  /* `min(…, 100%)` обязателен: без него колонка 280px не влезает в 208px доступных
+     на экране 320px и тащит горизонтальный скролл ВСЕЙ страницы (WCAG 1.4.10,
+     design-critic). */
+  grid-template-columns: repeat(auto-fill, minmax(min(var(--demo-card-w), 100%), 1fr));
+}
+
+/* Вся карточка — кнопка. Сброс собственных стилей `button` обязателен: иначе браузер
+   центрирует текст и режет шрифт до системного. */
+.fp-demo__card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  width: 100%;
+  height: 100%;
+  text-align: left;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  padding: var(--sp-4);
+  background: var(--c-surface);
+  /* `--c-border-hl`, а не `--c-border`: у последнего контраст к поверхности около 1.2:1,
+     и десять карточек читались как сплошной текст без границ — где кончается одна цель
+     нажатия и начинается другая, было не видно (WCAG 1.4.11, a11y-auditor). */
+  border: var(--border-w) solid var(--c-border-hl);
+  border-radius: var(--r-md);
+  /* Цель нажатия — от токена, а не «набирается текстом»: правило не должно держаться
+     на том, сколько слов в описании портрета (WCAG 2.5.8). */
+  min-height: var(--tap-target-min);
+  transition: border-color var(--motion-fast) var(--ease);
+}
+
+.fp-demo__card:hover:not(:disabled) {
+  border-color: var(--c-border-hl);
+}
+
+.fp-demo__card:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: var(--focus-ring-offset);
+}
+
+/* Гаснет ТОЛЬКО грузящаяся карточка, и текст не тускнеет: `opacity` на весь блок
+   роняет контраст ниже AA на время загрузки (a11y-auditor). */
+.fp-demo__card[aria-busy="true"] {
+  border-color: var(--c-accent);
+}
+
+.fp-demo__card[aria-disabled="true"] {
+  cursor: progress;
+}
+
+.fp-demo__busy {
+  font-size: var(--fs-sm);
+  color: var(--c-accent);
+}
+
+.fp-demo__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--sp-2);
+}
+
+.fp-demo__name {
+  font-weight: 600;
+}
+
+/* Ярлык тяжести ситуации — единственное, что видно до чтения описания. Цвет приходит
+   с сервера семантическим словом, палитра остаётся здесь. */
+.fp-demo__tag {
+  /* Без `flex-shrink: 0`: на узкой карточке длинный ярлык сжимал имя портрета
+     и ломал шапку (design-critic). */
+  font-size: var(--fs-xs);
+  padding: 0 var(--sp-2);
+  border-radius: var(--r-full);
+  background: var(--c-surface-up);
+  color: var(--c-text2);
+}
+
+.fp-demo__tag--amber {
+  background: var(--c-amber-bg);
+  color: var(--c-amber);
+}
+
+.fp-demo__tag--green {
+  background: var(--c-green-bg);
+  color: var(--c-green);
+}
+
+.fp-demo__tag--red {
+  background: var(--c-red-bg);
+  color: var(--c-red);
+}
+
+.fp-demo__tag--blue {
+  background: var(--c-blue-bg);
+  color: var(--c-blue);
+}
+
+/* Подписи «Ситуация» и «Что покажет расчёт»: без них десять карточек по сорок слов —
+   стена однородного серого, по которой нельзя скользить взглядом. Были в Jinja. */
+.fp-demo__label {
+  font-size: var(--fs-xs);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-eyebrow);
+  color: var(--c-text3);
+  margin-top: var(--sp-1);
+}
+
+.fp-demo__role {
+  font-size: var(--fs-sm);
+  color: var(--c-text3);
+}
+
+.fp-demo__situation {
+  font-size: var(--fs-sm);
+  color: var(--c-text2);
+}
+
+/* «Что покажет расчёт» — то, ради чего экран существует. В первой редакции оно было
+   самым тусклым и последним: цвет подписи на самом важном тексте (design-critic). */
+.fp-demo__expect {
+  font-size: var(--fs-sm);
+  color: var(--c-text2);
+}
+
+.fp-demo__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--sp-3);
+  margin-top: var(--sp-5);
+}
+
+.fp-demo__note {
+  color: var(--c-text2);
+  padding: var(--sp-4) 0;
+}

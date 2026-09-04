@@ -100,6 +100,12 @@ THRESHOLDS = {
     # места на диске нет (99-claude-code-sessions.md §4). Порог 1: одна долгая
     # вахта на грани — уже повод вынуть из неё ценное в репу, пока она есть.
     "сессий на грани удаления": 1,
+    # 🔴 Порог 7, а не 1: неделя без разбора — обычная жизнь (батчи бывают
+    # механические, и это законно). Восемь дней подряд — уже затор, и именно
+    # столько очередь простояла незамеченной (`PIT-195`). Порог 1 давал бы
+    # красное каждый день, когда работали над гейтами, — то есть всегда,
+    # а всегда красное перестают читать (`69` §4з).
+    "дней без разбора переписи": 7,
 }
 
 # 🔴 ОБРАТНЫЕ ПОРОГИ: тревога при значении НИЖЕ порога, а не выше.
@@ -540,7 +546,53 @@ def _population(label: str) -> int | None:
     return None
 
 
+def census_stalled() -> tuple[int, list[str]]:
+    """Сколько дней очередь переписи метода стоит без движения.
+
+    🔴 ПОВОД — `PIT-195`. Перепись `scan_lessons.py` отвечает «что читать»
+    и отвечала верно **восемь дней**, пока очередь стояла: 27.08 разобран
+    первый кандидат, дальше ноль до 04.09. Простой был невидим — ни одна
+    проверка не считала, сколько разобрано за период.
+
+    Корень назван там же: механика отчитывается числами («821 дубль снят»),
+    подъём урока — одним абзацем в чужом документе. При выборе, чем закрыть
+    батч, механика выигрывает не по важности, а по видимости результата.
+    Здесь простой становится числом — то есть уравнивается в видимости.
+
+    🔴 ГРАНИЦА: считается движение счётчика `разобрано`, а не польза от него.
+    Разбор, признанный «покрыто, поднимать нечего», двигает счётчик так же,
+    как поднятый раздел, — и это верно: «уже покрыто» такой же результат
+    прохода (`ROADMAP` §P2). Отписку гейт не отличит, как и `check_campaign_log`.
+    """
+    journal = BASE_REPO / "05-infra-synthesis-lab/tools/census-progress.tsv"
+    if not journal.is_file():
+        return 0, []
+    rows = [l.split("\t") for l in
+            journal.read_text(encoding="utf-8").splitlines()[1:] if l.strip()]
+    if not rows:
+        return 0, []
+    import datetime
+    last_moved, last_seen = None, None
+    prev = None
+    for r in rows:
+        if len(r) < 3:
+            continue
+        last_seen = r[0]
+        if prev is None or int(r[1]) > prev:
+            last_moved = r[0]
+        prev = int(r[1])
+    queue = int(rows[-1][2])
+    if queue == 0 or last_moved is None:
+        return 0, []
+    days = (datetime.date.today() - datetime.date.fromisoformat(last_moved)).days
+    if days == 0:
+        return 0, []
+    return days, [f"очередь ≥400: {queue} · последний разбор {last_moved}"
+                  f" · последний замер {last_seen}"]
+
+
 CHECKS = (
+    ("дней без разбора переписи", census_stalled),
     ("отставших от канона", canon_lag),
     ("повреждённых архивов", broken_archives),
     ("дней до порога размера", growth_forecast),
@@ -587,7 +639,45 @@ def selftest() -> bool:
                for v, l, inv, expected in checks):
         return False
     # И сами разряды не должны пересекаться: метка не может быть в обоих.
-    return not (set(THRESHOLDS) & set(LOWER_IS_WORSE))
+    if set(THRESHOLDS) & set(LOWER_IS_WORSE):
+        return False
+
+    # 🔴 У КАЖДОЙ ПРОВЕРКИ ОБЯЗАН БЫТЬ ПОРОГ. Без этой строки новая проверка,
+    # добавленная в CHECKS без записи в THRESHOLDS, печатала бы значение
+    # и молчала бы навсегда — «проверка без порога не проверка, а строка»
+    # (поймано на хуках 29.08.2026, и повторилось бы на счётчике переписи).
+    labels = {lab for lab, _ in CHECKS}
+    if labels - set(THRESHOLDS) - set(LOWER_IS_WORSE):
+        return False
+
+    # 🔴 Счётчик переписи проверяется НА СВОИХ ДАННЫХ, а не на литералах
+    # (`PIT-195`): движение счётчика `разобрано` должно гасить тревогу,
+    # а стоящая непустая очередь — поднимать.
+    import tempfile, datetime, io, contextlib
+    global BASE_REPO
+    real = BASE_REPO
+    y = (datetime.date.today() - datetime.timedelta(days=30)).isoformat()
+    cases = (
+        # (строки журнала, ожидаем тревогу)
+        ((f"{y}\t5\t9\t100", f"{datetime.date.today()}\t7\t9\t100"), False),
+        ((f"{y}\t5\t9\t100", f"{datetime.date.today()}\t5\t9\t100"), True),
+        ((f"{y}\t5\t0\t100", f"{datetime.date.today()}\t5\t0\t100"), False),
+    )
+    ok = True
+    try:
+        for lines, expect in cases:
+            with tempfile.TemporaryDirectory() as d:
+                j = Path(d) / "05-infra-synthesis-lab/tools"
+                j.mkdir(parents=True)
+                (j / "census-progress.tsv").write_text(
+                    "дата\tразобрано\tочередь_400\tвсего\n" + "\n".join(lines) + "\n",
+                    encoding="utf-8")
+                BASE_REPO = Path(d)
+                days, _ = census_stalled()
+                ok &= bool(days) is expect
+    finally:
+        BASE_REPO = real
+    return ok
 
 
 def main() -> int:

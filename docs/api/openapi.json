@@ -1247,6 +1247,89 @@
         "title": "DebtSchedule",
         "type": "object"
       },
+      "DemoCase": {
+        "description": "Один демо-портрет для карточки выбора.\n\nВсе поля обязательны: карточка строится из них целиком, и необязательное поле здесь\nозначает `undefined` в вёрстке — пустая кнопка или портрет без описания, по которому\nнельзя понять, похож ли он на тебя. Ради этого выбора экран и существует.",
+        "properties": {
+          "accent": {
+            "description": "Семантический цвет ярлыка: amber | green | red | blue.",
+            "title": "Accent",
+            "type": "string"
+          },
+          "expect": {
+            "description": "Что покажет алгоритм и почему — до нажатия.",
+            "title": "Expect",
+            "type": "string"
+          },
+          "key": {
+            "description": "Ключ кейса для `/demo/load?case=`.",
+            "title": "Key",
+            "type": "string"
+          },
+          "n": {
+            "description": "Порядковый номер в списке (строкой, как в разметке).",
+            "title": "N",
+            "type": "string"
+          },
+          "name": {
+            "description": "Имя и возраст: «Анна Петрова, 36».",
+            "title": "Name",
+            "type": "string"
+          },
+          "role": {
+            "description": "Занятие и город: «Маркетолог · Москва».",
+            "title": "Role",
+            "type": "string"
+          },
+          "situation": {
+            "description": "Исходные данные портрета человеческим языком.",
+            "title": "Situation",
+            "type": "string"
+          },
+          "tag": {
+            "description": "Ярлык ситуации: «Пограничный», «Критический».",
+            "title": "Tag",
+            "type": "string"
+          }
+        },
+        "required": [
+          "key",
+          "n",
+          "name",
+          "role",
+          "tag",
+          "accent",
+          "situation",
+          "expect"
+        ],
+        "title": "DemoCase",
+        "type": "object"
+      },
+      "DemoCases": {
+        "description": "Ответ `/demo/cases`.\n\nСхема заведена ДО фронта (v8.46.0): раньше эндпоинт был размечен `-> dict[str, Any]`\nи приезжал в контракт как `{[key: string]: unknown}`. Гостевая песочница — первый\nэкран, который видит человек без своих данных, и рукописный тип под него означал бы\nпустые карточки на первом же расхождении (урок v8.31.1).",
+        "properties": {
+          "cases": {
+            "items": {
+              "$ref": "#/components/schemas/DemoCase"
+            },
+            "title": "Cases",
+            "type": "array"
+          },
+          "keys": {
+            "description": "Только ключи — для мест, где метаданные не нужны.",
+            "items": {
+              "type": "string"
+            },
+            "title": "Keys",
+            "type": "array"
+          }
+        },
+        "required": [
+          "cases",
+          "keys"
+        ],
+        "title": "DemoCases",
+        "type": "object"
+      },
       "ExchangeRequest": {
         "properties": {
           "item_id": {
@@ -5232,28 +5315,10 @@
   },
   "info": {
     "title": "FINPILOT",
-    "version": "8.43.0"
+    "version": "8.45.0"
   },
   "openapi": "3.1.0",
   "paths": {
-    "/": {
-      "get": {
-        "operationId": "read_dashboard__get",
-        "responses": {
-          "200": {
-            "content": {
-              "text/html": {
-                "schema": {
-                  "type": "string"
-                }
-              }
-            },
-            "description": "Successful Response"
-          }
-        },
-        "summary": "Главная страница приложения"
-      }
-    },
     "/api/admin/experiments": {
       "get": {
         "operationId": "list_experiments_endpoint_api_admin_experiments_get",
@@ -6943,9 +7008,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response List Cases Api Demo Cases Get",
-                  "type": "object"
+                  "$ref": "#/components/schemas/DemoCases"
                 }
               }
             },
@@ -10227,24 +10290,6 @@
         ]
       }
     },
-    "/banks": {
-      "get": {
-        "operationId": "read_banks_banks_get",
-        "responses": {
-          "200": {
-            "content": {
-              "text/html": {
-                "schema": {
-                  "type": "string"
-                }
-              }
-            },
-            "description": "Successful Response"
-          }
-        },
-        "summary": "Банковская интеграция"
-      }
-    },
     "/contacts": {
       "get": {
         "operationId": "read_contacts_contacts_get",
@@ -10261,204 +10306,6 @@
           }
         },
         "summary": "Контакты и реквизиты оператора"
-      }
-    },
-    "/dashboard": {
-      "get": {
-        "operationId": "read_dashboard_dashboard_get",
-        "responses": {
-          "200": {
-            "content": {
-              "text/html": {
-                "schema": {
-                  "type": "string"
-                }
-              }
-            },
-            "description": "Successful Response"
-          }
-        },
-        "summary": "Обзорная панель"
-      }
-    },
-    "/goals": {
-      "get": {
-        "operationId": "read_goals_goals_get",
-        "responses": {
-          "200": {
-            "content": {
-              "text/html": {
-                "schema": {
-                  "type": "string"
-                }
-              }
-            },
-            "description": "Successful Response"
-          }
-        },
-        "summary": "Цели накопления"
-      }
-    },
-    "/legal/consent": {
-      "get": {
-        "operationId": "read_legal_consent_legal_consent_get",
-        "responses": {
-          "200": {
-            "content": {
-              "text/html": {
-                "schema": {
-                  "type": "string"
-                }
-              }
-            },
-            "description": "Successful Response"
-          }
-        },
-        "summary": "Согласие на обработку ПДн"
-      }
-    },
-    "/legal/cookies": {
-      "get": {
-        "operationId": "read_legal_cookies_legal_cookies_get",
-        "responses": {
-          "200": {
-            "content": {
-              "text/html": {
-                "schema": {
-                  "type": "string"
-                }
-              }
-            },
-            "description": "Successful Response"
-          }
-        },
-        "summary": "Политика использования cookie"
-      }
-    },
-    "/legal/financial-consent": {
-      "get": {
-        "operationId": "read_legal_financial_consent_legal_financial_consent_get",
-        "responses": {
-          "200": {
-            "content": {
-              "text/html": {
-                "schema": {
-                  "type": "string"
-                }
-              }
-            },
-            "description": "Successful Response"
-          }
-        },
-        "summary": "Согласие на обработку финансовых данных"
-      }
-    },
-    "/legal/marketing-consent": {
-      "get": {
-        "operationId": "read_legal_marketing_consent_legal_marketing_consent_get",
-        "responses": {
-          "200": {
-            "content": {
-              "text/html": {
-                "schema": {
-                  "type": "string"
-                }
-              }
-            },
-            "description": "Successful Response"
-          }
-        },
-        "summary": "Согласие на рекламную рассылку"
-      }
-    },
-    "/legal/privacy": {
-      "get": {
-        "operationId": "read_legal_privacy_legal_privacy_get",
-        "responses": {
-          "200": {
-            "content": {
-              "text/html": {
-                "schema": {
-                  "type": "string"
-                }
-              }
-            },
-            "description": "Successful Response"
-          }
-        },
-        "summary": "Политика обработки ПДн (152-ФЗ)"
-      }
-    },
-    "/legal/terms": {
-      "get": {
-        "operationId": "read_legal_terms_legal_terms_get",
-        "responses": {
-          "200": {
-            "content": {
-              "text/html": {
-                "schema": {
-                  "type": "string"
-                }
-              }
-            },
-            "description": "Successful Response"
-          }
-        },
-        "summary": "Пользовательское соглашение (оферта)"
-      }
-    },
-    "/obligations": {
-      "get": {
-        "operationId": "read_obligations_obligations_get",
-        "responses": {
-          "200": {
-            "content": {
-              "text/html": {
-                "schema": {
-                  "type": "string"
-                }
-              }
-            },
-            "description": "Successful Response"
-          }
-        },
-        "summary": "Обязательства"
-      }
-    },
-    "/planning": {
-      "get": {
-        "operationId": "read_planning_planning_get",
-        "responses": {
-          "200": {
-            "content": {
-              "text/html": {
-                "schema": {
-                  "type": "string"
-                }
-              }
-            },
-            "description": "Successful Response"
-          }
-        },
-        "summary": "Планирование и рекомендации СППР"
-      }
-    },
-    "/transactions": {
-      "get": {
-        "operationId": "read_transactions_transactions_get",
-        "responses": {
-          "200": {
-            "content": {
-              "text/html": {
-                "schema": {
-                  "type": "string"
-                }
-              }
-            },
-            "description": "Successful Response"
-          }
-        },
-        "summary": "Журнал операций"
       }
     },
     "/v1/analyze": {

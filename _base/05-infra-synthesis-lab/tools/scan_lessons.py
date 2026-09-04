@@ -275,8 +275,58 @@ def scan() -> list[dict]:
     return rows
 
 
+# 🔴 СЧЁТЧИК ДВИЖЕНИЯ ОЧЕРЕДИ (`PIT-195`). Перепись отвечает «что читать»
+# и отвечала верно ВОСЕМЬ ДНЕЙ, пока очередь стояла: 27.08 разобран первый
+# кандидат, дальше ноль до 04.09. Простой был невидим — ни одна проверка
+# не считала, сколько кандидатов разобрано за период.
+#
+# Журнал append-only, по строке на прогон. `.tsv` не входит в `SCAN_SUFFIXES`,
+# поэтому счётчик НЕ попадает в то, что сам измеряет (`/auto` §2г п.2).
+PROGRESS = Path(__file__).resolve().parent / "census-progress.tsv"
+
+# 🔴 ЧТО НЕ СЧИТАЕТСЯ ОЧЕРЕДЬЮ. Первая редакция счётчика напечатала «37»,
+# пока вахта докладывала владельцу «8» — два числа об одном факте, и ни одно
+# не сверялось с другим (`21` §4е-бис п.3, поднято этим же днём).
+#
+# Расходились не подсчёты, а определение: вахта отсеивала журналы и сырые
+# выгрузки глазами, инструмент — нет. Отсев перенесён СЮДА, чтобы число
+# было одно.
+#
+# Признак по свойству, а не список файлов: журнал СОБЫТИЙ (`94` §1) и сырая
+# выгрузка — это материал, а не метод. Ключевые слова метода в них есть
+# всегда, потому что они пересказывают работу, — и потому они всегда наверху
+# ранга и всегда бесполезны для подъёма.
+NOISE_RE = re.compile(
+    r"(^|/)(CHANGELOG|WATCHLOG|ROADMAP|TASKS|decisions|auto\.log)"
+    r"|(^|/)(telegram|10-life-history|06-communication)(/|-)", re.I)
+
+
+def log_progress(rows: list[dict]) -> None:
+    """Дописать строку: дата · разобрано · очередь ≥400 · всего."""
+    import datetime
+    reviewed = sum(1 for r in rows if r["reviewed"])
+    queue = sum(1 for r in rows
+                if not r["in_base"] and not r["near_base"] and not r["reviewed"]
+                and r["score"] >= 400 and not NOISE_RE.search(r["path"]))
+    line = "\t".join((datetime.date.today().isoformat(),
+                       str(reviewed), str(queue), str(len(rows))))
+    head = "" if PROGRESS.exists() else "дата\tразобрано\tочередь_400\tвсего\n"
+    with PROGRESS.open("a", encoding="utf-8") as fh:
+        fh.write(head + line + "\n")
+    prev = [l.split("\t") for l in PROGRESS.read_text(encoding="utf-8").splitlines()[1:-1]]
+    if prev:
+        was = int(prev[-1][1])
+        delta = reviewed - was
+        mark = "🟢" if delta > 0 else "🔴"
+        print(f"{mark} разобрано: {reviewed} (было {was}, {delta:+d}) · "
+              f"очередь ≥400: {queue}", file=sys.stderr)
+    else:
+        print(f"разобрано: {reviewed} · очередь ≥400: {queue}", file=sys.stderr)
+
+
 def main() -> int:
     rows = sorted(scan(), key=lambda r: -r["score"])
+    log_progress(rows)
     with OUT.open("w", newline="", encoding="utf-8") as fh:
         w = csv.DictWriter(fh, fieldnames=list(rows[0].keys()))
         w.writeheader()

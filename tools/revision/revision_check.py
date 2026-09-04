@@ -164,7 +164,13 @@ LEGACY_CONTEXT_MARKERS = (
 # документа. Реестр метаданных (`/legal/documents`) существовал с v8.40.0, а эндпоинта
 # с содержимым не было вовсе: React показать политику не мог и вынужден был бы
 # перепечатать юридический текст у себя.
-EXPECTED_COUNTS = {"tables": 30, "migrations": 34, "openapi_paths": 115}
+# openapi_paths 102 (v8.45.0): −13. Сняты Jinja-дубли экранов вехи 8 — `/`, `/dashboard`,
+# `/planning`, `/transactions`, `/obligations`, `/goals`, `/banks` и шесть `/legal/*`.
+# Пока они существовали, они выигрывали у SPA как более точные, и сервер отдавал СТАРЫЙ
+# интерфейс: фронт вехи 8 работал только в dev через Vite (PIT-020). Страницы теперь
+# отдаёт React через catch-all, который в OpenAPI не попадает (`include_in_schema=False`)
+# — и правильно: это не API, а отдача приложения.
+EXPECTED_COUNTS = {"tables": 30, "migrations": 34, "openapi_paths": 102}
 
 
 # Канарейка CJK: редкий токен-глюк генерации ассистентов — иероглиф вместо

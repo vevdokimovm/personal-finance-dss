@@ -928,6 +928,64 @@ make_zip "$D" "big-repo" "1.0.0" dot
 OUT="$(MIN_FILES=999 run_deploy "$D" || true)"
 assert_contains "MIN_FILES соблюдён" "$OUT" "не похоже на репу"
 
+case_ "E11" "LAST=N: починка смотрит только N свежих тегов, и свежих — по SemVer"
+# Заказ владельца 04.09.2026: REPAIR=1 обходит ВСЕ теги всех реп, а их стало
+# много. Нужен потолок — и отбор «последних» обязан идти по версии, а не по
+# порядку `git tag -l`: тот лексикографический, и v2.10.0 у него младше v2.9.0.
+D="$SANDBOX/t61"; mkdir -p "$D"
+for v in 1.0.0 1.9.0 1.10.0 2.0.0; do make_zip "$D" "many-repo" "$v" dot; done
+run_deploy "$D" >/dev/null
+
+OUT="$(LAST=2 REPAIR=1 run_deploy "$D")"
+assert_contains "сказано, сколько из скольких" "$OUT" "LAST=2"
+assert_contains "самый свежий тег взят" "$OUT" "v2.0.0"
+assert_contains "второй по свежести взят" "$OUT" "v1.10.0"
+assert_missing "🔴 лексикографический сосед НЕ взят" "$OUT" "→ v1.9.0"
+assert_missing "старый тег не тронут" "$OUT" "→ v1.0.0"
+
+# Без LAST поведение прежнее — потолок не должен стать умолчанием.
+OUT="$(REPAIR=1 run_deploy "$D")"
+assert_contains "без LAST чинится и самый старый" "$OUT" "v1.0.0"
+assert_missing "без LAST строки про потолок нет" "$OUT" "LAST="
+
+# Мусор в значении останавливает прогон, а не «понимается как-нибудь».
+OUT="$(LAST=abc REPAIR=1 run_deploy "$D" 2>&1 || true)"
+assert_contains "нечисловой LAST назван" "$OUT" "должен быть числом"
+
+case_ "C14" "🔴 Пустая репа на GitHub — не доставка: первая версия публикуется"
+# Отказ найден ВЛАДЕЛЬЦЕМ на живом прогоне 04.09.2026: `audiobook-forge` только
+# что создана, дерева нет, GitHub на `contents` отдаёт 404 с телом
+# «This repository is empty.». Предохранитель доставки принимал это тело
+# за имя файла и отказывался публиковать — навсегда, для любой новой репы.
+#
+# 🔴 Тест не поймал этого раньше по своей вине: стаб `gh` не знал команды
+# `api` и отвечал на неё успехом с пустым выводом. Теперь знает.
+D="$SANDBOX/t60"; mkdir -p "$D"
+make_zip "$D" "brandnew-repo" "1.0.0" dot
+OUT="$(run_deploy "$D")"
+assert_missing "пустая репа не названа доставкой" "$OUT" "есть доставка"
+[ -d "$REMOTES/brandnew-repo.git" ] \
+  && ok "новая репа создана" || bad "новая репа создана"
+assert_eq "первая версия опубликована" "$(tag_tree_version "$REMOTES/brandnew-repo.git" 1.0.0)" "1.0.0"
+
+# Второй прогон: дерево уже есть, `contents` отдаёт нормальный список —
+# предохранитель по-прежнему молчит, потому что INBOX там нет.
+make_zip "$D" "brandnew-repo" "1.1.0" dot
+OUT="$(run_deploy "$D")"
+assert_missing "непустая репа без INBOX тоже молчит" "$OUT" "есть доставка"
+assert_eq "вторая версия опубликована" "$(tag_tree_version "$REMOTES/brandnew-repo.git" 1.1.0)" "1.1.0"
+
+# 🔴 И обратная сторона: предохранитель ОБЯЗАН срабатывать, когда доставка
+# на GitHub действительно есть, а в архиве её нет. Без этой половины починка
+# была бы не сужением, а глушением (`69` §4к).
+mkdir -p "$GH_STORE/contents"
+printf 'INBOX-FROM-planner-001.md\n' > "$GH_STORE/contents/brandnew-repo"
+make_zip "$D" "brandnew-repo" "1.2.0" dot
+OUT="$(run_deploy "$D")"
+assert_contains "настоящая доставка всё ещё останавливает публикацию" "$OUT" "есть доставка"
+assert_eq "версия с доставкой НЕ опубликована" "$(tag_tree_version "$REMOTES/brandnew-repo.git" 1.2.0)" ""
+rm -f "$GH_STORE/contents/brandnew-repo"
+
 case_ "E10" "deploy-repos.conf: зеркала настраиваются без выпуска новой версии скрипта"
 # 🔴 Смысл кейса — не «файл читается», а ТРИ свойства сразу: конфиг
 # необязателен, окружение старше конфига, и неизвестный ключ не проглатывается

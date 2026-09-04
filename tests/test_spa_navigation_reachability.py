@@ -55,12 +55,30 @@ def _nav_paths() -> set[str]:
     return set(re.findall(r'\{\s*to:\s*"([^"]+)"', text))
 
 
+def _is_redirect_only(path: Path) -> bool:
+    """Маршрут-редирект — не экран: он ничего не рендерит и мгновенно уводит.
+
+    🔴 Признак СТРУКТУРНЫЙ (`beforeLoad` + `redirect(`, без `component`), а не список
+    имён файлов: список пришлось бы пополнять руками при каждом новом редиректе, то есть
+    гейт снова держался бы на внимательности. Заведено в v8.46.0 вместе с `/dashboard`,
+    который перенаправляет на `/`: адрес остался от Jinja, ссылок на него в продукте нет,
+    но есть закладки и внешние ссылки.
+
+    Требовать для такого маршрута пункт меню значило бы завести в навигации второй вход
+    в тот же экран.
+    """
+    text = path.read_text(encoding="utf-8")
+    return "redirect(" in text and "component:" not in text
+
+
 def _screen_route_paths() -> set[str]:
     """Файлы `routes/*.tsx` как URL-пути (TanStack file-based routing:
     `index.tsx` -> `/`, `forgot-password.tsx` -> `/forgot-password`)."""
     paths = set()
     for path in ROUTES_DIR.glob("*.tsx"):
         if path.name in LAYOUT_ROUTE_FILES or path.name in AUTH_ROUTE_FILES:
+            continue
+        if _is_redirect_only(path):
             continue
         paths.add("/" if path.name == "index.tsx" else f"/{path.stem}")
     return paths
