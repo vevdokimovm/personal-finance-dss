@@ -16,6 +16,7 @@
 from __future__ import annotations
 
 import importlib.util
+import os
 from pathlib import Path
 
 import pytest
@@ -68,6 +69,20 @@ def test_blocks(hook, command, why) -> None:
 def test_allows(hook, command, why) -> None:
     """Ложное срабатывание делает хук неработоспособным — он будет снят целиком."""
     assert not hook.offending_paths(command), f"ложно заблокировано ({why}): {command}"
+
+
+def test_hook_is_executable() -> None:
+    """🔴 Без бита `+x` хук не исполняется — и падения при этом НЕ будет.
+
+    Худший вид отказа: код на месте, регистрация на месте, вердикт «зелено» означает
+    «не проверялось». Бит слетел на этой же неделе, когда файл перезаписали целиком
+    после `chmod` — нашла соседняя вахта по своему `system_status.py`, не этот гейт.
+    Родня PIT-017 (гейт, заявленный как проверяющий X, обязан фактически проверять X).
+    """
+    assert os.access(HOOK, os.X_OK), (
+        f"{HOOK.name} без бита исполнения: PreToolUse его не запустит, "
+        f"и защита будет молча отсутствовать. Починка: chmod +x"
+    )
 
 
 def test_hook_is_registered() -> None:
