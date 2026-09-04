@@ -1,0 +1,93 @@
+/* Импорт выписки (v8.43.0).
+
+   🔴 Панель и лид приходят из общих модулей — импортируем их ЯВНО. Роуты режутся
+   на чанки (`autoCodeSplitting`), и при холодном заходе прямо на /transactions
+   `panel.css` не приехал бы вовсе: секция стала бы голым текстом на фоне страницы
+   (design-critic). `field.css` спасала случайность — его тянет TransactionForm
+   в том же чанке; полагаться на это нельзя. */
+@import "@shared/ui/panel.css";
+@import "@shared/ui/entityForm.css";
+
+.fp-statement-import__form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--sp-4);
+  /* Форма не растягивается на всю ширину контента: два поля по 500px — это выпадающий
+     список банка в половину экрана, ритм рассыпается. */
+  max-width: var(--statement-form-w);
+  margin-bottom: var(--sp-5);
+}
+
+.fp-statement-import__form .fp-entity-form__field {
+  flex: 1 1 var(--statement-field-w);
+  min-width: 0;
+}
+
+/* Кегль как у соседнего `select` (--fs-base из field.css): поля в паре не должны
+   отличаться размером, а контрол мельче 16px вызывает зум страницы на iOS ([TOK-03]). */
+.fp-statement-import__form input[type="file"] {
+  width: 100%;
+  max-width: 100%;
+  min-height: var(--tap-target-min);
+  color: var(--c-text);
+  font: inherit;
+}
+
+.fp-statement-import__result:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: var(--focus-ring-offset);
+}
+
+/* Ответ на действие — своя карточка, а не StatePanel: та центрирует текст и отбивает
+   64px сверху как состояние ЭКРАНА, а здесь это реплика в ответ на кнопку рядом. */
+.fp-statement-import__card {
+  padding: var(--sp-4);
+  border-left: calc(var(--border-w) * 3) solid var(--c-border-hl);
+  border-radius: var(--r-md);
+  background: var(--c-surface-up);
+}
+
+/* Успех и отказ различаются не только текстом заголовка ([A11Y-07] закрыт словом,
+   но глазу нужна и разница веса). */
+.fp-statement-import__card--ok {
+  border-left-color: var(--c-accent);
+}
+
+.fp-statement-import__card--error {
+  border-left-color: var(--c-red);
+}
+
+.fp-statement-import__title {
+  margin: 0 0 var(--sp-2);
+  color: var(--c-text);
+  font-size: var(--fs-sm);
+  font-weight: 700;
+}
+
+.fp-statement-import__text {
+  margin: 0;
+  color: var(--c-text);
+  font-size: var(--fs-sm);
+}
+
+.fp-statement-import__totals {
+  margin: var(--sp-2) 0 0;
+  color: var(--c-text2);
+  font-size: var(--fs-sm);
+}
+
+/* Сверка сошлась — самый сильный сигнал доверия по импорту, отдельной строкой. */
+.fp-statement-import__reconciled {
+  margin: var(--sp-2) 0 0;
+  color: var(--c-accent);
+  font-size: var(--fs-sm);
+}
+
+/* Расхождение — предупреждение, а не отказ: операции уже импортированы. Отдельным
+   абзацем, а не вклейкой в строку итогов: разная серьёзность — разные строки. */
+.fp-statement-import__warn {
+  margin: var(--sp-2) 0 0;
+  color: var(--c-amber);
+  font-size: var(--fs-sm);
+}

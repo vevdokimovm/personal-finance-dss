@@ -50,7 +50,16 @@ router.include_router(user_prefs_router)
 router.include_router(analysis_router, dependencies=_FIN)
 router.include_router(recommendation_router, dependencies=_FIN)
 router.include_router(demo_router)
-router.include_router(banks_router)
+# 🔴 ОСТАТОК H3 ЗАКРЫТ (v8.43.0). Импорт банковской выписки пачкой обрабатывал финансовые
+# данные БЕЗ согласия, тогда как ручное добавление ОДНОЙ операции его требовало: чем больше
+# данных человек загружал за раз, тем меньше проверок стояло на пути.
+#
+# Гейт не могли поставить раньше по решению владельца от v8.27.0 — единственным
+# потребителем был `app.js`, а он не умеет показать 403 (`grep "403|consent"` даёт ноль
+# на 2658 строк): человек увидел бы невнятную ошибку вместо объяснения про согласие.
+# В этом же батче импорт переехал в React, где `ConsentRequiredPanel` работает с v8.27.0.
+# Разбор — `docs/reports/decisions/2026-09-04_h3_and_jinja_removal_order.md`.
+router.include_router(banks_router, dependencies=_FIN)
 router.include_router(budgets_router, dependencies=_FIN)
 router.include_router(planning_router, dependencies=_FIN)
 router.include_router(notifications_router)

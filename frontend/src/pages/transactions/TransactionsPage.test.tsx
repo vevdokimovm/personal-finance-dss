@@ -21,6 +21,13 @@ vi.mock("@entities/consents", () => ({
   ),
 }));
 
+// Импорт выписки — своя секция со своими запросами и тестами
+// (StatementImportSection.test.tsx); здесь проверяется список операций.
+vi.mock("@entities/bank-import", () => ({
+  useBanks: () => ({ data: [], error: null, isLoading: false }),
+  useUploadStatement: () => ({ mutate: vi.fn(), isPending: false }),
+}));
+
 vi.mock("@entities/transactions", () => ({
   useTransactions: () => useTransactionsMock(),
   useCreateTransaction: () => ({

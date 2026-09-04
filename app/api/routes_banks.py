@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import Any
 
 from fastapi import APIRouter, Depends, File, Form, UploadFile
+from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
 from app.config import settings
@@ -25,9 +26,42 @@ from app.services.statement_reconcile import reconcile_statement
 router = APIRouter(prefix="/banks", tags=["Банки"])
 
 
+class BankOption(BaseModel):
+    """Банк в выпадающем списке импорта."""
+
+    id: str
+    name: str
+
+
+class StatementUploadResult(BaseModel):
+    """Результат импорта выписки.
+
+    Схема заведена ДО фронта (v8.43.0): раньше эндпоинт был размечен `-> dict[str, Any]`,
+    а ответ несёт семь полей, включая сверку с контрольными итогами выписки — рукописный
+    тип разошёлся бы с ним на первой же правке парсера.
+
+    🔴 Поля успеха НЕОБЯЗАТЕЛЬНЫ, и это не осторожность. Ошибка разбора возвращается со
+    статусом **200** и `status="error"`: «файл не распознан» — не сбой сервера, а результат
+    работы. Пометить `added_count` обязательным значило бы заставить фронт читать число
+    импортированных операций там, где импорт не состоялся.
+
+    `reconciliation` — сверка с итогами, объявленными в самой выписке. Может отсутствовать:
+    у CSV контрольных сумм обычно нет.
+    """
+
+    status: str
+    message: str
+    added_count: int | None = None
+    skipped_duplicates: int | None = None
+    total_income: float | None = None
+    total_expense: float | None = None
+    filename: str | None = None
+    reconciliation: dict[str, Any] | None = None
+
+
 @router.get("/list", summary="Список доступных банков")
-def list_banks() -> list[dict[str, str]]:
-    return get_available_banks()
+def list_banks() -> list[BankOption]:
+    return [BankOption(**bank) for bank in get_available_banks()]
 
 
 @router.post("/sync/{bank_id}", summary="Симуляция синхронизации одного банка")
@@ -53,7 +87,7 @@ async def upload_statement(
     bank_id: str = Form(default="tinkoff"),
     db: Session = Depends(get_db),
     user_id: str | None = Depends(get_current_user_id),
-) -> dict[str, Any]:
+) -> StatementUploadResult:
     """
     Загружает CSV-выписку из банка и импортирует транзакции.
     Поддерживаемые банки: tinkoff, sber, alfa, vtb, raiffeisen, universal.
@@ -63,11 +97,11 @@ async def upload_statement(
 
     max_bytes = settings.MAX_UPLOAD_SIZE_MB * 1024 * 1024
     if len(raw) > max_bytes:
-        return {
-            "status": "error",
-            "message": f"Файл больше {settings.MAX_UPLOAD_SIZE_MB} МБ — "
-                       "слишком большой для импорта.",
-        }
+        return StatementUploadResult(
+            status="error",
+            message=f"Файл больше {settings.MAX_UPLOAD_SIZE_MB} МБ — "
+                    "слишком большой для импорта.",
+        )
 
     # PDF-выписка. Банк определяем по СОДЕРЖИМОМУ файла, а выбор в форме оставляем
     # запасным вариантом: ошибка в выпадающем списке отправляла выписку не в тот парсер
@@ -83,26 +117,26 @@ async def upload_statement(
         if not transactions:
             reason = pdf_non_statement_reason(raw)
             if reason:
-                return {
-                    "status": "error",
-                    "message": f"Это {reason}, а не выписка операций. "
-                               "Загрузите выписку по счёту с историей операций.",
-                }
-            return {
-                "status": "error",
-                "message": "Не удалось распознать операции в PDF. "
-                           "Проверьте, что выбран правильный банк "
-                           "(PDF поддерживаются для Тинькофф, ВТБ, Сбер).",
-            }
+                return StatementUploadResult(
+                    status="error",
+                    message=f"Это {reason}, а не выписка операций. "
+                            "Загрузите выписку по счёту с историей операций.",
+                )
+            return StatementUploadResult(
+                status="error",
+                message="Не удалось распознать операции в PDF. "
+                        "Проверьте, что выбран правильный банк "
+                        "(PDF поддерживаются для Тинькофф, ВТБ, Сбер).",
+            )
     elif raw[:4] == b"PK\x03\x04":
         # XLSX — zip-контейнер; парсим теми же эвристиками, что и универсальный CSV
         transactions = parse_xlsx(raw, bank_id)
         if not transactions:
-            return {
-                "status": "error",
-                "message": "Не удалось распознать операции в XLSX. "
-                           "Проверьте, что в файле есть таблица с датой и суммой.",
-            }
+            return StatementUploadResult(
+                status="error",
+                message="Не удалось распознать операции в XLSX. "
+                        "Проверьте, что в файле есть таблица с датой и суммой.",
+            )
     else:
         # CSV/1C: декодер сам форсит cp1251 для 1C и перебирает кодировки для CSV.
         # `report` собирает статистику разбора: у CSV контрольных сумм обычно нет, и
@@ -114,10 +148,11 @@ async def upload_statement(
             reconciliation = reconcile_statement(raw, bank_id, transactions, parse_report)
 
     if not transactions:
-        return {
-            "status": "error",
-            "message": "Не удалось распознать транзакции. Проверьте формат файла и выбранный банк.",
-        }
+        return StatementUploadResult(
+            status="error",
+            message="Не удалось распознать транзакции. "
+                    "Проверьте формат файла и выбранный банк.",
+        )
 
     # Дедупликация: ключи уже сохранённых операций пользователя — защита от повторного
     # импорта той же выписки. Загружаем один раз, проверяем в памяти (O(1) на строку).
@@ -170,13 +205,13 @@ async def upload_statement(
         msg += f", пропущено дублей: {skipped_duplicates}"
     if detected_bank and detected_bank != bank_id:
         msg += f". Банк определён по файлу: {detected_bank}"
-    return {
-        "status": "success",
-        "message": msg,
-        "reconciliation": reconciliation,
-        "added_count": added,
-        "skipped_duplicates": skipped_duplicates,
-        "total_income": round(total_income, 2),
-        "total_expense": round(total_expense, 2),
-        "filename": file.filename,
-    }
+    return StatementUploadResult(
+        status="success",
+        message=msg,
+        reconciliation=reconciliation,
+        added_count=added,
+        skipped_duplicates=skipped_duplicates,
+        total_income=round(total_income, 2),
+        total_expense=round(total_expense, 2),
+        filename=file.filename,
+    )

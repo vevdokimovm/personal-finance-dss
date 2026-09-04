@@ -81,6 +81,46 @@ def has_mirror(repo: Path, base: Path) -> bool:
     return repo.name in mirrors(base)
 
 
+def watchlog_text(repo: Path) -> tuple[str, str]:
+    """Текст журнала вахты — СЛЕДУЯ УКАЗАТЕЛЮ, если корневой файл им является.
+
+    🔴 ПОВОД, 04.09.2026. Первая редакция читала только `WATCHLOG.md` в корне
+    и объявила `personal-finance-dss` нарушителем `Г4`. Репа была права:
+    в корне у неё **указатель**
+
+        > 🔴 Здесь журнала нет намеренно — он в `docs/WATCHLOG.md`
+
+    а сам журнал — в `docs/`, со строкой «**Версия:** 8.42.0», совпадающей
+    с `VERSION`. То есть требование выполнено, а проверка этого не видела.
+
+    Схема «указатель в корне + журнал глубже» законна: у крупной репы
+    документация живёт в `docs/`, и корневой файл честно на неё показывает.
+    Подстраиваться должна проверка, а не репа.
+
+    🔴 Класс `PIT-187`: проверка отвечала на СВОЙ вопрос («есть ли строка
+    в корневом файле») вместо заданного («называет ли точка входа репы
+    верную версию»). Вторая вахта уже собиралась потратить батч на правку,
+    которая была не нужна.
+
+    Возвращает (текст, откуда) — второе для внятного сообщения об отказе.
+    """
+    root = repo / "WATCHLOG.md"
+    txt = read(root)
+    if not txt:
+        return "", "WATCHLOG.md"
+
+    # Указатель узнаётся по свойству: сам версии не называет, но ссылается
+    # на другой WATCHLOG. Ссылка ищется markdown-формой `(путь)`.
+    if "**Версия:**" not in txt:
+        for m in re.finditer(r"\(([^)]*WATCHLOG\.md)\)", txt):
+            target = repo / m.group(1).lstrip("./")
+            if target.is_file() and target != root:
+                inner = read(target)
+                if "**Версия:**" in inner:
+                    return inner, m.group(1)
+    return txt, "WATCHLOG.md"
+
+
 def check(repo: Path, base: Path) -> list[tuple[str, str, str]]:
     """[(требование, что не так, как чинить)]."""
     bad: list[tuple[str, str, str]] = []
@@ -104,13 +144,13 @@ def check(repo: Path, base: Path) -> list[tuple[str, str, str]]:
             bad.append(("Г3", f"в CHANGELOG нет секции [{ver}]",
                         "закрыть батч ритуалом close_batch.py"))
 
-        wl = read(repo / "WATCHLOG.md")
+        wl, wl_where = watchlog_text(repo)
         m = re.search(r"\*\*Версия:\*\*\s*([0-9.]+)", wl)
         if not m:
-            bad.append(("Г4", "в WATCHLOG нет строки «Версия:»",
+            bad.append(("Г4", f"в {wl_where} нет строки «**Версия:**»",
                         "точка входа обязана называть версию (04-watchlog-protocol)"))
         elif m.group(1).strip() != ver:
-            bad.append(("Г4", f"WATCHLOG говорит {m.group(1)}, VERSION — {ver}",
+            bad.append(("Г4", f"{wl_where} говорит {m.group(1)}, VERSION — {ver}",
                         "обновить §0: расхождение шапки и тела ловит И18"))
 
     # 🔴 ФОРМАТ `owner/repo`, А НЕ ГОЛОЕ ИМЯ. Первая редакция сравнивала
@@ -169,6 +209,28 @@ def selftest() -> int:
         print(f"   {mark} годная репа проходит "
               f"{'' if not good else '— но найдено: ' + str(good)}")
         ok &= not good
+        # 🔴 СЛУЧАЙ С УКАЗАТЕЛЕМ — ради него проверка и правилась 04.09.2026.
+        # Корневой WATCHLOG не называет версию, а показывает на другой файл.
+        # Без этой канарейки регрессия вернётся молча: обычная репа пройдёт,
+        # а репа с указателем снова станет «нарушителем».
+        (r / "docs").mkdir()
+        (r / "WATCHLOG.md").write_text(
+            "# указатель\n> журнала здесь нет, он в [`docs/WATCHLOG.md`](docs/WATCHLOG.md)\n",
+            encoding="utf-8")
+        (r / "docs" / "WATCHLOG.md").write_text("**Версия:** 1.0.0\n", encoding="utf-8")
+        via = check(r, Path(d))
+        mark = "✅" if not via else "🔴"
+        print(f"   {mark} указатель в корне → журнал в docs/ "
+              f"{'' if not via else '— но найдено: ' + str(via)}")
+        ok &= not via
+
+        # И обратное: если по указателю версия ДРУГАЯ — обязано ловиться.
+        (r / "docs" / "WATCHLOG.md").write_text("**Версия:** 9.9.9\n", encoding="utf-8")
+        mism = {c for c, _, _ in check(r, Path(d))}
+        mark = "✅" if "Г4" in mism else "🔴"
+        print(f"   {mark} расхождение версии ЗА указателем ловится")
+        ok &= "Г4" in mism
+
     print("selftest OK" if ok else "🔴 selftest ПРОВАЛЕН")
     return 0 if ok else 1
 

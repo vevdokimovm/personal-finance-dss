@@ -78,7 +78,23 @@ COMPILED = {k: [re.compile(p, re.M) for p in v] for k, v in FAMILIES.items()}
 
 
 def base_hashes() -> set[str]:
-    """Хэши всего, что уже лежит в живой базе — чтобы не предлагать своё же."""
+    """Хэши всего, что уже лежит в живой базе — чтобы не предлагать своё же.
+
+    🔴 ГРАНИЦА, НАЗВАННАЯ ВСЛУХ (замер 04.09.2026). Сравнение идёт по sha256,
+    то есть `in_base=yes` означает **побайтовую копию**, а не «урок отсюда
+    уже поднят».
+
+    Разобранный кандидат, чей урок **переписан своими словами** — а именно так
+    и работает подъём в базу (`PROCEDURE.md`), — навсегда останется
+    `in_base=""`. Все три разобранных к 04.09 кандидата (`LESSONS.md`,
+    `inc_null_deadline`, `e2e_incident_postmortem`) в переписи числятся
+    неразобранными.
+
+    Значит колонка отвечает на вопрос «не предлагаю ли я базе её же файл»,
+    и **не отвечает** на «не разобран ли этот файл». Второе ведётся вручную
+    в `ROADMAP.md` — по полному пути, а не по имени: `CHANGELOG.md` есть
+    у всех 66 реп, и сверка по имени даёт девять ложных «уже разобрано».
+    """
     out = set()
     for p in BASE.rglob("*"):
         if p.is_file() and ".git" not in p.parts:
@@ -89,8 +105,55 @@ def base_hashes() -> set[str]:
     return out
 
 
+def reviewed_paths() -> set[str]:
+    """Пути, РАЗОБРАННЫЕ вахтой — из `ROADMAP.md`, а не из хешей.
+
+    🔴 Отвечает на вопрос, на который `in_base` ответить не может: урок
+    подняли, переписав своими словами, и побайтового совпадения нет.
+    Единственное место, где факт разбора записан, — очередь задач.
+
+    Сверка по ПОЛНОМУ пути. По имени файла нельзя: `CHANGELOG.md` есть
+    у всех 66 реп, и такая сверка даёт девять ложных «уже разобрано»
+    (замер 04.09.2026).
+    """
+    rm = BASE / "ROADMAP.md"
+    if not rm.is_file():
+        return set()
+    return {rm.read_text(encoding="utf-8", errors="replace")}
+
+
+def headings_overlap(src: Path, base_doc: Path) -> tuple[int, int, int]:
+    """(разделов у источника, у документа базы, уникальных у источника).
+
+    🔴 ПОВОД, 04.09.2026. Дважды за час решение «поднимать или дубль»
+    принималось вручную, и оба раза дорого: первый — чтением 180 строк,
+    второй — построчной сверкой заголовков скриптом на месте.
+
+    Вывод «дубль» НА ГЛАЗ — тот же класс, что «уже разобрано» по имени файла
+    (9 ложных срабатываний в тот же день). Выглядит проверкой и ею не является.
+
+    Сравниваются заголовки `##`/`###` по первым 22 символам: полное совпадение
+    строк не годится — при подъёме формулировку правят, и это нормально.
+
+    🔴 ГРАНИЦА: совпадение заголовков не означает совпадения содержания.
+    Инструмент отвечает «стоит ли читать», а не «дубль ли это» — решение
+    остаётся за вахтой.
+    """
+    def heads(f: Path) -> list[str]:
+        try:
+            return [h.strip() for h in re.findall(
+                r"^#{2,3}\s+(.+)$", f.read_text(encoding="utf-8", errors="replace"), re.M)]
+        except OSError:
+            return []
+    s, b = heads(src), heads(base_doc)
+    uniq = [h for h in s if not any(h[:22] in x for x in b)]
+    return len(s), len(b), len(uniq)
+
+
 def scan() -> list[dict]:
     known = base_hashes()
+    _roadmap = reviewed_paths()
+    roadmap_text = next(iter(_roadmap), "")
     print(f"файлов в живой базе: {len(known)}", file=sys.stderr)
     rows = []
     seen = 0
@@ -128,14 +191,33 @@ def scan() -> list[dict]:
             "fam_detail": ";".join(f"{k}={v}" for k, v in sorted(hits.items())),
             "in_base": "yes" if digest in known else "",
             "sha": digest[:12],
+            # 🔴 РАЗОБРАН ≠ СКОПИРОВАН. `in_base` ловит побайтовую копию,
+            # `reviewed` — факт разбора, записанный вахтой в `ROADMAP.md`.
+            # Все три разобранных к 04.09 кандидата имеют `in_base=""`:
+            # их уроки переписаны своими словами, как и требует `PROCEDURE`.
+            "reviewed": "yes" if rel in roadmap_text else "",
         })
     print(f"просмотрено файлов: {seen}; с признаками метода: {len(rows)}", file=sys.stderr)
     return rows
 
 
-rows = sorted(scan(), key=lambda r: -r["score"])
-with OUT.open("w", newline="", encoding="utf-8") as fh:
-    w = csv.DictWriter(fh, fieldnames=list(rows[0].keys()))
-    w.writeheader()
-    w.writerows(rows)
-print(f"записано: {OUT}")
+def main() -> int:
+    rows = sorted(scan(), key=lambda r: -r["score"])
+    with OUT.open("w", newline="", encoding="utf-8") as fh:
+        w = csv.DictWriter(fh, fieldnames=list(rows[0].keys()))
+        w.writeheader()
+        w.writerows(rows)
+    print(f"записано: {OUT}")
+    return 0
+
+
+# 🔴 ТЕЛО ПОД ГВАРДОМ, А НЕ НА ВЕРХНЕМ УРОВНЕ. Замер 04.09.2026: попытка
+# импортировать модуль ради ОДНОЙ функции (`headings_overlap`) запустила
+# полный обход **11 935 файлов** и перезаписала `scan.csv` — то есть чтение
+# кода изменило состояние.
+#
+# Побочный эффект при импорте — это ещё и ловушка для любого будущего
+# инструмента, который захочет переиспользовать отсюда функцию: он получит
+# не библиотеку, а запуск.
+if __name__ == "__main__":
+    raise SystemExit(main())

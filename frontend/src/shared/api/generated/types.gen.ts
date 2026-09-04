@@ -428,6 +428,22 @@ export type BlrStatus = {
 };
 
 /**
+ * BankOption
+ *
+ * Банк в выпадающем списке импорта.
+ */
+export type BankOption = {
+    /**
+     * Id
+     */
+    id: string;
+    /**
+     * Name
+     */
+    name: string;
+};
+
+/**
  * BliqPreallocation
  */
 export type BliqPreallocation = {
@@ -2682,6 +2698,60 @@ export type SnapshotDto = {
 };
 
 /**
+ * StatementUploadResult
+ *
+ * Результат импорта выписки.
+ *
+ * Схема заведена ДО фронта (v8.43.0): раньше эндпоинт был размечен `-> dict[str, Any]`,
+ * а ответ несёт семь полей, включая сверку с контрольными итогами выписки — рукописный
+ * тип разошёлся бы с ним на первой же правке парсера.
+ *
+ * 🔴 Поля успеха НЕОБЯЗАТЕЛЬНЫ, и это не осторожность. Ошибка разбора возвращается со
+ * статусом **200** и `status="error"`: «файл не распознан» — не сбой сервера, а результат
+ * работы. Пометить `added_count` обязательным значило бы заставить фронт читать число
+ * импортированных операций там, где импорт не состоялся.
+ *
+ * `reconciliation` — сверка с итогами, объявленными в самой выписке. Может отсутствовать:
+ * у CSV контрольных сумм обычно нет.
+ */
+export type StatementUploadResult = {
+    /**
+     * Added Count
+     */
+    added_count?: number | null;
+    /**
+     * Filename
+     */
+    filename?: string | null;
+    /**
+     * Message
+     */
+    message: string;
+    /**
+     * Reconciliation
+     */
+    reconciliation?: {
+        [key: string]: unknown;
+    } | null;
+    /**
+     * Skipped Duplicates
+     */
+    skipped_duplicates?: number | null;
+    /**
+     * Status
+     */
+    status: string;
+    /**
+     * Total Expense
+     */
+    total_expense?: number | null;
+    /**
+     * Total Income
+     */
+    total_income?: number | null;
+};
+
+/**
  * TransactionCreate
  */
 export type TransactionCreate = {
@@ -3924,9 +3994,7 @@ export type ListBanksApiBanksListGetResponses = {
      *
      * Successful Response
      */
-    200: Array<{
-        [key: string]: string;
-    }>;
+    200: Array<BankOption>;
 };
 
 export type ListBanksApiBanksListGetResponse = ListBanksApiBanksListGetResponses[keyof ListBanksApiBanksListGetResponses];
@@ -4003,13 +4071,9 @@ export type UploadStatementApiBanksUploadPostError = UploadStatementApiBanksUplo
 
 export type UploadStatementApiBanksUploadPostResponses = {
     /**
-     * Response Upload Statement Api Banks Upload Post
-     *
      * Successful Response
      */
-    200: {
-        [key: string]: unknown;
-    };
+    200: StatementUploadResult;
 };
 
 export type UploadStatementApiBanksUploadPostResponse = UploadStatementApiBanksUploadPostResponses[keyof UploadStatementApiBanksUploadPostResponses];

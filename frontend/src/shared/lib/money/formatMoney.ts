@@ -9,10 +9,17 @@
  */
 const NBSP = " ";
 
-export function formatMoney(amount: number): string {
+/**
+ * @param fractionDigits — принудительная точность. По умолчанию действует порог
+ * «копейки скрыты выше 100 000 ₽»: он осмыслен для ОДИНОЧНОГО числа, но для пары
+ * однородных сумм рядом даёт разнобой — «Доходы: 180 000 ₽, расходы: 78 000,00 ₽»
+ * читается как ошибка данных ([CMP-04], design-critic v8.43.0). Там, где суммы стоят
+ * парой, точность задаётся явно и одинаково для обеих.
+ */
+export function formatMoney(amount: number, fractionDigits?: 0 | 2): string {
   const negative = amount < 0;
   const abs = Math.abs(amount);
-  const hideKopecks = abs > 100_000;
+  const hideKopecks = fractionDigits === undefined ? abs > 100_000 : fractionDigits === 0;
 
   const fixed = hideKopecks ? Math.round(abs).toString() : abs.toFixed(2);
   const [intPart, fracPart] = fixed.split(".");

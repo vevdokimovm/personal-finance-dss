@@ -720,6 +720,25 @@
         "title": "BLRStatus",
         "type": "object"
       },
+      "BankOption": {
+        "description": "Банк в выпадающем списке импорта.",
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name"
+        ],
+        "title": "BankOption",
+        "type": "object"
+      },
       "BliqPreallocation": {
         "properties": {
           "bliq_remaining": {
@@ -4321,6 +4340,92 @@
         "title": "SnapshotDTO",
         "type": "object"
       },
+      "StatementUploadResult": {
+        "description": "Результат импорта выписки.\n\nСхема заведена ДО фронта (v8.43.0): раньше эндпоинт был размечен `-> dict[str, Any]`,\nа ответ несёт семь полей, включая сверку с контрольными итогами выписки — рукописный\nтип разошёлся бы с ним на первой же правке парсера.\n\n🔴 Поля успеха НЕОБЯЗАТЕЛЬНЫ, и это не осторожность. Ошибка разбора возвращается со\nстатусом **200** и `status=\"error\"`: «файл не распознан» — не сбой сервера, а результат\nработы. Пометить `added_count` обязательным значило бы заставить фронт читать число\nимпортированных операций там, где импорт не состоялся.\n\n`reconciliation` — сверка с итогами, объявленными в самой выписке. Может отсутствовать:\nу CSV контрольных сумм обычно нет.",
+        "properties": {
+          "added_count": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Added Count"
+          },
+          "filename": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Filename"
+          },
+          "message": {
+            "title": "Message",
+            "type": "string"
+          },
+          "reconciliation": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reconciliation"
+          },
+          "skipped_duplicates": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Skipped Duplicates"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "total_expense": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Total Expense"
+          },
+          "total_income": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Total Income"
+          }
+        },
+        "required": [
+          "status",
+          "message"
+        ],
+        "title": "StatementUploadResult",
+        "type": "object"
+      },
       "TransactionCreate": {
         "properties": {
           "amount": {
@@ -5088,7 +5193,7 @@
   },
   "info": {
     "title": "FINPILOT",
-    "version": "8.41.0"
+    "version": "8.42.0"
   },
   "openapi": "3.1.0",
   "paths": {
@@ -6211,10 +6316,7 @@
               "application/json": {
                 "schema": {
                   "items": {
-                    "additionalProperties": {
-                      "type": "string"
-                    },
-                    "type": "object"
+                    "$ref": "#/components/schemas/BankOption"
                   },
                   "title": "Response List Banks Api Banks List Get",
                   "type": "array"
@@ -6316,9 +6418,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response Upload Statement Api Banks Upload Post",
-                  "type": "object"
+                  "$ref": "#/components/schemas/StatementUploadResult"
                 }
               }
             },

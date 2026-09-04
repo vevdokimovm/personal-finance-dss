@@ -6,6 +6,7 @@ import { useTransactions, type Transaction } from "@entities/transactions";
 import { ConsentRequiredPanel } from "@entities/consents";
 import { TransactionRow } from "./ui/TransactionRow";
 import { TransactionForm } from "./ui/TransactionForm";
+import { StatementImportSection } from "./ui/StatementImportSection";
 import "./TransactionsPage.css";
 
 export function TransactionsPage() {
@@ -87,6 +88,9 @@ export function TransactionsPage() {
         <StatePanel title={t("Операций пока нет")} action={addButton}>
           {t("Добавьте доходы и расходы за 1–2 месяца — тогда СППР сможет построить план.")}
         </StatePanel>
+        {/* Импорт особенно нужен ИМЕННО здесь: человеку без операций проще загрузить
+            выписку, чем вводить сотню строк руками. */}
+        <StatementImportSection />
         {modal}
       </main>
     );
@@ -110,6 +114,10 @@ export function TransactionsPage() {
           />
         ))}
       </ul>
+      {/* Импорт — НИЖЕ списка, когда операции уже есть: главное содержание экрана это они,
+          и вспомогательная форма не должна отжимать их вниз (design-critic). В пустой ветке
+          наоборот — там списка нет, и загрузить выписку проще, чем ввести сотню строк. */}
+      <StatementImportSection />
       {modal}
     </main>
   );

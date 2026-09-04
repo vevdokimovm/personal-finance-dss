@@ -1,4 +1,0 @@
-# file: /Users/vasyaevdokimov/repos/personal-finance-dss/app/services/event_logger.py
-# hypothesis_version: 6.155.7
-
-[0.0, '***', '; ', 'APP_VERSION', 'BLR', 'Bliq', 'Bt', 'Dt', 'Et', 'It', 'Lt', 'Rt', 'SigmaP', 'access_token', 'admissible_count', 'alternatives_total', 'api_key', 'apikey', 'auth', 'authorization', 'best', 'card_number', 'cardnumber', 'costs', 'cvc', 'cvv', 'explanation', 'gains', 'indicators', 'insight', 'pan', 'passwd', 'password', 'pin', 'refresh_token', 'secret', 'token', 'utility', 'x_goals', 'x_obligations', 'x_reserve', 'Выгоды: ', 'Издержки: ']
