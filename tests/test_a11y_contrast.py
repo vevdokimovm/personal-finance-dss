@@ -16,7 +16,13 @@ from pathlib import Path
 
 import pytest
 
-CSS_PATH = Path(__file__).resolve().parents[1] / "frontend" / "static" / "css" / "styles.css"
+# 🔴 Источник токенов — React (v8.47.0). Раньше читался `frontend/static/css/styles.css`
+# от Jinja; тот снесён вместе с Jinja, а токены живут здесь с начала вехи 8 — то есть
+# последние сорок версий тест сторожил палитру СТАРОГО интерфейса, а не показываемого
+# пользователю. Структура та же (`:root` + `[data-theme="light"]`), разбор не менялся.
+CSS_PATH = (
+    Path(__file__).resolve().parents[1] / "frontend" / "src" / "app" / "styles" / "tokens.css"
+)
 AA_NORMAL = 4.5
 
 TEXT_TOKENS = ["--c-text", "--c-text2", "--c-text3", "--c-accent"]

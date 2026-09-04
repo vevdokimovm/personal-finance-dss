@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # =============================================================================
-# deploy.sh v4.27.0 — ЕДИНЫЙ деплойер репозиториев. Один скрипт на всю систему.
+# deploy.sh v4.27.1 — ЕДИНЫЙ деплойер репозиториев. Один скрипт на всю систему.
 #
 # ┌───────────────────────────────────────────────────────────────────────────┐
 # │ ЖЕЛЕЗНОЕ ПРАВИЛО: ВТОРОГО СКРИПТА НЕ ЗАВОДИТСЯ. НИКОГДА.                   │
@@ -132,7 +132,7 @@ ASSET="${ASSET:-1}"
 # висеть перед тем, как механизм вообще успеет заметить проблему.
 CLONE_LOW_SPEED_LIMIT="${CLONE_LOW_SPEED_LIMIT:-51200}"  # байт/с — ниже считаем зависанием
 CLONE_LOW_SPEED_TIME="${CLONE_LOW_SPEED_TIME:-15}"        # столько секунд подряд ниже лимита → обрыв
-SCRIPT_VERSION="4.27.0"
+SCRIPT_VERSION="4.27.1"
 # Накопители по релизам. Объявлены здесь, а не в блоке 2Б: ветка REPAIR (шаг 2А)
 # вызывает ensure_release раньше, и под `set -u` обращение к необъявленной ASSET_OK
 # роняло весь прогон уже ПОСЛЕ создания релиза — работа сделана, а код возврата ошибка.
@@ -164,7 +164,15 @@ CHLOG_FILL="${CHLOG_FILL:-0}"  # 1 = дописать секции и разря
 # не попали: algorithms-site, game-analytics-engine, claude-usage, salvation.
 # Это ровно PIT-097 («список — намерение, свойство объекта — факт»): держать список
 # в синхроне с GitHub руками невозможно, поэтому ниже стоит предохранитель по факту.
-# Сверить список с реальностью:
+# 🔴 СВЕРЯЕТСЯ ИНСТРУМЕНТОМ, А НЕ ГЛАЗАМИ (с 04.09.2026):
+#     python3 scripts/visibility_check.py
+# Он спрашивает GitHub и сравнивает с этим списком и с `repos-map.md`.
+# Первый же прогон нашёл ДВЕ публичные репы вне списка — `vevdokimovm`
+# и `vevdokimovm.github.io`, профиль и сайт. Массовый режим считал бы их
+# обычными и залил бы туда `_base/`; ровно это случилось 08.08.2026
+# с публичной `finpilot`.
+#
+# Сверить список с реальностью вручную:
 #   gh repo list vevdokimovm --limit 200 --json name,visibility \
 #     --jq '.[]|select(.visibility=="PUBLIC")|.name'
 # ── deploy-repos.conf — список зеркал БЕЗ выпуска новой версии скрипта ───────
@@ -204,7 +212,7 @@ if [ -f "$DEPLOY_CONF" ]; then
   done < "$DEPLOY_CONF"
   [ -n "$CONF_MIRRORS" ] && echo "· зеркала взяты из $DEPLOY_CONF"
 fi
-MIRRORS="${MIRRORS:-${CONF_MIRRORS:-finpilot finpilot-mirror finpilot-public-mirror vk-graph health-report-generator bron-kerbosch algorithms-site game-analytics-engine claude-usage salvation}}"
+MIRRORS="${MIRRORS:-${CONF_MIRRORS:-finpilot finpilot-mirror finpilot-public-mirror vk-graph health-report-generator bron-kerbosch algorithms-site game-analytics-engine claude-usage salvation vevdokimovm vevdokimovm.github.io}}"
 MIRRORS_ONLY="${MIRRORS_ONLY:-0}"
 if [ "$MIRRORS_ONLY" = "1" ]; then
   if [ -n "${ONLY:-}" ]; then

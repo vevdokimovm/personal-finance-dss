@@ -1330,6 +1330,115 @@
         "title": "DemoCases",
         "type": "object"
       },
+      "DemoMoneyItem": {
+        "description": "Строка дохода или расхода портрета.",
+        "properties": {
+          "amount": {
+            "title": "Amount",
+            "type": "number"
+          },
+          "category": {
+            "title": "Category",
+            "type": "string"
+          }
+        },
+        "required": [
+          "category",
+          "amount"
+        ],
+        "title": "DemoMoneyItem",
+        "type": "object"
+      },
+      "DemoMoneySide": {
+        "description": "Одна сторона денежного потока: сумма и из чего она сложилась.",
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/DemoMoneyItem"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "total": {
+            "title": "Total",
+            "type": "number"
+          }
+        },
+        "required": [
+          "total",
+          "items"
+        ],
+        "title": "DemoMoneySide",
+        "type": "object"
+      },
+      "DemoPreview": {
+        "description": "Расчёт портрета БЕЗ записи в базу.\n\n🔴 Схема заведена ДО фронта (v8.47.0): эндпоинт был размечен `-> dict[str, Any]`.\nЦена рукописного типа здесь высокая — предпросмотр снимает необратимость выбора\nпортрета (`/demo/load` стирает данные гостя), и расхождение вернуло бы человека\nк выбору вслепую.\n\n`metrics`, `plan` и `forecast` намеренно оставлены свободными объектами: их форму\nзадаёт движок (`run_planning`, `forecast_indicators`), у неё уже есть собственные\nсхемы в `/planning/*`, и дублировать их здесь значило бы завести вторую копию,\nрасходящуюся при первой же правке модели. Обязательность самих полей проверяется —\nименно на них строится экран.",
+        "properties": {
+          "expenses": {
+            "$ref": "#/components/schemas/DemoMoneySide"
+          },
+          "forecast": {
+            "additionalProperties": true,
+            "title": "Forecast",
+            "type": "object"
+          },
+          "goals": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Goals",
+            "type": "array"
+          },
+          "history": {
+            "additionalProperties": true,
+            "title": "History",
+            "type": "object"
+          },
+          "income": {
+            "$ref": "#/components/schemas/DemoMoneySide"
+          },
+          "liquid_assets": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Liquid Assets",
+            "type": "array"
+          },
+          "metrics": {
+            "additionalProperties": true,
+            "title": "Metrics",
+            "type": "object"
+          },
+          "obligations": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Obligations",
+            "type": "array"
+          },
+          "plan": {
+            "additionalProperties": true,
+            "title": "Plan",
+            "type": "object"
+          }
+        },
+        "required": [
+          "income",
+          "expenses",
+          "obligations",
+          "goals",
+          "liquid_assets",
+          "history",
+          "metrics",
+          "plan",
+          "forecast"
+        ],
+        "title": "DemoPreview",
+        "type": "object"
+      },
       "ExchangeRequest": {
         "properties": {
           "item_id": {
@@ -5315,7 +5424,7 @@
   },
   "info": {
     "title": "FINPILOT",
-    "version": "8.45.0"
+    "version": "8.46.0"
   },
   "openapi": "3.1.0",
   "paths": {
@@ -7116,9 +7225,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response Preview Demo Api Demo Preview Get",
-                  "type": "object"
+                  "$ref": "#/components/schemas/DemoPreview"
                 }
               }
             },

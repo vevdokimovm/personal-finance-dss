@@ -3,8 +3,9 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { DemoSandbox } from "./DemoSandbox";
 
-const { useCasesMock, loadMock, invalidateMock, toastError } = vi.hoisted(() => ({
+const { useCasesMock, usePreviewMock, loadMock, invalidateMock, toastError } = vi.hoisted(() => ({
   useCasesMock: vi.fn(),
+  usePreviewMock: vi.fn(),
   loadMock: vi.fn(),
   invalidateMock: vi.fn(),
   toastError: vi.fn(),
@@ -13,6 +14,7 @@ const { useCasesMock, loadMock, invalidateMock, toastError } = vi.hoisted(() => 
 vi.mock("@entities/demo", () => ({
   useDemoCases: () => useCasesMock(),
   useLoadDemoCase: () => ({ mutate: loadMock, isPending: false }),
+  useDemoPreview: (key: string | null) => usePreviewMock(key),
 }));
 
 vi.mock("@tanstack/react-query", async () => {
@@ -50,8 +52,24 @@ const CASES = [
   },
 ];
 
+const PREVIEW = {
+  metrics: { income_total: 180000, expense_total: 78000, free_resource: 39500, Lt: 0.5, Dt: 0.35 },
+  plan: {
+    risk_profile: "Сбалансированный",
+    best: {
+      explanation: {
+        insight: "Рекомендуем направить 100% в подушку безопасности (39 500 ₽).",
+        gains: ["В подушку откладываем 39 500 ₽ — это около 0,5 месяца расходов."],
+        costs: [],
+      },
+    },
+  },
+  forecast: { trend: "improving", horizon: 6, current: { Rt: 39500 } },
+};
+
 beforeEach(() => {
   vi.clearAllMocks();
+  usePreviewMock.mockReturnValue({ data: undefined, isLoading: false, isError: false });
   useCasesMock.mockReturnValue({
     data: { cases: CASES, keys: CASES.map((c) => c.key) },
     isLoading: false,
@@ -171,4 +189,34 @@ describe("DemoSandbox — гостевая песочница", () => {
     );
     expect(screen.getByRole("button", { name: /Михаил, 49/ })).not.toHaveAttribute("aria-busy");
   });
+
+  /* 🔴 Предпросмотр — то, ради чего эта функция вообще возвращена из Jinja. Загрузка
+     портрета СТИРАЕТ данные гостя мимо отмены, и без расчёта до нажатия человек выбирал
+     вслепую по абзацу прозы. Сначала смотрит — потом решает. */
+  it("расчёт портрета показывается ДО загрузки", async () => {
+    usePreviewMock.mockReturnValue({ data: PREVIEW, isLoading: false, isError: false });
+    render(<DemoSandbox />);
+
+    // Кнопка своя у каждого портрета — берём первую (Анна).
+    await userEvent.click(screen.getAllByRole("button", { name: /Показать расчёт/ })[0]);
+    // Объяснение человеческим языком, а не голые числа: по нему и выбирают.
+    expect(screen.getByText(/Рекомендуем направить 100%/)).toBeVisible();
+    // И ничего не загрузилось: предпросмотр не трогает данные.
+    expect(loadMock).not.toHaveBeenCalled();
+  });
+
+  /* Считать все десять портретов заранее — десять прогонов Монте-Карло ради того,
+     что человек, скорее всего, не откроет. Запрос уходит по раскрытию. */
+  it("расчёт не запрашивается, пока карточку не раскрыли", () => {
+    render(<DemoSandbox />);
+    expect(usePreviewMock).toHaveBeenCalledWith(null);
+  });
+
+  it("во время расчёта объясняет, что происходит", async () => {
+    usePreviewMock.mockReturnValue({ data: undefined, isLoading: true, isError: false });
+    render(<DemoSandbox />);
+    await userEvent.click(screen.getAllByRole("button", { name: /Показать расчёт/ })[0]);
+    expect(screen.getByText(/Считаем/)).toBeVisible();
+  });
 });
+

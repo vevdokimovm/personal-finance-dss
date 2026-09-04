@@ -78,7 +78,7 @@ WATCHLOG/CHANGELOG v8.27.0 объявляют периметр закрытым 
 **А что если** зелёный `fast`-гейт не говорит ничего о работоспособности продукта, который видит пользователь?
 
 **Почему правдоподобно:**
-- `fast` (блокирующий) гоняет `pytest -m e2e` против голого uvicorn. `tests/e2e/test_auth_e2e.py` регистрирует пользователя через `#auth-login-btn` / `#auth-email` / `[data-auth-tab="register"]` — это JS-модалка из `frontend/templates/base.html`, про которую докстринг `AuthTopbarLink.tsx:11-13` прямо пишет: «*модалка физически в коде, но недостижима с сайта*». То есть блокирующий тест утверждает работоспособность UI, который в проде закрыт nginx-ом.
+- `fast` (блокирующий) гоняет `pytest -m e2e` против голого uvicorn. `tests/e2e/test_auth_e2e.py` регистрирует пользователя через `#auth-login-btn` / `#auth-email` / `[data-auth-tab="register"]` — это JS-модалка из `docs/legacy_jinja/templates/base.html`, про которую докстринг `AuthTopbarLink.tsx:11-13` прямо пишет: «*модалка физически в коде, но недостижима с сайта*». То есть блокирующий тест утверждает работоспособность UI, который в проде закрыт nginx-ом.
 - `tests/e2e/test_dashboard_e2e.py:24` и `test_planning_e2e.py:28` ходят на `/` и `/planning` — в CI это Jinja-страницы (`app/main.py:142-150`), в проде на этих же адресах nginx отдаёт SPA (`nginx/templates/finpilot.conf.template:100-108`). Один и тот же URL — два разных приложения, тестируется не то (пункт 5 чек-листа).
 - Фронтовые Playwright-спеки (`frontend/e2e/*.spec.ts`) целиком на моках: `page.route("**/api/auth/me", route => route.fulfill(...))` поверх `npm run preview` — бэкенда в цепочке нет вовсе. И запускаются они только в джобе `full` (по тегу), не на пуше.
 - Итог: требование ROADMAP §9.0 E («реальный HTTP + реальный браузер, не моки») на сегодня не выполняется **ни одним** тестом в дереве; единственный такой прогон в истории — ручной Playwright владельца в v8.26.0.
@@ -145,7 +145,7 @@ WATCHLOG/CHANGELOG v8.27.0 объявляют периметр закрытым 
 
 **Область:** `frontend/src/routes/__root.tsx`, `app/schemas/recommendation.py:47`, `docs/legal/compliance_register.md:58-60`
 
-- L7 («ссылки на политику, оферту и cookie в футере **каждой** страницы») — блокер стартового гейта. В `frontend/src` нет ни одного `<footer>`, ни одной ссылки на `/legal/privacy|terms|cookies`. Единственные ссылки на `/legal/*` — в `ConsentRequiredPanel` и `ProfilePage` (на конкретный документ согласия). Футер жил в `frontend/templates/base.html`, который SPA не использует.
+- L7 («ссылки на политику, оферту и cookie в футере **каждой** страницы») — блокер стартового гейта. В `frontend/src` нет ни одного `<footer>`, ни одной ссылки на `/legal/privacy|terms|cookies`. Единственные ссылки на `/legal/*` — в `ConsentRequiredPanel` и `ProfilePage` (на конкретный документ согласия). Футер жил в `docs/legacy_jinja/templates/base.html`, который SPA не использует.
 - L5: `RecommendationResponse.disclaimer` (дефолт `DISCLAIMER_39FZ`) добавлен именно затем, чтобы «забыть было нельзя» (`docs/reports/audits/full_revision_before_frontend.md`). Grep `disclaimer` по `frontend/src` даёт только `DTI_LEGAL_DISCLAIMER_THRESHOLD` (601-ФЗ, ПДН>50%) и поле в сгенерированных типах — **ни один компонент его не рендерит**. Экраны с рекомендациями (`DashboardPage`, `PlanningPage` → `AllocationPanel`) текста 39-ФЗ не показывают. При этом L6 (cookie-баннер) в SPA тоже отсутствует полностью.
 
 ## H12. Уведомление ведёт на несуществующий адрес

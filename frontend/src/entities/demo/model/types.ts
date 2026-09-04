@@ -7,3 +7,4 @@
  * на первом же расхождении (урок v8.31.1).
  */
 export type { DemoCases, DemoCase } from "@shared/api/generated";
+export type { DemoPreview } from "@shared/api/generated";

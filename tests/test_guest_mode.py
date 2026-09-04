@@ -60,7 +60,17 @@ class TestAuthenticatedHidesSandbox:
         resp = client.post("/api/demo/load?case=anna")
         assert resp.status_code == 403
 
-    def test_validation_redirects_when_logged_in(self, client) -> None:
-        _login(client)
-        resp = client.get("/validation", follow_redirects=False)
-        assert resp.status_code in (302, 303, 307)
+    # 🔴 `test_validation_redirects_when_logged_in` снят в v8.47.0 вместе с Jinja.
+    #
+    # Редирект вошедшего с `/validation` на дашборд был свойством Jinja-роута
+    # (`app/main.py`), а не продуктовым правилом: сам раздел был гостевой песочницей
+    # в шапке старого интерфейса. В React отдельной страницы валидации нет — расчёт
+    # портрета раскрывается предпросмотром прямо в карточке песочницы
+    # (`/demo/preview`), а песочница показывается только гостю (`DemoSandbox`,
+    # проверено `features/demo-sandbox/ui/DemoSandbox.test.tsx`).
+    #
+    # `/validation` остался живым адресом: catch-all отдаёт приложение, чтобы старая
+    # закладка не давала «не найдено». Требовать от него редиректа значило бы
+    # проверять поведение, которого в продукте больше нет.
+    #
+    # Настоящее разграничение — ниже и на сервере: демо-данные вошедшему запрещены.

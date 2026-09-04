@@ -149,3 +149,62 @@
   color: var(--c-text2);
   padding: var(--sp-4) 0;
 }
+
+/* Раскрытие расчёта — отдельная кнопка под карточкой, не внутри неё: «посмотреть»
+   и «загрузить» это разные действия, и второе стирает данные гостя. */
+.fp-demo__toggle {
+  width: 100%;
+  text-align: left;
+  font: inherit;
+  font-size: var(--fs-sm);
+  color: var(--c-accent);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: var(--sp-2) 0 0;
+  min-height: var(--tap-target-min);
+}
+
+.fp-demo__toggle:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: var(--focus-ring-offset);
+}
+
+.fp-demo__preview {
+  padding: var(--sp-3) var(--sp-4);
+  background: var(--c-surface-up);
+  border-radius: var(--r-sm);
+  margin-top: var(--sp-2);
+}
+
+/* Рекомендация словами — первой и самой заметной: ради неё расчёт и открывают. */
+.fp-demo__insight {
+  font-size: var(--fs-sm);
+  margin: 0 0 var(--sp-3);
+}
+
+.fp-demo__gains {
+  font-size: var(--fs-sm);
+  color: var(--c-text2);
+  margin: 0 0 var(--sp-3);
+  padding-left: var(--sp-5);
+}
+
+.fp-demo__metrics {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(var(--plan-history-metric-w), 100%), 1fr));
+  gap: var(--sp-2);
+  margin: 0;
+  font-size: var(--fs-sm);
+}
+
+.fp-demo__metrics dt {
+  color: var(--c-text3);
+  font-size: var(--fs-xs);
+}
+
+.fp-demo__metrics dd {
+  margin: 0;
+  /* Табличные цифры: колонка сумм — ровно тот случай, для которого они и нужны. */
+  font-variant-numeric: tabular-nums;
+}

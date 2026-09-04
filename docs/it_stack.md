@@ -107,7 +107,12 @@ sequenceDiagram
 | **Минусы** | Практически нет для этого масштаба |
 | **Вердикт** | ✅ Оставить. Образцовая работа с конфигом |
 
-### 2.5. Jinja2 + vanilla JS + CSS (фронтенд)
+### 2.5. Jinja2 + vanilla JS + CSS (фронтенд) — СНЯТ в v8.47.0
+
+> 🔴 Раздел оставлен как история решения: чем обосновывался выбор и почему он
+> перестал подходить. Действующий фронт — React 19 + TypeScript (веха 8),
+> см. `docs/reports/adr/adr_011_milestone8_tooling.md`. Снятый код —
+> `docs/legacy_jinja/`.
 
 | | |
 |---|---|
@@ -390,7 +395,7 @@ flowchart LR
 
 ## 📌 Итоговая сводка
 
-**Текущий стек (as is):** Python 3.13 · FastAPI · Uvicorn · SQLAlchemy 2.0 (sync) · Pydantic 2 · Jinja2 + vanilla JS · SQLite. Слоистая архитектура, чистое ядро, современные версии. Грамотный прототип.
+**Текущий стек (as is):** Python 3.13 · FastAPI · Uvicorn · SQLAlchemy 2.0 (sync) · Pydantic 2 · React 19 + TypeScript (Vite) · SQLite. Слоистая архитектура, чистое ядро, современные версии. Грамотный прототип.
 
 **Целевой стек (to be):** + PostgreSQL/Alembic · Gunicorn-воркеры · JWT-auth · Docker/compose · GitHub Actions CI · structlog/Sentry · (Redis/очереди по росту). Тот же код, обвешанный продакшн-инфраструктурой.
 

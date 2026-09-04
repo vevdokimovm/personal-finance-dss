@@ -12,7 +12,7 @@
 
 - **[!] 2026-08-19 — v8.26.1: БАТЧ ДРЕЙФА ЗАКРЫТ (PATCH).** Три находки владельца одним
   сообщением (ROADMAP §9.0 «A»), TDD red→green на каждой:
-  1. **`/dashboard` → легаси Jinja вместо React SPA.** `frontend/templates/base.html`
+  1. **`/dashboard` → легаси Jinja вместо React SPA.** `docs/legacy_jinja/templates/base.html`
      (nav-dashboard) ссылался на `/dashboard`, React-дашборд живёт на `/` (`routes/index.tsx`).
      nginx SPA-regex не покрывал `/dashboard` (правильно — там нет такого TanStack-роута) →
      запрос падал на FastAPI, который отдавал ДРУГОЙ, легаси Jinja-дашборд с формой бюджета.

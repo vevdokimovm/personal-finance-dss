@@ -13,7 +13,6 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 NGINX_TEMPLATE = REPO_ROOT / "nginx" / "templates" / "finpilot.conf.template"
-BASE_HTML = REPO_ROOT / "frontend" / "templates" / "base.html"
 ROUTES_DIR = REPO_ROOT / "frontend" / "src" / "routes"
 
 # Файлы, которые не являются страницей приложения: __root.tsx — layout, не роут;
@@ -54,18 +53,11 @@ def test_nginx_spa_regex_covers_every_frontend_route_file():
     )
 
 
-def test_base_html_dashboard_link_points_to_react_dashboard_root():
-    """Реальный найденный баг (2026-08-19): легаси Jinja-навигация ссылалась на `/dashboard`,
-    хотя React-дашборд живёт на `/` (index.tsx) — `/dashboard` не покрыт SPA-блоком nginx
-    и уходит на FastAPI, который отдаёт другой, легаси Jinja-дашборд с формой бюджета."""
-    html = BASE_HTML.read_text(encoding="utf-8")
-    match = re.search(r'<a href="([^"]+)" id="nav-dashboard"', html)
-    assert match, "Ссылка nav-dashboard не найдена в base.html"
-    assert match.group(1) == "/", (
-        "Ссылка «Обзор» в легаси-навигации должна вести на канонический React-дашборд "
-        f"'/', а не на {match.group(1)!r} (уводит на легаси Jinja-дашборд через nginx)"
-    )
-
+# 🔴 `test_base_html_dashboard_link_points_to_react_dashboard_root` снят в v8.47.0
+# вместе с Jinja: он проверял ссылку «Обзор» в `frontend/templates/base.html`, а шаблона
+# больше нет (архив — `docs/legacy_jinja/`). Дефект, который он сторожил, закрыт иначе
+# и надёжнее: `/dashboard` теперь редиректит на `/` и в nginx (тест ниже), и в самом
+# роутере (`frontend/src/routes/dashboard.tsx`) — то есть работает и без nginx.
 
 def test_nginx_redirects_legacy_dashboard_path_to_spa_root():
     """Старые закладки/внешние ссылки на `/dashboard` не должны молча падать на легаси

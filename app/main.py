@@ -2,18 +2,11 @@ from __future__ import annotations
 
 from contextlib import asynccontextmanager
 from pathlib import Path
-from typing import Any, Optional
 
-from fastapi import Depends, FastAPI, HTTPException, Request
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import (
-    FileResponse,
-    HTMLResponse,
-    JSONResponse,
-    RedirectResponse,
-)
+from fastapi.responses import FileResponse, HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
-from fastapi.templating import Jinja2Templates
 from sqlalchemy import text
 
 from app.api.router import router as api_router
@@ -21,8 +14,6 @@ from app.api.routes_b2b import router as b2b_router
 from app.config import settings, validate_production_security
 from app.database.db import engine
 from app.database.init_db import init_db
-from app.database.models import User
-from app.dependencies import get_current_user
 from app.logging_config import setup_logging
 from app.middleware import (
     CSRFMiddleware,
@@ -34,16 +25,11 @@ from app.observability import init_sentry
 
 PROJECT_DIR = Path(__file__).resolve().parents[1]
 FRONTEND_DIR = PROJECT_DIR / "frontend"
-TEMPLATES_DIR = FRONTEND_DIR / "templates"
-STATIC_DIR = FRONTEND_DIR / "static"
 # Сборка React (веха 8). Может отсутствовать: `dist/` в `.gitignore`, на чистом клоне
 # его нет до `npm run build`. Приложение обязано подниматься и без него — иначе
 # отсутствие фронта ломает и API, и миграции, и health-check.
 SPA_DIR = FRONTEND_DIR / "dist"
 SPA_INDEX = SPA_DIR / "index.html"
-
-templates = Jinja2Templates(directory=str(TEMPLATES_DIR))
-templates.env.globals["app_version"] = settings.APP_VERSION
 
 # Наблюдаемость (P1.5): структурное логирование + опциональный Sentry.
 setup_logging(level=settings.LOG_LEVEL, json_format=settings.LOG_JSON)
@@ -131,42 +117,19 @@ async def health() -> JSONResponse:
         status_code=200 if healthy else 503,
     )
 
-app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
 app.include_router(api_router)
 app.include_router(b2b_router)  # B2B-контракт /v1/analyze вне /api-префикса (FR-23)
 
 
-def page_context(
-    request: Request, current_user: Optional[User] = Depends(get_current_user)
-) -> dict[str, Any]:
-    """Контекст для SSR-страниц. current_user управляет видимостью гостевых элементов
-    (загрузка демо-портретов и раздел валидации скрыты для вошедших пользователей)."""
-    return {
-        "request": request,
-        "project_name": settings.PROJECT_NAME,
-        "current_user": current_user,
-        "legal": settings.legal_context,
-    }
-
-
-# 🔴 Страницы вехи 8 отдаёт React (catch-all в конце файла). Jinja-дубли `/`,
-# `/dashboard`, `/planning`, `/transactions`, `/obligations`, `/goals`, `/banks`
-# и `/legal/*` сняты в v8.45.0: пока они существовали, они выигрывали у SPA —
-# объявлены раньше и точнее, — и сервер отдавал СТАРЫЙ интерфейс. Именно поэтому
-# сорок с лишним версий фронта работали только в dev через Vite.
-
-@app.get("/validation", response_class=HTMLResponse, summary="Валидация алгоритма на портретах")
-async def read_validation(ctx: dict = Depends(page_context)):
-    # Раздел валидации — часть гостевой песочницы; вошедшим он не нужен.
-    if ctx["current_user"] is not None:
-        return RedirectResponse(url="/dashboard", status_code=303)
-    return templates.TemplateResponse(request=ctx["request"], name="validation.html", context=ctx)
-
-
-@app.get("/contacts", response_class=HTMLResponse, summary="Контакты и реквизиты оператора")
-async def read_contacts(ctx: dict = Depends(page_context)) -> HTMLResponse:
-    return templates.TemplateResponse(request=ctx["request"], name="contacts.html", context=ctx)
-
+# 🔴 Jinja снесена целиком в v8.47.0. Последними ушли `/validation` и `/contacts`:
+# они наследовали `base.html`, а он нёс ПОЛНУЮ старую оболочку — навигацию по семи
+# экранам вехи 8, селектор демо-кейсов и `app.js` на 2658 строк. Человек, открывший
+# ссылку на контакты, попадал в другой продукт (`test_no_second_interface.py`).
+#
+# Раздел валидации переехал в React предпросмотром портрета прямо в карточке песочницы
+# (`/demo/preview` считает без записи в БД). Контакты — в футер: реквизиты и так приходят
+# из реестра `/legal/documents`. Разбор —
+# `docs/reports/decisions/2026-09-04_jinja_removal_and_validation.md`.
 
 # ── Отдача React-приложения (веха 8) ───────────────────────────────────
 # 🔴 Ставится ПОСЛЕДНИМ и только здесь. Catch-all перехватывает всё, что не разобрали

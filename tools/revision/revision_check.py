@@ -56,6 +56,17 @@ FROZEN_HINTS = (
     "/reports/merges/", "/reports/releases/", "/reports/incidents/",
     "/reports/investigations/", "/reports/audits/", "/reports/testing/",
     "/reports/decisions/", "/science/",
+    # 🔴 Замер по снятому интерфейсу (v8.47.0): документ считает вхождения токенов
+    # в Jinja-шаблонах и `app.js`, снесённых вместе с Jinja. Пути указывают на состояние
+    # НА МОМЕНТ ЗАМЕРА и намеренно не переписаны на архивные (`docs/legacy_jinja/`):
+    # иначе документ утверждал бы, что считал файлы там, где их тогда не было. Тот же
+    # принцип, что у CHANGELOG и отчётов — ссылка была верна на своей версии.
+    # `design_tokens_audit.md` — замер по Jinja-интерфейсу, снятому в v8.47.0. Раньше
+    # часть его ссылок держалась поштучно в LINK_ALLOWLIST (profile.html, снесённый ещё
+    # в v8.23.0); после сноса Jinja битыми стали все семь, и объяснение у них одно —
+    # документ описывает состояние НА МОМЕНТ ЗАМЕРА. Заморозка файла целиком честнее
+    # семи одинаковых записей, которые пришлось бы пополнять при каждом сносе.
+    "design_tokens_audit.md",
 )
 
 REF_PATTERN = re.compile(
@@ -100,14 +111,19 @@ LINK_ALLOWLIST = {
     ("docs/reports/adr/adr_006_reserve_floor_calibration.md", "docs/math_model_v3_5_0.md"):
         "историческая ссылка на канон-файл на момент ADR — переименован в docs/math_model.md "
         "в v8.9.4, ADR не переписывается задним числом.",
-    ("docs/design_tokens_audit.md", "frontend/templates/profile.html"):
-        "снимок на 2026-08-07/v8.3.2 (до React) — profile.html снесён частичным сносом Jinja "
-        "v8.23.0 (docs/reports/decisions/2026-08-14_jinja_frontend_removal.md), аудит "
-        "точечных строк не переписывается задним числом. Лежит прямо в docs/, не подпадает "
-        "под FROZEN_HINTS — тот же случай, что ui_visual_direction.md выше. dashboard.html/"
-        "planning.html/transactions.html из того же снимка НЕ в этом списке — они после "
-        "исправления в том же разборе остались на Jinja (React-версии read-only, снос убрал бы "
-        "CRUD), ссылки на них живые.",
+    # Снос Jinja (v8.47.0): `frontend/static/css/styles.css` был токен-слоем старого
+    # фронта. Четыре документа ссылаются на него, описывая состояние НА МОМЕНТ своего
+    # написания — план миграции, шаг плана вехи 8, отчёт о выборе направления и симптом
+    # PIT-022. Переписывать их на архивный путь (`docs/legacy_jinja/`) нельзя: они
+    # утверждали бы, что читали файл там, где его тогда не было. Сам файл — в архиве.
+    ("docs/frontend_migration_plan.md", "frontend/static/css/styles.css"):
+        "план миграции описывает исходный токен-слой, читанный в вехе 8 (снесён v8.47.0)",
+    ("docs/frontend_milestone8_plan.md", "frontend/static/css/styles.css"):
+        "шаг плана вехи 8: аудит исходного styles.css (снесён v8.47.0)",
+    ("docs/ui_visual_direction.md", "frontend/static/css/styles.css"):
+        "отчёт о выборе направления: сравнение с тогдашним styles.css (снесён v8.47.0)",
+    ("docs/pitfalls.md", "frontend/static/css/styles.css"):
+        "PIT-022 описывает состояние ДО сноса — путь указывает на то, что тогда читалось",
 }
 
 # Паттерны устаревшей мат-модели v2.x (не должны заявляться как текущий факт).

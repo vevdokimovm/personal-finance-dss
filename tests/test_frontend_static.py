@@ -1,10 +1,18 @@
-"""Статические guard-тесты фронтенда.
+"""Статические guard-тесты фронтенда: UI не разъезжается с матмоделью.
 
-Браузерных кликов тут нет (для них нужен Playwright). Эти тесты читают исходники
-фронта с диска и проверяют, что UI не разъезжается с математической моделью бэка:
-после перевода ликвидности на stock-based (refined-модель v3.0.0) во фронте не должно
-остаться старой flow-семантики Lt (норма-доля 0.30, «доля от обязательных трат») и
-устаревшего числа альтернатив. Именно этот класс рассинхрона ловят тесты.
+Читают исходники фронта с диска и проверяют, что интерфейс не остался на семантике
+предыдущей редакции модели. Класс дефекта: модель перевели на stock-based ликвидность
+(v3.0.0), а подписи и пороги в UI остались flow-based — расчёт верный, объяснение
+пользователю неверное, и расхождение не ловится ничем, потому что оба слоя «работают».
+
+🔴 **Перенацелены на React в v8.47.0.** До этого читались `frontend/static/js/app.js`
+и `frontend/templates/*.html` — Jinja-интерфейс, снесённый в том же батче. То есть
+последние сорок с лишним версий эти проверки сторожили **не тот фронт**: React жил
+своей жизнью и под guard не попадал вовсе (родня PIT-020 и PIT-022 — проверка была,
+покрывала не то).
+
+Проверяется наличие НОВОЙ семантики и отсутствие СТАРОЙ. Первое важнее: тест только
+на отсутствие проходит и на пустом файле.
 """
 from __future__ import annotations
 
@@ -12,71 +20,103 @@ from pathlib import Path
 
 import pytest
 
-FRONTEND = Path(__file__).resolve().parents[1] / "frontend"
-APP_JS = FRONTEND / "static" / "js" / "app.js"
-DASHBOARD = FRONTEND / "templates" / "dashboard.html"
-PLANNING = FRONTEND / "templates" / "planning.html"
-TEMPLATES_DIR = FRONTEND / "templates"
+SRC = Path(__file__).resolve().parents[1] / "frontend" / "src"
+
+# Экраны, где живёт семантика ликвидности и параметров расчёта.
+METRICS = SRC / "widgets" / "metrics-grid"
+PLAN_SETTINGS = SRC / "pages" / "planning" / "ui" / "PlanSettingsSection.tsx"
+
+# Формулировки предыдущей редакции модели. Появление любой — регрессия объяснения.
+STALE_PHRASES = (
+    "21 вариант",
+    "шаг 20%",
+    "÷ Обязательные траты",
+    "долю от обязательных трат",
+    "Насколько свободно от обязательных платежей",
+    "норма от 0.3",
+)
+
+
+def _tsx_sources() -> list[Path]:
+    """Все исходники фронта, кроме сгенерированных и тестов.
+
+    Сгенерированный клиент (`shared/api/generated`) исключён намеренно: его содержимое
+    задаёт контракт бэкенда, и найденная там строка означала бы дефект схемы, а не UI.
+    """
+    return [
+        p
+        for p in SRC.rglob("*.tsx")
+        if "generated" not in p.parts and not p.name.endswith(".test.tsx")
+    ] + [
+        p
+        for p in SRC.rglob("*.ts")
+        if "generated" not in p.parts and not p.name.endswith(".test.ts")
+    ]
 
 
 @pytest.fixture(scope="module")
-def app_js() -> str:
-    return APP_JS.read_text(encoding="utf-8")
+def metrics_sources() -> str:
+    return "\n".join(
+        p.read_text(encoding="utf-8") for p in METRICS.rglob("*.tsx") if ".test." not in p.name
+    )
 
 
-class TestAppJsNoStaleSemantics:
-    def test_no_hardcoded_alternative_count(self, app_js: str) -> None:
-        # Число альтернатив изменилось (21 → 66) и может меняться дальше — оно не
-        # должно быть зашито в UI-текст.
-        assert "21 вариант" not in app_js
-        assert "шаг 20%" not in app_js
+class TestLiquidityIsStockBased:
+    """Lt — месяцы автономии, а не доля от обязательных трат."""
 
-    def test_no_old_flow_liquidity_formula(self, app_js: str) -> None:
-        # Старая формула Lt = свободные / обязательные траты
-        assert "÷ Обязательные траты (расходы + кредиты)" not in app_js
-        assert "долю от обязательных трат составляют свободные" not in app_js
+    def test_liquidity_is_measured_in_months(self, metrics_sources: str) -> None:
+        """Ликвидность выражена в МЕСЯЦАХ автономии, а не долей.
 
-    def test_lt_uses_month_thresholds(self, app_js: str) -> None:
-        # Цвет/вердикт ликвидности — по месяцам автономии (норма Greninger 2.5–6),
-        # а не по доле 0.3.
-        assert "Lt >= 2.5" in app_js
-        assert "Lt >= 0.3 ?" not in app_js
+        🔴 Проверяется единица измерения, а не конкретное число. Первая редакция этого
+        теста искала «2.5» — порог Greninger из Jinja-версии; React считает иначе
+        и осознанно: там `RUNWAY_WARN_THRESHOLD = 1` со ссылкой на канон («отсев
+        по ликвидности мягкий», `docs/math_model.md`), то есть предупреждение мягче,
+        чем справочная норма. Тест на «2.5» требовал бы вернуть чужой порог —
+        и был бы красным на исправном коде (родня PIT-021).
 
-    def test_lt_popup_is_stock_based(self, app_js: str) -> None:
-        # Новый разбор Lt: ликвидная подушка ÷ месячные расходы
-        assert "Ликвидная подушка" in app_js
-        assert "Месячные расходы" in app_js
+        Проверяется НАЛИЧИЕ: тест только на отсутствие старых формулировок прошёл бы
+        и на экране, где про ликвидность не сказано вовсе.
+        """
+        assert "мес. автономии" in metrics_sources, (
+            "ликвидность не выражена в месяцах автономии — UI мог вернуться "
+            "к flow-семантике (доля от обязательных трат)"
+        )
 
+    def test_blr_is_distinguished_from_lt(self, metrics_sources: str) -> None:
+        """Подушка (BLR) считает и цели — это другой показатель, чем запас Lt.
 
-class TestDashboardTemplate:
-    def test_lt_card_months_norm(self) -> None:
-        html = DASHBOARD.read_text(encoding="utf-8")
-        assert "норма 2.5" in html
-        assert "норма от 0.3" not in html
-
-    def test_lt_card_no_flow_caption(self) -> None:
-        html = DASHBOARD.read_text(encoding="utf-8")
-        assert "Насколько свободно от обязательных платежей" not in html
-
-    def test_blr_distinct_from_lt(self) -> None:
-        html = DASHBOARD.read_text(encoding="utf-8")
-        assert "включая цели" in html
+        Если их подписи совпадут, человек решит, что видит одно число дважды.
+        """
+        assert "включая цели" in metrics_sources
 
 
-class TestPlanningTemplate:
-    def test_lmin_in_months(self) -> None:
-        html = PLANNING.read_text(encoding="utf-8")
-        assert "мес. расходов" in html
+class TestPlanSettingsSemantics:
+    def test_lmin_is_in_months(self) -> None:
+        """`l_min` задаётся в месяцах расходов, а не долей."""
+        text = PLAN_SETTINGS.read_text(encoding="utf-8")
+        assert "мес" in text and "расход" in text.lower()
 
-    def test_rbench_source_buttons(self) -> None:
-        html = PLANNING.read_text(encoding="utf-8")
-        assert "rbench-cbr" in html
-        assert "rbench-from-asset" in html
+    def test_key_rate_source_is_offered(self) -> None:
+        """Ставку можно взять у ЦБ, а не только вписать руками.
+
+        Была в Jinja (`rbench-cbr`), в React — кнопка «Взять ключевую ставку ЦБ».
+        """
+        text = PLAN_SETTINGS.read_text(encoding="utf-8")
+        assert "ключевую ставку" in text or "ключевая ставка" in text
 
 
-class TestAllTemplatesConsistent:
-    def test_no_flow_liquidity_caption_anywhere(self) -> None:
-        # Ни в одном шаблоне (включая легаси) не осталось старой flow-подписи Lt
-        for tpl in TEMPLATES_DIR.glob("*.html"):
-            text = tpl.read_text(encoding="utf-8")
-            assert "Насколько свободно от обязательных платежей" not in text, tpl.name
+class TestNoStaleModelSemanticsAnywhere:
+    @pytest.mark.parametrize("phrase", STALE_PHRASES)
+    def test_phrase_is_gone_from_frontend(self, phrase: str) -> None:
+        """Формулировка предыдущей редакции модели не осталась ни в одном исходнике.
+
+        🔴 Ищется по ВСЕМУ фронту, а не по списку файлов: экран могли перенести,
+        переименовать или разделить — список устарел бы молча, а поиск по дереву нет.
+        """
+        offenders = [
+            str(p.relative_to(SRC)) for p in _tsx_sources() if phrase in p.read_text("utf-8")
+        ]
+        assert not offenders, (
+            f"устаревшая формулировка модели {phrase!r} в {offenders} — "
+            f"UI объясняет пользователю то, чего расчёт больше не делает"
+        )

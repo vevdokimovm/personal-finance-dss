@@ -36,7 +36,7 @@ bcrypt-хеширование паролей, блокировка после н
 | Мера | Где в коде | Что закрывает |
 |---|---|---|
 | **Параметризованные запросы** — только ORM, нет сырых SQL | `app/database/crud.py`, модели `app/database/models.py` | SQL-инъекции (OWASP A03) |
-| **Экранирование вывода** — `escapeHtml()` для всех пользовательских строк | `frontend/static/js/app.js` (мерчанты, описания) | XSS (OWASP A03) |
+| **Экранирование вывода** — `escapeHtml()` для всех пользовательских строк | `docs/legacy_jinja/static/js/app.js` (мерчанты, описания) | XSS (OWASP A03) |
 | **Валидация ввода** — строгие схемы Pydantic v2 | `app/schemas/*.py` | некорректные/вредоносные данные |
 | **CSRF-защита** — проверка `Origin` на изменяющих методах | `app/middleware.py::CSRFMiddleware` | CSRF (OWASP A01) |
 | **Security-заголовки** — `X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy`, `Permissions-Policy`, CSP | `app/middleware.py::SecurityHeadersMiddleware` | clickjacking, MIME-sniffing, утечка referrer |

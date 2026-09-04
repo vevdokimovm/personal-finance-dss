@@ -891,6 +891,101 @@ export type DemoCases = {
 };
 
 /**
+ * DemoMoneyItem
+ *
+ * Строка дохода или расхода портрета.
+ */
+export type DemoMoneyItem = {
+    /**
+     * Amount
+     */
+    amount: number;
+    /**
+     * Category
+     */
+    category: string;
+};
+
+/**
+ * DemoMoneySide
+ *
+ * Одна сторона денежного потока: сумма и из чего она сложилась.
+ */
+export type DemoMoneySide = {
+    /**
+     * Items
+     */
+    items: Array<DemoMoneyItem>;
+    /**
+     * Total
+     */
+    total: number;
+};
+
+/**
+ * DemoPreview
+ *
+ * Расчёт портрета БЕЗ записи в базу.
+ *
+ * 🔴 Схема заведена ДО фронта (v8.47.0): эндпоинт был размечен `-> dict[str, Any]`.
+ * Цена рукописного типа здесь высокая — предпросмотр снимает необратимость выбора
+ * портрета (`/demo/load` стирает данные гостя), и расхождение вернуло бы человека
+ * к выбору вслепую.
+ *
+ * `metrics`, `plan` и `forecast` намеренно оставлены свободными объектами: их форму
+ * задаёт движок (`run_planning`, `forecast_indicators`), у неё уже есть собственные
+ * схемы в `/planning*`, и дублировать их здесь значило бы завести вторую копию,
+ * расходящуюся при первой же правке модели. Обязательность самих полей проверяется —
+ * именно на них строится экран.
+ */
+export type DemoPreview = {
+    expenses: DemoMoneySide;
+    /**
+     * Forecast
+     */
+    forecast: {
+        [key: string]: unknown;
+    };
+    /**
+     * Goals
+     */
+    goals: Array<{
+        [key: string]: unknown;
+    }>;
+    /**
+     * History
+     */
+    history: {
+        [key: string]: unknown;
+    };
+    income: DemoMoneySide;
+    /**
+     * Liquid Assets
+     */
+    liquid_assets: Array<{
+        [key: string]: unknown;
+    }>;
+    /**
+     * Metrics
+     */
+    metrics: {
+        [key: string]: unknown;
+    };
+    /**
+     * Obligations
+     */
+    obligations: Array<{
+        [key: string]: unknown;
+    }>;
+    /**
+     * Plan
+     */
+    plan: {
+        [key: string]: unknown;
+    };
+};
+
+/**
  * ExchangeRequest
  */
 export type ExchangeRequest = {
@@ -4600,13 +4695,9 @@ export type PreviewDemoApiDemoPreviewGetError = PreviewDemoApiDemoPreviewGetErro
 
 export type PreviewDemoApiDemoPreviewGetResponses = {
     /**
-     * Response Preview Demo Api Demo Preview Get
-     *
      * Successful Response
      */
-    200: {
-        [key: string]: unknown;
-    };
+    200: DemoPreview;
 };
 
 export type PreviewDemoApiDemoPreviewGetResponse = PreviewDemoApiDemoPreviewGetResponses[keyof PreviewDemoApiDemoPreviewGetResponses];

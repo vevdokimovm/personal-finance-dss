@@ -206,6 +206,8 @@ zip и запустить `REPAIR` — бесполезно, в дереве н�
 | `REPO_MAP` | `finpilot=personal-finance-dss finpilot-mirror=finpilot finpilot-public-mirror=finpilot` | архив едет в репу с другим именем. Применяется **только** если в архиве нет `.repo-id` — явный маркер старше карты (v4.5.0) |
 | `MIRRORS` | `finpilot finpilot-mirror finpilot-public-mirror vk-graph health-report-generator bron-kerbosch algorithms-site game-analytics-engine claude-usage salvation` | публичные зеркала: массовые режимы их пропускают. Настраивается ещё и через `deploy-repos.conf` (v4.26.0) |
 | `DEPLOY_CONF` | `<папка скрипта>/deploy-repos.conf` | путь к необязательному конфигу списков |
+
+🔴 **Список зеркал сверяется командой, а не глазами:** `python3 scripts/visibility_check.py` спрашивает GitHub и сравнивает с `MIRRORS` и `repos-map.md`. Первый прогон 04.09.2026 нашёл **две публичные репы вне списка** — `vevdokimovm` и `vevdokimovm.github.io`.
 | `LAST` | — (без ограничения) | сколько последних тегов чинить; `LAST=0` и нечисловое — выход с кодом 2 |
 | `VARIANT_REPOS` | `finpilot` | у кого срезается постфикс сборки (`_intl`) |
 | `SERVICE_RE` | см. скрипт | что считать служебным архивом (`files*.zip`, `N.zip`) |

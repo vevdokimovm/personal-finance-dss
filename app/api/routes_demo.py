@@ -636,8 +636,48 @@ def _analyze_portrait(
     }
 
 
+class DemoMoneyItem(BaseModel):
+    """Строка дохода или расхода портрета."""
+
+    category: str
+    amount: float
+
+
+class DemoMoneySide(BaseModel):
+    """Одна сторона денежного потока: сумма и из чего она сложилась."""
+
+    total: float
+    items: list[DemoMoneyItem]
+
+
+class DemoPreview(BaseModel):
+    """Расчёт портрета БЕЗ записи в базу.
+
+    🔴 Схема заведена ДО фронта (v8.47.0): эндпоинт был размечен `-> dict[str, Any]`.
+    Цена рукописного типа здесь высокая — предпросмотр снимает необратимость выбора
+    портрета (`/demo/load` стирает данные гостя), и расхождение вернуло бы человека
+    к выбору вслепую.
+
+    `metrics`, `plan` и `forecast` намеренно оставлены свободными объектами: их форму
+    задаёт движок (`run_planning`, `forecast_indicators`), у неё уже есть собственные
+    схемы в `/planning/*`, и дублировать их здесь значило бы завести вторую копию,
+    расходящуюся при первой же правке модели. Обязательность самих полей проверяется —
+    именно на них строится экран.
+    """
+
+    income: DemoMoneySide
+    expenses: DemoMoneySide
+    obligations: list[dict[str, Any]]
+    goals: list[dict[str, Any]]
+    liquid_assets: list[dict[str, Any]]
+    history: dict[str, Any]
+    metrics: dict[str, Any]
+    plan: dict[str, Any]
+    forecast: dict[str, Any]
+
+
 @router.get("/demo/preview", summary="Портрет кейса + метрики + прогноз + рекомендация")
-def preview_demo(case: str = "anna") -> dict[str, Any]:
+def preview_demo(case: str = "anna") -> DemoPreview:
     """Полный расчёт кейса без записи в БД: портрет, метрики, прогноз и рекомендация.
     Для раздела «Валидация» — визуальная проверка всех основных функций сразу."""
     if case not in CASES:
@@ -667,8 +707,14 @@ def preview_demo(case: str = "anna") -> dict[str, Any]:
     )
 
     return {
-        "income": {"total": analysis["metrics"]["income_total"], "items": income_items},
-        "expenses": {"total": analysis["metrics"]["expense_total"], "items": expense_items},
+        "income": DemoMoneySide(
+            total=analysis["metrics"]["income_total"],
+            items=[DemoMoneyItem(**i) for i in income_items],
+        ),
+        "expenses": DemoMoneySide(
+            total=analysis["metrics"]["expense_total"],
+            items=[DemoMoneyItem(**i) for i in expense_items],
+        ),
         "obligations": obl_dicts,
         "goals": [
             {**g, "months_left": _months_left(g.get("deadline"), now)} for g in goal_dicts
@@ -678,7 +724,7 @@ def preview_demo(case: str = "anna") -> dict[str, Any]:
         "metrics": analysis["metrics"],
         "plan": analysis["plan"],
         "forecast": analysis["forecast"],
-    }
+    }  # type: ignore[return-value]
 
 
 class _AnalyzeItem(BaseModel):

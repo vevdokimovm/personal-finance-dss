@@ -1,10 +1,11 @@
 import { useRef, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { useDemoCases, useLoadDemoCase } from "@entities/demo";
+import { useDemoCases, useDemoPreview, useLoadDemoCase } from "@entities/demo";
 import type { DemoCase } from "@entities/demo";
 import { Button, Modal, toast } from "@shared/ui";
 import { extractErrorMessage } from "@shared/lib/api/extractErrorMessage";
 import { t } from "@shared/lib/i18n/t";
+import { DemoPreviewBody } from "./DemoPreviewBody";
 import "./DemoSandbox.css";
 
 /**
@@ -45,6 +46,10 @@ export function DemoSandbox({
   const queryClient = useQueryClient();
   const [confirming, setConfirming] = useState<DemoCase | null>(null);
   const [pending, setPending] = useState<string | null>(null);
+  /* Раскрыт ровно один расчёт: десять сразу — десять прогонов Монте-Карло ради того,
+     что человек, скорее всего, не откроет. */
+  const [openKey, setOpenKey] = useState<string | null>(null);
+  const preview = useDemoPreview(openKey);
   const triggerRef = useRef<HTMLButtonElement | null>(null);
 
   const pendingKey = pendingKeyProp ?? pending;
@@ -166,6 +171,30 @@ export function DemoSandbox({
                 <span className="fp-demo__expect">{item.expect}</span>
                 {busy && <span className="fp-demo__busy">{t("Загружаем пример…")}</span>}
               </button>
+
+              {/* 🔴 Предпросмотр — вне кнопки загрузки. Кнопка в кнопке недопустима
+                  (вложенная интерактивность), а главное — это два разных действия:
+                  «посмотреть» ничего не меняет, «загрузить» стирает данные гостя. */}
+              <button
+                type="button"
+                className="fp-demo__toggle"
+                aria-expanded={openKey === item.key}
+                onClick={() => setOpenKey(openKey === item.key ? null : item.key)}
+              >
+                {openKey === item.key
+                  ? t("Свернуть расчёт")
+                  : t("Показать расчёт — метрики, прогноз, рекомендация")}
+              </button>
+
+              {openKey === item.key && (
+                <div className="fp-demo__preview">
+                  {preview.isLoading && <p role="status">{t("Считаем портрет…")}</p>}
+                  {preview.isError && (
+                    <p role="alert">{t("Не удалось посчитать портрет. Попробуйте ещё раз.")}</p>
+                  )}
+                  {preview.data && <DemoPreviewBody preview={preview.data} />}
+                </div>
+              )}
             </li>
           );
         })}

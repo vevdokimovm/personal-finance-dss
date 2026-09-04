@@ -67,10 +67,20 @@ server {
     gzip_types text/plain text/css application/javascript application/json image/svg+xml;
 
     # Статика Jinja-страниц (css/js/images для contacts, legal/*, восстановления пароля).
-    location /static/ {
-        proxy_pass http://web:8000;
+    # 🔴 Блок `/static/` снят в v8.47.0 вместе с Jinja: каталог `frontend/static`
+    # перенесён в архив (`docs/legacy_jinja/`), проксировать было бы некуда. Ассеты
+    # React лежат в `/assets/` (ниже) и в корне сборки (иконки).
+
+    # ── Файлы из КОРНЯ сборки: фавиконки, apple-touch-icon, robots.txt.
+    # Без этого блока они уходят в `location /` на бэкенд, а тот отвечает `index.html`
+    # (catch-all SPA) — браузер получает HTML вместо иконки и рисует пустую вкладку.
+    # Кэш умеренный: имена без хэша, при замене иконки не должно ждать год.
+    location ~* ^/[^/]+\.(?:ico|png|svg|webmanifest|txt)$ {
+        root /usr/share/nginx/html;
         expires 7d;
         add_header Cache-Control "public";
+        # Иконки могли и не попасть в сборку — тогда честный 404, а не страница-заглушка.
+        try_files $uri =404;
     }
 
     # ── Легаси-алиас: /dashboard существовал до React SPA, канонический адрес
