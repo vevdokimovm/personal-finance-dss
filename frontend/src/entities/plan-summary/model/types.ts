@@ -1,36 +1,29 @@
+import type {
+  Alternative,
+  InputSummary,
+  PlanningCalculateResponse,
+  PlanningIndicators,
+} from "@shared/api/generated";
+
 /**
- * Локальные типы для /api/planning/calculate и /api/planning/forecast.
+ * Типы `/api/planning/calculate` — РЕЭКСПОРТ сгенерированных из контракта (v8.40.0).
  *
- * ОБНОВЛЕНО v8.31.1 — прежняя редакция этого комментария УСТАРЕЛА и вводила в
- * заблуждение. Она утверждала, что оба эндпоинта размечены `-> dict[str, Any]` и потому
- * не типизированы в снимке. Для `/forecast` это по-прежнему верно
- * (`{[key: string]: unknown}` в `types.gen.ts`), а для **`/calculate` — уже нет**: в
- * контракте есть полная схема `PlanningCalculateResponse` со вложенными `Alternative`,
- * `PlanningIndicators`, `InputSummary`, `Weights`, `BliqPreallocation`.
+ * 🔴 Долг закрыт. Раньше этот файл вёлся руками, и рукописные типы обещали БОЛЬШЕ, чем
+ * гарантирует схема (`ranked`, `top3`, `Explanation.gains/costs` — все вне `required`).
+ * TypeScript молчал, потому что `usePlan.ts` делал `data as unknown as CalculatePlanResult`:
+ * каст выбрасывает сгенерированный тип и снимает всякую сверку с контрактом. Итог —
+ * дашборд падал в error boundary на ответе, который контракт разрешает (v8.31.1).
  *
- * Из-за устаревшего комментария файл продолжали вести руками, и рукописные типы стали
- * обещать БОЛЬШЕ, чем гарантирует схема (`ranked`, `top3`, `Explanation.gains/costs` —
- * все вне `required`). TypeScript при этом молчал, потому что `usePlan.ts` делает
- * `data as unknown as CalculatePlanResult` — каст выбрасывает сгенерированный тип и
- * снимает всякую сверку с контрактом. Итог: экран падал в error boundary на ответе,
- * который контракт разрешает.
+ * Повод закрыть долг именно сейчас: в ответ добавлено поле `disclaimer` (39-ФЗ, L5), и
+ * рукописный тип о нём не знал — экран не смог бы показать обязательный по закону текст,
+ * а компилятор сказал бы «свойства не существует» о поле, которое сервер отдаёт. Ровно
+ * тот же класс ошибки, только с другой стороны.
  *
- * Правильное решение — генерировать этот тип из `PlanningCalculateResponse`, как уже
- * сделано для `entities/goals`, `obligations`, `assets`, `transactions`, `profile`, `auth`
- * (там простой реэкспорт сгенерированного типа, и расхождений нет). Это структурная
- * замена, вынесена в ROADMAP §8.2 отдельным пунктом; здесь пока приведена в соответствие
- * ОБЯЗАТЕЛЬНОСТЬ полей — то, из-за чего падал экран.
+ * Что осталось рукописным и почему: `ForecastResult` — `/planning/forecast` до сих пор
+ * размечен `-> dict[str, Any]`, в контракте у него `{[key: string]: unknown}`, и
+ * реэкспортировать нечего. Это следующий кандидат на ту же операцию.
  */
 
-export interface PlanIndicators {
-  Rt: number;
-  Lt: number;
-  Dt: number;
-  BLR?: number | null;
-  It?: number | null;
-  Et?: number | null;
-  SigmaP?: number | null;
-}
 
 /** Вклад критериев SAW в utility (батч 0.3, app/core/ranking.py::rank_alternatives) —
  * ключи служебные (Rt/Lt/Dt/Si), как у ExplanationDelta ниже; сумма ≈ utility. */
@@ -66,62 +59,16 @@ export interface Explanation {
   counterfactual?: Counterfactual | null;
 }
 
-export interface PlanAlternative {
-  id: string;
-  name: string;
-  x_obligations: number;
-  x_reserve: number;
-  x_goals: number;
-  /** SAW-полезность альтернативы (app/core/ranking.py rank_alternatives), 0..1. */
-  utility: number;
-  /** Свободный поток/ликвидность/ПДН ПОСЛЕ применения альтернативы (evaluate_alternative). */
-  Rt_new: number;
-  Lt_new: number;
-  Dt_new: number;
-  /** Только у одной альтернативы в ranked — лучшая по (floor_level, utility). */
-  is_recommended?: boolean;
-  weighted_scores?: WeightedScores;
-  /** Только у top3 — explain_alternative() вызывается лишь для них (app/services/planning.py).
-   * У произвольного элемента ranked[] (гипотетическая позиция ползунков «что если») — не будет. */
-  explanation?: Explanation | null;
-}
 
-export interface PlanInputSummary {
-  income: number;
-  expense: number;
-  bliq: number;
-  transactions_count: number;
-  obligations_count: number;
-  goals_count: number;
-}
 
-export interface CalculatePlanResult {
-  indicators: PlanIndicators;
-  /* Тоже вне `required` схемы `PlanningCalculateResponse` — проверено на диске.
-     `plan.top3[0] ?? null` защищал только результат индексации, но не сам массив:
-     на ответе без `top3` падало ещё до рендера панели, роняя и Dashboard, и Planning. */
-  top3?: PlanAlternative[];
-  /** Все допустимые альтернативы (после фильтра §5), отсортированные по (floor_level, utility) —
-   * до 66 при канонической сетке шага 10% (app/core/alternatives.py generate_alternatives).
-   * top3 — НЕ буквально ranked[:3]: строится из distinct_ranked, дедуплицированного по
-   * эффективному распределению (app/services/planning.py, _effective_signature), плюс
-   * explanation. top3[0] и ranked[0] всегда совпадают (первый элемент дедупликация не
-   * выбрасывает), начиная со второго — позиции могут разойтись.
-   *
-   * ОПЦИОНАЛЬНОЕ, и это не осторожность, а контракт: в схеме
-   * `PlanningCalculateResponse` (`docs/api/openapi.json`) поля НЕТ в `required` —
-   * у него `default_factory=list` в `app/schemas/planning.py:283`. Пока здесь стояло
-   * обязательное `PlanAlternative[]`, рукописный тип обещал больше, чем гарантирует
-   * бэкенд: TypeScript молчал, а `AllocationPanel` звал `.some()` по undefined и ронял
-   * весь дашборд в error boundary. Найдено 2026-09-03, v8.31.1. */
-  ranked?: PlanAlternative[];
-  admissible_count: number;
-  alternatives_total: number;
-  input_summary: PlanInputSummary;
-  /** Метка риск-профиля ("Сбалансированный" и т. п., app/core/ranking.py RISK_PROFILES) — строка,
-   * не число; бэкенд всегда её отдаёт (run_planning в app/services/planning.py). */
-  risk_profile: string;
-}
+
+
+/* Алиасы на сгенерированные типы: имена, под которыми они уже разошлись по экранам,
+   сохранены, чтобы правка не размазалась на десяток файлов. Определения — из контракта. */
+export type PlanIndicators = PlanningIndicators;
+export type PlanAlternative = Alternative;
+export type PlanInputSummary = InputSummary;
+export type CalculatePlanResult = PlanningCalculateResponse;
 
 export interface ForecastPoint {
   period: number;

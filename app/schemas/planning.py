@@ -284,3 +284,9 @@ class PlanningCalculateResponse(BaseModel):
     rejected: List[Alternative] = Field(default_factory=list)
     best: Optional[Alternative] = None
     input_summary: InputSummary
+    # 🔴 Дисклеймер 39-ФЗ едет ВМЕСТЕ с планом (L5, v8.40.0), а не берётся фронтом
+    # отдельным запросом и тем более не перепечатывается у него. Требование говорит:
+    # предупреждение стоит НА САМОЙ странице рекомендаций — человек принимает решение
+    # о деньгах здесь. Перепечатанный юридический текст расходится с каноном молча
+    # и ровно тогда, когда канон меняют.
+    disclaimer: str

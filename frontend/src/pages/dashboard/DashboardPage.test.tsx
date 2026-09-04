@@ -80,6 +80,10 @@ const ALT_RESERVE = {
 };
 
 const PLAN_ANNA: CalculatePlanResult = {
+  bliq_preallocation: {},
+  weights: { w_rt: 0.3, w_lt: 0.25, w_dt: 0.25, w_goals: 0.2, lt_target: 6 },
+  rejected_count: 64,
+  disclaimer: "FINPILOT не является инвестиционным советником.",
   risk_profile: "Сбалансированный",
   indicators: { Rt: 39500, Lt: 0, Dt: 0.347, BLR: 3.4, It: 180000, Et: 78000, SigmaP: 62500 },
   top3: [ALT_RESERVE],
@@ -93,6 +97,11 @@ const PLAN_ANNA: CalculatePlanResult = {
     transactions_count: 12,
     obligations_count: 1,
     goals_count: 0,
+    liquid_assets_count: 2,
+    r_bench: 0.16,
+    r_bench_source: "key_rate",
+    l_min: 3,
+    risk_tolerance: 3,
   },
 };
 

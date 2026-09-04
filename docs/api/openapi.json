@@ -2484,6 +2484,57 @@
         "title": "InviteRole",
         "type": "string"
       },
+      "LegalDocument": {
+        "description": "Один юридический документ.\n\n`version` и `effective_from` — не украшение: по 152-ФЗ согласие даётся на\nКОНКРЕТНУЮ редакцию, и интерфейс обязан показывать, на какую именно.",
+        "properties": {
+          "effective_from": {
+            "title": "Effective From",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "url": {
+            "title": "Url",
+            "type": "string"
+          },
+          "version": {
+            "title": "Version",
+            "type": "string"
+          }
+        },
+        "required": [
+          "title",
+          "version",
+          "effective_from",
+          "url"
+        ],
+        "title": "LegalDocument",
+        "type": "object"
+      },
+      "LegalDocuments": {
+        "description": "Ответ `/legal/documents`.\n\nСхема заведена ДО фронта (v8.40.0): раньше эндпоинт был размечен `-> dict`, то есть\nпопадал в OpenAPI как `{[key: string]: unknown}`. Цена рукописного типа здесь выше\nобычной — по этим полям строится юридический контур (ссылки в футере L7, дисклеймер\n39-ФЗ L5), и расхождение означает отсутствие обязательного по закону элемента,\nа не косметический сбой.",
+        "properties": {
+          "disclaimer_39fz": {
+            "title": "Disclaimer 39Fz",
+            "type": "string"
+          },
+          "documents": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/LegalDocument"
+            },
+            "title": "Documents",
+            "type": "object"
+          }
+        },
+        "required": [
+          "documents",
+          "disclaimer_39fz"
+        ],
+        "title": "LegalDocuments",
+        "type": "object"
+      },
       "LiquidAssetCreate": {
         "properties": {
           "amount": {
@@ -3499,6 +3550,10 @@
             ],
             "title": "Crisis Plan"
           },
+          "disclaimer": {
+            "title": "Disclaimer",
+            "type": "string"
+          },
           "indicators": {
             "$ref": "#/components/schemas/PlanningIndicators"
           },
@@ -3558,7 +3613,8 @@
           "alternatives_total",
           "admissible_count",
           "rejected_count",
-          "input_summary"
+          "input_summary",
+          "disclaimer"
         ],
         "title": "PlanningCalculateResponse",
         "type": "object"
@@ -4951,7 +5007,7 @@
   },
   "info": {
     "title": "FINPILOT",
-    "version": "8.37.0"
+    "version": "8.39.0"
   },
   "openapi": "3.1.0",
   "paths": {
@@ -7885,9 +7941,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response Legal Documents Api Legal Documents Get",
-                  "type": "object"
+                  "$ref": "#/components/schemas/LegalDocuments"
                 }
               }
             },

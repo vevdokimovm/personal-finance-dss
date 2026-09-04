@@ -10,3 +10,15 @@ if (typeof Element !== "undefined") {
   Element.prototype.setPointerCapture ??= () => {};
   Element.prototype.releasePointerCapture ??= () => {};
 }
+
+// jsdom не реализует ResizeObserver. Он нужен CookieBanner'у, который отдаёт странице
+// свою реальную высоту (иначе фиксированный баннер накрывает футер и тосты). Заглушка,
+// а не полифилл: тесты проверяют логику выбора, а не измерение — размеры в jsdom всё
+// равно нулевые. Тот же класс, что стабы Pointer Events выше.
+if (typeof globalThis.ResizeObserver === "undefined") {
+  globalThis.ResizeObserver = class {
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+  } as unknown as typeof ResizeObserver;
+}

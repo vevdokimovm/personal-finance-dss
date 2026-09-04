@@ -1,0 +1,70 @@
+/* Баннер cookie (L6). Прижат к низу, но страницу не перекрывает целиком: это
+   уведомление с выбором, а не окно блокировки. */
+.fp-cookie-banner {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  /* 🔴 НИЖЕ модального слоя. Первая редакция дала 250 — выше `--z-modal: 201`, и при
+     открытой форме баннер рисовался поверх затемнения в полную яркость, но не кликался
+     и не читался скринридером (Radix вешает `aria-hidden` на всё вне диалога). */
+  z-index: var(--z-cookie-banner);
+  padding: var(--sp-4) var(--sp-5);
+  border-top: var(--border-w) solid var(--c-border-hl);
+  background: var(--c-surface);
+  box-shadow: var(--shadow-float);
+  /* Низкий вьюпорт (ландшафт телефона, зум 200%): баннер прокручивается внутри себя,
+     а не выносит кнопки за экран. */
+  max-height: 60vh;
+  overflow-y: auto;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .fp-cookie-banner {
+    animation: fp-cookie-in var(--motion-base) ease-out;
+  }
+}
+
+@keyframes fp-cookie-in {
+  from {
+    transform: translateY(100%);
+  }
+}
+
+.fp-cookie-banner__body {
+  max-width: var(--content-max);
+  margin: 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-4);
+}
+
+/* Кегль тела текста, а не подписи: на основании этого текста человек принимает
+   юридически значимое решение ([TOK-03]). */
+.fp-cookie-banner__text {
+  flex: 1 1 var(--measure-w);
+  margin: 0;
+  color: var(--c-text);
+  font-size: var(--fs-base);
+}
+
+/* Ссылка оформлена как в футере — подчёркиванием, а не акцентным цветом: акцент
+   в продукте работает, только пока его мало (бриф §1.1). */
+.fp-cookie-banner__link {
+  color: var(--c-text);
+  text-decoration: underline;
+}
+
+/* Кнопки равной ширины: отказ не должен выглядеть уже и тише согласия. На узком
+   экране растягиваются на всю строку, оставаясь одинаковыми. */
+.fp-cookie-banner__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-3);
+}
+
+.fp-cookie-banner__actions > * {
+  flex: 1 1 var(--household-field-w);
+}

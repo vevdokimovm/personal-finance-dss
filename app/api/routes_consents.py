@@ -7,6 +7,7 @@
 from __future__ import annotations
 
 from fastapi import APIRouter, Depends, HTTPException, Request, Response
+from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
 from app.core.legal import DISCLAIMER_39FZ, LEGAL_DOCUMENTS, is_known
@@ -65,14 +66,45 @@ def withdraw(consent_type: str, user: User = Depends(require_user),
     return Response(status_code=204)
 
 
+class LegalDocument(BaseModel):
+    """Один юридический документ.
+
+    `version` и `effective_from` — не украшение: по 152-ФЗ согласие даётся на
+    КОНКРЕТНУЮ редакцию, и интерфейс обязан показывать, на какую именно.
+    """
+
+    title: str
+    version: str
+    effective_from: str
+    url: str
+
+
+class LegalDocuments(BaseModel):
+    """Ответ `/legal/documents`.
+
+    Схема заведена ДО фронта (v8.40.0): раньше эндпоинт был размечен `-> dict`, то есть
+    попадал в OpenAPI как `{[key: string]: unknown}`. Цена рукописного типа здесь выше
+    обычной — по этим полям строится юридический контур (ссылки в футере L7, дисклеймер
+    39-ФЗ L5), и расхождение означает отсутствие обязательного по закону элемента,
+    а не косметический сбой.
+    """
+
+    documents: dict[str, LegalDocument]
+    disclaimer_39fz: str
+
+
 @router.get("/legal/documents", summary="Реестр юридических документов")
-def legal_documents() -> dict:
+def legal_documents() -> LegalDocuments:
     """Публичный: версии нужны и до входа — на странице регистрации."""
-    return {
-        "documents": {
-            key: {"title": doc["title"], "version": doc["version"],
-                  "effective_from": doc["effective_from"], "url": doc["url"]}
+    return LegalDocuments(
+        documents={
+            key: LegalDocument(
+                title=doc["title"],
+                version=doc["version"],
+                effective_from=doc["effective_from"],
+                url=doc["url"],
+            )
             for key, doc in LEGAL_DOCUMENTS.items()
         },
-        "disclaimer_39fz": DISCLAIMER_39FZ,
-    }
+        disclaimer_39fz=DISCLAIMER_39FZ,
+    )

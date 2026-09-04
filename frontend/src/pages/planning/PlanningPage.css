@@ -47,3 +47,32 @@
     grid-template-columns: 1fr 1fr;
   }
 }
+
+/* Дисклеймер 39-ФЗ (L5). Виден, но не кричит: это предупреждение о характере совета,
+   а не ошибка. Полоса слева отделяет его от плана, не перекрашивая экран.
+   🔴 Не «мелкий принт»: текст, на основании которого человек принимает юридически
+   значимое решение, идёт основным цветом и базовым кеглем ([TOK-03], design-critic).
+   Ширина полосы — через --border-w, а не spacing-токен: это граница, не отступ. */
+.fp-planning__disclaimer {
+  max-width: var(--measure-w);
+  margin: 0 0 var(--sp-5);
+  padding: var(--sp-4);
+  border-left: calc(var(--border-w) * 3) solid var(--c-border-hl);
+  border-radius: var(--r-md);
+  background: var(--c-surface-up);
+}
+
+.fp-planning__disclaimer-title {
+  margin: 0 0 var(--sp-1);
+  color: var(--c-text);
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-eyebrow);
+}
+
+.fp-planning__disclaimer-text {
+  margin: 0;
+  color: var(--c-text);
+  font-size: var(--fs-base);
+}

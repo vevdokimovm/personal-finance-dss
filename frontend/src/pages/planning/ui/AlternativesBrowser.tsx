@@ -12,10 +12,15 @@ const SORTERS: Record<SortKey, (a: PlanAlternative, b: PlanAlternative) => numbe
   // ranked уже отсортирован бэкендом по (floor_level, utility) — «по рекомендации» это
   // порядок как есть, без пересортировки на фронте.
   recommended: () => 0,
-  Rt_new: (a, b) => b.Rt_new - a.Rt_new,
-  Lt_new: (a, b) => b.Lt_new - a.Lt_new,
+  // 🔴 `?? 0` не «на всякий случай»: в контракте `Rt_new`/`Lt_new`/`Dt_new` вне
+  // `required` (v8.40.0, переход на сгенерированные типы это обнажил). Раньше здесь
+  // стояло голое вычитание — на ответе без показателя выходил NaN, а сортировка с NaN
+  // в компараторе даёт не «странный порядок», а произвольный: реализация сортировки
+  // вправе вести себя как угодно при несогласованном компараторе.
+  Rt_new: (a, b) => (b.Rt_new ?? 0) - (a.Rt_new ?? 0),
+  Lt_new: (a, b) => (b.Lt_new ?? 0) - (a.Lt_new ?? 0),
   // ПДН — чем меньше, тем лучше (жёсткий инвариант канона, docs/math_model.md §3: Dt <= 0.40).
-  Dt_new: (a, b) => a.Dt_new - b.Dt_new,
+  Dt_new: (a, b) => (a.Dt_new ?? 0) - (b.Dt_new ?? 0),
 };
 
 // Юникодный подстрочный индекс (U+209C, не буква "т" уменьшенным кеглем) — максимум
@@ -120,22 +125,37 @@ export function AlternativesBrowser({
                    * Раскрываемая формула — только у рекомендации в AllocationPanel
                    * (UtilityFormula), не на каждой из 66 строк этого списка. */}
                   <span className="fp-alt-row__utility">
-                    {t("Оценка {u}", { u: formatNumber(alt.utility, 2) })}
+                    {alt.utility == null
+                      ? t("Оценка недоступна")
+                      : t("Оценка {u}", { u: formatNumber(alt.utility, 2) })}
                   </span>
                 </div>
+                {/* Показатели вне `required` контракта — отсутствующий не выдумываем
+                    нулём в подписи: «Rt 0 ₽» и «нет данных» значат разное. */}
                 <div className="fp-alt-row__meta">
                   <span>
-                    <Formula tex="R_t" fallback="Rt" /> {formatMoney(alt.Rt_new)}
+                    <Formula tex="R_t" fallback="Rt" />{" "}
+                    {alt.Rt_new == null ? t("нет данных") : formatMoney(alt.Rt_new)}
                   </span>
                   <span>
-                    <Formula tex="L_t" fallback="Lt" /> {formatNumber(alt.Lt_new)} {t("мес.")}
+                    <Formula tex="L_t" fallback="Lt" />{" "}
+                    {alt.Lt_new == null
+                      ? t("нет данных")
+                      : `${formatNumber(alt.Lt_new)} ${t("мес.")}`}
                   </span>
-                  <span>{t("ПДН {v}", { v: formatPercent(alt.Dt_new) })}</span>
+                  <span>
+                    {alt.Dt_new == null
+                      ? t("ПДН нет данных")
+                      : t("ПДН {v}", { v: formatPercent(alt.Dt_new) })}
+                  </span>
                 </div>
+                {/* У долей есть дефолт 0.0 в схеме (`app/schemas/planning.py`), в
+                    `required` их нет только поэтому — ноль здесь смысл сохраняет:
+                    «на это направление не идёт ничего». */}
                 <div className="fp-alt-row__split">
-                  <span>{t("Долг {v}", { v: formatMoney(alt.x_obligations) })}</span>
-                  <span>{t("Резерв {v}", { v: formatMoney(alt.x_reserve) })}</span>
-                  <span>{t("Цели {v}", { v: formatMoney(alt.x_goals) })}</span>
+                  <span>{t("Долг {v}", { v: formatMoney(alt.x_obligations ?? 0) })}</span>
+                  <span>{t("Резерв {v}", { v: formatMoney(alt.x_reserve ?? 0) })}</span>
+                  <span>{t("Цели {v}", { v: formatMoney(alt.x_goals ?? 0) })}</span>
                 </div>
               </li>
             ))}

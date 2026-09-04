@@ -16,11 +16,16 @@ export function hasNonZeroCategory(
   alternatives: PlanAlternative[],
   category: "x_obligations" | "x_goals",
 ): boolean {
-  return alternatives.some((alt) => alt[category] > 0);
+  // `?? 0` — доля вне `required` из-за дефолта 0.0 в схеме; отсутствующая и нулевая
+  // здесь значат одно и то же: ползунок не нужен.
+  return alternatives.some((alt) => (alt[category] ?? 0) > 0);
 }
 
 export function notchesOf(alt: PlanAlternative, total: number): { debt: number; goals: number } {
-  return { debt: notchOf(alt.x_obligations, total), goals: notchOf(alt.x_goals, total) };
+  return {
+    debt: notchOf(alt.x_obligations ?? 0, total),
+    goals: notchOf(alt.x_goals ?? 0, total),
+  };
 }
 
 /** undefined — гипотетическая точка не прошла отсев модели (например, ПДН превысил бы 40%,

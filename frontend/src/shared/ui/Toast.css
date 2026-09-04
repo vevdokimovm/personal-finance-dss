@@ -1,6 +1,8 @@
 .fp-toast-viewport {
   position: fixed;
-  bottom: var(--sp-5);
+  /* Над cookie-баннером, а не на нём: у баннера действия прижаты к правому краю —
+     ровно туда, где всплывает тост, и он съедал бы по ним клики (design-critic). */
+  bottom: calc(var(--sp-5) + var(--cookie-banner-h, 0px));
   right: var(--sp-5);
   display: flex;
   flex-direction: column;

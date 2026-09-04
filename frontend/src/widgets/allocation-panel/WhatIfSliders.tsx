@@ -18,6 +18,11 @@ function describeResult(match: PlanAlternative | undefined): string {
       "Такое распределение не проходит проверку модели (например, превысило бы порог ПДН 40%) — недоступно.",
     );
   }
+  // Показатели вне `required` контракта. Отсутствие — не ноль: писать «ПДН 0%» там,
+  // где значения нет, значит соврать в самую спокойную сторону (v8.40.0).
+  if (match.Rt_new == null || match.Lt_new == null || match.Dt_new == null) {
+    return t("Модель не вернула показатели для этого распределения.");
+  }
   const warn = match.Dt_new > DTI_WARN_THRESHOLD ? t(", близко к порогу 40%") : "";
   return t("Свободный поток {rt}, ликвидность {lt} мес., ПДН {dt}{warn}.", {
     rt: formatMoney(match.Rt_new),
@@ -120,7 +125,7 @@ export function WhatIfSliders({
       </div>
 
       <div className="fp-whatif__result">
-        {match ? (
+        {match && match.Rt_new != null && match.Lt_new != null && match.Dt_new != null ? (
           <>
             <span>{t("Свободный поток: {v}", { v: formatMoney(match.Rt_new) })}</span>
             <span>{t("Ликвидность: {v} мес.", { v: formatNumber(match.Lt_new) })}</span>

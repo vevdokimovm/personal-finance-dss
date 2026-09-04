@@ -1518,6 +1518,57 @@ export type InviteAcceptResponse = {
 export type InviteRole = 'member' | 'viewer';
 
 /**
+ * LegalDocument
+ *
+ * Один юридический документ.
+ *
+ * `version` и `effective_from` — не украшение: по 152-ФЗ согласие даётся на
+ * КОНКРЕТНУЮ редакцию, и интерфейс обязан показывать, на какую именно.
+ */
+export type LegalDocument = {
+    /**
+     * Effective From
+     */
+    effective_from: string;
+    /**
+     * Title
+     */
+    title: string;
+    /**
+     * Url
+     */
+    url: string;
+    /**
+     * Version
+     */
+    version: string;
+};
+
+/**
+ * LegalDocuments
+ *
+ * Ответ `/legal/documents`.
+ *
+ * Схема заведена ДО фронта (v8.40.0): раньше эндпоинт был размечен `-> dict`, то есть
+ * попадал в OpenAPI как `{[key: string]: unknown}`. Цена рукописного типа здесь выше
+ * обычной — по этим полям строится юридический контур (ссылки в футере L7, дисклеймер
+ * 39-ФЗ L5), и расхождение означает отсутствие обязательного по закону элемента,
+ * а не косметический сбой.
+ */
+export type LegalDocuments = {
+    /**
+     * Disclaimer 39Fz
+     */
+    disclaimer_39fz: string;
+    /**
+     * Documents
+     */
+    documents: {
+        [key: string]: LegalDocument;
+    };
+};
+
+/**
  * LiquidAssetCreate
  */
 export type LiquidAssetCreate = {
@@ -2130,6 +2181,10 @@ export type PlanningCalculateResponse = {
     crisis_plan?: {
         [key: string]: unknown;
     } | null;
+    /**
+     * Disclaimer
+     */
+    disclaimer: string;
     indicators: PlanningIndicators;
     input_summary: InputSummary;
     /**
@@ -5033,13 +5088,9 @@ export type LegalDocumentsApiLegalDocumentsGetData = {
 
 export type LegalDocumentsApiLegalDocumentsGetResponses = {
     /**
-     * Response Legal Documents Api Legal Documents Get
-     *
      * Successful Response
      */
-    200: {
-        [key: string]: unknown;
-    };
+    200: LegalDocuments;
 };
 
 export type LegalDocumentsApiLegalDocumentsGetResponse = LegalDocumentsApiLegalDocumentsGetResponses[keyof LegalDocumentsApiLegalDocumentsGetResponses];

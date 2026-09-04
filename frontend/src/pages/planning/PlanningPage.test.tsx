@@ -97,6 +97,10 @@ const ALT_DEBT = {
 };
 
 const PLAN_ANNA: CalculatePlanResult = {
+  bliq_preallocation: {},
+  weights: { w_rt: 0.3, w_lt: 0.25, w_dt: 0.25, w_goals: 0.2, lt_target: 6 },
+  rejected_count: 64,
+  disclaimer: "FINPILOT не является инвестиционным советником.",
   risk_profile: "Сбалансированный",
   indicators: { Rt: 39500, Lt: 0, Dt: 0.347, BLR: 3.4, It: 180000, Et: 78000, SigmaP: 62500 },
   top3: [ALT_RESERVE],
@@ -110,6 +114,11 @@ const PLAN_ANNA: CalculatePlanResult = {
     transactions_count: 12,
     obligations_count: 1,
     goals_count: 2,
+    liquid_assets_count: 2,
+    r_bench: 0.16,
+    r_bench_source: "key_rate",
+    l_min: 3,
+    risk_tolerance: 3,
   },
 };
 
@@ -238,5 +247,24 @@ describe("PlanningPage", () => {
     // ALT_DEBT.Dt_new=0.28 < ALT_RESERVE.Dt_new=0.347 — при сортировке по ПДН (по возрастанию)
     // долговой вариант уходит первым.
     expect(names()).toEqual(["Всё на погашение долга", "Всё в резерв"]);
+  });
+  /* 🔴 Требование L5: дисклеймер 39-ФЗ выводится НА САМОЙ странице рекомендаций, а не
+     только в оферте — человек принимает решение о деньгах здесь. Текст берётся из поля
+     ответа: перепечатанный во фронте разошёлся бы с каноном при первой правке. */
+  it("дисклеймер 39-ФЗ показан на экране плана и взят из ответа (L5)", () => {
+    render(<PlanningPage />);
+    expect(screen.getByText(PLAN_ANNA.disclaimer)).toBeVisible();
+  });
+
+  it("дисклеймер стоит ДО распределения, а не в подвале страницы", () => {
+    const { container } = render(<PlanningPage />);
+    const disclaimer = container.querySelector(".fp-planning__disclaimer");
+    const allocation = screen.getByRole("heading", { name: "Куда пойдут свободные деньги" });
+    expect(disclaimer).not.toBeNull();
+    // Порядок в DOM: предупреждение, до которого надо доскроллить, требования не
+    // выполняет — оно должно попасться раньше рекомендации.
+    expect(
+      disclaimer!.compareDocumentPosition(allocation!) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
   });
 });

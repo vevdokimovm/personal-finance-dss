@@ -97,7 +97,8 @@ describe("AllocationPanel — объяснение выбранного план
     ...BEST,
     weighted_scores: { Rt: 0.05, Lt: 0.12, Dt: 0.34, Si: 0.03 },
     explanation: {
-      gains: ["Досрочно гасим 10 000 ₽ — самый дорогой кредит."],
+      delta: { Rt: 4200, Lt: 0.4, Dt: -0.03 },
+    gains: ["Досрочно гасим 10 000 ₽ — самый дорогой кредит."],
       costs: ["2 000 ₽ не пошли в цели — они уже профинансированы."],
       insight:
         "Рекомендуем направить 30% на досрочку, 40% на цели. Решающим оказалось то, " +
@@ -169,7 +170,8 @@ describe("AllocationPanel — объяснение выбранного план
     const alt: PlanAlternative = {
       ...BEST,
       explanation: {
-        gains: [],
+        delta: { Rt: 0, Lt: 0, Dt: 0 },
+      gains: [],
         costs: [],
         insight: "Рекомендуем направить всё в резерв.",
         counterfactual: { available: false },

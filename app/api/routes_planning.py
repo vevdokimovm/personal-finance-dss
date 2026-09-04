@@ -43,6 +43,7 @@ from app.services.forecasting import build_monthly_history, forecast_indicators
 from app.services.currency import to_base_currency
 from app.services.plan_export import plan_to_pdf, plan_to_xlsx
 from app.services.planning import run_planning
+from app.core.legal import DISCLAIMER_39FZ
 from app.schemas.planning import PlanningCalculateResponse
 from app.utils.time import utcnow
 
@@ -193,6 +194,9 @@ def calculate_plan(
         "admissible_count": result.get("admissible_count"),
         "u_score": (result.get("best") or {}).get("utility"),
     })
+    # Дисклеймер 39-ФЗ — часть ответа, а не украшение фронта (L5): экран рекомендаций
+    # обязан показать его рядом с планом, и текст обязан быть каноническим.
+    result["disclaimer"] = DISCLAIMER_39FZ
     return result
 
 

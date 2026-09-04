@@ -2,6 +2,8 @@ import { useEffect } from "react";
 import { createRootRoute, Outlet } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 import { TooltipProvider, ToastProvider, ThemeToggle } from "@shared/ui";
+import { LegalFooter } from "@widgets/legal-footer";
+import { CookieBanner } from "@widgets/cookie-banner";
 import { watchSystemTheme } from "@shared/lib/theme/useThemeStore";
 import { t } from "@shared/lib/i18n/t";
 import { AuthTopbarLink } from "@widgets/auth-topbar";
@@ -46,6 +48,10 @@ function RootLayout() {
         <div id="fp-main" tabIndex={-1} className="fp-main-anchor">
           <Outlet />
         </div>
+        {/* Юр-контур — на КАЖДОЙ странице, включая гостевые (L6, L7): до входа оферту
+            и политику читают чаще, чем после. Поэтому в корне, а не в экранах. */}
+        <LegalFooter />
+        <CookieBanner />
         {import.meta.env.DEV && <TanStackRouterDevtools position="bottom-right" />}
       </ToastProvider>
     </TooltipProvider>

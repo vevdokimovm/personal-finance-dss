@@ -30,9 +30,11 @@ export function buildAllocationSankeyData(
   amounts: Pick<PlanAlternative, "x_obligations" | "x_reserve" | "x_goals">,
 ): AllocationSankeyData {
   const categories: (SankeyNodeDatum & { value: number })[] = [
-    { name: t("Досрочное погашение"), color: "var(--c-red)", value: amounts.x_obligations },
-    { name: t("Резерв"), color: "var(--c-amber)", value: amounts.x_reserve },
-    { name: t("Цели"), color: "var(--c-green)", value: amounts.x_goals },
+    // `?? 0` — доли вне `required` контракта из-за дефолта 0.0 в схеме. Для диаграммы
+    // ноль означает «ветка не рисуется», что и требуется.
+    { name: t("Досрочное погашение"), color: "var(--c-red)", value: amounts.x_obligations ?? 0 },
+    { name: t("Резерв"), color: "var(--c-amber)", value: amounts.x_reserve ?? 0 },
+    { name: t("Цели"), color: "var(--c-green)", value: amounts.x_goals ?? 0 },
   ];
 
   const nodes: SankeyNodeDatum[] = [{ name: t("Свободные деньги") }];

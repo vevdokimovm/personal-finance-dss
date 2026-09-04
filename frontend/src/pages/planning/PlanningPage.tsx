@@ -165,6 +165,23 @@ export function PlanningPage() {
         </div>
       </dl>
       <MetricsGrid indicators={plan.indicators} />
+      {/* 🔴 Дисклеймер 39-ФЗ — ПЕРЕД распределением, а не в подвале страницы (L5).
+          Человек принимает решение о деньгах, глядя на рекомендацию; предупреждение,
+          до которого надо доскроллить, требования не выполняет. Текст берётся из поля
+          ответа — не перепечатывается здесь, иначе разойдётся с каноном при первой же
+          правке юридического текста. */}
+      {plan.disclaimer && (
+        /* `role="note"` заменена на регион с меткой: `note` не объявляется сама и
+           не попадает в landmark-навигацию — юридически значимый текст доставался бы
+           только тому, кто дочитает страницу линейно (a11y-auditor).
+           `<section aria-label>` даёт роль `region`; `<aside>` дал бы `complementary`
+           («отступление в стороне»), а предупреждение о самой рекомендации — часть
+           основного содержания, а не отступление. Расхождение поймал браузерный тест. */
+        <section className="fp-planning__disclaimer" aria-label={t("Важно о рекомендации")}>
+          <p className="fp-planning__disclaimer-title">{t("Важно")}</p>
+          <p className="fp-planning__disclaimer-text">{plan.disclaimer}</p>
+        </section>
+      )}
       <AllocationPanel best={plan.top3?.[0] ?? null} alternatives={plan.ranked} />
       <AlternativesBrowser alternatives={plan.ranked} />
       <ForecastPanel
