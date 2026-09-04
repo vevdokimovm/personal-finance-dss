@@ -70,27 +70,18 @@ export type PlanAlternative = Alternative;
 export type PlanInputSummary = InputSummary;
 export type CalculatePlanResult = PlanningCalculateResponse;
 
-export interface ForecastPoint {
-  period: number;
-  Rt: number;
-  Rt_p10?: number;
-  Rt_p50?: number;
-  Rt_p90?: number;
-}
+/* 🔴 `ForecastPoint` и `ForecastResult` были ПОСЛЕДНИМИ рукописными типами фронта.
+   Заменены реэкспортом сгенерированных в v8.48.0, когда `/planning/forecast` получил
+   схему (`ForecastResponse` на бэкенде).
 
-export interface ForecastResult {
-  current: { Bt: number; Rt: number; Lt: number; Dt: number };
-  horizon: number;
-  forecast: ForecastPoint[];
-  /** Ставка капитализации баланса, фактически применённая (app/api/routes_planning.py::
-   * get_forecast) — либо сценарий из запроса, либо реальная OCR (ключевая ЦБ после НДФЛ). */
-  r_bench: number;
-  /** "request" — сценарий «что если»; иначе источник реальной OCR
-   * (app/services/cbr_rate.py::get_opportunity_cost_rate). */
-  r_bench_source: string;
-  /** Настоящая OCR НЕЗАВИСИМО от сценария — считается всегда, даже когда `r_bench` выше
-   * это override из запроса. Нужна отдельно от `r_bench`: тот эхо'ит применённую ставку
-   * (override ИЛИ реальную), одного поля недостаточно, чтобы после override узнать, к чему
-   * возвращаться кнопкой «сбросить» (баг найден и исправлен при живой проверке в браузере). */
-  real_r_bench: number;
-}
+   Заведение схемы показало, ЧЕГО рукописные типы не знали:
+   · `ForecastPoint` описывал 5 полей из 12 — фронт не видел `income`, `expense`,
+     `obligations`, `cash_flow`, `Bt`, `Lt`, `Dt` по месяцам, то есть весь состав
+     прогноза, кроме свободного ресурса;
+   · `ForecastResult` не знал `deficit_alert` (предупреждение о месяце, когда денег
+     не хватит — самое важное, что прогноз умеет сказать), `trend`, `stable_baseline`
+     и `method`.
+
+   Это и есть довод за генерацию: рукописный тип показывает то, что помнил автор,
+   и молчит обо всём остальном — компилятор при этом доволен. */
+export type { ForecastPoint, ForecastResponse as ForecastResult } from "@shared/api/generated";

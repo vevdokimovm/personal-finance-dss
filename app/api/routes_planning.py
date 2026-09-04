@@ -128,6 +128,103 @@ class ForecastRequest(BaseModel):
         description="Сценарий «что если»: ставка капитализации вместо реальной OCR")
 
 
+class ForecastCurrent(BaseModel):
+    """Показатели на сегодня — точка отсчёта прогноза."""
+
+    Bt: float = Field(description="Ликвидный баланс.")
+    Rt: float = Field(description="Свободный ресурс: денежный поток минус платежи.")
+    Lt: float = Field(description="Ликвидность в месяцах автономии.")
+    Dt: float = Field(description="Долговая нагрузка (ПДН), доля дохода.")
+
+
+class ForecastPoint(BaseModel):
+    """Один месяц прогноза.
+
+    `Rt_p10`/`Rt_p50`/`Rt_p90` — границы интервала Монте-Карло: по ним рисуется коридор
+    неопределённости. Без них график показывал бы одну линию как достоверную,
+    а прогноз по определению вероятностный.
+    """
+
+    period: int = Field(description="Номер месяца от текущего (1 — следующий).")
+    Bt: float
+    income: float
+    expense: float
+    obligations: float
+    cash_flow: float
+    Rt: float
+    Lt: float
+    Dt: float
+    Rt_p10: float = Field(description="Пессимистичная граница (10-й процентиль).")
+    Rt_p50: float = Field(description="Медиана.")
+    Rt_p90: float = Field(description="Оптимистичная граница (90-й процентиль).")
+
+
+class DeficitAlert(BaseModel):
+    """Первый месяц, когда свободных денег не хватит (FR-08).
+
+    🔴 `pessimistic` различает две очень разные вещи: дефицит в основном прогнозе
+    («так и будет, если ничего не менять») и дефицит только в пессимистичном сценарии
+    («может случиться при неудачном стечении»). Показывать их одинаково значит либо
+    пугать без повода, либо промолчать о реальной угрозе.
+    """
+
+    period: int
+    gap: float = Field(description="Насколько не хватит, рублей.")
+    pessimistic: bool
+
+
+class StableBaseline(BaseModel):
+    """Какая часть потока регулярна — мера доверия к прогнозу.
+
+    При доходе из разовых поступлений прогноз строится на шуме, и человеку важно знать
+    это раньше, чем он примет по нему решение.
+    """
+
+    recurring_income: float
+    recurring_expense: float
+    recurring_cash_flow: float
+    income_share: float = Field(description="Доля регулярного в доходе, 0..1.")
+    expense_share: float = Field(description="Доля регулярного в расходе, 0..1.")
+
+
+class ForecastMethod(BaseModel):
+    """Чем считали — точку и интервал. Показывается в объяснении расчёта."""
+
+    point: str
+    interval: str
+
+
+class ForecastResponse(BaseModel):
+    """Ответ `/planning/forecast`.
+
+    🔴 Схема заведена в v8.48.0 — последний рукописный тип фронта. Эндпоинт был размечен
+    `-> dict[str, Any]`, и `entities/plan-summary/model/types.ts` держал под него
+    рукописный `ForecastResult`.
+
+    При заведении схемы вскрылось, что рукописный тип знал НЕ ВСЕ поля: он описывал
+    `current`, `horizon`, `forecast` и три поля ставки, а сервер отдаёт ещё
+    `deficit_alert`, `trend`, `stable_baseline` и `method`. То есть фронт не знал
+    о предупреждении про дефицит — самом важном, что прогноз умеет сказать.
+    Это и есть довод за генерацию из контракта: рукописный тип показывает то,
+    что помнил автор.
+    """
+
+    current: ForecastCurrent
+    horizon: int
+    forecast: list[ForecastPoint]
+    trend: str = Field(description="improving | declining | stable.")
+    stable_baseline: StableBaseline
+    method: ForecastMethod
+    # Необязателен намеренно: отсутствие означает «дефицита не предвидится» —
+    # нормальный исход, а не отсутствие данных.
+    deficit_alert: DeficitAlert | None = None
+    r_bench: float = Field(description="ПРИМЕНЁННАЯ ставка: сценарий или реальная.")
+    r_bench_source: str = Field(description='"request" — сценарий, иначе источник реальной.')
+    real_r_bench: float = Field(
+        description="Настоящая ставка ВСЕГДА, даже при сценарии — для кнопки «вернуть»."
+    )
+
+
 class ScenarioSave(BaseModel):
     name: str = Field(..., min_length=1, max_length=255)
     parameters: dict[str, Any] = Field(default_factory=dict)
@@ -577,7 +674,7 @@ def get_forecast(
     payload: ForecastRequest,
     db: Session = Depends(get_db),
     user_id: str | None = Depends(get_current_user_id),
-) -> dict[str, Any]:
+) -> ForecastResponse:
     transactions = get_transactions(db, user_id=user_id)
     obligations = _serialize_obligations(get_obligations(db, user_id=user_id))
     goals = _serialize_goals(get_goals(db, user_id=user_id))
@@ -642,7 +739,7 @@ def get_forecast(
     result["r_bench"] = r_bench
     result["r_bench_source"] = r_bench_source
     result["real_r_bench"] = real_r_bench
-    return result
+    return ForecastResponse(**result)
 
 
 @router.post("/scenarios", summary="Сохранить сценарий что-если (LOG-06)")

@@ -186,7 +186,13 @@ LEGACY_CONTEXT_MARKERS = (
 # интерфейс: фронт вехи 8 работал только в dev через Vite (PIT-020). Страницы теперь
 # отдаёт React через catch-all, который в OpenAPI не попадает (`include_in_schema=False`)
 # — и правильно: это не API, а отдача приложения.
-EXPECTED_COUNTS = {"tables": 30, "migrations": 34, "openapi_paths": 102}
+# openapi_paths 100 (v8.47.0): −2. Сняты последние Jinja-роуты `/validation` и `/contacts`
+# вместе с самой Jinja; страницы отдаёт React через catch-all, который в схему не попадает
+# (`include_in_schema=False`) — и правильно, это отдача приложения, а не API.
+# migrations 35 (v8.48.0): +1 — `0035_user_is_owner`, признак владельца продукта.
+# Решение владельца 04.09.2026: аналитику смотрит владелец по входу, а не через `curl`
+# с ADMIN_API_KEY. Матрица SQLite + PostgreSQL прогнана (`docs/pg_matrix_last_run.md`).
+EXPECTED_COUNTS = {"tables": 30, "migrations": 35, "openapi_paths": 100}
 
 
 # Канарейка CJK: редкий токен-глюк генерации ассистентов — иероглиф вместо

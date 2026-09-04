@@ -506,6 +506,39 @@
         "title": "AlternativeScores",
         "type": "object"
       },
+      "AnalyticsOverview": {
+        "description": "Сводка продуктовых метрик за период.\n\n🔴 `event_counts` — свободное отображение «тип события → сколько раз», и это\nнамеренно: ключи появляются вместе с новым логируемым действием в коде. Перечислить\nих полями значило бы править контракт при каждом таком действии и всё равно\nотставать — событие уже пишется, а схема о нём не знает.",
+        "properties": {
+          "active_users": {
+            "title": "Active Users",
+            "type": "integer"
+          },
+          "event_counts": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "description": "Тип события → число за период.",
+            "title": "Event Counts",
+            "type": "object"
+          },
+          "period_days": {
+            "title": "Period Days",
+            "type": "integer"
+          },
+          "total_events": {
+            "title": "Total Events",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "period_days",
+          "total_events",
+          "active_users",
+          "event_counts"
+        ],
+        "title": "AnalyticsOverview",
+        "type": "object"
+      },
       "AnalyzePortrait": {
         "description": "Произвольный портрет для проверки на странице «Валидация» (загрузка/вставка JSON).",
         "properties": {
@@ -1247,6 +1280,31 @@
         "title": "DebtSchedule",
         "type": "object"
       },
+      "DeficitAlert": {
+        "description": "Первый месяц, когда свободных денег не хватит (FR-08).\n\n🔴 `pessimistic` различает две очень разные вещи: дефицит в основном прогнозе\n(«так и будет, если ничего не менять») и дефицит только в пессимистичном сценарии\n(«может случиться при неудачном стечении»). Показывать их одинаково значит либо\nпугать без повода, либо промолчать о реальной угрозе.",
+        "properties": {
+          "gap": {
+            "description": "Насколько не хватит, рублей.",
+            "title": "Gap",
+            "type": "number"
+          },
+          "period": {
+            "title": "Period",
+            "type": "integer"
+          },
+          "pessimistic": {
+            "title": "Pessimistic",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "period",
+          "gap",
+          "pessimistic"
+        ],
+        "title": "DeficitAlert",
+        "type": "object"
+      },
       "DemoCase": {
         "description": "Один демо-портрет для карточки выбора.\n\nВсе поля обязательны: карточка строится из них целиком, и необязательное поле здесь\nозначает `undefined` в вёрстке — пустая кнопка или портрет без описания, по которому\nнельзя понять, похож ли он на тебя. Ради этого выбора экран и существует.",
         "properties": {
@@ -1706,6 +1764,131 @@
         "title": "ExplanationDelta",
         "type": "object"
       },
+      "ForecastCurrent": {
+        "description": "Показатели на сегодня — точка отсчёта прогноза.",
+        "properties": {
+          "Bt": {
+            "description": "Ликвидный баланс.",
+            "title": "Bt",
+            "type": "number"
+          },
+          "Dt": {
+            "description": "Долговая нагрузка (ПДН), доля дохода.",
+            "title": "Dt",
+            "type": "number"
+          },
+          "Lt": {
+            "description": "Ликвидность в месяцах автономии.",
+            "title": "Lt",
+            "type": "number"
+          },
+          "Rt": {
+            "description": "Свободный ресурс: денежный поток минус платежи.",
+            "title": "Rt",
+            "type": "number"
+          }
+        },
+        "required": [
+          "Bt",
+          "Rt",
+          "Lt",
+          "Dt"
+        ],
+        "title": "ForecastCurrent",
+        "type": "object"
+      },
+      "ForecastMethod": {
+        "description": "Чем считали — точку и интервал. Показывается в объяснении расчёта.",
+        "properties": {
+          "interval": {
+            "title": "Interval",
+            "type": "string"
+          },
+          "point": {
+            "title": "Point",
+            "type": "string"
+          }
+        },
+        "required": [
+          "point",
+          "interval"
+        ],
+        "title": "ForecastMethod",
+        "type": "object"
+      },
+      "ForecastPoint": {
+        "description": "Один месяц прогноза.\n\n`Rt_p10`/`Rt_p50`/`Rt_p90` — границы интервала Монте-Карло: по ним рисуется коридор\nнеопределённости. Без них график показывал бы одну линию как достоверную,\nа прогноз по определению вероятностный.",
+        "properties": {
+          "Bt": {
+            "title": "Bt",
+            "type": "number"
+          },
+          "Dt": {
+            "title": "Dt",
+            "type": "number"
+          },
+          "Lt": {
+            "title": "Lt",
+            "type": "number"
+          },
+          "Rt": {
+            "title": "Rt",
+            "type": "number"
+          },
+          "Rt_p10": {
+            "description": "Пессимистичная граница (10-й процентиль).",
+            "title": "Rt P10",
+            "type": "number"
+          },
+          "Rt_p50": {
+            "description": "Медиана.",
+            "title": "Rt P50",
+            "type": "number"
+          },
+          "Rt_p90": {
+            "description": "Оптимистичная граница (90-й процентиль).",
+            "title": "Rt P90",
+            "type": "number"
+          },
+          "cash_flow": {
+            "title": "Cash Flow",
+            "type": "number"
+          },
+          "expense": {
+            "title": "Expense",
+            "type": "number"
+          },
+          "income": {
+            "title": "Income",
+            "type": "number"
+          },
+          "obligations": {
+            "title": "Obligations",
+            "type": "number"
+          },
+          "period": {
+            "description": "Номер месяца от текущего (1 — следующий).",
+            "title": "Period",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "period",
+          "Bt",
+          "income",
+          "expense",
+          "obligations",
+          "cash_flow",
+          "Rt",
+          "Lt",
+          "Dt",
+          "Rt_p10",
+          "Rt_p50",
+          "Rt_p90"
+        ],
+        "title": "ForecastPoint",
+        "type": "object"
+      },
       "ForecastRequest": {
         "properties": {
           "horizon": {
@@ -1733,6 +1916,74 @@
         "title": "ForecastRequest",
         "type": "object"
       },
+      "ForecastResponse": {
+        "description": "Ответ `/planning/forecast`.\n\n🔴 Схема заведена в v8.48.0 — последний рукописный тип фронта. Эндпоинт был размечен\n`-> dict[str, Any]`, и `entities/plan-summary/model/types.ts` держал под него\nрукописный `ForecastResult`.\n\nПри заведении схемы вскрылось, что рукописный тип знал НЕ ВСЕ поля: он описывал\n`current`, `horizon`, `forecast` и три поля ставки, а сервер отдаёт ещё\n`deficit_alert`, `trend`, `stable_baseline` и `method`. То есть фронт не знал\nо предупреждении про дефицит — самом важном, что прогноз умеет сказать.\nЭто и есть довод за генерацию из контракта: рукописный тип показывает то,\nчто помнил автор.",
+        "properties": {
+          "current": {
+            "$ref": "#/components/schemas/ForecastCurrent"
+          },
+          "deficit_alert": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/DeficitAlert"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "forecast": {
+            "items": {
+              "$ref": "#/components/schemas/ForecastPoint"
+            },
+            "title": "Forecast",
+            "type": "array"
+          },
+          "horizon": {
+            "title": "Horizon",
+            "type": "integer"
+          },
+          "method": {
+            "$ref": "#/components/schemas/ForecastMethod"
+          },
+          "r_bench": {
+            "description": "ПРИМЕНЁННАЯ ставка: сценарий или реальная.",
+            "title": "R Bench",
+            "type": "number"
+          },
+          "r_bench_source": {
+            "description": "\"request\" — сценарий, иначе источник реальной.",
+            "title": "R Bench Source",
+            "type": "string"
+          },
+          "real_r_bench": {
+            "description": "Настоящая ставка ВСЕГДА, даже при сценарии — для кнопки «вернуть».",
+            "title": "Real R Bench",
+            "type": "number"
+          },
+          "stable_baseline": {
+            "$ref": "#/components/schemas/StableBaseline"
+          },
+          "trend": {
+            "description": "improving | declining | stable.",
+            "title": "Trend",
+            "type": "string"
+          }
+        },
+        "required": [
+          "current",
+          "horizon",
+          "forecast",
+          "trend",
+          "stable_baseline",
+          "method",
+          "r_bench",
+          "r_bench_source",
+          "real_r_bench"
+        ],
+        "title": "ForecastResponse",
+        "type": "object"
+      },
       "ForgotPasswordRequest": {
         "properties": {
           "email": {
@@ -1745,6 +1996,54 @@
           "email"
         ],
         "title": "ForgotPasswordRequest",
+        "type": "object"
+      },
+      "FunnelResponse": {
+        "description": "Воронка завершения шагов онбординга.\n\n🔴 `period_days` в ответе, а не только в запросе: экран обязан подписать, за какое\nокно посчитано. До v8.48.0 воронка молча считалась за всю историю, а подпись\nнад ней говорила «за 30 дней».\n\nЭто **воронка завершения**, а не временная последовательность: на каждом шаге —\nлюди, прошедшие все предыдущие шаги, независимо от порядка во времени\n(`app/services/analytics.py::funnel`).",
+        "properties": {
+          "period_days": {
+            "title": "Period Days",
+            "type": "integer"
+          },
+          "steps": {
+            "items": {
+              "$ref": "#/components/schemas/FunnelStep"
+            },
+            "title": "Steps",
+            "type": "array"
+          }
+        },
+        "required": [
+          "period_days",
+          "steps"
+        ],
+        "title": "FunnelResponse",
+        "type": "object"
+      },
+      "FunnelStep": {
+        "description": "Шаг воронки: сколько людей до него дошло.",
+        "properties": {
+          "conversion_pct": {
+            "description": "Доля от первого шага, проценты.",
+            "title": "Conversion Pct",
+            "type": "number"
+          },
+          "step": {
+            "description": "Тип события (`login_success`, `goal_created`, …).",
+            "title": "Step",
+            "type": "string"
+          },
+          "users": {
+            "title": "Users",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "step",
+          "users",
+          "conversion_pct"
+        ],
+        "title": "FunnelStep",
         "type": "object"
       },
       "FxRateResponse": {
@@ -4571,6 +4870,42 @@
         "title": "SnapshotDTO",
         "type": "object"
       },
+      "StableBaseline": {
+        "description": "Какая часть потока регулярна — мера доверия к прогнозу.\n\nПри доходе из разовых поступлений прогноз строится на шуме, и человеку важно знать\nэто раньше, чем он примет по нему решение.",
+        "properties": {
+          "expense_share": {
+            "description": "Доля регулярного в расходе, 0..1.",
+            "title": "Expense Share",
+            "type": "number"
+          },
+          "income_share": {
+            "description": "Доля регулярного в доходе, 0..1.",
+            "title": "Income Share",
+            "type": "number"
+          },
+          "recurring_cash_flow": {
+            "title": "Recurring Cash Flow",
+            "type": "number"
+          },
+          "recurring_expense": {
+            "title": "Recurring Expense",
+            "type": "number"
+          },
+          "recurring_income": {
+            "title": "Recurring Income",
+            "type": "number"
+          }
+        },
+        "required": [
+          "recurring_income",
+          "recurring_expense",
+          "recurring_cash_flow",
+          "income_share",
+          "expense_share"
+        ],
+        "title": "StableBaseline",
+        "type": "object"
+      },
       "StatementUploadResult": {
         "description": "Результат импорта выписки.\n\nСхема заведена ДО фронта (v8.43.0): раньше эндпоинт был размечен `-> dict[str, Any]`,\nа ответ несёт семь полей, включая сверку с контрольными итогами выписки — рукописный\nтип разошёлся бы с ним на первой же правке парсера.\n\n🔴 Поля успеха НЕОБЯЗАТЕЛЬНЫ, и это не осторожность. Ошибка разбора возвращается со\nстатусом **200** и `status=\"error\"`: «файл не распознан» — не сбой сервера, а результат\nработы. Пометить `added_count` обязательным значило бы заставить фронт читать число\nимпортированных операций там, где импорт не состоялся.\n\n`reconciliation` — сверка с итогами, объявленными в самой выписке. Может отсутствовать:\nу CSV контрольных сумм обычно нет.",
         "properties": {
@@ -5183,6 +5518,11 @@
           "id": {
             "title": "Id",
             "type": "string"
+          },
+          "is_owner": {
+            "default": false,
+            "title": "Is Owner",
+            "type": "boolean"
           }
         },
         "required": [
@@ -5424,7 +5764,7 @@
   },
   "info": {
     "title": "FINPILOT",
-    "version": "8.46.0"
+    "version": "8.47.0"
   },
   "openapi": "3.1.0",
   "paths": {
@@ -5790,6 +6130,7 @@
     },
     "/api/analytics/funnel": {
       "get": {
+        "description": "🔴 `days` появился в v8.48.0. До этого воронка считалась ЗА ВСЮ ИСТОРИЮ, а сводка\nрядом — за 30 дней, и экран печатал над обеими «за последние 30 дней». Владелец\nсравнил бы «37 активных за месяц» со «100 человек на первом шаге» и решил, что данные\nбитые или конверсия рухнула. Сервис `since` поддерживал всегда — его просто\nне передавали (design-critic).",
         "operationId": "funnel_endpoint_api_analytics_funnel_get",
         "parameters": [
           {
@@ -5808,6 +6149,20 @@
               ],
               "description": "Список event_type через запятую",
               "title": "Steps"
+            }
+          },
+          {
+            "description": "Окно, дней — как у /overview.",
+            "in": "query",
+            "name": "days",
+            "required": false,
+            "schema": {
+              "default": 30,
+              "description": "Окно, дней — как у /overview.",
+              "maximum": 365,
+              "minimum": 1,
+              "title": "Days",
+              "type": "integer"
             }
           },
           {
@@ -5832,9 +6187,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response Funnel Endpoint Api Analytics Funnel Get",
-                  "type": "object"
+                  "$ref": "#/components/schemas/FunnelResponse"
                 }
               }
             },
@@ -5895,9 +6248,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response Overview Api Analytics Overview Get",
-                  "type": "object"
+                  "$ref": "#/components/schemas/AnalyticsOverview"
                 }
               }
             },
@@ -9340,9 +9691,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response Get Forecast Api Planning Forecast Post",
-                  "type": "object"
+                  "$ref": "#/components/schemas/ForecastResponse"
                 }
               }
             },
@@ -10397,24 +10746,6 @@
         ]
       }
     },
-    "/contacts": {
-      "get": {
-        "operationId": "read_contacts_contacts_get",
-        "responses": {
-          "200": {
-            "content": {
-              "text/html": {
-                "schema": {
-                  "type": "string"
-                }
-              }
-            },
-            "description": "Successful Response"
-          }
-        },
-        "summary": "Контакты и реквизиты оператора"
-      }
-    },
     "/v1/analyze": {
       "post": {
         "operationId": "analyze_v1_analyze_post",
@@ -10472,24 +10803,6 @@
         "tags": [
           "B2B"
         ]
-      }
-    },
-    "/validation": {
-      "get": {
-        "operationId": "read_validation_validation_get",
-        "responses": {
-          "200": {
-            "content": {
-              "text/html": {
-                "schema": {
-                  "type": "string"
-                }
-              }
-            },
-            "description": "Successful Response"
-          }
-        },
-        "summary": "Валидация алгоритма на портретах"
       }
     }
   }

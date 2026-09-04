@@ -6,6 +6,7 @@ import type { TooltipPayload } from "recharts/types/state/tooltipSlice";
 import { ForecastPanel, ForecastTooltip } from "./ForecastPanel";
 import { buildForecastChartData } from "./buildForecastChartData";
 import type { ForecastResult } from "@entities/plan-summary";
+import { makeForecast, makeForecastPoint } from "@shared/lib/test/forecastFixtures";
 
 // Recharts НЕ рендерит <Area> как обычный React-компонент в DOM — AreaChart
 // читает children через Children.map чисто для чтения props и рисует SVG
@@ -17,6 +18,9 @@ interface AreaLikeProps {
   children?: ReactNode;
   stackId?: string;
   fill?: string;
+  /* `dataKey` — какое поле рисует Area. Добавлен в v8.48.0 вместе с проверкой, что
+     полоса построена на ГРАНИЦАХ интервала, а не на медиане. */
+  dataKey?: string;
 }
 
 function findElementsByType(
@@ -37,32 +41,32 @@ function findElementsByType(
   return out;
 }
 
-const FORECAST_ANNA: ForecastResult = {
+const FORECAST_ANNA: ForecastResult = makeForecast({
   current: { Bt: 265000, Rt: 39500, Lt: 0, Dt: 0.347 },
   horizon: 12,
   forecast: [
-    { period: 6, Rt: 400000, Rt_p10: 350000, Rt_p90: 450000 },
-    { period: 12, Rt: 813519, Rt_p10: 682866, Rt_p90: 952920 },
+    makeForecastPoint({ period: 6, Rt: 400000, Rt_p10: 350000, Rt_p90: 450000 }),
+    makeForecastPoint({ period: 12, Rt: 813519, Rt_p10: 682866, Rt_p90: 952920 }),
   ],
   r_bench: 0.139,
   real_r_bench: 0.139,
   r_bench_source: "cbr_keyrate_post_tax",
-};
+});
 
 // pavel — дефицит: p10/p90 ОБА отрицательные. Старый баг (Area без stackId,
 // fill=var(--c-bg)) на этом фикстуре случайно не проявлялся визуально —
 // проверка нужна именно на нём, не только на положительном anna.
-const FORECAST_PAVEL: ForecastResult = {
+const FORECAST_PAVEL: ForecastResult = makeForecast({
   current: { Bt: 50000, Rt: -63000, Lt: 0, Dt: 0.822 },
   horizon: 12,
   forecast: [
-    { period: 6, Rt: -350000, Rt_p10: -450000, Rt_p90: -280000 },
-    { period: 12, Rt: -709583, Rt_p10: -823544, Rt_p90: -587992 },
+    makeForecastPoint({ period: 6, Rt: -350000, Rt_p10: -450000, Rt_p90: -280000 }),
+    makeForecastPoint({ period: 12, Rt: -709583, Rt_p10: -823544, Rt_p90: -587992 }),
   ],
   r_bench: 0.139,
   real_r_bench: 0.139,
   r_bench_source: "cbr_keyrate_post_tax",
-};
+});
 
 describe("buildForecastChartData", () => {
   it.each([
@@ -153,6 +157,14 @@ describe("ForecastPanel — конфигурация полосы p10-p90", () =
       // Ровно одна невидимая база и одна видимая полоса.
       const fills = areas.map((a) => a.props.fill).sort();
       expect(fills).toEqual(["none", "var(--c-accent-bg)"]);
+
+      /* 🔴 И полоса построена на ГРАНИЦАХ интервала, а не на медиане. Проверка добавлена
+         в v8.48.0: мутация `dataKey="Rt_p10"` → `"Rt"` не роняла ни одного теста, то есть
+         коридор неопределённости мог схлопнуться в линию, и никто бы не заметил.
+         Прогноз без коридора читается как обещание точной суммы — ровно то, чего
+         вероятностный расчёт не даёт. */
+      const keys = areas.map((a) => a.props.dataKey).sort();
+      expect(keys).toEqual(["Rt_band", "Rt_p10"]);
     },
   );
 });
@@ -195,7 +207,7 @@ describe("ForecastPanel — сценарий «что если» и живая �
 
     const updated: ForecastResult = {
       ...FORECAST_ANNA,
-      forecast: [{ period: 12, Rt: 900000, Rt_p10: 800000, Rt_p90: 1000000 }],
+      forecast: [makeForecastPoint({ period: 12, Rt: 900000, Rt_p10: 800000, Rt_p90: 1000000 })],
     };
     rerender(
       <ForecastPanel

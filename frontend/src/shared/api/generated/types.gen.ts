@@ -281,6 +281,39 @@ export type AlternativeScores = {
 };
 
 /**
+ * AnalyticsOverview
+ *
+ * Сводка продуктовых метрик за период.
+ *
+ * 🔴 `event_counts` — свободное отображение «тип события → сколько раз», и это
+ * намеренно: ключи появляются вместе с новым логируемым действием в коде. Перечислить
+ * их полями значило бы править контракт при каждом таком действии и всё равно
+ * отставать — событие уже пишется, а схема о нём не знает.
+ */
+export type AnalyticsOverview = {
+    /**
+     * Active Users
+     */
+    active_users: number;
+    /**
+     * Event Counts
+     *
+     * Тип события → число за период.
+     */
+    event_counts: {
+        [key: string]: number;
+    };
+    /**
+     * Period Days
+     */
+    period_days: number;
+    /**
+     * Total Events
+     */
+    total_events: number;
+};
+
+/**
  * AnalyzePortrait
  *
  * Произвольный портрет для проверки на странице «Валидация» (загрузка/вставка JSON).
@@ -808,6 +841,33 @@ export type DebtSchedule = {
 };
 
 /**
+ * DeficitAlert
+ *
+ * Первый месяц, когда свободных денег не хватит (FR-08).
+ *
+ * 🔴 `pessimistic` различает две очень разные вещи: дефицит в основном прогнозе
+ * («так и будет, если ничего не менять») и дефицит только в пессимистичном сценарии
+ * («может случиться при неудачном стечении»). Показывать их одинаково значит либо
+ * пугать без повода, либо промолчать о реальной угрозе.
+ */
+export type DeficitAlert = {
+    /**
+     * Gap
+     *
+     * Насколько не хватит, рублей.
+     */
+    gap: number;
+    /**
+     * Period
+     */
+    period: number;
+    /**
+     * Pessimistic
+     */
+    pessimistic: boolean;
+};
+
+/**
  * DemoCase
  *
  * Один демо-портрет для карточки выбора.
@@ -1130,6 +1190,122 @@ export type ExplanationDelta = {
 };
 
 /**
+ * ForecastCurrent
+ *
+ * Показатели на сегодня — точка отсчёта прогноза.
+ */
+export type ForecastCurrent = {
+    /**
+     * Bt
+     *
+     * Ликвидный баланс.
+     */
+    Bt: number;
+    /**
+     * Dt
+     *
+     * Долговая нагрузка (ПДН), доля дохода.
+     */
+    Dt: number;
+    /**
+     * Lt
+     *
+     * Ликвидность в месяцах автономии.
+     */
+    Lt: number;
+    /**
+     * Rt
+     *
+     * Свободный ресурс: денежный поток минус платежи.
+     */
+    Rt: number;
+};
+
+/**
+ * ForecastMethod
+ *
+ * Чем считали — точку и интервал. Показывается в объяснении расчёта.
+ */
+export type ForecastMethod = {
+    /**
+     * Interval
+     */
+    interval: string;
+    /**
+     * Point
+     */
+    point: string;
+};
+
+/**
+ * ForecastPoint
+ *
+ * Один месяц прогноза.
+ *
+ * `Rt_p10`/`Rt_p50`/`Rt_p90` — границы интервала Монте-Карло: по ним рисуется коридор
+ * неопределённости. Без них график показывал бы одну линию как достоверную,
+ * а прогноз по определению вероятностный.
+ */
+export type ForecastPoint = {
+    /**
+     * Bt
+     */
+    Bt: number;
+    /**
+     * Dt
+     */
+    Dt: number;
+    /**
+     * Lt
+     */
+    Lt: number;
+    /**
+     * Rt
+     */
+    Rt: number;
+    /**
+     * Rt P10
+     *
+     * Пессимистичная граница (10-й процентиль).
+     */
+    Rt_p10: number;
+    /**
+     * Rt P50
+     *
+     * Медиана.
+     */
+    Rt_p50: number;
+    /**
+     * Rt P90
+     *
+     * Оптимистичная граница (90-й процентиль).
+     */
+    Rt_p90: number;
+    /**
+     * Cash Flow
+     */
+    cash_flow: number;
+    /**
+     * Expense
+     */
+    expense: number;
+    /**
+     * Income
+     */
+    income: number;
+    /**
+     * Obligations
+     */
+    obligations: number;
+    /**
+     * Period
+     *
+     * Номер месяца от текущего (1 — следующий).
+     */
+    period: number;
+};
+
+/**
  * ForecastRequest
  */
 export type ForecastRequest = {
@@ -1146,6 +1322,61 @@ export type ForecastRequest = {
 };
 
 /**
+ * ForecastResponse
+ *
+ * Ответ `/planning/forecast`.
+ *
+ * 🔴 Схема заведена в v8.48.0 — последний рукописный тип фронта. Эндпоинт был размечен
+ * `-> dict[str, Any]`, и `entities/plan-summary/model/types.ts` держал под него
+ * рукописный `ForecastResult`.
+ *
+ * При заведении схемы вскрылось, что рукописный тип знал НЕ ВСЕ поля: он описывал
+ * `current`, `horizon`, `forecast` и три поля ставки, а сервер отдаёт ещё
+ * `deficit_alert`, `trend`, `stable_baseline` и `method`. То есть фронт не знал
+ * о предупреждении про дефицит — самом важном, что прогноз умеет сказать.
+ * Это и есть довод за генерацию из контракта: рукописный тип показывает то,
+ * что помнил автор.
+ */
+export type ForecastResponse = {
+    current: ForecastCurrent;
+    deficit_alert?: DeficitAlert | null;
+    /**
+     * Forecast
+     */
+    forecast: Array<ForecastPoint>;
+    /**
+     * Horizon
+     */
+    horizon: number;
+    method: ForecastMethod;
+    /**
+     * R Bench
+     *
+     * ПРИМЕНЁННАЯ ставка: сценарий или реальная.
+     */
+    r_bench: number;
+    /**
+     * R Bench Source
+     *
+     * "request" — сценарий, иначе источник реальной.
+     */
+    r_bench_source: string;
+    /**
+     * Real R Bench
+     *
+     * Настоящая ставка ВСЕГДА, даже при сценарии — для кнопки «вернуть».
+     */
+    real_r_bench: number;
+    stable_baseline: StableBaseline;
+    /**
+     * Trend
+     *
+     * improving | declining | stable.
+     */
+    trend: string;
+};
+
+/**
  * ForgotPasswordRequest
  */
 export type ForgotPasswordRequest = {
@@ -1153,6 +1384,54 @@ export type ForgotPasswordRequest = {
      * Email
      */
     email: string;
+};
+
+/**
+ * FunnelResponse
+ *
+ * Воронка завершения шагов онбординга.
+ *
+ * 🔴 `period_days` в ответе, а не только в запросе: экран обязан подписать, за какое
+ * окно посчитано. До v8.48.0 воронка молча считалась за всю историю, а подпись
+ * над ней говорила «за 30 дней».
+ *
+ * Это **воронка завершения**, а не временная последовательность: на каждом шаге —
+ * люди, прошедшие все предыдущие шаги, независимо от порядка во времени
+ * (`app/services/analytics.py::funnel`).
+ */
+export type FunnelResponse = {
+    /**
+     * Period Days
+     */
+    period_days: number;
+    /**
+     * Steps
+     */
+    steps: Array<FunnelStep>;
+};
+
+/**
+ * FunnelStep
+ *
+ * Шаг воронки: сколько людей до него дошло.
+ */
+export type FunnelStep = {
+    /**
+     * Conversion Pct
+     *
+     * Доля от первого шага, проценты.
+     */
+    conversion_pct: number;
+    /**
+     * Step
+     *
+     * Тип события (`login_success`, `goal_created`, …).
+     */
+    step: string;
+    /**
+     * Users
+     */
+    users: number;
 };
 
 /**
@@ -2916,6 +3195,41 @@ export type SnapshotDto = {
 };
 
 /**
+ * StableBaseline
+ *
+ * Какая часть потока регулярна — мера доверия к прогнозу.
+ *
+ * При доходе из разовых поступлений прогноз строится на шуме, и человеку важно знать
+ * это раньше, чем он примет по нему решение.
+ */
+export type StableBaseline = {
+    /**
+     * Expense Share
+     *
+     * Доля регулярного в расходе, 0..1.
+     */
+    expense_share: number;
+    /**
+     * Income Share
+     *
+     * Доля регулярного в доходе, 0..1.
+     */
+    income_share: number;
+    /**
+     * Recurring Cash Flow
+     */
+    recurring_cash_flow: number;
+    /**
+     * Recurring Expense
+     */
+    recurring_expense: number;
+    /**
+     * Recurring Income
+     */
+    recurring_income: number;
+};
+
+/**
  * StatementUploadResult
  *
  * Результат импорта выписки.
@@ -3237,6 +3551,10 @@ export type UserResponse = {
      * Id
      */
     id: string;
+    /**
+     * Is Owner
+     */
+    is_owner?: boolean;
 };
 
 /**
@@ -3720,6 +4038,12 @@ export type FunnelEndpointApiAnalyticsFunnelGetData = {
          * Список event_type через запятую
          */
         steps?: string | null;
+        /**
+         * Days
+         *
+         * Окно, дней — как у /overview.
+         */
+        days?: number;
     };
     url: '/api/analytics/funnel';
 };
@@ -3735,13 +4059,9 @@ export type FunnelEndpointApiAnalyticsFunnelGetError = FunnelEndpointApiAnalytic
 
 export type FunnelEndpointApiAnalyticsFunnelGetResponses = {
     /**
-     * Response Funnel Endpoint Api Analytics Funnel Get
-     *
      * Successful Response
      */
-    200: {
-        [key: string]: unknown;
-    };
+    200: FunnelResponse;
 };
 
 export type FunnelEndpointApiAnalyticsFunnelGetResponse = FunnelEndpointApiAnalyticsFunnelGetResponses[keyof FunnelEndpointApiAnalyticsFunnelGetResponses];
@@ -3775,13 +4095,9 @@ export type OverviewApiAnalyticsOverviewGetError = OverviewApiAnalyticsOverviewG
 
 export type OverviewApiAnalyticsOverviewGetResponses = {
     /**
-     * Response Overview Api Analytics Overview Get
-     *
      * Successful Response
      */
-    200: {
-        [key: string]: unknown;
-    };
+    200: AnalyticsOverview;
 };
 
 export type OverviewApiAnalyticsOverviewGetResponse = OverviewApiAnalyticsOverviewGetResponses[keyof OverviewApiAnalyticsOverviewGetResponses];
@@ -6065,13 +6381,9 @@ export type GetForecastApiPlanningForecastPostError = GetForecastApiPlanningFore
 
 export type GetForecastApiPlanningForecastPostResponses = {
     /**
-     * Response Get Forecast Api Planning Forecast Post
-     *
      * Successful Response
      */
-    200: {
-        [key: string]: unknown;
-    };
+    200: ForecastResponse;
 };
 
 export type GetForecastApiPlanningForecastPostResponse = GetForecastApiPlanningForecastPostResponses[keyof GetForecastApiPlanningForecastPostResponses];
@@ -6775,22 +7087,6 @@ export type PatchPrefsApiUserPrefsPatchResponses = {
 
 export type PatchPrefsApiUserPrefsPatchResponse = PatchPrefsApiUserPrefsPatchResponses[keyof PatchPrefsApiUserPrefsPatchResponses];
 
-export type ReadContactsContactsGetData = {
-    body?: never;
-    path?: never;
-    query?: never;
-    url: '/contacts';
-};
-
-export type ReadContactsContactsGetResponses = {
-    /**
-     * Successful Response
-     */
-    200: string;
-};
-
-export type ReadContactsContactsGetResponse = ReadContactsContactsGetResponses[keyof ReadContactsContactsGetResponses];
-
 export type AnalyzeV1AnalyzePostData = {
     body: SnapshotDto;
     headers?: {
@@ -6821,19 +7117,3 @@ export type AnalyzeV1AnalyzePostResponses = {
 };
 
 export type AnalyzeV1AnalyzePostResponse = AnalyzeV1AnalyzePostResponses[keyof AnalyzeV1AnalyzePostResponses];
-
-export type ReadValidationValidationGetData = {
-    body?: never;
-    path?: never;
-    query?: never;
-    url: '/validation';
-};
-
-export type ReadValidationValidationGetResponses = {
-    /**
-     * Successful Response
-     */
-    200: string;
-};
-
-export type ReadValidationValidationGetResponse = ReadValidationValidationGetResponses[keyof ReadValidationValidationGetResponses];

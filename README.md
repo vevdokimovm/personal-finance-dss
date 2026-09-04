@@ -1,13 +1,13 @@
 # FINPILOT — СППР для персональных финансов
 
 <!-- STATUS -->
-> **Сейчас:** `v8.47.0` · 2026-09-04 · Jinja снесена целиком — у продукта один
-> интерфейс, React.
+> **Сейчас:** `v8.48.0` · 2026-09-04 · веха 8 закрыта: последний рукописный тип
+> убран, у владельца появился экран метрик продукта.
 > Где стоим — [`WATCHLOG.md`](WATCHLOG.md) §0.
 <!-- /STATUS -->
 
 [![CI](https://github.com/vevdokimovm/personal-finance-dss/actions/workflows/ci.yml/badge.svg)](https://github.com/vevdokimovm/personal-finance-dss/actions/workflows/ci.yml)
-![version](https://img.shields.io/badge/version-8.47.0-blue)
+![version](https://img.shields.io/badge/version-8.48.0-blue)
 ![python](https://img.shields.io/badge/python-3.13-blue)
 ![coverage](https://img.shields.io/badge/coverage-gate%2090%25-brightgreen)
 ![tests](https://img.shields.io/badge/tests-1762%20%2B%20454-brightgreen)
@@ -31,7 +31,7 @@
 
 ---
 
-## Текущее состояние (v8.47.0, сентябрь 2026)
+## Текущее состояние (v8.48.0, сентябрь 2026)
 
 | | |
 |---|---|

@@ -1,7 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { useProfile } from "@entities/profile";
 import { t } from "@shared/lib/i18n/t";
-import { APP_NAV_ITEMS } from "./navItems";
+import { APP_NAV_ITEMS, OWNER_NAV_ITEMS } from "./navItems";
 import "./AppNav.css";
 
 /**
@@ -32,7 +32,12 @@ export function AppNav() {
   return (
     <nav className="fp-app-nav" aria-label={t("Основные разделы")}>
       <ul className="fp-app-nav__list">
-        {APP_NAV_ITEMS.map(({ to, label }) => (
+        {/* Разделы владельца — в конце и только ему: остальным сервер отдаёт 403,
+            и пункт меню вёл бы в гарантированный отказ ([IA-04]). */}
+        {[
+          ...APP_NAV_ITEMS,
+          ...(data.is_owner === true ? OWNER_NAV_ITEMS : []),
+        ].map(({ to, label }) => (
           <li key={to}>
             <Link
               to={to}

@@ -4,6 +4,7 @@ import userEvent from "@testing-library/user-event";
 import type { UseQueryResult } from "@tanstack/react-query";
 import { DashboardPage } from "./DashboardPage";
 import type { CalculatePlanResult, ForecastResult } from "@entities/plan-summary";
+import { makeForecast, makeForecastPoint } from "@shared/lib/test/forecastFixtures";
 
 const { useProfileMock, usePlanMock, useForecastMock } = vi.hoisted(() => ({
   useProfileMock: vi.fn(),
@@ -122,14 +123,14 @@ const PLAN_ANNA: CalculatePlanResult = {
   },
 };
 
-const FORECAST_ANNA: ForecastResult = {
+const FORECAST_ANNA: ForecastResult = makeForecast({
   current: { Bt: 265000, Rt: 39500, Lt: 0, Dt: 0.347 },
   horizon: 12,
-  forecast: [{ period: 12, Rt: 813519, Rt_p10: 682866, Rt_p90: 952920 }],
+  forecast: [makeForecastPoint({ period: 12, Rt: 813519, Rt_p10: 682866, Rt_p90: 952920 })],
   r_bench: 0.139,
   real_r_bench: 0.139,
   r_bench_source: "cbr_keyrate_post_tax",
-};
+});
 
 /* Профиль по умолчанию — ВОШЕДШИЙ пользователь: гостевую ветку включает тот тест,
    которому она нужна. Сбрасывается перед каждым тестом, иначе состояние протекает

@@ -1,0 +1,159 @@
+/* Метрики продукта: экран владельца. Плотная сетка чисел — здесь смотрят и сравнивают,
+   а не читают, поэтому воздуха меньше, чем на пользовательских экранах. */
+
+.fp-insights {
+  max-width: var(--content-max);
+  margin: 0 auto;
+  padding: var(--sp-6) var(--sp-5) var(--sp-8);
+}
+
+.fp-insights h1 {
+  font-size: var(--fs-xl);
+  margin: 0 0 var(--sp-3);
+}
+
+.fp-insights h2 {
+  font-size: var(--fs-lg);
+  margin: var(--sp-6) 0 var(--sp-3);
+}
+
+.fp-insights__summary,
+.fp-insights__events {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(var(--plan-history-metric-w), 100%), 1fr));
+  gap: var(--sp-4);
+  margin: var(--sp-5) 0 0;
+}
+
+.fp-insights__summary dt,
+.fp-insights__events dt {
+  color: var(--c-text3);
+  font-size: var(--fs-sm);
+}
+
+.fp-insights__summary dd {
+  margin: 0;
+  font-size: var(--fs-2xl);
+  /* Табличные цифры: колонка чисел — ровно тот случай, для которого они и нужны. */
+  font-variant-numeric: tabular-nums;
+}
+
+.fp-insights__events dd {
+  margin: 0;
+  font-size: var(--fs-md);
+  font-variant-numeric: tabular-nums;
+}
+
+.fp-insights__funnel {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: var(--sp-3);
+}
+
+/* Шаг воронки: подпись, полоса, число. Полоса — вспомогательная, значение всегда
+   продублировано текстом: по одной длине полосы точное число не прочитать,
+   а разницу между шагами глазом видно именно по ней. */
+.fp-insights__funnel li {
+  display: grid;
+  /* 🔴 На узком экране строка перестраивается в две, а не сжимается. `min(…, 100%)`
+     задачу НЕ решал: проценты в `minmax()` резолвятся от ширины контейнера, поэтому
+     `min(220px, 272px)` = 220px, и пол строки оставался ≈375px против 272px контента
+     на экране 320px — прокрутка всей страницы (WCAG 1.4.10, design-critic поймал это
+     после того, как первая правка объявила проблему закрытой). */
+  grid-template-columns: 1fr auto;
+  grid-template-areas:
+    "step value"
+    "bar  bar";
+  align-items: center;
+  gap: var(--sp-3);
+}
+
+.fp-insights__step {
+  grid-area: step;
+  font-size: var(--fs-sm);
+}
+
+/* Широкий экран: подпись, полоса и значение в одну строку — так глазом видно разницу
+   между шагами. Брейкпоинт — литералом: CSS не подставляет переменные в @media
+   (ограничение языка, см. tokens.css). */
+@media (min-width: 700px) {
+  .fp-insights__funnel li {
+    grid-template-columns: minmax(var(--plan-history-note-w), 1fr) 2fr auto;
+    grid-template-areas: "step bar value";
+  }
+}
+
+.fp-insights__bar {
+  grid-area: bar;
+  display: block;
+  height: calc(var(--border-w) * 12);
+  background: var(--c-surface-up);
+  /* Граница дорожки: без неё правый край (условные 100%) сливается с фоном — контраст
+     `--c-surface-up` к `--c-bg` около 1.1:1 в обеих темах. Полоса заявлена как способ
+     «увидеть разницу глазом», и без видимого максимума сравнивать не с чем
+     (a11y-auditor). */
+  border: var(--border-w) solid var(--c-border-hl);
+  border-radius: var(--r-full);
+  overflow: hidden;
+}
+
+/* Нейтральная заливка по умолчанию: акцент на каждой строке не выделяет ничего
+   (бриф §1.1). Акцентным красится только худший шаг — ниже. */
+.fp-insights__bar > span {
+  display: block;
+  height: 100%;
+  background: var(--c-text3);
+}
+
+/* Худший шаг: цвет НЕ единственный признак — рядом стоит блок «Больше всего теряем
+   здесь» с тем же названием текстом (A11Y-07). */
+.fp-insights__funnel li.is-worst .fp-insights__bar > span {
+  background: var(--c-amber);
+}
+
+.fp-insights__funnel li.is-worst .fp-insights__step {
+  font-weight: 600;
+}
+
+/* Ответ экрана: где теряем. Самый крупный элемент — он, а не «событий всего». */
+.fp-insights__answer {
+  margin: var(--sp-5) 0 var(--sp-6);
+  padding: var(--sp-4) var(--sp-5);
+  background: var(--c-surface);
+  border: var(--border-w) solid var(--c-border-hl);
+  border-radius: var(--r-md);
+}
+
+.fp-insights__answer h2 {
+  margin: 0;
+  font-size: var(--fs-sm);
+  color: var(--c-text3);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-eyebrow);
+}
+
+.fp-insights__worst {
+  margin: var(--sp-2) 0 0;
+  font-size: var(--fs-xl);
+}
+
+.fp-insights__worst-note {
+  margin: var(--sp-1) 0 0;
+  color: var(--c-text2);
+  font-size: var(--fs-sm);
+}
+
+.fp-insights__value {
+  grid-area: value;
+  font-size: var(--fs-sm);
+  color: var(--c-text2);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.fp-insights__note {
+  color: var(--c-text2);
+  font-size: var(--fs-sm);
+}

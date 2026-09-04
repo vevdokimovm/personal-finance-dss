@@ -24,27 +24,6 @@ __all__ = [
 ]
 
 
-def require_admin(x_admin_key: Optional[str] = Header(None, alias="X-Admin-Key")) -> None:
-    """Защита админ-эндпоинтов (аналитика, cron-триггеры).
-
-    В production ADMIN_API_KEY обязателен (старт упадёт при отсутствии — fail-loud), и эндпоинт
-    требует совпадающий заголовок X-Admin-Key. В development при пустом ключе доступ открыт —
-    чтобы не мешать локальной разработке и тестам.
-    """
-    expected = settings.ADMIN_API_KEY
-    if not expected:
-        if settings.is_production:
-            raise HTTPException(
-                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-                detail="Админ-доступ не сконфигурирован (ADMIN_API_KEY).",
-            )
-        return
-    if not x_admin_key or not secrets.compare_digest(x_admin_key, expected):
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN, detail="Недействительный админ-ключ."
-        )
-
-
 def _extract_token(request: Request) -> Optional[str]:
     """JWT из заголовка Authorization: Bearer (приоритет) либо из httpOnly-cookie.
 
@@ -150,3 +129,42 @@ def get_current_scope(
         user_id=user_id,
         household_ids=tuple(get_user_household_ids(db, user_id)),
     )
+
+
+def require_admin(
+    x_admin_key: Optional[str] = Header(None, alias="X-Admin-Key"),
+    current_user: Optional[User] = Depends(get_current_user),
+) -> None:
+    """Защита админ-эндпоинтов (аналитика, A/B-эксперименты, cron-триггеры).
+
+    Два независимых способа пройти, и оба нужны:
+
+    1. **Владелец продукта по входу** (`user.is_owner`) — чтобы смотреть аналитику
+       в интерфейсе, а не через `curl`. Решение владельца 04.09.2026; альтернативой
+       был ключ в браузере, но его пришлось бы хранить в `localStorage` — секрет
+       за пределами `.env`, доступный любому скрипту страницы.
+    2. **`X-Admin-Key`** — для скриптов и cron: у них нет аккаунта, и заменить ключ
+       признаком владельца значило бы сломать автоматизацию.
+
+    В production ADMIN_API_KEY обязателен (старт упадёт при отсутствии — fail-loud).
+    В development при пустом ключе доступ открыт — чтобы не мешать локальной разработке
+    и тестам. 🔴 Из-за этой ветки тесты разграничения обязаны задавать ключ явно, иначе
+    они зелены по причине, не имеющей отношения к утверждению
+    (`tests/test_owner_access.py`).
+    """
+    # Владелец первым: у него может не быть ключа вовсе, и это нормальный путь.
+    if current_user is not None and getattr(current_user, "is_owner", False):
+        return
+
+    expected = settings.ADMIN_API_KEY
+    if not expected:
+        if settings.is_production:
+            raise HTTPException(
+                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+                detail="Админ-доступ не сконфигурирован (ADMIN_API_KEY).",
+            )
+        return
+    if not x_admin_key or not secrets.compare_digest(x_admin_key, expected):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, detail="Недействительный админ-ключ."
+        )

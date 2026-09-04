@@ -45,6 +45,12 @@ class UserResponse(BaseModel):
     display_name: Optional[str] = None
     created_at: Optional[datetime] = None
     email_verified: bool = False
+    # Владелец продукта: по нему интерфейс решает, показывать ли раздел аналитики.
+    # Без поля в ответе у фронта два плохих выхода — показать пункт всем и упереться
+    # в 403 (кнопка в отказ, [IA-04]) либо не показывать никому, и признак бесполезен.
+    # Не секрет: говорит лишь о том, что у ЭТОГО аккаунта есть доступ, и виден только
+    # ему самому в ответе о себе.
+    is_owner: bool = False
 
 
 class UpdateProfileRequest(BaseModel):

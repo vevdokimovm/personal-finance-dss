@@ -48,6 +48,11 @@ class User(Base):
     referral_code: Mapped[Optional[str]] = mapped_column(
         String(12), nullable=True, unique=True, index=True
     )
+    # Владелец продукта: видит аналитику и A/B-эксперименты по входу, без ADMIN_API_KEY.
+    # 🔴 Раздаётся ВРУЧНУЮ и только через базу — регистрации этого признака не дают.
+    # Решение владельца 04.09.2026: альтернативой был ключ в браузере, но его пришлось бы
+    # хранить в localStorage (секрет за пределами .env, доступен любому скрипту страницы).
+    is_owner: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
     referred_by_code: Mapped[Optional[str]] = mapped_column(String(12), nullable=True, index=True)
     # Telegram-привязка (P3.6): chat_id привязанного бота, уникален (один чат — один аккаунт).
     telegram_chat_id: Mapped[Optional[str]] = mapped_column(

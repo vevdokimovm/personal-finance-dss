@@ -1,0 +1,4 @@
+# file: /Users/vasyaevdokimov/repos/personal-finance-dss/app/services/notifications.py
+# hypothesis_version: 6.155.7
+
+[0.0, '%Y-%m', '/budgets', '/goals', '/planning', 'active_goals', 'budget_overrun', 'category', 'digest', 'expense', 'goal_deadline', 'income', 'limit_amount', 'net', 'over', 'period', 'spent', 'telegram_chat_id', 'top_expense_category', 'transactions', 'users', 'Месячный отчёт готов', 'Превышен бюджет', 'Прочее']
