@@ -21,6 +21,7 @@
   "license": "UNLICENSED",
   "description": "FINPILOT SPA (веха 8) — Vite + React 19 + TypeScript.",
   "dependencies": {
+    "@fontsource-variable/manrope": "^5.3.0",
     "@radix-ui/react-dialog": "^1.1.23",
     "@radix-ui/react-label": "^2.1.15",
     "@radix-ui/react-popover": "^1.1.23",
