@@ -614,6 +614,53 @@ export type ClosedGoal = {
 };
 
 /**
+ * ConsentState
+ *
+ * Состояние одного согласия.
+ *
+ * `withdrawable` — не удобство, а требование: по нему интерфейс решает, показывать ли
+ * кнопку отзыва. Согласие-основание (обработка ПДн) отозвать нельзя иначе как удалением
+ * аккаунта — кнопка там гарантированно дала бы 409, то есть тупик ([IA-04]).
+ */
+export type ConsentState = {
+    /**
+     * Granted
+     */
+    granted: boolean;
+    /**
+     * Granted At
+     */
+    granted_at?: string | null;
+    /**
+     * Version
+     */
+    version: string;
+    /**
+     * Withdrawable
+     */
+    withdrawable: boolean;
+};
+
+/**
+ * ConsentsResponse
+ *
+ * Ответ `/consents`: состояние по ВСЕМ известным типам, включая невыданные.
+ *
+ * Схема заведена ДО фронта (v8.41.0): раньше эндпоинт был размечен `-> dict`. Цена
+ * рукописного типа здесь максимальна из всех — по этому ответу строится экран выдачи
+ * и отзыва согласий (L3), а невозможность отозвать согласие это нарушение 152-ФЗ,
+ * а не дефект интерфейса.
+ */
+export type ConsentsResponse = {
+    /**
+     * Consents
+     */
+    consents: {
+        [key: string]: ConsentState;
+    };
+};
+
+/**
  * ConvertRequest
  */
 export type ConvertRequest = {
@@ -4159,13 +4206,9 @@ export type GetConsentsApiConsentsGetData = {
 
 export type GetConsentsApiConsentsGetResponses = {
     /**
-     * Response Get Consents Api Consents Get
-     *
      * Successful Response
      */
-    200: {
-        [key: string]: unknown;
-    };
+    200: ConsentsResponse;
 };
 
 export type GetConsentsApiConsentsGetResponse = GetConsentsApiConsentsGetResponses[keyof GetConsentsApiConsentsGetResponses];

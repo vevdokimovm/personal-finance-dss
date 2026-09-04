@@ -47,3 +47,68 @@ test("сетевая ошибка (500) — состояние ошибки, п�
   await page.getByRole("button", { name: "Повторить" }).click();
   await expect(page.getByText("Анна")).toBeVisible();
 });
+
+/* Экран согласий — требование L3 (v8.41.0). Юнит-тесты проверяют логику списка;
+   браузер показывает, что все три согласия действительно доезжают до страницы. */
+test("экран согласий показывает все типы и различает отзываемые (L3)", async ({ page }) => {
+  await page.route("**/api/auth/me", (route) => route.fulfill({ json: PROFILE }));
+  await page.route("**/api/notifications/unread-count", (route) =>
+    route.fulfill({ json: { unread_count: 0 } }),
+  );
+  await page.route("**/api/referral/me", (route) =>
+    route.fulfill({
+      json: {
+        referral_code: "ABC123",
+        invite_url: "https://finpilot.ru/register?ref=ABC123",
+        invited_count: 0,
+        referred_by: null,
+        milestones: [],
+        next_milestone: null,
+      },
+    }),
+  );
+  await page.route("**/api/consents", (route) =>
+    route.fulfill({
+      json: {
+        consents: {
+          personal_data: {
+            granted: true,
+            version: "1.0",
+            granted_at: "2026-01-15T10:00:00",
+            withdrawable: false,
+          },
+          financial_data: {
+            granted: false,
+            version: "1.0",
+            granted_at: null,
+            withdrawable: true,
+          },
+          marketing: {
+            granted: true,
+            version: "1.0",
+            granted_at: "2026-02-01T10:00:00",
+            withdrawable: true,
+          },
+        },
+      },
+    }),
+  );
+
+  await page.goto("/profile");
+
+  const main = page.locator("#fp-main");
+  // 🔴 До v8.41.0 экран знал ОДНО согласие из трёх: отозвать маркетинговое было нельзя.
+  await expect(main.getByText("Персональные данные")).toBeVisible();
+  await expect(main.getByText("Финансовые данные")).toBeVisible();
+  await expect(main.getByText("Рекламная рассылка")).toBeVisible();
+
+  // Отзываемое — с кнопкой; согласие-основание — с объяснением вместо кнопки,
+  // которая гарантированно дала бы 409.
+  await expect(
+    main.getByRole("button", { name: /Отозвать согласие: Рекламная/ }),
+  ).toBeVisible();
+  await expect(
+    main.getByRole("button", { name: /Отозвать согласие: Персональные/ }),
+  ).toHaveCount(0);
+  await expect(main.getByText(/нельзя отозвать без удаления аккаунта/)).toBeVisible();
+});

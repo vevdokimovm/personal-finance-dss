@@ -102,3 +102,33 @@
 .fp-consent-doc-link a:hover {
   color: var(--c-text);
 }
+
+/* Список согласий (L3). Три согласия вместо одного зашитого — значит это список,
+   а не пара строк: у каждого свой статус, документ и действие. */
+.fp-consents__lede {
+  margin: 0 0 var(--sp-4);
+  max-width: var(--measure-w);
+  color: var(--c-text2);
+  font-size: var(--fs-sm);
+}
+
+.fp-consents {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.fp-consents__item + .fp-consents__item {
+  padding-top: var(--sp-4);
+  border-top: var(--border-w) solid var(--c-border);
+}
+
+/* Редакция рядом со ссылкой: согласие даётся на конкретный текст, и человек должен
+   видеть, на какой именно оно было дано. */
+.fp-consents__version {
+  color: var(--c-text2);
+  font-size: var(--fs-xs);
+}

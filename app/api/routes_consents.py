@@ -24,11 +24,41 @@ from app.services.consent import (
 router = APIRouter(tags=["Согласия и право"])
 
 
+class ConsentState(BaseModel):
+    """Состояние одного согласия.
+
+    `withdrawable` — не удобство, а требование: по нему интерфейс решает, показывать ли
+    кнопку отзыва. Согласие-основание (обработка ПДн) отозвать нельзя иначе как удалением
+    аккаунта — кнопка там гарантированно дала бы 409, то есть тупик ([IA-04]).
+    """
+
+    granted: bool
+    version: str
+    granted_at: str | None = None
+    withdrawable: bool
+
+
+class ConsentsResponse(BaseModel):
+    """Ответ `/consents`: состояние по ВСЕМ известным типам, включая невыданные.
+
+    Схема заведена ДО фронта (v8.41.0): раньше эндпоинт был размечен `-> dict`. Цена
+    рукописного типа здесь максимальна из всех — по этому ответу строится экран выдачи
+    и отзыва согласий (L3), а невозможность отозвать согласие это нарушение 152-ФЗ,
+    а не дефект интерфейса.
+    """
+
+    consents: dict[str, ConsentState]
+
+
 @router.get("/consents", summary="Состояние согласий пользователя")
 def get_consents(user: User = Depends(require_user),
-                 db: Session = Depends(get_db)) -> dict:
+                 db: Session = Depends(get_db)) -> ConsentsResponse:
     """Все известные типы, включая невыданные: фронт должен знать, что спросить."""
-    return {"consents": consent_state(db, user.id)}
+    return ConsentsResponse(
+        consents={
+            key: ConsentState(**value) for key, value in consent_state(db, user.id).items()
+        }
+    )
 
 
 @router.post("/consents/{consent_type}", summary="Выдать согласие")

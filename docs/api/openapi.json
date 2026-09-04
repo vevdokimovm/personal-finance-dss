@@ -996,6 +996,58 @@
         "title": "ClosedGoal",
         "type": "object"
       },
+      "ConsentState": {
+        "description": "Состояние одного согласия.\n\n`withdrawable` — не удобство, а требование: по нему интерфейс решает, показывать ли\nкнопку отзыва. Согласие-основание (обработка ПДн) отозвать нельзя иначе как удалением\nаккаунта — кнопка там гарантированно дала бы 409, то есть тупик ([IA-04]).",
+        "properties": {
+          "granted": {
+            "title": "Granted",
+            "type": "boolean"
+          },
+          "granted_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Granted At"
+          },
+          "version": {
+            "title": "Version",
+            "type": "string"
+          },
+          "withdrawable": {
+            "title": "Withdrawable",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "granted",
+          "version",
+          "withdrawable"
+        ],
+        "title": "ConsentState",
+        "type": "object"
+      },
+      "ConsentsResponse": {
+        "description": "Ответ `/consents`: состояние по ВСЕМ известным типам, включая невыданные.\n\nСхема заведена ДО фронта (v8.41.0): раньше эндпоинт был размечен `-> dict`. Цена\nрукописного типа здесь максимальна из всех — по этому ответу строится экран выдачи\nи отзыва согласий (L3), а невозможность отозвать согласие это нарушение 152-ФЗ,\nа не дефект интерфейса.",
+        "properties": {
+          "consents": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/ConsentState"
+            },
+            "title": "Consents",
+            "type": "object"
+          }
+        },
+        "required": [
+          "consents"
+        ],
+        "title": "ConsentsResponse",
+        "type": "object"
+      },
       "ConvertRequest": {
         "properties": {
           "amount": {
@@ -5007,7 +5059,7 @@
   },
   "info": {
     "title": "FINPILOT",
-    "version": "8.39.0"
+    "version": "8.40.0"
   },
   "openapi": "3.1.0",
   "paths": {
@@ -6576,9 +6628,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response Get Consents Api Consents Get",
-                  "type": "object"
+                  "$ref": "#/components/schemas/ConsentsResponse"
                 }
               }
             },
