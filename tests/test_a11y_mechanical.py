@@ -14,19 +14,19 @@ from collections import defaultdict
 import pytest
 from bs4 import BeautifulSoup, Tag
 
+# 🔴 Только SSR-страницы. Экраны вехи 8 (`/dashboard`, `/planning`, `/transactions`,
+# `/obligations`, `/goals`, `/banks`, `/legal/*`) с v8.45.0 отдаёт React, и сервер
+# присылает пустой shell: разметка строится в браузере, поэтому разбирать ответ здесь
+# нечего — проверка была бы зелёной или красной по причинам, не связанным с
+# доступностью.
+#
+# Это НЕ потеря покрытия. Те же инварианты для React проверяются там, где разметка
+# существует: `a11y-auditor` на каждом экране перед закрытием, юнит-тесты компонентов
+# (роли, доступные имена, уровни заголовков) и Playwright в трёх браузерах. Механический
+# разбор HTML остаётся для страниц, которые сервер действительно рендерит.
 PAGES: list[str] = [
-    "/dashboard",
-    "/planning",
-    "/transactions",
-    "/obligations",
-    "/goals",
-    "/banks",
     "/validation",
     "/contacts",
-    "/legal/privacy",
-    "/legal/terms",
-    "/legal/consent",
-    "/legal/financial-consent",
 ]
 
 _NO_NAME_INPUT_TYPES = {"hidden", "submit", "button", "reset", "image"}

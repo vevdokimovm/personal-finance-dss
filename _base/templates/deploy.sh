@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # =============================================================================
-# deploy.sh v4.25.0 — ЕДИНЫЙ деплойер репозиториев. Один скрипт на всю систему.
+# deploy.sh v4.26.0 — ЕДИНЫЙ деплойер репозиториев. Один скрипт на всю систему.
 #
 # ┌───────────────────────────────────────────────────────────────────────────┐
 # │ ЖЕЛЕЗНОЕ ПРАВИЛО: ВТОРОГО СКРИПТА НЕ ЗАВОДИТСЯ. НИКОГДА.                   │
@@ -131,7 +131,7 @@ ASSET="${ASSET:-1}"
 # висеть перед тем, как механизм вообще успеет заметить проблему.
 CLONE_LOW_SPEED_LIMIT="${CLONE_LOW_SPEED_LIMIT:-51200}"  # байт/с — ниже считаем зависанием
 CLONE_LOW_SPEED_TIME="${CLONE_LOW_SPEED_TIME:-15}"        # столько секунд подряд ниже лимита → обрыв
-SCRIPT_VERSION="4.25.0"
+SCRIPT_VERSION="4.26.0"
 # Накопители по релизам. Объявлены здесь, а не в блоке 2Б: ветка REPAIR (шаг 2А)
 # вызывает ensure_release раньше, и под `set -u` обращение к необъявленной ASSET_OK
 # роняло весь прогон уже ПОСЛЕ создания релиза — работа сделана, а код возврата ошибка.
@@ -166,7 +166,44 @@ CHLOG_FILL="${CHLOG_FILL:-0}"  # 1 = дописать секции и разря
 # Сверить список с реальностью:
 #   gh repo list vevdokimovm --limit 200 --json name,visibility \
 #     --jq '.[]|select(.visibility=="PUBLIC")|.name'
-MIRRORS="${MIRRORS:-finpilot finpilot-mirror finpilot-public-mirror vk-graph health-report-generator bron-kerbosch algorithms-site game-analytics-engine claude-usage salvation}"
+# ── deploy-repos.conf — список зеркал БЕЗ выпуска новой версии скрипта ───────
+# Заказ: `ROADMAP` §P2, «списки в теле deploy.sh». Исходная формулировка
+# («перенести списки в данные») отвергнута: файл данных сломал бы главное
+# свойство деплойера — самодостаточность. Он лежит в ПЯТИ местах, владелец
+# запускает копию из `~/Developer`, и внешний конфиг туда бы не поехал —
+# копия молча осталась бы без зеркал, то есть начала считать зеркало
+# обычной репой и залила бы в витрину `_base/`.
+#
+# 🔴 Поэтому конфиг НЕОБЯЗАТЕЛЕН и лежит РЯДОМ со скриптом. Нет файла —
+# работает ровно как раньше, на встроенном умолчании. Порядок старшинства:
+#
+#     переменная окружения  >  deploy-repos.conf  >  встроенное умолчание
+#
+# Окружение старше конфига намеренно: разовый прогон `MIRRORS="a b" ./deploy.sh`
+# обязан перебивать постоянную настройку, а не наоборот.
+#
+# Формат — по одному `КЛЮЧ=значение` в строке, `#` в начале строки — комментарий.
+# Единственный ключ сейчас — `MIRRORS`. Файл НЕ исполняется: он разбирается
+# построчно, поэтому положить в него команду нельзя.
+CONF_MIRRORS=""
+DEPLOY_CONF="${DEPLOY_CONF:-$SELF_DIR/deploy-repos.conf}"
+if [ -f "$DEPLOY_CONF" ]; then
+  while IFS= read -r _cline || [ -n "$_cline" ]; do
+    case "$_cline" in ''|'#'*) continue ;; esac
+    case "$_cline" in *=*) : ;; *) continue ;; esac
+    _ckey="${_cline%%=*}"
+    _cval="${_cline#*=}"
+    _ckey="$(printf '%s' "$_ckey" | tr -d ' \t')"
+    _cval="$(printf '%s' "$_cval" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' \
+                                        -e 's/^"\(.*\)"$/\1/' -e "s/^'\(.*\)'\$/\1/")"
+    case "$_ckey" in
+      MIRRORS) CONF_MIRRORS="$_cval" ;;
+      *) echo "⚠ ${DEPLOY_CONF}: неизвестный ключ «${_ckey}» — пропущен" >&2 ;;
+    esac
+  done < "$DEPLOY_CONF"
+  [ -n "$CONF_MIRRORS" ] && echo "· зеркала взяты из $DEPLOY_CONF"
+fi
+MIRRORS="${MIRRORS:-${CONF_MIRRORS:-finpilot finpilot-mirror finpilot-public-mirror vk-graph health-report-generator bron-kerbosch algorithms-site game-analytics-engine claude-usage salvation}}"
 MIRRORS_ONLY="${MIRRORS_ONLY:-0}"
 if [ "$MIRRORS_ONLY" = "1" ]; then
   if [ -n "${ONLY:-}" ]; then

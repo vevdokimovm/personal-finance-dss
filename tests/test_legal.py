@@ -1,9 +1,16 @@
-"""Юридический блок (P1.1): публикация документов, footer, контакты, связка согласия.
+"""Юридический блок (P1.1): содержание опубликованных документов и связка согласия.
 
-Проверяет серверный рендер юр-страниц, наличие ключевых нормативных формулировок
-(152-ФЗ, 39-ФЗ), подстановку реквизитов оператора из настроек, правовые ссылки в
-footer и информированность согласия при регистрации. Браузерное поведение (клики)
-сюда не входит — только SSR.
+🔴 Переписан в v8.45.0. Раньше проверял SSR-рендер Jinja-страниц `/legal/*` — их больше
+нет: тексты отдаёт `GET /api/legal/documents/{slug}`, а показывает React.
+
+**Проверка стала строже, а не слабее.** Jinja рендерила СВОЮ копию документа, разошедшуюся
+с официальным пакетом (разбор — `docs/reports/decisions/2026-09-04_legal_texts_single_
+source.md`): оператор, срок хранения и адрес обращений отличались. Теперь те же требования
+предъявляются к тому единственному тексту, который реально публикуется и из которого
+печатаются `docx`.
+
+Формулировки берутся из требований закона (152-ФЗ, 39-ФЗ), а не из вёрстки, поэтому
+переезд ничего не потерял: проверялось содержание, оно и проверяется.
 """
 from __future__ import annotations
 
@@ -12,83 +19,105 @@ from fastapi.testclient import TestClient
 
 from app.config import settings
 
-LEGAL_PAGES = [
-    "/legal/privacy",
-    "/legal/terms",
-    "/legal/consent",
-    "/legal/financial-consent",
-    "/contacts",
+# Ключи реестра (`app/core/legal.py`), а не URL: адреса — дело фронта, содержание — нет.
+PUBLIC_DOCUMENTS = [
+    "privacy_policy",
+    "terms_of_service",
+    "cookie_policy",
+    "personal_data",
+    "financial_data",
+    "marketing",
 ]
 
 
-@pytest.mark.parametrize("path", LEGAL_PAGES)
-def test_legal_page_renders(client: TestClient, path: str) -> None:
-    resp = client.get(path)
-    assert resp.status_code == 200
-    assert "text/html" in resp.headers.get("content-type", "")
-    assert len(resp.text) > 500
+def _text(client: TestClient, slug: str) -> str:
+    response = client.get(f"/api/legal/documents/{slug}")
+    assert response.status_code == 200, f"{slug} -> {response.status_code}"
+    return response.json()["content"]
+
+
+@pytest.mark.parametrize("slug", PUBLIC_DOCUMENTS)
+def test_document_is_published_and_not_empty(client: TestClient, slug: str) -> None:
+    """Документ отдаётся и содержит текст.
+
+    Пустой документ хуже отсутствующего: ссылка есть, требование формально закрыто,
+    а человек ничего не прочитал.
+    """
+    assert len(_text(client, slug)) > 500, f"{slug}: подозрительно короткий текст"
 
 
 def test_privacy_has_152fz_and_operator(client: TestClient) -> None:
-    html = client.get("/legal/privacy").text
-    assert "152-ФЗ" in html
-    assert "Политика обработки персональных данных" in html
-    assert settings.LEGAL_OPERATOR_NAME in html
+    text = _text(client, "privacy_policy")
+    assert "152-ФЗ" in text
+    assert "персональных данных" in text.lower()
+    # Оператор в тексте и в коде — один и тот же (гейт единого источника, v8.44.0).
+    assert settings.LEGAL_OPERATOR_NAME in text
 
 
 def test_terms_has_investment_disclaimer_39fz(client: TestClient) -> None:
-    # Ключевой финтех-дисклеймер: сервис не инвестсоветник (39-ФЗ).
-    html = client.get("/legal/terms").text
-    assert "39-ФЗ" in html
-    assert "не является индивидуальной инвестиционной рекомендацией" in html
+    """Ключевой финтех-дисклеймер: сервис не инвестсоветник (39-ФЗ).
+
+    Проверяется в оферте — там он и обязан быть как условие договора. Отдельно он же
+    показывается на самом экране рекомендаций (L5, `DISCLAIMER_39FZ`): требование
+    закона в том, чтобы человек видел его в момент решения, а не только в оферте.
+    """
+    text = _text(client, "terms_of_service")
+    assert "39-ФЗ" in text
+    assert "инвестиционной рекомендацией" in text
 
 
 def test_consent_has_withdrawal(client: TestClient) -> None:
-    html = client.get("/legal/consent").text
-    assert "отзыв" in html.lower()
+    """Право отозвать согласие названо в самом согласии — иначе оно не реализуемо."""
+    assert "отзыв" in _text(client, "personal_data").lower()
 
 
 def test_financial_consent_mentions_import_paths(client: TestClient) -> None:
-    html = client.get("/legal/financial-consent").text
-    assert "выписк" in html.lower()
-    assert "ручн" in html.lower()
+    """Согласие на финданные называет ОБА пути их появления.
+
+    Импорт выписки и ручной ввод — разные способы, и умолчать про любой значит собирать
+    данные способом, на который человек не соглашался.
+    """
+    text = _text(client, "financial_data").lower()
+    assert "выписк" in text
+    assert "ручн" in text
 
 
-def test_contacts_has_operator_email(client: TestClient) -> None:
-    html = client.get("/contacts").text
-    assert settings.LEGAL_CONTACT_EMAIL in html
+def test_contact_email_reachable_in_documents(client: TestClient) -> None:
+    """Адрес обращений напечатан в документах: по нему отзывают согласие и требуют
+    удаления данных. Адреса, которого нет в тексте, для человека не существует."""
+    assert settings.LEGAL_CONTACT_EMAIL in _text(client, "privacy_policy")
 
 
-def test_footer_has_legal_links(client: TestClient) -> None:
-    # Footer наследуется base.html → присутствует на любой странице.
-    html = client.get("/").text
-    assert 'href="/legal/privacy"' in html
-    assert 'href="/legal/terms"' in html
-    assert 'href="/legal/financial-consent"' in html
-    assert 'href="/contacts"' in html
+def test_registry_lists_documents_for_the_footer(client: TestClient) -> None:
+    """Реестр отдаёт адреса — по ним футер (L7) строит ссылки на каждой странице.
+
+    Раньше здесь проверялись сырые `href` в HTML; теперь ссылки строит React из этого
+    ответа, и проверять надо источник, а не разметку одного шаблона.
+    """
+    documents = client.get("/api/legal/documents").json()["documents"]
+    urls = {doc["url"] for doc in documents.values()}
+    for required in ("/legal/privacy", "/legal/terms", "/legal/cookies"):
+        assert required in urls, f"{required} нет в реестре — ссылка футера вела бы в пустоту"
 
 
-def test_registration_consent_links_to_documents(client: TestClient) -> None:
-    # Чекбокс согласия 152-ФЗ ведёт на опубликованные документы — согласие информированное.
-    html = client.get("/").text
-    assert 'id="auth-consent"' in html
-    assert 'href="/legal/privacy"' in html
-    assert 'href="/legal/consent"' in html
+def test_disclaimer_is_served_for_the_recommendation_screen(client: TestClient) -> None:
+    """Дисклеймер 39-ФЗ приходит ПОЛЕМ ответа, а не перепечатывается фронтом (L5)."""
+    body = client.get("/api/legal/documents").json()
+    assert "39-ФЗ" in body["disclaimer_39fz"] or "инвестиционн" in body["disclaimer_39fz"]
 
 
-class TestDraftBanner:
-    """Страховка: пока реквизиты оператора не подтверждены — на документах виден баннер."""
-
-    def test_banner_visible_by_default(self, client: TestClient) -> None:
-        # По умолчанию ИНН/адрес пусты и флаг не выставлен → баннер виден.
-        html = client.get("/legal/privacy").text
-        assert "legal-draft-banner" in html
-
-    def test_banner_hidden_when_details_confirmed(
-        self, client: TestClient, monkeypatch: pytest.MonkeyPatch
-    ) -> None:
-        monkeypatch.setattr(settings, "LEGAL_OPERATOR_INN", "7700000000")
-        monkeypatch.setattr(settings, "LEGAL_OPERATOR_ADDRESS", "г. Москва, ул. Пример, д. 1")
-        monkeypatch.setattr(settings, "LEGAL_DETAILS_CONFIRMED", True)
-        html = client.get("/legal/privacy").text
-        assert "legal-draft-banner" not in html
+# 🔴 `TestDraftBanner` снят вместе с Jinja-страницами.
+#
+# Баннер «документ в стадии оформления» показывался, пока `LEGAL_DETAILS_CONFIRMED` не
+# выставлен и ИНН с адресом пусты. Он предупреждал о пустых полях ШАБЛОНА — механизме,
+# которого в пакете `docs/legal/` нет по построению: пакет сознательно называет оператором
+# «сервис FINPILOT» без реквизитов юрлица (решение этапа MVP, `docs/legal/README.md` §1).
+#
+# Показывать «в стадии оформления» поверх текста, объявленного окончательным, значило бы
+# подрывать его же силу. Решение и два открытых вопроса владельцу (достаточно ли оператора
+# без реквизитов для запуска в РФ; нужен ли баннер до проверки живым юристом) —
+# `docs/reports/decisions/2026-09-04_legal_texts_single_source.md`.
+#
+# Флаг и поля в `app/config.py` оставлены: понадобятся, когда появится юрлицо. Если
+# владелец решит вернуть баннер — он вернётся явным состоянием React-экрана, а не
+# побочным эффектом пустого поля конфигурации, и тест заводится тогда же.

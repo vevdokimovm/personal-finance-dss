@@ -67,10 +67,22 @@ def _load_axe() -> str:
 
 def _run_axe(page, url: str, theme: str) -> list[dict]:
     page.goto(url, wait_until="networkidle")
-    # Тема хранится в localStorage под ключом finpilot-theme; применяется скриптом
-    # в base.html при загрузке, поэтому ставим значение и перезагружаем.
-    page.evaluate(f"localStorage.setItem('finpilot-theme', '{theme}')")
+    # 🔴 Ключ темы — `fp-theme` и формат Zustand persist (`{state:{theme}, version}`).
+    # До v8.45.0 здесь стоял `finpilot-theme` — ключ Jinja-версии. После переезда на React
+    # он перестал что-либо значить: тема не применялась, axe мерил контраст НЕ ТОЙ темы
+    # и выдавал ложные `color-contrast`/`aria-hidden-focus`. Проверено прямым прогоном
+    # axe по тому же адресу: ноль нарушений (родня PIT-021 — красное от неверной проверки).
+    page.evaluate(
+        "theme => localStorage.setItem('fp-theme',"
+        " JSON.stringify({state: {theme}, version: 0}))",
+        theme,
+    )
     page.reload(wait_until="networkidle")
+    # React рендерит в браузере: до появления содержимого проверять нечего. На страницах,
+    # которые остаются серверными (`/validation`, `/contacts`), узла `#root` нет вовсе —
+    # ждать его там значило бы валить исправную страницу по таймауту.
+    if page.locator("#root").count():
+        page.wait_for_selector("#root *", timeout=10_000)
     # Секции-карточки имеют fade-in анимацию (opacity 0->1). Если axe.run сработает
     # ДО её завершения, он замеряет контраст текста при opacity<1 (полупрозрачный
     # на фоне страницы) и выдаёт ЛОЖНЫЕ color-contrast нарушения. Замораживаем

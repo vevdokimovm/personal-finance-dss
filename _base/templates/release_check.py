@@ -68,12 +68,37 @@ _MIRRORS: set[str] | None = None
 
 
 def mirrors(base: Path) -> set[str]:
-    """Имена реп-зеркал — из строки `MIRRORS=` деплойера."""
+    """Имена реп-зеркал — умолчание деплойера плюс его `deploy-repos.conf`.
+
+    🔴 Регулярка обязана переживать вложенное умолчание. С v4.26.0 строка
+    выглядит так: `MIRRORS="${MIRRORS:-${CONF_MIRRORS:-имя …}}"`, и жадное
+    `[^}]*` прежней редакции не совпало бы вовсе — проверка молча получила бы
+    ПУСТОЙ набор зеркал и стала бы зелёной на всех десяти. Это `PIT-165`:
+    правка в одном файле, отказ в другом, и оба выглядят исправными.
+    """
     global _MIRRORS
     if _MIRRORS is None:
-        m = re.search(r'^MIRRORS="\$\{MIRRORS:-([^}]*)\}"',
-                      read(base / "templates" / "deploy.sh"), re.M)
-        _MIRRORS = set(m.group(1).split()) if m else set()
+        deploy = base / "templates" / "deploy.sh"
+        m = re.search(r'^MIRRORS="\$\{MIRRORS:-(.*)\}"$',
+                      read(deploy), re.M)
+        raw = m.group(1) if m else ""
+        inner = re.match(r'^\$\{CONF_MIRRORS:-(.*)\}$', raw)
+        if inner:
+            raw = inner.group(1)
+        names = set(raw.split())
+        # Конфиг рядом со скриптом ДОПОЛНЯЕТ умолчание, а не заменяет его.
+        # Здесь вопрос не «что применится на прогоне», а «какая репа вообще
+        # является зеркалом»: репу, убранную из конфига, всё ещё нельзя
+        # публиковать как обычную, пока она открыта в public.
+        conf = read(deploy.parent / "deploy-repos.conf")
+        for line in conf.splitlines():
+            line = line.strip()
+            if not line or line.startswith("#") or "=" not in line:
+                continue
+            key, _, val = line.partition("=")
+            if key.strip() == "MIRRORS":
+                names |= set(val.strip().strip('"\'').split())
+        _MIRRORS = names
     return _MIRRORS
 
 

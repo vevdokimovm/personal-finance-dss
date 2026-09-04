@@ -71,6 +71,20 @@ jobs:
           pip install -r requirements.txt -r requirements-dev.txt
       - name: Revision gate (docs↔code, статически, быстро)
         run: python -m tools.revision.revision_check
+      # 🔴 Сборка фронта ДО pytest. Гейт `test_spa_is_actually_served.py` проверяет, что
+      # сервер отдаёт React, а не Jinja, и пропускает себя, если `frontend/dist` нет.
+      # Без этого шага он молча не исполнялся бы — тот самый класс, ради которого он
+      # и заведён: проверка есть, вердикт «зелено» означает «не проверялось» (PIT-020).
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - name: Сборка фронта (нужна гейту «сервер отдаёт SPA»)
+        working-directory: frontend
+        run: |
+          npm ci
+          npm run build
       - name: Быстрые тесты + покрытие (unit + integration + property, порог 90%)
         run: |
           coverage run -m pytest -m fast

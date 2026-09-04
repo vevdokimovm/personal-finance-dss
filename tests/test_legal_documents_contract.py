@@ -123,9 +123,27 @@ class TestServed:
         Иначе `../../.env` читался бы с диска через публичный эндпоинт. Проверяется
         именно отказ, а не «содержимое пустое»: пустой ответ мог бы означать, что
         файла нет, а не что обход запрещён.
+
+        Векторы — только те, что РЕАЛЬНО доходят до эндпоинта. Первая редакция проверяла
+        `../../../etc/passwd` голым: такой путь нормализуется до отправки, до обработчика
+        не доезжает вовсе, и тест утверждал невозможное (родня PIT-021 — проверка ожидала
+        не того, что бывает). Закодированные формы проходят нормализацию и доходят.
         """
-        for attack in ("../../../etc/passwd", "..%2F..%2F.env", "../config"):
-            assert client.get(f"/api/legal/documents/{attack}").status_code in (404, 422)
+        for attack in ("..%2F..%2F.env", "%2e%2e%2f.env", "....//.env", "docs%2Flegal"):
+            response = client.get(f"/api/legal/documents/{attack}")
+            assert response.status_code in (404, 422), attack
+
+    def test_spa_fallback_does_not_leak_files(self, client) -> None:
+        """🔴 Catch-all SPA не отдаёт файлы за пределами сборки.
+
+        Он обязан вернуть `index.html` на любой неизвестный адрес — и именно поэтому
+        опасен: отдай он `../.env` как файл, ответ был бы 200 и выглядел бы нормально.
+        Проверяется не код ответа (он всегда 200), а СОДЕРЖИМОЕ.
+        """
+        markers = ("DATABASE_URL", "JWT_SECRET", "fastapi==", "def create_app")
+        for attack in ("../.env", "..%2F.env", "../../app/config.py", "%2e%2e/requirements.txt"):
+            body = client.get(f"/{attack}").text
+            assert not any(m in body for m in markers), f"{attack}: с диска утёк файл"
 
 
 class TestPublic:

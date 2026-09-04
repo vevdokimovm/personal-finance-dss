@@ -4,9 +4,14 @@ from contextlib import asynccontextmanager
 from pathlib import Path
 from typing import Any, Optional
 
-from fastapi import Depends, FastAPI, Request
+from fastapi import Depends, FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
+from fastapi.responses import (
+    FileResponse,
+    HTMLResponse,
+    JSONResponse,
+    RedirectResponse,
+)
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from sqlalchemy import text
@@ -31,6 +36,11 @@ PROJECT_DIR = Path(__file__).resolve().parents[1]
 FRONTEND_DIR = PROJECT_DIR / "frontend"
 TEMPLATES_DIR = FRONTEND_DIR / "templates"
 STATIC_DIR = FRONTEND_DIR / "static"
+# Сборка React (веха 8). Может отсутствовать: `dist/` в `.gitignore`, на чистом клоне
+# его нет до `npm run build`. Приложение обязано подниматься и без него — иначе
+# отсутствие фронта ломает и API, и миграции, и health-check.
+SPA_DIR = FRONTEND_DIR / "dist"
+SPA_INDEX = SPA_DIR / "index.html"
 
 templates = Jinja2Templates(directory=str(TEMPLATES_DIR))
 templates.env.globals["app_version"] = settings.APP_VERSION
@@ -139,36 +149,11 @@ def page_context(
     }
 
 
-@app.get("/", response_class=HTMLResponse, summary="Главная страница приложения")
-@app.get("/dashboard", response_class=HTMLResponse, summary="Обзорная панель")
-async def read_dashboard(ctx: dict = Depends(page_context)) -> HTMLResponse:
-    return templates.TemplateResponse(request=ctx["request"], name="dashboard.html", context=ctx)
-
-
-@app.get("/planning", response_class=HTMLResponse, summary="Планирование и рекомендации СППР")
-async def read_planning(ctx: dict = Depends(page_context)) -> HTMLResponse:
-    return templates.TemplateResponse(request=ctx["request"], name="planning.html", context=ctx)
-
-
-@app.get("/transactions", response_class=HTMLResponse, summary="Журнал операций")
-async def read_transactions(ctx: dict = Depends(page_context)) -> HTMLResponse:
-    return templates.TemplateResponse(request=ctx["request"], name="transactions.html", context=ctx)
-
-
-@app.get("/obligations", response_class=HTMLResponse, summary="Обязательства")
-async def read_obligations(ctx: dict = Depends(page_context)) -> HTMLResponse:
-    return templates.TemplateResponse(request=ctx["request"], name="obligations.html", context=ctx)
-
-
-@app.get("/goals", response_class=HTMLResponse, summary="Цели накопления")
-async def read_goals(ctx: dict = Depends(page_context)) -> HTMLResponse:
-    return templates.TemplateResponse(request=ctx["request"], name="goals.html", context=ctx)
-
-
-@app.get("/banks", response_class=HTMLResponse, summary="Банковская интеграция")
-async def read_banks(ctx: dict = Depends(page_context)) -> HTMLResponse:
-    return templates.TemplateResponse(request=ctx["request"], name="banks.html", context=ctx)
-
+# 🔴 Страницы вехи 8 отдаёт React (catch-all в конце файла). Jinja-дубли `/`,
+# `/dashboard`, `/planning`, `/transactions`, `/obligations`, `/goals`, `/banks`
+# и `/legal/*` сняты в v8.45.0: пока они существовали, они выигрывали у SPA —
+# объявлены раньше и точнее, — и сервер отдавал СТАРЫЙ интерфейс. Именно поэтому
+# сорок с лишним версий фронта работали только в dev через Vite.
 
 @app.get("/validation", response_class=HTMLResponse, summary="Валидация алгоритма на портретах")
 async def read_validation(ctx: dict = Depends(page_context)):
@@ -178,56 +163,43 @@ async def read_validation(ctx: dict = Depends(page_context)):
     return templates.TemplateResponse(request=ctx["request"], name="validation.html", context=ctx)
 
 
-# ── Юридический блок (P1.1): публичные документы и контакты ────────────
-@app.get("/legal/privacy", response_class=HTMLResponse, summary="Политика обработки ПДн (152-ФЗ)")
-async def read_legal_privacy(ctx: dict = Depends(page_context)) -> HTMLResponse:
-    return templates.TemplateResponse(
-        request=ctx["request"], name="legal/privacy.html", context=ctx
-    )
-
-
-@app.get("/legal/terms", response_class=HTMLResponse,
-         summary="Пользовательское соглашение (оферта)")
-async def read_legal_terms(ctx: dict = Depends(page_context)) -> HTMLResponse:
-    return templates.TemplateResponse(request=ctx["request"], name="legal/terms.html", context=ctx)
-
-
-@app.get("/legal/consent", response_class=HTMLResponse, summary="Согласие на обработку ПДн")
-async def read_legal_consent(ctx: dict = Depends(page_context)) -> HTMLResponse:
-    return templates.TemplateResponse(
-        request=ctx["request"], name="legal/consent.html", context=ctx
-    )
-
-
-@app.get("/legal/marketing-consent", response_class=HTMLResponse,
-         summary="Согласие на рекламную рассылку")
-async def read_legal_marketing_consent(
-    ctx: dict = Depends(page_context),
-) -> HTMLResponse:
-    return templates.TemplateResponse(
-        request=ctx["request"], name="legal/marketing_consent.html", context=ctx
-    )
-
-
-@app.get("/legal/cookies", response_class=HTMLResponse,
-         summary="Политика использования cookie")
-async def read_legal_cookies(ctx: dict = Depends(page_context)) -> HTMLResponse:
-    return templates.TemplateResponse(
-        request=ctx["request"], name="legal/cookies.html", context=ctx
-    )
-
-
-@app.get(
-    "/legal/financial-consent",
-    response_class=HTMLResponse,
-    summary="Согласие на обработку финансовых данных",
-)
-async def read_legal_financial_consent(ctx: dict = Depends(page_context)) -> HTMLResponse:
-    return templates.TemplateResponse(
-        request=ctx["request"], name="legal/financial_consent.html", context=ctx
-    )
-
-
 @app.get("/contacts", response_class=HTMLResponse, summary="Контакты и реквизиты оператора")
 async def read_contacts(ctx: dict = Depends(page_context)) -> HTMLResponse:
     return templates.TemplateResponse(request=ctx["request"], name="contacts.html", context=ctx)
+
+
+# ── Отдача React-приложения (веха 8) ───────────────────────────────────
+# 🔴 Ставится ПОСЛЕДНИМ и только здесь. Catch-all перехватывает всё, что не разобрали
+# роутеры выше, поэтому любой маршрут, объявленный ниже, был бы мёртв. По той же причине
+# `/api` и `/v1` подключены раньше: иначе фронт получал бы `index.html` там, где ждёт
+# JSON, — запросы «проходили» бы с кодом 200, и ломалось бы всё сразу и непонятно.
+if SPA_INDEX.is_file():
+    # Ассеты Vite: имена с хешем содержимого, поэтому кешируются агрессивно самим
+    # браузером — отдельная политика не нужна, достаточно отдать их по своим адресам.
+    app.mount("/assets", StaticFiles(directory=str(SPA_DIR / "assets")), name="spa-assets")
+
+    @app.get("/{full_path:path}", response_class=HTMLResponse, include_in_schema=False)
+    async def serve_spa(full_path: str) -> HTMLResponse:
+        """`index.html` на любой не-API адрес: маршрутизация клиентская.
+
+        Сервер о `/legal/privacy` и `/transactions` ничего не знает и знать не должен —
+        роутер разберётся сам. Без этого прямой заход по ссылке, закладка и обычный F5
+        на любом экране дают 404, при том что переходы ВНУТРИ приложения работают:
+        дефект невидим в разработке и появляется только у живого пользователя.
+
+        Файлы из корня сборки (`favicon`, шрифты, `robots.txt`) отдаются как файлы —
+        иначе браузер получил бы HTML вместо шрифта и молча нарисовал системным.
+        """
+        # 🔴 Адреса API остаются за API, даже когда такого эндпоинта нет. Иначе опечатка
+        # в пути запроса возвращает страницу с кодом 200, и «работает, но неправильно»
+        # приходится разбирать по телу ответа вместо кода. Пойман собственным гейтом.
+        if full_path.startswith(("api/", "v1/")):
+            raise HTTPException(status_code=404, detail="Not Found")
+
+        candidate = (SPA_DIR / full_path).resolve()
+        # `resolve()` + проверка принадлежности каталогу: без неё `../../.env` уехал бы
+        # с диска по публичному адресу. Проверяется ПОСЛЕ разрешения символических
+        # ссылок, иначе ссылка наружу обошла бы запрет.
+        if full_path and candidate.is_file() and SPA_DIR.resolve() in candidate.parents:
+            return FileResponse(candidate)  # type: ignore[return-value]
+        return HTMLResponse(SPA_INDEX.read_text(encoding="utf-8"))

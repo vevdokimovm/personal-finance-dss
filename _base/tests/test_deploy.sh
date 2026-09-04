@@ -928,6 +928,44 @@ make_zip "$D" "big-repo" "1.0.0" dot
 OUT="$(MIN_FILES=999 run_deploy "$D" || true)"
 assert_contains "MIN_FILES соблюдён" "$OUT" "не похоже на репу"
 
+case_ "E10" "deploy-repos.conf: зеркала настраиваются без выпуска новой версии скрипта"
+# 🔴 Смысл кейса — не «файл читается», а ТРИ свойства сразу: конфиг
+# необязателен, окружение старше конфига, и неизвестный ключ не проглатывается
+# молча. Первое проверяют все остальные 120 вызовов теста (конфига нет —
+# они зелёные), здесь проверяются второе и третье.
+D="$SANDBOX/t56b"; mkdir -p "$D"
+CONF="$D/deploy-repos.conf"
+make_zip "$D" "mir-repo" "1.0.0" dot
+
+printf '# комментарий\nMIRRORS=mir-repo\n' > "$CONF"
+OUT="$(DEPLOY_CONF="$CONF" run_deploy "$D")"
+assert_contains "конфиг назван вслух, а не применён молча" "$OUT" "зеркала взяты из"
+assert_contains "зеркало из конфига пропущено массовым режимом" "$OUT" "mir-repo"
+[ ! -d "$REMOTES/mir-repo.git" ] \
+  && ok "репа-зеркало из конфига НЕ создана массовым прогоном" \
+  || bad "репа-зеркало из конфига НЕ создана массовым прогоном"
+
+# 🔴 Порядок старшинства. Разовый прогон обязан перебивать постоянную настройку:
+# иначе конфиг, забытый в папке, тихо переопределит явную команду владельца.
+D="$SANDBOX/t56c"; mkdir -p "$D"
+CONF="$D/deploy-repos.conf"
+make_zip "$D" "mir-repo" "1.0.0" dot
+printf 'MIRRORS=mir-repo\n' > "$CONF"
+OUT="$(DEPLOY_CONF="$CONF" MIRRORS="совсем-другая-репа" run_deploy "$D")"
+[ -d "$REMOTES/mir-repo.git" ] \
+  && ok "переменная окружения старше конфига — репа опубликована" \
+  || bad "переменная окружения старше конфига" "$(printf '%s' "$OUT" | tail -5)"
+
+# Неизвестный ключ: опечатка в имени не должна выглядеть как рабочая настройка.
+D="$SANDBOX/t56d"; mkdir -p "$D"
+CONF="$D/deploy-repos.conf"
+make_zip "$D" "plain-repo" "1.0.0" dot
+printf 'MIRORS=plain-repo\n' > "$CONF"
+OUT="$(DEPLOY_CONF="$CONF" run_deploy "$D" 2>&1)"
+assert_contains "опечатка в ключе названа" "$OUT" "неизвестный ключ"
+[ -d "$REMOTES/plain-repo.git" ] \
+  && ok "опечатка не остановила прогон" || bad "опечатка не остановила прогон"
+
 case_ "E9" "ASSET=0 — релиз без ассета, дерево и тег на месте"
 D="$SANDBOX/t56"; mkdir -p "$D"
 make_zip "$D" "noasset-repo" "1.0.0" dot

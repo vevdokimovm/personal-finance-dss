@@ -21,11 +21,28 @@
 
   · **не импортирует проверяемое** — это и был бы тот самый побочный
     эффект. Разбирается исходник, программа не выполняется;
-  · **не судит о вреде.** `print()` на верхнем уровне безобиден, обход
-    12 тысяч файлов — нет. Различить их статически нельзя, поэтому
-    правило одно для всех: тело под гвардом;
+  · **не судит о вреде в общем виде.** `print()` безобиден, обход 12 тысяч
+    файлов — нет; статически это не различить. Но РАБОТУ от КОНФИГУРАЦИИ
+    инструмент различает — см. отдельный блок ниже;
   · **не трогает `__init__.py`** и модули-библиотеки без тела — им гвард
     не нужен, и требовать его было бы шумом.
+
+🔴 РАБОТА ПРОТИВ КОНФИГУРАЦИИ. Граница предложена второй вахтой
+(`finpilot-02`, 04.09.2026) после двух ложных срабатываний в её репе:
+
+  · `tools/timewarp/warp.py` — pytest-плагин: подменяет время НА ИМПОРТЕ,
+    и это его назначение. Гвард его сломает — подмена обязана случиться
+    ДО импорта модулей приложения;
+  · `tools/survey_analysis/visualization.py` — `matplotlib.use("Agg")`
+    обязан стоять ДО `import pyplot`. Требование библиотеки, а не оплошность.
+
+Её формулировка принята дословно: **«присваивание, `matplotlib.use`,
+регистрация в реестре — конфигурация; открытие файлов, сеть, запуск расчёта,
+`print` — работа»**. Иначе инструмент даёт красное на плагинах и на matplotlib
+ВСЕГДА, а красное, которое всегда, перестают читать (`69` §4з).
+
+Решает при этом не место и не имя, а **вызов**: `CFG = os.getcwd()` остаётся
+находкой, хотя это присваивание с именем константы.
 
 ЗАПУСК:
     python3 scripts/import_safety_check.py            # база
@@ -57,6 +74,70 @@ SKIP_PARTS = (".git", "__pycache__", "_base", "_archive", "node_modules",
               "02-code-archive")
 
 
+# 🔴 РАБОТА — вызовы, обращающиеся к миру за пределами процесса. Список
+# короткий намеренно: он не обязан быть полным, потому что НЕИЗВЕСТНЫЙ вызов
+# и так считается работой (см. `call_kind`). Он нужен для другого — чтобы
+# работа, спрятанная ВНУТРИ дешёвой обёртки, не проехала: `X = Path(open(...))`
+# снаружи выглядит как построение пути.
+WORK_CALLS = frozenset((
+    "open", "print", "input", "read_text", "read_bytes", "write_text",
+    "write_bytes", "glob", "rglob", "iterdir", "walk", "listdir", "mkdir",
+    "remove", "unlink", "rmtree", "copy", "move", "rename",
+    "run", "check_output", "check_call", "call", "popen", "system", "Popen",
+    "urlopen", "request", "connect", "socket", "sendall", "recv",
+    "main", "sleep", "execute", "executemany", "commit",
+))
+
+# 🔴 КОНФИГУРАЦИЯ — вызовы, которые ставят значение и ничего не делают.
+# Они законны на верхнем уровне и часто ОБЯЗАНЫ там быть: `matplotlib.use`
+# работает только до импорта `pyplot`, регистрация плагина — только до того,
+# как реестр прочитают.
+CONFIG_CALLS = frozenset((
+    "use", "register", "register_dialect", "filterwarnings", "simplefilter",
+    "basicConfig", "setLevel", "addHandler", "setFormatter", "disable",
+    "set_start_method", "setrecursionlimit", "set_loglevel", "seed",
+    "set_option", "setdefaulttimeout", "signal", "setattr",
+))
+
+# Дешёвые фабрики: строят значение из готовых частей, мира не касаются.
+CHEAP_CALLS = frozenset((
+    "Path", "compile", "set", "dict", "list", "tuple", "frozenset",
+    "namedtuple", "getLogger", "timedelta", "datetime", "date", "time",
+    "Decimal", "Fraction", "defaultdict", "deque", "Counter", "OrderedDict",
+    "str", "int", "float", "bool", "bytes", "len", "sorted", "range",
+))
+
+
+def call_name(node: ast.AST) -> str:
+    """Имя вызываемого — `f()` и `mod.f()` дают одинаковое `f`."""
+    fn = node.func if isinstance(node, ast.Call) else None
+    if isinstance(fn, ast.Name):
+        return fn.id
+    if isinstance(fn, ast.Attribute):
+        return fn.attr
+    return ""
+
+
+def call_kind(value: ast.AST) -> str:
+    """`work` · `config` · `none` — что произойдёт при импорте.
+
+    🔴 Порядок проверок — не косметика. Работа ищется ПО ВСЕМУ поддереву,
+    и только потом смотрится внешний вызов: обёртка не должна прикрывать
+    то, что внутри неё. Неизвестный вызов считается работой — ошибиться
+    в эту сторону дешевле (`/auto` §1.4).
+    """
+    calls = [n for n in ast.walk(value) if isinstance(n, ast.Call)]
+    if not calls:
+        return "none"
+    names = {call_name(c) for c in calls}
+    if names & WORK_CALLS:
+        return "work"
+    outer = call_name(value) if isinstance(value, ast.Call) else ""
+    if outer in CONFIG_CALLS or outer in CHEAP_CALLS:
+        return "config"
+    return "work"
+
+
 def body_lineno(src: str) -> int | None:
     """Строка первого исполняемого узла верхнего уровня, или None."""
     try:
@@ -76,20 +157,21 @@ def body_lineno(src: str) -> int | None:
             # `CFG = os.getcwd()` проскакивал. Имя говорит о намерении
             # автора, вызов — о том, что произойдёт при импорте.
             # Поймано собственной канарейкой до первого прогона.
-            if isinstance(node.value, (ast.Call, ast.Await)):
-                # Дешёвые фабрики читать безопасно: они ничего не делают
-                # с миром. Список намеренно короткий — всё прочее ловится.
-                fn = node.value.func if isinstance(node.value, ast.Call) else None
-                name = (fn.id if isinstance(fn, ast.Name)
-                        else fn.attr if isinstance(fn, ast.Attribute) else "")
-                if name not in ("Path", "compile", "set", "dict", "list",
-                                "frozenset", "namedtuple", "getLogger"):
-                    return node.lineno
-                continue
+            if isinstance(node.value, ast.Await):
+                return node.lineno
+            if call_kind(node.value) == "work":
+                return node.lineno
+            continue
             # Константа-литерал верхнего уровня — объявление, не действие.
             if isinstance(tgt, ast.Name) and tgt.id.isupper():
                 continue
             continue
+        if isinstance(node, ast.Expr):
+            # Голый вызов: `matplotlib.use("Agg")` — конфигурация,
+            # `print(...)` и `main()` — работа.
+            if call_kind(node.value) == "config":
+                continue
+            return node.lineno
         if isinstance(node, ast.If):
             # `if __name__ == "__main__":` — это и есть гвард.
             if "__main__" in ast.dump(node.test):
@@ -144,6 +226,15 @@ def selftest() -> int:
         ("только определения", 'import os\n\n\ndef f():\n    return 1\n', False),
         ("константы не тело", 'X = 1\nPATH = "/tmp"\n\n\ndef f():\n    pass\n', False),
         ("🔴 вызов в присваивании", 'import os\nCFG = os.getcwd()\n', True),
+        ("конфигурация: matplotlib.use",
+         'import matplotlib\nmatplotlib.use("Agg")\nimport matplotlib.pyplot\n',
+         False),
+        ("конфигурация: подмена в плагине",
+         'import os\nfrom datetime import timedelta\n'
+         '_off = timedelta(days=int(os.environ.get("WARP_DAYS", "90")))\n', False),
+        ("🔴 работа под дешёвой обёрткой",
+         'from pathlib import Path\nDATA = Path(open("x").read())\n', True),
+        ("🔴 голый вызов-работа", 'import shutil\nshutil.rmtree("/tmp/x")\n', True),
     ]
     with tempfile.TemporaryDirectory() as d:
         for name, src, expect in cases:

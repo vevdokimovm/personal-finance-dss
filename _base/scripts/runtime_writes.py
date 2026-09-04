@@ -165,8 +165,18 @@ _WRITE = re.compile(
 def _anchor(expr: str, script: Path, base: Path) -> Path | None:
     """Куда указывает начало выражения. None — начало не распознано."""
     if "Path(__file__)" in expr:
-        p = script.resolve().parent
-        # каждый `.parent` после `.resolve()` поднимает на уровень
+        # 🔴 СЧЁТ ОТ ФАЙЛА, А НЕ ОТ ЕГО КАТАЛОГА. Прежняя редакция начинала
+        # с `script.parent` — то есть первый `.parent` в выражении съедался
+        # молча, — и потом применяла ВСЕ `.parent` ещё раз. Якорь выходил
+        # на уровень выше настоящего.
+        #
+        # Замер 04.09.2026: `OUT = Path(__file__).resolve().parent / "scan.csv"`
+        # в `05-infra-synthesis-lab/tools/` давал цель
+        # `05-infra-synthesis-lab/scan.csv`. Отказ обманчив: проверка краснеет
+        # ПРАВИЛЬНО (объявление действительно нужно), но требует объявить путь,
+        # которого нет. Объявишь по её словам — она замолчит, а настоящий файл
+        # так и останется необъявленным.
+        p = script.resolve()
         for _ in range(expr.count(".parent")):
             p = p.parent
         return p
@@ -191,6 +201,13 @@ def scan_writers(base: Path, within: tuple[str, ...]) -> list[tuple[Path, str]]:
         в `/tmp` и `$HOME`, но автоматически здесь не ловится.
     Поэтому перепись — **помощник ревью, а не доказательство полноты**.
     """
+    # 🔴 КОРЕНЬ СВОДИТСЯ, ИНАЧЕ ВСЕ НАХОДКИ МОЛЧА ПРОПАДАЮТ. Цель считается
+    # от `Path(__file__).resolve()`, то есть уже сведена; если корень пришёл
+    # через симлинк, `relative_to` кидает ValueError, и `_scan_one` честно
+    # отвечает «пишет вне базы — не наше дело». На этой машине риск живой:
+    # `~/Documents/base-repo` — симлинк на `система_репозиториев/base-repo`.
+    # Найдено 04.09.2026 канарейкой на адрес, где `/var` → `/private/var`.
+    base = base.resolve()
     found: list[tuple[Path, str]] = []
     for name in within:
         root = base / name
@@ -280,7 +297,8 @@ def selftest(base: Path | None = None, within: tuple[str, ...] | None = None) ->
     import tempfile
 
     with tempfile.TemporaryDirectory() as tmp:
-        root = Path(tmp)
+        # `.resolve()` — на macOS `/var` это симлинк на `/private/var`
+        root = Path(tmp).resolve()
         kit = root / "12-проба-кит"
         (kit / "snapshots").mkdir(parents=True)
         (kit / "observations").mkdir()
@@ -304,6 +322,28 @@ def selftest(base: Path | None = None, within: tuple[str, ...] | None = None) ->
              "помеченное `канон:` попало в ИСКЛЮЧЕНИЯ — канон перестал бы доезжать"),
             (is_declared("12-проба-кит/README.md", both),
              "помеченное `канон:` не видно переписи — случай считался бы пропущенным"),
+        ]
+
+        # 🔴 «НАШЁЛ» И «НАШЁЛ ТАМ» — ДВА УТВЕРЖДЕНИЯ (`PIT-192`). Четыре
+        # проверки выше судят различение, и ни одна не судит АДРЕС. Именно
+        # адрес и был неверен: якорь `Path(__file__)` поднимался на уровень
+        # выше настоящего, проверка краснела правильно и называла путь,
+        # которого нет. Починка по её выводу заглушила бы её навсегда.
+        tools = kit / "tools"
+        tools.mkdir()
+        (tools / "писака.py").write_text(
+            'from pathlib import Path\n'
+            'OUT = Path(__file__).resolve().parent / "снимок.csv"\n'
+            'UP = Path(__file__).resolve().parent.parent / "наверху.csv"\n'
+            'def go():\n'
+            '    OUT.write_text("x")\n'
+            '    UP.write_text("y")\n', encoding="utf-8")
+        found = {rel.as_posix() for rel, _ in scan_writers(root, ("12-проба-кит",))}
+        checks += [
+            (f"12-проба-кит/tools/снимок.csv" in found,
+             f"адрес записи назван неверно: ждал tools/снимок.csv, получил {found}"),
+            (f"12-проба-кит/наверху.csv" in found,
+             f"`.parent.parent` разобран неверно: {found}"),
         ]
         for ok, why in checks:
             if not ok:

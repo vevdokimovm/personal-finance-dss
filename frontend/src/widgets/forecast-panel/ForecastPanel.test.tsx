@@ -214,4 +214,21 @@ describe("ForecastPanel — сценарий «что если» и живая �
     expect(anyStatusContains("900 000")).toBe(true);
     vi.useRealTimers();
   });
+
+  /* 🔴 `aria-hidden` скрывает график от скринридера, но НЕ убирает его содержимое из
+     порядка обхода: Recharts вставляет внутрь фокусируемые узлы. Получается ловушка —
+     Tab уводит фокус в элемент, о котором скринридер молчит, и пользователь не понимает,
+     где он находится (WCAG 4.1.2, axe `aria-hidden-focus`).
+
+     Найдено axe-тиром `full` после того, как он впервые реально исполнился: до v8.45.0
+     тир не запускался (не было браузера нужной версии), а до этого проверял Jinja. */
+  it("декоративный график не ловит фокус клавиатуры", () => {
+    const { container } = render(<ForecastPanel forecast={FORECAST_ANNA} />);
+    const chart = container.querySelector(".fp-forecast-chart");
+    expect(chart).not.toBeNull();
+    expect(chart).toHaveAttribute("aria-hidden", "true");
+    // `inert` — единственное, что и скрывает от AT, и вынимает поддерево из Tab-порядка.
+    expect(chart).toHaveAttribute("inert");
+  });
 });
+

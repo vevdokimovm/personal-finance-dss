@@ -1,3 +1,17 @@
+# ── Stage 0: сборка React (веха 8) ─────────────────────────────────────
+# 🔴 Без этой стадии продукт в контейнере отдаёт СТАРЫЙ интерфейс. `frontend/dist`
+# лежит в `.gitignore`, значит `COPY . .` его не приносит: сорок с лишним версий
+# фронта существовали только в dev через Vite (v8.45.0, PIT-020).
+FROM node:22-slim AS frontend
+
+WORKDIR /frontend
+# Манифесты отдельным слоем: пересборка зависимостей только при их изменении,
+# а не на каждую правку исходников.
+COPY frontend/package.json frontend/package-lock.json ./
+RUN npm ci
+COPY frontend/ ./
+RUN npm run build
+
 # ── Stage 1: builder — установка зависимостей в изолированный venv ──
 FROM python:3.13-slim AS builder
 
@@ -26,6 +40,9 @@ RUN useradd --create-home --uid 1000 appuser
 
 COPY --from=builder /opt/venv /opt/venv
 COPY . .
+# Сборка фронта приезжает ПОСЛЕ `COPY . .`: иначе следующий слой затёр бы её пустым
+# местом (в исходниках каталога `dist` нет).
+COPY --from=frontend /frontend/dist ./frontend/dist
 
 RUN chmod +x docker-entrypoint.sh && chown -R appuser:appuser /app
 USER appuser

@@ -26,7 +26,16 @@ from pathlib import Path
 # Скрипт лежит в `05-infra-synthesis-lab/tools/`, то есть на два уровня ниже корня.
 BASE = Path(os.environ.get("BASE_REPO") or Path(__file__).resolve().parents[2]).expanduser()
 ROOT = BASE.parent
-OUT = Path(sys.argv[1] if len(sys.argv) > 1 else "scan.csv")
+# 🔴 ПЕРЕПИСЬ ЛОЖИТСЯ РЯДОМ С ИНСТРУМЕНТОМ, А НЕ ТУДА, ГДЕ ТЫ СТОИШЬ.
+# Замер 04.09.2026: умолчание было `Path("scan.csv")` — относительно ТЕКУЩЕГО
+# каталога. Запуск из корня репы (`python3 05-infra-synthesis-lab/tools/
+# scan_lessons.py`) написал `base-repo/scan.csv`, а настоящая перепись
+# осталась нетронутой. Скрипт при этом бодро сказал «записано: scan.csv».
+#
+# Отказ тихий и обманчивый: команда успешна, файл создан, данные новые —
+# просто не там, где их читают. Это `PIT-G` (артефакт кладут туда, где
+# удобно оказаться, а не туда, где ему место по канону).
+OUT = Path(sys.argv[1]) if len(sys.argv) > 1 else Path(__file__).resolve().parent / "scan.csv"
 
 SKIP_DIR_PARTS = {".git", "node_modules", "__pycache__", ".venv", "venv", "__MACOSX"}
 
@@ -75,6 +84,65 @@ FAMILIES = {
     ],
 }
 COMPILED = {k: [re.compile(p, re.M) for p in v] for k, v in FAMILIES.items()}
+
+
+# 🔴 ПОЧТИ-КОПИЯ ДЛЯ sha256 — ЧУЖОЙ ФАЙЛ. Замер 04.09.2026:
+# `personal-finance-dss/docs/documentation_methodology.md` (score 651, третий
+# в переписи) оказался ТЕМ ЖЕ документом, что `02-methodology-library/
+# incident_process_documentation_methodology.md` в базе: 481 строка против
+# 481, заголовки совпадают все до одного. После снятия эмодзи-маркеров
+# важности (🔥⭐💼, база проставила их себе сама) различий осталось
+# **2 строки из 351** — один путь в примере.
+#
+# Для sha256 это другой файл, поэтому `in_base` пуст, и кандидат три недели
+# стоял в очереди как неразобранный. Разбирать было нечего.
+#
+# 🔴 ПОЧЕМУ НЕ НОРМАЛИЗОВАННЫЙ ХЭШ. Пробовал первым — не сработало ровно
+# на этом случае: две строки расхождения дают другой хэш, а «почти» хэшем
+# не выражается. Порог похожести по всему тексту стоил бы 652 × 3660
+# сравнений. Подпись по ЗАГОЛОВКАМ дешевле и точнее: структура документа
+# при переносе не меняется, а формулировки — меняются.
+#
+# ГРАНИЦА: подпись ловит перенесённую КОПИЮ, а не поднятый урок. Урок
+# переписывают своими словами, и заголовки у него другие — для этого есть
+# `reviewed` из `ROADMAP.md`. Один переименованный заголовок ломает подпись;
+# такие случаи добивает `headings_overlap` попарно, по решению вахты.
+HEAD_RE = re.compile(r"^#{2,3}\s+(.+)$", re.M)
+_MARKERS = str.maketrans("", "", "🔥⭐💼🆕🔴🟢🟡✅🔲⛔️")
+MIN_HEADS = 5      # ниже этого совпадение структуры ничего не значит
+
+
+def head_signature(text: str) -> frozenset[str] | None:
+    """Подпись документа — множество заголовков без маркеров важности."""
+    heads = {" ".join(h.translate(_MARKERS).split())[:22]
+             for h in HEAD_RE.findall(text)}
+    return frozenset(heads) if len(heads) >= MIN_HEADS else None
+
+
+def base_signatures() -> dict[frozenset[str], str]:
+    """Подписи документов базы → путь. Первый выигрывает, их там не дублируют."""
+    out: dict[frozenset[str], str] = {}
+    for f in sorted(BASE.rglob("*.md")):
+        # 🔴 ФОРМЫ ИСКЛЮЧЕНЫ, И ЭТО НЕ ПРИДИРКА. Первый прогон дал 48 находок,
+        # из них **16** — заполненные `MANIFEST.md` разных реп, совпавшие
+        # с `templates/MANIFEST_TEMPLATE.md`. Совпадение верное: заголовки
+        # шаблона копируются дословно, содержание пишется под ними.
+        #
+        # Но вывод из него ложный: манифест `edu-base` — не копия шаблона,
+        # а уникальный документ в его форме. Форма на то и форма, чтобы
+        # совпадать; совпасть с ней — не признак дубля.
+        #
+        # Остальные 32 находки проверены поштучно и все настоящие: один
+        # документ под разными именами в разных репах.
+        if ".git" in f.parts or "_base" in f.parts or "templates" in f.parts:
+            continue
+        try:
+            sig = head_signature(f.read_text(encoding="utf-8"))
+        except (OSError, UnicodeDecodeError):
+            continue
+        if sig is not None:
+            out.setdefault(sig, f.relative_to(BASE).as_posix())
+    return out
 
 
 def base_hashes() -> set[str]:
@@ -152,6 +220,7 @@ def headings_overlap(src: Path, base_doc: Path) -> tuple[int, int, int]:
 
 def scan() -> list[dict]:
     known = base_hashes()
+    base_sigs = base_signatures()
     _roadmap = reviewed_paths()
     roadmap_text = next(iter(_roadmap), "")
     print(f"файлов в живой базе: {len(known)}", file=sys.stderr)
@@ -190,6 +259,11 @@ def scan() -> list[dict]:
             "score": len(hits) * 100 + min(sum(hits.values()), 99),
             "fam_detail": ";".join(f"{k}={v}" for k, v in sorted(hits.items())),
             "in_base": "yes" if digest in known else "",
+            # 🔴 Побайтово другой, по содержанию тот же — см. `normalize`.
+            # Такому кандидату разбор не нужен: он УЖЕ в базе, просто под
+            # другим именем и с проставленными маркерами.
+            "near_base": ("" if digest in known
+                          else base_sigs.get(head_signature(text) or frozenset(), "")),
             "sha": digest[:12],
             # 🔴 РАЗОБРАН ≠ СКОПИРОВАН. `in_base` ловит побайтовую копию,
             # `reviewed` — факт разбора, записанный вахтой в `ROADMAP.md`.

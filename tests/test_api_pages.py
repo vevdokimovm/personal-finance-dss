@@ -1,16 +1,33 @@
-"""Тесты отрисовки интерфейса.
+"""Серверный рендер страниц, которые сервер ДЕЙСТВИТЕЛЬНО рендерит.
 
-Проверяют, что каждая страница рендерится (200) и содержит ключевые элементы
-своих фич (формы, контейнеры, секции). Настоящие клики/JS-взаимодействие тут не
-покрываются — для этого нужен браузерный стек (Playwright); здесь проверяется
-серверный рендер шаблонов.
+🔴 Файл сузился в v8.45.0. Раньше здесь проверялась разметка Jinja-шаблонов `/`,
+`/planning`, `/transactions`, `/obligations`, `/goals`, `/banks` — но эти экраны с v8.45.0
+отдаёт React, и сервер присылает пустой shell: разметка строится в браузере, разбирать
+ответ нечего. Оставить проверки как были значило бы получить зелёный тест, не проверяющий
+ничего, — ровно то, ради чего заведён PIT-020.
+
+**Покрытие не потеряно, оно переехало туда, где разметка существует:**
+
+| Что проверялось здесь | Где проверяется теперь |
+|---|---|
+| контейнер прогноза и советы по тратам (`/planning`) | `pages/planning/**` — vitest |
+| привязка цели к активу (`/goals`) | `pages/goals/**` — vitest |
+| поле срока обязательства (`/obligations`) | `pages/obligations/**` — vitest |
+| Lt в месяцах автономии, BLR отдельно от Lt | `widgets/metrics-grid/MetricsGrid.test.tsx` |
+| `l_min` в месяцах, источники `r_bench` | `pages/planning/ui/PlanSettingsSection.tsx` |
+
+Плюс Playwright в трёх браузерах на тех же экранах и `tests/test_spa_is_actually_served.py`
+— проверка, что сервер вообще отдаёт React, а не старый интерфейс.
+
+Здесь остались страницы, которые остаются серверными: `/validation` (гостевая песочница)
+и `/contacts`.
 """
 from __future__ import annotations
 
 import pytest
 from fastapi.testclient import TestClient
 
-PAGES = ["/", "/planning", "/transactions", "/obligations", "/goals", "/banks", "/validation"]  # noqa: E501
+PAGES = ["/validation", "/contacts"]
 
 
 @pytest.mark.parametrize("path", PAGES)
@@ -21,69 +38,13 @@ def test_page_renders(client: TestClient, path: str) -> None:
     assert len(resp.text) > 500  # не пустая заглушка
 
 
-def test_planning_page_has_feature_blocks(client: TestClient) -> None:
-    html = client.get("/planning").text
-    # Блок советов по тратам и контейнер прогноза
-    assert "spending-advice-container" in html
-    assert "forecast" in html
-
-
-def test_goals_page_has_envelope_select(client: TestClient) -> None:
-    html = client.get("/goals").text
-    # Селект привязки цели к активу (конверты)
-    assert "goal-linked-asset" in html
-
-
-def test_obligations_page_has_total_term_field(client: TestClient) -> None:
-    html = client.get("/obligations").text
-    # Поле общего срока кредита (term-фикс)
-    assert "obligation-term" in html
-
-
-def test_transactions_page_has_period_inputs(client: TestClient) -> None:
-    html = client.get("/transactions").text
-    assert "type=\"date\"" in html or "date" in html
-
-
 def test_app_js_and_css_served(client: TestClient) -> None:
-    # Статика фронтенда отдаётся
+    """Статика Jinja-страниц отдаётся.
+
+    Она нужна, пока живы `/validation` и `/contacts`: их шаблоны наследуют `base.html`
+    и подключают эти файлы. Уйдёт вместе с ними при сносе Jinja-остатка.
+    """
     js = client.get("/static/js/app.js")
     css = client.get("/static/css/styles.css")
     assert js.status_code == 200
     assert css.status_code == 200
-
-
-# ── Refined-модель v3.0.0: фронт должен отражать stock-based ликвидность ──
-
-class TestDashboardLiquiditySemantics:
-    """Дашборд должен показывать Lt как месяцы автономии, а не старый flow-коэффициент."""
-
-    def test_lt_card_shows_months_norm(self, client: TestClient) -> None:
-        html = client.get("/").text
-        # Новая норма ликвидности — в месяцах (Greninger 2.5–6)
-        assert "норма 2.5" in html
-        # Подпись про месяцы автономии на резерве
-        assert "резерв" in html.lower()
-
-    def test_lt_card_drops_old_flow_norm(self, client: TestClient) -> None:
-        html = client.get("/").text
-        # Старого порога-доли 0.3 и flow-формулировки быть не должно
-        assert "норма от 0.3" not in html
-        assert "Насколько свободно от обязательных платежей" not in html
-
-    def test_blr_card_distinguished_from_lt(self, client: TestClient) -> None:
-        html = client.get("/").text
-        # Подушка (BLR) явно отличается от запаса прочности: учитывает накопления целей
-        assert "включая цели" in html
-
-
-class TestPlanningControls:
-    def test_lmin_slider_in_months(self, client: TestClient) -> None:
-        html = client.get("/planning").text
-        assert "мес. расходов" in html  # порог ликвидности задаётся в месяцах автономии
-
-    def test_rbench_dynamic_controls_present(self, client: TestClient) -> None:
-        html = client.get("/planning").text
-        # Кнопки источника r_bench: ключевая ЦБ и ставка собственного вклада
-        assert "rbench-cbr" in html
-        assert "rbench-from-asset" in html

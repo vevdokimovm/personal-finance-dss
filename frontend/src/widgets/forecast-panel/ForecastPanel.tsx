@@ -121,8 +121,15 @@ export function ForecastPanel({
       {showControls && <ForecastResultAnnouncer forecast={forecast} lastMedian={last?.Rt} />}
 
       {/* График декоративный (aria-hidden) — та же информация в таблице ниже полностью,
-          не только последняя точка (WCAG 1.1.1, находка a11y-auditor №2). */}
-      <div className="fp-forecast-chart" aria-hidden="true">
+          не только последняя точка (WCAG 1.1.1, находка a11y-auditor №2).
+
+          🔴 `inert` обязателен рядом с `aria-hidden`: Recharts вставляет внутрь
+          фокусируемые узлы, и один `aria-hidden` создавал ловушку — Tab уводил фокус
+          в элемент, о котором скринридер молчит, и человек терял позицию на странице
+          (WCAG 4.1.2, axe `aria-hidden-focus`). `inert` вынимает поддерево из порядка
+          обхода целиком. Найдено axe-тиром `full`, когда он впервые реально исполнился
+          (v8.45.0): до этого браузера нужной версии не было, и тир молча не запускался. */}
+      <div className="fp-forecast-chart" aria-hidden="true" inert>
         <ResponsiveContainer>
           <AreaChart data={chartData} margin={{ top: 8, right: 8, bottom: 0, left: 0 }}>
             <CartesianGrid stroke="var(--c-border)" vertical={false} />
