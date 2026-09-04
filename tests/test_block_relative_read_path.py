@@ -46,6 +46,16 @@ ALLOWED = [
     ("uptime", "нет путей вовсе"),
     ('echo \'{"command":"cd /abs && grep -n x docs/f.md"}\'', "оператор внутри кавычек"),
     ("grep -rn pattern $CLAUDE_PROJECT_DIR/docs", "путь через переменную окружения"),
+    ("grep -rn x /abs/f.md 2>/dev/null", "перенаправление stderr, а не аргумент"),
+    ("grep -rn x /abs/f.md > out.log", "перенаправление stdout"),
+    (
+        "cat > /abs/f.css <<'EOF'\n/* ритм */\n.a { margin: 0 }\nEOF",
+        "тело heredoc — данные, а не команда",
+    ),
+    (
+        "cat > /abs/f.sh <<'EOF'\ngrep -n x docs/pitfalls.md\nEOF",
+        "команда ВНУТРИ heredoc не выполняется сейчас",
+    ),
 ]
 
 

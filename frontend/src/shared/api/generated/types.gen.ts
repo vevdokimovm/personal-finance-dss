@@ -1640,6 +1640,46 @@ export type LegalDocument = {
 };
 
 /**
+ * LegalDocumentContent
+ *
+ * Документ вместе с ТЕКСТОМ.
+ *
+ * Отдельно от `LegalDocument`: реестр отдаёт метаданные всех документов сразу и висит
+ * в футере каждой страницы — вкладывать в него шесть полных текстов значило бы возить
+ * десятки килобайт на каждой навигации ради ссылки из четырёх слов.
+ *
+ * Содержимое — markdown, как в официальном пакете (`docs/legal/`), а не HTML. Конверсия
+ * на бэкенде завела бы ТРЕТЬЮ редакцию документа рядом с `md` и `docx`, и доказывать
+ * в споре пришлось бы, какая из трёх показана человеку.
+ */
+export type LegalDocumentContent = {
+    /**
+     * Content
+     */
+    content: string;
+    /**
+     * Effective From
+     */
+    effective_from: string;
+    /**
+     * Slug
+     */
+    slug: string;
+    /**
+     * Title
+     */
+    title: string;
+    /**
+     * Url
+     */
+    url: string;
+    /**
+     * Version
+     */
+    version: string;
+};
+
+/**
  * LegalDocuments
  *
  * Ответ `/legal/documents`.
@@ -5233,6 +5273,36 @@ export type LegalDocumentsApiLegalDocumentsGetResponses = {
 };
 
 export type LegalDocumentsApiLegalDocumentsGetResponse = LegalDocumentsApiLegalDocumentsGetResponses[keyof LegalDocumentsApiLegalDocumentsGetResponses];
+
+export type LegalDocumentContentApiLegalDocumentsSlugGetData = {
+    body?: never;
+    path: {
+        /**
+         * Slug
+         */
+        slug: string;
+    };
+    query?: never;
+    url: '/api/legal/documents/{slug}';
+};
+
+export type LegalDocumentContentApiLegalDocumentsSlugGetErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type LegalDocumentContentApiLegalDocumentsSlugGetError = LegalDocumentContentApiLegalDocumentsSlugGetErrors[keyof LegalDocumentContentApiLegalDocumentsSlugGetErrors];
+
+export type LegalDocumentContentApiLegalDocumentsSlugGetResponses = {
+    /**
+     * Successful Response
+     */
+    200: LegalDocumentContent;
+};
+
+export type LegalDocumentContentApiLegalDocumentsSlugGetResponse = LegalDocumentContentApiLegalDocumentsSlugGetResponses[keyof LegalDocumentContentApiLegalDocumentsSlugGetResponses];
 
 export type ListAssetsApiLiquidAssetsGetData = {
     body?: never;

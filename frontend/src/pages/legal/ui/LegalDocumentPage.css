@@ -1,0 +1,182 @@
+/* Юридический документ — длинный сплошной текст, и читаемым его делают ровно две вещи:
+   мера строки и воздух между блоками.
+
+   Ширина берётся из `--measure-w`: токен заведён именно для прозаического текста,
+   и свой заводить нельзя — это был бы второй ответ на тот же вопрос (TOK-01). */
+
+.fp-legal-page {
+  max-width: var(--measure-w);
+  margin: 0 auto;
+  /* По горизонтали — `--sp-5`, как у всех страниц продукта и у футера прямо под
+     текстом. Была ступень мельче, и левый край документа не совпадал со ссылками
+     футера под ним. */
+  padding: var(--sp-6) var(--sp-5) var(--sp-8);
+}
+
+/* Заголовок — по шкале, как на всех экранах. Правила не было вовсе, и работал
+   браузерный дефолт: размер мимо ступеней шкалы и поля не кратные сетке —
+   на самом крупном элементе экрана (design-critic). */
+.fp-legal-page h1 {
+  font-size: var(--fs-xl);
+  margin: 0 0 var(--sp-3);
+}
+
+.fp-legal-page__meta {
+  color: var(--c-text3);
+  font-size: var(--fs-sm);
+  margin: 0 0 var(--sp-5);
+}
+
+.fp-legal-page__note {
+  color: var(--c-text2);
+  padding: var(--sp-4) 0;
+}
+
+.fp-legal-page__body {
+  line-height: var(--lh-prose);
+  /* Табличные цифры наследуются из `global.css` — они для колонок с суммами.
+     В юридической прозе («27.07.2006 № 152-ФЗ», нумерация «6.3.») они дают
+     рваные интервалы внутри слова. */
+  font-variant-numeric: normal;
+}
+
+/* 🔴 Ритм задают ТОЛЬКО эти правила. Ресета в проекте нет, поэтому у `p`, `li`, `ul`
+   остаётся браузерный `margin-block-start: 1em` — он выигрывал у объявленного отступа
+   при схлопывании полей, и реальный интервал зависел от браузера, а не от токенов
+   (design-critic). Поля задаются с обеих сторон явно. */
+.fp-legal-page__body h2 {
+  font-size: var(--fs-lg);
+  margin: var(--sp-6) 0 var(--sp-3);
+}
+
+.fp-legal-page__body h3 {
+  font-size: var(--fs-md);
+  margin: var(--sp-5) 0 var(--sp-2);
+}
+
+.fp-legal-page__body p {
+  margin: 0 0 var(--sp-3);
+}
+
+.fp-legal-page__body ul,
+.fp-legal-page__body ol {
+  padding-left: var(--sp-5);
+  margin: 0 0 var(--sp-4);
+}
+
+/* Внутри перечисления интервал меньше, чем между абзацами: с одинаковым списки
+   в §3, §4, §9 политики распадались на отдельные абзацы и переставали читаться
+   как один перечень. */
+.fp-legal-page__body li {
+  margin: 0 0 var(--sp-2);
+}
+
+/* Цитаты несут примечания и оговорки: отличать от основного текста надо, отправлять
+   на второй план нельзя — юридически они равноценны. Толщина полосы — из семейства
+   границ, а не из отступов: `--sp-1` в этой роли завёл бы вторую акцентную полосу
+   в продукте, не совпадающую с той, что у импорта выписки. */
+.fp-legal-page__body blockquote {
+  border-left: calc(var(--border-w) * 3) solid var(--c-border-hl);
+  padding-left: var(--sp-4);
+  margin: var(--sp-4) 0;
+  color: var(--c-text2);
+}
+
+/* Прокрутка — на ОБЁРТКЕ, а не на самой таблице: `display: block` на `<table>`
+   снимает с неё роль таблицы для скринридера (WCAG 1.3.1, a11y-auditor). */
+.fp-legal-page__table-wrap {
+  overflow-x: auto;
+  margin-bottom: var(--sp-4);
+}
+
+.fp-legal-page__table-wrap:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: var(--focus-ring-offset);
+}
+
+.fp-legal-page__body table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.fp-legal-page__body th,
+.fp-legal-page__body td {
+  /* Граница по `--c-border` в тёмной теме давала контраст около 1.2:1 — опереться
+     на сетку глазами было нельзя (a11y-auditor). */
+  border: var(--border-w) solid var(--c-border-hl);
+  padding: var(--sp-2) var(--sp-3);
+  text-align: left;
+  vertical-align: top;
+}
+
+/* 🔴 Контактные таблицы пакета безголовые (`| | |`), и remark-gfm рисует пустую
+   строку заголовков. Заливка и рамка превращали её в серую пустую полосу прямо над
+   контактами оператора — самым посещаемым блоком документа (design-critic).
+   Пустой `thead` убирается, непустой оформляется как обычно. */
+.fp-legal-page__body thead:has(th:empty) {
+  display: none;
+}
+
+.fp-legal-page__body th {
+  background: var(--c-surface-up);
+  font-weight: 600;
+}
+
+.fp-legal-page__body code {
+  background: var(--c-surface-up);
+  padding: 0 var(--sp-1);
+  border-radius: var(--r-sm);
+}
+
+.fp-legal-page__back {
+  margin: 0 0 var(--sp-4);
+}
+
+.fp-legal-page__siblings {
+  margin-top: var(--sp-7);
+  padding-top: var(--sp-4);
+  border-top: var(--border-w) solid var(--c-border);
+}
+
+.fp-legal-page__siblings-title {
+  color: var(--c-text3);
+  font-size: var(--fs-sm);
+  margin: 0 0 var(--sp-2);
+}
+
+.fp-legal-page__siblings ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.fp-legal-page__siblings li {
+  margin-bottom: var(--sp-2);
+}
+
+/* Печать. Главный сценарий этого экрана — «сохранить экземпляр в момент спора»,
+   и на бумагу не должны ехать навигация приложения и переходы между документами.
+   Цвета не переопределяются: браузер сам не печатает фоновые заливки, а задавать
+   чёрный и белый значило бы завести два цвета мимо палитры (TOK-01). */
+@media print {
+  .fp-legal-page {
+    max-width: none;
+    padding: 0;
+  }
+
+  .fp-legal-page__back,
+  .fp-legal-page__siblings {
+    display: none;
+  }
+
+  /* Таблица на бумаге не прокручивается — печатаем целиком. */
+  .fp-legal-page__table-wrap {
+    overflow: visible;
+  }
+
+  /* Раздел не должен начинаться последней строкой листа. */
+  .fp-legal-page__body h2,
+  .fp-legal-page__body h3 {
+    break-after: avoid;
+  }
+}

@@ -160,7 +160,11 @@ LEGACY_CONTEXT_MARKERS = (
 # openapi_paths 114 (v8.38.0): +1 — `/api/planning/history/{snapshot_id}/restore`.
 # Отмена удаления снимка: у пяти прочих сущностей она была, у снимков плана нет,
 # хотя мягкое удаление уже работало и данные оставались в базе.
-EXPECTED_COUNTS = {"tables": 30, "migrations": 34, "openapi_paths": 114}
+# openapi_paths 115 (v8.44.0): +1 — `/api/legal/documents/{slug}`, ТЕКСТ юридического
+# документа. Реестр метаданных (`/legal/documents`) существовал с v8.40.0, а эндпоинта
+# с содержимым не было вовсе: React показать политику не мог и вынужден был бы
+# перепечатать юридический текст у себя.
+EXPECTED_COUNTS = {"tables": 30, "migrations": 34, "openapi_paths": 115}
 
 
 # Канарейка CJK: редкий токен-глюк генерации ассистентов — иероглиф вместо

@@ -100,4 +100,18 @@ describe("RegisterPage — регистрация (FRM/FB, 152-ФЗ)", () => {
     expect(mutateAsyncMock.mock.calls.at(-1)?.[0]).toMatchObject({ referral_code: "ABC123" });
     searchMock.mockReturnValue({});
   });
+
+  /* 🔴 Согласие, данное без возможности прочитать текст ЗДЕСЬ ЖЕ, — неинформированное.
+     Единственным путём к политике был футер внизу страницы, то есть после того, как
+     решение уже принято (design-critic). Ссылка открывается в новой вкладке: иначе
+     наполовину заполненная форма теряется ([FRM-06]). */
+  it("у согласия есть ссылка на сам документ, и она не топит форму", () => {
+    render(<RegisterPage />);
+    const link = screen.getByRole("link", { name: /прочитать политику/i });
+    expect(link).toHaveAttribute("href", "/legal/privacy");
+    expect(link).toHaveAttribute("target", "_blank");
+    // Без `noopener` открытая вкладка получает доступ к `window.opener`.
+    expect(link).toHaveAttribute("rel", expect.stringContaining("noopener"));
+  });
 });
+

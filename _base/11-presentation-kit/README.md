@@ -9,6 +9,8 @@
 
 ---
 
+> 🆕 **Форматы файлов** — [`FORMATS.md`](FORMATS.md): PDF, DOCX, EPUB, XLSX, RTF, HTML и чем каждый собирается. Исполнитель — `scripts/make_document.py`.
+
 ## §1. Инструменты уже подключены — не писать HTML руками
 
 `00-infrastructure/63-ai-tools-landscape.md` §«Презентация из текста»:

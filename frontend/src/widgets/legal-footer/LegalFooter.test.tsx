@@ -3,7 +3,35 @@ import { render, screen } from "@testing-library/react";
 import { LegalFooter } from "./LegalFooter";
 
 const { useLegalMock } = vi.hoisted(() => ({ useLegalMock: vi.fn() }));
-vi.mock("@entities/legal", () => ({ useLegalDocuments: () => useLegalMock() }));
+/* Подменяются только запросы: `legalLink` — чистая функция разбора адреса,
+   и подменять её значило бы проверять свою выдумку вместо настоящей ссылки. */
+vi.mock("@entities/legal", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@entities/legal")>()),
+  useLegalDocuments: () => useLegalMock(),
+}));
+/* Роутер подменён: поднимать его ради футера дороже, чем стоит. `Link` собирает href
+   из маршрута и параметров так же, как настоящий, — иначе проверялась бы разметка,
+   которой в продукте нет. */
+vi.mock("@tanstack/react-router", () => ({
+  Link: ({
+    children,
+    to,
+    params,
+    ...rest
+  }: {
+    children: React.ReactNode;
+    to: string;
+    params?: Record<string, string>;
+  }) => (
+    <a
+      href={Object.entries(params ?? {}).reduce((p, [k, v]) => p.replace(`$${k}`, v), to)}
+      {...rest}
+    >
+      {children}
+    </a>
+  ),
+}));
+
 
 const LEGAL = {
   documents: {

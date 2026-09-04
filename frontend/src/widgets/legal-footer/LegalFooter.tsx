@@ -1,4 +1,5 @@
-import { useLegalDocuments } from "@entities/legal";
+import { Link } from "@tanstack/react-router";
+import { legalLink, useLegalDocuments } from "@entities/legal";
 import { formatDate } from "@shared/lib/date/formatDate";
 import { t } from "@shared/lib/i18n/t";
 import { clearCookieChoice } from "@widgets/cookie-banner";
@@ -55,13 +56,18 @@ export function LegalFooter() {
           {documents.map((doc) => (
             <li key={doc.key} className="fp-legal-footer__item">
               {/* Вся строка — одна ссылка: цель нажатия набирает высоту сама, а редакция
-                  попадает в доступное имя и звучит при обходе по Tab ([A11Y-09]). */}
-              <a href={doc.url} className="fp-legal-footer__link">
+                  попадает в доступное имя и звучит при обходе по Tab ([A11Y-09]).
+
+                  🔴 `Link`, а не `<a href>`: с полной перезагрузкой человек, читающий
+                  политику посреди заполнения формы регистрации, возвращался к ПУСТОЙ
+                  форме ([FRM-06], design-critic). Обычная ссылка стояла, пока тексты
+                  отдавала Jinja; с v8.44.0 они в React. */}
+              <Link {...legalLink(doc.url)} className="fp-legal-footer__link">
                 <span className="fp-legal-footer__title">{doc.title}</span>
                 {!sharedEdition && doc.edition && (
                   <span className="fp-legal-footer__meta">{doc.edition}</span>
                 )}
-              </a>
+              </Link>
             </li>
           ))}
         </ul>

@@ -28,7 +28,7 @@ class Settings(BaseSettings):
         description="Название проекта.",
     )
     APP_VERSION: str = Field(
-        default="8.43.0",
+        default="8.44.0",
         description="Версия приложения (INFRA-13): код, UI-футер, git-тег.",
     )
     PROJECT_TAGLINE: str = Field(
@@ -209,8 +209,12 @@ class Settings(BaseSettings):
     # регистрационные данные. Пока не заполнены и флаг ниже не выставлен,
     # на юр-страницах показывается баннер «документ в стадии оформления».
     LEGAL_OPERATOR_NAME: str = Field(
-        default="ООО «ФИНПАЙЛОТ»",
-        description="Наименование оператора ПДн (юрлицо/ИП). До регистрации — заглушка.",
+        default="сервис FINPILOT",
+        description=(
+            "Наименование оператора ПДн. Совпадает с опубликованным пакетом "
+            "(docs/legal/README.md §1: решение этапа MVP — оператор без реквизитов "
+            "юрлица). Гейт: tests/test_legal_single_source.py."
+        ),
     )
     LEGAL_OPERATOR_INN: str = Field(
         default="",
@@ -221,17 +225,25 @@ class Settings(BaseSettings):
         description="Юридический адрес оператора. Пусто = не заполнено.",
     )
     LEGAL_CONTACT_EMAIL: str = Field(
-        default="support@finpilot.app",
-        description="Контактный e-mail для обращений (в т.ч. по ПДн). Домен — заглушка.",
+        default="finpilot.help@proton.me",
+        description=(
+            "Адрес обращений и отзыва согласий. Напечатан в самих документах — по нему "
+            "человек реализует права по 152-ФЗ, поэтому расходиться с текстом нельзя."
+        ),
     )
     LEGAL_DOC_DATE: str = Field(
         default="",
         description="Дата вступления документов в силу (YYYY-MM-DD). Пусто = не указана.",
     )
     LEGAL_DATA_RETENTION_MONTHS: int = Field(
-        default=6,
+        default=12,
         ge=0,
-        description="Срок хранения данных после удаления учётной записи, месяцев.",
+        description=(
+            "Срок хранения данных после удаления учётной записи, месяцев. 🔴 Это "
+            "обещание пользователю, напечатанное в политике словами («1 (одного) "
+            "года», privacy-policy.md §6.3). Было 6 при годе в тексте — полгода "
+            "расхождения между кодом и обязательством."
+        ),
     )
     LEGAL_DETAILS_CONFIRMED: bool = Field(
         default=False,

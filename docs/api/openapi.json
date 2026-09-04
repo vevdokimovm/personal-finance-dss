@@ -2613,6 +2613,45 @@
         "title": "LegalDocument",
         "type": "object"
       },
+      "LegalDocumentContent": {
+        "description": "Документ вместе с ТЕКСТОМ.\n\nОтдельно от `LegalDocument`: реестр отдаёт метаданные всех документов сразу и висит\nв футере каждой страницы — вкладывать в него шесть полных текстов значило бы возить\nдесятки килобайт на каждой навигации ради ссылки из четырёх слов.\n\nСодержимое — markdown, как в официальном пакете (`docs/legal/`), а не HTML. Конверсия\nна бэкенде завела бы ТРЕТЬЮ редакцию документа рядом с `md` и `docx`, и доказывать\nв споре пришлось бы, какая из трёх показана человеку.",
+        "properties": {
+          "content": {
+            "title": "Content",
+            "type": "string"
+          },
+          "effective_from": {
+            "title": "Effective From",
+            "type": "string"
+          },
+          "slug": {
+            "title": "Slug",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "url": {
+            "title": "Url",
+            "type": "string"
+          },
+          "version": {
+            "title": "Version",
+            "type": "string"
+          }
+        },
+        "required": [
+          "title",
+          "version",
+          "effective_from",
+          "url",
+          "slug",
+          "content"
+        ],
+        "title": "LegalDocumentContent",
+        "type": "object"
+      },
       "LegalDocuments": {
         "description": "Ответ `/legal/documents`.\n\nСхема заведена ДО фронта (v8.40.0): раньше эндпоинт был размечен `-> dict`, то есть\nпопадал в OpenAPI как `{[key: string]: unknown}`. Цена рукописного типа здесь выше\nобычной — по этим полям строится юридический контур (ссылки в футере L7, дисклеймер\n39-ФЗ L5), и расхождение означает отсутствие обязательного по закону элемента,\nа не косметический сбой.",
         "properties": {
@@ -5193,7 +5232,7 @@
   },
   "info": {
     "title": "FINPILOT",
-    "version": "8.42.0"
+    "version": "8.43.0"
   },
   "openapi": "3.1.0",
   "paths": {
@@ -8128,6 +8167,49 @@
           }
         },
         "summary": "Реестр юридических документов",
+        "tags": [
+          "Согласия и право"
+        ]
+      }
+    },
+    "/api/legal/documents/{slug}": {
+      "get": {
+        "description": "Текст документа из ЕДИНСТВЕННОГО источника — файла официального пакета.\n\n🔴 Публичный намеренно. Политику обработки ПДн человек обязан прочитать ДО\nрегистрации, иначе согласие неинформированное — а это дефект юридический, а не\nинтерфейсный. Требовать авторизации, чтобы прочитать условия обработки данных,\nзначит замкнуть круг.\n\n🔴 Путь берётся из реестра ПО КЛЮЧУ и никогда не склеивается из ввода: иначе\n`../../.env` читался бы с диска через публичный эндпоинт. Неизвестный ключ — 404\nдо всякого обращения к файловой системе.",
+        "operationId": "legal_document_content_api_legal_documents__slug__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "slug",
+            "required": true,
+            "schema": {
+              "title": "Slug",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LegalDocumentContent"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Текст юридического документа",
         "tags": [
           "Согласия и право"
         ]

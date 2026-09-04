@@ -216,9 +216,25 @@ def main() -> int:
     # а её результат проверяется постусловием ниже: шаг, который нельзя забыть,
     # потому что его никто не выполняет руками.
     #
-    # Классы `product` и `profile` — публичные витрины, им `_base/` не кладётся
-    # никогда (ADR-004): канон системы не публикуется вместе с продуктом.
-    if args.cls not in {"product", "profile"}:
+    is_public = str(args.private).lower() == "false"
+    NO_BASE_CLASSES = {"archived"}   # тот же список, что в repo_invariants.py
+
+    # 🔴 РЕШАЕТ ПУБЛИЧНОСТЬ, А НЕ КЛАСС — исправлено 04.09.2026.
+    #
+    # Прежняя строка гласила «классы `product` и `profile` — публичные витрины,
+    # им `_base/` не кладётся никогда». Формулировка подменяла признак: `ADR-004`
+    # запрещает раздачу **публичным** репам, потому что канон системы не должен
+    # уезжать наружу вместе с продуктом. Класс тут ни при чём.
+    #
+    # Замер по 9 репам класса `product` — закономерность без единого исключения:
+    #
+    #     private=true   control-panel, personal-finance-dss, research-engine  → _base ЕСТЬ
+    #     private=false  algorithms-site, claude-usage, salvation, vk-graph, … → _base нет
+    #
+    # Расхождение стоило отката: заведение приватного продукта падало по `R-06`
+    # («нет _base/BASE_VERSION»), потому что `new_repo` не раздавал канон,
+    # а инвариант его требовал. Два места знали разное — классический `/auto` §7.
+    if not is_public and args.cls not in NO_BASE_CLASSES:
         print("  · раскладываю _base/ (канон base-repo) …")
         sync = subprocess.run(
             ["python3", str(BASE_REPO / "scripts" / "sync_base_local.py"),

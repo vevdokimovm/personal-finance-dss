@@ -116,6 +116,11 @@ export function RegisterPage() {
             onChange={(e) => setDisplayName(e.target.value)}
           />
         </div>
+        {/* 🔴 Ссылка на сам документ — в подписи чекбокса. Согласие, данное без
+            возможности прочитать текст в этот момент, неинформированное: единственным
+            путём к политике был футер внизу страницы, то есть ровно там, где человек
+            уже принял решение (design-critic). Открывается в новой вкладке — иначе
+            наполовину заполненная форма теряется ([FRM-06]). */}
         <label className="fp-auth-consent">
           <input
             type="checkbox"
@@ -123,7 +128,12 @@ export function RegisterPage() {
             checked={consent}
             onChange={(e) => setConsent(e.target.checked)}
           />
-          {t("Согласен на обработку персональных данных (152-ФЗ)")}
+          <span>
+            {t("Согласен на обработку персональных данных (152-ФЗ) — ")}
+            <a href="/legal/privacy" target="_blank" rel="noopener noreferrer">
+              {t("прочитать политику")}
+            </a>
+          </span>
         </label>
         <label className="fp-auth-consent">
           <input

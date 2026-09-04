@@ -10,6 +10,7 @@ from fastapi import APIRouter, Depends, HTTPException, Request, Response
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
+from app.config import BASE_DIR
 from app.core.legal import DISCLAIMER_39FZ, LEGAL_DOCUMENTS, is_known
 from app.database.db import get_db
 from app.database.models import User
@@ -137,4 +138,57 @@ def legal_documents() -> LegalDocuments:
             for key, doc in LEGAL_DOCUMENTS.items()
         },
         disclaimer_39fz=DISCLAIMER_39FZ,
+    )
+
+
+class LegalDocumentContent(LegalDocument):
+    """Документ вместе с ТЕКСТОМ.
+
+    Отдельно от `LegalDocument`: реестр отдаёт метаданные всех документов сразу и висит
+    в футере каждой страницы — вкладывать в него шесть полных текстов значило бы возить
+    десятки килобайт на каждой навигации ради ссылки из четырёх слов.
+
+    Содержимое — markdown, как в официальном пакете (`docs/legal/`), а не HTML. Конверсия
+    на бэкенде завела бы ТРЕТЬЮ редакцию документа рядом с `md` и `docx`, и доказывать
+    в споре пришлось бы, какая из трёх показана человеку.
+    """
+
+    slug: str
+    content: str
+
+
+@router.get("/legal/documents/{slug}", summary="Текст юридического документа")
+def legal_document_content(slug: str) -> LegalDocumentContent:
+    """Текст документа из ЕДИНСТВЕННОГО источника — файла официального пакета.
+
+    🔴 Публичный намеренно. Политику обработки ПДн человек обязан прочитать ДО
+    регистрации, иначе согласие неинформированное — а это дефект юридический, а не
+    интерфейсный. Требовать авторизации, чтобы прочитать условия обработки данных,
+    значит замкнуть круг.
+
+    🔴 Путь берётся из реестра ПО КЛЮЧУ и никогда не склеивается из ввода: иначе
+    `../../.env` читался бы с диска через публичный эндпоинт. Неизвестный ключ — 404
+    до всякого обращения к файловой системе.
+    """
+    doc = LEGAL_DOCUMENTS.get(slug)
+    if doc is None:
+        raise HTTPException(status_code=404, detail="Неизвестный документ")
+    path = BASE_DIR / doc["path"]
+    try:
+        content = path.read_text(encoding="utf-8")
+    except OSError:
+        # Файл пакета пропал или недоступен. Молча отдать пустой текст нельзя: снаружи
+        # это неотличимо от документа, который так и написан, — и человек «ознакомился»
+        # с пустой страницей.
+        raise HTTPException(
+            status_code=503,
+            detail="Текст документа временно недоступен. Обратитесь в поддержку.",
+        )
+    return LegalDocumentContent(
+        slug=slug,
+        title=doc["title"],
+        version=doc["version"],
+        effective_from=doc["effective_from"],
+        url=doc["url"],
+        content=content,
     )

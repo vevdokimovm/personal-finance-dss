@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { useLegalDocuments } from "@entities/legal";
 import { Button } from "@shared/ui";
+import { Link } from "@tanstack/react-router";
+import { legalLink } from "@entities/legal";
 import { t } from "@shared/lib/i18n/t";
 import { readCookieChoice, saveCookieChoice, type CookieChoice } from "./cookieConsent";
 import "./CookieBanner.css";
@@ -85,12 +87,12 @@ export function CookieBanner() {
               "настройки. Аналитические помогают находить и устранять ошибки. " +
               "Выберите, что разрешить.",
           )}{" "}
-          {/* Обычный `<a>`, а не `<Link>`: тексты документов отдаёт Jinja
-              (`app/main.py::/legal/cookies`), их перенос в React — часть сноса Jinja.
-              Ссылка обязана быть живой уже сейчас (L7). */}
-          <a href="/legal/cookies" className="fp-cookie-banner__link">
+          {/* `Link` с v8.44.0: тексты документов переехали в React, и полная
+              перезагрузка ради чтения политики больше не нужна — она стирала
+              введённое на форме под баннером. */}
+          <Link {...legalLink("/legal/cookies")} className="fp-cookie-banner__link">
             {t("Политика cookie")}
-          </a>
+          </Link>
         </p>
         <div className="fp-cookie-banner__actions">
           {/* Один вариант оформления на обе кнопки: отказ не должен быть дороже

@@ -7,3 +7,4 @@
  * отсутствие обязательного по закону элемента, а не косметический сбой.
  */
 export type { LegalDocuments, LegalDocument } from "@shared/api/generated";
+export type { LegalDocumentContent } from "@shared/api/generated";

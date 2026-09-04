@@ -138,3 +138,109 @@ test("дисклеймер 39-ФЗ стоит на экране рекоменд
   await expect(disclaimer).toBeVisible();
   await expect(disclaimer).toContainText("не является инвестиционным советником");
 });
+
+/* 🔴 Экран документа в НАСТОЯЩЕМ браузере (v8.44.0). Юнит-тесты проверяют разметку
+   при подменённом роутере; только браузер показывает, что маршрут `/legal/$doc`
+   действительно отвечает по адресу из реестра, markdown превращается в разметку,
+   а переход из футера не перезагружает приложение. */
+const PRIVACY_TEXT = `# Политика в отношении обработки персональных данных
+
+Настоящая Политика определяет порядок обработки персональных данных.
+
+## 1. Общие положения и сведения об Операторе
+
+1.1. Оператором выступает сервис FINPILOT.
+
+| | |
+|---|---|
+| **Оператор** | сервис FINPILOT |
+| **E-mail для обращений** | finpilot.help@proton.me |
+`;
+
+async function stubDocumentOn(
+  target: import("@playwright/test").Page | import("@playwright/test").BrowserContext,
+) {
+  await target.route("**/api/legal/documents/privacy_policy", (route) =>
+    route.fulfill({
+      json: {
+        slug: "privacy_policy",
+        title: "Политика обработки персональных данных",
+        version: "1.0",
+        effective_from: "2026-07-29",
+        url: "/legal/privacy",
+        content: PRIVACY_TEXT,
+      },
+    }),
+  );
+}
+
+test("гость открывает политику из футера и читает настоящий текст (L7)", async ({ page }) => {
+  await stubLegal(page);
+  await stubDocumentOn(page);
+  await page.route("**/api/auth/me", (route) => route.fulfill({ status: 401, json: {} }));
+
+  await page.goto("/login");
+  await page.getByRole("link", { name: /Политика обработки персональных данных/ }).click();
+
+  // Текст документа, а не заглушка и не пустая страница.
+  await expect(page.getByText(/Оператором выступает сервис FINPILOT/)).toBeVisible();
+  // Markdown стал разметкой: раздел — настоящий заголовок.
+  await expect(page.getByRole("heading", { name: /1\. Общие положения/ })).toBeVisible();
+  // Таблица осталась таблицей, несмотря на прокрутку по горизонтали.
+  await expect(page.getByRole("table")).toBeVisible();
+  // Заголовок вкладки называет документ (WCAG 2.4.2).
+  await expect(page).toHaveTitle(/Политика обработки персональных данных/);
+});
+
+/* 🔴 Проверяется ИМЕННО SPA-навигация, а не сохранение формы. Форму от потери спасает
+   не `Link`, а отдельная ссылка у чекбокса согласия с `target="_blank"`: при переходе
+   в той же вкладке React размонтирует страницу регистрации, и введённое исчезает
+   одинаково что с `Link`, что с `<a href>`. `Link` убирает полную перезагрузку
+   приложения — не больше и не меньше. */
+test("переход на документ не перезагружает приложение", async ({ page }) => {
+  await stubLegal(page);
+  await stubDocumentOn(page);
+  await page.route("**/api/auth/me", (route) => route.fulfill({ status: 401, json: {} }));
+
+  await page.goto("/register");
+  // Метка на объекте окна переживает SPA-навигацию и гибнет при полной перезагрузке.
+  await page.evaluate(() => {
+    (window as unknown as { __spa?: boolean }).__spa = true;
+  });
+
+  await page
+    .getByRole("link", { name: /Политика обработки персональных данных/ })
+    .first()
+    .click();
+  await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+  expect(await page.evaluate(() => (window as unknown as { __spa?: boolean }).__spa)).toBe(true);
+});
+
+/* Согласие, данное без возможности прочитать текст здесь же, — неинформированное.
+   Ссылка открывает документ НОВОЙ вкладкой: в той же заполненная форма потерялась бы. */
+test("политику можно прочитать прямо из формы регистрации, не потеряв введённое", async ({
+  page,
+  context,
+}) => {
+  /* Заглушки — на КОНТЕКСТ, а не на страницу: документ открывается новой вкладкой,
+     и `page.route` на неё не распространяется — вкладка ушла бы за настоящим API. */
+  await context.route("**/api/legal/documents", (route) => route.fulfill({ json: LEGAL }));
+  await stubDocumentOn(context);
+  await context.route("**/api/notifications/unread-count", (route) =>
+    route.fulfill({ json: { unread_count: 0 } }),
+  );
+  await context.route("**/api/auth/me", (route) => route.fulfill({ status: 401, json: {} }));
+
+  await page.goto("/register");
+  await page.getByLabel("Email").fill("keep-me@test.io");
+
+  const [documentTab] = await Promise.all([
+    context.waitForEvent("page"),
+    page.getByRole("link", { name: /прочитать политику/i }).click(),
+  ]);
+  await documentTab.waitForLoadState();
+  await expect(documentTab.getByText(/Оператором выступает сервис FINPILOT/)).toBeVisible();
+
+  // Исходная вкладка нетронута: введённое на месте.
+  await expect(page.getByLabel("Email")).toHaveValue("keep-me@test.io");
+});

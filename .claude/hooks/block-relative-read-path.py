@@ -34,6 +34,35 @@ FILE_SUFFIX = re.compile(
     r"\.(md|py|ts|tsx|js|jsx|json|css|html|txt|xml|ya?ml|toml|cfg|ini|sh|sql|log)$"
 )
 OPERATORS = {"&&", "||", "|", ";"}
+# Перенаправления (`2>/dev/null`, `>out.log`, `<in.txt`) — не аргументы команды: их
+# обрабатывает shell, и под правила `Read()` они не попадают. Токен `2>/dev/null`
+# содержит «/» и без этой проверки читался как относительный путь у `grep`.
+REDIRECT = re.compile(r"^\d*[<>]")
+
+
+HEREDOC_START = re.compile(r"<<-?\s*(['\"]?)([A-Za-z_][A-Za-z0-9_]*)\1")
+
+
+def strip_heredocs(command: str) -> str:
+    """Убрать ТЕЛА heredoc: это данные, а не команды.
+
+    Без этого содержимое `cat > f.css <<'EOF' … EOF` разбиралось как аргументы: строка
+    CSS `*/` и любой путь внутри текста читались как вызов утилиты. Поймано на записи
+    файла со стилями — команда была исправна, а хук её блокировал.
+    """
+    lines = command.split("\n")
+    result: list[str] = []
+    terminator: str | None = None
+    for line in lines:
+        if terminator is not None:
+            if line.strip() == terminator:
+                terminator = None
+            continue
+        result.append(line)
+        match = HEREDOC_START.search(line)
+        if match:
+            terminator = match.group(2)
+    return "\n".join(result)
 
 
 def segments(command: str) -> list[list[str]]:
@@ -45,7 +74,7 @@ def segments(command: str) -> list[list[str]]:
     с JSON внутри, то есть собственную проверочную команду. Разбор идёт по ТОКЕНАМ:
     оператор внутри кавычек токеном-оператором не является.
     """
-    padded = re.sub(r"(\|\||&&|[|;])", r" \1 ", command)
+    padded = re.sub(r"(\|\||&&|[|;])", r" \1 ", strip_heredocs(command))
     try:
         tokens = shlex.split(padded, posix=False)
     except ValueError:
@@ -69,7 +98,16 @@ def offending_paths(command: str) -> list[str]:
     for parts in segments(command):
         if parts[0].rsplit("/", 1)[-1] not in READERS:
             continue
+        after_redirect = False
         for arg in parts[1:]:
+            # Цель перенаправления идёт отдельным токеном (`> out.log`) либо слитно
+            # (`2>/dev/null`) — пропускаются оба вида.
+            if after_redirect:
+                after_redirect = False
+                continue
+            if REDIRECT.match(arg):
+                after_redirect = arg.rstrip("&") in {">", ">>", "<", "2>", "2>>", "&>"}
+                continue
             if arg.startswith("-") or arg[:1] in {'"', "'", "$"}:
                 continue
             if arg.startswith("/"):
