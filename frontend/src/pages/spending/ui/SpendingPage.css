@@ -1,0 +1,140 @@
+/* Советы по расходам. Сумма экономии — первый и самый крупный элемент: экран
+   открывают, чтобы узнать «сколько», разбор по категориям читают вторым.
+
+   🔴 Разделы намеренно неравноправны (design-critic). Советы и влияние на цели —
+   то, ради чего экран существует: рамка, поверхность, вес. Тренды и разбор по
+   категориям — справочный хвост: строки с разделителем, без рамки. Четыре
+   одинаковые плитки подряд читаются как четыре равнозначных раздела, а они
+   не равнозначны. */
+
+.fp-spending {
+  max-width: var(--content-max);
+  margin: 0 auto;
+  padding: var(--sp-6) var(--sp-5) var(--sp-8);
+}
+
+.fp-spending h1 {
+  font-size: var(--fs-xl);
+  margin: 0 0 var(--sp-2);
+}
+
+.fp-spending h2 {
+  font-size: var(--fs-lg);
+  margin: var(--sp-6) 0 var(--sp-3);
+}
+
+.fp-spending__window {
+  color: var(--c-text3);
+  font-size: var(--fs-sm);
+  margin: 0 0 var(--sp-5);
+}
+
+/* Ответ экрана, а не строка в потоке. Единственная акцентная поверхность:
+   акцент работает, только пока его мало. */
+.fp-spending__total {
+  background: var(--c-accent-bg);
+  border-radius: var(--r-lg);
+  padding: var(--sp-5);
+  margin: 0 0 var(--sp-5);
+  font-size: var(--fs-md);
+}
+
+.fp-spending__total strong {
+  font-size: var(--fs-2xl);
+  color: var(--c-accent-hl);
+  /* Табличные цифры — правило проекта для любых денег: иначе колонка сумм
+     «дышит» при обновлении. */
+  font-variant-numeric: tabular-nums;
+}
+
+.fp-spending__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--sp-3);
+}
+
+.fp-spending__advice,
+.fp-spending__goal {
+  border: var(--border-w) solid var(--c-border);
+  border-radius: var(--r-md);
+  padding: var(--sp-4);
+  background: var(--c-surface);
+}
+
+/* Справочные разделы: строки, разделённые линией. Ни рамки, ни фона — их вес
+   на экране должен быть меньше, чем у советов и целей. */
+.fp-spending__list--plain {
+  gap: 0;
+}
+
+.fp-spending__list--plain > li {
+  padding: var(--sp-3) 0;
+  border-bottom: var(--border-w) solid var(--c-border);
+}
+
+.fp-spending__list--plain > li:last-child {
+  border-bottom: none;
+}
+
+.fp-spending__stats-row,
+.fp-spending__trend,
+.fp-spending__goal {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2) var(--sp-4);
+  align-items: baseline;
+}
+
+.fp-spending__advice-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--sp-4);
+  margin: 0 0 var(--sp-2);
+}
+
+.fp-spending__category {
+  font-size: var(--fs-md);
+  color: var(--c-text);
+}
+
+/* Сумма совета — весом, а не цветом: акцентный зелёный в проекте означает
+   «текст/ссылки», и на некликабельном числе даёт ложный аффорданс. */
+.fp-spending__saving {
+  font-size: var(--fs-lg);
+  color: var(--c-text);
+  font-variant-numeric: tabular-nums;
+}
+
+.fp-spending__message {
+  margin: 0 0 var(--sp-2);
+  color: var(--c-text2);
+}
+
+/* Сравнение «сейчас / обычно» — суть карточки, а не подпись: набирается телом,
+   вторичным цветом, а не третичной мелочью. */
+.fp-spending__compare {
+  margin: 0 0 var(--sp-1);
+  color: var(--c-text2);
+  font-size: var(--fs-base);
+  font-variant-numeric: tabular-nums;
+}
+
+.fp-spending__numbers {
+  margin: 0;
+  color: var(--c-text3);
+  font-size: var(--fs-sm);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Аномалия помечена цветом И словом: цвет один не различим тем, кто его не видит
+   (WCAG 1.4.1 — информация не передаётся одним лишь цветом). */
+.fp-spending__flag {
+  background: var(--c-amber-bg);
+  color: var(--c-amber);
+  border-radius: var(--r-sm);
+  padding: var(--sp-0) var(--sp-2);
+  font-size: var(--fs-sm);
+}

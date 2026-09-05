@@ -141,6 +141,7 @@ def test_navigation_labels_match_screen_headings():
         "/": "Финансовый обзор",
         "/planning": "План распределения",
         "/transactions": "Операции",
+        "/spending": "Советы по расходам",
         "/obligations": "Кредиты и обязательства",
         "/goals": "Цели",
         "/banks": "Ликвидные активы",

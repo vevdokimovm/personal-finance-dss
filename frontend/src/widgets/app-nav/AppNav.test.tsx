@@ -55,7 +55,7 @@ describe("AppNav — постоянный навигационный карка�
       .map((a) => a.getAttribute("href"))
       .sort();
     expect(hrefs).toEqual(
-      ["/", "/planning", "/transactions", "/obligations", "/goals", "/banks", "/household", "/profile"].sort(),
+      ["/", "/planning", "/transactions", "/spending", "/obligations", "/goals", "/banks", "/household", "/profile"].sort(),
     );
   });
 
@@ -96,6 +96,7 @@ describe("AppNav — постоянный навигационный карка�
       "Финансовый обзор",
       "План распределения",
       "Операции",
+      "Советы по расходам",
       "Кредиты и обязательства",
       "Цели",
       "Ликвидные активы",

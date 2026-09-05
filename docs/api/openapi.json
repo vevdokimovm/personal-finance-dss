@@ -1041,6 +1041,75 @@
         "title": "CategoryRuleResponse",
         "type": "object"
       },
+      "CategoryStatsSchema": {
+        "description": "Слой 1: статистика по категории за окно месяцев.\n\nНорма — медиана, разброс — MAD, аномалия — robust z-score: метод устойчив\nк выбросам, потому что один отпуск не должен переписывать норму «Транспорта».",
+        "properties": {
+          "avg_check": {
+            "title": "Avg Check",
+            "type": "number"
+          },
+          "baseline": {
+            "title": "Baseline",
+            "type": "number"
+          },
+          "category": {
+            "title": "Category",
+            "type": "string"
+          },
+          "compressibility": {
+            "title": "Compressibility",
+            "type": "number"
+          },
+          "current": {
+            "title": "Current",
+            "type": "number"
+          },
+          "freq_month": {
+            "title": "Freq Month",
+            "type": "number"
+          },
+          "is_anomaly": {
+            "title": "Is Anomaly",
+            "type": "boolean"
+          },
+          "mad": {
+            "title": "Mad",
+            "type": "number"
+          },
+          "months_observed": {
+            "title": "Months Observed",
+            "type": "integer"
+          },
+          "pain_score": {
+            "title": "Pain Score",
+            "type": "number"
+          },
+          "share": {
+            "title": "Share",
+            "type": "number"
+          },
+          "z_score": {
+            "title": "Z Score",
+            "type": "number"
+          }
+        },
+        "required": [
+          "category",
+          "baseline",
+          "mad",
+          "current",
+          "z_score",
+          "freq_month",
+          "avg_check",
+          "share",
+          "compressibility",
+          "pain_score",
+          "is_anomaly",
+          "months_observed"
+        ],
+        "title": "CategoryStatsSchema",
+        "type": "object"
+      },
       "ChangePasswordRequest": {
         "properties": {
           "current_password": {
@@ -2398,6 +2467,83 @@
         "title": "GoalDTO",
         "type": "object"
       },
+      "GoalImpactSchema": {
+        "description": "Слой 3-B: на сколько экономия приближает цель.\n\n🔴 `months_to_deadline`, `eta_now` и `months_earlier` необязательны и означают\nразное: бессрочную цель, отсутствие пополнений вовсе и невозможность посчитать\nвыигрыш. Схема, объявившая их обязательными, заставила бы фронт показать ноль\nтам, где ответа нет, — а «до цели 0 месяцев» и «цель не пополняется» человек\nчитает противоположным образом.",
+        "properties": {
+          "current_monthly": {
+            "title": "Current Monthly",
+            "type": "number"
+          },
+          "eta_boosted": {
+            "title": "Eta Boosted",
+            "type": "number"
+          },
+          "eta_now": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Eta Now"
+          },
+          "goal_name": {
+            "title": "Goal Name",
+            "type": "string"
+          },
+          "message": {
+            "title": "Message",
+            "type": "string"
+          },
+          "months_earlier": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Months Earlier"
+          },
+          "months_to_deadline": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Months To Deadline"
+          },
+          "on_track": {
+            "title": "On Track",
+            "type": "boolean"
+          },
+          "redirected_saving": {
+            "title": "Redirected Saving",
+            "type": "number"
+          },
+          "remaining": {
+            "title": "Remaining",
+            "type": "number"
+          }
+        },
+        "required": [
+          "goal_name",
+          "remaining",
+          "current_monthly",
+          "redirected_saving",
+          "eta_boosted",
+          "on_track",
+          "message"
+        ],
+        "title": "GoalImpactSchema",
+        "type": "object"
+      },
       "GoalResponse": {
         "properties": {
           "achieved_at": {
@@ -3423,6 +3569,45 @@
           "password"
         ],
         "title": "LoginRequest",
+        "type": "object"
+      },
+      "MerchantStatsSchema": {
+        "description": "Слой 2: агрегат по мерчанту за текущий период (информационно).",
+        "properties": {
+          "avg_check": {
+            "title": "Avg Check",
+            "type": "number"
+          },
+          "category": {
+            "title": "Category",
+            "type": "string"
+          },
+          "compressibility": {
+            "title": "Compressibility",
+            "type": "number"
+          },
+          "count": {
+            "title": "Count",
+            "type": "integer"
+          },
+          "merchant": {
+            "title": "Merchant",
+            "type": "string"
+          },
+          "total": {
+            "title": "Total",
+            "type": "number"
+          }
+        },
+        "required": [
+          "merchant",
+          "total",
+          "count",
+          "avg_check",
+          "category",
+          "compressibility"
+        ],
+        "title": "MerchantStatsSchema",
         "type": "object"
       },
       "MfaConfirmRequest": {
@@ -4947,6 +5132,109 @@
         "title": "SnapshotDTO",
         "type": "object"
       },
+      "SpendingAdviceResponse": {
+        "description": "Ответ GET /planning/spending-advice целиком.\n\n`months_with_data` возвращается вместе с окном намеренно: у нового пользователя\nданных меньше минимума модели (`MIN_MONTHS = 3`), и экран обязан объяснить это\nсловами, а не показать пустые списки как поломку.",
+        "properties": {
+          "advice": {
+            "items": {
+              "$ref": "#/components/schemas/SpendingAdviceSchema"
+            },
+            "title": "Advice",
+            "type": "array"
+          },
+          "current_period": {
+            "title": "Current Period",
+            "type": "string"
+          },
+          "goal_impact": {
+            "items": {
+              "$ref": "#/components/schemas/GoalImpactSchema"
+            },
+            "title": "Goal Impact",
+            "type": "array"
+          },
+          "merchant_insights": {
+            "items": {
+              "$ref": "#/components/schemas/MerchantStatsSchema"
+            },
+            "title": "Merchant Insights",
+            "type": "array"
+          },
+          "months_window": {
+            "title": "Months Window",
+            "type": "integer"
+          },
+          "months_with_data": {
+            "title": "Months With Data",
+            "type": "integer"
+          },
+          "stats": {
+            "items": {
+              "$ref": "#/components/schemas/CategoryStatsSchema"
+            },
+            "title": "Stats",
+            "type": "array"
+          },
+          "temporal_patterns": {
+            "items": {
+              "$ref": "#/components/schemas/TemporalPatternSchema"
+            },
+            "title": "Temporal Patterns",
+            "type": "array"
+          },
+          "total_potential_saving": {
+            "title": "Total Potential Saving",
+            "type": "number"
+          }
+        },
+        "required": [
+          "current_period",
+          "months_window",
+          "months_with_data",
+          "total_potential_saving"
+        ],
+        "title": "SpendingAdviceResponse",
+        "type": "object"
+      },
+      "SpendingAdviceSchema": {
+        "description": "Слой 1: один совет по сокращению с уже посчитанной экономией.",
+        "properties": {
+          "baseline": {
+            "title": "Baseline",
+            "type": "number"
+          },
+          "category": {
+            "title": "Category",
+            "type": "string"
+          },
+          "current": {
+            "title": "Current",
+            "type": "number"
+          },
+          "message": {
+            "title": "Message",
+            "type": "string"
+          },
+          "potential_saving": {
+            "title": "Potential Saving",
+            "type": "number"
+          },
+          "reason": {
+            "title": "Reason",
+            "type": "string"
+          }
+        },
+        "required": [
+          "category",
+          "potential_saving",
+          "reason",
+          "current",
+          "baseline",
+          "message"
+        ],
+        "title": "SpendingAdviceSchema",
+        "type": "object"
+      },
       "StableBaseline": {
         "description": "Какая часть потока регулярна — мера доверия к прогнозу.\n\nПри доходе из разовых поступлений прогноз строится на шуме, и человеку важно знать\nэто раньше, чем он примет по нему решение.",
         "properties": {
@@ -5067,6 +5355,50 @@
           "message"
         ],
         "title": "StatementUploadResult",
+        "type": "object"
+      },
+      "TemporalPatternSchema": {
+        "description": "Слой 3-A: робастный тренд категории по завершённым месяцам.",
+        "properties": {
+          "baseline": {
+            "title": "Baseline",
+            "type": "number"
+          },
+          "category": {
+            "title": "Category",
+            "type": "string"
+          },
+          "direction": {
+            "title": "Direction",
+            "type": "string"
+          },
+          "message": {
+            "title": "Message",
+            "type": "string"
+          },
+          "months_observed": {
+            "title": "Months Observed",
+            "type": "integer"
+          },
+          "slope_abs": {
+            "title": "Slope Abs",
+            "type": "number"
+          },
+          "slope_pct": {
+            "title": "Slope Pct",
+            "type": "number"
+          }
+        },
+        "required": [
+          "category",
+          "direction",
+          "slope_abs",
+          "slope_pct",
+          "baseline",
+          "months_observed",
+          "message"
+        ],
+        "title": "TemporalPatternSchema",
         "type": "object"
       },
       "TransactionCreate": {
@@ -5902,7 +6234,7 @@
   },
   "info": {
     "title": "FINPILOT",
-    "version": "8.49.0"
+    "version": "8.53.0"
   },
   "openapi": "3.1.0",
   "paths": {
@@ -10166,9 +10498,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response Spending Advice Endpoint Api Planning Spending Advice Get",
-                  "type": "object"
+                  "$ref": "#/components/schemas/SpendingAdviceResponse"
                 }
               }
             },

@@ -45,6 +45,7 @@ from app.services.plan_export import plan_to_pdf, plan_to_xlsx
 from app.services.planning import run_planning
 from app.core.legal import DISCLAIMER_39FZ
 from app.schemas.planning import PlanningCalculateResponse
+from app.schemas.spending import SpendingAdviceResponse
 from app.utils.time import utcnow
 
 
@@ -805,14 +806,18 @@ def key_rate_endpoint() -> KeyRate:
     return KeyRate(**get_key_rate(fallback=settings.CBR_KEY_RATE_FALLBACK))
 
 
-@router.get("/spending-advice", summary="Советы по расходам (анализ трат по категориям)")
+@router.get(
+    "/spending-advice",
+    response_model=SpendingAdviceResponse,
+    summary="Советы по расходам (анализ трат по категориям)",
+)
 def spending_advice_endpoint(
     months: int = 6,
     db: Session = Depends(get_db),
     user_id: str | None = Depends(get_current_user_id),
-) -> dict[str, Any]:
+) -> SpendingAdviceResponse:
     """Анализ расходов по категориям за окно месяцев: персональная норма (медиана),
     аномалии (robust z-score) и мягкие советы по сокращению (мат-модель v3.0.0)."""
     from app.services.spending import get_spending_advice
 
-    return get_spending_advice(db, user_id=user_id, months=months)
+    return SpendingAdviceResponse(**get_spending_advice(db, user_id=user_id, months=months))

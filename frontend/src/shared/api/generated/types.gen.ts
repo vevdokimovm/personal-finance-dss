@@ -667,6 +667,65 @@ export type CategoryRuleResponse = {
 };
 
 /**
+ * CategoryStatsSchema
+ *
+ * Слой 1: статистика по категории за окно месяцев.
+ *
+ * Норма — медиана, разброс — MAD, аномалия — robust z-score: метод устойчив
+ * к выбросам, потому что один отпуск не должен переписывать норму «Транспорта».
+ */
+export type CategoryStatsSchema = {
+    /**
+     * Avg Check
+     */
+    avg_check: number;
+    /**
+     * Baseline
+     */
+    baseline: number;
+    /**
+     * Category
+     */
+    category: string;
+    /**
+     * Compressibility
+     */
+    compressibility: number;
+    /**
+     * Current
+     */
+    current: number;
+    /**
+     * Freq Month
+     */
+    freq_month: number;
+    /**
+     * Is Anomaly
+     */
+    is_anomaly: boolean;
+    /**
+     * Mad
+     */
+    mad: number;
+    /**
+     * Months Observed
+     */
+    months_observed: number;
+    /**
+     * Pain Score
+     */
+    pain_score: number;
+    /**
+     * Share
+     */
+    share: number;
+    /**
+     * Z Score
+     */
+    z_score: number;
+};
+
+/**
  * ChangePasswordRequest
  */
 export type ChangePasswordRequest = {
@@ -1669,6 +1728,60 @@ export type GoalDto = {
 };
 
 /**
+ * GoalImpactSchema
+ *
+ * Слой 3-B: на сколько экономия приближает цель.
+ *
+ * 🔴 `months_to_deadline`, `eta_now` и `months_earlier` необязательны и означают
+ * разное: бессрочную цель, отсутствие пополнений вовсе и невозможность посчитать
+ * выигрыш. Схема, объявившая их обязательными, заставила бы фронт показать ноль
+ * там, где ответа нет, — а «до цели 0 месяцев» и «цель не пополняется» человек
+ * читает противоположным образом.
+ */
+export type GoalImpactSchema = {
+    /**
+     * Current Monthly
+     */
+    current_monthly: number;
+    /**
+     * Eta Boosted
+     */
+    eta_boosted: number;
+    /**
+     * Eta Now
+     */
+    eta_now?: number | null;
+    /**
+     * Goal Name
+     */
+    goal_name: string;
+    /**
+     * Message
+     */
+    message: string;
+    /**
+     * Months Earlier
+     */
+    months_earlier?: number | null;
+    /**
+     * Months To Deadline
+     */
+    months_to_deadline?: number | null;
+    /**
+     * On Track
+     */
+    on_track: boolean;
+    /**
+     * Redirected Saving
+     */
+    redirected_saving: number;
+    /**
+     * Remaining
+     */
+    remaining: number;
+};
+
+/**
  * GoalResponse
  */
 export type GoalResponse = {
@@ -2322,6 +2435,38 @@ export type LoginRequest = {
      * Password
      */
     password: string;
+};
+
+/**
+ * MerchantStatsSchema
+ *
+ * Слой 2: агрегат по мерчанту за текущий период (информационно).
+ */
+export type MerchantStatsSchema = {
+    /**
+     * Avg Check
+     */
+    avg_check: number;
+    /**
+     * Category
+     */
+    category: string;
+    /**
+     * Compressibility
+     */
+    compressibility: number;
+    /**
+     * Count
+     */
+    count: number;
+    /**
+     * Merchant
+     */
+    merchant: string;
+    /**
+     * Total
+     */
+    total: number;
 };
 
 /**
@@ -3255,6 +3400,86 @@ export type SnapshotDto = {
 };
 
 /**
+ * SpendingAdviceResponse
+ *
+ * Ответ GET /planning/spending-advice целиком.
+ *
+ * `months_with_data` возвращается вместе с окном намеренно: у нового пользователя
+ * данных меньше минимума модели (`MIN_MONTHS = 3`), и экран обязан объяснить это
+ * словами, а не показать пустые списки как поломку.
+ */
+export type SpendingAdviceResponse = {
+    /**
+     * Advice
+     */
+    advice?: Array<SpendingAdviceSchema>;
+    /**
+     * Current Period
+     */
+    current_period: string;
+    /**
+     * Goal Impact
+     */
+    goal_impact?: Array<GoalImpactSchema>;
+    /**
+     * Merchant Insights
+     */
+    merchant_insights?: Array<MerchantStatsSchema>;
+    /**
+     * Months Window
+     */
+    months_window: number;
+    /**
+     * Months With Data
+     */
+    months_with_data: number;
+    /**
+     * Stats
+     */
+    stats?: Array<CategoryStatsSchema>;
+    /**
+     * Temporal Patterns
+     */
+    temporal_patterns?: Array<TemporalPatternSchema>;
+    /**
+     * Total Potential Saving
+     */
+    total_potential_saving: number;
+};
+
+/**
+ * SpendingAdviceSchema
+ *
+ * Слой 1: один совет по сокращению с уже посчитанной экономией.
+ */
+export type SpendingAdviceSchema = {
+    /**
+     * Baseline
+     */
+    baseline: number;
+    /**
+     * Category
+     */
+    category: string;
+    /**
+     * Current
+     */
+    current: number;
+    /**
+     * Message
+     */
+    message: string;
+    /**
+     * Potential Saving
+     */
+    potential_saving: number;
+    /**
+     * Reason
+     */
+    reason: string;
+};
+
+/**
  * StableBaseline
  *
  * Какая часть потока регулярна — мера доверия к прогнозу.
@@ -3341,6 +3566,42 @@ export type StatementUploadResult = {
      * Total Income
      */
     total_income?: number | null;
+};
+
+/**
+ * TemporalPatternSchema
+ *
+ * Слой 3-A: робастный тренд категории по завершённым месяцам.
+ */
+export type TemporalPatternSchema = {
+    /**
+     * Baseline
+     */
+    baseline: number;
+    /**
+     * Category
+     */
+    category: string;
+    /**
+     * Direction
+     */
+    direction: string;
+    /**
+     * Message
+     */
+    message: string;
+    /**
+     * Months Observed
+     */
+    months_observed: number;
+    /**
+     * Slope Abs
+     */
+    slope_abs: number;
+    /**
+     * Slope Pct
+     */
+    slope_pct: number;
 };
 
 /**
@@ -6719,13 +6980,9 @@ export type SpendingAdviceEndpointApiPlanningSpendingAdviceGetError = SpendingAd
 
 export type SpendingAdviceEndpointApiPlanningSpendingAdviceGetResponses = {
     /**
-     * Response Spending Advice Endpoint Api Planning Spending Advice Get
-     *
      * Successful Response
      */
-    200: {
-        [key: string]: unknown;
-    };
+    200: SpendingAdviceResponse;
 };
 
 export type SpendingAdviceEndpointApiPlanningSpendingAdviceGetResponse = SpendingAdviceEndpointApiPlanningSpendingAdviceGetResponses[keyof SpendingAdviceEndpointApiPlanningSpendingAdviceGetResponses];

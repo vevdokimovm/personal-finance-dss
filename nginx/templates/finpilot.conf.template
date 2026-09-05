@@ -107,7 +107,7 @@ server {
     # Jinja-страницы forgot_password.html/reset_password.html (были живые, отдавались
     # FastAPI ниже) и никогда не существовавший login.html/register.html (в легаси вход
     # был JS-модалкой в общем base.html, недостижимой после переноса семи экранов на React).
-    location ~ ^/(dashboard|planning|transactions|obligations|goals|banks|profile|household|join|login|register|forgot-password|reset-password|legal|insights|experiments)(/|$) {
+    location ~ ^/(dashboard|planning|transactions|spending|obligations|goals|banks|profile|household|join|login|register|forgot-password|reset-password|legal|insights|experiments)(/|$) {
         root /usr/share/nginx/html;
         try_files /index.html =404;
     }
