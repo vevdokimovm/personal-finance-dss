@@ -122,9 +122,40 @@ def delete_experiment_endpoint(key: str, db: Session = Depends(get_db)):
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
-@admin_router.get("/{key}/results", summary="Результаты эксперимента: assigned/converted/rate")
-def experiment_results_endpoint(key: str, db: Session = Depends(get_db)) -> dict:
+class VariantResult(BaseModel):
+    """Строка результата по одному варианту.
+
+    Поля сравнения (`uplift_pct`, `p_value`) необязательны намеренно: у контроля их
+    нет по построению, а на пустой выборке они не определены. Пустое значение здесь
+    означает «сказать нечего», и экран обязан показать это словами, а не нулём.
+    """
+
+    variant: str
+    assigned: int
+    converted: int
+    conversion_rate: float
+    is_control: bool
+    uplift_pct: float | None = None
+    p_value: float | None = None
+    significant: bool = False
+
+
+class ExperimentResults(BaseModel):
+    """Результаты эксперимента: счётчики плюс вывод о значимости разницы."""
+
+    key: str
+    status: str
+    conversion_event: str | None = None
+    variants: list[VariantResult]
+
+
+@admin_router.get(
+    "/{key}/results",
+    response_model=ExperimentResults,
+    summary="Результаты эксперимента: конверсия вариантов и значимость разницы",
+)
+def experiment_results_endpoint(key: str, db: Session = Depends(get_db)) -> ExperimentResults:
     results = experiment_results(db, key)
     if results is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Эксперимент не найден.")
-    return results
+    return ExperimentResults(**results)

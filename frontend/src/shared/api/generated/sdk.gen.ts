@@ -53,7 +53,7 @@ export const updateExperimentEndpointApiAdminExperimentsKeyPatch = <ThrowOnError
 });
 
 /**
- * Результаты эксперимента: assigned/converted/rate
+ * Результаты эксперимента: конверсия вариантов и значимость разницы
  */
 export const experimentResultsEndpointApiAdminExperimentsKeyResultsGet = <ThrowOnError extends boolean = false>(options: Options<ExperimentResultsEndpointApiAdminExperimentsKeyResultsGetData, ThrowOnError>) => (options.client ?? client).get<ExperimentResultsEndpointApiAdminExperimentsKeyResultsGetResponses, ExperimentResultsEndpointApiAdminExperimentsKeyResultsGetErrors, ThrowOnError>({ url: '/api/admin/experiments/{key}/results', ...options });
 

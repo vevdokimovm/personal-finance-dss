@@ -111,7 +111,7 @@ export const updateExperimentEndpointApiAdminExperimentsKeyPatchMutation = (opti
 export const experimentResultsEndpointApiAdminExperimentsKeyResultsGetQueryKey = (options: Options<ExperimentResultsEndpointApiAdminExperimentsKeyResultsGetData>) => createQueryKey('experimentResultsEndpointApiAdminExperimentsKeyResultsGet', options);
 
 /**
- * Результаты эксперимента: assigned/converted/rate
+ * Результаты эксперимента: конверсия вариантов и значимость разницы
  */
 export const experimentResultsEndpointApiAdminExperimentsKeyResultsGetOptions = (options: Options<ExperimentResultsEndpointApiAdminExperimentsKeyResultsGetData>) => queryOptions<ExperimentResultsEndpointApiAdminExperimentsKeyResultsGetResponse, ExperimentResultsEndpointApiAdminExperimentsKeyResultsGetError, ExperimentResultsEndpointApiAdminExperimentsKeyResultsGetResponse, ReturnType<typeof experimentResultsEndpointApiAdminExperimentsKeyResultsGetQueryKey>>({
     queryFn: async ({ queryKey, signal }) => {

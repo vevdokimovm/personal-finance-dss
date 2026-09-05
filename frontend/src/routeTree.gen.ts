@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as BanksRouteImport } from './routes/banks'
 import { Route as DashboardRouteImport } from './routes/dashboard'
+import { Route as ExperimentsRouteImport } from './routes/experiments'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as GoalsRouteImport } from './routes/goals'
 import { Route as HouseholdRouteImport } from './routes/household'
@@ -39,6 +40,11 @@ const BanksRoute = BanksRouteImport.update({
 const DashboardRoute = DashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ExperimentsRoute = ExperimentsRouteImport.update({
+  id: '/experiments',
+  path: '/experiments',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
@@ -111,6 +117,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/banks': typeof BanksRoute
   '/dashboard': typeof DashboardRoute
+  '/experiments': typeof ExperimentsRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/goals': typeof GoalsRoute
   '/household': typeof HouseholdRoute
@@ -129,6 +136,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/banks': typeof BanksRoute
   '/dashboard': typeof DashboardRoute
+  '/experiments': typeof ExperimentsRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/goals': typeof GoalsRoute
   '/household': typeof HouseholdRoute
@@ -148,6 +156,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/banks': typeof BanksRoute
   '/dashboard': typeof DashboardRoute
+  '/experiments': typeof ExperimentsRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/goals': typeof GoalsRoute
   '/household': typeof HouseholdRoute
@@ -168,6 +177,7 @@ export interface FileRouteTypes {
     | '/'
     | '/banks'
     | '/dashboard'
+    | '/experiments'
     | '/forgot-password'
     | '/goals'
     | '/household'
@@ -186,6 +196,7 @@ export interface FileRouteTypes {
     | '/'
     | '/banks'
     | '/dashboard'
+    | '/experiments'
     | '/forgot-password'
     | '/goals'
     | '/household'
@@ -204,6 +215,7 @@ export interface FileRouteTypes {
     | '/'
     | '/banks'
     | '/dashboard'
+    | '/experiments'
     | '/forgot-password'
     | '/goals'
     | '/household'
@@ -223,6 +235,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   BanksRoute: typeof BanksRoute
   DashboardRoute: typeof DashboardRoute
+  ExperimentsRoute: typeof ExperimentsRoute
   ForgotPasswordRoute: typeof ForgotPasswordRoute
   GoalsRoute: typeof GoalsRoute
   HouseholdRoute: typeof HouseholdRoute
@@ -259,6 +272,13 @@ declare module '@tanstack/react-router' {
       path: '/dashboard'
       fullPath: '/dashboard'
       preLoaderRoute: typeof DashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/experiments': {
+      id: '/experiments'
+      path: '/experiments'
+      fullPath: '/experiments'
+      preLoaderRoute: typeof ExperimentsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/forgot-password': {
@@ -359,6 +379,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   BanksRoute: BanksRoute,
   DashboardRoute: DashboardRoute,
+  ExperimentsRoute: ExperimentsRoute,
   ForgotPasswordRoute: ForgotPasswordRoute,
   GoalsRoute: GoalsRoute,
   HouseholdRoute: HouseholdRoute,

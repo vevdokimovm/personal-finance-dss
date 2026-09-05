@@ -1625,6 +1625,44 @@
         "title": "ExperimentResponse",
         "type": "object"
       },
+      "ExperimentResults": {
+        "description": "Результаты эксперимента: счётчики плюс вывод о значимости разницы.",
+        "properties": {
+          "conversion_event": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Conversion Event"
+          },
+          "key": {
+            "title": "Key",
+            "type": "string"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "variants": {
+            "items": {
+              "$ref": "#/components/schemas/VariantResult"
+            },
+            "title": "Variants",
+            "type": "array"
+          }
+        },
+        "required": [
+          "key",
+          "status",
+          "variants"
+        ],
+        "title": "ExperimentResults",
+        "type": "object"
+      },
       "ExperimentUpdate": {
         "properties": {
           "conversion_event": {
@@ -5593,6 +5631,67 @@
         "title": "VariantIn",
         "type": "object"
       },
+      "VariantResult": {
+        "description": "Строка результата по одному варианту.\n\nПоля сравнения (`uplift_pct`, `p_value`) необязательны намеренно: у контроля их\nнет по построению, а на пустой выборке они не определены. Пустое значение здесь\nозначает «сказать нечего», и экран обязан показать это словами, а не нулём.",
+        "properties": {
+          "assigned": {
+            "title": "Assigned",
+            "type": "integer"
+          },
+          "conversion_rate": {
+            "title": "Conversion Rate",
+            "type": "number"
+          },
+          "converted": {
+            "title": "Converted",
+            "type": "integer"
+          },
+          "is_control": {
+            "title": "Is Control",
+            "type": "boolean"
+          },
+          "p_value": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "P Value"
+          },
+          "significant": {
+            "default": false,
+            "title": "Significant",
+            "type": "boolean"
+          },
+          "uplift_pct": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Uplift Pct"
+          },
+          "variant": {
+            "title": "Variant",
+            "type": "string"
+          }
+        },
+        "required": [
+          "variant",
+          "assigned",
+          "converted",
+          "conversion_rate",
+          "is_control"
+        ],
+        "title": "VariantResult",
+        "type": "object"
+      },
       "WeightedScores": {
         "description": "Вклад каждого критерия SAW в utility: w_x * x_norm (батч 0.3, Волна 0).\n\nАддитивно к `scores` — сумма полей равна `utility` с точностью округления.\nНе влияет на ранжирование (сортировка по floor_level/utility не менялась).",
         "properties": {
@@ -5764,7 +5863,7 @@
   },
   "info": {
     "title": "FINPILOT",
-    "version": "8.47.0"
+    "version": "8.48.0"
   },
   "openapi": "3.1.0",
   "paths": {
@@ -6035,9 +6134,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response Experiment Results Endpoint Api Admin Experiments  Key  Results Get",
-                  "type": "object"
+                  "$ref": "#/components/schemas/ExperimentResults"
                 }
               }
             },
@@ -6054,7 +6151,7 @@
             "description": "Validation Error"
           }
         },
-        "summary": "Результаты эксперимента: assigned/converted/rate",
+        "summary": "Результаты эксперимента: конверсия вариантов и значимость разницы",
         "tags": [
           "A/B-эксперименты (админ)"
         ]

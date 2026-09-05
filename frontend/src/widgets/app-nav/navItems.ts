@@ -31,4 +31,5 @@ export const APP_NAV_ITEMS = [
  */
 export const OWNER_NAV_ITEMS = [
   { to: "/insights", label: "Метрики продукта" },
+  { to: "/experiments", label: "A/B-эксперименты" },
 ] as const;

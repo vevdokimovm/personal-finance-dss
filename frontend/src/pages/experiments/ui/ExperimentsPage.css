@@ -1,0 +1,148 @@
+/* Результаты A/B: экран владельца. Вывод словами сверху, числа под ним — читают
+   ради решения «катить или нет», а не ради самой таблицы. */
+
+.fp-experiments {
+  max-width: var(--content-max);
+  margin: 0 auto;
+  padding: var(--sp-6) var(--sp-5) var(--sp-8);
+}
+
+.fp-experiments h1 {
+  font-size: var(--fs-xl);
+  margin: 0 0 var(--sp-3);
+}
+
+/* Ключ эксперимента — служебная подпись, а не заголовок карточки: имя вроде
+   `checkout_cta_v3` не должно перетягивать взгляд с ответа (design-critic). */
+.fp-experiments__key {
+  font-size: var(--fs-sm);
+  color: var(--c-text3);
+  margin: 0 0 var(--sp-1);
+  font-weight: 400;
+}
+
+.fp-experiments__meta,
+.fp-experiments__intro {
+  color: var(--c-text3);
+  font-size: var(--fs-sm);
+  margin: 0 0 var(--sp-4);
+}
+
+.fp-experiments__card {
+  border: var(--border-w) solid var(--c-border);
+  border-radius: var(--r-lg);
+  padding: var(--sp-5);
+  margin: 0 0 var(--sp-5);
+  background: var(--c-surface);
+}
+
+/* 🔴 Ответ — самый крупный элемент карточки: ради него экран и открывают.
+   Отдельная панель, как на соседнем экране метрик, а не строка в потоке. */
+.fp-experiments__answer {
+  border: var(--border-w) solid var(--c-border);
+  border-radius: var(--r-md);
+  background: var(--c-bg2);
+  padding: var(--sp-4);
+  margin: 0 0 var(--sp-5);
+}
+
+.fp-experiments__eyebrow {
+  font-size: var(--fs-xs);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--c-text3);
+  margin: 0 0 var(--sp-2);
+}
+
+.fp-experiments__verdict {
+  font-size: var(--fs-xl);
+  line-height: 1.25;
+  margin: 0;
+  color: var(--c-text);
+}
+
+/* Нет вывода — тот же размер, но спокойным цветом: «данных мало» это ответ,
+   а не тревога. */
+.fp-experiments__verdict.is-inconclusive {
+  font-size: var(--fs-lg);
+  color: var(--c-text2);
+}
+
+.fp-experiments__table {
+  width: 100%;
+  border-collapse: collapse;
+  /* Табличные цифры: колонки чисел сравнивают взглядом сверху вниз. */
+  font-variant-numeric: tabular-nums;
+}
+
+.fp-experiments__table th,
+.fp-experiments__table td {
+  text-align: right;
+  padding: var(--sp-2) var(--sp-3);
+  border-bottom: var(--border-w) solid var(--c-border);
+}
+
+.fp-experiments__table thead th,
+.fp-experiments__table tbody th {
+  text-align: left;
+  font-weight: 500;
+}
+
+.fp-experiments__table thead th {
+  color: var(--c-text3);
+  font-size: var(--fs-sm);
+}
+
+/* Победившая строка: фон И жирность. Цвет как единственный носитель смысла
+   не проходит WCAG 1.4.1, поэтому признаков два. */
+.fp-experiments__table tr.is-winner {
+  background: var(--c-accent-bg);
+}
+
+.fp-experiments__table tr.is-winner th {
+  font-weight: 600;
+}
+
+.fp-experiments__tag {
+  margin-left: var(--sp-2);
+  padding: var(--sp-1) var(--sp-2);
+  border-radius: var(--r-sm);
+  background: var(--c-bg2);
+  color: var(--c-text3);
+  font-size: var(--fs-xs);
+  white-space: nowrap;
+}
+
+/* Значимый подъём выделяется весом, незначимый несёт пояснение словами —
+   один и тот же смысл передан дважды, не только цветом. */
+.fp-experiments__uplift.is-significant {
+  font-weight: 600;
+  color: var(--c-text);
+}
+
+.fp-experiments__hint {
+  color: var(--c-text3);
+  font-size: var(--fs-sm);
+}
+
+.fp-experiments__dash {
+  color: var(--c-text3);
+}
+
+/* Узкий экран: пять колонок в 380px не помещаются, и таблица уезжает за край
+   страницы целиком. Скролл держится внутри обёртки, а не у body ([CMP-07]). */
+.fp-experiments__scroll {
+  overflow-x: auto;
+}
+
+@media (max-width: 640px) {
+  .fp-experiments__table th,
+  .fp-experiments__table td {
+    padding: var(--sp-2);
+    font-size: var(--fs-sm);
+  }
+
+  .fp-experiments__hint {
+    display: block;
+  }
+}

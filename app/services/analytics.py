@@ -11,6 +11,7 @@ from sqlalchemy import func
 from sqlalchemy.orm import Session
 
 from app.database.models import Event, Experiment, ExperimentAssignment
+from app.services.experiment_stats import compare_to_control
 from app.utils.time import utcnow
 
 
@@ -99,18 +100,33 @@ def experiment_results(db: Session, key: str) -> dict | None:
             if session_id:
                 converted_subjects.add(session_id)
 
-    variants_out = []
+    # Контроль — первый вариант списка: порядок задаёт тот, кто заводил эксперимент,
+    # и он же решает, что считать точкой отсчёта. Сравнение «каждый с каждым» дало бы
+    # квадратичное число чисел и ни одного вывода.
+    counts: list[tuple[str, int, int]] = []
     for variant in experiment.variants:
         name = variant["name"]
         assigned = subjects_by_variant.get(name, set())
-        converted = len(assigned & converted_subjects)
-        total = len(assigned)
-        variants_out.append({
+        counts.append((name, len(assigned), len(assigned & converted_subjects)))
+
+    control_pair = (counts[0][1], counts[0][2]) if counts else (0, 0)
+
+    variants_out = []
+    for index, (name, total, converted) in enumerate(counts):
+        row = {
             "variant": name,
             "assigned": total,
             "converted": converted,
             "conversion_rate": round(converted / total, 4) if total else 0.0,
-        })
+            "is_control": index == 0,
+        }
+        # Контроль сам с собой не сравнивается: «подъём ноль при p=1» — строка,
+        # которая выглядит результатом, не будучи им.
+        if index == 0:
+            row.update({"uplift_pct": None, "p_value": None, "significant": False})
+        else:
+            row.update(compare_to_control(control=control_pair, variant=(total, converted)))
+        variants_out.append(row)
 
     return {
         "key": experiment.key,

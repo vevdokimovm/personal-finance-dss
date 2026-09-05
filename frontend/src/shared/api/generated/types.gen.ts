@@ -1122,6 +1122,30 @@ export type ExperimentResponse = {
 };
 
 /**
+ * ExperimentResults
+ *
+ * Результаты эксперимента: счётчики плюс вывод о значимости разницы.
+ */
+export type ExperimentResults = {
+    /**
+     * Conversion Event
+     */
+    conversion_event?: string | null;
+    /**
+     * Key
+     */
+    key: string;
+    /**
+     * Status
+     */
+    status: string;
+    /**
+     * Variants
+     */
+    variants: Array<VariantResult>;
+};
+
+/**
  * ExperimentUpdate
  */
 export type ExperimentUpdate = {
@@ -3600,6 +3624,50 @@ export type VariantIn = {
 };
 
 /**
+ * VariantResult
+ *
+ * Строка результата по одному варианту.
+ *
+ * Поля сравнения (`uplift_pct`, `p_value`) необязательны намеренно: у контроля их
+ * нет по построению, а на пустой выборке они не определены. Пустое значение здесь
+ * означает «сказать нечего», и экран обязан показать это словами, а не нулём.
+ */
+export type VariantResult = {
+    /**
+     * Assigned
+     */
+    assigned: number;
+    /**
+     * Conversion Rate
+     */
+    conversion_rate: number;
+    /**
+     * Converted
+     */
+    converted: number;
+    /**
+     * Is Control
+     */
+    is_control: boolean;
+    /**
+     * P Value
+     */
+    p_value?: number | null;
+    /**
+     * Significant
+     */
+    significant?: boolean;
+    /**
+     * Uplift Pct
+     */
+    uplift_pct?: number | null;
+    /**
+     * Variant
+     */
+    variant: string;
+};
+
+/**
  * WeightedScores
  *
  * Вклад каждого критерия SAW в utility: w_x * x_norm (батч 0.3, Волна 0).
@@ -3957,13 +4025,9 @@ export type ExperimentResultsEndpointApiAdminExperimentsKeyResultsGetError = Exp
 
 export type ExperimentResultsEndpointApiAdminExperimentsKeyResultsGetResponses = {
     /**
-     * Response Experiment Results Endpoint Api Admin Experiments  Key  Results Get
-     *
      * Successful Response
      */
-    200: {
-        [key: string]: unknown;
-    };
+    200: ExperimentResults;
 };
 
 export type ExperimentResultsEndpointApiAdminExperimentsKeyResultsGetResponse = ExperimentResultsEndpointApiAdminExperimentsKeyResultsGetResponses[keyof ExperimentResultsEndpointApiAdminExperimentsKeyResultsGetResponses];
