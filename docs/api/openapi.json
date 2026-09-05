@@ -881,6 +881,45 @@
         "title": "BudgetResponse",
         "type": "object"
       },
+      "BudgetStatus": {
+        "description": "План-факт по одному категорийному бюджету (FR-22).\n\n🔴 `id` обязателен: по нему фронт правит и удаляет бюджет. Схема без него молча\nвыбрасывала бы идентификатор при сериализации, и экран потерял бы редактирование —\nпричём выглядело бы это дефектом фронта, а не контракта.",
+        "properties": {
+          "category": {
+            "title": "Category",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "limit_amount": {
+            "title": "Limit Amount",
+            "type": "number"
+          },
+          "over": {
+            "title": "Over",
+            "type": "boolean"
+          },
+          "pct": {
+            "title": "Pct",
+            "type": "number"
+          },
+          "spent": {
+            "title": "Spent",
+            "type": "number"
+          }
+        },
+        "required": [
+          "id",
+          "category",
+          "limit_amount",
+          "spent",
+          "pct",
+          "over"
+        ],
+        "title": "BudgetStatus",
+        "type": "object"
+      },
       "CategoryAssignRequest": {
         "description": "Переназначение категории операции. По умолчанию запоминает правило и применяет его\nк существующим совпадающим операциям (это и есть «обучение»). `match_token` можно сузить\nвручную; если не задан — берётся описание операции.",
         "properties": {
@@ -5863,7 +5902,7 @@
   },
   "info": {
     "title": "FINPILOT",
-    "version": "8.48.0"
+    "version": "8.49.0"
   },
   "openapi": "3.1.0",
   "paths": {
@@ -7187,8 +7226,7 @@
               "application/json": {
                 "schema": {
                   "items": {
-                    "additionalProperties": true,
-                    "type": "object"
+                    "$ref": "#/components/schemas/BudgetStatus"
                   },
                   "title": "Response Budget Status Api Budgets Status Get",
                   "type": "array"

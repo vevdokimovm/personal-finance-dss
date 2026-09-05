@@ -4,6 +4,7 @@ import secrets
 import string
 from collections import Counter
 from datetime import datetime, timedelta
+from decimal import Decimal
 from typing import Any, Optional
 
 from sqlalchemy import delete, func
@@ -416,7 +417,14 @@ def get_scenarios(db: Session, limit: int = 20, user_id: Optional[str] = None) -
 
 
 def get_budget_status(db: Session, days: int = 30, user_id: Optional[str] = None) -> list[dict]:
-    """План-факт по категорийным бюджетам за период (FR-22)."""
+    """План-факт по категорийным бюджетам за период (FR-22).
+
+    🔴 Вся арифметика — в `Decimal`. `limit_amount` и `amount` объявлены `Numeric(14, 2)`
+    и приходят из БД как `Decimal`, а подстановка `or 0.0` для пустой суммы возвращала
+    `float`: деление `float / Decimal` даёт `TypeError`, то есть **500 на экране бюджетов
+    у каждого, кто завёл бюджет и ещё ничего по нему не потратил**. Смешивать два типа
+    в деньгах нельзя ещё и по существу — `float` теряет копейки на длинных суммах.
+    """
     since = utcnow() - timedelta(days=days)
     owner = Transaction.user_id == user_id if user_id is not None else Transaction.user_id.is_(None)
     statuses = []
@@ -434,15 +442,19 @@ def get_budget_status(db: Session, days: int = 30, user_id: Optional[str] = None
                 owner,
             )
             .scalar()
-        ) or 0.0
-        pct = round(spent / b.limit_amount * 100, 1) if b.limit_amount > 0 else 0.0
+        )
+        spent = Decimal(spent) if spent is not None else Decimal("0")
+        limit_amount = Decimal(b.limit_amount)
+        pct = (
+            float(round(spent / limit_amount * 100, 1)) if limit_amount > 0 else 0.0
+        )
         statuses.append({
             "id": b.id,
             "category": b.category,
-            "limit_amount": round(b.limit_amount, 2),
-            "spent": round(spent, 2),
+            "limit_amount": float(round(limit_amount, 2)),
+            "spent": float(round(spent, 2)),
             "pct": pct,
-            "over": spent > b.limit_amount,
+            "over": spent > limit_amount,
         })
     return statuses
 

@@ -1,5 +1,3 @@
-from typing import Any
-
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
@@ -11,7 +9,7 @@ from app.database.crud import (
     restore_budget,
 )
 from app.dependencies import get_current_user_id, get_db
-from app.schemas.budget import BudgetCreate, BudgetResponse
+from app.schemas.budget import BudgetCreate, BudgetResponse, BudgetStatus
 from app.services.event_logger import log_event
 
 router = APIRouter(prefix="/budgets", tags=["Бюджеты"])
@@ -25,13 +23,17 @@ def list_budgets(
     return get_budgets(db, user_id=user_id)
 
 
-@router.get("/status", summary="План-факт по категорийным бюджетам (FR-22)")
+@router.get(
+    "/status",
+    response_model=list[BudgetStatus],
+    summary="План-факт по категорийным бюджетам (FR-22)",
+)
 def budget_status(
     days: int = 30,
     db: Session = Depends(get_db),
     user_id: str | None = Depends(get_current_user_id),
-) -> list[dict[str, Any]]:
-    return get_budget_status(db, days=days, user_id=user_id)
+) -> list[BudgetStatus]:
+    return [BudgetStatus(**row) for row in get_budget_status(db, days=days, user_id=user_id)]
 
 
 @router.post(

@@ -6,7 +6,6 @@ import {
   restoreBudgetEndpointApiBudgetsBudgetIdRestorePost,
 } from "@shared/api/generated";
 import type { BudgetCreate } from "@shared/api/generated";
-import type { BudgetStatus } from "../model/types";
 
 const BUDGETS_QUERY_KEY = ["budgets", "status"];
 
@@ -18,7 +17,7 @@ export function useBudgetStatus() {
     queryKey: BUDGETS_QUERY_KEY,
     queryFn: async () => {
       const { data } = await budgetStatusApiBudgetsStatusGet({ throwOnError: true });
-      return (data ?? []) as unknown as BudgetStatus[];
+      return data ?? [];
     },
   });
 }

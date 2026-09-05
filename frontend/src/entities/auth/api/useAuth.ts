@@ -29,7 +29,7 @@ export function useRegister() {
   return useMutation({
     mutationFn: async (body: RegisterRequest) => {
       const { data } = await registerApiAuthRegisterPost({ body, throwOnError: true });
-      return data as unknown as AuthResponse;
+      return data satisfies AuthResponse;
     },
     onSuccess: invalidate,
   });
@@ -40,7 +40,7 @@ export function useLogin() {
   return useMutation({
     mutationFn: async (body: LoginRequest) => {
       const { data } = await loginApiAuthLoginPost({ body, throwOnError: true });
-      return data as unknown as AuthResponse;
+      return data satisfies AuthResponse;
     },
     // mfa_required=true не заводит полную сессию (см. routes_auth.py::login) — инвалидировать
     // «кто я» в этом случае рано, там ещё нет cookie. MFA-экран — вне периметра этого батча

@@ -14,7 +14,7 @@ export function useForecast(horizon = 12, rBench?: number) {
         body: { horizon, r_bench: rBench },
         throwOnError: true,
       });
-      return data as unknown as ForecastResult;
+      return data satisfies ForecastResult;
     },
     placeholderData: keepPreviousData,
   });

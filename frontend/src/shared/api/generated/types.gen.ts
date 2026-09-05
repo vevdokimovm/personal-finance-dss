@@ -549,6 +549,42 @@ export type BudgetResponse = {
 };
 
 /**
+ * BudgetStatus
+ *
+ * План-факт по одному категорийному бюджету (FR-22).
+ *
+ * 🔴 `id` обязателен: по нему фронт правит и удаляет бюджет. Схема без него молча
+ * выбрасывала бы идентификатор при сериализации, и экран потерял бы редактирование —
+ * причём выглядело бы это дефектом фронта, а не контракта.
+ */
+export type BudgetStatus = {
+    /**
+     * Category
+     */
+    category: string;
+    /**
+     * Id
+     */
+    id: number;
+    /**
+     * Limit Amount
+     */
+    limit_amount: number;
+    /**
+     * Over
+     */
+    over: boolean;
+    /**
+     * Pct
+     */
+    pct: number;
+    /**
+     * Spent
+     */
+    spent: number;
+};
+
+/**
  * CategoryAssignRequest
  *
  * Переназначение категории операции. По умолчанию запоминает правило и применяет его
@@ -4730,9 +4766,7 @@ export type BudgetStatusApiBudgetsStatusGetResponses = {
      *
      * Successful Response
      */
-    200: Array<{
-        [key: string]: unknown;
-    }>;
+    200: Array<BudgetStatus>;
 };
 
 export type BudgetStatusApiBudgetsStatusGetResponse = BudgetStatusApiBudgetsStatusGetResponses[keyof BudgetStatusApiBudgetsStatusGetResponses];

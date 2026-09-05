@@ -16,7 +16,13 @@ export function usePlan() {
         body: {},
         throwOnError: true,
       });
-      return data as unknown as CalculatePlanResult;
+      /* 🔴 Без каста. `as unknown as` здесь жил с тех пор, когда `CalculatePlanResult`
+         вёлся руками и расходился со схемой: двойной каст выбрасывает сгенерированный
+         тип и снимает сверку с контрактом целиком — TypeScript перестаёт видеть,
+         что фронт ждёт полей, которых сервер не обещает (v8.31.1, дашборд в error
+         boundary). С v8.40.0 тип реэкспортирует `PlanningCalculateResponse`, то есть
+         SDK и так возвращает ровно его: каст стал не только опасным, но и лишним. */
+      return data satisfies CalculatePlanResult;
     },
   });
 }

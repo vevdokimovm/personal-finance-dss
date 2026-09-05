@@ -1,11 +1,12 @@
-/** GET /api/budgets/status отдаёт `list[dict[str, Any]]` (app/schemas/budget.py::BudgetStatus
- * + `id`, добавленный в crud.get_budget_status) — генератор OpenAPI не типизирует произвольный
- * dict строже, чем `Record<string, unknown>[]`. Локальный тип держит реальную форму ответа. */
-export interface BudgetStatus {
-  id: number;
-  category: string;
-  limit_amount: number;
-  spent: number;
-  pct: number;
-  over: boolean;
-}
+/** Рукописных типов нет — реэкспорт сгенерированных из контракта.
+ *
+ * 🔴 До v8.50.0 здесь жил рукописный `BudgetStatus`, потому что `/budgets/status`
+ * возвращал `list[dict[str, Any]]` и генератор не мог описать его строже, чем
+ * `Record<string, unknown>[]`. Схема `BudgetStatus` при этом в проекте существовала —
+ * она просто не была подключена к роуту и не знала про `id`, который сервис кладёт
+ * в каждую строку.
+ *
+ * Чинилось в правильном порядке: сначала схема на бэкенде (плюс `id` в неё), потом
+ * снятие каста здесь. Наоборот вышло бы «фронт требует того, чего контракт не
+ * обещает» — ровно дефект v8.31.1. */
+export type { BudgetResponse, BudgetStatus } from "@shared/api/generated";
