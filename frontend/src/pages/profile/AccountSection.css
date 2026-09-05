@@ -1,0 +1,77 @@
+/* Аккаунт и безопасность: смена пароля и удаление. Опасная зона отделена рамкой —
+   удаление необратимо и стирает всё, поэтому визуально не должно соседствовать
+   с обычной формой как равное действие. */
+
+.fp-account {
+  border: var(--border-w) solid var(--c-border);
+  border-radius: var(--r-lg);
+  background: var(--c-surface);
+  padding: var(--sp-5);
+  margin: var(--sp-5) 0 0;
+}
+
+.fp-account h2 {
+  font-size: var(--fs-lg);
+  margin: 0 0 var(--sp-4);
+}
+
+.fp-account__subtitle {
+  font-size: var(--fs-md);
+  margin: 0 0 var(--sp-2);
+}
+
+.fp-account__form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  max-width: var(--form-max, 420px);
+}
+
+.fp-account__label {
+  font-size: var(--fs-sm);
+  color: var(--c-text2);
+}
+
+.fp-account__input {
+  padding: var(--sp-2) var(--sp-3);
+  border: var(--border-w) solid var(--c-border);
+  border-radius: var(--r-sm);
+  background: var(--c-bg2);
+  color: var(--c-text);
+  font: inherit;
+}
+
+.fp-account__hint {
+  color: var(--c-text3);
+  font-size: var(--fs-sm);
+  margin: 0 0 var(--sp-2);
+}
+
+.fp-account__error {
+  color: var(--c-red);
+  font-size: var(--fs-sm);
+  margin: 0;
+}
+
+.fp-account__ok {
+  color: var(--c-green);
+  font-size: var(--fs-sm);
+  margin: 0;
+}
+
+/* Опасная зона: отдельная рамка и отступ сверху — чтобы «Удалить аккаунт»
+   не читалось как продолжение формы смены пароля. */
+.fp-account__danger {
+  margin: var(--sp-6) 0 0;
+  padding: var(--sp-4);
+  border: var(--border-w) solid var(--c-red);
+  border-radius: var(--r-md);
+  background: var(--c-red-bg);
+}
+
+.fp-account__actions {
+  display: flex;
+  gap: var(--sp-3);
+  justify-content: flex-end;
+  margin: var(--sp-4) 0 0;
+}

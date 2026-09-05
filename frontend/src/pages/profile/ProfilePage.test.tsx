@@ -13,6 +13,12 @@ let searchMock: { verified?: string } = {};
 // секция заглушена (её собственные тесты — ReferralSection.test.tsx).
 // Секция согласий берёт названия документов из реестра — здесь проверяется профиль,
 // а сам список согласий покрыт ConsentsSection.test.tsx.
+const { resendMock } = vi.hoisted(() => ({
+  /* Возвращает объект мутации, а не `undefined`: хук читается сразу при рендере,
+     и пустой мок роняет страницу на `.isPending` (поймано первым же прогоном). */
+  resendMock: vi.fn(() => ({ mutate: vi.fn(), isPending: false, isError: false, error: null })),
+}));
+
 vi.mock("@entities/legal", () => ({
   useLegalDocuments: () => ({ data: undefined, error: null, isLoading: false }),
 }));
@@ -31,6 +37,16 @@ vi.mock("@entities/profile", async () => {
 const useConsentsMock = vi.fn();
 const grantMutateMock = vi.fn();
 const withdrawMutateMock = vi.fn();
+
+/* `AccountSection` (v8.52.0) зовёт мутации смены пароля и удаления аккаунта. Мокаем
+   сущность, а не компонент: тест страницы проверяет, что секция на месте, а её
+   поведение живёт в `AccountSection.test.tsx`. Без мока падает «No QueryClient set» —
+   страница не обёрнута в провайдер, потому что все данные ей приходят через моки. */
+vi.mock("@entities/auth", () => ({
+  useChangePassword: () => ({ mutate: vi.fn(), isPending: false, isError: false, error: null }),
+  useDeleteAccount: () => ({ mutate: vi.fn(), isPending: false, isError: false, error: null }),
+  useResendVerification: () => resendMock(),
+}));
 
 vi.mock("@entities/consents", () => ({
   useConsents: () => useConsentsMock(),

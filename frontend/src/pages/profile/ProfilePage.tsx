@@ -1,10 +1,13 @@
+import { useState } from "react";
 import { useSearch, Link } from "@tanstack/react-router";
 import { ListSkeleton, StatePanel, Button } from "@shared/ui";
 import { t } from "@shared/lib/i18n/t";
 import { ReferralSection } from "./ReferralSection";
+import { AccountSection } from "./AccountSection";
 import { ConsentsSection } from "./ConsentsSection";
 import { formatDate } from "@shared/lib/date/formatDate";
 import { useProfile, NotAuthenticatedError } from "@entities/profile";
+import { useResendVerification } from "@entities/auth";
 import "./ProfilePage.css";
 
 
@@ -39,6 +42,10 @@ function VerifiedBanner() {
  * дикторов). role="status" (не "alert") — это не сбой, а ожидаемое состояние. */
 export function ProfilePage() {
   const query = useProfile();
+  const resendVerification = useResendVerification();
+  /* Одноразовость в состоянии, а не в `isSuccess`: письмо ушло — повторять незачем,
+     и кнопка, остающаяся активной, провоцирует спамить себе почту. */
+  const [resendSent, setResendSent] = useState(false);
 
   if (query.isLoading) {
     return (
@@ -102,7 +109,25 @@ export function ProfilePage() {
           <span className="fp-profile__value">
             {profile.email}
             {!profile.email_verified && (
-              <span className="fp-profile__badge">{t("не подтверждён")}</span>
+              <>
+                <span className="fp-profile__badge">{t("не подтверждён")}</span>
+                {/* 🔴 Бейдж-проблема обязан нести действие. До v8.52.0 он стоял один:
+                    человек видел, что что-то не так, и не мог ничего сделать —
+                    `resend-verification` жил на бэкенде и не вызывался ниоткуда. */}
+                <Button
+                  variant="ghost"
+                  aria-disabled={resendVerification.isPending || resendSent}
+                  aria-busy={resendVerification.isPending}
+                  onClick={() => {
+                    if (resendVerification.isPending || resendSent) return;
+                    resendVerification.mutate(undefined, {
+                      onSuccess: () => setResendSent(true),
+                    });
+                  }}
+                >
+                  {resendSent ? t("Письмо отправлено") : t("Отправить письмо ещё раз")}
+                </Button>
+              </>
             )}
           </span>
         </div>
@@ -115,6 +140,10 @@ export function ProfilePage() {
       </section>
       <ReferralSection />
       <ConsentsSection />
+      {/* Секция аккаунта — ПОСЛЕ согласий: экран согласий отправляет сюда за отзывом
+          согласия на ПДн («нельзя отозвать без удаления аккаунта»), и путь должен
+          вести вниз по странице, а не вверх (v8.52.0). */}
+      <AccountSection />
     </main>
   );
 }

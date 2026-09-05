@@ -39,7 +39,13 @@
    занят позитивом/действием, не удалением). */
 .fp-button--danger {
   background: transparent;
-  border-color: var(--c-border);
+  /* 🔴 `--c-border-hl`, а не `--c-border`: граница элемента управления обязана
+     давать 3:1 (WCAG 1.4.11), а `--c-border` это rgba(...,0.08) в тёмной теме —
+     кнопка на прозрачном фоне визуально не имела границы вовсе. Вариант `ghost`
+     выше взял `--c-border-hl` ровно по этой причине, `danger` пропустили
+     (a11y-auditor, v8.52.0) — при том что именно у danger цена промаха выше:
+     это удаление. */
+  border-color: var(--c-border-hl);
   color: var(--c-red);
 }
 .fp-button--danger:hover {

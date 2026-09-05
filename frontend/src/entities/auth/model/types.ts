@@ -9,4 +9,5 @@ export type {
   LoginRequest,
   ForgotPasswordRequest,
   ResetPasswordRequest,
+  ChangePasswordRequest,
 } from "@shared/api/generated";

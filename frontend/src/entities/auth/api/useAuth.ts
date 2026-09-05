@@ -2,13 +2,17 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   registerApiAuthRegisterPost,
   loginApiAuthLoginPost,
+  changePasswordApiAuthChangePasswordPost,
+  deleteAccountApiAuthMeDelete,
   logoutApiAuthLogoutPost,
+  resendVerificationApiAuthResendVerificationPost,
   forgotPasswordApiAuthForgotPasswordPost,
   resetPasswordApiAuthResetPasswordPost,
 } from "@shared/api/generated";
 import { PROFILE_QUERY_KEY } from "@entities/profile";
 import type {
   AuthResponse,
+  ChangePasswordRequest,
   ForgotPasswordRequest,
   LoginRequest,
   RegisterRequest,
@@ -58,6 +62,69 @@ export function useLogout() {
       await logoutApiAuthLogoutPost({ throwOnError: true });
     },
     onSuccess: invalidate,
+  });
+}
+
+/**
+ * Смена пароля (v8.52.0).
+ *
+ * 🔴 Эндпоинт жил на бэкенде без UI вовсе — найдено аудитом independent-expert
+ * 05.09.2026. Скомпрометированный пароль сменить из интерфейса было нельзя, только
+ * через «забыли пароль» и рабочий SMTP.
+ *
+ * Сервер гасит ВСЕ сессии, включая текущую (банковская планка, см. `routes_auth`),
+ * поэтому после успеха профиль инвалидируется: интерфейс обязан немедленно перейти
+ * в состояние «не авторизован», а не показывать данные из кеша.
+ */
+export function useChangePassword() {
+  const invalidate = useInvalidateProfile();
+  return useMutation({
+    mutationFn: async (body: ChangePasswordRequest) => {
+      const { data } = await changePasswordApiAuthChangePasswordPost({
+        body,
+        throwOnError: true,
+      });
+      return data;
+    },
+    onSuccess: invalidate,
+  });
+}
+
+/**
+ * Удаление аккаунта со всеми данными (v8.52.0).
+ *
+ * 🔴 Это путь исполнения права по 152-ФЗ: экран согласий говорит «отозвать согласие
+ * на обработку ПДн можно только удалением аккаунта», а удаления в интерфейсе не было.
+ * Право реализовано на бэкенде и недостижимо — повтор SEV1 `CONSENT-GATE-NO-UI`.
+ */
+export function useDeleteAccount() {
+  const invalidate = useInvalidateProfile();
+  return useMutation({
+    mutationFn: async () => {
+      const { data } = await deleteAccountApiAuthMeDelete({ throwOnError: true });
+      return data;
+    },
+    onSuccess: invalidate,
+  });
+}
+
+/**
+ * Повторная отправка письма подтверждения (v8.52.0).
+ *
+ * 🔴 Бейдж «не подтверждён» стоял на профиле без единого действия рядом — найдено
+ * аудитом independent-expert. На первом деплое без рабочего SMTP (а
+ * `docs/deploy_owner_checklist.md` прямо предупреждает, что почта может не успеть)
+ * все аккаунты остались бы «не подтверждён» навсегда, и починить это из интерфейса
+ * было бы нельзя.
+ */
+export function useResendVerification() {
+  return useMutation({
+    mutationFn: async () => {
+      const { data } = await resendVerificationApiAuthResendVerificationPost({
+        throwOnError: true,
+      });
+      return data;
+    },
   });
 }
 

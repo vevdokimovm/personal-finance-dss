@@ -4,6 +4,9 @@ export {
   useLogout,
   useForgotPassword,
   useResetPassword,
+  useChangePassword,
+  useDeleteAccount,
+  useResendVerification,
 } from "./api/useAuth";
 export type {
   AuthResponse,
@@ -11,4 +14,5 @@ export type {
   LoginRequest,
   ForgotPasswordRequest,
   ResetPasswordRequest,
+  ChangePasswordRequest,
 } from "./model/types";
