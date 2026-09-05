@@ -86,6 +86,68 @@ def require_user(user: Optional[User] = Depends(get_current_user)) -> User:
     return user
 
 
+SAFE_METHODS = frozenset({"GET", "HEAD", "OPTIONS"})
+
+# POST, который ничего не пишет: валидация произвольного портрета для демо.
+# Гость обязан оставаться в состоянии «попробовать до регистрации», а этот путь
+# считает в памяти и в БД не заглядывает.
+READ_ONLY_WRITE_PATHS = frozenset({"/demo/analyze"})
+
+
+def require_account_for_writes(
+    request: Request,
+    user: Optional[User] = Depends(get_current_user),
+) -> Optional[User]:
+    """🔴 На проде запись финансовых данных требует аккаунта (v8.53.0).
+
+    **Что закрывает.** `get_current_user_id` отдаёт гостю `None`, а
+    `_owner_filter(query, model, None)` фильтрует по `user_id IS NULL` — то есть
+    гостевой пул **один глобальный на всех посетителей сервера**, без привязки
+    к сессии. Посетитель Б видит операции, цели и кредиты посетителя А;
+    `/demo/load` зовёт `_clear_all(user_id=None)` и стирает данные всех гостей
+    разом. Найдено аудитом independent-expert 05.09.2026.
+
+    **Почему запрет, а не сессионный пул.** Правильная починка — свой `session_id`
+    каждому гостю с колонкой во всех финансовых таблицах и фильтрацией по ней:
+    изменение схемы и правка каждого запроса. Утечка чужих финансов столько
+    не ждёт. Цена ошибки в обе стороны несимметрична: запрет обратим одной
+    строкой конфига, утечка персональных данных — нет.
+
+    **Почему на роутере, а не на каждой ручке.** Тот же довод, что у `_FIN`
+    (`app/api/router.py`): пропуск одной ручки означал бы дыру, которую нечем
+    заметить. Метод проверяется здесь, поэтому чтение остаётся открытым само
+    собой, а новая мутирующая ручка получает защиту, не вспомнив о ней.
+
+    **Только в production.** В development гостевая запись — рабочий инструмент,
+    и общего пула там не существует: сервер один и человек за ним один.
+
+    Returns:
+        Пользователя, если он есть; `None` для гостя, когда запрет не применяется.
+
+    Raises:
+        HTTPException: 401, если гость мутирует данные на проде. Именно 401,
+            а не 403: человек не «не имеет права», он не представился.
+    """
+    if user is not None:
+        return user
+    # Через `is_production`, а не прямым сравнением: property нормализует регистр
+    # и пробелы, и "Production" в .env не должно молча снимать защиту.
+    if not settings.is_production:
+        return None
+    if request.method in SAFE_METHODS:
+        return None
+    if any(request.url.path.endswith(tail) for tail in READ_ONLY_WRITE_PATHS):
+        return None
+    raise HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail=(
+            "Чтобы вносить свои финансовые данные, нужен аккаунт. "
+            "Демо-портреты доступны для просмотра без регистрации."
+        ),
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+
+
 def require_premium(user: User = Depends(require_user)) -> User:
     """Защита платных эндпоинтов (каркас монетизации): 403, если тариф не premium.
 

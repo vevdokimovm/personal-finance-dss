@@ -29,6 +29,7 @@ from app.api.routes_telegram import router as telegram_router
 from app.api.routes_telemetry import router as telemetry_router
 from app.api.routes_user_prefs import router as user_prefs_router
 from app.config import settings
+from app.dependencies import require_account_for_writes
 
 router = APIRouter(prefix=settings.API_PREFIX)
 router.include_router(auth_router)
@@ -39,17 +40,25 @@ router.include_router(consents_router)
 # ручки означал бы обработку без основания, и заметить это было бы нечем.
 _FIN = [Depends(require_financial_consent)]
 
-router.include_router(transactions_router, dependencies=_FIN)
-router.include_router(obligations_router, dependencies=_FIN)
-router.include_router(goals_router, dependencies=_FIN)
+# 🔴 Гостевая ЗАПИСЬ финансовых данных на проде запрещена (v8.53.0).
+# Гостевой пул — один глобальный `user_id IS NULL` на всех посетителей сервера:
+# один видит операции другого, `/demo/load` стирает данные третьего. Гейт
+# пропускает безопасные методы сам, поэтому чтение и демо остаются открытыми.
+# Разбор — докстрока `require_account_for_writes`.
+_GUEST = [Depends(require_account_for_writes)]
+_FIN_W = _FIN + _GUEST
+
+router.include_router(transactions_router, dependencies=_FIN_W)
+router.include_router(obligations_router, dependencies=_FIN_W)
+router.include_router(goals_router, dependencies=_FIN_W)
 router.include_router(households_router)
-router.include_router(liquid_assets_router, dependencies=_FIN)
+router.include_router(liquid_assets_router, dependencies=_FIN_W)
 router.include_router(telemetry_router, dependencies=_FIN)
 router.include_router(categories_router)
 router.include_router(user_prefs_router)
 router.include_router(analysis_router, dependencies=_FIN)
 router.include_router(recommendation_router, dependencies=_FIN)
-router.include_router(demo_router)
+router.include_router(demo_router, dependencies=_GUEST)
 # 🔴 ОСТАТОК H3 ЗАКРЫТ (v8.43.0). Импорт банковской выписки пачкой обрабатывал финансовые
 # данные БЕЗ согласия, тогда как ручное добавление ОДНОЙ операции его требовало: чем больше
 # данных человек загружал за раз, тем меньше проверок стояло на пути.
@@ -59,8 +68,8 @@ router.include_router(demo_router)
 # на 2658 строк): человек увидел бы невнятную ошибку вместо объяснения про согласие.
 # В этом же батче импорт переехал в React, где `ConsentRequiredPanel` работает с v8.27.0.
 # Разбор — `docs/reports/decisions/2026-09-04_h3_and_jinja_removal_order.md`.
-router.include_router(banks_router, dependencies=_FIN)
-router.include_router(budgets_router, dependencies=_FIN)
+router.include_router(banks_router, dependencies=_FIN_W)
+router.include_router(budgets_router, dependencies=_FIN_W)
 router.include_router(planning_router, dependencies=_FIN)
 router.include_router(notifications_router)
 router.include_router(export_router, dependencies=_FIN)
