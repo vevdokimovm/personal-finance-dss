@@ -155,14 +155,21 @@ class TestProductionSecretsGuard:
         assert any("TOKEN_ENCRYPTION" in p for p in problems)
 
     def test_explicit_encryption_key_passes(self) -> None:
+        # 🔴 `CORS_ORIGINS` и `DATABASE_URL` заданы явно с v8.56.0: старт-гард
+        # требует их, потому что дефолты ломают прод молча — localhost-origin даёт
+        # 403 на каждое действие пользователя, SQLite в контейнере теряет данные.
         s = Settings(ENVIRONMENT="production", JWT_SECRET="x" * 40,
                      COOKIE_SECURE=True, ADMIN_API_KEY="y" * 24,
+                     CORS_ORIGINS="https://finpilot.ru",
+                     DATABASE_URL="postgresql+psycopg2://u:p@db:5432/finpilot",
                      TOKEN_ENCRYPTION_KEY=_FERNET_KEY)
         assert validate_production_security(s) == []
 
     def test_encryption_keys_multi_passes(self) -> None:
         s = Settings(ENVIRONMENT="production", JWT_SECRET="x" * 40,
                      COOKIE_SECURE=True, ADMIN_API_KEY="y" * 24,
+                     CORS_ORIGINS="https://finpilot.ru",
+                     DATABASE_URL="postgresql+psycopg2://u:p@db:5432/finpilot",
                      TOKEN_ENCRYPTION_KEYS=_FERNET_KEY)
         assert validate_production_security(s) == []
 

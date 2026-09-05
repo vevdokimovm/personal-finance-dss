@@ -53,9 +53,11 @@ server {
     add_header X-Content-Type-Options   "nosniff" always;
     add_header Referrer-Policy          "strict-origin-when-cross-origin" always;
     add_header Permissions-Policy       "geolocation=(), microphone=(), camera=()" always;
-    # CSP: 'unsafe-inline' временно — фронт содержит inline JS/CSS (см. UI-роадмап:
-    # вынос inline-стилей). После выноса убрать 'unsafe-inline' для ужесточения.
-    add_header Content-Security-Policy   "default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; font-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'" always;
+    # CSP: 'unsafe-inline' снят со СКРИПТОВ (v8.56.0) — Jinja снесена, собранный SPA
+    # inline-скриптов не содержит. У стилей остаётся: Radix и react-remove-scroll ставят
+    # их в рантайме. Политика обязана совпадать с `app/middleware.py`; расхождение
+    # ловит `tests/test_csp_policy.py`.
+    add_header Content-Security-Policy   "default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self'; font-src 'self' data:; connect-src 'self'; object-src 'none'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'" always;
 
     # Импорт банковских выписок — до 10 МБ, даём запас.
     client_max_body_size 12m;

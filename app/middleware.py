@@ -14,6 +14,7 @@ from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.requests import Request
 from starlette.responses import JSONResponse
 
+from app.config import settings
 from app.services.event_logger import log_event
 
 _request_logger = logging.getLogger("finpilot.request")
@@ -119,11 +120,31 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
         response.headers["X-Frame-Options"] = "DENY"
         response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
         response.headers["Permissions-Policy"] = "geolocation=(), microphone=(), camera=()"
+        # 🔴 `script-src` БЕЗ `'unsafe-inline'` (v8.56.0). Пункт вехи 4.4 был отложен
+        # до переезда фронта на React; веха 8 закрыта, Jinja снесена, и собранный SPA
+        # inline-скриптов не содержит вовсе (`frontend/dist/index.html` — единственный
+        # `<script>` внешний). `'unsafe-inline'` здесь снимал главную защиту CSP от XSS:
+        # любой внедрённый в разметку скрипт выполнялся бы.
+        #
+        # У СТИЛЕЙ он остаётся сознательно: Radix (диалоги, тултипы, тосты) и
+        # `react-remove-scroll` ставят стили в рантайме — `style`-атрибутами и
+        # инжектируемыми `<style>`. Nonce для рантайм-инжекции требует прокидывания
+        # через каждую библиотеку. CSS-инъекция искажает вид, JS-инъекция крадёт токен;
+        # снимаем то, что снимается, и называем, что не снимается.
+        #
+        # Набор директив тот же, что в `nginx/templates/finpilot.conf.template`: раньше
+        # middleware был беднее, и ответ приложения защищался слабее того же ответа
+        # через прокси — одна страница получала разную политику в зависимости от пути.
         response.headers["Content-Security-Policy"] = (
             "default-src 'self'; "
             "style-src 'self' 'unsafe-inline'; "
-            "script-src 'self' 'unsafe-inline'; "
+            "script-src 'self'; "
             "img-src 'self' data:; "
+            "font-src 'self' data:; "
+            "connect-src 'self'; "
+            "object-src 'none'; "
+            "base-uri 'self'; "
+            "form-action 'self'; "
             "frame-ancestors 'none'"
         )
         if self._hsts:
@@ -134,11 +155,34 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
 
 
 class CSRFMiddleware(BaseHTTPMiddleware):
-    """Защита от CSRF через проверку Origin на изменяющих запросах (NFR-04).
+    """Защита от CSRF на изменяющих запросах (NFR-04).
 
-    Origin сверяется со списком доверенных, только если он présent (браузерный
-    запрос). Его отсутствие (curl, server-to-server, мобильный клиент) не несёт
-    CSRF-риска — атака требует амбиентных cookies в браузере.
+    Origin сверяется со списком доверенных. Запросы по `Bearer`-токену или API-ключу
+    пропускаются: браузер сам такой заголовок не приложит, значит подделать запрос
+    с чужого сайта нельзя (B2B `/v1`, Plaid, мобильные и серверные клиенты).
+
+    🔴 **Исправлено в v8.56.0.** Здесь стояло «отсутствие Origin не несёт CSRF-риска —
+    атака требует амбиентных cookies в браузере». Рассуждение верное, вывод из него —
+    нет: наличие амбиентной cookie проверяется по самой cookie, а не по наличию Origin.
+    Запрос **с auth-cookie и без Origin** — ровно тот случай, который докстрока
+    объявляла невозможным, и он проходил молча.
+
+    Современный браузер шлёт `Origin` на каждый POST/PUT/PATCH/DELETE, поэтому такой
+    запрос либо от клиента, которому cookie не нужна (пусть шлёт `Bearer`), либо
+    подделан. На проде он отвергается.
+
+    **Почему не double-submit токен.** Он требует правок фронта (чтение куки, заголовок
+    на каждый мутирующий запрос, обновление после логина) и даёт браузерным клиентам
+    ту же гарантию, что уже даёт Origin. Разница проявляется только там, где `Origin`
+    отсутствует, — а этот случай мы и запрещаем.
+
+    **Только в production.** В development cookie-запрос без Origin — это `TestClient`
+    и `curl`; запрет там сломал бы десятки тестов ради угрозы, которой нет: ни чужого
+    сайта, ни жертвы. Та же развилка и то же решение, что у гостевой записи в v8.53.0.
+
+    Первым рубежом остаётся `SameSite=lax` на auth-cookie (`routes_auth._set_auth_cookie`):
+    браузер не приложит её к cross-site POST. Он живёт на стороне браузера — старого,
+    нестандартного или обёрнутого прокси; серверная проверка от клиента не зависит.
     """
 
     SAFE_METHODS = {"GET", "HEAD", "OPTIONS", "TRACE"}
@@ -161,4 +205,15 @@ class CSRFMiddleware(BaseHTTPMiddleware):
                         status_code=403,
                         content={"detail": "Запрос с недоверенного источника отклонён."},
                     )
+                # Амбиентная cookie без Origin: см. разбор в докстроке класса.
+                if origin is None and settings.AUTH_COOKIE_NAME in request.cookies:
+                    if settings.is_production:
+                        log_event("csrf_blocked", {"path": request.url.path, "origin": None})
+                        return JSONResponse(
+                            status_code=403,
+                            content={
+                                "detail": "Запрос без указания источника отклонён. "
+                                "Обновите страницу и попробуйте ещё раз."
+                            },
+                        )
         return await call_next(request)

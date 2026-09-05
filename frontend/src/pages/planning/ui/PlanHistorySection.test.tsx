@@ -164,7 +164,17 @@ describe("PlanHistorySection — история сохранённых план�
     expect(saveMock.mock.calls[0][0]).toEqual({ note: null });
   });
 
-  it("удаление спрашивает подтверждение, а не стирает по первому клику", async () => {
+  /* 🔴 Модалка подтверждения снята в v8.56.0. Она стояла с обоснованием
+     «restore-эндпоинта для снимков нет, вернуть удалённое нечем» — и это обоснование
+     отпало в v8.38.0, когда появились `POST /planning/history/{id}/restore`
+     и `useRestorePlanSnapshot`. Комментарий, текст модалки и `description` остались
+     от прежнего состояния кода на восемнадцать версий.
+
+     У остальных ПЯТИ сущностей (цели, активы, обязательства, операции, бюджеты)
+     удаление идёт сразу и предлагает «Вернуть». Модалка на шестой — расхождение,
+     а не осознанная защита: она не защищает ни от чего, чего не защищает undo. */
+  it("удаляет сразу, без подтверждения — как остальные пять сущностей", async () => {
+    deleteMock.mockImplementation((_id, opts) => opts?.onSuccess?.());
     usePlanHistoryMock.mockReturnValue({
       data: { items: [snapshot()], count: 1 },
       error: null,
@@ -173,13 +183,8 @@ describe("PlanHistorySection — история сохранённых план�
     });
     render(<PlanHistorySection />);
     await userEvent.click(screen.getAllByRole("button", { name: /Удалить снимок/ })[0]);
-    expect(deleteMock).not.toHaveBeenCalled();
-    // В модалке кнопка называется датой снимка: при обходе документа списком кнопок
-    // «Удалить» без уточнения неотличима от кнопок в списке ([A11Y-05]).
-    const confirm = screen
-      .getAllByRole("button", { name: /Удалить снимок от 01\.09\.2026/ })
-      .at(-1)!;
-    await userEvent.click(confirm);
+
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
     expect(deleteMock.mock.calls[0][0]).toBe(7);
   });
 });
@@ -239,18 +244,21 @@ describe("PlanHistorySection — длинная история и ПДН", () =>
     expect(screen.queryByText("выше порога")).not.toBeInTheDocument();
   });
 
-  it("подтверждение показывает, КАКОЙ снимок удаляют, видимым текстом (FRM-07)", async () => {
+  it("нигде не обещает, что восстановить снимок нельзя", () => {
+    /* 🔴 Продукт не должен пугать необратимостью там, где действие обратимо: человек
+       читает «восстановить будет нельзя», отказывается от удаления и копит снимки,
+       которых не хотел. Неверная надпись меняет его решение — это дороже лишнего клика,
+       ради которого модалка и стояла. */
     usePlanHistoryMock.mockReturnValue({
       data: { items: [snapshot()], count: 1 },
       error: null,
       isLoading: false,
       refetch: vi.fn(),
     });
-    const { container } = render(<PlanHistorySection />);
-    await userEvent.click(screen.getAllByRole("button", { name: /Удалить снимок/ })[0]);
-    const target = container.ownerDocument.querySelector(".fp-plan-history__confirm-target");
-    expect(target).not.toBeNull();
-    expect(target).toHaveTextContent(/01\.09\.2026, \d{2}:\d{2}/);
+    render(<PlanHistorySection />);
+    expect(
+      screen.queryByText(/необратим|восстановить.*нельзя|нельзя.*восстановить/i),
+    ).not.toBeInTheDocument();
   });
   /* Удаление снимка обратимо с v8.38.0. До этого продукт говорил на двух языках:
      у целей, активов, обязательств, операций и бюджетов «Вернуть» было, у истории
@@ -265,10 +273,6 @@ describe("PlanHistorySection — длинная история и ПДН", () =>
     });
     render(<PlanHistorySection />);
     await userEvent.click(screen.getAllByRole("button", { name: /Удалить снимок/ })[0]);
-    const confirm = screen
-      .getAllByRole("button", { name: /Удалить снимок от 01\.09\.2026/ })
-      .at(-1)!;
-    await userEvent.click(confirm);
 
     expect(undoMock).toHaveBeenCalledWith("Снимок удалён", expect.any(Function));
     undoMock.mock.calls[0][1]();

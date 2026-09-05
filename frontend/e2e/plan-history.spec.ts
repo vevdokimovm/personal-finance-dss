@@ -3,10 +3,14 @@ import { expect, test } from "@playwright/test";
 /**
  * История планов в настоящем браузере (v8.34.0).
  *
- * Юнит-тесты мокают сущность целиком и потому не проверяют главного: что подтверждение
- * удаления действительно ловит фокус и закрывается по Esc (Radix Dialog), и что после
- * удаления фокус не проваливается в <body>. Именно это отличает «диалог показывается»
- * от «диалогом можно пользоваться с клавиатуры».
+ * Юнит-тесты мокают сущность целиком и потому не проверяют главного: что после удаления
+ * фокус не проваливается в <body> и что кнопка «Вернуть» реально доходит до человека
+ * в тосте, а нажатие уходит на сервер.
+ *
+ * 🔴 Модалка подтверждения снята в v8.56.0 — её обоснование («restore-эндпоинта нет»)
+ * отпало ещё в v8.38.0. У остальных пяти сущностей удаление идёт сразу с undo; модалка
+ * на шестой была расхождением, а её текст «восстановить будет нельзя» — прямой
+ * неправдой.
  */
 
 const PROFILE = {
@@ -100,22 +104,22 @@ test("снимок показывает дату, профиль и деньги
   expect(rendered, "неразрывный пробел схлопнулся").not.toContain("39 500");
 });
 
-test("удаление требует подтверждения, Esc отменяет его (A11Y-06)", async ({ page }) => {
+test("удаление не открывает диалог и не пугает необратимостью (v8.56.0)", async ({ page }) => {
   await setup(page, [SNAPSHOT]);
+  await page.route("**/api/planning/history/*", async (route) => {
+    if (route.request().method() === "DELETE") {
+      return route.fulfill({ json: { status: "deleted", id: 7 } });
+    }
+    return route.fallback();
+  });
   await page.goto("/planning");
 
-  const trigger = page.getByRole("button", { name: /Удалить снимок от 01.09.2026/ });
-  await trigger.click();
+  await page.getByRole("button", { name: /Удалить снимок от 01.09.2026/ }).click();
 
-  const dialog = page.getByRole("dialog");
-  await expect(dialog).toBeVisible();
-  await expect(dialog).toContainText("Удалить снимок плана?");
-
-  await page.keyboard.press("Escape");
-  await expect(dialog).toHaveCount(0);
-  // Снимок на месте — Esc отменяет, а не подтверждает.
-  await expect(page.getByText("01.09.2026")).toBeVisible();
-  await expect(trigger).toBeFocused();
+  await expect(page.getByRole("dialog")).toHaveCount(0);
+  // Слово «необратимо» стояло в описании диалога: продукт обещал невозможность
+  // восстановления, имея работающий restore.
+  await expect(page.getByText(/необратим/i)).toHaveCount(0);
 });
 
 test("подпись снимка ограничена и связана с полем по label", async ({ page }) => {
@@ -147,10 +151,6 @@ test("удалённый снимок возвращается кнопкой «
 
   await page.goto("/planning");
   await page.getByRole("button", { name: /Удалить снимок от 01.09.2026/ }).click();
-  await page
-    .getByRole("dialog")
-    .getByRole("button", { name: /Удалить снимок от 01.09.2026/ })
-    .click();
 
   const undo = page.getByRole("button", { name: "Вернуть" });
   await expect(undo).toBeVisible();

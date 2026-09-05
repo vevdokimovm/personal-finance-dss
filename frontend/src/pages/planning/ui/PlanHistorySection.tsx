@@ -7,7 +7,7 @@ import {
 } from "@entities/plan-history";
 import type { PlanSnapshotSummary } from "@entities/plan-history";
 import { ConsentRequiredPanel } from "@entities/consents";
-import { Button, ListSkeleton, StatePanel, Modal, toast } from "@shared/ui";
+import { Button, ListSkeleton, StatePanel, toast } from "@shared/ui";
 import { formatMoney, formatPercent } from "@shared/lib/money/formatMoney";
 import { t } from "@shared/lib/i18n/t";
 import { getConsentRequiredDetail } from "@shared/lib/api/extractErrorMessage";
@@ -42,14 +42,8 @@ export function PlanHistorySection() {
   const restore = useRestorePlanSnapshot();
   const [note, setNote] = useState("");
   const [expanded, setExpanded] = useState(false);
-  const [pendingDelete, setPendingDelete] = useState<PlanSnapshotSummary | null>(null);
   const saveButtonRef = useRef<HTMLButtonElement>(null);
   const listRef = useRef<HTMLUListElement>(null);
-  // Кнопка, с которой открыли подтверждение. Modal управляется пропсом `open`, а не
-  // `Dialog.Trigger`, поэтому Radix НЕ знает, куда вернуть фокус при закрытии — и без
-  // этой ссылки фокус проваливается в <body> на Esc и на «Отмена». Поймано e2e; тот же
-  // класс, что чинили у GoalContributionForm в v8.28.0.
-  const deleteTriggerRef = useRef<HTMLButtonElement | null>(null);
 
   const consent = getConsentRequiredDetail(history.error);
   const items = history.data?.items ?? [];
@@ -76,7 +70,6 @@ export function PlanHistorySection() {
   function handleDelete(snapshot: PlanSnapshotSummary) {
     remove.mutate(snapshot.id, {
       onSuccess: () => {
-        setPendingDelete(null);
         // После УДАЛЕНИЯ возвращать фокус на кнопку нельзя — её больше нет в DOM.
         // Список тоже исчезает, если удалён последний снимок, поэтому запасной якорь —
         // кнопка сохранения: она на экране всегда.
@@ -230,11 +223,8 @@ export function PlanHistorySection() {
 
                     <Button
                       variant="danger"
-                      aria-haspopup="dialog"
-                      onClick={(e) => {
-                        deleteTriggerRef.current = e.currentTarget;
-                        setPendingDelete(s);
-                      }}
+                      aria-disabled={remove.isPending}
+                      onClick={() => !remove.isPending && handleDelete(s)}
                       /* Имя кнопки несёт дату: на экране их несколько, и «Удалить»
                          без уточнения в списке кнопок скринридера неразличимо ([A11Y-05]). */
                       aria-label={t("Удалить снимок от {date}", {
@@ -259,60 +249,6 @@ export function PlanHistorySection() {
         </>
       )}
 
-      {/* Подтверждение, а не удаление по первому клику: restore-эндпоинта для снимков на
-          бэкенде нет, поэтому undo-тостом (как у бюджетов и целей) обойтись нельзя —
-          вернуть удалённое пользователю нечем. Завести restore и перейти на общий язык
-          удаления — отдельная задача, записана в ROADMAP. */}
-      <Modal
-        open={pendingDelete !== null}
-        onOpenChange={(open) => !open && setPendingDelete(null)}
-        title={t("Удалить снимок плана?")}
-        description={t("Действие необратимо: восстановить снимок будет нельзя.")}
-        // Фокус возвращается на кнопку, с которой открыли подтверждение. Если снимок
-        // уже удалён, кнопки в DOM нет — тогда Modal ничего не делает, а фокус переносит
-        // `handleDelete`.
-        returnFocusTo={() =>
-          deleteTriggerRef.current?.isConnected ? deleteTriggerRef.current : null
-        }
-      >
-        {/* Видимый текст, а не только `description`: тот рендерится `sr-only`, и зрячий
-            пользователь не видел, КАКОЙ из снимков сейчас исчезнет ([FRM-07]). */}
-        {pendingDelete && (
-          <p className="fp-plan-history__confirm-target">
-            {t("Снимок от {date} — {money} свободных денег.", {
-              date: formatWhen(pendingDelete.created_at),
-              money: formatMoney(pendingDelete.indicators.Rt),
-            })}
-          </p>
-        )}
-        <div className="fp-plan-history__confirm">
-          <Button variant="ghost" onClick={() => setPendingDelete(null)}>
-            {t("Отмена")}
-          </Button>
-          <Button
-            variant="danger"
-            aria-busy={remove.isPending}
-            /* `aria-disabled`, а не `disabled`: нативный `disabled` выбрасывает кнопку
-               из дерева доступности прямо под фокусом пользователя — тот же выбор, что
-               уже сделан для мутаций в Button.css. Повторный клик при этом гасится,
-               иначе второй DELETE вернул бы 404 и показал ложную ошибку на успешно
-               удалённом снимке. */
-            aria-disabled={remove.isPending}
-            /* Имя с датой: при обходе документа списком кнопок «Удалить» без уточнения
-               неотличима от кнопок в самом списке ([A11Y-05]). */
-            aria-label={
-              pendingDelete
-                ? t("Удалить снимок от {date}", {
-                    date: formatWhen(pendingDelete.created_at),
-                  })
-                : t("Удалить")
-            }
-            onClick={() => !remove.isPending && pendingDelete && handleDelete(pendingDelete)}
-          >
-            {remove.isPending ? t("Удаляем…") : t("Удалить")}
-          </Button>
-        </div>
-      </Modal>
     </section>
   );
 }

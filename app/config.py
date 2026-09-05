@@ -28,7 +28,7 @@ class Settings(BaseSettings):
         description="Название проекта.",
     )
     APP_VERSION: str = Field(
-        default="8.55.0",
+        default="8.56.0",
         description="Версия приложения (INFRA-13): код, UI-футер, git-тег.",
     )
     PROJECT_TAGLINE: str = Field(
@@ -312,4 +312,24 @@ def validate_production_security(s: Settings) -> list[str]:
             "TOKEN_ENCRYPTION_KEY(S) не задан — в production ключ шифрования «в покое» "
             "должен быть явным; иначе он деривится из JWT_SECRET (нет разделения ключей "
             "по назначению, ротация ключа шифрования невозможна). Задайте Fernet-ключ в .env")
+
+    # 🔴 Ниже — проверки, которые ловят не взлом, а ТИХУЮ поломку прода (v8.56.0).
+    # Общее у них: дефолт удобен в разработке, губителен в бою и не даёт ошибки
+    # при старте, так что узнаёт о нём первый живой пользователь, а не мы.
+    origins = s.cors_origins_list
+    bad_origins = [
+        o for o in origins
+        if "localhost" in o or "127.0.0.1" in o or o.startswith("http://")
+    ]
+    if not origins or bad_origins:
+        problems.append(
+            "CORS_ORIGINS содержит локальные или незащищённые источники "
+            f"({', '.join(bad_origins) or 'список пуст'}) — CSRFMiddleware отвергнет "
+            "каждый POST/PUT/PATCH/DELETE с боевого домена, и сайт будет открываться, "
+            "ничего не сохраняя. Задайте https-домены продукта в .env")
+    if s.DATABASE_URL.strip().lower().startswith("sqlite"):
+        problems.append(
+            "DATABASE_URL указывает на SQLite — в контейнере это файл, который исчезает "
+            "при первом же пересоздании, вместе с финансовыми данными пользователей "
+            "и без единой ошибки. Задайте PostgreSQL в .env")
     return problems

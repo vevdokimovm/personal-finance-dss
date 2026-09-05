@@ -34,8 +34,13 @@ class TestProductionConfigGuard:
         assert validate_production_security(s) == []
 
     def test_secure_production_passes(self) -> None:
+        # 🔴 `CORS_ORIGINS` и `DATABASE_URL` заданы явно с v8.56.0: старт-гард
+        # требует их, потому что дефолты ломают прод молча — localhost-origin даёт
+        # 403 на каждое действие пользователя, SQLite в контейнере теряет данные.
         s = Settings(ENVIRONMENT="production", JWT_SECRET="x" * 40, COOKIE_SECURE=True,
                      ADMIN_API_KEY="y" * 24,
+                     CORS_ORIGINS="https://finpilot.ru",
+                     DATABASE_URL="postgresql+psycopg2://u:p@db:5432/finpilot",
                      TOKEN_ENCRYPTION_KEY="PpUqrWqj3kK0n0a9rO2mWqH3sT6vY8bX1cZ4dF7gH0k=")
         assert validate_production_security(s) == []
 
