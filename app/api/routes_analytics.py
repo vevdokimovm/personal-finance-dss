@@ -18,7 +18,11 @@ from app.services.analytics import analytics_overview, funnel
 router = APIRouter(prefix="/analytics", tags=["Аналитика"], dependencies=[Depends(require_admin)])
 
 # Воронка онбординга по умолчанию (по реально логируемым событиям).
-_DEFAULT_FUNNEL = ["login_success", "obligation_created", "goal_created"]
+# 🔴 Первый шаг — регистрация, а не вход: воронка онбординга описывает путь НОВОГО
+# человека, и «сколько вошло» без «сколько зарегистрировалось» не с чем сравнивать.
+# Имя события — `user_registered`, ровно как его пишет `routes_auth.register`;
+# фронт до v8.51.0 держал в словаре несуществующий `register_success` (v8.48.0).
+_DEFAULT_FUNNEL = ["user_registered", "login_success", "obligation_created", "goal_created"]
 
 
 class AnalyticsOverview(BaseModel):

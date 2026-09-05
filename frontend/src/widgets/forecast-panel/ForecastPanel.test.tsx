@@ -101,6 +101,49 @@ function mockPayload(): TooltipPayload {
   ] as unknown as TooltipPayload;
 }
 
+describe("ForecastPanel — предупреждение о дефиците", () => {
+  /* 🔴 Найдено аудитом independent-expert 05.09.2026: `deficit_alert` — месяц, когда
+     денег не хватит, — считался на бэкенде (`forecasting.py:157`), лежал в контракте
+     и НЕ показывался нигде. CHANGELOG [8.48.0] сам называл его «самым важным, что
+     прогноз умеет сказать»: починка типов сделала поле видимым для TypeScript,
+     а экран под него не завели. Классический «замысел зафиксирован, кодом не стал». */
+
+  it("называет месяц и сумму разрыва, когда дефицит предсказан", () => {
+    render(
+      <ForecastPanel
+        forecast={makeForecast({
+          deficit_alert: { period: 4, gap: 12000, pessimistic: false },
+        })}
+      />,
+    );
+    const alert = screen.getByRole("alert");
+    // Месяц и сумма — оба обязаны быть в тексте: «денег не хватит» без «когда»
+    // и «сколько» не даёт человеку ничего, кроме тревоги.
+    expect(alert.textContent).toMatch(/4-м месяце/);
+    expect(alert.textContent).toMatch(/12/);
+    expect(alert.textContent).toMatch(/₽/);
+  });
+
+  /* Пессимистичный сценарий — другой смысл: дефицита в основном прогнозе нет,
+     он появляется только в нижней границе интервала. Показывать оба одинаково
+     значило бы пугать человека тем, что скорее всего не случится. */
+  it("различает дефицит основного прогноза и пессимистичного сценария", () => {
+    render(
+      <ForecastPanel
+        forecast={makeForecast({
+          deficit_alert: { period: 5, gap: 3000, pessimistic: true },
+        })}
+      />,
+    );
+    expect(screen.getByRole("alert")).toHaveTextContent(/неблагоприятн|пессимистич/i);
+  });
+
+  it("молчит, когда дефицита не предвидится", () => {
+    render(<ForecastPanel forecast={makeForecast()} />);
+    expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+  });
+});
+
 describe("ForecastTooltip — только медиана, не сырые dataKey служебных серий", () => {
   it("не активен — ничего не рендерит", () => {
     const { container } = render(

@@ -29,3 +29,17 @@
   font-weight: 400;
   color: var(--c-text3);
 }
+
+/* Предупреждение о дефиците: янтарь, а не красный. Прогноз — оценка, а не факт,
+   и красный здесь читался бы как «уже случилось». Смысл несёт текст, цвет только
+   поддерживает: убери его — предложение всё равно говорит, когда и сколько
+   не хватит (WCAG 1.4.1). */
+.fp-forecast__deficit {
+  margin: var(--sp-3) 0 0;
+  padding: var(--sp-3) var(--sp-4);
+  border-left: var(--sp-1) solid var(--c-amber);
+  border-radius: var(--r-sm);
+  background: var(--c-amber-bg);
+  color: var(--c-text);
+  font-size: var(--fs-md);
+}

@@ -97,11 +97,12 @@ def create_transaction_endpoint(
         currency=payload.currency,
         user_id=user_id,
     )
+    # 🔴 `user_id` обязателен: без него событие не попадает в воронку (H7, v8.51.0).
     log_event("transaction_created", {
         "type": payload.type,
         "category": payload.category,
         "amount": payload.amount,
-    })
+    }, user_id=user_id)
     return transaction
 
 
@@ -123,7 +124,7 @@ def update_transaction_endpoint(
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Транзакция не найдена."
         )
-    log_event("transaction_updated", {"transaction_id": transaction_id})
+    log_event("transaction_updated", {"transaction_id": transaction_id}, user_id=user_id)
     return transaction
 
 
@@ -143,7 +144,7 @@ def delete_transaction_endpoint(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Транзакция не найдена.",
         )
-    log_event("transaction_deleted", {"transaction_id": transaction_id})
+    log_event("transaction_deleted", {"transaction_id": transaction_id}, user_id=user_id)
     return transaction
 
 
@@ -155,14 +156,15 @@ def delete_transaction_endpoint(
 def restore_transaction_endpoint(
     transaction_id: int,
     db: Session = Depends(get_db),
+    user_id: str | None = Depends(get_current_user_id),
 ) -> TransactionResponse:
-    transaction = restore_transaction(db=db, transaction_id=transaction_id)
+    transaction = restore_transaction(db=db, transaction_id=transaction_id, user_id=user_id)
     if transaction is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Удалённая транзакция не найдена.",
         )
-    log_event("transaction_restored", {"transaction_id": transaction_id})
+    log_event("transaction_restored", {"transaction_id": transaction_id}, user_id=user_id)
     return transaction
 
 
@@ -236,7 +238,7 @@ def set_transaction_category_endpoint(
         "category": payload.category,
         "learned": rule is not None,
         "updated_count": updated_count,
-    })
+    }, user_id=user_id)
     return {"transaction": transaction, "rule": rule, "updated_count": updated_count}
 
 

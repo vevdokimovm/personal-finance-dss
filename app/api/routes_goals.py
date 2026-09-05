@@ -60,11 +60,12 @@ def create_goal_endpoint(
         user_id=user_id,
         household_id=payload.household_id,
     )
+    # 🔴 `user_id` обязателен: без него событие не попадает в воронку (H7, v8.51.0).
     log_event("goal_created", {
         "category": payload.category.value,
         "target_amount": payload.target_amount,
         "shared": payload.household_id is not None,
-    })
+    }, user_id=user_id)
     return goal
 
 
@@ -85,7 +86,7 @@ def update_goal_endpoint(
     goal = update_goal(db, goal_id, user_id=user_id, **fields)
     if goal is None:
         raise HTTPException(status_code=404, detail="Цель не найдена")
-    log_event("goal_updated", {"goal_id": goal_id})
+    log_event("goal_updated", {"goal_id": goal_id}, user_id=user_id)
     return goal
 
 
@@ -110,7 +111,11 @@ def add_goal_contribution_endpoint(
             "автоматически — вносить его вручную нельзя.",
         )
     updated = add_goal_contribution(db, goal_id, payload.amount, user_id=user_id)
-    log_event("goal_contribution_added", {"goal_id": goal_id, "amount": payload.amount})
+    log_event(
+        "goal_contribution_added",
+        {"goal_id": goal_id, "amount": payload.amount},
+        user_id=user_id,
+    )
     return updated
 
 
@@ -141,5 +146,5 @@ def restore_goal_endpoint(
     goal = restore_goal(db, goal_id, user_id=user_id)
     if goal is None:
         raise HTTPException(status_code=404, detail="Удалённая цель не найдена")
-    log_event("goal_restored", {"goal_id": goal_id})
+    log_event("goal_restored", {"goal_id": goal_id}, user_id=user_id)
     return goal

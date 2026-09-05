@@ -496,10 +496,19 @@ def delete_transaction(
     return transaction
 
 
-def restore_transaction(db: Session, transaction_id: int) -> Optional[Transaction]:
-    """Восстановление мягко удалённой транзакции (BUG-03)."""
+def restore_transaction(
+    db: Session, transaction_id: int, user_id: Optional[str] = None
+) -> Optional[Transaction]:
+    """Восстановление мягко удалённой транзакции (BUG-03).
+
+    🔴 Проверка владельца добавлена в v8.51.0. До неё функция была единственной из пяти
+    `restore_*` без неё (`restore_goal`, `restore_obligation`, `restore_budget`,
+    `restore_liquid_asset` проверяли), то есть посторонний, зная `id`, возвращал чужую
+    удалённую операцию в чужой список — а она меняет баланс владельца и, через него,
+    рекомендацию плана. Не решение, а пропуск: четыре соседа сделаны одинаково.
+    """
     transaction = db.get(Transaction, transaction_id)
-    if transaction is None or not transaction.is_deleted:
+    if transaction is None or not transaction.is_deleted or transaction.user_id != user_id:
         return None
     transaction.is_deleted = False
     transaction.deleted_at = None

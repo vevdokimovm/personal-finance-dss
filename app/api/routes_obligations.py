@@ -55,12 +55,15 @@ def create_obligation_endpoint(
         currency=payload.currency,
         user_id=user_id,
     )
+    # 🔴 `user_id` обязателен: `analytics.funnel()` фильтрует `Event.user_id.isnot(None)`,
+    # и событие без него не попадает в воронку ВООБЩЕ. Гипотеза H7 independent-expert,
+    # подтверждена 05.09.2026: экран метрик показывал ложный обрыв на первом шаге.
     log_event("obligation_created", {
         "type": payload.type,
         "bank": payload.bank,
         "amount": payload.amount,
         "interest_rate": payload.interest_rate,
-    })
+    }, user_id=user_id)
     return obligation
 
 
@@ -82,7 +85,7 @@ def update_obligation_endpoint(
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Обязательство не найдено."
         )
-    log_event("obligation_updated", {"obligation_id": obligation_id})
+    log_event("obligation_updated", {"obligation_id": obligation_id}, user_id=user_id)
     return obligation
 
 
@@ -119,5 +122,5 @@ def restore_obligation_endpoint(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Удалённое обязательство не найдено.",
         )
-    log_event("obligation_restored", {"obligation_id": obligation_id})
+    log_event("obligation_restored", {"obligation_id": obligation_id}, user_id=user_id)
     return obligation

@@ -25,7 +25,7 @@ import "./InsightsPage.css";
  * новый тип появляется в коде раньше, чем в словаре, и ключ лучше пустой строки. */
 const STEP_LABELS: Record<string, string> = {
   login_success: "Вход в аккаунт",
-  register_success: "Регистрация",
+  user_registered: "Регистрация",
   obligation_created: "Добавлен кредит",
   goal_created: "Добавлена цель",
   transaction_created: "Добавлена операция",

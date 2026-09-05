@@ -26,7 +26,7 @@ import "./ExperimentsPage.css";
  * раньше, чем в словаре. */
 const EVENT_LABELS: Record<string, string> = {
   login_success: "Вход в аккаунт",
-  register_success: "Регистрация",
+  user_registered: "Регистрация",
   obligation_created: "Добавлен кредит",
   goal_created: "Добавлена цель",
   transaction_created: "Добавлена операция",

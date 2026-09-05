@@ -126,13 +126,25 @@ jobs:
       - name: Сборка
         run: npm run build
 
-  # ── Линтеры: ИНФОРМАЦИОННЫЙ job (не блокирует). ──────────────────────────────
+  # ── Линтеры: flake8 и mypy БЛОКИРУЮТ, pylint информационный. ────────────────
+  #
+  # 🔴 До v8.50.0 вся джоба стояла с `continue-on-error: true`, то есть красное
+  # в ней не значило ничего — «декоративность джобы линтеров» висела отдельным
+  # пунктом долга в роадмапе. Разделено по факту, а не по желанию: flake8 и mypy
+  # на момент правки чисты (`mypy app` — 118 файлов без ошибок) и уже входят
+  # в блокирующий `tools.preflight`, то есть де-факто обязательны — сделать их
+  # блокирующими здесь ничего не ломает и убирает расхождение между локальным
+  # гейтом и CI.
+  #
+  # pylint остаётся информационным ЧЕСТНО: 9.63/10 с замечаниями `duplicate-code`
+  # в расчётных модулях. Сделать его блокирующим сейчас значило бы либо покрасить
+  # CI в красное, либо занизить порог до бессмысленного — оба варианта хуже
+  # честной пометки «информационно».
   lint:
-    name: Линтеры (информационно)
+    name: Линтеры (flake8, mypy — блокируют)
     if: github.event_name == 'push' || github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    continue-on-error: true
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -147,6 +159,25 @@ jobs:
         run: flake8 .
       - name: mypy
         run: mypy app --config-file=.mypy.ini
+
+  # ── pylint: информационно, отдельным job, чтобы его красное не валило блокирующий
+  #    выше и было видно, что именно он информационный.
+  pylint:
+    name: pylint (информационно)
+    if: github.event_name == 'push' || github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: pip
+      - name: Установка зависимостей
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt -r requirements-dev.txt
       - name: pylint
         run: pylint app --rcfile=.pylintrc
 

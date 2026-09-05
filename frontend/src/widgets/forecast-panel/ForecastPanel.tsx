@@ -10,7 +10,7 @@ import {
   YAxis,
 } from "recharts";
 import type { TooltipPayload } from "recharts/types/state/tooltipSlice";
-import { formatMoney, formatPercent } from "@shared/lib/money/formatMoney";
+import { formatMoney, formatNumber, formatPercent } from "@shared/lib/money/formatMoney";
 import { t } from "@shared/lib/i18n/t";
 import { Formula } from "@shared/ui";
 import type { ForecastResult } from "@entities/plan-summary";
@@ -99,6 +99,29 @@ export function ForecastPanel({
           {t("Сценарий «что если»: график посчитан со ставкой {v}, не решение СППР.", {
             v: formatPercent(forecast.r_bench),
           })}
+        </p>
+      )}
+
+      {/* 🔴 Предупреждение о дефиците — самое важное, что прогноз умеет сказать, и до
+          v8.51.0 оно не показывалось нигде: поле считалось на бэкенде и лежало
+          в контракте (аудит independent-expert 05.09.2026). Стоит ДО графика: человек,
+          у которого через четыре месяца не хватит денег, должен узнать об этом раньше,
+          чем начнёт разглядывать коридор. */}
+      {forecast.deficit_alert && (
+        <p className="fp-forecast__deficit" role="alert">
+          {forecast.deficit_alert.pessimistic
+            ? t(
+                "При неблагоприятном сценарии на {n}-м месяце не хватит {gap}. " +
+                  "В основном прогнозе дефицита нет — это нижняя граница интервала.",
+                {
+                  n: formatNumber(forecast.deficit_alert.period, 0),
+                  gap: formatMoney(forecast.deficit_alert.gap),
+                },
+              )
+            : t("На {n}-м месяце денег не хватит: разрыв {gap}.", {
+                n: formatNumber(forecast.deficit_alert.period, 0),
+                gap: formatMoney(forecast.deficit_alert.gap),
+              })}
         </p>
       )}
 
