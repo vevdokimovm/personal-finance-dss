@@ -8,6 +8,7 @@ import {
   type Transaction,
 } from "@entities/transactions";
 import "@shared/ui/entityForm.css";
+import { HouseholdScopeField } from "@features/household-scope";
 
 interface TransactionFormProps {
   open: boolean;
@@ -35,6 +36,10 @@ export function TransactionForm({ open, onOpenChange, transaction }: Transaction
   const [category, setCategory] = useState(transaction?.category ?? "");
   const [description, setDescription] = useState(transaction?.description ?? "");
   const [errors, setErrors] = useState<FieldErrors>({});
+  /* Владелец записи выбирается только при СОЗДАНИИ: PUT на бэкенде `household_id`
+     не принимает, и показать контрол в правке значило бы обещать переезд записи
+     между личным и общим, которого код не делает. */
+  const [householdId, setHouseholdId] = useState<number | null>(null);
 
   const amountRef = useRef<HTMLInputElement>(null);
   const dateRef = useRef<HTMLInputElement>(null);
@@ -70,6 +75,7 @@ export function TransactionForm({ open, onOpenChange, transaction }: Transaction
       date: new Date(date).toISOString(),
       category: category.trim() || null,
       description: description.trim() || null,
+      ...(isEdit ? {} : { household_id: householdId }),
     };
     try {
       if (isEdit) {
@@ -172,6 +178,13 @@ export function TransactionForm({ open, onOpenChange, transaction }: Transaction
             )}
           </div>
         </div>
+        {!isEdit && (
+          <HouseholdScopeField
+            value={householdId}
+            onChange={setHouseholdId}
+            idPrefix="transaction-form"
+          />
+        )}
         <div className="fp-entity-form__field">
           <label htmlFor="transaction-form-category">{t("Категория")}</label>
           <input

@@ -4,6 +4,7 @@ import { t } from "@shared/lib/i18n/t";
 import { extractErrorMessage } from "@shared/lib/api/extractErrorMessage";
 import { useCreateBudget, type BudgetStatus } from "@entities/budgets";
 import "@shared/ui/entityForm.css";
+import { HouseholdScopeField } from "@features/household-scope";
 
 interface BudgetFormProps {
   open: boolean;
@@ -28,6 +29,10 @@ export function BudgetForm({ open, onOpenChange, budget }: BudgetFormProps) {
   const [category, setCategory] = useState(budget?.category ?? "");
   const [limitAmount, setLimitAmount] = useState(budget ? String(budget.limit_amount) : "");
   const [errors, setErrors] = useState<FieldErrors>({});
+  /* Владелец записи выбирается только при СОЗДАНИИ: PUT на бэкенде `household_id`
+     не принимает, и показать контрол в правке значило бы обещать переезд записи
+     между личным и общим, которого код не делает. */
+  const [householdId, setHouseholdId] = useState<number | null>(null);
 
   const categoryRef = useRef<HTMLInputElement>(null);
   const limitRef = useRef<HTMLInputElement>(null);
@@ -61,6 +66,7 @@ export function BudgetForm({ open, onOpenChange, budget }: BudgetFormProps) {
       await create.mutateAsync({
         category: category.trim(),
         limit_amount: Number(limitAmount),
+        ...(isEdit ? {} : { household_id: householdId }),
       });
       toast.success(isEdit ? t("Лимит бюджета изменён.") : t("Бюджет добавлен."));
       onOpenChange(false);
@@ -112,6 +118,13 @@ export function BudgetForm({ open, onOpenChange, budget }: BudgetFormProps) {
             </p>
           )}
         </div>
+        {!isEdit && (
+          <HouseholdScopeField
+            value={householdId}
+            onChange={setHouseholdId}
+            idPrefix="budget-form"
+          />
+        )}
         <div className="fp-entity-form__field">
           <label htmlFor="budget-form-limit">{t("Лимит в месяц, ₽ *")}</label>
           <input

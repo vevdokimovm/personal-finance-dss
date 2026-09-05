@@ -16,6 +16,19 @@ const deleteMutateMock = vi.fn((_id: number, opts?: { onSuccess?: () => void }) 
   opts?.onSuccess?.();
 });
 
+/* Выбор владельца записи (v8.55.0) — предмет своего файла тестов
+   (`features/household-scope`). Настоящий компонент тянет `useHouseholds`, а с ним
+   `QueryClientProvider`, во ВСЕ тесты этой страницы ради поля, к их утверждениям
+   отношения не имеющего. Мокнут маркером — тот же приём, что `DemoSandbox`
+   в `DashboardPage.test.tsx`. */
+vi.mock("@features/household-scope", () => ({
+  HouseholdScopeField: () => null,
+  // Признак общей записи проверяется своим файлом тестов; здесь он маркер, чтобы
+  // утверждения о строке списка не зависели от загрузки списка семей.
+  SharedBadge: ({ householdId }: { householdId?: number | null }) =>
+    householdId == null ? null : <span data-testid="shared-badge">Общая</span>,
+}));
+
 vi.mock("@entities/consents", () => ({
   ConsentRequiredPanel: ({ detail }: { detail: { message: string } }) => (
     <div role="alert">{detail.message}</div>

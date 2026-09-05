@@ -13,6 +13,7 @@ from app.database.crud import (
     restore_goal,
     update_goal,
 )
+from app.api._guards import ensure_can_share
 from app.dependencies import get_current_user_id, get_db
 from app.schemas.goal import GoalContributionCreate, GoalCreate, GoalResponse, GoalUpdate
 from app.services.event_logger import log_event
@@ -39,12 +40,9 @@ def create_goal_endpoint(
     db: Session = Depends(get_db),
     user_id: str | None = Depends(get_current_user_id),
 ) -> GoalResponse:
-    if payload.household_id is not None and not can_write_household(
-        db, payload.household_id, user_id
-    ):
-        raise HTTPException(
-            status_code=403, detail="Нет прав на запись в этот household"
-        )
+    # Общий котёл требует права на него — одна проверка на все сущности
+    # (`_guards.ensure_can_share`), четыре копии разошлись бы при первой правке.
+    ensure_can_share(db, payload.household_id, user_id)
     goal = create_goal(
         db,
         name=payload.name,

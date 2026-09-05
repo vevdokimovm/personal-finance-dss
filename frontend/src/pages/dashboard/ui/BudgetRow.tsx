@@ -2,6 +2,7 @@ import { formatMoney, formatNumber } from "@shared/lib/money/formatMoney";
 import { t } from "@shared/lib/i18n/t";
 import { Button, toast } from "@shared/ui";
 import { useDeleteBudget, useRestoreBudget, type BudgetStatus } from "@entities/budgets";
+import { SharedBadge } from "@features/household-scope";
 
 export function BudgetRow({
   budget,
@@ -38,6 +39,7 @@ export function BudgetRow({
     <li className="fp-budget-row">
       <div className="fp-budget-row__head">
         <span className="fp-budget-row__category">{budget.category}</span>
+        <SharedBadge householdId={budget.household_id} />
         {/* Потрачено — главное число строки: лимит сам по себе не говорит, где сейчас
             пользователь относительно него (design-critic, тот же принцип, что остаток
             долга в ObligationRow, Батч 1). */}

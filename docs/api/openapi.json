@@ -864,6 +864,17 @@
             ],
             "title": "Created At"
           },
+          "household_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Household Id"
+          },
           "id": {
             "title": "Id",
             "type": "integer"
@@ -2589,6 +2600,17 @@
             ],
             "title": "Deadline"
           },
+          "household_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Household Id"
+          },
           "id": {
             "title": "Id",
             "type": "integer"
@@ -3460,6 +3482,17 @@
             ],
             "title": "Comment"
           },
+          "household_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Household Id"
+          },
           "id": {
             "title": "Id",
             "type": "integer"
@@ -3951,6 +3984,17 @@
               }
             ],
             "title": "Comment"
+          },
+          "household_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Household Id"
           },
           "id": {
             "title": "Id",
@@ -5606,6 +5650,17 @@
             ],
             "title": "External Id"
           },
+          "household_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Household Id"
+          },
           "id": {
             "title": "Id",
             "type": "integer"
@@ -6234,7 +6289,7 @@
   },
   "info": {
     "title": "FINPILOT",
-    "version": "8.53.0"
+    "version": "8.54.0"
   },
   "openapi": "3.1.0",
   "paths": {

@@ -8,6 +8,7 @@ from app.database.crud import (
     get_budgets,
     restore_budget,
 )
+from app.api._guards import ensure_can_share
 from app.dependencies import get_current_user_id, get_db
 from app.schemas.budget import BudgetCreate, BudgetResponse, BudgetStatus
 from app.services.event_logger import log_event
@@ -47,8 +48,15 @@ def add_budget(
     db: Session = Depends(get_db),
     user_id: str | None = Depends(get_current_user_id),
 ) -> BudgetResponse:
+    # Общий котёл требует права на него — одна проверка на все сущности
+    # (`_guards.ensure_can_share`), четыре копии разошлись бы при первой правке.
+    ensure_can_share(db, payload.household_id, user_id)
     budget = create_budget(
-        db, category=payload.category, limit_amount=payload.limit_amount, user_id=user_id
+        db,
+        category=payload.category,
+        limit_amount=payload.limit_amount,
+        user_id=user_id,
+        household_id=payload.household_id,
     )
     log_event("budget_set", {"category": payload.category, "limit": payload.limit_amount})
     return budget

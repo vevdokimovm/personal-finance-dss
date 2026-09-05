@@ -10,6 +10,7 @@ from app.database.crud import (
     restore_obligation,
     update_obligation,
 )
+from app.api._guards import ensure_can_share
 from app.dependencies import get_current_user_id, get_db
 from app.schemas.obligation import ObligationCreate, ObligationResponse, ObligationUpdate
 from app.services.event_logger import log_event
@@ -40,6 +41,9 @@ def create_obligation_endpoint(
     db: Session = Depends(get_db),
     user_id: str | None = Depends(get_current_user_id),
 ) -> ObligationResponse:
+    # Общий котёл требует права на него — одна проверка на все сущности
+    # (`_guards.ensure_can_share`), четыре копии разошлись бы при первой правке.
+    ensure_can_share(db, payload.household_id, user_id)
     obligation = create_obligation(
         db=db,
         name=payload.name,
@@ -54,6 +58,7 @@ def create_obligation_endpoint(
         start_date=payload.start_date,
         currency=payload.currency,
         user_id=user_id,
+        household_id=payload.household_id,
     )
     # 🔴 `user_id` обязателен: `analytics.funnel()` фильтрует `Event.user_id.isnot(None)`,
     # и событие без него не попадает в воронку ВООБЩЕ. Гипотеза H7 independent-expert,

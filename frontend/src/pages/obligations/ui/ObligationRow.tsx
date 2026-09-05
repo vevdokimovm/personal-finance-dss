@@ -2,6 +2,7 @@ import { formatMoney, formatPercent } from "@shared/lib/money/formatMoney";
 import { t } from "@shared/lib/i18n/t";
 import { Button, toast } from "@shared/ui";
 import { useDeleteObligation, useRestoreObligation, type Obligation } from "@entities/obligations";
+import { SharedBadge } from "@features/household-scope";
 
 export function ObligationRow({
   obligation,
@@ -41,6 +42,7 @@ export function ObligationRow({
     <li className="fp-obligation-row">
       <div className="fp-obligation-row__head">
         <span className="fp-obligation-row__name">{obligation.name}</span>
+        <SharedBadge householdId={obligation.household_id} />
         {/* Остаток долга — главное число строки (design-critic, Батч 1): форма делает его
             обязательным полем первого порядка, а строка списка его не показывала вообще —
             единственный способ проверить введённое число был открыть форму правки заново. */}

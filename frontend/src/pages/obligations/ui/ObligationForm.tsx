@@ -4,6 +4,7 @@ import { t } from "@shared/lib/i18n/t";
 import { extractErrorMessage } from "@shared/lib/api/extractErrorMessage";
 import { useCreateObligation, useUpdateObligation, type Obligation } from "@entities/obligations";
 import "@shared/ui/entityForm.css";
+import { HouseholdScopeField } from "@features/household-scope";
 
 interface ObligationFormProps {
   open: boolean;
@@ -46,6 +47,10 @@ export function ObligationForm({ open, onOpenChange, obligation }: ObligationFor
   const [startDate, setStartDate] = useState(toDateInputValue(obligation?.start_date));
   const [comment, setComment] = useState(obligation?.comment ?? "");
   const [errors, setErrors] = useState<FieldErrors>({});
+  /* Владелец записи выбирается только при СОЗДАНИИ: PUT на бэкенде `household_id`
+     не принимает, и показать контрол в правке значило бы обещать переезд записи
+     между личным и общим, которого код не делает. */
+  const [householdId, setHouseholdId] = useState<number | null>(null);
 
   const nameRef = useRef<HTMLInputElement>(null);
   const amountRef = useRef<HTMLInputElement>(null);
@@ -94,6 +99,7 @@ export function ObligationForm({ open, onOpenChange, obligation }: ObligationFor
       payment_day: Number(paymentDay) || 1,
       start_date: startDate ? new Date(startDate).toISOString() : null,
       comment: comment.trim() || null,
+      ...(isEdit ? {} : { household_id: householdId }),
     };
     try {
       if (isEdit) {
@@ -167,6 +173,13 @@ export function ObligationForm({ open, onOpenChange, obligation }: ObligationFor
               </p>
             )}
           </div>
+        {!isEdit && (
+          <HouseholdScopeField
+            value={householdId}
+            onChange={setHouseholdId}
+            idPrefix="obligation-form"
+          />
+        )}
           <div className="fp-entity-form__field">
             <label htmlFor="obligation-form-rate">{t("Ставка, % годовых")}</label>
             <input

@@ -11,6 +11,7 @@ import {
 import { useLiquidAssets } from "@entities/assets";
 import type { GoalCategory } from "@shared/api/generated";
 import "@shared/ui/entityForm.css";
+import { HouseholdScopeField } from "@features/household-scope";
 
 interface GoalFormProps {
   open: boolean;
@@ -42,6 +43,10 @@ export function GoalForm({ open, onOpenChange, goal }: GoalFormProps) {
   );
   const [comment, setComment] = useState(goal?.comment ?? "");
   const [errors, setErrors] = useState<FieldErrors>({});
+  /* Владелец записи выбирается только при СОЗДАНИИ: PUT на бэкенде `household_id`
+     не принимает, и показать контрол в правке значило бы обещать переезд записи
+     между личным и общим, которого код не делает. */
+  const [householdId, setHouseholdId] = useState<number | null>(null);
 
   const nameRef = useRef<HTMLInputElement>(null);
   const targetAmountRef = useRef<HTMLInputElement>(null);
@@ -91,6 +96,7 @@ export function GoalForm({ open, onOpenChange, goal }: GoalFormProps) {
         toast.success(t("Цель изменена."));
       } else {
         await create.mutateAsync({
+          ...(isEdit ? {} : { household_id: householdId }),
           name: name.trim(),
           target_amount: Number(targetAmount),
           current_amount: 0,
@@ -165,6 +171,13 @@ export function GoalForm({ open, onOpenChange, goal }: GoalFormProps) {
               </p>
             )}
           </div>
+        {!isEdit && (
+          <HouseholdScopeField
+            value={householdId}
+            onChange={setHouseholdId}
+            idPrefix="goal-form"
+          />
+        )}
           <div className="fp-entity-form__field">
             <label htmlFor="goal-form-deadline">{t("Срок (пусто — бессрочная)")}</label>
             <input

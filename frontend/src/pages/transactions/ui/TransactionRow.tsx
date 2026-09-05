@@ -3,6 +3,7 @@ import { formatDate } from "@shared/lib/date/formatDate";
 import { t } from "@shared/lib/i18n/t";
 import { Button, toast } from "@shared/ui";
 import { useDeleteTransaction, useRestoreTransaction, type Transaction } from "@entities/transactions";
+import { SharedBadge } from "@features/household-scope";
 
 export function TransactionRow({
   transaction,
@@ -40,6 +41,7 @@ export function TransactionRow({
     <li className="fp-transaction-row">
       <div className="fp-transaction-row__main">
         <span className="fp-transaction-row__category">{transaction.category}</span>
+        <SharedBadge householdId={transaction.household_id} />
         {transaction.description && (
           <span className="fp-transaction-row__description">{transaction.description}</span>
         )}

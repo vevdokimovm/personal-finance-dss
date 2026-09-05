@@ -10,6 +10,7 @@ from app.database.crud import (
     restore_liquid_asset,
     update_liquid_asset,
 )
+from app.api._guards import ensure_can_share
 from app.dependencies import get_current_user_id, get_db
 from app.schemas.liquid_asset import LiquidAssetCreate, LiquidAssetResponse, LiquidAssetUpdate
 from app.services.event_logger import log_event
@@ -36,6 +37,9 @@ def add_asset(
     db: Session = Depends(get_db),
     user_id: str | None = Depends(get_current_user_id),
 ) -> LiquidAssetResponse:
+    # Общий котёл требует права на него — одна проверка на все сущности
+    # (`_guards.ensure_can_share`), четыре копии разошлись бы при первой правке.
+    ensure_can_share(db, payload.household_id, user_id)
     return create_liquid_asset(
         db,
         name=payload.name,
@@ -45,6 +49,7 @@ def add_asset(
         comment=payload.comment,
         currency=payload.currency,
         user_id=user_id,
+        household_id=payload.household_id,
     )
 
 

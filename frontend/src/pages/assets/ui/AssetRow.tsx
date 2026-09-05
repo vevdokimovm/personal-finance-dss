@@ -2,6 +2,7 @@ import { formatMoney, formatPercent } from "@shared/lib/money/formatMoney";
 import { t } from "@shared/lib/i18n/t";
 import { Button, toast } from "@shared/ui";
 import { useDeleteAsset, useRestoreAsset, type LiquidAsset } from "@entities/assets";
+import { SharedBadge } from "@features/household-scope";
 
 const TYPE_LABELS: Record<string, string> = {
   deposit: "Депозит",
@@ -43,6 +44,7 @@ export function AssetRow({
     <li className="fp-asset-row">
       <div className="fp-asset-row__main">
         <span className="fp-asset-row__name">{asset.name}</span>
+        <SharedBadge householdId={asset.household_id} />
         <span className="fp-asset-row__type">{TYPE_LABELS[asset.type] ?? asset.type}</span>
       </div>
       <span className="fp-asset-row__rate">

@@ -45,3 +45,7 @@ class TransactionResponse(BaseModel):
     is_synced: bool = False
     bank: Optional[str] = None
     created_at: Optional[datetime] = None
+    # 🔴 Общий доступ виден в ответе (v8.55.0). Без этого поля продукт принимал
+    # `household_id` и отдавал ответ, по которому нельзя понять, стала ли запись
+    # общей: человек думает «поделился», а проверить это нечем.
+    household_id: Optional[int] = None

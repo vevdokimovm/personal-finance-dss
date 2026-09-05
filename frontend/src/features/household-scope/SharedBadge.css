@@ -1,0 +1,11 @@
+/* Признак общей записи. Слово, а не только цвет: речь о том, кто видит эти деньги,
+   и человеку, не различающему оттенок, ответ нужен ровно так же (WCAG 1.4.1). */
+.fp-shared-badge {
+  display: inline-block;
+  background: var(--c-blue-bg);
+  color: var(--c-blue);
+  border-radius: var(--r-sm);
+  padding: var(--sp-0) var(--sp-2);
+  font-size: var(--fs-xs);
+  white-space: nowrap;
+}

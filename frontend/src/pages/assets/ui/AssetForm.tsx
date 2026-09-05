@@ -3,6 +3,7 @@ import { Button, Modal, toast } from "@shared/ui";
 import { t } from "@shared/lib/i18n/t";
 import { extractErrorMessage } from "@shared/lib/api/extractErrorMessage";
 import { useCreateAsset, useUpdateAsset, type LiquidAsset } from "@entities/assets";
+import { HouseholdScopeField } from "@features/household-scope";
 import "@shared/ui/entityForm.css";
 
 interface AssetFormProps {
@@ -40,6 +41,10 @@ export function AssetForm({ open, onOpenChange, asset }: AssetFormProps) {
   const [type, setType] = useState(asset?.type ?? "deposit");
   const [comment, setComment] = useState(asset?.comment ?? "");
   const [errors, setErrors] = useState<FieldErrors>({});
+  /* Владелец записи выбирается только при СОЗДАНИИ: PUT на бэкенде `household_id`
+     не принимает, и показать контрол в правке значило бы обещать переезд записи
+     между личным и общим, которого код не делает. */
+  const [householdId, setHouseholdId] = useState<number | null>(null);
 
   const nameRef = useRef<HTMLInputElement>(null);
   const amountRef = useRef<HTMLInputElement>(null);
@@ -76,6 +81,7 @@ export function AssetForm({ open, onOpenChange, asset }: AssetFormProps) {
       interest_rate: (Number(interestRatePct) || 0) / 100,
       type,
       comment: comment.trim() || null,
+      ...(isEdit ? {} : { household_id: householdId }),
     };
     try {
       if (isEdit) {
@@ -127,6 +133,13 @@ export function AssetForm({ open, onOpenChange, asset }: AssetFormProps) {
             </p>
           )}
         </div>
+        {!isEdit && (
+          <HouseholdScopeField
+            value={householdId}
+            onChange={setHouseholdId}
+            idPrefix="asset-form"
+          />
+        )}
         <div className="fp-entity-form__field">
           <label htmlFor="asset-form-type">{t("Тип")}</label>
           <select id="asset-form-type" value={type} onChange={(e) => setType(e.target.value)}>

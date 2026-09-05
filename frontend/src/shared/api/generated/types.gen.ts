@@ -539,6 +539,10 @@ export type BudgetResponse = {
      */
     created_at?: string | null;
     /**
+     * Household Id
+     */
+    household_id?: number | null;
+    /**
      * Id
      */
     id: number;
@@ -1806,6 +1810,10 @@ export type GoalResponse = {
      */
     deadline?: string | null;
     /**
+     * Household Id
+     */
+    household_id?: number | null;
+    /**
      * Id
      */
     id: number;
@@ -2380,6 +2388,10 @@ export type LiquidAssetResponse = {
      */
     comment?: string | null;
     /**
+     * Household Id
+     */
+    household_id?: number | null;
+    /**
      * Id
      */
     id: number;
@@ -2689,6 +2701,10 @@ export type ObligationResponse = {
      * Comment
      */
     comment?: string | null;
+    /**
+     * Household Id
+     */
+    household_id?: number | null;
     /**
      * Id
      */
@@ -3715,6 +3731,10 @@ export type TransactionResponse = {
      */
     external_id?: string | null;
     /**
+     * Household Id
+     */
+    household_id?: number | null;
+    /**
      * Id
      */
     id: number;
@@ -4121,6 +4141,10 @@ export type ObligationResponseWritable = {
      * Comment
      */
     comment?: string | null;
+    /**
+     * Household Id
+     */
+    household_id?: number | null;
     /**
      * Id
      */

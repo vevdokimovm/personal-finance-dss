@@ -2,6 +2,7 @@ import { formatDate } from "@shared/lib/date/formatDate";
 import { t } from "@shared/lib/i18n/t";
 import { Button, toast } from "@shared/ui";
 import { useDeleteGoal, useRestoreGoal, GOAL_CATEGORY_LABEL, type Goal } from "@entities/goals";
+import { SharedBadge } from "@features/household-scope";
 
 const NBSP = " ";
 
@@ -66,6 +67,7 @@ export function GoalRow({
     <li className="fp-goal-row">
       <div className="fp-goal-row__head">
         <span className="fp-goal-row__name">{goal.name}</span>
+        <SharedBadge householdId={goal.household_id} />
         {goal.deadline && (
           <span className="fp-goal-row__deadline">
             {formatDate(goal.deadline)}
