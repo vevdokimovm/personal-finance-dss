@@ -28,7 +28,7 @@ class Settings(BaseSettings):
         description="Название проекта.",
     )
     APP_VERSION: str = Field(
-        default="8.56.0",
+        default="9.0.0",
         description="Версия приложения (INFRA-13): код, UI-футер, git-тег.",
     )
     PROJECT_TAGLINE: str = Field(
@@ -63,6 +63,18 @@ class Settings(BaseSettings):
         description=(
             "Разрешённые источники CORS через запятую (INFRA-12). "
             "5173 — Vite dev-server (frontend/), веха 8, Э2+; прод переопределяет env-переменной."
+        ),
+    )
+    TRUST_PROXY_HEADERS: bool = Field(
+        default=False,
+        description=(
+            "Доверять ли `X-Forwarded-For` при определении клиента (v8.57.0). "
+            "🔴 ВЫКЛЮЧЕН по умолчанию: заголовок ставит клиент, и с доверием «всегда» "
+            "атакующий шлёт новый адрес на каждый запрос — счётчик не наберётся никогда, "
+            "то есть rate-limit обходится одной строкой. Включать ТОЛЬКО там, где перед "
+            "приложением стоит наш nginx: он выставляет заголовок сам и затирает "
+            "клиентский. Без него за прокси лимит считает всех пользователей как одного "
+            "и отвечает 429 всем сразу."
         ),
     )
     RATE_LIMIT_REQUESTS: int = Field(

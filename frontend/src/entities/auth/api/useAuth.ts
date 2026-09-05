@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   registerApiAuthRegisterPost,
   loginApiAuthLoginPost,
+  mfaVerifyApiAuthMfaVerifyPost,
   changePasswordApiAuthChangePasswordPost,
   deleteAccountApiAuthMeDelete,
   logoutApiAuthLogoutPost,
@@ -15,6 +16,7 @@ import type {
   ChangePasswordRequest,
   ForgotPasswordRequest,
   LoginRequest,
+  MfaVerifyRequest,
   RegisterRequest,
   ResetPasswordRequest,
 } from "../model/types";
@@ -47,11 +49,34 @@ export function useLogin() {
       return data satisfies AuthResponse;
     },
     // mfa_required=true не заводит полную сессию (см. routes_auth.py::login) — инвалидировать
-    // «кто я» в этом случае рано, там ещё нет cookie. MFA-экран — вне периметра этого батча
-    // (в UI пока нет способа включить MFA вообще, ветка практически недостижима).
+    // «кто я» в этом случае рано, там ещё нет cookie. Второй фактор вводится на том же
+    // экране входа (v9.0.0) и завершается `useMfaVerify` ниже.
     onSuccess: (data) => {
       if (!data.mfa_required) invalidate();
     },
+  });
+}
+
+/**
+ * POST /api/auth/mfa/verify — обмен `mfa_token` на полную сессию (v9.0.0).
+ *
+ * 🔴 Гипотеза H9 независимого эксперта, подтверждена чтением кода. `/mfa/enroll`
+ * и `/mfa/confirm` открыты любому пользователю, а войти с включённым вторым фактором
+ * было НЕЛЬЗЯ: экран входа показывал уведомление без поля кода. Аккаунт, у которого
+ * MFA когда-либо включали, запирался навсегда — `/mfa/disable` требует уже
+ * аутентифицированной сессии, то есть выключить фактор может только тот, кто вошёл.
+ *
+ * Принимает и TOTP, и одноразовый recovery-код: схема `MfaVerifyRequest` допускает
+ * до 16 символов, и это единственный выход при потерянном устройстве.
+ */
+export function useMfaVerify() {
+  const invalidate = useInvalidateProfile();
+  return useMutation({
+    mutationFn: async (body: MfaVerifyRequest) => {
+      const { data } = await mfaVerifyApiAuthMfaVerifyPost({ body, throwOnError: true });
+      return data satisfies AuthResponse;
+    },
+    onSuccess: invalidate,
   });
 }
 

@@ -5,7 +5,7 @@ import { getConsentRequiredDetail } from "@shared/lib/api/extractErrorMessage";
 import { ConsentRequiredPanel } from "@entities/consents";
 import { NotAuthenticatedError, useProfile } from "@entities/profile";
 import { DashboardSkeleton } from "./ui/DashboardSkeleton";
-import { DashboardEmpty } from "./ui/DashboardEmpty";
+import { DashboardEmpty, type EmptyReason } from "./ui/DashboardEmpty";
 import { DashboardErrorState } from "./ui/DashboardErrorState";
 import { Hero } from "./ui/Hero";
 import { MetricsGrid } from "@widgets/metrics-grid";
@@ -13,6 +13,18 @@ import { AllocationPanel } from "@widgets/allocation-panel";
 import { ForecastPanel } from "@widgets/forecast-panel";
 import { BudgetsSection } from "./ui/BudgetsSection";
 import "./DashboardPage.css";
+
+/** Какого куска данных не хватает для осмысленного плана.
+ *
+ * `null` — хватает обоих. Порядок проверок неважен: состояния взаимоисключающие
+ * по построению (ноль дохода и ноль расхода одновременно — это «ничего нет»).
+ */
+function getEmptyReason(income: number, expense: number): EmptyReason | null {
+  if (income === 0 && expense === 0) return "nothing";
+  if (income === 0) return "no-income";
+  if (expense === 0) return "no-expense";
+  return null;
+}
 
 export function DashboardPage() {
   /* Гостевой режим определяет страница, а не пустое состояние: она уже держит запросы
@@ -69,9 +81,12 @@ export function DashboardPage() {
   }
 
   const { input_summary } = plan;
-  const isEmpty = input_summary.income === 0 && input_summary.expense === 0;
-  if (isEmpty) {
-    return <DashboardEmpty mainRef={headingRef} isGuest={isGuest} />;
+  /* 🔴 Считать план можно, только когда известны ОБЕ стороны (H10). Пустой профиль,
+     «только расходы» и «только доходы» — три разных состояния с разными подсказками:
+     человеку надо сказать, чего именно не хватает, а не «данных нет». */
+  const emptyReason = getEmptyReason(input_summary.income, input_summary.expense);
+  if (emptyReason) {
+    return <DashboardEmpty mainRef={headingRef} isGuest={isGuest} reason={emptyReason} />;
   }
 
   return (

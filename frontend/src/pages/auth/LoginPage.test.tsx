@@ -18,6 +18,16 @@ const mutateAsyncMock = vi.fn();
 const useLoginMock = vi.fn();
 vi.mock("@entities/auth", () => ({
   useLogin: () => useLoginMock(),
+  /* Второй фактор — предмет `LoginPage.mfa.test.tsx`. Здесь заглушка в состоянии
+     покоя: у подавляющего большинства аккаунтов MFA выключен, и утверждения этого
+     файла про обычный вход. */
+  useMfaVerify: () => ({
+    mutate: vi.fn(),
+    mutateAsync: vi.fn(),
+    isPending: false,
+    isError: false,
+    error: null,
+  }),
 }));
 
 function baseLoginState() {

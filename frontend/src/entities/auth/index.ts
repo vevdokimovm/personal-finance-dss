@@ -1,6 +1,7 @@
 export {
   useRegister,
   useLogin,
+  useMfaVerify,
   useLogout,
   useForgotPassword,
   useResetPassword,

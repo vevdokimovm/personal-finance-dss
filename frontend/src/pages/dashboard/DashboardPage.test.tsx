@@ -209,6 +209,45 @@ describe("DashboardPage", () => {
     expect(screen.getByText("Пока нет данных для обзора")).toBeInTheDocument();
   });
 
+  /* 🔴 Гипотеза H10 независимого эксперта, подтверждена чтением кода 05.09.2026.
+     Пустота определялась как `income === 0 && expense === 0` — то есть человек,
+     внёсший ТОЛЬКО расходы, считался «непустым». А это типичный первый заход:
+     импортировал выписку, зарплата приходит на другой счёт.
+
+     Что он получал: полноценный экран плана и рекомендацию, посчитанную при нулевом
+     доходе. `ensure_calculable` отдаёт 422 только при наличии обязательств — без них
+     план считается и выглядит настоящим. Совет «отложите N рублей» человеку, чей доход
+     системе неизвестен, — это не пустой экран, это неверный экран, и он хуже. */
+  it("только расходы без доходов — подсказка, а не план по нулевому доходу", () => {
+    const expensesOnly: CalculatePlanResult = {
+      ...PLAN_ANNA,
+      input_summary: { ...PLAN_ANNA.input_summary, income: 0, expense: 54000 },
+    };
+    usePlanMock.mockReturnValue(queryResult({ data: expensesOnly }));
+    useForecastMock.mockReturnValue(queryResult({ data: FORECAST_ANNA }));
+    render(<DashboardPage />);
+
+    // Заголовок панели, а не любое вхождение слова: «доход» встречается и в тексте
+    // подсказки, и в подписи кнопки — getByText нашёл бы три узла и упал бы на этом.
+    expect(screen.getByRole("heading", { name: /не хватает доходов/i })).toBeVisible();
+    expect(screen.queryByText(/Свободные деньги/i)).not.toBeInTheDocument();
+  });
+
+  it("только доходы без расходов — та же подсказка", () => {
+    /* Обратный случай реже, но столь же неверен: план по расходам, которых система
+       не видит, обещает свободных денег больше, чем есть. */
+    const incomeOnly: CalculatePlanResult = {
+      ...PLAN_ANNA,
+      input_summary: { ...PLAN_ANNA.input_summary, income: 120000, expense: 0 },
+    };
+    usePlanMock.mockReturnValue(queryResult({ data: incomeOnly }));
+    useForecastMock.mockReturnValue(queryResult({ data: FORECAST_ANNA }));
+    render(<DashboardPage />);
+
+    expect(screen.getByRole("heading", { name: /не хватает расходов/i })).toBeVisible();
+    expect(screen.queryByText(/Свободные деньги/i)).not.toBeInTheDocument();
+  });
+
   it("рендерит реальные показатели профиля anna при успехе", () => {
     usePlanMock.mockReturnValue(queryResult({ data: PLAN_ANNA }));
     useForecastMock.mockReturnValue(queryResult({ data: FORECAST_ANNA }));

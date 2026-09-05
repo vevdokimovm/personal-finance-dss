@@ -84,6 +84,7 @@ app.add_middleware(
     limit=settings.RATE_LIMIT_REQUESTS,
     window_seconds=settings.RATE_LIMIT_WINDOW_SECONDS,
     protected_prefixes=RATE_LIMITED_PREFIXES,
+    trust_proxy_headers=settings.TRUST_PROXY_HEADERS,
 )
 app.add_middleware(CSRFMiddleware, allowed_origins=settings.cors_origins_list)
 app.add_middleware(SecurityHeadersMiddleware, hsts=settings.is_production)

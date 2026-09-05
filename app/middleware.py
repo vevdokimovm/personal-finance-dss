@@ -61,27 +61,66 @@ class RequestLoggingMiddleware(BaseHTTPMiddleware):
 
 
 class RateLimitMiddleware(BaseHTTPMiddleware):
+    """Ограничение частоты запросов на чувствительных путях (NFR-04).
+
+    🔴 **За прокси считается РЕАЛЬНЫЙ клиент, а не nginx (v8.57.0).** До этого ключом
+    был `request.client.host`, а в прод-схеме перед приложением стоит nginx — значит
+    один и тот же адрес для всего интернета. Лимит тратился всеми вместе, и, исчерпав
+    его, продукт отвечал 429 **всем сразу**, включая пришедших впервые. Защита от
+    перебора превращалась в способ положить вход всему сервису; локально этого не видно
+    вовсе — прокси нет, адрес настоящий.
+
+    `X-Forwarded-For` доверяется только при `TRUST_PROXY_HEADERS`: заголовок ставит
+    клиент, и с доверием «всегда» атакующий шлёт новый адрес на каждый запрос.
+
+    **Берётся ЛЕВЫЙ адрес цепочки** `клиент, прокси1, прокси2`: правый конец ближе к нам
+    и одинаков у всех, по нему счёт снова стал бы общим. У нас ровно один доверенный
+    хоп; появится CDN — потребуется отсчёт от конца на число доверенных хопов, и менять
+    надо будет здесь.
+
+    **Счётчик в памяти инстанса** — на мультиинстансном проде каждый считает своё, то есть
+    лимит мягче в N раз. Общий стор (Redis) требует нового сервиса в compose и решения
+    по хостингу — записан долгом вехи 9. Разница в цене: здесь «мягче», у дефекта
+    выше было «вход не работает ни у кого».
+    """
+
     def __init__(
         self,
         app,
         limit: int,
         window_seconds: int,
         protected_prefixes: tuple[str, ...],
+        trust_proxy_headers: bool = False,
     ) -> None:
         super().__init__(app)
         self._limit = limit
         self._window = window_seconds
         self._protected = protected_prefixes
+        self._trust_proxy = trust_proxy_headers
         self._hits: dict[str, deque[float]] = defaultdict(deque)
 
     def _is_protected(self, path: str) -> bool:
         return any(path.startswith(prefix) for prefix in self._protected)
 
+    def _client_ip(self, request: Request) -> str:
+        """Адрес, по которому ведётся счёт.
+
+        Пустой или мусорный заголовок откатывается к адресу сокета: пустая строка
+        как ключ склеила бы всех отправителей мусора в один счётчик, и такой
+        отправитель гасил бы лимит остальным.
+        """
+        if self._trust_proxy:
+            forwarded = request.headers.get("x-forwarded-for", "")
+            first = forwarded.split(",")[0].strip()
+            if first:
+                return first
+        return request.client.host if request.client else "unknown"
+
     async def dispatch(self, request: Request, call_next):
         if not self._is_protected(request.url.path):
             return await call_next(request)
 
-        client_ip = request.client.host if request.client else "unknown"
+        client_ip = self._client_ip(request)
         key = f"{client_ip}:{request.url.path}"
         now = time.monotonic()
         window_start = now - self._window
