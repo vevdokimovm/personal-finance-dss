@@ -21,6 +21,40 @@ export function configureApiClient(): void {
     baseUrl: "",
     credentials: "include",
   });
+
+  /* 🔴 Код ответа доезжает до обработчика ошибки (v9.1.0, нашёл `/code-review`).
+     `client.gen.ts` при неуспехе делает `throw jsonError ?? textError` — бросается
+     ТОЛЬКО тело, а `status` теряется. Значит любая проверка `error.status === 401`
+     во всех хуках на этом клиенте всегда давала `false`:
+
+     · `isSessionExpired` срабатывал лишь на `NotAuthenticatedError` из `useProfile`,
+       и человек с истёкшей сессией на остальных экранах получал «Проверьте соединение»
+       с кнопкой, возвращающей 401 по кругу;
+     · `useSpendingAdvice` и `useNotifications` ретраили 401/403, вопреки собственным
+       докстрокам «повторять осознанный отказ бессмысленно».
+
+     Интерцептор — единственное место, где ещё виден сам `Response`. Правка здесь
+     чинит все хуки разом; правка в каждом хуке разошлась бы при первом же новом. */
+  client.interceptors.error.use((error, response) => {
+    /* 🔴 Ответа может не быть вовсе (нашёл `/code-review`): `client.gen.ts` зовёт
+       error-интерцепторы из `catch`, который покрывает и падение самого `fetch` —
+       офлайн, отказ DNS, прерванный запрос. Там `response` ещё `undefined`, и обращение
+       к `.status` подменило бы настоящую ошибку `TypeError`-ом у КАЖДОГО хука.
+       Возвращаем ошибку как есть: `status` у неё и не существует, а разбор обрыва
+       сети живёт в `useProfile`. */
+    if (!response) {
+      return error;
+    }
+    // Строке поле не присвоить — заворачиваем, иначе `status` пропадёт молча именно
+    // там, где ответ не JSON: 502 от прокси, HTML от балансировщика.
+    if (typeof error === "string") {
+      return { detail: error, status: response.status };
+    }
+    if (error && typeof error === "object") {
+      return { ...(error as object), status: response.status };
+    }
+    return { detail: String(error), status: response.status };
+  });
 }
 
 export { client as apiClient };

@@ -213,3 +213,180 @@ class TestSharedRecordIsVisibleToFamily:
         assert not any(row["id"] == personal.json()["id"] for row in seen), (
             "личная операция видна другому участнику семьи — утечка внутри household"
         )
+
+
+class TestBudgetCategoryIsPerOwner:
+    """🔴 Нашёл `/code-review`: категория бюджета уникальна ГЛОБАЛЬНО.
+
+    `budgets.category` несёт `unique=True` (модель и миграция 0006), а поиск
+    существующей строки в `create_budget` идёт через `_owner_filter`, то есть
+    в пределах владельца. Значит второй пользователь, заводящий «Продукты»,
+    не находит своей строки, идёт на INSERT и получает `IntegrityError` — **500**.
+
+    В однопользовательской разработке это невидимо: конфликт возникает только когда
+    людей больше одного. То есть бюджеты ломались бы у всех, кроме первого,
+    и только на проде.
+    """
+
+    def test_two_users_may_have_the_same_category(self, client: TestClient) -> None:
+        """Одноимённые бюджеты у разных людей — норма, а не конфликт."""
+        first = _register(client, "budget-a@test.io")
+        created = client.post(
+            "/api/budgets", headers=first,
+            json={"category": "Продукты", "limit_amount": 30000.0},
+        )
+        assert created.status_code in (200, 201), created.text
+
+        second = _register(client, "budget-b@test.io")
+        response = client.post(
+            "/api/budgets", headers=second,
+            json={"category": "Продукты", "limit_amount": 25000.0},
+        )
+        assert response.status_code in (200, 201), (
+            f"второй пользователь не смог завести «Продукты» ({response.status_code}): "
+            "категория уникальна глобально, и бюджеты ломаются у всех, кроме первого"
+        )
+
+    def test_repeated_category_updates_the_limit(self, client: TestClient) -> None:
+        """🔴 Уникальность не снята, а СУЖЕНА — upsert по категории продолжает работать.
+
+        Мутация «убрать ключ `(user_id, category)`» не ловилась предыдущими тестами:
+        они проверяли, что разные люди не мешают друг другу, и это верно и без ключа.
+        Ключ держит другое — FR-22, «завести бюджет повторно значит изменить лимит».
+        Без него повторное заведение создало бы ВТОРУЮ строку, и человек увидел бы
+        две «Еды» с разными лимитами, не понимая, какая действует.
+        """
+        headers = _register(client, "budget-upsert@test.io")
+        first = client.post("/api/budgets", headers=headers,
+                            json={"category": "Еда", "limit_amount": 10000.0})
+        assert first.status_code in (200, 201), first.text
+
+        second = client.post("/api/budgets", headers=headers,
+                             json={"category": "Еда", "limit_amount": 12000.0})
+        assert second.status_code in (200, 201), second.text
+        assert second.json()["id"] == first.json()["id"], (
+            "повторное заведение категории создало вторую строку вместо изменения "
+            "лимита — у человека две «Еды», и неясно, какая действует"
+        )
+
+        rows = [r for r in client.get("/api/budgets", headers=headers).json()
+                if r["category"] == "Еда"]
+        assert len(rows) == 1 and rows[0]["limit_amount"] == 12000.0
+
+    def test_each_owner_sees_only_their_own_limit(self, client: TestClient) -> None:
+        """Лимиты не перетираются: у каждого свой.
+
+        Без этой пары «починка» уникальности могла бы свестись к тому, что второй
+        пользователь молча переписывает бюджет первого, — и это было бы хуже 500,
+        потому что беззвучно.
+        """
+        first = _register(client, "budget-c@test.io")
+        client.post("/api/budgets", headers=first,
+                    json={"category": "Транспорт", "limit_amount": 9000.0})
+        second = _register(client, "budget-d@test.io")
+        client.post("/api/budgets", headers=second,
+                    json={"category": "Транспорт", "limit_amount": 4000.0})
+
+        first_rows = client.get("/api/budgets", headers=first).json()
+        second_rows = client.get("/api/budgets", headers=second).json()
+        assert [r["limit_amount"] for r in first_rows if r["category"] == "Транспорт"] == [9000.0]
+        assert [r["limit_amount"] for r in second_rows if r["category"] == "Транспорт"] == [4000.0]
+
+
+class TestWriteScopeIsStricterThanReadScope:
+    """🔴 Нашёл `/code-review`: запись шла через ЧИТАЮЩИЙ скоуп.
+
+    `_owner_filter` объединяет свои строки с общими строками household — это правильный
+    скоуп для ЧТЕНИЯ. Но три пути использовали его перед **изменением**: `create_budget`,
+    `set_transaction_category`, `apply_category_rule`.
+
+    Следствие: участник семьи — **включая `viewer`, у которого прав на запись нет
+    вовсе** — правит чужие записи. `create_budget` перезаписывает лимит общего бюджета,
+    а `apply_category_rule` меняет категории пачкой по всем совпавшим общим операциям.
+
+    Что это значит для продукта: правило `can_write_household` (owner/member, но не
+    viewer) существует и на этих путях не спрашивалось. Соседние функции — `update_transaction`,
+    `delete_transaction`, `delete_budget`, `restore_budget` — сверяют `user_id` строго,
+    то есть намерение однозначно, а три пути из него выпали.
+    """
+
+    def _member_of(self, client: TestClient, owner: dict[str, str], household_id: int,
+                   email: str, role: str) -> dict[str, str]:
+        invite = client.post(
+            f"/api/households/{household_id}/invites", headers=owner, json={"role": role},
+        )
+        assert invite.status_code in (200, 201), invite.text
+        member = _register(client, email)
+        accepted = client.post(
+            f"/api/households/invites/{invite.json()['token']}/accept", headers=member
+        )
+        assert accepted.status_code in (200, 201), accepted.text
+        return member
+
+    def test_member_cannot_overwrite_shared_budget_limit(self, client: TestClient) -> None:
+        """Чужой общий бюджет не перетирается «своим» созданием той же категории."""
+        owner = _register(client, "wscope-owner@test.io")
+        household_id = _household(client, owner)
+        created = client.post(
+            "/api/budgets", headers=owner,
+            json={"category": "Продукты", "limit_amount": 50000.0, "household_id": household_id},
+        )
+        assert created.status_code in (200, 201), created.text
+
+        member = self._member_of(client, owner, household_id, "wscope-member@test.io", "member")
+        # Личный бюджет той же категории: `household_id` не передан, значит человек
+        # заводит СВОЙ, а не правит общий.
+        client.post("/api/budgets", headers=member,
+                    json={"category": "Продукты", "limit_amount": 1.0})
+
+        rows = client.get("/api/budgets", headers=owner).json()
+        shared = [r for r in rows if r["id"] == created.json()["id"]]
+        assert shared and shared[0]["limit_amount"] == 50000.0, (
+            "общий бюджет перезаписан лимитом другого участника — запись шла "
+            "через читающий скоуп"
+        )
+
+    def test_viewer_cannot_recategorise_shared_transaction(self, client: TestClient) -> None:
+        """🔴 `viewer` не меняет категорию чужой общей операции.
+
+        У него нет прав на запись по определению (`can_write_household` пропускает
+        owner и member), и именно этот случай показывает, что дело не в «участник
+        правит участника», а в обходе роли целиком.
+        """
+        owner = _register(client, "wscope-owner2@test.io")
+        household_id = _household(client, owner)
+        created = client.post(
+            "/api/transactions", headers=owner,
+            json={"amount": 1000.0, "type": "expense", "category": "Еда",
+                  "date": TODAY, "household_id": household_id},
+        )
+        assert created.status_code in (200, 201), created.text
+        transaction_id = created.json()["id"]
+
+        viewer = self._member_of(client, owner, household_id, "wscope-viewer@test.io", "viewer")
+        response = client.post(
+            f"/api/transactions/{transaction_id}/category",
+            headers=viewer, json={"category": "Развлечения"},
+        )
+        assert response.status_code in (403, 404), (
+            f"viewer переназначил категорию чужой операции ({response.status_code})"
+        )
+
+        rows = client.get("/api/transactions", headers=owner).json()
+        row = next(r for r in rows if r["id"] == transaction_id)
+        assert row["category"] == "Еда", "категория чужой операции изменена"
+
+    def test_owner_still_edits_own_records(self, client: TestClient) -> None:
+        """Свои записи по-прежнему правятся — проверка, что защита не сломала работу."""
+        owner = _register(client, "wscope-owner3@test.io")
+        created = client.post(
+            "/api/transactions", headers=owner,
+            json={"amount": 500.0, "type": "expense", "category": "Еда", "date": TODAY},
+        )
+        transaction_id = created.json()["id"]
+
+        response = client.post(
+            f"/api/transactions/{transaction_id}/category",
+            headers=owner, json={"category": "Развлечения"},
+        )
+        assert response.status_code in (200, 201), response.text

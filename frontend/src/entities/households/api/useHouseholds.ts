@@ -114,12 +114,10 @@ export function useRevokeInvite() {
   const invalidate = useInvalidateAll();
   return useMutation({
     mutationFn: async (args: { householdId: number; inviteId: number }) => {
-      const { data } = await revokeInviteEndpointApiHouseholdsHouseholdIdInvitesInviteIdRevokePost(
-        {
-          path: { household_id: args.householdId, invite_id: args.inviteId },
-          throwOnError: true,
-        },
-      );
+      const { data } = await revokeInviteEndpointApiHouseholdsHouseholdIdInvitesInviteIdRevokePost({
+        path: { household_id: args.householdId, invite_id: args.inviteId },
+        throwOnError: true,
+      });
       return data;
     },
     onSuccess: invalidate,
@@ -130,11 +128,10 @@ export function useRemoveMember() {
   const invalidate = useInvalidateAll();
   return useMutation({
     mutationFn: async (args: { householdId: number; userId: string }) => {
-      const { data } =
-        await removeMemberEndpointApiHouseholdsHouseholdIdMembersMemberUserIdDelete({
-          path: { household_id: args.householdId, member_user_id: args.userId },
-          throwOnError: true,
-        });
+      const { data } = await removeMemberEndpointApiHouseholdsHouseholdIdMembersMemberUserIdDelete({
+        path: { household_id: args.householdId, member_user_id: args.userId },
+        throwOnError: true,
+      });
       return data;
     },
     onSuccess: invalidate,

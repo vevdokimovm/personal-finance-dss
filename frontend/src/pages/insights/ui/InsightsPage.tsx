@@ -194,9 +194,7 @@ export function InsightsPage() {
                 const isWorst = worst?.step.step === step.step;
                 return (
                   <li key={step.step} className={isWorst ? "is-worst" : undefined}>
-                    <span className="fp-insights__step">
-                      {STEP_LABELS[step.step] ?? step.step}
-                    </span>
+                    <span className="fp-insights__step">{STEP_LABELS[step.step] ?? step.step}</span>
                     {/* Полоса декоративна: значение продублировано текстом. Акцентный
                         цвет — только у худшего шага, иначе акцент на каждой строке
                         и не выделяет ничего (бриф §1.1). */}
@@ -216,9 +214,7 @@ export function InsightsPage() {
           </section>
 
           <section aria-labelledby="fp-summary-title">
-            <h2 id="fp-summary-title">
-              {t("Сводка за {n} дней", { n: data?.period_days ?? 30 })}
-            </h2>
+            <h2 id="fp-summary-title">{t("Сводка за {n} дней", { n: data?.period_days ?? 30 })}</h2>
             <dl className="fp-insights__summary">
               <div>
                 <dt>{t("Активных пользователей")}</dt>

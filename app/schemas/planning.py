@@ -266,6 +266,63 @@ class InputSummary(BaseModel):
     risk_tolerance: int
 
 
+class CrisisAction(BaseModel):
+    """Одно действие кризисного плана (`app/core/crisis.py`, канон §12).
+
+    🔴 Размеченное объединение по `type`, а не плоский набор необязательных полей.
+    Четыре вида действий несут разное: у `cut_expenses` есть `amount` и потолок трат,
+    у `restructure_debt` — имя кредита, ставка и варианты, у `freeze_goals` — список
+    целей, у `close_debts_from_liquidity` — шаги и пересчитанные Rt/Lt.
+
+    Поля объявлены необязательными потому, что каждое принадлежит своему `type`;
+    фронт разбирает их по нему. Плоская схема без `type` приняла бы любой мусор
+    и не отличила бы вид действия от вида.
+    """
+
+    type: str
+
+    # cut_expenses
+    amount: Optional[float] = None
+    share_of_expenses: Optional[float] = None
+    max_affordable_expenses: Optional[float] = None
+
+    # freeze_goals
+    goals: Optional[List[str]] = None
+
+    # restructure_debt
+    loan: Optional[str] = None
+    interest_rate: Optional[float] = None
+    monthly_payment: Optional[float] = None
+    options: Optional[List[str]] = None
+
+    # close_debts_from_liquidity
+    steps: Optional[List[Dict[str, Any]]] = None
+    bliq_used: Optional[float] = None
+    bliq_remaining: Optional[float] = None
+    new_rt: Optional[float] = None
+    new_lt: Optional[float] = None
+
+
+class CrisisPlan(BaseModel):
+    """Кризисный план при отрицательном свободном потоке (v6.0.0, схема — v9.1.0).
+
+    🔴 Существовал полтора десятка версий без единой строки на фронте: считался,
+    отдавался в ответе и не показывался никому. Владелец, поручивший эту фичу,
+    считал, что её нет — он её не видел. Тот же класс, что spending-advice
+    до v8.54.0, и цена выше: человек в дефиците — тот, кому продукт нужнее всего.
+
+    `runway_months` необязателен: при нулевом дефиците запас хода не определён,
+    а ноль означал бы «денег не осталось» — противоположное по смыслу.
+    """
+
+    deficit: float
+    runway_months: Optional[float] = None
+    max_affordable_expenses: float
+    severity: str
+    actions: List[CrisisAction] = Field(default_factory=list)
+    summary: str
+
+
 class PlanningCalculateResponse(BaseModel):
     """Ответ POST /planning/calculate."""
 
@@ -273,8 +330,7 @@ class PlanningCalculateResponse(BaseModel):
     bliq_preallocation: BliqPreallocation
     risk_profile: str
     weights: Weights
-    # Не типизированы в этом батче — см. докстринг модуля.
-    crisis_plan: Optional[Dict[str, Any]] = None
+    crisis_plan: Optional[CrisisPlan] = None
     surplus_plan: Optional[Dict[str, Any]] = None
     alternatives_total: int
     admissible_count: int

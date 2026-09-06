@@ -70,13 +70,20 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
     перебора превращалась в способ положить вход всему сервису; локально этого не видно
     вовсе — прокси нет, адрес настоящий.
 
-    `X-Forwarded-For` доверяется только при `TRUST_PROXY_HEADERS`: заголовок ставит
-    клиент, и с доверием «всегда» атакующий шлёт новый адрес на каждый запрос.
+    Заголовок доверяется только при `TRUST_PROXY_HEADERS`: его ставит клиент, и с
+    доверием «всегда» атакующий шлёт новый адрес на каждый запрос.
 
-    **Берётся ЛЕВЫЙ адрес цепочки** `клиент, прокси1, прокси2`: правый конец ближе к нам
-    и одинаков у всех, по нему счёт снова стал бы общим. У нас ровно один доверенный
-    хоп; появится CDN — потребуется отсчёт от конца на число доверенных хопов, и менять
-    надо будет здесь.
+    🔴 **Читается `X-Real-IP`, а НЕ `X-Forwarded-For` (найдено `/code-review`).** Здесь
+    стоял левый элемент цепочки `X-Forwarded-For` с обоснованием «nginx выставляет
+    заголовок сам и затирает клиентский». Обоснование неверно: шаблон использует
+    `$proxy_add_x_forwarded_for`, а это **append** — `$http_x_forwarded_for, $remote_addr`.
+    Левый элемент целиком контролируется тем, кто стучится, и на проде
+    (`TRUST_PROXY_HEADERS` там обязателен) перебор пароля со случайным заголовком
+    получал бы свежий счётчик и **не упирался в лимит никогда**.
+
+    `X-Real-IP` nginx ставит из `$remote_addr` и перезаписывает целиком — подменить
+    его клиент не может. Появится второй прокси или CDN — менять надо будет здесь,
+    и тогда `X-Real-IP` перестанет быть адресом клиента.
 
     **Счётчик в памяти инстанса** — на мультиинстансном проде каждый считает своё, то есть
     лимит мягче в N раз. Общий стор (Redis) требует нового сервиса в compose и решения
@@ -98,6 +105,8 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
         self._protected = protected_prefixes
         self._trust_proxy = trust_proxy_headers
         self._hits: dict[str, deque[float]] = defaultdict(deque)
+        # Момент следующей уборки протухших счётчиков (см. `_sweep`).
+        self._next_sweep = 0.0
 
     def _is_protected(self, path: str) -> bool:
         return any(path.startswith(prefix) for prefix in self._protected)
@@ -105,24 +114,52 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
     def _client_ip(self, request: Request) -> str:
         """Адрес, по которому ведётся счёт.
 
-        Пустой или мусорный заголовок откатывается к адресу сокета: пустая строка
-        как ключ склеила бы всех отправителей мусора в один счётчик, и такой
-        отправитель гасил бы лимит остальным.
+        Пустой заголовок откатывается к адресу сокета: пустая строка как ключ склеила бы
+        всех отправителей мусора в один счётчик, и такой отправитель гасил бы лимит
+        остальным.
         """
         if self._trust_proxy:
-            forwarded = request.headers.get("x-forwarded-for", "")
-            first = forwarded.split(",")[0].strip()
-            if first:
-                return first
+            real_ip = request.headers.get("x-real-ip", "").strip()
+            if real_ip:
+                return real_ip
         return request.client.host if request.client else "unknown"
+
+    def _key(self, request: Request) -> str:
+        """Ключ счёта: клиент и путь. Разные пути не делят лимит между собой."""
+        return f"{self._client_ip(request)}:{request.url.path}"
+
+    def _sweep(self, now: float) -> None:
+        """Выбросить счётчики, чьи окна целиком протухли.
+
+        🔴 Найдено `/code-review`: `defaultdict` заводил запись на каждый уникальный
+        `адрес:путь` и не удалял НИКОГДА. На проде — утечка на каждого посетителя;
+        в связке с подделкой заголовка (закрыта выше) — прямой канал исчерпания памяти:
+        новый адрес на каждый запрос давал новую запись.
+
+        Чистится не текущий ключ, а всё протухшее: удалять только свою запись мало —
+        память съедают как раз чужие, которых больше никто не тронет. Проход идёт
+        не чаще раза в окно (`_next_sweep`), чтобы не платить обходом словаря
+        на каждом запросе.
+        """
+        if now < self._next_sweep:
+            return
+        window_start = now - self._window
+        stale = [key for key, hits in self._hits.items() if not hits or hits[-1] < window_start]
+        for key in stale:
+            del self._hits[key]
+        # Следующая уборка — через окно: за это время накопится ровно один «слой»
+        # протухших записей, и обход амортизируется по всем запросам окна.
+        self._next_sweep = now + max(self._window, 1)
 
     async def dispatch(self, request: Request, call_next):
         if not self._is_protected(request.url.path):
             return await call_next(request)
 
+        now = time.monotonic()
+        self._sweep(now)
+
         client_ip = self._client_ip(request)
         key = f"{client_ip}:{request.url.path}"
-        now = time.monotonic()
         window_start = now - self._window
 
         hits = self._hits[key]

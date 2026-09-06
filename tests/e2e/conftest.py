@@ -13,6 +13,7 @@ import os
 import socket
 import subprocess
 import sys
+import pathlib
 import tempfile
 import time
 import urllib.request
@@ -55,22 +56,34 @@ def live_server() -> Iterator[str]:
         # иначе CSRFMiddleware режет браузерные POST (recommendation и пр.) как чужой origin.
         "CORS_ORIGINS": f"http://127.0.0.1:{port}",
     }
+    # 🔴 Вывод сервера НЕ выбрасывается (v9.1.0). Раньше стояло `DEVNULL` на обоих
+    # потоках, и падение в CI выглядело как «E2E live server failed to start» без
+    # единой строки о причине: приложение могло не подняться из-за конфига, миграции
+    # или занятого порта — отличить было нечем, и каждый разбор начинался с догадок.
+    log_fd, log_path = tempfile.mkstemp(suffix="-e2e-server.log")
+    log_file = os.fdopen(log_fd, "w")
     proc = subprocess.Popen(
         [sys.executable, "-m", "uvicorn", "app.main:app",
          "--host", "127.0.0.1", "--port", str(port)],
         cwd=ROOT,
         env=env,
-        stdout=subprocess.DEVNULL,
-        stderr=subprocess.DEVNULL,
+        stdout=log_file,
+        stderr=subprocess.STDOUT,
     )
     base_url = f"http://127.0.0.1:{port}"
 
     if not _wait_until_ready(base_url + "/"):
         proc.terminate()
-        raise RuntimeError("E2E live server failed to start")
+        log_file.flush()
+        details = pathlib.Path(log_path).read_text(encoding="utf-8", errors="replace")
+        tail = "\n".join(details.splitlines()[-30:]) or "(сервер не написал ни строки)"
+        raise RuntimeError(
+            "E2E live server failed to start. Последние строки вывода:\n" + tail
+        )
 
     yield base_url
 
+    log_file.close()
     proc.terminate()
     try:
         proc.wait(timeout=10)

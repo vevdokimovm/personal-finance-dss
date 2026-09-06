@@ -100,6 +100,27 @@ def _owner_filter(query, model, user_id):
     return query.filter(model.user_id == user_id)
 
 
+def _writable_filter(query, model, user_id):
+    """Скоуп для ИЗМЕНЕНИЯ строки: только своё, без household-объединения.
+
+    🔴 Найдено `/code-review` 05.09.2026. `_owner_filter` объединяет свои строки
+    с общими строками household — это правильный скоуп ЧТЕНИЯ, и три пути использовали
+    его перед записью: `create_budget`, `set_transaction_category`, `apply_category_rule`.
+
+    Следствие: участник семьи — **включая `viewer`, у которого прав на запись нет
+    вовсе** — правил чужие записи. `create_budget` перезаписывал лимит общего бюджета,
+    `apply_category_rule` менял категории пачкой по всем совпавшим общим операциям.
+
+    Что правило существует, видно по соседям: `update_transaction`, `delete_transaction`,
+    `delete_budget` и `restore_budget` сверяют `user_id` строго. Три пути из этого
+    намерения выпали, и заметить это можно было только сравнив их между собой.
+
+    Правка общей записи участником — отдельная задача: она требует роли (owner/member,
+    но не viewer) и своего пути, а не молчаливого расширения скоупа записи.
+    """
+    return query.filter(model.user_id == user_id)
+
+
 # ── Categories (DATA-04) ─────────────────────────────────────────────────
 def create_category(db: Session, name: str, type: str = "expense",
                     is_system: bool = False) -> Category:
@@ -335,7 +356,9 @@ def create_budget(
     мягкого удаления упёрлось бы в UNIQUE-конфликт со старой удалённой строкой вместо
     того, чтобы её оживить. Оживление здесь и есть корректный смысл upsert (P1.7).
     """
-    existing = _owner_filter(
+    # Скоуп ЗАПИСИ: upsert правит СВОЙ бюджет, а не первый совпавший по категории
+    # в семейном котле (см. `_writable_filter`).
+    existing = _writable_filter(
         db.query(Budget).filter(Budget.category == category), Budget, user_id
     ).first()
     if existing is not None:
@@ -455,6 +478,7 @@ def get_budget_status(db: Session, days: int = 30, user_id: Optional[str] = None
             "spent": float(round(spent, 2)),
             "pct": pct,
             "over": spent > limit_amount,
+            "household_id": b.household_id,
         })
     return statuses
 
@@ -610,7 +634,8 @@ def set_transaction_category(
 ) -> Optional[Transaction]:
     """Переназначает категорию конкретной операции (с проверкой владельца).
     None — если не найдена."""
-    transaction = _owner_filter(
+    # Скоуп ЗАПИСИ: категорию чужой общей операции менять нельзя даже участнику семьи.
+    transaction = _writable_filter(
         db.query(Transaction), Transaction, user_id
     ).filter(
         Transaction.id == transaction_id,
@@ -647,7 +672,9 @@ def apply_category_rule(
     token = normalize_match_key(match_token)
     if len(token) < MIN_MATCH_TOKEN_LEN:
         return 0
-    transactions = _owner_filter(
+    # Скоуп ЗАПИСИ: правило применяется пачкой, и на читающем скоупе оно переписывало бы
+    # категории по ВСЕМ совпавшим общим операциям семьи (см. `_writable_filter`).
+    transactions = _writable_filter(
         db.query(Transaction), Transaction, user_id
     ).filter(
         Transaction.is_deleted == False,  # noqa: E712

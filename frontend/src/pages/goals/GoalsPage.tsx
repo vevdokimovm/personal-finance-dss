@@ -4,6 +4,7 @@ import { t } from "@shared/lib/i18n/t";
 import { getConsentRequiredDetail } from "@shared/lib/api/extractErrorMessage";
 import { useGoals, type Goal } from "@entities/goals";
 import { ConsentRequiredPanel } from "@entities/consents";
+import { SessionExpiredPanel, isSessionExpired } from "@entities/auth";
 import { GoalRow } from "./ui/GoalRow";
 import { GoalForm } from "./ui/GoalForm";
 import { GoalContributionForm } from "./ui/GoalContributionForm";
@@ -54,6 +55,20 @@ export function GoalsPage() {
   }
 
   if (query.isError) {
+    /* 🔴 401 — истёкшая сессия, а не сбой связи (гипотеза 7). Кнопка «Повторить»
+       на нём возвращала бы 401 бесконечно, а совет проверить интернет при работающем
+       интернете уводит человека чинить не то. `JWT_TTL_HOURS = 168` и refresh-токена
+       нет — событие регулярное. */
+    if (isSessionExpired(query.error)) {
+      return (
+        <main className="fp-goals">
+          <h1 ref={headingRef} tabIndex={-1}>
+            {t("Цели")}
+          </h1>
+          <SessionExpiredPanel redirectTo="/goals" />
+        </main>
+      );
+    }
     const consentDetail = getConsentRequiredDetail(query.error);
     if (consentDetail) {
       return (

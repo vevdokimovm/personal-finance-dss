@@ -104,6 +104,40 @@ class TestRootIsClean:
         )
 
 
+class TestEnvFileIsFoundWhereDocumented:
+    """🔴 Нашёл `/code-review`: `.env` искался ЗА пределами репозитория.
+
+    `BASE_DIR = parents[1]` — это корень репо, а `ENV_FILE = BASE_DIR.parent / ".env"`
+    указывал на каталог **выше** него. Проверено живым импортом: путь вёл
+    в `~/repos/.env`, которого не существует.
+
+    Цена: README велит скопировать `.env.example` в `.env`, `.gitignore` этот файл
+    прячет — а приложение его не читает. При нативном запуске (`python run.py`,
+    uvicorn) продукт молча стартует на дефолтах: `ENVIRONMENT=development`, значит
+    `validate_production_security` возвращает пустой список, `require_admin`
+    при пустом `ADMIN_API_KEY` пропускает всех, проверка CSRF для cookie без Origin
+    выключена. Прод в Docker не задет — там `env_file` в compose, — но человек,
+    поднявший продукт по инструкции из README, получает боевой сервер
+    в dev-конфигурации и не узнаёт об этом ниоткуда.
+    """
+
+    def test_env_file_points_inside_the_repository(self) -> None:
+        """Путь к `.env` лежит в корне репо — там же, куда его кладёт README."""
+        from app.config import ENV_FILE
+
+        assert ENV_FILE.parent == REPO_ROOT, (
+            f".env ищется в {ENV_FILE.parent}, а README велит класть его в {REPO_ROOT} — "
+            "приложение молча стартует на дефолтах, включая ENVIRONMENT=development"
+        )
+
+    def test_env_file_name_matches_the_example(self) -> None:
+        """Имя файла ровно то, что предлагает пример: `.env.example` → `.env`."""
+        from app.config import ENV_FILE
+
+        assert ENV_FILE.name == ".env"
+        assert (REPO_ROOT / ".env.example").exists()
+
+
 class TestEnvExampleIsComplete:
     """Пример окружения покрывает все настройки, которые читает приложение."""
 

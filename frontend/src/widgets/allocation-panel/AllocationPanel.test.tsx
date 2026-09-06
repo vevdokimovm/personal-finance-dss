@@ -98,7 +98,7 @@ describe("AllocationPanel — объяснение выбранного план
     weighted_scores: { Rt: 0.05, Lt: 0.12, Dt: 0.34, Si: 0.03 },
     explanation: {
       delta: { Rt: 4200, Lt: 0.4, Dt: -0.03 },
-    gains: ["Досрочно гасим 10 000 ₽ — самый дорогой кредит."],
+      gains: ["Досрочно гасим 10 000 ₽ — самый дорогой кредит."],
       costs: ["2 000 ₽ не пошли в цели — они уже профинансированы."],
       insight:
         "Рекомендуем направить 30% на досрочку, 40% на цели. Решающим оказалось то, " +
@@ -171,7 +171,7 @@ describe("AllocationPanel — объяснение выбранного план
       ...BEST,
       explanation: {
         delta: { Rt: 0, Lt: 0, Dt: 0 },
-      gains: [],
+        gains: [],
         costs: [],
         insight: "Рекомендуем направить всё в резерв.",
         counterfactual: { available: false },
@@ -203,12 +203,16 @@ describe("AllocationPanel — ответ без ranked не роняет экр�
   } as PlanAlternative;
 
   it("рендерит столбец распределения, когда alternatives не пришли вовсе", () => {
-    render(<AllocationPanel best={best} alternatives={undefined as unknown as PlanAlternative[]} />);
+    render(
+      <AllocationPanel best={best} alternatives={undefined as unknown as PlanAlternative[]} />,
+    );
     expect(screen.getByText(/Резерв/)).toBeInTheDocument();
   });
 
   it("не показывает ползунки «что если», когда выбирать не из чего", () => {
-    render(<AllocationPanel best={best} alternatives={undefined as unknown as PlanAlternative[]} />);
+    render(
+      <AllocationPanel best={best} alternatives={undefined as unknown as PlanAlternative[]} />,
+    );
     expect(screen.queryByRole("slider")).not.toBeInTheDocument();
   });
 });

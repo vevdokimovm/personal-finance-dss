@@ -110,9 +110,7 @@ describe("LoginPage — второй фактор при входе", () => {
     await userEvent.click(screen.getByRole("button", { name: /подтвердить|войти/i }));
 
     await waitFor(() =>
-      expect(mfaVerify).toHaveBeenCalledWith(
-        expect.objectContaining({ code: "a1b2-c3d4-e5f6" }),
-      ),
+      expect(mfaVerify).toHaveBeenCalledWith(expect.objectContaining({ code: "a1b2-c3d4-e5f6" })),
     );
   });
 
@@ -136,8 +134,11 @@ describe("LoginPage — второй фактор при входе", () => {
       mutation({ mutateAsync: vi.fn().mockResolvedValue({ mfa_required: true, mfa_token: "t1" }) }),
     );
     verifyMock.mockReturnValue(
-      mutation({ isError: true, error: { detail: "Неверный код." },
-                 mutateAsync: vi.fn().mockRejectedValue(new Error("bad")) }),
+      mutation({
+        isError: true,
+        error: { detail: "Неверный код." },
+        mutateAsync: vi.fn().mockRejectedValue(new Error("bad")),
+      }),
     );
     render(<LoginPage />);
     await submitCredentials();

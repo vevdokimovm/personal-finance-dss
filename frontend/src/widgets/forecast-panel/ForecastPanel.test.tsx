@@ -286,4 +286,3 @@ describe("ForecastPanel — сценарий «что если» и живая �
     expect(chart).toHaveAttribute("inert");
   });
 });
-

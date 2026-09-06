@@ -61,7 +61,8 @@ const CONTENT = {
   version: "1.0",
   effective_from: "2026-07-29",
   url: "/legal/privacy",
-  content: "# Политика\n\nНастоящая Политика определяет порядок обработки.\n\n## 1. Общие положения\n\n1.1. Оператором выступает сервис FINPILOT.",
+  content:
+    "# Политика\n\nНастоящая Политика определяет порядок обработки.\n\n## 1. Общие положения\n\n1.1. Оператором выступает сервис FINPILOT.",
 };
 
 function idle<T>(data: T) {
@@ -158,7 +159,7 @@ describe("LegalDocumentPage — текст юридического докуме
      через будущую админку, превратил бы это в XSS. */
   it("скрипт в тексте документа не исполняется", () => {
     useDocumentMock.mockReturnValue(
-      idle({ ...CONTENT, content: 'Текст <script>window.__pwned = 1</script> дальше.' }),
+      idle({ ...CONTENT, content: "Текст <script>window.__pwned = 1</script> дальше." }),
     );
     const { container } = render(<LegalDocumentPage />);
     expect(container.querySelector("script")).toBeNull();
@@ -231,4 +232,3 @@ describe("LegalDocumentPage — текст юридического докуме
     expect(back!.compareDocumentPosition(body!) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   });
 });
-

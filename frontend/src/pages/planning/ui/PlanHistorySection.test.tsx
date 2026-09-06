@@ -125,7 +125,7 @@ describe("PlanHistorySection — история сохранённых план�
       refetch: vi.fn(),
     });
     const { container } = render(<PlanHistorySection />);
-        // Время зависит от часового пояса машины (бэкенд отдаёт наивный UTC, показываем
+    // Время зависит от часового пояса машины (бэкенд отдаёт наивный UTC, показываем
     // локальное), поэтому сверяем дату и наличие времени, а не точную строку.
     expect(screen.getByText(/^01\.09\.2026, \d{2}:\d{2}$/)).toBeVisible();
     expect(screen.getByText("Сбалансированный")).toBeVisible();

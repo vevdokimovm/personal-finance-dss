@@ -1,8 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import {
-  readPrefsApiUserPrefsGet,
-  patchPrefsApiUserPrefsPatch,
-} from "@shared/api/generated";
+import { readPrefsApiUserPrefsGet, patchPrefsApiUserPrefsPatch } from "@shared/api/generated";
 import type { UserPrefsResponse, UserPrefsUpdate } from "../model/types";
 
 const PREFS_KEY = ["user-prefs"];

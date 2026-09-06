@@ -567,6 +567,10 @@ export type BudgetStatus = {
      */
     category: string;
     /**
+     * Household Id
+     */
+    household_id?: number | null;
+    /**
      * Id
      */
     id: number;
@@ -857,6 +861,121 @@ export type Counterfactual = {
      * Utility Gap
      */
     utility_gap?: number | null;
+};
+
+/**
+ * CrisisAction
+ *
+ * Одно действие кризисного плана (`app/core/crisis.py`, канон §12).
+ *
+ * 🔴 Размеченное объединение по `type`, а не плоский набор необязательных полей.
+ * Четыре вида действий несут разное: у `cut_expenses` есть `amount` и потолок трат,
+ * у `restructure_debt` — имя кредита, ставка и варианты, у `freeze_goals` — список
+ * целей, у `close_debts_from_liquidity` — шаги и пересчитанные Rt/Lt.
+ *
+ * Поля объявлены необязательными потому, что каждое принадлежит своему `type`;
+ * фронт разбирает их по нему. Плоская схема без `type` приняла бы любой мусор
+ * и не отличила бы вид действия от вида.
+ */
+export type CrisisAction = {
+    /**
+     * Amount
+     */
+    amount?: number | null;
+    /**
+     * Bliq Remaining
+     */
+    bliq_remaining?: number | null;
+    /**
+     * Bliq Used
+     */
+    bliq_used?: number | null;
+    /**
+     * Goals
+     */
+    goals?: Array<string> | null;
+    /**
+     * Interest Rate
+     */
+    interest_rate?: number | null;
+    /**
+     * Loan
+     */
+    loan?: string | null;
+    /**
+     * Max Affordable Expenses
+     */
+    max_affordable_expenses?: number | null;
+    /**
+     * Monthly Payment
+     */
+    monthly_payment?: number | null;
+    /**
+     * New Lt
+     */
+    new_lt?: number | null;
+    /**
+     * New Rt
+     */
+    new_rt?: number | null;
+    /**
+     * Options
+     */
+    options?: Array<string> | null;
+    /**
+     * Share Of Expenses
+     */
+    share_of_expenses?: number | null;
+    /**
+     * Steps
+     */
+    steps?: Array<{
+        [key: string]: unknown;
+    }> | null;
+    /**
+     * Type
+     */
+    type: string;
+};
+
+/**
+ * CrisisPlan
+ *
+ * Кризисный план при отрицательном свободном потоке (v6.0.0, схема — v9.1.0).
+ *
+ * 🔴 Существовал полтора десятка версий без единой строки на фронте: считался,
+ * отдавался в ответе и не показывался никому. Владелец, поручивший эту фичу,
+ * считал, что её нет — он её не видел. Тот же класс, что spending-advice
+ * до v8.54.0, и цена выше: человек в дефиците — тот, кому продукт нужнее всего.
+ *
+ * `runway_months` необязателен: при нулевом дефиците запас хода не определён,
+ * а ноль означал бы «денег не осталось» — противоположное по смыслу.
+ */
+export type CrisisPlan = {
+    /**
+     * Actions
+     */
+    actions?: Array<CrisisAction>;
+    /**
+     * Deficit
+     */
+    deficit: number;
+    /**
+     * Max Affordable Expenses
+     */
+    max_affordable_expenses: number;
+    /**
+     * Runway Months
+     */
+    runway_months?: number | null;
+    /**
+     * Severity
+     */
+    severity: string;
+    /**
+     * Summary
+     */
+    summary: string;
 };
 
 /**
@@ -2988,12 +3107,7 @@ export type PlanningCalculateResponse = {
     alternatives_total: number;
     best?: Alternative | null;
     bliq_preallocation: BliqPreallocation;
-    /**
-     * Crisis Plan
-     */
-    crisis_plan?: {
-        [key: string]: unknown;
-    } | null;
+    crisis_plan?: CrisisPlan | null;
     /**
      * Disclaimer
      */

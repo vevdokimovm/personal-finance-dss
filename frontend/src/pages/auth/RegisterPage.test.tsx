@@ -114,4 +114,3 @@ describe("RegisterPage — регистрация (FRM/FB, 152-ФЗ)", () => {
     expect(link).toHaveAttribute("rel", expect.stringContaining("noopener"));
   });
 });
-

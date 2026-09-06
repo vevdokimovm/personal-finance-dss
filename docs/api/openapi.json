@@ -899,6 +899,17 @@
             "title": "Category",
             "type": "string"
           },
+          "household_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Household Id"
+          },
           "id": {
             "title": "Id",
             "type": "integer"
@@ -1300,6 +1311,220 @@
           }
         },
         "title": "Counterfactual",
+        "type": "object"
+      },
+      "CrisisAction": {
+        "description": "Одно действие кризисного плана (`app/core/crisis.py`, канон §12).\n\n🔴 Размеченное объединение по `type`, а не плоский набор необязательных полей.\nЧетыре вида действий несут разное: у `cut_expenses` есть `amount` и потолок трат,\nу `restructure_debt` — имя кредита, ставка и варианты, у `freeze_goals` — список\nцелей, у `close_debts_from_liquidity` — шаги и пересчитанные Rt/Lt.\n\nПоля объявлены необязательными потому, что каждое принадлежит своему `type`;\nфронт разбирает их по нему. Плоская схема без `type` приняла бы любой мусор\nи не отличила бы вид действия от вида.",
+        "properties": {
+          "amount": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Amount"
+          },
+          "bliq_remaining": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Bliq Remaining"
+          },
+          "bliq_used": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Bliq Used"
+          },
+          "goals": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Goals"
+          },
+          "interest_rate": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Interest Rate"
+          },
+          "loan": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Loan"
+          },
+          "max_affordable_expenses": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Max Affordable Expenses"
+          },
+          "monthly_payment": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Monthly Payment"
+          },
+          "new_lt": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "New Lt"
+          },
+          "new_rt": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "New Rt"
+          },
+          "options": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Options"
+          },
+          "share_of_expenses": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Share Of Expenses"
+          },
+          "steps": {
+            "anyOf": [
+              {
+                "items": {
+                  "additionalProperties": true,
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Steps"
+          },
+          "type": {
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "type"
+        ],
+        "title": "CrisisAction",
+        "type": "object"
+      },
+      "CrisisPlan": {
+        "description": "Кризисный план при отрицательном свободном потоке (v6.0.0, схема — v9.1.0).\n\n🔴 Существовал полтора десятка версий без единой строки на фронте: считался,\nотдавался в ответе и не показывался никому. Владелец, поручивший эту фичу,\nсчитал, что её нет — он её не видел. Тот же класс, что spending-advice\nдо v8.54.0, и цена выше: человек в дефиците — тот, кому продукт нужнее всего.\n\n`runway_months` необязателен: при нулевом дефиците запас хода не определён,\nа ноль означал бы «денег не осталось» — противоположное по смыслу.",
+        "properties": {
+          "actions": {
+            "items": {
+              "$ref": "#/components/schemas/CrisisAction"
+            },
+            "title": "Actions",
+            "type": "array"
+          },
+          "deficit": {
+            "title": "Deficit",
+            "type": "number"
+          },
+          "max_affordable_expenses": {
+            "title": "Max Affordable Expenses",
+            "type": "number"
+          },
+          "runway_months": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Runway Months"
+          },
+          "severity": {
+            "title": "Severity",
+            "type": "string"
+          },
+          "summary": {
+            "title": "Summary",
+            "type": "string"
+          }
+        },
+        "required": [
+          "deficit",
+          "max_affordable_expenses",
+          "severity",
+          "summary"
+        ],
+        "title": "CrisisPlan",
         "type": "object"
       },
       "DebtDTO": {
@@ -4477,14 +4702,12 @@
           "crisis_plan": {
             "anyOf": [
               {
-                "additionalProperties": true,
-                "type": "object"
+                "$ref": "#/components/schemas/CrisisPlan"
               },
               {
                 "type": "null"
               }
-            ],
-            "title": "Crisis Plan"
+            ]
           },
           "disclaimer": {
             "title": "Disclaimer",
@@ -6289,7 +6512,7 @@
   },
   "info": {
     "title": "FINPILOT",
-    "version": "8.54.0"
+    "version": "9.0.0"
   },
   "openapi": "3.1.0",
   "paths": {

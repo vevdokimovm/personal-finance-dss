@@ -277,6 +277,9 @@ class Goal(Base):
 
 class Budget(Base):
     __tablename__ = "budgets"
+    __table_args__ = (
+        UniqueConstraint("user_id", "category", name="uq_budgets_owner_category"),
+    )
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
     user_id: Mapped[Optional[str]] = mapped_column(
@@ -285,7 +288,11 @@ class Budget(Base):
     household_id: Mapped[Optional[int]] = mapped_column(
         ForeignKey("households.id", ondelete="SET NULL"), nullable=True, index=True
     )
-    category: Mapped[str] = mapped_column(String(64), nullable=False, unique=True, index=True)
+    # 🔴 Уникальность — по ПАРЕ с владельцем, не глобально (миграция 0036).
+    # Глобальный `unique` означал 500 у каждого второго пользователя, заводящего
+    # ту же категорию: `create_budget` ищет существующую строку в пределах владельца,
+    # не находит чужую и идёт на INSERT. Видно только когда людей больше одного.
+    category: Mapped[str] = mapped_column(String(64), nullable=False, index=True)
     limit_amount: Mapped[Decimal] = mapped_column(
         Numeric(14, 2), nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=utcnow)

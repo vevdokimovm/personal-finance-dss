@@ -205,7 +205,9 @@ export function DemoSandbox({
         open={confirming !== null}
         onOpenChange={(open) => !open && setConfirming(null)}
         title={t("Заменить данные демонстрационными?")}
-        description={t("Введённые вами операции, цели и кредиты будут удалены без возможности вернуть.")}
+        description={t(
+          "Введённые вами операции, цели и кредиты будут удалены без возможности вернуть.",
+        )}
         returnFocusTo={() => triggerRef.current}
       >
         <p>

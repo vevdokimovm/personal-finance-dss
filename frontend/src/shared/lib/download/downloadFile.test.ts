@@ -3,8 +3,9 @@ import { downloadFile, filenameFromDisposition } from "./downloadFile";
 
 describe("filenameFromDisposition — имя файла даёт сервер, а не фронт", () => {
   it("берёт filename из заголовка", () => {
-    expect(filenameFromDisposition('attachment; filename="finpilot-plan-2026-09-03.csv"'))
-      .toBe("finpilot-plan-2026-09-03.csv");
+    expect(filenameFromDisposition('attachment; filename="finpilot-plan-2026-09-03.csv"')).toBe(
+      "finpilot-plan-2026-09-03.csv",
+    );
   });
 
   it("понимает filename* с процентным кодированием (RFC 5987)", () => {

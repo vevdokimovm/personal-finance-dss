@@ -10,7 +10,6 @@ import { useProfile, NotAuthenticatedError } from "@entities/profile";
 import { useResendVerification } from "@entities/auth";
 import "./ProfilePage.css";
 
-
 /** GET /api/auth/verify (ссылка в письме) редиректит сюда с ?verified=1|0 — не отдельный
  * экран (routes_auth.py::verify_email), только баннер поверх уже существующего профиля. */
 function VerifiedBanner() {

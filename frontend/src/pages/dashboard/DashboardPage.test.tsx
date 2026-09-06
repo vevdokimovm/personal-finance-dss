@@ -275,9 +275,8 @@ describe("DashboardPage", () => {
      себя на десяти готовых портретах (README: «Демо за 30 секунд»). Вход был в Jinja
      и потерялся при переносе на React — найдено в v8.45.0. */
   it("гостю с пустым дашбордом предлагает посмотреть на примере", async () => {
-    const { NotAuthenticatedError } = await vi.importActual<
-      typeof import("@entities/profile")
-    >("@entities/profile");
+    const { NotAuthenticatedError } =
+      await vi.importActual<typeof import("@entities/profile")>("@entities/profile");
     useProfileMock.mockReturnValue({ data: undefined, error: new NotAuthenticatedError() });
 
     usePlanMock.mockReturnValue({
@@ -301,4 +300,3 @@ describe("DashboardPage", () => {
     expect(screen.queryByTestId("demo-sandbox")).not.toBeInTheDocument();
   });
 });
-

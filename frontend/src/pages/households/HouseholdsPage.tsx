@@ -479,9 +479,12 @@ function HouseholdCard({
               setConfirm({
                 title: t("Распустить семейный доступ?"),
                 description: t("Действие необратимо: восстановить его будет нельзя."),
-                body: t("«{name}» исчезнет у всех участников, их доступ к общему плану прекратится.", {
-                  name: household.name,
-                }),
+                body: t(
+                  "«{name}» исчезнет у всех участников, их доступ к общему плану прекратится.",
+                  {
+                    name: household.name,
+                  },
+                ),
                 confirmLabel: t("Распустить навсегда"),
                 trigger: e.currentTarget,
                 run: () =>

@@ -72,7 +72,9 @@ export function GoalRow({
           <span className="fp-goal-row__deadline">
             {formatDate(goal.deadline)}
             {overdue && (
-              <span className="fp-goal-row__overdue">{NBSP}· {t("срок прошёл")}</span>
+              <span className="fp-goal-row__overdue">
+                {NBSP}· {t("срок прошёл")}
+              </span>
             )}
           </span>
         )}

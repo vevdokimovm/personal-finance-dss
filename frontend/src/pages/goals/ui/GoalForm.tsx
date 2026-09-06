@@ -2,12 +2,7 @@ import { useRef, useState, type FormEvent } from "react";
 import { Button, Modal, toast } from "@shared/ui";
 import { t } from "@shared/lib/i18n/t";
 import { extractErrorMessage } from "@shared/lib/api/extractErrorMessage";
-import {
-  useCreateGoal,
-  useUpdateGoal,
-  GOAL_CATEGORY_OPTIONS,
-  type Goal,
-} from "@entities/goals";
+import { useCreateGoal, useUpdateGoal, GOAL_CATEGORY_OPTIONS, type Goal } from "@entities/goals";
 import { useLiquidAssets } from "@entities/assets";
 import type { GoalCategory } from "@shared/api/generated";
 import "@shared/ui/entityForm.css";
@@ -171,13 +166,13 @@ export function GoalForm({ open, onOpenChange, goal }: GoalFormProps) {
               </p>
             )}
           </div>
-        {!isEdit && (
-          <HouseholdScopeField
-            value={householdId}
-            onChange={setHouseholdId}
-            idPrefix="goal-form"
-          />
-        )}
+          {!isEdit && (
+            <HouseholdScopeField
+              value={householdId}
+              onChange={setHouseholdId}
+              idPrefix="goal-form"
+            />
+          )}
           <div className="fp-entity-form__field">
             <label htmlFor="goal-form-deadline">{t("Срок (пусто — бессрочная)")}</label>
             <input

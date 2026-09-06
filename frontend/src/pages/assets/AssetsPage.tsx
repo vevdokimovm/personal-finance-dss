@@ -4,6 +4,7 @@ import { t } from "@shared/lib/i18n/t";
 import { getConsentRequiredDetail } from "@shared/lib/api/extractErrorMessage";
 import { useLiquidAssets, type LiquidAsset } from "@entities/assets";
 import { ConsentRequiredPanel } from "@entities/consents";
+import { SessionExpiredPanel, isSessionExpired } from "@entities/auth";
 import { AssetRow } from "./ui/AssetRow";
 import { AssetForm } from "./ui/AssetForm";
 import "./AssetsPage.css";
@@ -44,6 +45,20 @@ export function AssetsPage() {
   }
 
   if (query.isError) {
+    /* 🔴 401 — истёкшая сессия, а не сбой связи (гипотеза 7). Кнопка «Повторить»
+       на нём возвращала бы 401 бесконечно, а совет проверить интернет при работающем
+       интернете уводит человека чинить не то. `JWT_TTL_HOURS = 168` и refresh-токена
+       нет — событие регулярное. */
+    if (isSessionExpired(query.error)) {
+      return (
+        <main className="fp-assets">
+          <h1 ref={headingRef} tabIndex={-1}>
+            {t("Ликвидные активы")}
+          </h1>
+          <SessionExpiredPanel redirectTo="/banks" />
+        </main>
+      );
+    }
     const consentDetail = getConsentRequiredDetail(query.error);
     if (consentDetail) {
       return (

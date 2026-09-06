@@ -202,10 +202,13 @@ jobs:
           pip install -r requirements.txt -r requirements-dev.txt pillow
       - name: Установка браузеров (chromium + firefox + webkit)
         run: playwright install --with-deps chromium firefox webkit
-      - name: Мультибраузерные E2E (chromium + firefox + webkit)
-        run: pytest -m e2e --browser chromium --browser firefox --browser webkit
-      - name: Полный тир (визуальная регрессия + live-a11y)
-        run: pytest -m full --browser chromium
+      # 🔴 Node и сборка фронта — ДО pytest, а не после (исправлено v9.1.0).
+      # Здесь они стояли ниже E2E, поэтому `frontend/dist` не существовал, сервер
+      # `tests/e2e/conftest.py` отдавал 404 на `/`, не проходил проверку готовности —
+      # и весь тир падал с `E2E live server failed to start` без единой строки
+      # о причине. В джобе `fast` сборка стоит перед pytest ровно по этой причине,
+      # и там же записано почему; сюда правило не доехало (§7 автономного стандарта:
+      # правило, дошедшее не всюду, — это расхождение).
       - name: Фронт — установка Node
         uses: actions/setup-node@v4
         with:
@@ -215,6 +218,13 @@ jobs:
       - name: Фронт — зависимости
         working-directory: frontend
         run: npm ci
+      - name: Фронт — сборка (нужна E2E — сервер отдаёт SPA, а не 404)
+        working-directory: frontend
+        run: npm run build
+      - name: Мультибраузерные E2E (chromium + firefox + webkit)
+        run: pytest -m e2e --browser chromium --browser firefox --browser webkit
+      - name: Полный тир (визуальная регрессия + live-a11y)
+        run: pytest -m full --browser chromium
       - name: Фронт — браузеры Playwright (мультибраузер, как и бэк-E2E)
         working-directory: frontend
         run: npx playwright install --with-deps chromium firefox webkit

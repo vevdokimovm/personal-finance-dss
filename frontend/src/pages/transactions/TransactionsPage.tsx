@@ -4,6 +4,7 @@ import { t } from "@shared/lib/i18n/t";
 import { getConsentRequiredDetail } from "@shared/lib/api/extractErrorMessage";
 import { useTransactions, type Transaction } from "@entities/transactions";
 import { ConsentRequiredPanel } from "@entities/consents";
+import { SessionExpiredPanel, isSessionExpired } from "@entities/auth";
 import { TransactionRow } from "./ui/TransactionRow";
 import { TransactionForm } from "./ui/TransactionForm";
 import { StatementImportSection } from "./ui/StatementImportSection";
@@ -43,6 +44,20 @@ export function TransactionsPage() {
   }
 
   if (query.isError) {
+    /* 🔴 401 — истёкшая сессия, а не сбой связи (гипотеза 7). Кнопка «Повторить»
+       на нём возвращала бы 401 бесконечно, а совет проверить интернет при работающем
+       интернете уводит человека чинить не то. `JWT_TTL_HOURS = 168` и refresh-токена
+       нет — событие регулярное. */
+    if (isSessionExpired(query.error)) {
+      return (
+        <main className="fp-transactions">
+          <h1 ref={headingRef} tabIndex={-1}>
+            {t("Операции")}
+          </h1>
+          <SessionExpiredPanel redirectTo="/transactions" />
+        </main>
+      );
+    }
     const consentDetail = getConsentRequiredDetail(query.error);
     if (consentDetail) {
       return (

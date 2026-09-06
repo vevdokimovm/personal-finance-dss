@@ -5,10 +5,12 @@ import { ListSkeleton, StatePanel, Button, Formula } from "@shared/ui";
 import { formatMoney } from "@shared/lib/money/formatMoney";
 import { t } from "@shared/lib/i18n/t";
 import { getConsentRequiredDetail } from "@shared/lib/api/extractErrorMessage";
+import { SessionExpiredPanel, isSessionExpired } from "@entities/auth";
 import { ConsentRequiredPanel } from "@entities/consents";
 import { MetricsGrid } from "@widgets/metrics-grid";
 import { PlanExportSection } from "./ui/PlanExportSection";
 import { PlanHistorySection } from "./ui/PlanHistorySection";
+import { CrisisPlanSection } from "./ui/CrisisPlanSection";
 import { AllocationPanel } from "@widgets/allocation-panel";
 import { PlanSettingsSection } from "./ui/PlanSettingsSection";
 import { ForecastPanel } from "@widgets/forecast-panel";
@@ -41,6 +43,19 @@ export function PlanningPage() {
   }
 
   if (planQuery.isError || forecastQuery.isError) {
+    /* 🔴 401 — истёкшая сессия, а не сбой связи (гипотеза 7). «Повторить» на нём
+       возвращает 401 бесконечно, а совет проверить интернет при работающем интернете
+       уводит чинить не то. */
+    if (isSessionExpired(planQuery.error) || isSessionExpired(forecastQuery.error)) {
+      return (
+        <main className="fp-planning">
+          <h1 ref={headingRef} tabIndex={-1}>
+            {t("План распределения")}
+          </h1>
+          <SessionExpiredPanel redirectTo="/planning" />
+        </main>
+      );
+    }
     const consentDetail =
       getConsentRequiredDetail(planQuery.error) ?? getConsentRequiredDetail(forecastQuery.error);
     if (consentDetail) {
@@ -192,8 +207,25 @@ export function PlanningPage() {
           <p className="fp-planning__disclaimer-text">{plan.disclaimer}</p>
         </section>
       )}
-      <AllocationPanel best={plan.top3?.[0] ?? null} alternatives={plan.ranked} />
-      <AlternativesBrowser alternatives={plan.ranked} />
+      {/* 🔴 Кризисный план стоит ПЕРЕД распределением (v9.1.0). Когда свободных денег
+          нет, обычный план не построить — распределять нечего, и `AllocationPanel` ниже
+          покажет пустоту. Человек в дефиците должен первым делом увидеть разбор, а не
+          проскроллить пустой блок в поисках ответа.
+
+          План считался с v6.0.0 и не показывался никому: `grep crisis` по `frontend/src`
+          давал ноль совпадений. Тот же класс, что spending-advice до v8.54.0. */}
+      <CrisisPlanSection plan={plan.crisis_plan} />
+      {/* 🔴 При кризисном плане панель распределения НЕ рисуется (design-critic).
+          `top3` в этом случае пуст, и панель показывает своё «плана нет» — с внутренним
+          термином «fail-loud» в тексте. Человек в дефиците получал подряд два объяснения
+          одного факта разными словами, второе — жаргоном разработки. Кризисный разбор
+          заменяет пустую панель, а не соседствует с ней. */}
+      {!plan.crisis_plan && (
+        <>
+          <AllocationPanel best={plan.top3?.[0] ?? null} alternatives={plan.ranked} />
+          <AlternativesBrowser alternatives={plan.ranked} />
+        </>
+      )}
       <ForecastPanel
         forecast={forecast}
         horizon={horizon}

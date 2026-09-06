@@ -192,7 +192,7 @@ LEGACY_CONTEXT_MARKERS = (
 # migrations 35 (v8.48.0): +1 — `0035_user_is_owner`, признак владельца продукта.
 # Решение владельца 04.09.2026: аналитику смотрит владелец по входу, а не через `curl`
 # с ADMIN_API_KEY. Матрица SQLite + PostgreSQL прогнана (`docs/pg_matrix_last_run.md`).
-EXPECTED_COUNTS = {"tables": 30, "migrations": 35, "openapi_paths": 100}
+EXPECTED_COUNTS = {"tables": 30, "migrations": 36, "openapi_paths": 100}
 
 
 # Канарейка CJK: редкий токен-глюк генерации ассистентов — иероглиф вместо

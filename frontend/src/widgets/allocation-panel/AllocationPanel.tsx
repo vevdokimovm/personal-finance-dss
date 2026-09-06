@@ -116,9 +116,7 @@ export function AllocationPanel({
   const [detailed, setDetailed] = useState(false);
   // Доли вне `required` только из-за дефолта 0.0 в схеме — ноль тут осмыслен:
   // «на это направление не идёт ничего» (v8.40.0, переход на типы из контракта).
-  const total = best
-    ? (best.x_obligations ?? 0) + (best.x_reserve ?? 0) + (best.x_goals ?? 0)
-    : 0;
+  const total = best ? (best.x_obligations ?? 0) + (best.x_reserve ?? 0) + (best.x_goals ?? 0) : 0;
   const recommendedNotches = best ? notchesOf(best, total) : { debt: 0, goals: 0 };
   const [debtNotch, setDebtNotch] = useState(recommendedNotches.debt);
   const [goalsNotch, setGoalsNotch] = useState(recommendedNotches.goals);
@@ -249,10 +247,7 @@ export function AllocationPanel({
                * explanation теоретически не может отсутствовать здесь, но проверяем на
                * случай старого кэша (тот же принцип защиты, что у explanation выше). */}
               {best.weighted_scores && (
-                <UtilityFormula
-                  weightedScores={best.weighted_scores}
-                  utility={best.utility ?? 0}
-                />
+                <UtilityFormula weightedScores={best.weighted_scores} utility={best.utility ?? 0} />
               )}
             </>
           ) : (

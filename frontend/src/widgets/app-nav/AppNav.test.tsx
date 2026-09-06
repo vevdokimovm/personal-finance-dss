@@ -38,14 +38,11 @@ describe("AppNav — постоянный навигационный карка�
     expect(screen.getByRole("navigation", { name: "Основные разделы" })).toBeInTheDocument();
   });
 
-  it.each(APP_NAV_ITEMS)(
-    "залогинен: раздел «$label» достижим ссылкой на $to",
-    ({ to, label }) => {
-      useProfileMock.mockReturnValue(authorized);
-      render(<AppNav />);
-      expect(screen.getByRole("link", { name: label })).toHaveAttribute("href", to);
-    },
-  );
+  it.each(APP_NAV_ITEMS)("залогинен: раздел «$label» достижим ссылкой на $to", ({ to, label }) => {
+    useProfileMock.mockReturnValue(authorized);
+    render(<AppNav />);
+    expect(screen.getByRole("link", { name: label })).toHaveAttribute("href", to);
+  });
 
   it("залогинен: покрыты ВСЕ экраны продукта — недостижимого кликом раздела не осталось", () => {
     useProfileMock.mockReturnValue(authorized);
@@ -55,7 +52,17 @@ describe("AppNav — постоянный навигационный карка�
       .map((a) => a.getAttribute("href"))
       .sort();
     expect(hrefs).toEqual(
-      ["/", "/planning", "/transactions", "/spending", "/obligations", "/goals", "/banks", "/household", "/profile"].sort(),
+      [
+        "/",
+        "/planning",
+        "/transactions",
+        "/spending",
+        "/obligations",
+        "/goals",
+        "/banks",
+        "/household",
+        "/profile",
+      ].sort(),
     );
   });
 
@@ -83,7 +90,37 @@ describe("AppNav — постоянный навигационный карка�
     useProfileMock.mockReturnValue({
       data: { email: "anna@example.com" },
       isLoading: false,
-      error: new Error("401"),
+      // Форма ошибки та же, что бросает `useProfile` на 401 (`NotAuthenticatedError`),
+      // а не произвольный Error с текстом «401»: текст сообщения ничего не значит
+      // для кода, и тест на нём проверял бы совпадение строк, а не поведение.
+      error: Object.assign(new Error("401"), { name: "NotAuthenticatedError" }),
+    });
+    const { container } = render(<AppNav />);
+    expect(container.textContent).toBe("");
+  });
+
+  /* 🔴 Остаток гипотезы 7. `if (!data || error) return null` убирал меню при ЛЮБОЙ
+     ошибке профиля — включая сетевую, когда человек вошёл и данные лежат в кэше
+     (TanStack Query держит последние успешные `data` при упавшем рефетче).
+     Экран визуально «ломался» без объяснения: разделы исчезали из-за моргнувшей сети. */
+  it("сетевая ошибка при живой сессии НЕ убирает навигацию", () => {
+    useProfileMock.mockReturnValue({
+      data: { email: "anna@example.com", is_owner: false },
+      error: new TypeError("Failed to fetch"),
+      isLoading: false,
+    });
+    render(<AppNav />);
+    expect(screen.getByRole("navigation")).toBeInTheDocument();
+  });
+
+  it("401 убирает навигацию — человек больше не вошёл", () => {
+    /* Обратная сторона: при истёкшей сессии разделы за гейтом отдадут 401/403,
+       и семь ссылок превратятся в семь тупиков ([IA-04]). Объяснение даёт
+       `SessionExpiredPanel` на самом экране, а не меню. */
+    useProfileMock.mockReturnValue({
+      data: { email: "anna@example.com", is_owner: false },
+      error: { status: 401 },
+      isLoading: false,
     });
     const { container } = render(<AppNav />);
     expect(container.textContent).toBe("");

@@ -59,9 +59,7 @@ export function GoalContributionForm({ open, onOpenChange, goal }: GoalContribut
       onOpenChange={onOpenChange}
       title={t("Внести прогресс")}
       description={
-        goal
-          ? t("Сумма прибавится к уже накопленному для цели «{name}».", { name: goal.name })
-          : ""
+        goal ? t("Сумма прибавится к уже накопленному для цели «{name}».", { name: goal.name }) : ""
       }
     >
       <form className="fp-entity-form" onSubmit={handleSubmit} noValidate>

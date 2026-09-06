@@ -87,9 +87,10 @@ export async function downloadFile(url: string, options: DownloadOptions = {}): 
   }
 
   const blob = await response.blob();
-  const name = filenameFromDisposition(response.headers.get("Content-Disposition"))
-    ?? options.fallbackName
-    ?? "finpilot-export";
+  const name =
+    filenameFromDisposition(response.headers.get("Content-Disposition")) ??
+    options.fallbackName ??
+    "finpilot-export";
 
   const href = URL.createObjectURL(blob);
   const link = document.createElement("a");

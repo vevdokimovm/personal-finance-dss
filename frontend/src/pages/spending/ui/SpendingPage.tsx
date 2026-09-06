@@ -7,11 +7,9 @@ import type {
   TemporalPatternSchema,
 } from "@entities/spending";
 import { ConsentRequiredPanel } from "@entities/consents";
+import { SessionExpiredPanel, isSessionExpired } from "@entities/auth";
 import { Button, ListSkeleton, StatePanel } from "@shared/ui";
-import {
-  extractErrorMessage,
-  getConsentRequiredDetail,
-} from "@shared/lib/api/extractErrorMessage";
+import { extractErrorMessage, getConsentRequiredDetail } from "@shared/lib/api/extractErrorMessage";
 import { formatMoney } from "@shared/lib/money/formatMoney";
 import { pluralize } from "@shared/lib/i18n/plural";
 import { t } from "@shared/lib/i18n/t";
@@ -62,8 +60,7 @@ function AdviceCard({ item }: { item: SpendingAdviceSchema }) {
       <p className="fp-spending__compare">
         {t("Сейчас")} {formatMoney(item.current, 0)}
         <span aria-hidden="true"> · </span>
-        {t("обычно")}{" "}
-        {formatMoney(item.baseline, 0)}
+        {t("обычно")} {formatMoney(item.baseline, 0)}
       </p>
       <p className="fp-spending__numbers">{t(REASON_LABELS[item.reason] ?? item.reason)}</p>
     </li>
@@ -77,8 +74,7 @@ function StatsRow({ row }: { row: CategoryStatsSchema }) {
       <span className="fp-spending__numbers">
         {t("Сейчас")} {formatMoney(row.current, 0)}
         <span aria-hidden="true"> · </span>
-        {t("норма")}{" "}
-        {formatMoney(row.baseline, 0)}
+        {t("норма")} {formatMoney(row.baseline, 0)}
       </span>
       {/* Аномалия названа словом, а не оставлена внутри z-score: число 5.1 не говорит
           человеку ничего, «необычно много» говорит всё (WCAG 1.4.1 — не одним цветом). */}
@@ -103,16 +99,24 @@ function TrendRow({ row }: { row: TemporalPatternSchema }) {
   );
 }
 
-function GoalImpactRow({ row }: { row: GoalImpactSchema }) {
+function GoalImpactRow({ row, index }: { row: GoalImpactSchema; index: number }) {
   /* 🔴 Три поля необязательны и означают разное: бессрочную цель, отсутствие
      пополнений вовсе и невозможность посчитать выигрыш. Подставить ноль в любое
      из них — сказать человеку неправду о его собственной цели. */
   const earlier = row.months_earlier;
   const notFunded = row.eta_now === null;
   return (
-    <li className="fp-spending__goal" data-testid={`fp-goal-impact-${row.goal_name}`}>
+    <li
+      className="fp-spending__goal"
+      data-testid={`fp-goal-impact-${row.goal_name}`}
+      data-index={index}
+    >
       <span className="fp-spending__category">{row.goal_name}</span>
-      {earlier !== null && earlier !== undefined ? (
+      {/* 🔴 Округление до нуля отсекается (нашёл `/code-review`): бэкенд не фильтрует
+          малые значения, и `months_earlier = 0.2` давало «на 0 месяцев раньше» —
+          выигрыш, поданный как выигрыш, которого нет. Тот же класс, что решение
+          не подставлять ноль вместо отсутствующего поля. */}
+      {earlier !== null && earlier !== undefined && Math.round(earlier) >= 1 ? (
         /* Склонение через `pluralize`: «на 1 месяца раньше» в главной формулировке
            выигрыша читается как сломанный шаблон, а это единственная фраза, ради
            которой блок целей и существует. */
@@ -157,6 +161,15 @@ export function SpendingPage() {
     /* 🔴 403 «согласие на финданные отозвано» — не поломка, а известный системе отказ
        с понятным выходом. Показывать его тем же «недоступно», что сетевую ошибку,
        значит прятать от человека причину, которую продукт знает. */
+    /* 401 — истёкшая сессия: «Повторить» вернул бы её бесконечно (гипотеза 7). */
+    if (isSessionExpired(query.error)) {
+      return (
+        <main className="fp-spending">
+          {heading}
+          <SessionExpiredPanel redirectTo="/spending" />
+        </main>
+      );
+    }
     const consentDetail = getConsentRequiredDetail(query.error);
     if (consentDetail) {
       return (
@@ -274,8 +287,11 @@ export function SpendingPage() {
               «цель на четыре месяца раньше» — нет. Поэтому он и советы держат рамку
               и поверхность, а справочные разделы ниже идут простыми строками. */}
           <ul className="fp-spending__list">
-            {goalImpact.map((row) => (
-              <GoalImpactRow key={row.goal_name} row={row} />
+            {/* Ключ с индексом: `Goal.name` в БД — обычный `String(255)` без
+                уникальности, две цели с одним именем давали дублирующиеся ключи
+                (React переиспользует не тот узел) и коллизию `data-testid`. */}
+            {goalImpact.map((row, index) => (
+              <GoalImpactRow key={`${row.goal_name}-${index}`} row={row} index={index} />
             ))}
           </ul>
         </>

@@ -173,13 +173,13 @@ export function ObligationForm({ open, onOpenChange, obligation }: ObligationFor
               </p>
             )}
           </div>
-        {!isEdit && (
-          <HouseholdScopeField
-            value={householdId}
-            onChange={setHouseholdId}
-            idPrefix="obligation-form"
-          />
-        )}
+          {!isEdit && (
+            <HouseholdScopeField
+              value={householdId}
+              onChange={setHouseholdId}
+              idPrefix="obligation-form"
+            />
+          )}
           <div className="fp-entity-form__field">
             <label htmlFor="obligation-form-rate">{t("Ставка, % годовых")}</label>
             <input

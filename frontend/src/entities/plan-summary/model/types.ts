@@ -24,7 +24,6 @@ import type {
  * реэкспортировать нечего. Это следующий кандидат на ту же операцию.
  */
 
-
 /** Вклад критериев SAW в utility (батч 0.3, app/core/ranking.py::rank_alternatives) —
  * ключи служебные (Rt/Lt/Dt/Si), как у ExplanationDelta ниже; сумма ≈ utility. */
 export interface WeightedScores {
@@ -59,12 +58,12 @@ export interface Explanation {
   counterfactual?: Counterfactual | null;
 }
 
-
-
-
-
 /* Алиасы на сгенерированные типы: имена, под которыми они уже разошлись по экранам,
    сохранены, чтобы правка не размазалась на десяток файлов. Определения — из контракта. */
+/* Кризисный план: реэкспорт из контракта (v9.1.0). Считался с v6.0.0 и не показывался
+   никому — `grep crisis` по `frontend/src` давал ноль. */
+export type { CrisisPlan, CrisisAction } from "@shared/api/generated";
+
 export type PlanIndicators = PlanningIndicators;
 export type PlanAlternative = Alternative;
 export type PlanInputSummary = InputSummary;

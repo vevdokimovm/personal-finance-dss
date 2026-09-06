@@ -76,9 +76,7 @@ export function StatementImportSection() {
 
   const failed = result?.status === "error" || networkError !== null;
   const reconciliation = result?.reconciliation as
-    | { status?: string; message?: string }
-    | null
-    | undefined;
+    { status?: string; message?: string } | null | undefined;
   // 🔴 У сверки ТРИ исхода (`statement_reconcile.py`): `ok` — сошлось, `mismatch` —
   // расхождение, `unavailable` — сверять было нечем (CSV без контрольных итогов, PDF
   // банка без профиля сверки). Первая редакция считала расхождением всё, что не `ok`,
@@ -86,8 +84,7 @@ export function StatementImportSection() {
   const mismatch = reconciliation?.status === "mismatch";
   const reconciled = reconciliation?.status === "ok";
 
-  const bankName =
-    banks.data?.find((bank) => bank.id === bankId)?.name ?? bankId;
+  const bankName = banks.data?.find((bank) => bank.id === bankId)?.name ?? bankId;
   const pdfSupported = PDF_BANKS.has(bankId);
 
   return (
@@ -167,12 +164,7 @@ export function StatementImportSection() {
           на смонтированном узле и вкладывала внутрь `StatePanel` с такой же ролью —
           вложенные live-регионы ведут себя по-разному в разных связках браузер+AT,
           и второе сообщение могло пропасть, а первое звучало исправно. */}
-      <div
-        ref={resultRef}
-        tabIndex={-1}
-        role="status"
-        className="fp-statement-import__result"
-      >
+      <div ref={resultRef} tabIndex={-1} role="status" className="fp-statement-import__result">
         {networkError && (
           <div className="fp-statement-import__card fp-statement-import__card--error">
             <p className="fp-statement-import__title">{t("Импорт не прошёл")}</p>

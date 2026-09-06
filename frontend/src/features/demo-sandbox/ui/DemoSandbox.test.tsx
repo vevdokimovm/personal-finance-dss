@@ -18,9 +18,8 @@ vi.mock("@entities/demo", () => ({
 }));
 
 vi.mock("@tanstack/react-query", async () => {
-  const actual = await vi.importActual<typeof import("@tanstack/react-query")>(
-    "@tanstack/react-query",
-  );
+  const actual =
+    await vi.importActual<typeof import("@tanstack/react-query")>("@tanstack/react-query");
   return { ...actual, useQueryClient: () => ({ invalidateQueries: invalidateMock }) };
 });
 
@@ -219,4 +218,3 @@ describe("DemoSandbox — гостевая песочница", () => {
     expect(screen.getByText(/Считаем/)).toBeVisible();
   });
 });
-

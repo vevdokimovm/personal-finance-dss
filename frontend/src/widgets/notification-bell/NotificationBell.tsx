@@ -169,9 +169,7 @@ export function NotificationBell() {
                 <li key={n.id}>
                   <button
                     type="button"
-                    className={
-                      n.is_read ? "fp-bell__item" : "fp-bell__item fp-bell__item--unread"
-                    }
+                    className={n.is_read ? "fp-bell__item" : "fp-bell__item fp-bell__item--unread"}
                     onClick={() => openLink(n)}
                   >
                     <span className="fp-bell__item-head">

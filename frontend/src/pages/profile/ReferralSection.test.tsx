@@ -61,7 +61,11 @@ describe("ReferralSection — приглашение друзей", () => {
      лестница из пустых плашек и «осталось 1» при нуле нарушает ST-03. */
   it("нуль приглашённых объяснён, а не показан витриной достижений", () => {
     useReferralMock.mockReturnValue(
-      query({ ...data, invited_count: 0, milestones: data.milestones.map((m) => ({ ...m, reached: false })) }),
+      query({
+        ...data,
+        invited_count: 0,
+        milestones: data.milestones.map((m) => ({ ...m, reached: false })),
+      }),
     );
     render(<ReferralSection />);
     expect(screen.getByText(/Пока по вашей ссылке никто не пришёл/)).toBeVisible();

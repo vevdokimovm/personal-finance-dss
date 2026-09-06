@@ -73,6 +73,11 @@ RATE_LIMITED_PREFIXES = (
     "/api/analysis",
     "/api/auth/login",
     "/api/auth/register",
+    # 🔴 Второй фактор под лимитом (v9.1.0, нашёл `/code-review`). Без него атакующий,
+    # знающий пароль, получал пятиминутный `mfa_pending`-токен и бросал в шестизначный
+    # TOTP неограниченное число догадок — второй фактор переставал быть фактором.
+    # Префикс покрывает и `/mfa/enroll` с `/mfa/confirm`: перебор там тоже ни к чему.
+    "/api/auth/mfa/",
     "/api/planning/calculate",
     "/api/planning/forecast",
     "/v1/analyze",

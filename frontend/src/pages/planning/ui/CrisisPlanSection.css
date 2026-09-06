@@ -1,0 +1,91 @@
+/* Кризисный план: разбор для человека с отрицательным потоком.
+
+   🔴 Тон сдержанный, без красной заливки во весь блок. Человек и так знает, что
+   денег не хватает — он пришёл за тем, что делать. Паника в оформлении добавляет
+   стресс и не добавляет ответа; акцент отдан числам и списку действий. */
+
+.fp-crisis {
+  display: grid;
+  gap: var(--sp-4);
+}
+
+.fp-crisis__facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-5);
+  margin: 0;
+}
+
+.fp-crisis__fact {
+  display: grid;
+  gap: var(--sp-1);
+}
+
+.fp-crisis__facts dt {
+  color: var(--c-text3);
+  font-size: var(--fs-sm);
+}
+
+.fp-crisis__facts dd {
+  margin: 0;
+  font-size: var(--fs-md);
+}
+
+/* 🔴 Дефицит — единственный главный показатель ([IA-01]): он ответ экрана
+   и единица измерения всего ниже. Раньше три числа были равны по весу, и якоря
+   не было ни одного (design-critic). */
+.fp-crisis__fact--primary dd {
+  font-size: var(--fs-2xl);
+}
+
+.fp-crisis__actions-title {
+  font-size: var(--fs-md);
+  margin: var(--sp-2) 0 0;
+}
+
+.fp-crisis__actions {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--sp-3);
+}
+
+.fp-crisis__action {
+  border: var(--border-w) solid var(--c-border);
+  border-radius: var(--r-md);
+  padding: var(--sp-4);
+  background: var(--c-surface);
+}
+
+.fp-crisis__action p {
+  margin: 0;
+  color: var(--c-text2);
+}
+
+.fp-crisis__action-title {
+  font-size: var(--fs-base);
+  margin: 0 0 var(--sp-2);
+  color: var(--c-text);
+}
+
+/* Специфичность повышена селектором, а не `!important`: конфликт с
+   `.fp-crisis__action p` реален, но лечится одной строкой — а `!important`
+   создал бы прецедент, которого в продуктовом CSS фронта нет (design-critic). */
+.fp-crisis__action .fp-crisis__note {
+  margin-top: var(--sp-2);
+  color: var(--c-text3);
+  font-size: var(--fs-sm);
+}
+
+.fp-crisis__action-link {
+  margin-top: var(--sp-3);
+}
+
+/* 🔴 Критическое положение помечено полосой, а не заливкой. Заливка во весь блок
+   добавляет стресс и не добавляет ответа; полоса даёт сигнал, оставляя текст
+   главным носителем смысла (WCAG 1.4.1 соблюдён — тяжесть названа словами). */
+.fp-crisis[data-severity="critical"] {
+  border-left: 3px solid var(--c-amber);
+  padding-left: var(--sp-4);
+}

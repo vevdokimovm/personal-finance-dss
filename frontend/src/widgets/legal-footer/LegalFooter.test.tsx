@@ -32,7 +32,6 @@ vi.mock("@tanstack/react-router", () => ({
   ),
 }));
 
-
 const LEGAL = {
   documents: {
     privacy_policy: {

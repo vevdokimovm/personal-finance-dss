@@ -1,8 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import {
-  listBanksApiBanksListGet,
-  uploadStatementApiBanksUploadPost,
-} from "@shared/api/generated";
+import { listBanksApiBanksListGet, uploadStatementApiBanksUploadPost } from "@shared/api/generated";
 import type { BankOption, StatementUploadResult } from "../model/types";
 
 /** GET /api/banks/list — банки, для которых есть разбор выписки. */

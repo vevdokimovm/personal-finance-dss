@@ -80,9 +80,7 @@ describe("PlanExportSection — выгрузка плана", () => {
 
   it("во время скачивания кнопка сообщает о работе и не даёт нажать второй раз", async () => {
     let release: () => void = () => {};
-    downloadMock.mockImplementation(
-      () => new Promise<void>((resolve) => (release = resolve)),
-    );
+    downloadMock.mockImplementation(() => new Promise<void>((resolve) => (release = resolve)));
     render(<PlanExportSection />);
     const csv = screen.getByRole("button", { name: /CSV/ });
     await userEvent.click(csv);
@@ -147,9 +145,7 @@ describe("PlanExportSection — выгрузка плана", () => {
     );
     render(<PlanExportSection />);
     await userEvent.click(screen.getByRole("button", { name: /CSV/ }));
-    await waitFor(() =>
-      expect(screen.getByRole("alert")).toHaveTextContent(/Нужно согласие/),
-    );
+    await waitFor(() => expect(screen.getByRole("alert")).toHaveTextContent(/Нужно согласие/));
     expect(toastError).not.toHaveBeenCalled();
   });
 

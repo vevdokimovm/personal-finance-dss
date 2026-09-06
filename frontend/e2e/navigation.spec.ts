@@ -68,9 +68,12 @@ test("переход по каркасу идёт внутри SPA, без пе�
     (window as unknown as { __spaMarker?: number }).__spaMarker = 42;
   });
 
-  await page.getByRole("navigation", { name: "Основные разделы" }).getByRole("link", {
-    name: "Цели",
-  }).click();
+  await page
+    .getByRole("navigation", { name: "Основные разделы" })
+    .getByRole("link", {
+      name: "Цели",
+    })
+    .click();
 
   await expect(page).toHaveURL(/\/goals$/);
   const marker = await page.evaluate(
@@ -144,10 +147,7 @@ test("активный пункт не меняет ширину — карка�
   await page.goto("/transactions");
   const active = await nav.getByRole("link", { name: "Операции" }).boundingBox();
 
-  await expect(nav.getByRole("link", { name: "Операции" })).toHaveAttribute(
-    "aria-current",
-    "page",
-  );
+  await expect(nav.getByRole("link", { name: "Операции" })).toHaveAttribute("aria-current", "page");
   expect(
     Math.abs(active!.width - inactive!.width),
     "ширина активного пункта уехала — перенос строк будет прыгать при переходах",

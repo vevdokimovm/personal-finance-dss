@@ -1,8 +1,5 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
-import {
-  listCasesApiDemoCasesGet,
-  loadDemoApiDemoLoadPost,
-} from "@shared/api/generated";
+import { listCasesApiDemoCasesGet, loadDemoApiDemoLoadPost } from "@shared/api/generated";
 import type { DemoCases } from "../model/types";
 
 /**

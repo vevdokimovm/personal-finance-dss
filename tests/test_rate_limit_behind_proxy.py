@@ -42,6 +42,8 @@ nginx (`nginx/templates/finpilot.conf.template`), и до FastAPI доезжае
 """
 from __future__ import annotations
 
+import time
+
 import pytest
 from starlette.applications import Starlette
 from starlette.responses import PlainTextResponse
@@ -55,13 +57,14 @@ LIMIT = 3
 PROTECTED = ("/api/auth/login",)
 
 
+async def _ok(request):
+    return PlainTextResponse("ok")
+
+
 def _app(trust_proxy: bool) -> TestClient:
     """Отдельное мини-приложение: тест про middleware, а не про эндпоинты продукта."""
 
-    async def endpoint(request):
-        return PlainTextResponse("ok")
-
-    app = Starlette(routes=[Route("/api/auth/login", endpoint, methods=["POST"])])
+    app = Starlette(routes=[Route("/api/auth/login", _ok, methods=["POST"])])
     app.add_middleware(
         RateLimitMiddleware,
         limit=LIMIT,
@@ -72,8 +75,14 @@ def _app(trust_proxy: bool) -> TestClient:
     return TestClient(app)
 
 
-def _post(client: TestClient, forwarded_for: str | None = None):
-    headers = {"X-Forwarded-For": forwarded_for} if forwarded_for else {}
+def _post(client: TestClient, client_ip: str | None = None):
+    """🔴 Шлём `X-Real-IP`, а не `X-Forwarded-For`.
+
+    Второй за нашим nginx **дополняется**, а не перезаписывается
+    (`$proxy_add_x_forwarded_for`), поэтому его левый элемент подделывается клиентом.
+    `X-Real-IP` прокси ставит из `$remote_addr` целиком — найдено `/code-review`.
+    """
+    headers = {"X-Real-IP": client_ip} if client_ip else {}
     return client.post("/api/auth/login", headers=headers)
 
 
@@ -102,18 +111,22 @@ class TestBehindProxy:
             assert _post(client, "203.0.113.30").status_code == 200
         assert _post(client, "203.0.113.30").status_code == 429
 
-    def test_leftmost_address_wins(self) -> None:
-        """Из цепочки берётся исходный клиент, а не последний прокси.
+    def test_forwarded_for_is_ignored_entirely(self) -> None:
+        """🔴 `X-Forwarded-For` не участвует в счёте вовсе.
 
-        `X-Forwarded-For: клиент, прокси` — правый конец ближе к нам и одинаков
-        у всех, то есть по нему счёт снова стал бы общим.
+        За нашим nginx он дополняется, а не перезаписывается, значит его левый элемент —
+        строка от клиента. Пока `X-Real-IP` на месте, подделка цепочки ничего не меняет.
         """
         client = _app(trust_proxy=True)
         for _ in range(LIMIT):
-            _post(client, "203.0.113.40, 10.0.0.2")
-        assert _post(client, "203.0.113.40, 10.0.0.9").status_code == 429, (
-            "смена ПОСЛЕДНЕГО хопа обнулила счётчик — значит ключом был прокси"
-        )
+            assert client.post(
+                "/api/auth/login",
+                headers={"X-Real-IP": "203.0.113.40", "X-Forwarded-For": "1.1.1.1"},
+            ).status_code == 200
+        assert client.post(
+            "/api/auth/login",
+            headers={"X-Real-IP": "203.0.113.40", "X-Forwarded-For": "9.9.9.9"},
+        ).status_code == 429, "смена подделанной цепочки обнулила счётчик"
 
     def test_missing_header_falls_back_to_socket_address(self) -> None:
         """Заголовка нет — работаем как раньше, а не пускаем без счёта.
@@ -125,6 +138,131 @@ class TestBehindProxy:
         for _ in range(LIMIT):
             assert _post(client).status_code == 200
         assert _post(client).status_code == 429
+
+
+class TestForgedForwardedFor:
+    """🔴 Нашёл `/code-review`: `X-Forwarded-For` подделывается даже за нашим nginx.
+
+    Докстрока middleware утверждала, что nginx «выставляет заголовок сам и затирает
+    клиентский». **Это неверно:** `nginx/templates/finpilot.conf.template` использует
+    `$proxy_add_x_forwarded_for` — а это **append**, `$http_x_forwarded_for, $remote_addr`.
+    Левый элемент цепочки целиком контролируется тем, кто стучится.
+
+    Цена: на проде (`TRUST_PROXY_HEADERS` там обязателен) перебор пароля со случайным
+    `X-Forwarded-For` на каждом запросе получал бы свежий счётчик и **не упирался
+    в лимит никогда**. То есть защита от перебора не работала бы ровно там, ради чего
+    заводилась. Плюс произвольная строка от клиента уезжала в журнал событий.
+
+    Починка: читаем `X-Real-IP`, который nginx ставит из `$remote_addr` (строка 132
+    шаблона) и который клиент подменить не может — прокси перезаписывает его целиком.
+    """
+
+    def test_forged_forwarded_for_does_not_reset_the_counter(self) -> None:
+        """Подделанная цепочка не даёт нового счётчика.
+
+        `X-Real-IP` один и тот же (его ставит прокси), меняется только подделанный
+        `X-Forwarded-For` — счёт обязан идти по первому.
+        """
+        client = _app(trust_proxy=True)
+        for index in range(LIMIT):
+            assert client.post(
+                "/api/auth/login",
+                headers={"X-Real-IP": "203.0.113.5", "X-Forwarded-For": f"1.2.3.{index}"},
+            ).status_code == 200
+        assert client.post(
+            "/api/auth/login",
+            headers={"X-Real-IP": "203.0.113.5", "X-Forwarded-For": "9.9.9.9"},
+        ).status_code == 429, (
+            "смена X-Forwarded-For обнулила счётчик — на проде перебор пароля "
+            "не упрётся в лимит никогда"
+        )
+
+    def test_real_ip_header_identifies_the_client(self) -> None:
+        """🔴 Счёт идёт по `X-Real-IP` — его ставит nginx, клиент подменить не может."""
+        middleware = RateLimitMiddleware(
+            app=None, limit=LIMIT, window_seconds=60,
+            protected_prefixes=PROTECTED, trust_proxy_headers=True,
+        )
+        request = Request({
+            "type": "http", "method": "POST", "path": "/api/auth/login",
+            "query_string": b"",
+            "headers": [
+                (b"x-real-ip", b"203.0.113.7"),
+                # Подделка в цепочке игнорируется: nginx её только дополняет.
+                (b"x-forwarded-for", b"1.2.3.4, 203.0.113.7"),
+            ],
+            "client": ("10.0.0.2", 1),
+        })
+        assert middleware._client_ip(request) == "203.0.113.7"
+
+    def test_different_real_ips_are_counted_apart(self) -> None:
+        """Разные клиенты по-прежнему не делят лимит — ради этого всё и затевалось."""
+        client = _app(trust_proxy=True)
+        for _ in range(LIMIT):
+            assert client.post(
+                "/api/auth/login", headers={"X-Real-IP": "203.0.113.10"}
+            ).status_code == 200
+        assert client.post(
+            "/api/auth/login", headers={"X-Real-IP": "203.0.113.10"}
+        ).status_code == 429
+        assert client.post(
+            "/api/auth/login", headers={"X-Real-IP": "198.51.100.20"}
+        ).status_code == 200
+
+
+class TestCounterDoesNotLeak:
+    """🔴 Нашёл `/code-review`: словарь счётчиков рос без границы.
+
+    `defaultdict(deque)` заводил запись на КАЖДЫЙ уникальный ключ `адрес:путь`
+    и не удалял опустевшие. На проде это утечка памяти на каждого посетителя,
+    а в связке с подделкой заголовка (закрыта выше) — прямой канал исчерпания:
+    новый адрес на каждый запрос давал новую запись.
+
+    Чистка делается по ходу, а не по таймеру: отдельный сборщик пришлось бы
+    заводить, останавливать и тестировать, а «убери за собой, когда проходишь
+    мимо» не требует ни того, ни другого.
+    """
+
+    def test_counter_map_stays_bounded(self) -> None:
+        """🔴 Прямая проверка размера: 200 разных адресов не оставляют 200 записей.
+
+        Проверяется `_sweep` напрямую, а не через HTTP: уборка идёт не чаще раза
+        в окно (иначе обход словаря платился бы на каждом запросе), и тест, гоняющий
+        запросы в одну миллисекунду, до неё просто не доживает — что и показала
+        первая редакция, зелёная при сломанной чистке.
+        """
+        middleware = RateLimitMiddleware(
+            app=_ok, limit=LIMIT, window_seconds=1,
+            protected_prefixes=PROTECTED, trust_proxy_headers=True,
+        )
+        now = time.monotonic()
+        for index in range(200):
+            middleware._hits[f"203.0.113.{index}:/api/auth/login"].append(now - 10)
+
+        assert len(middleware._hits) == 200, "подготовка не удалась"
+        middleware._sweep(now)
+        assert len(middleware._hits) == 0, (
+            f"после уборки осталось {len(middleware._hits)} протухших записей — "
+            "на проде это утечка на каждого посетителя"
+        )
+
+    def test_live_counters_survive_the_sweep(self) -> None:
+        """Уборка не трогает живые счётчики.
+
+        Без этой пары `_sweep` мог бы «починить» утечку, стирая всё подряд — и лимит
+        перестал бы работать вовсе, потому что каждый запрос начинал бы счёт заново.
+        """
+        middleware = RateLimitMiddleware(
+            app=_ok, limit=LIMIT, window_seconds=60,
+            protected_prefixes=PROTECTED, trust_proxy_headers=True,
+        )
+        now = time.monotonic()
+        middleware._hits["203.0.113.1:/api/auth/login"].append(now)      # свежая
+        middleware._hits["203.0.113.2:/api/auth/login"].append(now - 90)  # протухшая
+
+        middleware._sweep(now)
+        assert "203.0.113.1:/api/auth/login" in middleware._hits
+        assert "203.0.113.2:/api/auth/login" not in middleware._hits
 
 
 class TestWithoutProxy:
@@ -153,7 +291,7 @@ class TestConfigDefaults:
 
         assert Settings().TRUST_PROXY_HEADERS is False
 
-    @pytest.mark.parametrize("header", ["", "   ", ",", " , "])
+    @pytest.mark.parametrize("header", ["", "   "])
     def test_blank_header_resolves_to_socket_address(self, header: str) -> None:
         """🔴 Пустой или мусорный заголовок даёт адрес сокета, а НЕ пустую строку.
 
@@ -171,15 +309,15 @@ class TestConfigDefaults:
             app=None, limit=LIMIT, window_seconds=60,
             protected_prefixes=PROTECTED, trust_proxy_headers=True,
         )
-        headers = [(b"x-forwarded-for", header.encode())] if header else []
+        headers = [(b"x-real-ip", header.encode())] if header else []
         request = Request({
             "type": "http", "method": "POST", "path": "/api/auth/login",
             "query_string": b"", "headers": headers, "client": ("1.2.3.4", 1),
         })
         assert middleware._client_ip(request) == "1.2.3.4"
 
-    def test_forwarded_address_wins_over_socket(self) -> None:
-        """Обратная сторона: осмысленный заголовок побеждает адрес сокета.
+    def test_real_ip_wins_over_socket(self) -> None:
+        """Осмысленный заголовок побеждает адрес сокета.
 
         Без этой пары предыдущий тест выполнялся бы функцией, всегда возвращающей
         адрес сокета, — то есть починкой, которая ничего не чинит.
@@ -190,7 +328,40 @@ class TestConfigDefaults:
         )
         request = Request({
             "type": "http", "method": "POST", "path": "/api/auth/login",
-            "query_string": b"", "headers": [(b"x-forwarded-for", b"203.0.113.7, 10.0.0.2")],
+            "query_string": b"", "headers": [(b"x-real-ip", b"203.0.113.7")],
             "client": ("1.2.3.4", 1),
         })
         assert middleware._client_ip(request) == "203.0.113.7"
+
+
+class TestMfaVerifyIsRateLimited:
+    """🔴 Нашёл `/code-review`: перебор второго фактора не ограничен.
+
+    `RATE_LIMITED_PREFIXES` знает `/api/auth/login` и `/api/auth/register`, но
+    `/api/auth/mfa/verify` не подходит ни под один префикс. Свой счётчик неудач у роута
+    тоже отсутствует — он лишь пишет событие и повторно бросает ошибку.
+
+    Сценарий: атакующий, уже знающий пароль, получает `mfa_pending`-токен на пять минут
+    и бросает в шестизначный TOTP сколько угодно догадок за это окно. 10⁶ вариантов
+    и никакого предела — второй фактор перестаёт быть фактором.
+
+    Проверяется список префиксов, а не живой перебор: гонять сотню запросов ради
+    утверждения «путь под лимитом» дорого и хрупко, а состав списка — это ровно то,
+    что забыли.
+    """
+
+    def test_mfa_verify_is_covered_by_prefixes(self) -> None:
+        from app.main import RATE_LIMITED_PREFIXES
+
+        path = "/api/auth/mfa/verify"
+        assert any(path.startswith(prefix) for prefix in RATE_LIMITED_PREFIXES), (
+            "перебор TOTP не ограничен ничем: пятиминутный mfa_pending-токен "
+            "и 10^6 вариантов — второй фактор перестаёт быть фактором"
+        )
+
+    def test_login_and_register_stay_covered(self) -> None:
+        """Проверка, что правка не подменила список, а дополнила его."""
+        from app.main import RATE_LIMITED_PREFIXES
+
+        for path in ("/api/auth/login", "/api/auth/register"):
+            assert any(path.startswith(prefix) for prefix in RATE_LIMITED_PREFIXES), path

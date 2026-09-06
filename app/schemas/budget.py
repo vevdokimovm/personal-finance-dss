@@ -37,3 +37,8 @@ class BudgetStatus(BaseModel):
     spent: float
     pct: float
     over: bool
+    # 🔴 Общий доступ виден и в СТАТУСЕ, не только в самой записи (v9.1.0).
+    # `BudgetRow` показывает признак «Общая» и берёт данные из `/budgets/status` —
+    # без этого поля `tsc` падал в CI (`Property 'household_id' does not exist`),
+    # а локально молчал: снимок контракта был свежее собранного клиента.
+    household_id: Optional[int] = None

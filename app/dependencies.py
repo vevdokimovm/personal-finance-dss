@@ -91,7 +91,7 @@ SAFE_METHODS = frozenset({"GET", "HEAD", "OPTIONS"})
 # POST, который ничего не пишет: валидация произвольного портрета для демо.
 # Гость обязан оставаться в состоянии «попробовать до регистрации», а этот путь
 # считает в памяти и в БД не заглядывает.
-READ_ONLY_WRITE_PATHS = frozenset({"/demo/analyze"})
+READ_ONLY_WRITE_PATHS = frozenset({"/api/demo/analyze"})
 
 
 def require_account_for_writes(
@@ -136,7 +136,9 @@ def require_account_for_writes(
         return None
     if request.method in SAFE_METHODS:
         return None
-    if any(request.url.path.endswith(tail) for tail in READ_ONLY_WRITE_PATHS):
+    # Точное совпадение, а не `endswith` (найдено `/code-review`): суффиксное сравнение
+    # молча освободило бы от гейта любой будущий роут, чей путь оканчивается так же.
+    if request.url.path in READ_ONLY_WRITE_PATHS:
         return None
     raise HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
@@ -226,7 +228,13 @@ def require_admin(
                 detail="Админ-доступ не сконфигурирован (ADMIN_API_KEY).",
             )
         return
-    if not x_admin_key or not secrets.compare_digest(x_admin_key, expected):
+    # 🔴 Сравниваем БАЙТЫ (найдено `/code-review`). `secrets.compare_digest` на строке
+    # с не-ASCII бросает `TypeError`: `curl -H "X-Admin-Key: пароль"` давал 500 вместо
+    # 403 — необработанное исключение вместо отказа, плюс шум в Sentry от любого сканера.
+    # Кодирование в UTF-8 сохраняет постоянство времени сравнения.
+    if not x_admin_key or not secrets.compare_digest(
+        x_admin_key.encode("utf-8"), expected.encode("utf-8")
+    ):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN, detail="Недействительный админ-ключ."
         )

@@ -9,7 +9,16 @@ import { meApiAuthMeGet } from "@shared/api/generated";
  * бэкенда, см. WATCHLOG/CHANGELOG v8.7.0) — код полагается на исходники бэкенда,
  * не на контракт, это явно помечено здесь и не должно молчать после регенерации
  * снимка. */
-export class NotAuthenticatedError extends Error {}
+/** 401 у `/auth/me`: гость либо истёкшая сессия.
+ *
+ * 🔴 `name` задан явно (v9.1.0): `isSessionExpired` в `entities/auth` распознаёт эту
+ * ошибку по имени, а не через `instanceof`. Импорт из одной сущности в другую нарушил
+ * бы слоистость FSD, а сравнение конструкторов ломается при дублировании модуля
+ * в сборке. Имя переживает и то, и другое.
+ */
+export class NotAuthenticatedError extends Error {
+  name = "NotAuthenticatedError";
+}
 
 /** Общий ключ кэша «кто я сейчас» — читает не только ProfilePage, но и топбар/auth-хуки
  * (entities/auth), которые инвалидируют его после логина/логаута. Один источник истины,

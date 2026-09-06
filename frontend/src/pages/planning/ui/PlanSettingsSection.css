@@ -44,7 +44,9 @@
      во flex-wrap перескакивали бы между строками при переборе стрелками. */
   font-weight: 600;
   cursor: pointer;
-  transition: background var(--motion-fast), border-color var(--motion-fast);
+  transition:
+    background var(--motion-fast),
+    border-color var(--motion-fast);
 }
 
 /* Аффорданс наведения — Must по [IA-05]; без него плашка выглядит как подпись. */

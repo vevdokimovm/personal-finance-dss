@@ -18,7 +18,14 @@ vi.mock("@entities/auth", async () => {
 });
 
 function idleMutation(overrides: Record<string, unknown> = {}) {
-  return { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false, isError: false, error: null, ...overrides };
+  return {
+    mutate: vi.fn(),
+    mutateAsync: vi.fn(),
+    isPending: false,
+    isError: false,
+    error: null,
+    ...overrides,
+  };
 }
 
 beforeEach(() => {

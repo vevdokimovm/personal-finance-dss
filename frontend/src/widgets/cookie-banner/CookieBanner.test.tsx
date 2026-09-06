@@ -34,7 +34,6 @@ vi.mock("@tanstack/react-router", () => ({
   ),
 }));
 
-
 const LEGAL = {
   documents: {
     cookie_policy: {

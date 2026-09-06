@@ -70,7 +70,9 @@ export function RegisterPage() {
       footer={
         <p>
           {t("Уже есть аккаунт? ")}
-          <Link to="/login" search={{ ref: search.ref }}>{t("Войти")}</Link>
+          <Link to="/login" search={{ ref: search.ref }}>
+            {t("Войти")}
+          </Link>
         </p>
       }
     >

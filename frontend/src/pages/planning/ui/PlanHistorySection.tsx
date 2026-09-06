@@ -80,8 +80,7 @@ export function PlanHistorySection() {
         toast.undo(t("Снимок удалён"), () =>
           restore.mutate(snapshot.id, {
             onSuccess: () => toast.success(t("Снимок восстановлен")),
-            onError: () =>
-              toast.error(t("Не получилось восстановить снимок. Попробуйте ещё раз.")),
+            onError: () => toast.error(t("Не получилось восстановить снимок. Попробуйте ещё раз.")),
           }),
         );
       },
@@ -182,9 +181,7 @@ export function PlanHistorySection() {
                     <dl className="fp-plan-history__metrics">
                       <div>
                         <dt>{t("Свободные деньги")}</dt>
-                        <dd className="fp-plan-history__money">
-                          {formatMoney(s.indicators.Rt)}
-                        </dd>
+                        <dd className="fp-plan-history__money">{formatMoney(s.indicators.Rt)}</dd>
                       </div>
                       <div>
                         {/* ПДН показан, иначе снимок с нагрузкой 48% выглядел бы в истории
@@ -239,16 +236,13 @@ export function PlanHistorySection() {
 
               {items.length > VISIBLE_BY_DEFAULT && (
                 <Button variant="ghost" onClick={() => setExpanded((v) => !v)}>
-                  {expanded
-                    ? t("Свернуть список")
-                    : t("Показать все ({n})", { n: items.length })}
+                  {expanded ? t("Свернуть список") : t("Показать все ({n})", { n: items.length })}
                 </Button>
               )}
             </>
           )}
         </>
       )}
-
     </section>
   );
 }

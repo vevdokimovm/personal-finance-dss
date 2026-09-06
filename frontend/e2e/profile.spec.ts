@@ -104,11 +104,9 @@ test("экран согласий показывает все типы и раз
 
   // Отзываемое — с кнопкой; согласие-основание — с объяснением вместо кнопки,
   // которая гарантированно дала бы 409.
-  await expect(
-    main.getByRole("button", { name: /Отозвать согласие: Рекламная/ }),
-  ).toBeVisible();
-  await expect(
-    main.getByRole("button", { name: /Отозвать согласие: Персональные/ }),
-  ).toHaveCount(0);
+  await expect(main.getByRole("button", { name: /Отозвать согласие: Рекламная/ })).toBeVisible();
+  await expect(main.getByRole("button", { name: /Отозвать согласие: Персональные/ })).toHaveCount(
+    0,
+  );
   await expect(main.getByText(/нельзя отозвать без удаления аккаунта/)).toBeVisible();
 });

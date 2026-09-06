@@ -72,13 +72,7 @@ function toDomId(key: string): string {
   return `fp-exp-${key.replace(/[^A-Za-z0-9_-]/g, "-")}`;
 }
 
-function ExperimentCard({
-  results,
-  name,
-}: {
-  results: ExperimentResults;
-  name?: string;
-}) {
+function ExperimentCard({ results, name }: { results: ExperimentResults; name?: string }) {
   const variants = results.variants ?? [];
   const winner = findWinner(variants);
   const total = totalAssigned(variants);
@@ -147,9 +141,7 @@ function ExperimentCard({
                 <tr key={row.variant} className={isWinner ? "is-winner" : undefined}>
                   <th scope="row">
                     {row.variant}
-                    {row.is_control && (
-                      <span className="fp-experiments__tag">{t("контроль")}</span>
-                    )}
+                    {row.is_control && <span className="fp-experiments__tag">{t("контроль")}</span>}
                     {/* Победитель помечен и в самой строке: при точечной навигации
                         по таблице скринридером человек попадает в строку, не читая
                         вывод выше (a11y-auditor). */}

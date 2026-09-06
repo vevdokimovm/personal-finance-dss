@@ -195,4 +195,3 @@ describe("InsightsPage — метрики продукта для владель
     expect(screen.getByText(/Шаги воронки пока не набрали данных/)).toBeVisible();
   });
 });
-

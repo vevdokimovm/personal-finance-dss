@@ -2,7 +2,11 @@ import { formatMoney } from "@shared/lib/money/formatMoney";
 import { formatDate } from "@shared/lib/date/formatDate";
 import { t } from "@shared/lib/i18n/t";
 import { Button, toast } from "@shared/ui";
-import { useDeleteTransaction, useRestoreTransaction, type Transaction } from "@entities/transactions";
+import {
+  useDeleteTransaction,
+  useRestoreTransaction,
+  type Transaction,
+} from "@entities/transactions";
 import { SharedBadge } from "@features/household-scope";
 
 export function TransactionRow({

@@ -6,7 +6,13 @@ from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 BASE_DIR = Path(__file__).resolve().parents[1]
-ENV_FILE = BASE_DIR.parent / ".env"
+# 🔴 В корне РЕПОЗИТОРИЯ, а не выше него (исправлено v9.1.0, нашёл `/code-review`).
+# Здесь стоял `BASE_DIR.parent`, то есть каталог над репой: README велит скопировать
+# `.env.example` в `.env`, `.gitignore` этот файл прячет — а приложение его не читало
+# и молча стартовало на дефолтах. При нативном запуске это означало боевой сервер
+# в dev-конфигурации: `validate_production_security` молчит, `require_admin` пропускает
+# всех при пустом ключе, проверка CSRF для cookie без Origin выключена.
+ENV_FILE = BASE_DIR / ".env"
 
 
 class Settings(BaseSettings):
@@ -28,7 +34,7 @@ class Settings(BaseSettings):
         description="Название проекта.",
     )
     APP_VERSION: str = Field(
-        default="9.0.0",
+        default="9.1.0",
         description="Версия приложения (INFRA-13): код, UI-футер, git-тег.",
     )
     PROJECT_TAGLINE: str = Field(
@@ -339,6 +345,11 @@ def validate_production_security(s: Settings) -> list[str]:
             f"({', '.join(bad_origins) or 'список пуст'}) — CSRFMiddleware отвергнет "
             "каждый POST/PUT/PATCH/DELETE с боевого домена, и сайт будет открываться, "
             "ничего не сохраняя. Задайте https-домены продукта в .env")
+    if not s.TRUST_PROXY_HEADERS:
+        problems.append(
+            "TRUST_PROXY_HEADERS=false — за nginx rate-limit считает клиентом сам прокси, "
+            "то есть всех пользователей как одного: лимит тратится вместе, и, исчерпав "
+            "его, продукт отвечает 429 ВСЕМ сразу. Включите на проде (нашёл /code-review)")
     if s.DATABASE_URL.strip().lower().startswith("sqlite"):
         problems.append(
             "DATABASE_URL указывает на SQLite — в контейнере это файл, который исчезает "

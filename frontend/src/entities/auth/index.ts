@@ -17,3 +17,5 @@ export type {
   ResetPasswordRequest,
   ChangePasswordRequest,
 } from "./model/types";
+export { SessionExpiredPanel } from "./ui/SessionExpiredPanel";
+export { isSessionExpired } from "./lib/isSessionExpired";

@@ -132,7 +132,9 @@ describe("PlanSettingsSection — параметры расчёта", () => {
 
   it("минимальный запас уходит в месяцах, как в контракте", async () => {
     render(<PlanSettingsSection />);
-    fireEvent.change(screen.getByLabelText(/Минимальная ликвидность/), { target: { value: "5.5" } });
+    fireEvent.change(screen.getByLabelText(/Минимальная ликвидность/), {
+      target: { value: "5.5" },
+    });
     await userEvent.click(screen.getByRole("button", { name: /Сохранить и пересчитать/ }));
     expect(updateMock.mock.calls[0][0].l_min).toBe(5.5);
   });

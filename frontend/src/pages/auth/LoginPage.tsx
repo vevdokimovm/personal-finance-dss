@@ -121,45 +121,45 @@ export function LoginPage() {
           </Button>
         </form>
       ) : (
-      <form className="fp-auth-form" onSubmit={handleSubmit} noValidate={false}>
-        {errorMessage && (
-          <p className="fp-auth-banner" role="alert">
-            {errorMessage}
-          </p>
-        )}
+        <form className="fp-auth-form" onSubmit={handleSubmit} noValidate={false}>
+          {errorMessage && (
+            <p className="fp-auth-banner" role="alert">
+              {errorMessage}
+            </p>
+          )}
 
-        <div className="fp-auth-field">
-          <label htmlFor="login-email">{t("Email")}</label>
-          <input
-            id="login-email"
-            type="email"
-            autoComplete="email"
-            inputMode="email"
-            required
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
-        </div>
-        <div className="fp-auth-field">
-          <label htmlFor="login-password">{t("Пароль")}</label>
-          <input
-            id="login-password"
-            type="password"
-            autoComplete="current-password"
-            required
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-        </div>
-        <Button
-          type="submit"
-          variant="primary"
-          disabled={login.isPending}
-          aria-busy={login.isPending}
-        >
-          {login.isPending ? t("Входим…") : t("Войти")}
-        </Button>
-      </form>
+          <div className="fp-auth-field">
+            <label htmlFor="login-email">{t("Email")}</label>
+            <input
+              id="login-email"
+              type="email"
+              autoComplete="email"
+              inputMode="email"
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+          </div>
+          <div className="fp-auth-field">
+            <label htmlFor="login-password">{t("Пароль")}</label>
+            <input
+              id="login-password"
+              type="password"
+              autoComplete="current-password"
+              required
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+          </div>
+          <Button
+            type="submit"
+            variant="primary"
+            disabled={login.isPending}
+            aria-busy={login.isPending}
+          >
+            {login.isPending ? t("Входим…") : t("Войти")}
+          </Button>
+        </form>
       )}
     </AuthLayout>
   );

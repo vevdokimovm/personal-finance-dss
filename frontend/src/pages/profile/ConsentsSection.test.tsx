@@ -107,9 +107,10 @@ describe("ConsentsSection — требование L3", () => {
 
   it("ссылка на документ ведёт по адресу из реестра, а не зашита в код", () => {
     render(<ConsentsSection />);
-    expect(
-      screen.getByRole("link", { name: /Согласие на обработку финансовых/ }),
-    ).toHaveAttribute("href", "/legal/financial-consent");
+    expect(screen.getByRole("link", { name: /Согласие на обработку финансовых/ })).toHaveAttribute(
+      "href",
+      "/legal/financial-consent",
+    );
     expect(screen.getByRole("link", { name: /рекламную рассылку/ })).toHaveAttribute(
       "href",
       "/legal/marketing-consent",

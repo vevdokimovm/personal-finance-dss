@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { useProfile } from "@entities/profile";
+import { isSessionExpired } from "@entities/auth";
 import { t } from "@shared/lib/i18n/t";
 import { APP_NAV_ITEMS, OWNER_NAV_ITEMS } from "./navItems";
 import "./AppNav.css";
@@ -22,35 +23,42 @@ export function AppNav() {
 
   if (isLoading) return null;
 
-  // Условие дословно то же, что в `AuthTopbarLink`, и по той же причине: TanStack Query
-  // держит последние успешные `data` даже когда рефетч упал (stale-if-error, кэш на 401 не
-  // чистится). Проверять `data` в одиночку — воспроизвести баг, пойманный в браузере на
-  // топбаре. Гостю каркас не показываем сознательно: все экраны продукта за гейтом согласия
+  // Гостю каркас не показываем сознательно: все экраны продукта за гейтом согласия
   // или авторизации, семь ссылок в 403 — это семь тупиков ([IA-04] no dead ends).
-  if (!data || error) return null;
+  //
+  // 🔴 Различаем ВИД ошибки (v9.1.0, остаток гипотезы 7). Здесь стояло
+  // `if (!data || error) return null` — меню исчезало при ЛЮБОЙ ошибке профиля,
+  // включая сетевую, когда человек вошёл и `data` лежит в кэше (TanStack Query держит
+  // последние успешные данные при упавшем рефетче). Экран визуально «ломался» из-за
+  // моргнувшей сети, и подсказка «Войти» пряталась в топбаре.
+  //
+  // 401 меню убирает: человек больше не вошёл, и разделы за гейтом отдадут отказ.
+  // Объяснение при этом даёт `SessionExpiredPanel` на самом экране — там, куда человек
+  // смотрит, а не отсутствием меню.
+  if (!data) return null;
+  if (error && isSessionExpired(error)) return null;
 
   return (
     <nav className="fp-app-nav" aria-label={t("Основные разделы")}>
       <ul className="fp-app-nav__list">
         {/* Разделы владельца — в конце и только ему: остальным сервер отдаёт 403,
             и пункт меню вёл бы в гарантированный отказ ([IA-04]). */}
-        {[
-          ...APP_NAV_ITEMS,
-          ...(data.is_owner === true ? OWNER_NAV_ITEMS : []),
-        ].map(({ to, label }) => (
-          <li key={to}>
-            <Link
-              to={to}
-              className="fp-app-nav__link"
-              activeProps={{ "aria-current": "page" }}
-              /* Точное совпадение нужно только корню: иначе `/` подсвечивался бы активным
+        {[...APP_NAV_ITEMS, ...(data.is_owner === true ? OWNER_NAV_ITEMS : [])].map(
+          ({ to, label }) => (
+            <li key={to}>
+              <Link
+                to={to}
+                className="fp-app-nav__link"
+                activeProps={{ "aria-current": "page" }}
+                /* Точное совпадение нужно только корню: иначе `/` подсвечивался бы активным
                  на КАЖДОМ экране, потому что все пути начинаются со слэша. */
-              activeOptions={to === "/" ? { exact: true } : undefined}
-            >
-              {t(label)}
-            </Link>
-          </li>
-        ))}
+                activeOptions={to === "/" ? { exact: true } : undefined}
+              >
+                {t(label)}
+              </Link>
+            </li>
+          ),
+        )}
       </ul>
     </nav>
   );

@@ -35,6 +35,9 @@ SECRETS = {
     "ADMIN_API_KEY": "y" * 20,
     "TOKEN_ENCRYPTION_KEY": "z" * 44,
     "COOKIE_SECURE": True,
+    # Доверие прокси — часть валидного прод-конфига с v9.1.0: продукт за nginx
+    # без него считает всех пользователей одним клиентом.
+    "TRUST_PROXY_HEADERS": True,
 }
 PROD_DB = "postgresql+psycopg2://finpilot:pass@db:5432/finpilot"
 PROD_ORIGINS = "https://finpilot.ru,https://www.finpilot.ru"
@@ -86,6 +89,39 @@ class TestCorsOriginsMustBeReal:
         """Правильный конфиг проходит — иначе гейт запретил бы деплой вообще."""
         settings = _settings(DATABASE_URL=PROD_DB, CORS_ORIGINS=PROD_ORIGINS)
         assert _problem_about(settings, "CORS_ORIGINS") is None
+
+
+class TestProxyTrustMustBeExplicit:
+    """🔴 Нашёл `/code-review`: старт-гард не смотрел на `TRUST_PROXY_HEADERS`.
+
+    Настройка выключена по умолчанию и такой же уезжает в `.env.example`. Деплой
+    с шаблоном nginx из этой же репы и дефолтом возвращает ровно тот дефект, что
+    закрыт в v9.0.0: `request.client.host` — адрес контейнера прокси, один на весь
+    интернет, лимит тратится всеми вместе, и, исчерпав его, продукт отвечает 429
+    **всем сразу**.
+
+    Гейт заведён ловить «тихую поломку прода» и проверяет CORS, SQLite и cookie —
+    а эту настройку пропускал, хотя цена ошибки та же: продукт работает, пока никто
+    не перебирает пароль, и падает для всех, когда кто-то начал.
+    """
+
+    def test_default_is_refused_in_production(self) -> None:
+        # Явно выключаем: в `SECRETS` доверие включено, потому что это часть
+        # ВАЛИДНОГО прод-конфига, а здесь проверяется именно дефолт.
+        settings = _settings(
+            CORS_ORIGINS=PROD_ORIGINS, DATABASE_URL=PROD_DB, TRUST_PROXY_HEADERS=False
+        )
+        problem = _problem_about(settings, "TRUST_PROXY_HEADERS")
+        assert problem, (
+            "старт с выключенным доверием прокси разрешён — за nginx лимит считает "
+            "всех пользователей как одного и отвечает 429 всем сразу"
+        )
+
+    def test_enabled_passes(self) -> None:
+        settings = _settings(
+            CORS_ORIGINS=PROD_ORIGINS, DATABASE_URL=PROD_DB, TRUST_PROXY_HEADERS=True
+        )
+        assert _problem_about(settings, "TRUST_PROXY_HEADERS") is None
 
 
 class TestDatabaseMustNotBeSqlite:
