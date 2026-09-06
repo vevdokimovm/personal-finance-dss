@@ -25,6 +25,7 @@
 """
 from __future__ import annotations
 
+import re
 from pathlib import Path
 
 import pytest
@@ -125,3 +126,63 @@ def test_blocking_jobs_are_not_silenced() -> None:
     assert not silenced, (
         f"джобы молчат об ошибках: {silenced} — красное в них ничего не значит"
     )
+
+
+class TestCoverageGatesAreSymmetric:
+    """🔴 Обе половины продукта держат одну планку — 90 % (решение владельца 06.09.2026).
+
+    **Что было.** Бэкенд шёл через `coverage report` с `fail_under = 90` в `.coveragerc`;
+    фронт гонял `npm test` — голый vitest, без измерения покрытия вовсе. Половина продукта
+    держала планку, вторая не измерялась, и разницу не было видно **ниоткуда**: обе джобы
+    зелёные, обе называются «тесты».
+
+    Дословно владелец: *«тогда для бэкенда точно такие же требования как и для фронта
+    покрытие должно быть больше или равно 90%»* и *«сделай симметрично»*.
+
+    **Почему гейт, а не разовая правка.** Пороги живут в разных файлах и на разных языках:
+    `.coveragerc` у Python, `vite.config.ts` у фронта. Поднять один и забыть про второй —
+    вопрос одной невнимательной правки, и расхождение снова станет невидимым.
+    Тот же класс, что §7 автономного стандарта: правило, дошедшее не всюду, — это
+    не правило, а расхождение.
+    """
+
+    BACKEND_THRESHOLD = 90
+
+    def test_backend_keeps_its_threshold(self) -> None:
+        """Порог бэкенда на месте и равен 90."""
+        text = (REPO_ROOT / ".coveragerc").read_text(encoding="utf-8")
+        match = re.search(r"^fail_under\s*=\s*(\d+)", text, re.MULTILINE)
+        assert match, "в .coveragerc нет fail_under — гейт покрытия бэкенда снят"
+        assert int(match.group(1)) == self.BACKEND_THRESHOLD
+
+    def test_frontend_declares_the_same_threshold(self) -> None:
+        """🔴 Порог фронта объявлен и совпадает с бэкендом по ВСЕМ четырём метрикам.
+
+        Одних строк мало: `functions` и `branches` расходятся со строками сильнее всего,
+        и покрытие, зелёное по строкам при 70 % по веткам, скрывает необработанные случаи.
+        """
+        text = (REPO_ROOT / "frontend" / "vite.config.ts").read_text(encoding="utf-8")
+        found = {
+            metric: int(value)
+            for metric, value in re.findall(
+                r"(lines|statements|functions|branches):\s*(\d+)", text
+            )
+        }
+        missing = [m for m in ("lines", "statements", "functions", "branches") if m not in found]
+        assert not missing, f"во фронте не объявлены пороги: {missing}"
+        wrong = {m: v for m, v in found.items() if v != self.BACKEND_THRESHOLD}
+        assert not wrong, (
+            f"пороги фронта разошлись с бэкендом ({self.BACKEND_THRESHOLD}): {wrong}"
+        )
+
+    def test_ci_actually_measures_frontend_coverage(self) -> None:
+        """🔴 Объявленный порог ничего не значит, если CI гоняет тесты без покрытия.
+
+        Ровно это и было: `thresholds` можно объявить и не запускать `--coverage` —
+        конфиг выглядит строгим, а джоба проходит всегда. Проверяется КОМАНДА в workflow,
+        а не намерение в конфиге.
+        """
+        commands = " ".join(_step_commands("frontend"))
+        assert "coverage" in commands, (
+            "джоба фронта не измеряет покрытие — порог в vite.config.ts не применяется"
+        )

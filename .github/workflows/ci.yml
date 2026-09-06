@@ -121,8 +121,14 @@ jobs:
         run: npm run lint
       - name: Формат (Prettier)
         run: npm run format:check
-      - name: Vitest
-        run: npm test
+      # 🔴 Покрытие, а не голый прогон — симметрично бэкенду (решение владельца
+      # 06.09.2026). Джоба фронта гоняла `npm test` без порога, тогда как бэкенд
+      # шёл через `coverage report` с `fail_under = 90`: одна половина продукта
+      # держала планку, вторая не измерялась вовсе, и разницу не было видно ниоткуда.
+      # Порог фронта живёт в `frontend/vite.config.ts` (`test.coverage.thresholds`),
+      # порог бэкенда — в `.coveragerc`; оба равны 90.
+      - name: Vitest + покрытие (порог 90%)
+        run: npm run test:coverage
       - name: Сборка
         run: npm run build
 

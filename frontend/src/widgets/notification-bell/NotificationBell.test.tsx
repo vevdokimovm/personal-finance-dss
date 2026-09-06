@@ -10,6 +10,14 @@ const markAllReadMock = vi.fn();
 
 vi.mock("@tanstack/react-router", () => ({ useNavigate: () => navigateMock }));
 
+/* Мока `toast` в файле не было: до v9.2.0 проверялся только успешный путь.
+   Ветки отказа сообщают о себе именно тостом — без шпиона проверить их нечем. */
+const { toastError } = vi.hoisted(() => ({ toastError: vi.fn() }));
+vi.mock("@shared/ui", async () => {
+  const actual = await vi.importActual<typeof import("@shared/ui")>("@shared/ui");
+  return { ...actual, toast: { ...actual.toast, error: toastError, success: vi.fn() } };
+});
+
 const navigateMock = vi.fn();
 
 const useProfileMock = vi.fn();
@@ -229,5 +237,51 @@ describe("NotificationBell — гость", () => {
     });
     const { container } = render(<NotificationBell />);
     expect(container.textContent).toBe("");
+  });
+});
+
+/**
+ * Ветки отказа колокольчика.
+ *
+ * 🔴 **«Отметить прочитанным» — действие, результат которого человек видит только
+ * по исчезнувшей точке.** Если запрос упал, а мы промолчали, он уверен, что прочёл,
+ * и уведомление вернётся при следующей загрузке — выглядит как поломка счётчика.
+ */
+describe("NotificationBell — отказы и повтор", () => {
+  it("отказ при отметке одного уведомления сообщается", async () => {
+    markReadMock.mockImplementation((_id: number, opts?: { onError?: () => void }) =>
+      opts?.onError?.(),
+    );
+    /* Лента подаётся явно: `beforeEach` оставляет её пустой, и без этого панель
+       откроется без единого уведомления — кликать будет не по чему. */
+    useUnreadCountMock.mockReturnValue({ data: 1, error: null, isLoading: false });
+    useNotificationsFeedMock.mockReturnValue({
+      data: { items: [item({ is_read: false })], unread_count: 1 },
+      error: null,
+      isLoading: false,
+      refetch: vi.fn(),
+    });
+    render(<NotificationBell />);
+
+    await userEvent.click(screen.getByRole("button", { name: /Уведомления/ }));
+    await userEvent.click(screen.getByRole("button", { name: /Превышен бюджет/ }));
+
+    expect(toastError).toHaveBeenCalled();
+  });
+
+  it("сбой загрузки ленты даёт кнопку повтора", async () => {
+    const refetch = vi.fn();
+    useNotificationsFeedMock.mockReturnValue({
+      data: undefined,
+      isLoading: false,
+      error: new Error("500"),
+      refetch,
+    });
+    render(<NotificationBell />);
+
+    await userEvent.click(screen.getByRole("button", { name: /Уведомления/ }));
+    await userEvent.click(screen.getByRole("button", { name: "Повторить" }));
+
+    expect(refetch).toHaveBeenCalled();
   });
 });

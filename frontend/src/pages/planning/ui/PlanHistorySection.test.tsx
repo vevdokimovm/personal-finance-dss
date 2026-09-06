@@ -10,7 +10,11 @@ const restoreMock = vi.fn();
 
 // `vi.mock` поднимается выше объявлений, поэтому мок создаётся через `vi.hoisted`:
 // обычная `const` даёт ReferenceError до инициализации.
-const { undoMock } = vi.hoisted(() => ({ undoMock: vi.fn() }));
+const { undoMock, toastSuccess, toastError } = vi.hoisted(() => ({
+  undoMock: vi.fn(),
+  toastSuccess: vi.fn(),
+  toastError: vi.fn(),
+}));
 // ToastProvider в юнит-тесте не смонтирован, поэтому кнопки «Вернуть» в DOM нет.
 // Проверяем контракт вызова: удаление ОБЯЗАНО предложить отмену и отдать в неё
 // восстановление именно этого снимка.
@@ -18,7 +22,7 @@ vi.mock("@shared/ui", async () => {
   const actual = await vi.importActual<typeof import("@shared/ui")>("@shared/ui");
   return {
     ...actual,
-    toast: { ...actual.toast, undo: undoMock, success: vi.fn(), error: vi.fn() },
+    toast: { ...actual.toast, undo: undoMock, success: toastSuccess, error: toastError },
   };
 });
 
@@ -277,5 +281,76 @@ describe("PlanHistorySection — длинная история и ПДН", () =>
     expect(undoMock).toHaveBeenCalledWith("Снимок удалён", expect.any(Function));
     undoMock.mock.calls[0][1]();
     expect(restoreMock.mock.calls[0][0]).toBe(7);
+  });
+});
+
+/**
+ * Ветки отказа — непокрытый остаток секции на момент v9.2.0.
+ *
+ * 🔴 **Снимок плана человек делает перед решением о деньгах**: «сохраню, как есть,
+ * а потом сравню». Молчание после клика читается как «сохранено», и он уйдёт со
+ * страницы, потеряв состояние, ради которого и нажимал.
+ */
+describe("PlanHistorySection — что видно, когда действие не удалось", () => {
+  it("отказ при сохранении снимка сообщается", async () => {
+    usePlanHistoryMock.mockReturnValue({
+      data: { items: [] },
+      isLoading: false,
+      error: null,
+      refetch: vi.fn(),
+    });
+    saveMock.mockImplementation((_body: unknown, opts?: { onError?: () => void }) =>
+      opts?.onError?.(),
+    );
+    render(<PlanHistorySection />);
+
+    await userEvent.click(screen.getByRole("button", { name: /Сохранить снимок|Сохранить/ }));
+
+    expect(toastError).toHaveBeenCalled();
+    expect(toastSuccess).not.toHaveBeenCalled();
+  });
+
+  it("успех при сохранении очищает заметку — она относилась к прошлому снимку", async () => {
+    /* Заметка, оставшаяся в поле, уедет во второй снимок и опишет не то состояние. */
+    usePlanHistoryMock.mockReturnValue({
+      data: { items: [] },
+      isLoading: false,
+      error: null,
+      refetch: vi.fn(),
+    });
+    saveMock.mockImplementation((_body: unknown, opts?: { onSuccess?: () => void }) =>
+      opts?.onSuccess?.(),
+    );
+    render(<PlanHistorySection />);
+
+    const note = screen.getByLabelText(/Подпись к снимку/i);
+    await userEvent.type(note, "До отпуска");
+    await userEvent.click(screen.getByRole("button", { name: /Сохранить снимок|Сохранить/ }));
+
+    expect(toastSuccess).toHaveBeenCalled();
+    expect(note).toHaveValue("");
+  });
+
+  it("🔴 отказ при восстановлении сообщается — «Вернуть» не всегда срабатывает", async () => {
+    /* Кнопка отмены создаёт впечатление обратимости. Если восстановление упало,
+       а мы промолчали, человек уверен, что снимок вернулся, — и не сделает новый. */
+    usePlanHistoryMock.mockReturnValue({
+      data: { items: [snapshot()] },
+      isLoading: false,
+      error: null,
+      refetch: vi.fn(),
+    });
+    deleteMock.mockImplementation((_id: number, opts?: { onSuccess?: () => void }) =>
+      opts?.onSuccess?.(),
+    );
+    restoreMock.mockImplementation((_id: number, opts?: { onError?: () => void }) =>
+      opts?.onError?.(),
+    );
+    render(<PlanHistorySection />);
+
+    await userEvent.click(screen.getAllByRole("button", { name: /Удалить снимок/ })[0]);
+    undoMock.mock.calls[0][1]();
+
+    expect(toastError).toHaveBeenCalled();
   });
 });
