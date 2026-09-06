@@ -1,13 +1,14 @@
 # FINPILOT — СППР для персональных финансов
 
 <!-- STATUS -->
-> **Сейчас:** `v9.0.0` · 2026-09-05 · веха 9 открыта, идёт предподготовка к деплою:
-> rate-limit за прокси, второй фактор на экране входа, ревизия перед запуском.
+> **Сейчас:** `v9.2.0` · 2026-09-06 · веха 9 открыта, идёт предподготовка к деплою:
+> обе причины падения CI закрыты гейтами, сквозной гейт по персональным данным,
+> второй фактор дожат — токен сгорает после пяти неверных кодов.
 > Где стоим — [`WATCHLOG.md`](WATCHLOG.md) §0.
 <!-- /STATUS -->
 
 [![CI](https://github.com/vevdokimovm/personal-finance-dss/actions/workflows/ci.yml/badge.svg)](https://github.com/vevdokimovm/personal-finance-dss/actions/workflows/ci.yml)
-![version](https://img.shields.io/badge/version-9.1.0-blue)
+![version](https://img.shields.io/badge/version-9.2.0-blue)
 ![python](https://img.shields.io/badge/python-3.13-blue)
 ![coverage](https://img.shields.io/badge/coverage-gate%2090%25-brightgreen)
 ![tests](https://img.shields.io/badge/tests-1762%20%2B%20454-brightgreen)

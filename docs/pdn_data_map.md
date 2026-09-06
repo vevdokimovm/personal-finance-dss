@@ -9,7 +9,7 @@
 | Категория ПДн | Таблицы / колонки | Цель обработки | Основание | Защита в покое |
 |---|---|---|---|---|
 | Идентификатор личности | `users.email` (UK) | аккаунт, вход, письма verify/reset | согласие при регистрации (чекбокс consent) | БД-доступ; TLS в транзите |
-| Аутентификационные | `users.password_hash`, `mfa_recovery_codes.code_hash`, `revoked_tokens.jti` | вход, MFA, ревокация сессий | согласие / законный интерес (безопасность) | bcrypt / хеши; необратимо |
+| Аутентификационные | `users.password_hash`, `mfa_recovery_codes.code_hash`, `revoked_tokens.jti`, `mfa_pending_attempts.jti` | вход, MFA, ревокация сессий | согласие / законный интерес (безопасность) | bcrypt / хеши; необратимо |
 | Финансовые сведения | `transactions.*`, `obligations.*`, `goals.*`, `liquid_assets.*`, `budgets.*`, `plan_snapshots.*`, `recommendations.*` | суть сервиса: учёт и рекомендации СППР | согласие (оферта/ПС) | БД-доступ; агрегаты без прямой идентичности вне `user_id` |
 | Интеграционные секреты | `plaid_tokens.token_encrypted` | подключение банка (задел) | согласие при подключении | **Fernet** (`EncryptedString`) |
 | Домохозяйство | `households.*`, `household_memberships.*`, `household_invites.token` | семейный доступ | согласие участников | токен-приглашение UK, срок жизни |

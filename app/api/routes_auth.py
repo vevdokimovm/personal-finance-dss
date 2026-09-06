@@ -467,20 +467,41 @@ def mfa_confirm(
 def mfa_verify(
     payload: MfaVerifyRequest, response: Response, db: Session = Depends(get_db)
 ) -> AuthResponse:
-    user_id = token_service.decode_mfa_pending(payload.mfa_token)
-    if not user_id:
+    claims = token_service.decode_mfa_pending_claims(payload.mfa_token)
+    if not claims:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
                             detail="Недействительный или истёкший MFA-токен.")
+    user_id, jti, expires_at = claims
+    # 🔴 Порог проверяется ДО сверки кода (v9.2.0): иначе код, угаданный на шестой
+    # попытке, прошёл бы, и счётчик остался бы украшением. Rate-limit на префиксе
+    # `/api/auth/mfa/` (v9.1.0) держит ЧАСТОТУ, но не общее число догадок за пять
+    # минут жизни токена — а пространство TOTP это миллион кодов.
+    if mfa_store.mfa_token_is_burned(db, jti):
+        log_event("mfa_token_burned", user_id=user_id)
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Слишком много неверных кодов. Войдите заново.",
+        )
     user = get_user_by_id(db, user_id)
     if user is None or not user.mfa_enabled or not user.mfa_secret:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
                             detail="MFA-проверка недоступна.")
-    # Принимаем TOTP-код ИЛИ одноразовый recovery-код.
+    # Принимаем TOTP-код ИЛИ одноразовый recovery-код. Потолок у них ОБЩИЙ: считать
+    # порознь значило бы дать два независимых бюджета догадок, а recovery-коды
+    # к тому же не меняются со временем.
     ok = (mfa_service.verify_totp(user.mfa_secret, payload.code)
           or mfa_store.consume_recovery_code(db, user, payload.code))
     if not ok:
+        failures = mfa_store.register_mfa_failure(db, jti, user.id, expires_at)
         log_event("mfa_verify_failed", user_id=user.id)
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Неверный код.")
+        detail = (
+            "Слишком много неверных кодов. Войдите заново."
+            if failures >= mfa_store.MAX_MFA_ATTEMPTS
+            else "Неверный код."
+        )
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=detail)
+    # Токен отработал: следить больше не за чем, строка счётчика ни к чему.
+    mfa_store.clear_mfa_attempts(db, jti)
     token = token_service.issue(user.id, user.email)
     _set_auth_cookie(response, token)
     log_event("mfa_verify_success", user_id=user.id)

@@ -69,6 +69,31 @@ FROZEN_HINTS = (
     "design_tokens_audit.md",
 )
 
+# 🔴 Пути, которых на чистом клоне НЕТ НИКОГДА: они порождаются сборкой и закрыты
+# `.gitignore`. Ссылка на такой путь битая на CI и «живая» у того, кто только что
+# собрал проект, — то есть проверка даёт разный вердикт на одном и том же тексте.
+#
+# **Почему список, а не allowlist по паре (файл, ссылка).** Пара закрывает ОДНО
+# упоминание. `frontend/dist/index.html` уже ронял CI дважды: сначала как ссылка
+# в роадмапе (v9.1.0), потом — тремя строками, которые ОПИСЫВАЛИ первый инцидент
+# в `ROADMAP`, `WATCHLOG` и `pitfalls`. Разбор дефекта воспроизвёл дефект, и любое
+# следующее упоминание сделало бы это снова. Свойство пути не зависит от того,
+# кто на него сослался, — поэтому и проверяется свойство.
+GENERATED_PREFIXES = (
+    "frontend/dist/",
+    "frontend/coverage/",
+    "frontend/.typecheck-tmp/",
+    "frontend/playwright-report/",
+    "frontend/test-results/",
+    "htmlcov/",
+)
+
+
+def _is_generated(ref: str) -> bool:
+    """Путь порождается сборкой и в системе контроля версий не живёт."""
+    return ref.startswith(GENERATED_PREFIXES)
+
+
 REF_PATTERN = re.compile(
     r"(?<![\w/])((?:docs|knowledge|tools|app|tests|alembic|scripts|frontend|deploy|nginx)"
     r"/[\w./\-]+\.\w+)"
@@ -158,6 +183,9 @@ LEGACY_CONTEXT_MARKERS = (
     "прежн", "раньше", "было", "историч", "legacy", "переход", "заменен",
 )
 
+# tables 31 (v9.2.0): добавлена `mfa_pending_attempts` — счётчик неудачных кодов
+# на один mfa_pending-токен (миграция 0037). Вторая половина защиты второго фактора:
+# rate-limit v9.1.0 держит частоту, но не общее число догадок за жизнь токена.
 # tables 29: добавлена `user_consents` (юрблок L1, миграция 0030).
 # migrations 31: 0030 (раздельные согласия) и 0031 (перенос согласия на
 # финданные существующим пользователям).
@@ -192,7 +220,7 @@ LEGACY_CONTEXT_MARKERS = (
 # migrations 35 (v8.48.0): +1 — `0035_user_is_owner`, признак владельца продукта.
 # Решение владельца 04.09.2026: аналитику смотрит владелец по входу, а не через `curl`
 # с ADMIN_API_KEY. Матрица SQLite + PostgreSQL прогнана (`docs/pg_matrix_last_run.md`).
-EXPECTED_COUNTS = {"tables": 30, "migrations": 36, "openapi_paths": 100}
+EXPECTED_COUNTS = {"tables": 31, "migrations": 37, "openapi_paths": 100}
 
 
 # Канарейка CJK: редкий токен-глюк генерации ассистентов — иероглиф вместо
@@ -287,11 +315,15 @@ class LinkChecker:
         result = CheckResult(self.name)
         frozen_broken = 0
         allowed = 0
+        generated = 0
         for path in self._scanner.files():
             rel = self._scanner.relative(path)
             text = path.read_text(encoding="utf-8", errors="ignore")
             for match in REF_PATTERN.finditer(text):
                 ref = match.group(1).rstrip(".,);:").split("#")[0]
+                if _is_generated(ref):
+                    generated += 1
+                    continue
                 if _exists_with_matching_case(self._root, ref):
                     continue
                 if self._scanner.is_frozen(rel):
@@ -302,6 +334,7 @@ class LinkChecker:
                     result.failures.append(Finding(rel, f"битая ссылка -> {ref}"))
         result.infos.append(Finding("сводка", f"замороженных пропущено: {frozen_broken}"))
         result.infos.append(Finding("сводка", f"allowlist принято: {allowed}"))
+        result.infos.append(Finding("сводка", f"порождаемых путей пропущено: {generated}"))
         return result
 
 

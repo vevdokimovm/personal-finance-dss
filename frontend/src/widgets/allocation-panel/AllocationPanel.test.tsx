@@ -251,3 +251,54 @@ describe("AllocationPanel — необязательные по контракт
     expect(screen.queryByText("Чем приходится жертвовать")).not.toBeInTheDocument();
   });
 });
+
+describe("AllocationPanel — новая рекомендация вытесняет старую", () => {
+  /**
+   * 🔴 Оставлено `/code-review` в v9.1.0, закрыто в v9.2.0.
+   *
+   * Ползунки засеяны через `useState(recommendedNotches...)`, а начальное значение
+   * `useState` читается ОДИН раз за жизнь компонента. Человек меняет риск-профиль,
+   * `usePlan` возвращает другую рекомендацию, `best` приходит новый — а ползунки
+   * остаются на прежних делениях.
+   *
+   * Что видит человек: свежая рекомендация подписана «Гипотетический вариант —
+   * не рекомендация СППР» (ползунки не совпадают с новым `best`), суммы посчитаны
+   * от СТАРОГО распределения, а кнопка предлагает «Вернуть рекомендацию» из состояния,
+   * в которое он не входил.
+   *
+   * 🔴 **Это не косметика: экран показывает числа, по которым принимают решение
+   * о деньгах.** Смена риск-профиля — ровно тот жест, которым человек проверяет
+   * «а что, если осторожнее», и именно на нём панель начинает врать.
+   */
+  it("ползунки встают на новую рекомендацию при смене плана", () => {
+    const { rerender } = render(<AllocationPanel best={BEST} alternatives={FULL_GRID} />);
+    expect(screen.getByText(/Досрочное погашение — .*\(30%\)/)).toBeInTheDocument();
+
+    const conservative = {
+      ...FULL_GRID.find((a) => a.id === "a-1-2")!,
+      name: "Осторожное распределение",
+    };
+    rerender(<AllocationPanel best={conservative} alternatives={FULL_GRID} />);
+
+    // Панель считает новую рекомендацию своей, а не «что если».
+    expect(screen.getByText(/Рекомендация СППР \(Осторожное распределение\)/)).toBeInTheDocument();
+    expect(screen.queryByText(/Гипотетический вариант/)).not.toBeInTheDocument();
+    // И числа под ползунками — от НОВОГО распределения, а не от прежнего.
+    expect(screen.getByText(/Досрочное погашение — .*\(10%\)/)).toBeInTheDocument();
+  });
+
+  it("правки человека переживают перерисовку с тем же планом", () => {
+    /* 🔴 Обратная сторона: синхронизация не должна сбрасывать ползунки при КАЖДОМ
+       рендере. Родитель перерисовывается по множеству причин (наведение, фокус,
+       фоновое обновление кэша), и затирать сдвинутый ползунок на каждой из них —
+       дефект дороже исходного: человек двигает, а оно возвращается. */
+    const { rerender } = render(<AllocationPanel best={BEST} alternatives={FULL_GRID} />);
+    fireEvent.change(screen.getByLabelText("Досрочное погашение"), { target: { value: "4" } });
+    expect(screen.getByText(/Гипотетический вариант/)).toBeInTheDocument();
+
+    rerender(<AllocationPanel best={BEST} alternatives={FULL_GRID} />);
+
+    expect(screen.getByText(/Гипотетический вариант/)).toBeInTheDocument();
+    expect(screen.getByText(/Досрочное погашение — .*\(40%\)/)).toBeInTheDocument();
+  });
+});

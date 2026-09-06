@@ -5,10 +5,12 @@
 """
 from __future__ import annotations
 
+from datetime import datetime
+
 from sqlalchemy import delete, select
 from sqlalchemy.orm import Session
 
-from app.database.models import MfaRecoveryCode, User
+from app.database.models import MfaPendingAttempt, MfaRecoveryCode, User
 from app.services import mfa as mfa_service
 from app.utils.time import utcnow
 
@@ -52,3 +54,69 @@ def consume_recovery_code(db: Session, user: User, code: str) -> bool:
             db.commit()
             return True
     return False
+
+
+# Порог неудачных кодов на ОДИН `mfa_pending`-токен. Пять — компромисс между
+# опечаткой и перебором: человек, читающий шестизначный код с телефона, ошибается
+# один-два раза; пять неверных подряд означают либо чужой телефон, либо машину.
+MAX_MFA_ATTEMPTS = 5
+
+
+def register_mfa_failure(db: Session, jti: str, user_id: str, expires_at: datetime) -> int:
+    """Учесть неудачный код и вернуть общее число неудач по этому токену.
+
+    🔴 **Считается токен, а не пользователь** (v9.2.0). Счётчик на пользователе выглядит
+    строже и слабее на деле: атакующий, знающий пароль, повторным входом получает новый
+    токен и обнуляет счёт. Привязка к токену делает партию догадок дороже ровно на один
+    полный вход — то есть переносит стоимость туда, где уже стоят и лимит, и учёт
+    неудачных входов.
+
+    Строка заводится при ПЕРВОЙ неудаче, а не при выдаче токена: у подавляющего
+    большинства входов неудач нет вовсе, и таблица не должна расти по числу входов.
+
+    Args:
+        jti: Идентификатор выдачи из `mfa_pending`-токена.
+        user_id: Владелец токена — для каскадного удаления вместе с аккаунтом.
+        expires_at: Срок годности самого токена; строка живёт не дольше него.
+
+    Returns:
+        Сколько неудач накопилось по этому токену, включая текущую.
+    """
+    purge_expired_mfa_attempts(db)
+    row = db.get(MfaPendingAttempt, jti)
+    if row is None:
+        row = MfaPendingAttempt(
+            jti=jti, user_id=user_id, failures=1, expires_at=expires_at
+        )
+        db.add(row)
+    else:
+        row.failures += 1
+    db.commit()
+    return row.failures
+
+
+def mfa_token_is_burned(db: Session, jti: str) -> bool:
+    """Исчерпан ли лимит попыток по этому токену.
+
+    🔴 Проверяется ДО сверки кода — иначе верный код, угаданный на шестой попытке,
+    прошёл бы, и весь счётчик оказался бы украшением.
+    """
+    row = db.get(MfaPendingAttempt, jti)
+    return row is not None and row.failures >= MAX_MFA_ATTEMPTS
+
+
+def clear_mfa_attempts(db: Session, jti: str) -> None:
+    """Убрать счётчик после успешного входа — токен отработал, следить больше не за чем."""
+    db.execute(delete(MfaPendingAttempt).where(MfaPendingAttempt.jti == jti))
+    db.commit()
+
+
+def purge_expired_mfa_attempts(db: Session) -> None:
+    """Выбросить счётчики токенов, которые всё равно уже недействительны.
+
+    Зовётся из `register_mfa_failure`, то есть по неудаче, а не по расписанию:
+    отдельный планировщик ради таблицы, растущей только от неудачных входов, —
+    механизм дороже задачи. Диапазон закрыт индексом по `expires_at`.
+    """
+    db.execute(delete(MfaPendingAttempt).where(MfaPendingAttempt.expires_at < utcnow()))
+    db.commit()

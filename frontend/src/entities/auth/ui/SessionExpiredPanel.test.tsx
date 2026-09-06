@@ -8,9 +8,31 @@ vi.mock("@tanstack/react-router", async () => {
     await vi.importActual<typeof import("@tanstack/react-router")>("@tanstack/react-router");
   return {
     ...actual,
-    Link: ({ children, to }: { children: React.ReactNode; to: string }) => (
-      <a href={to}>{children}</a>
-    ),
+    /* 🔴 Мок собирает `href` из `to` И `search` — как настоящий роутер.
+       Прежний брал только `to`, и это работало, пока компонент вшивал строку
+       запроса прямо в путь. После перевода на типизированный `search`
+       (маршрут `/login` объявил параметры через `validateSearch`) мок стал
+       терять `redirect`, и тест краснел на СВОЁМ упрощении, а не на компоненте.
+
+       Проверка адреса здесь осмысленна именно потому, что мок кодирует значение
+       так же, как роутер: тест утверждает, куда человек попадёт по ссылке. */
+    Link: ({
+      children,
+      to,
+      search,
+    }: {
+      children: React.ReactNode;
+      to: string;
+      search?: Record<string, string | undefined>;
+    }) => {
+      const query = new URLSearchParams(
+        Object.entries(search ?? {}).filter(([, value]) => value !== undefined) as [
+          string,
+          string,
+        ][],
+      ).toString();
+      return <a href={query ? `${to}?${query}` : to}>{children}</a>;
+    },
   };
 });
 

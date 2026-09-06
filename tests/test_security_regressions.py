@@ -162,7 +162,12 @@ class TestProductionSecretsGuard:
                      COOKIE_SECURE=True, ADMIN_API_KEY="y" * 24,
                      CORS_ORIGINS="https://finpilot.ru",
                      DATABASE_URL="postgresql+psycopg2://u:p@db:5432/finpilot",
-                     TOKEN_ENCRYPTION_KEY=_FERNET_KEY)
+                     TOKEN_ENCRYPTION_KEY=_FERNET_KEY,
+                     # 🔴 v9.2.0: проверка `TRUST_PROXY_HEADERS` появилась
+                     # в старт-гарде v9.1.0, а тесты «валидный прод проходит»
+                     # о ней не узнали. Такой тест перечисляет валидный прод
+                     # ЦЕЛИКОМ, значит пополняется вместе с гардом.
+                     TRUST_PROXY_HEADERS=True)
         assert validate_production_security(s) == []
 
     def test_encryption_keys_multi_passes(self) -> None:
@@ -170,7 +175,8 @@ class TestProductionSecretsGuard:
                      COOKIE_SECURE=True, ADMIN_API_KEY="y" * 24,
                      CORS_ORIGINS="https://finpilot.ru",
                      DATABASE_URL="postgresql+psycopg2://u:p@db:5432/finpilot",
-                     TOKEN_ENCRYPTION_KEYS=_FERNET_KEY)
+                     TOKEN_ENCRYPTION_KEYS=_FERNET_KEY,
+                     TRUST_PROXY_HEADERS=True)  # см. соседний тест: v9.2.0
         assert validate_production_security(s) == []
 
     def test_development_still_clean(self) -> None:

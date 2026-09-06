@@ -1,4 +1,0 @@
-# file: /Users/vasyaevdokimov/repos/personal-finance-dss/app/core/recommendation.py
-# hypothesis_version: 6.155.7
-
-[0.0, 0.2, 0.4, 0.5, 2.5, 100, ',', ', ', '. ', '; ', 'Dt', 'Dt_new', 'Lt', 'Lt_new', 'Rt', 'Rt_new', 'Si', 'alternative_id', 'amount', 'available', 'bonds', 'costs', 'counterfactual', 'cushion_part', 'delta', 'deposits', 'dominant_criterion', 'emotional', 'equity', 'gains', 'goal_allocation', 'id', 'income_growth', 'insight', 'interest_rate', 'investment_tranche', 'is_recommended', 'material', 'new_payment', 'note', 'safety', 'split', 'text', 'utility', 'utility_gap', 'weighted_scores', 'x_goals_unused', 'x_obl_effective', 'x_obl_unused', 'x_obligations', 'x_reserve', 'x_reserve_effective', 'безопасность', 'материальная цель', 'рост дохода', 'самый дорогой кредит', 'эмоциональная цель']

@@ -224,6 +224,7 @@ export function CrisisPlanSection({ plan }: { plan?: CrisisPlan | null }) {
 
   const { title, lead } = SEVERITY[plan.severity] ?? UNKNOWN_SEVERITY;
   const runway = plan.runway_months;
+  const actions = plan.actions ?? [];
 
   return (
     <section
@@ -270,14 +271,19 @@ export function CrisisPlanSection({ plan }: { plan?: CrisisPlan | null }) {
         </div>
       </dl>
 
-      {plan.actions.length > 0 && (
+      {/* 🔴 `actions` необязателен ПО КОНТРАКТУ: у поля есть `default_factory=list`
+          на бэкенде, значит в OpenAPI оно не попадает в `required`, и генератор
+          выводит `actions?: CrisisAction[]`. Обращение к `.length` напрямую роняло
+          `tsc` в CI, где сборка идёт от снимка контракта. Список пустой и список
+          отсутствующий здесь означают одно — показывать нечего. */}
+      {actions.length > 0 && (
         <>
           <h3 className="fp-crisis__actions-title">{t("Что можно сделать")}</h3>
           {/* `role="list"` обязателен при `list-style: none`: WebKit снимает роль списка,
               и VoiceOver не объявит «список, N элементов» (a11y-auditor). Тот же приём
               уже применён в `PlanHistorySection`. */}
           <ul className="fp-crisis__actions" role="list">
-            {plan.actions.map((action, index) => (
+            {actions.map((action, index) => (
               <ActionCard key={`${action.type}-${index}`} action={action} />
             ))}
           </ul>

@@ -41,10 +41,17 @@ SECRETS = {
 }
 PROD_DB = "postgresql+psycopg2://finpilot:pass@db:5432/finpilot"
 PROD_ORIGINS = "https://finpilot.ru,https://www.finpilot.ru"
+# 🔴 Дефолт задаётся ЯВНО, а не берётся из окружения. Под PG-матрицей
+# `DATABASE_URL` стоит в env, `Settings` его подхватывает — и тест про SQLite
+# проверял машину, на которой запущен, а не код. Локально зелёный, в матрице
+# красный: тот же класс, что PIT-032.
+DEV_DB = "sqlite:///./sppr.db"
 
 
 def _settings(**overrides) -> Settings:
-    return Settings(ENVIRONMENT="production", **{**SECRETS, **overrides})
+    return Settings(
+        ENVIRONMENT="production", **{"DATABASE_URL": DEV_DB, **SECRETS, **overrides}
+    )
 
 
 def _problem_about(settings: Settings, needle: str) -> str | None:

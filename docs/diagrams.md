@@ -102,6 +102,7 @@ erDiagram
     users ||--o{ recommendations : "рекомендации"
     users ||--o{ user_category_rules : "правила"
     users ||--o{ mfa_recovery_codes : "MFA-коды"
+    users ||--o{ mfa_pending_attempts : "счётчик попыток MFA"
     users ||--o{ plaid_tokens : "Open Banking"
     users ||--o{ households : "владеет (owner)"
     users ||--o{ household_memberships : "участие"
@@ -253,6 +254,12 @@ erDiagram
         string user_id FK
         string code_hash
         bool used
+    }
+    mfa_pending_attempts {
+        string jti PK
+        string user_id FK
+        int failures
+        datetime expires_at
     }
     revoked_tokens {
         int id PK

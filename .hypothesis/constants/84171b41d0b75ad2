@@ -1,4 +1,0 @@
-# file: /Users/vasyaevdokimov/repos/personal-finance-dss/tools/portrait_testing/invariants.py
-# hypothesis_version: 6.155.7
-
-[0.0, 1e-09, 1e-06, 5e-05, 0.001, 0.002, 0.05, 0.4, 1.0, 3.0, 6.0, 50.0, 90.0, 100.0, 105.0, 110.0, 120.0, 130.0, 2026, 'Bliq', 'Dt', 'Dt_new', 'Lt', 'Lt_new', 'Rt_new', 'actions', 'admissible_count', 'alternatives_total', 'amount', 'avalanche_detail', 'best', 'bliq', 'bliq_after', 'bliq_remaining', 'bliq_used', 'crisis_plan', 'critical', 'current_amount', 'cut_required', 'deficit', 'deployable', 'expense_total', 'floor_level', 'goals', 'income_total', 'indicators', 'interest_rate', 'is_admissible', 'lt_target', 'monthly_payment', 'moves', 'new_rt', 'obligations', 'p10', 'p50', 'p90', 'passed', 'r_bench', 'ranked', 'rejected', 'rejected_count', 'reserve_target', 'result', 'severity', 'skipped', 'surplus_plan', 'target_amount', 'type', 'utility', 'w_dt', 'w_goals', 'w_lt', 'w_rt', 'x_goals', 'x_obligations', 'x_reserve', 'x_reserve_effective']

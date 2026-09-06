@@ -41,7 +41,14 @@ class TestProductionConfigGuard:
                      ADMIN_API_KEY="y" * 24,
                      CORS_ORIGINS="https://finpilot.ru",
                      DATABASE_URL="postgresql+psycopg2://u:p@db:5432/finpilot",
-                     TOKEN_ENCRYPTION_KEY="PpUqrWqj3kK0n0a9rO2mWqH3sT6vY8bX1cZ4dF7gH0k=")
+                     TOKEN_ENCRYPTION_KEY="PpUqrWqj3kK0n0a9rO2mWqH3sT6vY8bX1cZ4dF7gH0k=",
+                     # 🔴 Добавлено v9.2.0. Проверка `TRUST_PROXY_HEADERS`
+                     # появилась в старт-гарде v9.1.0, а тесты «валидный прод
+                     # проходит» о ней не узнали — и стали красными на CI при
+                     # зелёном соседе `test_production_config_guard.py`, который
+                     # писался уже с ней. Такой тест перечисляет валидный прод
+                     # ЦЕЛИКОМ, значит обязан пополняться вместе с гардом.
+                     TRUST_PROXY_HEADERS=True)
         assert validate_production_security(s) == []
 
 

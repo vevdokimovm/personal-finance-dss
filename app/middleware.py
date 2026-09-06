@@ -125,7 +125,15 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
         return request.client.host if request.client else "unknown"
 
     def _key(self, request: Request) -> str:
-        """Ключ счёта: клиент и путь. Разные пути не делят лимит между собой."""
+        """Ключ счёта: клиент и путь. Разные пути не делят лимит между собой.
+
+        🔴 Функция была объявлена и НЕ вызывалась: `dispatch` собирал ту же строку
+        руками (нашёл `/code-review ultra`). Два источника одного формата ключа —
+        и `_sweep` чистит то, что пишет `dispatch`, а не то, что вернёт `_key`.
+        Правка формата в одном месте (скажем, добавить метод HTTP) прошла бы все
+        тесты и не сделала бы ничего — либо развела бы чистку и запись по разным
+        пространствам ключей, вернув утечку счётчиков, ради которой `_sweep` и писался.
+        """
         return f"{self._client_ip(request)}:{request.url.path}"
 
     def _sweep(self, now: float) -> None:
@@ -159,7 +167,7 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
         self._sweep(now)
 
         client_ip = self._client_ip(request)
-        key = f"{client_ip}:{request.url.path}"
+        key = self._key(request)
         window_start = now - self._window
 
         hits = self._hits[key]

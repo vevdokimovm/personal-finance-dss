@@ -1,4 +1,0 @@
-# file: /Users/vasyaevdokimov/repos/personal-finance-dss/tools/model_validation/round5_model_half_analysis.py
-# hypothesis_version: 6.155.7
-
-[0.0, 0.95, 1.0, 100, '--json', '--key', '--outcomes', '->', ':', 'C', 'D', 'M', 'M1_income', '__main__', 'base', 'c_kinds_status', 'd_layer', 'deficit', 'dom', 'dom_flip_rate', 'dom_flips', 'dom_ok', 'expected_error', 'families', 'family', 'flip_examples', 'id', 'invalid', 'invalid_outside_d', 'invalid_reason', 'invest', 'kind', 'l1', 'l1_rel_median', 'l1_rel_p95', 'layer', 'layers_dom_ok', 'layers_status', 'lt', 'lump', 'median', 'metamorphic', 'missed', 'missed_sample', 'model_lump', 'model_status', 'n', 'ok', 'ok_pairs', 'pair_id', 'pair_relation', 'pair_role', 'pairs', 'reasons', 'rt', 'share_pct', 'status', 'status_violations', 'total', 'twin', 'utf-8', 'xg', 'xo', 'xr', 'ЖЁСТКИЕ ИНВАРИАНТЫ:', 'НАРУШЕНЫ', 'ЧИСТО']

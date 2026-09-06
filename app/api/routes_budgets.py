@@ -8,7 +8,7 @@ from app.database.crud import (
     get_budgets,
     restore_budget,
 )
-from app.api._guards import ensure_can_share
+from app.api._guards import ensure_can_share, ensure_scope_unchanged
 from app.dependencies import get_current_user_id, get_db
 from app.schemas.budget import BudgetCreate, BudgetResponse, BudgetStatus
 from app.services.event_logger import log_event
@@ -51,6 +51,9 @@ def add_budget(
     # Общий котёл требует права на него — одна проверка на все сущности
     # (`_guards.ensure_can_share`), четыре копии разошлись бы при первой правке.
     ensure_can_share(db, payload.household_id, user_id)
+    # POST здесь upsert: у существующей строки владение не меняется, а запрос
+    # на смену отклоняется явно, а не выполняется наполовину.
+    ensure_scope_unchanged(db, payload.category, payload.household_id, user_id)
     budget = create_budget(
         db,
         category=payload.category,

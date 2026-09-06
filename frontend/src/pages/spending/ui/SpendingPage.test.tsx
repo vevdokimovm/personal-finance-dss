@@ -262,6 +262,79 @@ describe("SpendingPage — тренды и цели", () => {
     expect(impact).not.toHaveTextContent(/0 месяц/);
     expect(impact).toHaveTextContent(/не пополня|без срока|срок не задан/i);
   });
+
+  it("цель СО СРОКОМ не объявляется бессрочной, когда выигрыш округлился до нуля", () => {
+    /* 🔴 Нашёл `/code-review ultra` в правке предыдущего часа. Фильтр
+       `Math.round(earlier) >= 1` завели, чтобы не писать «на 0 месяцев раньше», —
+       и он открыл ветку, недостижимую до него.
+
+       По бэкенду (`spending_advice.py`) `months_earlier != null ⟹ eta_now != null`,
+       значит `notFunded` здесь ложь; при `0 < earlier < 0.5` первая ветка отсекается,
+       вторая не срабатывает, и код падает в «срок не задан» — при выставленном дедлайне.
+
+       Правка, задуманная убрать одну неправду, начала говорить другую: продукт
+       сообщает человеку про его собственную цель то, что тот сам опровергнет
+       за две секунды. `months_to_deadline` — отдельное поле схемы, и отвечает
+       за наличие срока именно оно. */
+    adviceMock.mockReturnValue(
+      query({
+        data: payload({
+          total_potential_saving: 500,
+          goal_impact: [
+            {
+              goal_name: "Отпуск",
+              remaining: 80000,
+              months_to_deadline: 8.5,
+              current_monthly: 9000,
+              redirected_saving: 500,
+              eta_now: 8.7,
+              eta_boosted: 8.4,
+              months_earlier: 0.3,
+              on_track: true,
+              message: "Цель будет достигнута чуть раньше",
+            },
+          ],
+        }),
+      }),
+    );
+    render(<SpendingPage />);
+
+    const impact = screen.getByTestId("fp-goal-impact-Отпуск");
+    expect(impact).not.toHaveTextContent(/срок не задан/i);
+    expect(impact).not.toHaveTextContent(/0 месяц/);
+    // Строка не исчезает целиком: сумма перенаправленной экономии остаётся полезной.
+    expect(impact).toHaveTextContent(/500/);
+  });
+
+  it("бессрочная цель С пополнениями всё-таки называется бессрочной", () => {
+    /* Обратная проверка: сузив ветку, легко потерять её законный случай.
+       Здесь дедлайна нет (`months_to_deadline: null`), цель пополняется —
+       и «срок не задан» это ровно то, что надо сказать. */
+    adviceMock.mockReturnValue(
+      query({
+        data: payload({
+          total_potential_saving: 500,
+          goal_impact: [
+            {
+              goal_name: "Резерв",
+              remaining: 60000,
+              months_to_deadline: null,
+              current_monthly: 5000,
+              redirected_saving: 500,
+              eta_now: 12,
+              eta_boosted: 11.8,
+              months_earlier: 0.2,
+              on_track: true,
+              message: "Бессрочная цель",
+            },
+          ],
+        }),
+      }),
+    );
+    render(<SpendingPage />);
+
+    expect(screen.getByTestId("fp-goal-impact-Резерв")).toHaveTextContent(/срок не задан/i);
+  });
 });
 
 describe("SpendingPage — ошибка ведёт куда-то, а не в тупик", () => {

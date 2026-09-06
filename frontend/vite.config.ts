@@ -34,5 +34,22 @@ export default defineConfig({
     globals: true,
     setupFiles: ["./src/shared/lib/test/setup.ts"],
     exclude: ["**/node_modules/**", "**/e2e/**"],
+    coverage: {
+      provider: "v8",
+      reporter: ["text-summary", "json-summary", "html"],
+      reportsDirectory: "./coverage",
+      include: ["src/**/*.{ts,tsx}"],
+      /* Что исключено и почему — важнее самого числа: покрытие, посчитанное
+         по сгенерированному клиенту и точкам входа, измеряет генератор,
+         а не написанные нами тесты. */
+      exclude: [
+        "src/shared/api/generated/**",  // артефакт hey-api, не наш код
+        "src/**/*.test.{ts,tsx}",
+        "src/**/*.d.ts",
+        "src/main.tsx",                 // точка входа: монтирует и всё
+        "src/vite-env.d.ts",
+        "src/routeTree.gen.ts",         // артефакт TanStack Router
+      ],
+    },
   },
 });

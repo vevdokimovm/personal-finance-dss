@@ -13,7 +13,10 @@ import { t } from "@shared/lib/i18n/t";
  */
 
 export function SessionExpiredPanel({ redirectTo }: { redirectTo?: string }) {
-  const search = redirectTo ? `?redirect=${encodeURIComponent(redirectTo)}` : "";
+  /* Собирать строку запроса руками больше не нужно: маршрут `/login` объявил
+     `redirect` через `validateSearch`, и роутер кодирует значение сам. Ручная
+     сборка обходила систему типов и роняла `tsc` в CI. */
+  const search = redirectTo ? { redirect: redirectTo } : undefined;
   return (
     <StatePanel
       title={t("Сессия истекла")}
@@ -23,7 +26,9 @@ export function SessionExpiredPanel({ redirectTo }: { redirectTo?: string }) {
           {/* Ссылка, а не кнопка «Повторить»: повтор на 401 возвращает 401 бесконечно.
               `redirect` возвращает человека на тот экран, с которого его выбило, —
               иначе он попадёт на дашборд и будет искать, где остановился. */}
-          <Link to={`/login${search}`}>{t("Войти заново")}</Link>
+          <Link to="/login" search={search}>
+            {t("Войти заново")}
+          </Link>
         </Button>
       }
     >

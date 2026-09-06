@@ -140,6 +140,37 @@ class MfaRecoveryCode(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=utcnow)
 
 
+class MfaPendingAttempt(Base):
+    """Счётчик неудачных кодов ОДНОГО `mfa_pending`-токена (v9.2.0).
+
+    🔴 **Вторая половина защиты, начатой в v9.1.0.** Тогда `/api/auth/mfa/` попал
+    под rate-limit — но лимит ограничивает **частоту**, а не общее число попыток
+    за пять минут жизни токена. Пространство TOTP это миллион кодов; сотня догадок
+    не «ничтожная доля», а сотня.
+
+    **Почему счёт по токену, а не по пользователю.** Счётчик на пользователе выглядит
+    строже и слабее на деле: атакующий, знающий пароль, повторным входом получает новый
+    токен и сбрасывает счётчик. Привязка к токену делает каждую сотню догадок дороже
+    ровно на один полный вход — то есть переносит стоимость туда, где уже стоит и лимит,
+    и учёт неудачных входов.
+
+    **Почему в базе, а не в памяти.** Продукт за gunicorn с четырьмя воркерами хранил бы
+    в памяти четыре независимых счётчика, и порог тихо умножился бы на число воркеров.
+    Ошибка такого рода не видна ни в тестах (один процесс), ни в логах.
+
+    Строки живут не дольше самого токена; чистка — `purge_expired_mfa_attempts`.
+    """
+    __tablename__ = "mfa_pending_attempts"
+
+    jti: Mapped[str] = mapped_column(String(36), primary_key=True)
+    user_id: Mapped[str] = mapped_column(
+        String(36), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    failures: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    expires_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, index=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=utcnow)
+
+
 class FxRate(Base):
     """Курс валюты к USD-пивоту (FR-19). convert(A→B) = amount · rate(A)/rate(B)."""
     __tablename__ = "fx_rates"

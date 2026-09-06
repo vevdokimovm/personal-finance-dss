@@ -132,12 +132,23 @@ class TokenService:
 
         Выдаётся, когда пароль верен, но у пользователя включён MFA. Короткоживущий,
         с purpose='mfa_pending' — НЕ является сессией (`get_current_user` отвергает
-        purpose-токены), годен только для `/auth/mfa/verify`."""
+        purpose-токены), годен только для `/auth/mfa/verify`.
+
+        🔴 `jti` (v9.2.0) — уникальный идентификатор ВЫДАЧИ, а не пользователя.
+        По нему считаются неудачные коды (`MfaPendingAttempt`), и после порога токен
+        отвергается целиком. Без `jti` два токена одного человека неразличимы, и счёт
+        пришлось бы вести по пользователю — а это сбрасывается повторным входом,
+        то есть защищает только от тех, кто пароля не знает.
+
+        `iat` для этого не годится: секундная точность позволяет двум выдачам совпасть,
+        и тогда неудачи одного входа сожгли бы токен другого.
+        """
         now = datetime.now(timezone.utc)
         payload = {
             "sub": user_id,
             "email": email,
             "purpose": "mfa_pending",
+            "jti": uuid.uuid4().hex,
             "iat": now,
             "exp": now + timedelta(minutes=ttl_minutes),
         }
@@ -149,6 +160,22 @@ class TokenService:
         if not payload or payload.get("purpose") != "mfa_pending":
             return None
         return payload.get("sub")
+
+    def decode_mfa_pending_claims(self, token: str) -> Optional[tuple[str, str, datetime]]:
+        """Возвращает `(user_id, jti, срок годности)` — всё, что нужно счётчику попыток.
+
+        Отдельный метод рядом с `decode_mfa_pending`, а не замена ему: старая подпись
+        зовётся из тестов и читается проще там, где `jti` не нужен. Возвращать кортеж
+        вместо трёх обращений к `decode` важнее, чем кажется: три разбора одного токена
+        разошлись бы, начни кто-то проверять срок в одном месте и не проверять в другом.
+        """
+        payload = self.decode(token)
+        if not payload or payload.get("purpose") != "mfa_pending":
+            return None
+        user_id, jti, exp = payload.get("sub"), payload.get("jti"), payload.get("exp")
+        if not user_id or not jti or not exp:
+            return None
+        return user_id, jti, datetime.fromtimestamp(exp, tz=timezone.utc)
 
 
 class TokenCipher:

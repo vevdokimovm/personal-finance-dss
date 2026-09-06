@@ -105,6 +105,13 @@ function GoalImpactRow({ row, index }: { row: GoalImpactSchema; index: number })
      из них — сказать человеку неправду о его собственной цели. */
   const earlier = row.months_earlier;
   const notFunded = row.eta_now === null;
+  /* 🔴 Наличие срока определяется СВОИМ полем, а не выводится из выигрыша
+     (нашёл `/code-review ultra`). Фильтр `Math.round(earlier) >= 1` ниже открыл
+     ветку, до него недостижимую: при `0 < earlier < 0.5` цель пополняется
+     (`eta_now` посчитан, значит `notFunded` ложь), первая ветка отсекается —
+     и подпись «срок не задан» доставалась цели с выставленным дедлайном.
+     Правка, убравшая одну неправду, сказала бы другую. */
+  const hasDeadline = row.months_to_deadline !== null && row.months_to_deadline !== undefined;
   return (
     <li
       className="fp-spending__goal"
@@ -123,7 +130,9 @@ function GoalImpactRow({ row, index }: { row: GoalImpactSchema; index: number })
         <span>{t("на {n} раньше", { n: pluralize(Math.round(earlier), MONTHS) })}</span>
       ) : notFunded ? (
         <span>{t("цель пока не пополняется — экономию можно направить на неё")}</span>
-      ) : (
+      ) : hasDeadline /* Срок есть, а выигрыш меньше половины месяца: сказать про него нечего,
+           и молчание честнее любой из двух подписей. Строка не пропадает —
+           сумма перенаправленной экономии ниже остаётся. */ ? null : (
         <span>{t("срок не задан")}</span>
       )}
       <span className="fp-spending__numbers">
