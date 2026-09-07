@@ -302,3 +302,88 @@ describe("AllocationPanel — новая рекомендация вытесня
     expect(screen.getByText(/Досрочное погашение — .*\(40%\)/)).toBeInTheDocument();
   });
 });
+
+describe("AllocationPanel — второй ползунок и его связь с первым", () => {
+  it("🔴 движение «Цели» сдвигает «Долг», чтобы сумма не превысила 100 %", () => {
+    /* Три доли делят один пирог: резерв — остаток. Без взаимной подрезки человек
+       выставил бы 70 % на долг и 70 % на цели, и панель показала бы распределение
+       140 % свободного потока — числа, которого не существует. */
+    render(<AllocationPanel best={BEST} alternatives={FULL_GRID} />);
+
+    /* Подрезка работает в ОБЕ стороны: рекомендация `a-3-4` держит 40 % на целях,
+       поэтому запрошенные 80 % на долг сразу ужимаются до 60 %. Это и есть предмет
+       проверки — сумма долей не может превысить сто процентов ни в какой момент. */
+    fireEvent.change(screen.getByLabelText("Досрочное погашение"), { target: { value: "8" } });
+    expect((screen.getByLabelText("Досрочное погашение") as HTMLInputElement).value).toBe("6");
+
+    /* 🔴 Защита стоит В ДВУХ местах, и это не дублирование. Атрибут `max` не даёт
+       выставить недопустимое значение мышью — но он не защищает от программной
+       установки и от того, что второй ползунок сдвинулся после. Подрезка
+       в `onGoalsChange` закрывает именно этот случай.
+
+       Здесь виден первый рубеж: `max = GRID_NOTCHES - debtNotch` = 4, и запрошенные
+       70 % приходят в обработчик уже как 40 %. */
+    fireEvent.change(screen.getByLabelText("Цели"), { target: { value: "7" } });
+
+    const debt = screen.getByLabelText("Досрочное погашение") as HTMLInputElement;
+    const goals = screen.getByLabelText("Цели") as HTMLInputElement;
+    expect(Number(goals.value)).toBe(4);
+    expect(Number(debt.value) + Number(goals.value)).toBeLessThanOrEqual(10);
+  });
+
+  it("🔴 второй рубеж: подрезка в обработчике, минуя атрибут `max`", () => {
+    /* Атрибут ограничивает ввод мышью, но `onGoalsChange` вызывается и напрямую —
+       например, когда долг уже занял 60 %, а цели остались с прошлого состояния.
+       Без `Math.min` в обработчике сумма долей превысила бы 100 %, и панель показала
+       бы распределение денег, которых нет. */
+    render(<AllocationPanel best={BEST} alternatives={FULL_GRID} />);
+
+    fireEvent.change(screen.getByLabelText("Цели"), { target: { value: "10" } });
+    const debt = screen.getByLabelText("Досрочное погашение") as HTMLInputElement;
+    const goals = screen.getByLabelText("Цели") as HTMLInputElement;
+
+    expect(Number(debt.value) + Number(goals.value)).toBeLessThanOrEqual(10);
+  });
+
+  it("детальный вид рисует диаграмму, а не пустое место", async () => {
+    /* Санкей-узлы и связи — отдельные компоненты, и они существуют только здесь:
+       собственная отрисовка вместо стандартной заведена потому, что подписи
+       у стандартной обрезались, а поля вокруг оставались пустыми. */
+    render(<AllocationPanel best={BEST} alternatives={FULL_GRID} />);
+    await userEvent.click(screen.getByRole("button", { name: "Подробно — диаграмма Санкея" }));
+
+    expect(
+      screen.queryByRole("button", { name: "Подробно — диаграмма Санкея" }),
+    ).not.toBeInTheDocument();
+  });
+});
+
+describe("AllocationPanel — неполные данные альтернативы", () => {
+  it("🔴 альтернатива без имени не показывает пустые скобки", () => {
+    /* `name` необязателен по контракту. «Рекомендация СППР ().» — не текст,
+       а следы шаблона: человек читает это как сбой, а не как отсутствие имени. */
+    const nameless = { ...BEST, name: undefined as unknown as string };
+    render(<AllocationPanel best={nameless} alternatives={FULL_GRID} />);
+
+    expect(screen.getByText(/Рекомендация СППР \(вариант\)/)).toBeInTheDocument();
+  });
+
+  it("панель без альтернатив показывает рекомендацию и не падает", () => {
+    /* `alternatives` необязателен: расчёт мог не дать ни одной допустимой.
+       Панель теряет ползунки «что если» — и только их. */
+    render(<AllocationPanel best={BEST} />);
+
+    expect(screen.getByText(/Рекомендация СППР/)).toBeInTheDocument();
+    expect(screen.queryByLabelText("Досрочное погашение")).not.toBeInTheDocument();
+  });
+
+  it("🔴 без рекомендации панель ОБЪЯСНЯЕТ, почему её нет", () => {
+    /* `best === null` — расчёт не дал рекомендации (все альтернативы нарушают
+       инвариант `Rt ≥ 0`). Показать нули значило бы утверждать, что рекомендация —
+       «ничего не делать»; пустое место читалось бы как поломка. Панель называет
+       состояние словами, и это правильнее обоих вариантов. */
+    render(<AllocationPanel best={null} alternatives={FULL_GRID} />);
+    expect(screen.getByText(/Плана распределения нет/)).toBeInTheDocument();
+    expect(screen.queryByLabelText("Досрочное погашение")).not.toBeInTheDocument();
+  });
+});

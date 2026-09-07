@@ -283,3 +283,41 @@ describe("PlanningPage", () => {
     ).toBeTruthy();
   });
 });
+
+/**
+ * Состояния «не загрузилось» — непокрытый остаток страницы.
+ *
+ * 🔴 **План — единственный экран, ради которого продукт существует.** Пустое место
+ * вместо него без объяснения читается как «продукт сломался», и человек уходит.
+ * Каждое состояние обязано называть, что произошло, и давать следующий шаг ([ST-04]).
+ */
+describe("PlanningPage — состояния без плана", () => {
+  it("🔴 истёкшая сессия ведёт ко входу, а не к «Повторить»", () => {
+    /* Повтор на 401 возвращает 401 бесконечно. Отличить истёкшую сессию
+       от сетевого сбоя можно только по коду ответа — `isSessionExpired`. */
+    usePlanMock.mockReturnValue(
+      queryResult({
+        /* `status` появляется у ошибки в error-интерцепторе (v9.1.0), но тип
+         `UseQueryResult.error` — `Error`. Каст точечный: подменять тип целиком
+         значило бы спрятать и настоящие расхождения. */
+        error: Object.assign(new Error("401"), { status: 401 }),
+        isError: true,
+      }),
+    );
+    useForecastMock.mockReturnValue(queryResult({ data: undefined }));
+    render(<PlanningPage />);
+
+    expect(screen.getByRole("alert")).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /Войти/i })).toBeInTheDocument();
+  });
+
+  it("сбой загрузки даёт «Повторить», и она зовёт refetch", async () => {
+    const refetch = vi.fn();
+    usePlanMock.mockReturnValue(queryResult({ data: undefined, refetch }));
+    useForecastMock.mockReturnValue(queryResult({ data: undefined }));
+    render(<PlanningPage />);
+
+    await userEvent.click(screen.getByRole("button", { name: /Повторить/ }));
+    expect(refetch).toHaveBeenCalled();
+  });
+});

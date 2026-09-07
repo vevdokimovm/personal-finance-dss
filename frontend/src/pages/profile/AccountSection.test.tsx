@@ -188,3 +188,60 @@ describe("AccountSection — удаление аккаунта", () => {
     expect(screen.getByText(/соглас/i)).toBeVisible();
   });
 });
+
+/**
+ * Успешные пути смены пароля и удаления аккаунта — непокрытый остаток секции.
+ *
+ * 🔴 **После смены пароля сервер гасит ВСЕ сессии, включая текущую** (банковская планка,
+ * `routes_auth`). Поля обязаны очиститься: оставленный в них пароль — тот, которого
+ * больше нет, и человек, вернувшись к форме, попробует войти именно им.
+ *
+ * 🔴 `changePasswordMock` — ФАБРИКА, возвращающая объект мутации, а не сама `mutate`.
+ * Подменять её реализацию напрямую бесполезно: компонент вызовет её без аргументов,
+ * получит `undefined` и упадёт на `.isError`. Шпион ставится внутрь `idleMutation`.
+ */
+describe("AccountSection — успешные пути", () => {
+  it("🔴 после смены пароля поля очищаются", async () => {
+    const mutate = vi.fn((_body: unknown, opts?: { onSuccess?: () => void }) =>
+      opts?.onSuccess?.(),
+    );
+    changePasswordMock.mockReturnValue(idleMutation({ mutate }));
+    render(<AccountSection />);
+
+    const current = screen.getByLabelText(/текущий пароль/i);
+    const next = screen.getByLabelText(/новый пароль/i);
+    await userEvent.type(current, "oldpassword1");
+    await userEvent.type(next, "newpassword1");
+    await userEvent.click(screen.getByRole("button", { name: /сменить пароль/i }));
+
+    expect(mutate).toHaveBeenCalled();
+    expect(current).toHaveValue("");
+    expect(next).toHaveValue("");
+  });
+
+  it("незаполненная форма не отправляется", async () => {
+    /* `canSubmit` гасит отправку до запроса: пустой пароль сервер отверг бы 422,
+       и человек получил бы отказ там, где просто ещё не закончил вводить. */
+    const mutate = vi.fn();
+    changePasswordMock.mockReturnValue(idleMutation({ mutate }));
+    render(<AccountSection />);
+
+    await userEvent.click(screen.getByRole("button", { name: /сменить пароль/i }));
+    expect(mutate).not.toHaveBeenCalled();
+  });
+
+  it("🔴 подтверждённое удаление аккаунта доходит до запроса", async () => {
+    /* Удаление — путь исполнения права по 152-ФЗ и необратимо. Диалог подтверждения
+       обязан вести к действию, а не быть тупиком: право, до которого нельзя дойти,
+       равно отсутствующему (повтор SEV1 `CONSENT-GATE-NO-UI`). */
+    const mutate = vi.fn((_arg: unknown, opts?: { onSuccess?: () => void }) => opts?.onSuccess?.());
+    deleteAccountMock.mockReturnValue(idleMutation({ mutate }));
+    render(<AccountSection />);
+
+    await userEvent.click(screen.getByRole("button", { name: /удалить аккаунт/i }));
+    const buttons = screen.getAllByRole("button", { name: /удалить/i });
+    await userEvent.click(buttons[buttons.length - 1]);
+
+    expect(mutate).toHaveBeenCalled();
+  });
+});

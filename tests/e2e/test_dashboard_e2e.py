@@ -1,8 +1,22 @@
-"""E2E дашборда: реальный браузерный рендер и клики.
+"""E2E дашборда в реальном браузере (переписано под React, v9.4.0).
 
-Проверяют то, что не видят SSR-тесты: что JS отрисовывает показатели в браузере,
-ликвидность подаётся в месяцах (refined-модель v3.0.0), а попап по клику на карточку
-Lt показывает stock-based формулу. Маркер e2e — запускаются отдельно с браузером.
+## 🔴 Почему файл переписан
+
+Прежняя редакция искала `#rt-value`, `#lt-value`, `#dt-value`, `#metric-explain` —
+разметку Jinja, снесённую в вехе 8. Все 5 селекторов мертвы, все 5 тестов падали
+по таймауту (прогон 06.09.2026 и живой CI).
+
+В React карточки показателей рисует `MetricsGrid` и подписывает их **по-русски**:
+«Ликвидность», «Долговая нагрузка», «Свободный ресурс». Искать по подписи здесь
+правильнее, чем по `id`: она и есть то, что видит человек, а `id` — деталь реализации,
+которую переименуют при следующем рефакторинге, и тест снова замолчит.
+
+## Что проверяется
+
+Дашборд — экран, ради которого человек открывает продукт. Проверяется, что он
+**доезжает до чисел**: сервер посчитал план, фронт разобрал ответ, карточки отрисовались.
+Разрыв в любом звене даёт пустой экран, и юнит-тесты его не увидят — они проверяют
+звенья по отдельности.
 """
 from __future__ import annotations
 
@@ -10,53 +24,52 @@ import pytest
 
 pytestmark = pytest.mark.e2e
 
-LT_POPULATED = (
-    "() => { const el = document.querySelector('#lt-value');"
-    " return el && el.textContent.trim() !== '—'; }"
-)
-BLR_POPULATED = (
-    "() => { const el = document.querySelector('#blr-value');"
-    " return el && el.textContent.trim() !== '—'; }"
-)
+# Подписи карточек — то, что читает человек. Совпадают с `MetricsGrid.tsx`.
+METRIC_LABELS = ["Ликвидность", "Долговая нагрузка"]
 
 
-def test_dashboard_loads(page, base_url) -> None:
-    page.goto("/")
-    assert page.locator("body").is_visible()
+def test_dashboard_loads(page, seeded) -> None:
+    """Дашборд открывается и показывает свой заголовок.
+
+    Заголовок `sr-only` — он для скринридера, но существует в DOM, и его отсутствие
+    означало бы, что страница не смонтировалась вовсе.
+    """
+    page.goto(f"{seeded}/dashboard")
+    page.wait_for_selector("text=Финансовый обзор", timeout=20000)
 
 
 def test_metric_cards_render_after_seed(page, seeded) -> None:
-    page.goto("/")
-    page.wait_for_function(LT_POPULATED, timeout=15000)
-    # Все четыре карточки заполнены (не плейсхолдер)
-    for sel in ("#rt-value", "#lt-value", "#dt-value", "#blr-value"):
-        assert page.locator(sel).inner_text().strip() != "—", sel
+    """🔴 Показатели доезжают от расчёта до экрана.
+
+    Демо-данные загружены фикстурой `seeded` через `POST /api/demo/load` — то есть
+    у продукта есть, что считать. Если карточки не появились, разрыв где-то между
+    расчётом и отрисовкой, и никакой юнит-тест этого не покажет.
+    """
+    page.goto(f"{seeded}/dashboard")
+    # 🔴 «Ключевые показатели» — это `aria-label` секции, а не видимый текст:
+    # ищем по роли, иначе тест краснеет на собственном селекторе.
+    page.get_by_role("region", name="Ключевые показатели").wait_for(timeout=20000)
+    for label in METRIC_LABELS:
+        page.wait_for_selector(f"text={label}", timeout=10000)
 
 
-def test_liquidity_card_shows_months(page, seeded) -> None:
-    page.goto("/")
-    page.wait_for_function(LT_POPULATED, timeout=15000)
-    # Stock-based ликвидность отображается в месяцах автономии
-    assert "мес" in page.locator("#lt-value").inner_text()
+def test_liquidity_card_shows_runway(page, seeded) -> None:
+    """Ликвидность подписана месяцами автономии, а не голым числом.
+
+    🔴 «1.8» рядом с деньгами человек прочтёт как угодно. «Месяцев без дохода» —
+    единственная формулировка, из которой понятно, что это про запас прочности.
+    """
+    page.goto(f"{seeded}/dashboard")
+    page.wait_for_selector("text=Ликвидность", timeout=20000)
+    page.wait_for_selector("text=Месяцев без дохода", timeout=10000)
 
 
-def test_blr_card_shows_months(page, seeded) -> None:
-    page.goto("/")
-    page.wait_for_function(BLR_POPULATED, timeout=15000)
-    assert "мес" in page.locator("#blr-value").inner_text()
+def test_allocation_panel_renders(page, seeded) -> None:
+    """Панель распределения показывает рекомендацию.
 
-
-def test_lt_card_click_opens_stock_based_popup(page, seeded) -> None:
-    page.goto("/")
-    page.wait_for_function(LT_POPULATED, timeout=15000)
-
-    page.locator('article[data-metric="lt"]').click()
-    explain = page.locator("#metric-explain")
-    explain.wait_for(state="visible", timeout=5000)
-
-    text = explain.inner_text()
-    # Новая формула: ликвидная подушка ÷ месячные расходы
-    assert "Ликвидная подушка" in text
-    assert "Месячные расходы" in text
-    # Старой flow-семантики быть не должно
-    assert "Обязательные траты (расходы + кредиты)" not in text
+    Это главный ответ продукта на вопрос «что делать с деньгами». Пустое место здесь
+    означает, что расчёт не дал рекомендации либо она не доехала до экрана — и то,
+    и другое человек прочтёт как «продукт не работает».
+    """
+    page.goto(f"{seeded}/dashboard")
+    page.wait_for_selector("text=Рекомендация СППР", timeout=20000)

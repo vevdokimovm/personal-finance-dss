@@ -71,7 +71,7 @@ export function HouseholdsPage() {
     create.mutate(trimmed, {
       onSuccess: () => {
         setName("");
-        setFormOpen(false);
+        closeForm();
         toast.success(t("Семейный доступ создан"));
       },
       onError: () => toast.error(t("Не получилось создать. Попробуйте ещё раз.")),
@@ -86,14 +86,21 @@ export function HouseholdsPage() {
     </Button>
   );
 
+  /* 🔴 Одна точка закрытия формы, а не две (v9.3.0, нашёл тест). Кнопка «Отмена»
+     звала `setFormOpen(false)` напрямую, минуя сброс ошибки в `onOpenChange`:
+     сообщение «Введите название» переживало закрытие и встречало человека при
+     следующем открытии — он решал, что предыдущая попытка что-то сломала.
+     Два пути закрытия одного окна расходятся при первой же правке одного из них. */
+  function closeForm() {
+    setFormOpen(false);
+    setNameError(null);
+  }
+
   const formModal = (
     <Modal
       open={formOpen}
       onOpenChange={(open) => {
-        if (!open) {
-          setFormOpen(false);
-          setNameError(null);
-        }
+        if (!open) closeForm();
       }}
       title={t("Новый семейный доступ")}
       description={t("Общий план для нескольких человек. Участников добавите потом.")}
@@ -126,7 +133,7 @@ export function HouseholdsPage() {
           )}
         </div>
         <div className="fp-entity-form__actions">
-          <Button variant="ghost" type="button" onClick={() => setFormOpen(false)}>
+          <Button variant="ghost" type="button" onClick={closeForm}>
             {t("Отмена")}
           </Button>
           <Button

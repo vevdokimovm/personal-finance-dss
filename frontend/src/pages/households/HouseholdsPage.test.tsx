@@ -31,12 +31,17 @@ const {
   toastSuccess: vi.fn(),
 }));
 
+/* Флаги «запрос уже идёт» вынесены в объект: `vi.mock` поднимается выше объявлений,
+   и обычная `const` дала бы ReferenceError. Через него тесты управляют `isPending`,
+   не пересоздавая мок. */
+const pendingFlags = vi.hoisted(() => ({ create: false, invite: false }));
+
 vi.mock("@entities/households", () => ({
   useHouseholds: () => useHouseholdsMock(),
   useHouseholdMembers: () => useMembersMock(),
   useHouseholdInvites: () => useInvitesMock(),
-  useCreateHousehold: () => ({ mutate: createMock, isPending: false }),
-  useCreateInvite: () => ({ mutate: inviteMock, isPending: false }),
+  useCreateHousehold: () => ({ mutate: createMock, isPending: pendingFlags.create }),
+  useCreateInvite: () => ({ mutate: inviteMock, isPending: pendingFlags.invite }),
   useRevokeInvite: () => ({ mutate: revokeMock, isPending: false }),
   useRemoveMember: () => ({ mutate: removeMock, isPending: false }),
   useLeaveHousehold: () => ({ mutate: leaveMock, isPending: false }),
@@ -461,5 +466,159 @@ describe("HouseholdsPage — отмена, повтор и защита от д�
     await userEvent.click(screen.getByRole("button", { name: /Отмена|Отменить/ }));
 
     expect(revokeMock).not.toHaveBeenCalled();
+  });
+});
+
+/**
+ * Успешные пути необратимых действий и защита от двойного клика.
+ *
+ * 🔴 **`if (mutation.isPending) return;` — не микрооптимизация.** Роспуск семьи
+ * и приглашение не идемпотентны: второй клик по неотзывчивой кнопке создаёт второе
+ * приглашение или шлёт второй запрос на удаление. Проверка стоит первой строкой
+ * обработчика, и её легко снять при рефакторинге — тест держит её на месте.
+ */
+describe("HouseholdsPage — успешные пути и защита от повторного клика", () => {
+  it("успех исключения участника сообщается и возвращает фокус", async () => {
+    /* Строка исчезает вместе с кнопкой, на которой стоял фокус: без переноса
+       он проваливается в body, и человек теряет место на странице ([A11Y-05]). */
+    removeMock.mockImplementation((_args: unknown, opts?: { onSuccess?: () => void }) =>
+      opts?.onSuccess?.(),
+    );
+    render(<HouseholdsPage />);
+
+    await userEvent.click(screen.getByRole("button", { name: /Убрать участника/ }));
+    await userEvent.click(screen.getByRole("button", { name: "Убрать" }));
+
+    expect(toastSuccess).toHaveBeenCalled();
+  });
+
+  it("успех отзыва приглашения сообщается", async () => {
+    useInvitesMock.mockReturnValue(
+      query([{ id: 7, email: null, role: "member", expires_at: "2026-09-12T10:00:00" }]),
+    );
+    revokeMock.mockImplementation((_args: unknown, opts?: { onSuccess?: () => void }) =>
+      opts?.onSuccess?.(),
+    );
+    render(<HouseholdsPage />);
+
+    await userEvent.click(screen.getByRole("button", { name: /Отозвать приглашение/ }));
+    await userEvent.click(screen.getByRole("button", { name: "Отозвать" }));
+
+    expect(toastSuccess).toHaveBeenCalled();
+  });
+
+  it("успех роспуска сообщается", async () => {
+    disbandMock.mockImplementation((_id: number, opts?: { onSuccess?: () => void }) =>
+      opts?.onSuccess?.(),
+    );
+    render(<HouseholdsPage />);
+
+    await userEvent.click(screen.getByRole("button", { name: /Распустить/ }));
+    await userEvent.click(screen.getByRole("button", { name: "Распустить навсегда" }));
+
+    expect(toastSuccess).toHaveBeenCalled();
+  });
+
+  it("успех выхода из семьи сообщается", async () => {
+    useHouseholdsMock.mockReturnValue(query([joined]));
+    leaveMock.mockImplementation((_id: number, opts?: { onSuccess?: () => void }) =>
+      opts?.onSuccess?.(),
+    );
+    render(<HouseholdsPage />);
+
+    await userEvent.click(screen.getByRole("button", { name: /Покинуть/ }));
+    await userEvent.click(screen.getByRole("button", { name: /^Покинуть$|Выйти/ }));
+
+    expect(toastSuccess).toHaveBeenCalled();
+  });
+
+  it("сбой загрузки приглашений даёт повтор", async () => {
+    const refetch = vi.fn();
+    useInvitesMock.mockReturnValue(query(undefined, { error: new Error("500"), refetch }));
+    render(<HouseholdsPage />);
+
+    await userEvent.click(screen.getByRole("button", { name: /Повторить|Обновить/ }));
+    expect(refetch).toHaveBeenCalled();
+  });
+});
+
+describe("HouseholdsPage — защита от повторного клика", () => {
+  it("🔴 второй клик по «Создать» во время запроса не создаёт вторую семью", async () => {
+    /* `if (create.isPending) return;` первой строкой обработчика. Создание НЕ
+       идемпотентно: два запроса — две семьи с одним именем, и человек увидит дубль,
+       который придётся распускать. Проверка легко снимается при рефакторинге. */
+    pendingFlags.create = true;
+    render(<HouseholdsPage />);
+
+    await userEvent.click(screen.getByRole("button", { name: /Создать семейный доступ/ }));
+    await userEvent.type(screen.getByLabelText(/Название/), "Семья");
+    /* Во время запроса кнопка подписана «Создаём…» — по ней и кликаем: тест обязан
+       нажимать то, что видит человек, а не идеализированную подпись. */
+    await userEvent.click(screen.getByRole("button", { name: /Создаём/ }));
+
+    expect(createMock).not.toHaveBeenCalled();
+    pendingFlags.create = false;
+  });
+
+  it("🔴 второй клик по «Пригласить» не создаёт второе приглашение", async () => {
+    /* Каждое приглашение — отдельная одноразовая ссылка. Два клика дают две ссылки,
+       и вторая останется висеть непогашенной: отзывать её человек не будет,
+       потому что не знает о ней. */
+    pendingFlags.invite = true;
+    render(<HouseholdsPage />);
+
+    await userEvent.click(screen.getByRole("button", { name: /Пригласить|Создаём ссылку/ }));
+
+    expect(inviteMock).not.toHaveBeenCalled();
+    pendingFlags.invite = false;
+  });
+
+  it("закрытие модалки крестиком сбрасывает ошибку имени", async () => {
+    /* Ошибка, пережившая закрытие, встретит человека при следующем открытии формы —
+       и он решит, что предыдущая попытка что-то сломала. */
+    render(<HouseholdsPage />);
+
+    await userEvent.click(screen.getByRole("button", { name: /Создать семейный доступ/ }));
+    await userEvent.click(screen.getByRole("button", { name: "Создать" }));
+    expect(screen.getByRole("alert")).toBeInTheDocument();
+
+    /* Кнопок закрытия у модалки две — «Отмена» в форме и крестик в шапке. Берём
+       именно «Отмена»: крестик — предмет тестов самой `Modal`. */
+    await userEvent.click(screen.getByRole("button", { name: "Отмена" }));
+    await userEvent.click(screen.getByRole("button", { name: /Создать семейный доступ/ }));
+
+    expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+  });
+});
+
+describe("HouseholdsPage — незнакомая роль и участник без почты", () => {
+  it("🔴 незнакомая роль показывается как есть, а не пропадает", () => {
+    /* `ROLE_LABEL[role] ?? role` — карта переводов отстаёт от бэкенда на релиз.
+       Пустое место вместо роли опаснее непереведённого кода: владелец не увидит,
+       что у участника вообще есть какие-то права. */
+    useMembersMock.mockReturnValue(
+      query([{ user_id: "u2", email: "b@test.io", role: "auditor", joined_at: null }]),
+    );
+    render(<HouseholdsPage />);
+    expect(screen.getByText(/auditor/)).toBeInTheDocument();
+  });
+
+  it("участник без почты опознаётся по идентификатору", () => {
+    /* `member.email ?? member.user_id` — почта необязательна: приглашение можно
+       отправить ссылкой без адреса. Строка без подписи не даёт исключить нужного
+       человека, а кнопка «Убрать» рядом с ней остаётся. */
+    useMembersMock.mockReturnValue(
+      query([{ user_id: "u-42", email: null, role: "member", joined_at: null }]),
+    );
+    render(<HouseholdsPage />);
+    expect(screen.getByText(/u-42/)).toBeInTheDocument();
+  });
+
+  it("пока грузятся участники — скелетон, а не пустой состав семьи", () => {
+    /* Пустой список читается как «в семье никого», и владелец решит, что приглашения
+       не сработали. */
+    useMembersMock.mockReturnValue(query(undefined, { isLoading: true }));
+    render(<HouseholdsPage />);
+    expect(screen.getByRole("status")).toBeInTheDocument();
   });
 });

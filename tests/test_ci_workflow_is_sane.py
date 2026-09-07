@@ -186,3 +186,83 @@ class TestCoverageGatesAreSymmetric:
         assert "coverage" in commands, (
             "джоба фронта не измеряет покрытие — порог в vite.config.ts не применяется"
         )
+
+
+class TestCoreIsItsOwnContour:
+    """🔴 Ядро модели — третья сущность, и у неё свой контур (решение владельца 06.09.2026).
+
+    Дословно: *«есть тесты бэк, фронт — может сделать и тесты ядра математического?
+    как будто это три сущности разные»*.
+
+    **Отличие по цене ошибки, а не по организации кода:**
+
+    | что сломалось | как выглядит | заметит ли человек |
+    |---|---|---|
+    | бэкенд | 500 | да, и повторит |
+    | фронт | пустой экран | да, и пожалуется |
+    | **ядро** | **неверный совет о деньгах** | **нет** |
+
+    Третий случай не даёт ни отказа, ни жалобы: продукт работает, числа правдоподобны,
+    а человек гасит не тот долг. Отсюда порог **95 %** против общих 90: непокрытая ветка
+    в роутере — необработанный запрос, непокрытая ветка в ядре — расчётный путь, по которому
+    никто не проходил, и его результат некому оспорить.
+
+    **Почему гейт, а не «мы помним».** Три порога живут в трёх файлах на двух языках
+    (`.coveragerc`, `.coveragerc.core`, `vite.config.ts`). Снять один — вопрос одной
+    невнимательной правки, и расхождение станет невидимым: джоба продолжит быть зелёной,
+    потому что перестанет проверять.
+    """
+
+    CORE_THRESHOLD = 95
+
+    def test_core_config_exists_and_targets_core_only(self) -> None:
+        """Конфиг ядра существует и считает покрытие ИМЕННО ядра.
+
+        🔴 `source = app` вместо `app/core` дал бы тот же процент, что у общего прогона,
+        и порог 95 стал бы недостижимым по причине, не связанной с ядром, — его бы сняли.
+        """
+        config = REPO_ROOT / ".coveragerc.core"
+        assert config.exists(), "нет .coveragerc.core — контур ядра не заведён"
+        text = config.read_text(encoding="utf-8")
+        assert re.search(r"^source\s*=\s*app/core\s*$", text, re.MULTILINE), (
+            "конфиг ядра считает покрытие не по app/core — порог перестанет означать ядро"
+        )
+
+    def test_core_threshold_is_stricter_than_backend(self) -> None:
+        """Порог ядра выше общего — иначе отдельный контур ничего не добавляет."""
+        core = re.search(
+            r"^fail_under\s*=\s*(\d+)",
+            (REPO_ROOT / ".coveragerc.core").read_text(encoding="utf-8"),
+            re.MULTILINE,
+        )
+        backend = re.search(
+            r"^fail_under\s*=\s*(\d+)",
+            (REPO_ROOT / ".coveragerc").read_text(encoding="utf-8"),
+            re.MULTILINE,
+        )
+        assert core and backend
+        assert int(core.group(1)) == self.CORE_THRESHOLD
+        assert int(core.group(1)) > int(backend.group(1)), (
+            "порог ядра не строже общего — отдельный контур не даёт ничего, "
+            "кроме лишней джобы"
+        )
+
+    def test_ci_runs_the_core_job(self) -> None:
+        """🔴 Порог, который не гоняется, — это комментарий.
+
+        Проверяется наличие джобы И команды с её конфигом: объявить конфиг и не
+        применить его — ровно тот случай, что был у фронта до v9.3.0.
+        """
+        jobs = _workflow()["jobs"]
+        assert "core" in jobs, "в CI нет джобы ядра — порог 95 % нигде не применяется"
+        commands = " ".join(_step_commands("core"))
+        assert ".coveragerc.core" in commands, (
+            "джоба ядра не использует свой конфиг — считается общее покрытие"
+        )
+        assert "coverage report" in commands, (
+            "джоба ядра не проверяет порог: `coverage run` без `report` ничего не валит"
+        )
+
+    def test_core_marker_is_declared(self) -> None:
+        """Маркер `core` объявлен — иначе `--strict-markers` уронит любой прогон."""
+        assert "core:" in (REPO_ROOT / "pytest.ini").read_text(encoding="utf-8")

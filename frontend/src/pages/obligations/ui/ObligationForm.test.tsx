@@ -160,3 +160,42 @@ describe("ObligationForm — правка", () => {
     expect(args.body).not.toHaveProperty("household_id");
   });
 });
+
+describe("ObligationForm — необязательные поля доезжают до тела", () => {
+  it("срок, день платежа, дата старта и комментарий не теряются", async () => {
+    /* Поля необязательные, но не декоративные: `term` и `start_date` задают
+       `months_remaining`, по которому строится график погашения, а `payment_day` —
+       день, когда система ждёт платёж. Потерянное поле не даст ошибки, просто
+       расчёт будет о другом обязательстве. */
+    createMutateAsync.mockResolvedValue({ id: 1 });
+    const user = userEvent.setup();
+    render(<ObligationForm open onOpenChange={() => {}} />);
+
+    await fillRequired(user);
+    await user.clear(screen.getByLabelText(/срок/i));
+    await user.type(screen.getByLabelText(/срок/i), "24");
+    await user.clear(screen.getByLabelText(/день платежа/i));
+    await user.type(screen.getByLabelText(/день платежа/i), "15");
+    await user.type(screen.getByLabelText(/комментар/i), "  рефинансировать  ");
+    await user.click(screen.getByRole("button", { name: /сохранить|добавить/i }));
+
+    await waitFor(() => expect(createMutateAsync).toHaveBeenCalled());
+    const body = createMutateAsync.mock.calls[0][0];
+    expect(body.term).toBe(24);
+    expect(body.payment_day).toBe(15);
+    expect(body.comment).toBe("рефинансировать");
+  });
+
+  it("без остатка долга фокус уходит в сумму", async () => {
+    /* Третья ветка валидации: название есть, суммы нет. Порядок проверок задаёт,
+       куда уедет фокус, и он должен совпадать с порядком полей на экране. */
+    const user = userEvent.setup();
+    render(<ObligationForm open onOpenChange={() => {}} />);
+
+    await user.type(screen.getByLabelText(/название/i), "Кредитка");
+    await user.click(screen.getByRole("button", { name: /сохранить|добавить/i }));
+
+    expect(createMutateAsync).not.toHaveBeenCalled();
+    await waitFor(() => expect(screen.getByLabelText(/остаток долга|сумма/i)).toHaveFocus());
+  });
+});

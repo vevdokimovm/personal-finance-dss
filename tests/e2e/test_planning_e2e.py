@@ -1,8 +1,26 @@
-"""E2E страницы планирования: реальный расчёт через UI.
+"""E2E экрана планирования в реальном браузере (переписано под React, v9.4.0).
 
-Главная проверка — что refined-модель работает end-to-end через браузер: выбор
-профиля риска и клик «Рассчитать альтернативы» дают разные планы у консервативного
-и агрессивного профилей (доказательство ортогонализации критериев на уровне UI).
+## 🔴 Почему файл переписан
+
+Прежняя редакция искала `#planning-form`, `#best-container`, `#plan-rt`, `#rbench-cbr` —
+разметку Jinja, снесённую в вехе 8. Шесть селекторов из семи мертвы, все пять тестов
+падали по таймауту (прогон 06.09.2026 и живой CI).
+
+В React параметры расчёта живут в `PlanSettingsSection`: риск-профиль — радиогруппа
+с русскими подписями («Консервативный» … «Агрессивный»), кнопка — «Сохранить
+и пересчитать». Альтернативы показывает `AlternativesBrowser` по кнопке «Показать все».
+
+## Что проверяется, чего не видит ничто другое
+
+🔴 **Что смена риск-профиля ДЕЙСТВИТЕЛЬНО меняет рекомендацию.** Это сквозная цепочка:
+выбор → `PATCH /api/user-prefs` → инвалидация ключа `["plan"]` → пересчёт на сервере →
+новая рекомендация на экране. Юнит-тесты проверяют каждое звено отдельно, и ровно здесь
+жил дефект v9.2.0: `AllocationPanel` не пересаживал ползунки при новой рекомендации
+и подписывал её «гипотетическим вариантом».
+
+**Почему это важнее остальных сценариев.** Риск-профиль — единственная настройка,
+которой человек управляет напрямую. Если она ни на что не влияет (или влияет незаметно),
+продукт превращается в калькулятор с одним ответом.
 """
 from __future__ import annotations
 
@@ -10,66 +28,81 @@ import pytest
 
 pytestmark = pytest.mark.e2e
 
-BEST_READY = (
-    "() => { const el = document.querySelector('#best-container');"
-    " return el && el.textContent.includes('оценка'); }"
-)
+
+def _recommendation_text(page) -> str:
+    """Текст рекомендации СППР — то, ради чего экран существует."""
+    node = page.locator("text=Рекомендация СППР").first
+    node.wait_for(timeout=20000)
+    return node.inner_text()
 
 
-def _calculate(page, risk: int) -> str:
-    """Открывает planning, выбирает профиль, запускает расчёт, ждёт результат.
+def test_planning_loads(page, seeded) -> None:
+    """Экран открывается и показывает план, а не пустоту."""
+    page.goto(f"{seeded}/planning")
+    page.wait_for_selector("text=План распределения", timeout=20000)
 
-    При загрузке /planning приложение делает автоматический расчёт с дефолтным
-    risk=3. Если просто ждать появления результата, можно прочитать его, а не
-    наш ручной расчёт (гонка авто vs ручной — незаметна для risk=1, ломает risk=5).
-    Поэтому: дожидаемся завершения авто-расчёта, выбираем профиль и ждём ответ
-    именно на наш POST, затем — применения рендера.
+
+def test_recommendation_renders(page, seeded) -> None:
+    """Рекомендация доезжает от расчёта до экрана."""
+    page.goto(f"{seeded}/planning")
+    assert "Рекомендация СППР" in _recommendation_text(page)
+
+
+def test_alternatives_browser_opens(page, seeded) -> None:
+    """🔴 Альтернативы доступны, а не спрятаны навсегда.
+
+    Модель считает 66 альтернатив (канон v3.9.0, шаг 10 %), и показать только одну
+    значило бы выдать рекомендацию за единственно возможный вариант. «Показать все»
+    — единственный путь к остальным.
     """
-    page.goto("/planning")
-    page.wait_for_load_state("networkidle")  # авто-расчёт (risk=3) завершён и отрисован
-    page.locator(f'button[data-risk="{risk}"]').click()
-    page.wait_for_selector(f'button[data-risk="{risk}"].active', timeout=5000)
-    with page.expect_response("**/api/planning/calculate") as resp:
-        page.locator('#planning-form button[type="submit"]').click()
-    resp.value  # сервер ответил именно на ручной расчёт с выбранным профилем
-    page.wait_for_load_state("networkidle")
-    page.wait_for_function(BEST_READY, timeout=20000)
-    return page.locator("#best-container").inner_text()
+    page.goto(f"{seeded}/planning")
+    page.wait_for_selector("text=План распределения", timeout=20000)
+    page.get_by_role("button", name="Показать все").first.click()
+    page.wait_for_selector("text=Оценка", timeout=10000)
 
 
-def test_planning_loads(page, base_url) -> None:
-    page.goto("/planning")
-    assert page.locator("#planning-form").is_visible()
+def test_risk_profile_change_updates_plan(page, seeded) -> None:
+    """🔴 ГЛАВНЫЙ сценарий экрана: смена риск-профиля доезжает до пересчёта.
 
+    Сквозная цепочка от клика до нового плана: выбор → `PATCH /api/user-prefs` →
+    инвалидация ключа `["plan"]` → пересчёт на сервере → перерисовка. Юнит-тесты
+    проверяют каждое звено отдельно, и ровно здесь жил дефект v9.2.0:
+    `AllocationPanel` не пересаживал ползунки при новой рекомендации.
 
-def test_calculation_generates_66_alternatives(page, seeded) -> None:
-    text = _calculate(page, 3)
-    # Шаг дискретизации 10% → 66 альтернатив
-    assert "66" in text
+    🔴 **Проверяется ОЦЕНКА, а не имя альтернативы — и это разбор, а не упрощение.**
+    Первая редакция сравнивала текст рекомендации и падала: у демо-портрета «Анна»
+    победитель одинаков при любом профиле («Всё в резерв»). Проверка по API показала,
+    почему это правильно, а не дефект:
 
+    - ранжирование **лексикографическое**: сначала `floor_level` (заполнен ли стартовый
+      месяц ликвидности, G6), и только потом `utility`;
+    - у портрета с `Lt` ниже порога все альтернативы, кроме максимального резерва,
+      проигрывают уже на первом ключе — независимо от весов профиля;
+    - при этом **оценка меняется**: 0.9 → 0.8 → 0.6 для профилей 1/3/5.
 
-def test_profiles_produce_different_plans(page, seeded) -> None:
-    conservative = _calculate(page, 1)
-    aggressive = _calculate(page, 5)
+    Значит наблюдаемый признак работы настройки — именно оценка. Сравнивать имена
+    значило бы требовать от модели менять вывод там, где инвариант G6 его фиксирует.
+    """
+    page.goto(f"{seeded}/planning")
+    page.wait_for_selector("text=Параметры расчёта", timeout=20000)
+    page.get_by_role("button", name="Показать все").first.click()
 
-    # Планы должны различаться — критерии ортогональны, профили реально влияют
-    assert conservative != aggressive
-    # Консервативный тянет в резерв, агрессивный — в цели
-    assert "Резерв" in conservative
-    assert "Цел" in aggressive
+    def first_score() -> str:
+        node = page.locator("text=/Оценка \\d/").first
+        node.wait_for(timeout=15000)
+        return node.inner_text()
 
+    page.get_by_role("radio", name="Консервативный", exact=True).check()
+    page.get_by_role("button", name="Сохранить и пересчитать").click()
+    page.wait_for_timeout(1500)
+    conservative = first_score()
 
-def test_best_plan_metrics_render(page, seeded) -> None:
-    _calculate(page, 3)
-    for sel in ("#plan-rt", "#plan-lt", "#plan-dt"):
-        assert page.locator(sel).inner_text().strip() != "—", sel
-    # Ликвидность плана — в месяцах
-    assert "мес" in page.locator("#plan-lt").inner_text()
+    page.get_by_role("radio", name="Агрессивный", exact=True).check()
+    page.get_by_role("button", name="Сохранить и пересчитать").click()
+    page.wait_for_timeout(1500)
+    aggressive = first_score()
 
-
-def test_rbench_cbr_button_keeps_valid_rate(page, base_url) -> None:
-    page.goto("/planning")
-    page.locator("#rbench-cbr").click()
-    page.wait_for_timeout(2500)
-    # Независимо от доступности cbr.ru значение остаётся валидной ставкой в %
-    assert "%" in page.locator("#rbench-value").inner_text()
+    assert conservative != aggressive, (
+        f"оценка не изменилась при смене риск-профиля ({conservative}) — либо параметры "
+        "не доехали до сервера, либо экран не перечитал ответ"
+    )

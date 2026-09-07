@@ -8,6 +8,10 @@ from __future__ import annotations
 import os
 import tempfile
 
+import re
+from functools import lru_cache
+from pathlib import Path
+
 import pytest
 
 # По умолчанию — изолированный SQLite-файл. Но если DATABASE_URL задан извне
@@ -112,6 +116,20 @@ def _reset_rate_limit():
     yield
 
 
+@lru_cache(maxsize=None)
+def _imports_core(path: str) -> bool:
+    """Тянет ли файл теста `app.core` — то есть проверяет ли он ядро.
+
+    Кэш обязателен: хук зовётся на каждый собранный тест, а файлов сотни;
+    без него разбор одного модуля повторялся бы десятки раз.
+    """
+    try:
+        text = Path(path).read_text(encoding="utf-8", errors="ignore")
+    except OSError:
+        return False
+    return bool(re.search(r"^\s*(from|import)\s+app\.core", text, re.MULTILINE))
+
+
 def pytest_collection_modifyitems(config, items):
     """Авто-маркировка категории `fast` (CI-тиры fast/full/deep).
 
@@ -126,3 +144,11 @@ def pytest_collection_modifyitems(config, items):
         own = {marker.name for marker in item.iter_markers()}
         if own.isdisjoint(tiered):
             item.add_marker(pytest.mark.fast)
+        # 🔴 Маркер `core` ставится ПО ФАКТУ импорта `app.core`, а не по списку файлов.
+        # Список из 42 имён разошёлся бы с кодом при первом же новом тесте, и заметить
+        # это было бы нечем: тест просто не попал бы в свою джобу и в свой порог
+        # покрытия. Признак «модуль тянет ядро» не устаревает.
+        module = getattr(item, "module", None)
+        source = getattr(module, "__file__", None)
+        if source and _imports_core(source):
+            item.add_marker(pytest.mark.core)

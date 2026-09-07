@@ -28,6 +28,17 @@ vi.mock("@features/household-scope", () => ({
     householdId == null ? null : <span data-testid="shared-badge">Общая</span>,
 }));
 
+/* Панель истёкшей сессии — предмет своего файла тестов (`entities/auth`).
+   Настоящая тянет `Link` из роутера, а с ним провайдер. `isSessionExpired`
+   при этом НЕ мокается: именно она решает, какую ветку показать. */
+vi.mock("@entities/auth", async () => {
+  const actual = await vi.importActual<typeof import("@entities/auth")>("@entities/auth");
+  return {
+    ...actual,
+    SessionExpiredPanel: () => <a href="/login">Войти заново</a>,
+  };
+});
+
 vi.mock("@entities/consents", () => ({
   ConsentRequiredPanel: ({ detail }: { detail: { message: string } }) => (
     <div role="alert">{detail.message}</div>
@@ -167,5 +178,36 @@ describe("TransactionsPage", () => {
     await userEvent.click(screen.getByRole("button", { name: "Удалить «Пятёрочка»" }));
     expect(deleteMutateMock).toHaveBeenCalledWith(2, expect.any(Object));
     expect(screen.getByRole("button", { name: "Добавить операцию" })).toHaveFocus();
+  });
+});
+
+describe("TransactionsPage — форма правки и истёкшая сессия", () => {
+  it("форма правки открывается и закрывается, не оставляя выбранную запись", async () => {
+    /* `key={editing?.id ?? "new"}` пересоздаёт форму при смене записи, а `onOpenChange`
+       сбрасывает `editing`: без этого следующее «Добавить» открыло бы форму с чужими
+       данными, и человек сохранил бы правку не туда. */
+    useTransactionsMock.mockReturnValue(queryResult({ data: [TX_EXPENSE] }));
+    render(<TransactionsPage />);
+
+    await userEvent.click(screen.getAllByRole("button", { name: /изменить|править/i })[0]);
+    expect(screen.getByRole("dialog")).toBeInTheDocument();
+
+    await userEvent.click(screen.getByRole("button", { name: /отмена/i }));
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+  });
+
+  it("🔴 истёкшая сессия ведёт ко входу, а не к «Повторить»", () => {
+    /* `JWT_TTL_HOURS = 168`, refresh-токена нет — 401 в середине работы регулярен.
+       «Проверьте соединение» уводит чинить интернет, который работает. */
+    useTransactionsMock.mockReturnValue(
+      queryResult({
+        isError: true,
+        error: Object.assign(new Error("401"), { status: 401 }) as unknown as Error,
+      }),
+    );
+    render(<TransactionsPage />);
+
+    expect(screen.getByRole("link", { name: /Войти/i })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Повторить" })).not.toBeInTheDocument();
   });
 });

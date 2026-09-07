@@ -218,3 +218,64 @@ describe("DemoSandbox — гостевая песочница", () => {
     expect(screen.getByText(/Считаем/)).toBeVisible();
   });
 });
+
+/**
+ * Отказы и краевые состояния песочницы — непокрытый остаток.
+ *
+ * 🔴 **Демо — первый экран человека без своих данных.** Всё, что здесь молчит,
+ * молчит на самом раннем шаге знакомства с продуктом, и второго шанса не будет.
+ */
+describe("DemoSandbox — отказы и краевые состояния", () => {
+  it("🔴 отказ загрузки примера объясняется словами сервера", async () => {
+    /* `POST /api/demo/load` отвечает 403 вошедшему — чтобы демо-данные не смешались
+       с настоящими. Общее «не получилось» здесь бесполезно: человек не поймёт,
+       что мешает именно его собственный вход. */
+    useCasesMock.mockReturnValue({ data: { cases: CASES }, isLoading: false, error: null });
+    usePreviewMock.mockReturnValue({ data: undefined, isLoading: false, isError: false });
+    loadMock.mockImplementation((_args: unknown, opts?: { onError?: (e: unknown) => void }) =>
+      opts?.onError?.({ detail: "Демо доступно только гостю.", status: 403 }),
+    );
+    render(<DemoSandbox />);
+
+    await userEvent.click(screen.getByRole("button", { name: /Анна Петрова/ }));
+    await userEvent.click(screen.getByRole("button", { name: /Заменить и показать/ }));
+
+    expect(toastError).toHaveBeenCalled();
+  });
+
+  it("сбой загрузки списка примеров даёт повтор", async () => {
+    const refetch = vi.fn();
+    /* Компонент ветвится по `isError`, а не по `error`: мок без этого флага
+       показал бы обычный экран, и тест искал бы кнопку, которой нет. */
+    useCasesMock.mockReturnValue({
+      data: undefined,
+      isLoading: false,
+      isError: true,
+      error: new Error("500"),
+      refetch,
+    });
+    usePreviewMock.mockReturnValue({ data: undefined, isLoading: false, isError: false });
+    render(<DemoSandbox />);
+
+    await userEvent.click(screen.getByRole("button", { name: "Попробовать снова" }));
+    expect(refetch).toHaveBeenCalled();
+  });
+
+  it("пустой список примеров не роняет экран", () => {
+    /* `cases.data?.cases ?? []` — контракт допускает пустой ответ, и потребители
+       зовут `.map` сразу. */
+    useCasesMock.mockReturnValue({ data: { cases: [] }, isLoading: false, error: null });
+    usePreviewMock.mockReturnValue({ data: undefined, isLoading: false, isError: false });
+    expect(() => render(<DemoSandbox />)).not.toThrow();
+  });
+
+  it("сбой предпросмотра портрета виден отдельно от сбоя списка", () => {
+    /* Предпросмотр — отдельный запрос: список загрузился, а конкретный портрет нет.
+       Смешать эти два состояния значит спрятать рабочий список за общей ошибкой. */
+    useCasesMock.mockReturnValue({ data: { cases: CASES }, isLoading: false, error: null });
+    usePreviewMock.mockReturnValue({ data: undefined, isLoading: false, isError: true });
+    render(<DemoSandbox />);
+
+    expect(screen.getByRole("button", { name: /Анна Петрова/ })).toBeInTheDocument();
+  });
+});

@@ -1,5 +1,6 @@
 import { describe, expect, it, vi, beforeEach } from "vitest";
 import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { InsightsPage } from "./InsightsPage";
 
 const { useOverviewMock, useFunnelMock, useProfileMock } = vi.hoisted(() => ({
@@ -193,5 +194,68 @@ describe("InsightsPage — метрики продукта для владель
     useFunnelMock.mockReturnValue(idle({ steps: [] }));
     render(<InsightsPage />);
     expect(screen.getByText(/Шаги воронки пока не набрали данных/)).toBeVisible();
+  });
+});
+
+/**
+ * Отказы и неполные данные — непокрытый остаток экрана метрик.
+ *
+ * 🔴 **Экран владельца, и он читает по нему решения о продукте.** Пустое место
+ * вместо воронки означает не «ноль пользователей», а «не загрузилось» — разница
+ * определяет, будет ли владелец что-то менять в продукте.
+ */
+describe("InsightsPage — отказы и неполные данные", () => {
+  it("сбой обеих загрузок даёт «Повторить», и она обновляет ОБА запроса", async () => {
+    /* Метрики и воронка — два независимых запроса на одном экране. Повтор,
+       обновляющий только один, оставит половину экрана в отказе. */
+    const overviewRefetch = vi.fn();
+    const funnelRefetch = vi.fn();
+    useOverviewMock.mockReturnValue({
+      data: undefined,
+      isLoading: false,
+      isError: true,
+      error: new Error("500"),
+      refetch: overviewRefetch,
+    });
+    useFunnelMock.mockReturnValue({
+      data: undefined,
+      isLoading: false,
+      isError: true,
+      error: new Error("500"),
+      refetch: funnelRefetch,
+    });
+    render(<InsightsPage />);
+
+    await userEvent.click(screen.getByRole("button", { name: /Повторить/ }));
+
+    expect(overviewRefetch).toHaveBeenCalled();
+    expect(funnelRefetch).toHaveBeenCalled();
+  });
+
+  it("пустая воронка не роняет экран", () => {
+    /* `funnel.data?.steps ?? []` — у нового продукта событий ещё нет,
+       и это обычное состояние, а не сбой. */
+    useFunnelMock.mockReturnValue(idle({ period_days: 30, steps: [] }));
+    expect(() => render(<InsightsPage />)).not.toThrow();
+  });
+
+  it("сводка без `period_days` берёт 30 по умолчанию, а не показывает пусто", () => {
+    /* `data?.period_days ?? 30` — заголовок обязан назвать период при любом ответе:
+       «Сводка за дней» читается как поломка вёрстки. Поле необязательно
+       по контракту, значит случай достижим. */
+    useOverviewMock.mockReturnValue(idle({ ...OVERVIEW, period_days: undefined }));
+    render(<InsightsPage />);
+    expect(screen.getByText(/Сводка за 30 дней/)).toBeInTheDocument();
+  });
+
+  it("пока грузится профиль — экран не решает, владелец перед ним или нет", () => {
+    useProfileMock.mockReturnValue({
+      data: undefined,
+      isLoading: true,
+      isError: false,
+      error: null,
+    });
+    render(<InsightsPage />);
+    expect(screen.queryByText(/нет доступа|только владельц/i)).not.toBeInTheDocument();
   });
 });

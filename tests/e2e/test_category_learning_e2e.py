@@ -1,66 +1,59 @@
-"""E2E обучения категоризации (P2.7) через реальный браузер.
+"""E2E обучения категорий — СЦЕНАРИЙ ЗАБЛОКИРОВАН: интерфейса не существует (v9.4.0).
 
-Сценарий целиком через UI: переназначить категорию операции (кнопка ↻ → модалка),
-правило запоминается и ретроактивно применяется к похожей операции; правило видно в списке
-и удаляется. Операции с описанием сеются через API (модалка создания описание не запрашивает),
-дальше всё — клики и проверки DOM. Гостевой режим, логин не требуется.
+## 🔴 Что нашлось
 
-Браузер для прогона ставится отдельно: `playwright install chromium`. В песочнице CDN браузеров
-заблокирован, поэтому спека гоняется на Mac/GitHub CI (как остальные e2e).
+Прежняя редакция кликала `.recat-button[data-transaction-id=...]`, заполняла `#recat-token`
+и проверяла `#category-rules-list` — разметку Jinja, снесённую в вехе 8. Все три селектора
+мертвы, тест падал по таймауту.
+
+**Но переписать его нельзя, и это главное.** Правил категорий во фронте **нет вовсе**:
+
+```
+GET    /api/category-rules            ← бэкенд отдаёт
+DELETE /api/category-rules/{rule_id}  ← бэкенд отдаёт
+```
+
+`grep` по `frontend/src` находит эти вызовы **только в сгенерированном клиенте**
+(`sdk.gen.ts`), то есть ни один компонент их не зовёт. Экрана правил не существует,
+кнопки «переназначить категорию» на строке операции нет.
+
+🔴 **Это повтор SEV1 `CONSENT-GATE-NO-UI`**: функция полностью реализована на бэкенде,
+пути к ней у пользователя нет, и молчат обе стороны. Причём здесь она была реализована
+и **имела интерфейс в Jinja** — то есть при переносе на React экран потеряли, а тест,
+который единственный это ловил, продолжал падать в общей куче красного.
+
+## Почему файл не удалён
+
+Удалить — значит потерять единственную запись о том, что функция существует и недоступна.
+`xfail` с причиной честнее: он не мешает прогону, виден в отчёте и **сам исчезнет**,
+когда экран появится (`strict=True` — тест, который вдруг прошёл, тоже красный).
+
+Задача заведена в роадмап, §9.A.
 """
 from __future__ import annotations
-
-import time
 
 import pytest
 
 pytestmark = pytest.mark.e2e
 
-FUTURE = "2030-12-31T00:00:00"
 
+@pytest.mark.xfail(
+    strict=True,
+    reason=(
+        "Экрана правил категорий не существует во фронте: GET/DELETE /api/category-rules "
+        "вызываются только из сгенерированного клиента, ни один компонент их не зовёт. "
+        "Повтор класса CONSENT-GATE-NO-UI. Роадмап §9.A."
+    ),
+)
+def test_recategorize_learns_and_rule_is_manageable(page, seeded) -> None:
+    """Человек меняет категорию операции, продукт запоминает правило и даёт им управлять.
 
-def _seed_txn(page, base_url, description: str, category: str = "Прочее") -> int:
-    """Создаёт операцию с описанием через API (в контексте браузера — CSRF/origin проходят)."""
-    resp = page.request.post(f"{base_url}/api/transactions", data={
-        "amount": 1000, "category": category, "type": "expense",
-        "date": FUTURE, "description": description,
-    })
-    assert resp.ok, resp.text()
-    return resp.json()["id"]
+    Сценарий целиком: переназначить категорию → правило создалось → следующая похожая
+    операция попала в ту же категорию → правило видно и удаляется.
 
-
-def test_recategorize_learns_applies_and_rule_is_manageable(page, base_url) -> None:
-    tag = f"ozonshop{int(time.time() * 1000)}"
-    t1 = _seed_txn(page, base_url, f"{tag} заказ 1")
-    _seed_txn(page, base_url, f"оплата {tag} заказ 2")
-
-    page.goto("/transactions")
-    page.wait_for_selector(f'.recat-button[data-transaction-id="{t1}"]', timeout=10000)
-
-    # открыть модалку переназначения у первой операции
-    page.locator(f'.recat-button[data-transaction-id="{t1}"]').click()
-    page.wait_for_selector("#recat-category", state="visible", timeout=5000)
-    page.locator("#recat-category").fill("Покупки")
-    page.locator("#recat-token").fill(tag)
-
-    # сохранить → POST /transactions/{id}/category, обучение + ретроактив
-    with page.expect_response(
-        lambda r: "/category" in r.url and r.request.method == "POST"
-    ) as resp:
-        page.locator("#recat-form button[type='submit']").click()
-    body = resp.value.json()
-    assert body["transaction"]["category"] == "Покупки"
-    assert body["updated_count"] == 1  # вторая совпадающая операция подхвачена ретроактивно
-
-    # правило появилось в списке выученных правил
-    page.wait_for_selector("#category-rules-list .rule-del", timeout=8000)
-    assert tag in page.locator("#category-rules-list").inner_text().lower()
-
-    # удалить правило → DELETE, строка исчезает
-    with page.expect_response(
-        lambda r: "/api/category-rules/" in r.url and r.request.method == "DELETE"
-    ):
-        page.locator("#category-rules-list .rule-del").first.click()
-    page.wait_for_function(
-        "() => !document.querySelector('#category-rules-list .rule-del')", timeout=8000
-    )
+    🔴 **Ценность именно в последнем шаге.** Продукт, который молча учится и не показывает
+    чему, — это продукт, который человек не может поправить: он видит, что операции
+    расходятся по неверным категориям, и не понимает почему.
+    """
+    page.goto(f"{seeded}/transactions")
+    page.get_by_role("button", name="Правила категорий").click(timeout=5000)

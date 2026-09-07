@@ -498,3 +498,40 @@ describe("SpendingPage — состояния запроса", () => {
     expect(within(header).getByText(/3/)).toBeInTheDocument();
   });
 });
+
+describe("SpendingPage — направление тренда и неполные данные", () => {
+  it("🔴 падающая категория подписана «снижается», а не только стрелкой", () => {
+    /* Направление, показанное лишь цветом или стрелкой, недоступно скринридеру
+       и дальтонику ([A11Y-07]). «−8.5 %» без слова человек читает как долю,
+       а не как изменение. */
+    adviceMock.mockReturnValue(
+      query({
+        data: payload({
+          temporal_patterns: [
+            {
+              category: "Кафе",
+              direction: "falling" as const,
+              slope_abs: -1200,
+              slope_pct: -8.5,
+              baseline: 14000,
+              months_observed: 6,
+              message: "Траты на кафе снижаются",
+            },
+          ],
+        }),
+      }),
+    );
+    render(<SpendingPage />);
+
+    expect(screen.getByText(/снижается/)).toBeInTheDocument();
+  });
+
+  it("ответ без советов и трендов не роняет экран", () => {
+    /* Оба массива необязательны: у человека с ровными тратами советов может
+       не быть вовсе, и это нормальный результат анализа, а не сбой. */
+    adviceMock.mockReturnValue(
+      query({ data: payload({ advice: undefined, temporal_patterns: undefined }) }),
+    );
+    expect(() => render(<SpendingPage />)).not.toThrow();
+  });
+});

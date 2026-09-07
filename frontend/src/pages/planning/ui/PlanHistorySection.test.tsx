@@ -354,3 +354,60 @@ describe("PlanHistorySection — что видно, когда действие 
     expect(toastError).toHaveBeenCalled();
   });
 });
+
+describe("PlanHistorySection — успех восстановления и повтор загрузки", () => {
+  it("успешное восстановление сообщается", async () => {
+    /* Симметрично проверке отказа: если «Вернуть» сработало, человек обязан
+       это увидеть — иначе он не отличит успех от тишины и нажмёт ещё раз. */
+    usePlanHistoryMock.mockReturnValue({
+      data: { items: [snapshot()] },
+      isLoading: false,
+      error: null,
+      refetch: vi.fn(),
+    });
+    deleteMock.mockImplementation((_id: number, opts?: { onSuccess?: () => void }) =>
+      opts?.onSuccess?.(),
+    );
+    restoreMock.mockImplementation((_id: number, opts?: { onSuccess?: () => void }) =>
+      opts?.onSuccess?.(),
+    );
+    render(<PlanHistorySection />);
+
+    await userEvent.click(screen.getAllByRole("button", { name: /Удалить снимок/ })[0]);
+    undoMock.mock.calls[0][1]();
+
+    expect(toastSuccess).toHaveBeenCalled();
+  });
+
+  it("отказ удаления сообщается", async () => {
+    usePlanHistoryMock.mockReturnValue({
+      data: { items: [snapshot()] },
+      isLoading: false,
+      error: null,
+      refetch: vi.fn(),
+    });
+    deleteMock.mockImplementation((_id: number, opts?: { onError?: () => void }) =>
+      opts?.onError?.(),
+    );
+    render(<PlanHistorySection />);
+
+    await userEvent.click(screen.getAllByRole("button", { name: /Удалить снимок/ })[0]);
+
+    expect(toastError).toHaveBeenCalled();
+    expect(undoMock).not.toHaveBeenCalled();
+  });
+
+  it("сбой загрузки истории даёт повтор", async () => {
+    const refetch = vi.fn();
+    usePlanHistoryMock.mockReturnValue({
+      data: undefined,
+      isLoading: false,
+      error: new Error("500"),
+      refetch,
+    });
+    render(<PlanHistorySection />);
+
+    await userEvent.click(screen.getByRole("button", { name: /Повторить|Обновить/ }));
+    expect(refetch).toHaveBeenCalled();
+  });
+});

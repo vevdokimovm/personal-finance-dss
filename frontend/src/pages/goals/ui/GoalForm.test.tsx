@@ -159,3 +159,37 @@ describe("GoalForm — ошибка сохранения", () => {
     expect(screen.getByRole("alert")).toBeInTheDocument();
   });
 });
+
+describe("GoalForm — необязательные поля и связь с активом", () => {
+  it("дедлайн, категория, связь с активом и комментарий доезжают", async () => {
+    /* 🔴 Связь с активом — не украшение: связанная цель пополняется через актив,
+       и попытка внести взнос вручную получит 409. Потерять выбор значит оставить
+       человека с целью, которую он не понимает, почему не может пополнить. */
+    createMutateAsync.mockResolvedValue({ id: 1 });
+    const user = userEvent.setup();
+    render(<GoalForm open onOpenChange={() => {}} />);
+
+    await user.type(screen.getByLabelText(/название/i), "Отпуск");
+    await user.type(screen.getByLabelText(/сумма цели|целевая сумма/i), "200000");
+    await user.type(screen.getByLabelText(/срок|дедлайн|дата/i), "2027-06-01");
+    await user.selectOptions(screen.getByLabelText(/актив/i), "3");
+    await user.type(screen.getByLabelText(/комментар/i), "  на море  ");
+    await user.click(screen.getByRole("button", { name: /сохранить|добавить/i }));
+
+    await waitFor(() => expect(createMutateAsync).toHaveBeenCalled());
+    const body = createMutateAsync.mock.calls[0][0];
+    expect(body.linked_asset_id).toBe(3);
+    expect(body.comment).toBe("на море");
+    expect(body.deadline).toMatch(/^2027-06-01T/);
+  });
+
+  it("отмена закрывает форму, ничего не отправив", async () => {
+    const onOpenChange = vi.fn();
+    render(<GoalForm open onOpenChange={onOpenChange} />);
+
+    await userEvent.click(screen.getByRole("button", { name: /отмена/i }));
+
+    expect(createMutateAsync).not.toHaveBeenCalled();
+    expect(onOpenChange).toHaveBeenCalledWith(false);
+  });
+});

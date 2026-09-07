@@ -167,3 +167,56 @@ describe("ConsentsSection — требование L3", () => {
     expect(screen.getByRole("button", { name: /Дать согласие: Финансовые/ })).toBeVisible();
   });
 });
+
+/**
+ * Ветки отказа — непокрытый остаток секции.
+ *
+ * 🔴 **Отзыв согласия на финданные закрывает шесть роутеров разом** (`_FIN`).
+ * Если запрос упал, а мы промолчали, человек уверен, что отозвал, — и продолжает
+ * пользоваться продуктом, считая свои данные защищёнными. Это не UX-мелочь,
+ * а расхождение между тем, что он решил, и тем, что произошло.
+ */
+describe("ConsentsSection — что видно, когда действие не удалось", () => {
+  it("отказ при выдаче согласия сообщается", async () => {
+    useConsentsMock.mockReturnValue({ data: ALL_CONSENTS, isLoading: false, error: null });
+    grantMock.mockImplementation((_type: string, opts?: { onError?: () => void }) =>
+      opts?.onError?.(),
+    );
+    render(<ConsentsSection />);
+
+    await userEvent.click(screen.getByRole("button", { name: /Дать согласие: Финансовые/ }));
+    expect(toastError).toHaveBeenCalled();
+  });
+
+  it("🔴 отказ при отзыве сообщается — иначе человек думает, что отозвал", async () => {
+    useConsentsMock.mockReturnValue({ data: ALL_CONSENTS, isLoading: false, error: null });
+    withdrawMock.mockImplementation((_type: string, opts?: { onError?: () => void }) =>
+      opts?.onError?.(),
+    );
+    render(<ConsentsSection />);
+
+    await userEvent.click(screen.getByRole("button", { name: /Отозвать согласие: Рекламная/ }));
+    expect(toastError).toHaveBeenCalled();
+    expect(toastUndo).not.toHaveBeenCalled();
+  });
+
+  it("🔴 отказ при ВОССТАНОВЛЕНИИ через «Вернуть» тоже сообщается", async () => {
+    /* Кнопка отмены создаёт впечатление обратимости. Если восстановление упало
+       молча, человек уверен, что согласие вернулось, и не даст его заново —
+       а шесть роутеров останутся закрытыми. */
+    useConsentsMock.mockReturnValue({ data: ALL_CONSENTS, isLoading: false, error: null });
+    withdrawMock.mockImplementation((_type: string, opts?: { onSuccess?: () => void }) =>
+      opts?.onSuccess?.(),
+    );
+    grantMock.mockImplementation((_type: string, opts?: { onError?: () => void }) =>
+      opts?.onError?.(),
+    );
+    render(<ConsentsSection />);
+
+    await userEvent.click(screen.getByRole("button", { name: /Отозвать согласие: Рекламная/ }));
+    expect(toastUndo).toHaveBeenCalled();
+    // Нажимаем «Вернуть» — ToastProvider в юнит-тесте не смонтирован, зовём обработчик.
+    toastUndo.mock.calls[0][1]();
+    expect(toastError).toHaveBeenCalled();
+  });
+});

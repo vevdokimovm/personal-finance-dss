@@ -111,10 +111,14 @@ class TestNoLinkDependsOnLocalOnlyFile:
         Префикс, который git НЕ игнорирует, означает, что путь живёт в репозитории,
         и пропускать ссылки на него — значит перестать проверять настоящие ссылки.
         """
-        wrong = [
-            prefix for prefix in GENERATED_PREFIXES
-            if (REPO_ROOT / prefix).exists() and not _is_ignored_by_git(prefix.rstrip("/"))
-        ]
+        # 🔴 Спрашиваем про ПУТЬ ВНУТРИ каталога, а не про сам каталог.
+        # `git check-ignore frontend/test-results` на чистом клоне отвечает «не
+        # игнорируется» — не потому, что правила нет, а потому что каталога нет:
+        # git отвечает про существующий путь. Локально каталоги собраны, на CI нет,
+        # и тест краснел ТОЛЬКО в CI. Тот же класс, что он сам и ловит (PIT-032):
+        # проверка зависела от состояния машины, а не от правил.
+        probe = lambda prefix: f"{prefix.rstrip('/')}/probe.txt"
+        wrong = [prefix for prefix in GENERATED_PREFIXES if not _is_ignored_by_git(probe(prefix))]
         assert not wrong, (
             f"эти префиксы объявлены порождаемыми, но git их не игнорирует: {wrong} — "
             "ссылки на них перестали проверяться зря"

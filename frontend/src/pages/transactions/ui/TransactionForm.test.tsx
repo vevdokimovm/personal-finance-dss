@@ -196,3 +196,20 @@ describe("TransactionForm — направление операции", () => {
     expect(createMutateAsync.mock.calls[0][0].category).toBe("Продукты");
   });
 });
+
+describe("TransactionForm — дата", () => {
+  it("🔴 пустая дата не отправляется, фокус уходит в дату", async () => {
+    /* Вторая ветка валидации: она проверяется отдельно от суммы, потому что
+       фокус должен уйти в ПЕРВОЕ незаполненное поле, а не всегда в одно и то же.
+       Сумма заполнена — значит очередь даты. */
+    const user = userEvent.setup();
+    render(<TransactionForm open onOpenChange={() => {}} />);
+
+    await user.type(screen.getByLabelText(/сумма/i), "1000");
+    await user.clear(screen.getByLabelText(/дата/i));
+    await user.click(screen.getByRole("button", { name: /сохранить|добавить/i }));
+
+    expect(createMutateAsync).not.toHaveBeenCalled();
+    await waitFor(() => expect(screen.getByLabelText(/дата/i)).toHaveFocus());
+  });
+});
