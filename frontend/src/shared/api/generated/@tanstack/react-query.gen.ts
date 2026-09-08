@@ -952,6 +952,22 @@ export const listRatesApiFxRatesGetOptions = (options?: Options<ListRatesApiFxRa
 
 /**
  * Обновить/добавить курс
+ *
+ * Записать курс валюты к доллару.
+ *
+ * 🔴 Только администратор. `fx_rates` — таблица с ключом по валюте, ОДНА на весь
+ * экземпляр, и она читается на каждом расчёте: планирование, анализ и рекомендация
+ * приводят суммы к базовой валюте через неё. Метод стоял без единой зависимости,
+ * кроме сессии БД, — то есть любой аноним менял курс и вместе с ним свободный ресурс,
+ * ликвидность, ПДН и рекомендацию у всех пользователей сразу, молча.
+ *
+ * Соседний `/fx/refresh` был закрыт `require_admin` с самого начала, и сам
+ * `require_admin` в этом файле уже импортирован: защиту знали, к этому методу
+ * не применили. Роутер подключается без гейта гостевой записи, поэтому запрет
+ * v8.53.0 сюда не доставал.
+ *
+ * Не «любой вошедший»: курс — общий ресурс. Меняя его «для себя», пользователь
+ * меняет его всем.
  */
 export const upsertRateApiFxRatesPutMutation = (options?: Partial<Options<UpsertRateApiFxRatesPutData>>): UseMutationOptions<UpsertRateApiFxRatesPutResponse, UpsertRateApiFxRatesPutError, Options<UpsertRateApiFxRatesPutData>> => {
     const mutationOptions: UseMutationOptions<UpsertRateApiFxRatesPutResponse, UpsertRateApiFxRatesPutError, Options<UpsertRateApiFxRatesPutData>> = {

@@ -7,7 +7,7 @@
 
     ПРОВАЛ: битая ссылка -> frontend/dist/index.html   (docs/pitfalls.md)
     ПРОВАЛ: битая ссылка -> frontend/dist/index.html   (docs/ROADMAP.md)
-    ПРОВАЛ: битая ссылка -> frontend/dist/index.html   (docs/WATCHLOG.md)
+    ПРОВАЛ: битая ссылка -> frontend/dist/index.html   (docs/<файл>.md)
 
 Причина не в ссылках, а в **разнице состояний**: `frontend/dist/` порождается сборкой
 и закрыт `.gitignore`. У того, кто только что собрал фронт, каталог есть, и проверка

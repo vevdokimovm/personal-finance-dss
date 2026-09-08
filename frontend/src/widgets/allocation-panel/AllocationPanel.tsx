@@ -104,6 +104,7 @@ function AllocationSankeyLink({
 export function AllocationPanel({
   best,
   alternatives,
+  rejected,
 }: {
   best: PlanAlternative | null;
   /* Опционально по контракту (см. `CalculatePlanResult.ranked`). Без альтернатив панель
@@ -111,6 +112,10 @@ export function AllocationPanel({
      отдельным полем `best` и показывается как обычно. Экран не обязан работать в полном
      объёме без этих данных, он обязан не падать. */
   alternatives?: PlanAlternative[];
+  /* Отклонённые альтернативы с причинами (`CalculatePlanResult.rejected`). Нужны ровно
+     для одного: объяснить ПУСТОЙ план настоящей причиной. Опционально — старый ответ
+     без этого поля не должен ронять экран. */
+  rejected?: PlanAlternative[];
 }) {
   const alts = alternatives ?? [];
   const [detailed, setDetailed] = useState(false);
@@ -169,14 +174,33 @@ export function AllocationPanel({
   }, [isRecommended]);
 
   if (!best) {
+    /* 🔴 Причина берётся из ответа, а не предполагается. Прежняя редакция утверждала
+       одно и то же при любой пустоте допустимого множества: «расходы превышают доход».
+       Но пустым оно становится и от собственной настройки человека — ползунок
+       «минимальная ликвидность» уходит в `l_min`, и фильтр отсекает по нему.
+       Человек с положительным свободным потоком читал неверное утверждение о своих
+       деньгах и делал вывод о доходах вместо вывода о своей же настройке.
+
+       Бэкенд присылает готовый текст причины по каждой отклонённой альтернативе
+       (`filter_alternatives` → `violations`), и до этой правки фронт их не читал вовсе. */
+    const reasons = Array.from(
+      new Set((rejected ?? []).flatMap((a) => a.violations ?? [])),
+    );
     return (
       <section className="fp-panel">
         <h2>{t("Плана распределения нет")}</h2>
         <p className="fp-lede">
           {t(
-            "Расходы и платежи превышают доход — свободных денег не остаётся, и алгоритм не выдаёт рекомендацию (fail-loud), а не молчит об этом.",
+            "Ни один вариант распределения не прошёл проверки, поэтому алгоритм не выдаёт рекомендацию — это отказ вслух, а не молчание.",
           )}
         </p>
+        {reasons.length > 0 && (
+          <ul className="fp-alloc-reasons">
+            {reasons.map((reason) => (
+              <li key={reason}>{reason}</li>
+            ))}
+          </ul>
+        )}
       </section>
     );
   }

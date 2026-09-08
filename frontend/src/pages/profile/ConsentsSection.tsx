@@ -2,7 +2,8 @@ import { useRef } from "react";
 import { useConsents, useGrantConsent, useWithdrawConsent } from "@entities/consents";
 import type { ConsentType } from "@entities/consents";
 import { useLegalDocuments } from "@entities/legal";
-import { Button, toast } from "@shared/ui";
+import { Button, StatePanel, toast } from "@shared/ui";
+import { SessionExpiredPanel, isSessionExpired, toastMutationError } from "@entities/auth";
 import { formatDate } from "@shared/lib/date/formatDate";
 import { t } from "@shared/lib/i18n/t";
 import "./ProfilePage.css";
@@ -46,13 +47,50 @@ export function ConsentsSection() {
   // явного переноса фокус проваливается в <body> (a11y-auditor).
   const statusRefs = useRef<Record<string, HTMLSpanElement | null>>({});
 
-  if (query.isLoading || query.isError || !query.data) return null;
+  /* 🔴 Ошибка не прячет секцию молча. Прежняя редакция сворачивала блок при ЛЮБОЙ
+     ошибке одной строкой `return null` — а это единственный путь отзыва согласия
+     в интерфейсе, и `routes_consents.py` прямо называет его недоступность нарушением
+     152-ФЗ, а не дефектом интерфейса. Человек не мог отличить «функции нет»
+     от «сеть моргнула»: экран просто оказывался без блока.
+
+     Загрузка по-прежнему тиха: сообщать не о чем, пока ответ не пришёл. */
+  if (query.isLoading) return null;
+
+  if (query.isError || !query.data) {
+    if (isSessionExpired(query.error)) {
+      return (
+        <section className="fp-profile-section">
+          <h2>{t("Согласия")}</h2>
+          <SessionExpiredPanel redirectTo="/profile" />
+        </section>
+      );
+    }
+    return (
+      <section className="fp-profile-section">
+        <h2>{t("Согласия")}</h2>
+        <StatePanel
+          title={t("Не получилось загрузить согласия")}
+          role="alert"
+          action={
+            <Button variant="primary" onClick={() => void query.refetch?.()}>
+              {t("Повторить")}
+            </Button>
+          }
+        >
+          {t(
+            "Управление согласиями временно недоступно. Ваши согласия при этом не изменились — "
+            + "повторите попытку или напишите в поддержку.",
+          )}
+        </StatePanel>
+      </section>
+    );
+  }
 
   function handleGrant(type: ConsentType) {
     if (grant.isPending) return;
     grant.mutate(type, {
       onSuccess: () => statusRefs.current[type]?.focus(),
-      onError: () => toast.error(t("Не получилось сохранить согласие. Попробуйте ещё раз.")),
+      onError: (error) => toastMutationError(error, t("Не получилось сохранить согласие. Попробуйте ещё раз.")),
     });
   }
 
@@ -65,11 +103,11 @@ export function ConsentsSection() {
         // шесть роутеров разом (_FIN, app/api/router.py) — отменяемость важна не меньше.
         toast.undo(t("Согласие «{name}» отозвано.", { name: label(type) }), () => {
           grant.mutate(type, {
-            onError: () => toast.error(t("Не получилось восстановить согласие.")),
+            onError: (error) => toastMutationError(error, t("Не получилось восстановить согласие.")),
           });
         });
       },
-      onError: () => toast.error(t("Не получилось отозвать согласие. Попробуйте ещё раз.")),
+      onError: (error) => toastMutationError(error, t("Не получилось отозвать согласие. Попробуйте ещё раз.")),
     });
   }
 

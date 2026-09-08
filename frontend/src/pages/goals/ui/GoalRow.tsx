@@ -3,6 +3,7 @@ import { t } from "@shared/lib/i18n/t";
 import { Button, toast } from "@shared/ui";
 import { useDeleteGoal, useRestoreGoal, GOAL_CATEGORY_LABEL, type Goal } from "@entities/goals";
 import { SharedBadge } from "@features/household-scope";
+import { toastMutationError } from "@entities/auth";
 
 const NBSP = " ";
 
@@ -47,11 +48,11 @@ export function GoalRow({
         toast.undo(t("Цель «{name}» удалена.", { name }), () => {
           restoreGoal.mutate(goal.id, {
             onSuccess: () => toast.success(t("Цель «{name}» восстановлена.", { name })),
-            onError: () => toast.error(t("Не получилось восстановить. Попробуйте ещё раз.")),
+            onError: (error) => toastMutationError(error, t("Не получилось восстановить. Попробуйте ещё раз.")),
           });
         });
       },
-      onError: () => toast.error(t("Не получилось удалить. Попробуйте ещё раз.")),
+      onError: (error) => toastMutationError(error, t("Не получилось удалить. Попробуйте ещё раз.")),
     });
   }
 

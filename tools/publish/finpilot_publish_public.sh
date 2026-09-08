@@ -173,6 +173,12 @@ DENY_NAME_PATTERNS=(
   '*.sqlite3'
   'finpilot_publish_public.sh'
   'public_release_notes.md'
+  # Гейт приватности приватного контура: по построению НАЗЫВАЕТ каталог с живыми
+  # персональными данными (список исключений — его рабочие данные). Публично это
+  # указатель «ПДн есть, вот где», а смысла в зеркале ноль: `knowledge/` не публикуется.
+  'test_no_personal_data_in_tree.py'
+  # Внутренний тулинг рабочей станции — к продукту отношения не имеет.
+  'setup_claude_code_plugins.sh'
 )
 
 # ── Секрет-паттерны (ERE, BSD-grep совместимо). Найдено → FAIL ────────────────
@@ -236,6 +242,17 @@ RSYNC_EXCLUDES=(
   --exclude 'setup_claude_code_plugins.sh' # инструментальный контур агента
 )
 
+# ── Тесты внутренних инструментов не публикуются вместе с самими инструментами ─
+# Каталог `tools/` в ALLOW_DIRS не входит, а `tests/` входит целиком — поэтому
+# в зеркало уезжали тесты кода, которого в зеркале нет. Для читателя это ссылки
+# в никуда, для сборки — лишний вес, а описания там про внутренний процесс.
+# Список считается по факту импорта, а не ведётся руками: добавили тест на
+# инструмент — он исключается сам, без правки этого файла.
+collect_internal_tool_tests() {
+  "$GREP" -rl -E '(from|import) tools[. ]' "$SOURCE_REPO/tests" 2>/dev/null \
+    | while read -r f; do /usr/bin/basename "$f"; done | sort -u
+}
+
 # ── Хелперы ──────────────────────────────────────────────────────────────────
 log()  { /bin/echo ">> $*"; }
 warn() { /bin/echo "!! $*" >&2; }
@@ -279,12 +296,22 @@ build_tree() {
   local dest="$1"
   [ -d "$SOURCE_REPO" ] || die "Источник не найден: $SOURCE_REPO (задай FINPILOT_SRC=...)"
 
+  # Тесты внутренних инструментов: исключения считаются по факту импорта `tools`,
+  # поэтому новый такой тест отсекается сам, без правки списков выше.
+  local extra_excludes=()
+  local t
+  while IFS= read -r t; do
+    [ -n "$t" ] && extra_excludes+=( --exclude "$t" )
+  done < <(collect_internal_tool_tests)
+  [ ${#extra_excludes[@]} -gt 0 ] \
+    && log "Исключаю тесты внутренних инструментов: $(( ${#extra_excludes[@]} / 2 )) шт."
+
   log "Копирую директории..."
   local d
   for d in "${ALLOW_DIRS[@]}"; do
     if [ -d "$SOURCE_REPO/$d" ]; then
       "$MKDIR" -p "$dest/$d"
-      "$RSYNC" -a "${RSYNC_EXCLUDES[@]}" "$SOURCE_REPO/$d/" "$dest/$d/"
+      "$RSYNC" -a "${RSYNC_EXCLUDES[@]}" "${extra_excludes[@]}" "$SOURCE_REPO/$d/" "$dest/$d/"
     else
       warn "нет директории $d — пропуск"
     fi

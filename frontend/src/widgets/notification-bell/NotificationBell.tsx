@@ -8,11 +8,12 @@ import {
   useMarkAllRead,
 } from "@entities/notifications";
 import type { NotificationOut } from "@entities/notifications";
-import { Button, ListSkeleton, StatePanel, toast } from "@shared/ui";
+import { Button, ListSkeleton, StatePanel } from "@shared/ui";
 import { t } from "@shared/lib/i18n/t";
 import { isConsentRequired } from "@shared/lib/api/extractErrorMessage";
 import { useProfile } from "@entities/profile";
 import "./NotificationBell.css";
+import { toastMutationError } from "@entities/auth";
 
 /**
  * Колокольчик уведомлений в топбаре (ROADMAP §8.2 «ГЛАВНОЕ», первая из API-only фич).
@@ -74,7 +75,7 @@ export function NotificationBell() {
   function openLink(n: NotificationOut) {
     if (!n.is_read) {
       markRead.mutate(n.id, {
-        onError: () => toast.error(t("Не получилось отметить уведомление прочитанным.")),
+        onError: (error) => toastMutationError(error, t("Не получилось отметить уведомление прочитанным.")),
       });
     }
     // `link` есть в контракте и бэкенд его заполняет (`/goals`, `/planning`). Без
@@ -126,8 +127,8 @@ export function NotificationBell() {
                 aria-busy={markAllRead.isPending}
                 onClick={() =>
                   markAllRead.mutate(undefined, {
-                    onError: () =>
-                      toast.error(t("Не получилось отметить уведомления прочитанными.")),
+                    onError: (error) =>
+                      toastMutationError(error, t("Не получилось отметить уведомления прочитанными.")),
                     // Фокус уводится на триггер ДО того, как кнопка исчезнет: она
                     // рендерится по `unread_count > 0`, и после успеха размонтируется —
                     // сфокусированный узел пропал бы, уронив фокус в <body> (тот же

@@ -222,7 +222,13 @@ export function PlanningPage() {
           заменяет пустую панель, а не соседствует с ней. */}
       {!plan.crisis_plan && (
         <>
-          <AllocationPanel best={plan.top3?.[0] ?? null} alternatives={plan.ranked} />
+          {/* `rejected` нужен ровно для пустого плана: панель объясняет пустоту
+              настоящей причиной из ответа, а не одной предполагаемой. */}
+          <AllocationPanel
+            best={plan.top3?.[0] ?? null}
+            alternatives={plan.ranked}
+            rejected={plan.rejected}
+          />
           <AlternativesBrowser alternatives={plan.ranked} />
         </>
       )}

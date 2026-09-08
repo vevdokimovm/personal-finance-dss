@@ -96,7 +96,13 @@ export function DashboardPage() {
       </h1>
       <Hero plan={plan} />
       <MetricsGrid indicators={plan.indicators} />
-      <AllocationPanel best={plan.top3?.[0] ?? null} alternatives={plan.ranked} />
+      {/* `rejected` — причины пустого плана. Без него панель называла бы одну
+          предполагаемую причину («расходы превышают доход») при любой из них. */}
+      <AllocationPanel
+        best={plan.top3?.[0] ?? null}
+        alternatives={plan.ranked}
+        rejected={plan.rejected}
+      />
       <ForecastPanel forecast={forecast} />
       <BudgetsSection />
     </main>

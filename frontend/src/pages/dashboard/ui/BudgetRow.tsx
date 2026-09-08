@@ -3,6 +3,7 @@ import { t } from "@shared/lib/i18n/t";
 import { Button, toast } from "@shared/ui";
 import { useDeleteBudget, useRestoreBudget, type BudgetStatus } from "@entities/budgets";
 import { SharedBadge } from "@features/household-scope";
+import { toastMutationError } from "@entities/auth";
 
 export function BudgetRow({
   budget,
@@ -26,11 +27,11 @@ export function BudgetRow({
         toast.undo(t("Бюджет «{category}» удалён.", { category }), () => {
           restoreBudget.mutate(budget.id, {
             onSuccess: () => toast.success(t("Бюджет «{category}» восстановлен.", { category })),
-            onError: () => toast.error(t("Не получилось восстановить. Попробуйте ещё раз.")),
+            onError: (error) => toastMutationError(error, t("Не получилось восстановить. Попробуйте ещё раз.")),
           });
         });
       },
-      onError: () => toast.error(t("Не получилось удалить. Попробуйте ещё раз.")),
+      onError: (error) => toastMutationError(error, t("Не получилось удалить. Попробуйте ещё раз.")),
     });
   }
 

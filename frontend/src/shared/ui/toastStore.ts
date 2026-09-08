@@ -54,4 +54,9 @@ export const toast = {
    * undo-toast в старой Jinja-версии, app.js). */
   undo: (message: string, onUndo: () => void) =>
     push("success", message, { label: "Вернуть", onClick: onUndo }),
+  /** Ошибка, из которой есть выход. Нужна там, где «Повторить» бессмысленно: на 401
+   * повтор возвращает 401 бесконечно, и единственный следующий шаг — вход заново.
+   * Вариант `error`, а не `success`: это отказ, а не отменяемое действие. */
+  errorWithAction: (message: string, label: string, onClick: () => void) =>
+    push("error", message, { label, onClick }),
 };

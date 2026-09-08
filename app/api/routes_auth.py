@@ -63,6 +63,29 @@ from app.utils.time import utcnow
 router = APIRouter(prefix="/auth", tags=["Аутентификация"])
 
 
+def _may_return_link_in_response() -> bool:
+    """Можно ли положить ссылку подтверждения/сброса прямо в тело ответа.
+
+    🔴 Условие про ОКРУЖЕНИЕ, а не только про почту. Прежняя редакция спрашивала
+    `not settings.email_enabled`, то есть «SMTP не настроен» — и комментарий рядом
+    говорил «в dev», хотя dev там не проверялся вовсе.
+
+    **Прод без почты — ожидаемая конфигурация, а не экзотика:** `validate_production_security`
+    требует JWT-секрет, cookie, ключ администратора, CORS, доверие прокси и запрет SQLite,
+    но не SMTP, так что приложение штатно поднимается без неё. В такой сборке
+    `POST /auth/forgot-password` с чужим адресом возвращал готовую ссылку сброса,
+    а по ней меняется пароль — полный захват аккаунта без доступа к почте владельца.
+
+    Заодно закрывается перебор аккаунтов: текст ответа одинаков для всех, но поле
+    `reset_url` было не-null только для существующего пользователя, и наличие поля
+    отвечало на вопрос, есть ли такой аккаунт.
+
+    В dev удобство сохраняется: без почты и без ссылки локально нельзя ни подтвердить
+    адрес, ни сбросить пароль.
+    """
+    return not settings.is_production and not settings.email_enabled
+
+
 def _set_auth_cookie(response: Response, token: str) -> None:
     response.set_cookie(
         key=settings.AUTH_COOKIE_NAME,
@@ -154,7 +177,7 @@ def register(
 
     # В dev (без SMTP) отдаём ссылку прямо в ответе — чтобы можно было подтвердить локально.
     # без SMTP отдаём ссылку (self-hosted)
-    dev_link = verify_url if not settings.email_enabled else None
+    dev_link = verify_url if _may_return_link_in_response() else None
     return AuthResponse(
         access_token=token,
         user=UserResponse.model_validate(user),
@@ -288,7 +311,7 @@ def forgot_password(
         log_event("password_reset_requested", user_id=user.id)
 
     # В dev (без SMTP) отдаём ссылку прямо в ответе — чтобы можно было сбросить локально.
-    dev_link = reset_url if (user is not None and not settings.email_enabled) else None
+    dev_link = reset_url if (user is not None and _may_return_link_in_response()) else None
     return {
         "detail": "Если аккаунт с таким email существует, "
                   "на него отправлена ссылка для сброса пароля.",
@@ -370,7 +393,7 @@ def resend_verification(
         user_id=user.id,
     )
     # без SMTP отдаём ссылку (self-hosted)
-    dev_link = verify_url if not settings.email_enabled else None
+    dev_link = verify_url if _may_return_link_in_response() else None
     return {"detail": "Письмо отправлено.", "verification_url": dev_link}
 
 

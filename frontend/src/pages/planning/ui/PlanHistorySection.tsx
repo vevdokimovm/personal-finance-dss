@@ -12,6 +12,7 @@ import { formatMoney, formatPercent } from "@shared/lib/money/formatMoney";
 import { t } from "@shared/lib/i18n/t";
 import { getConsentRequiredDetail } from "@shared/lib/api/extractErrorMessage";
 import "./PlanHistorySection.css";
+import { toastMutationError } from "@entities/auth";
 
 /** Сколько снимков показывать сразу. Остальные — по кнопке: сервер отдаёт до 50, и все
  * пятьдесят карточек дописались бы к самому длинному экрану продукта ([IA-06]). */
@@ -62,7 +63,7 @@ export function PlanHistorySection() {
           setNote("");
           toast.success(t("План сохранён в историю"));
         },
-        onError: () => toast.error(t("Не получилось сохранить план. Попробуйте ещё раз.")),
+        onError: (error) => toastMutationError(error, t("Не получилось сохранить план. Попробуйте ещё раз.")),
       },
     );
   }
@@ -80,11 +81,11 @@ export function PlanHistorySection() {
         toast.undo(t("Снимок удалён"), () =>
           restore.mutate(snapshot.id, {
             onSuccess: () => toast.success(t("Снимок восстановлен")),
-            onError: () => toast.error(t("Не получилось восстановить снимок. Попробуйте ещё раз.")),
+            onError: (error) => toastMutationError(error, t("Не получилось восстановить снимок. Попробуйте ещё раз.")),
           }),
         );
       },
-      onError: () => toast.error(t("Не получилось удалить снимок. Попробуйте ещё раз.")),
+      onError: (error) => toastMutationError(error, t("Не получилось удалить снимок. Попробуйте ещё раз.")),
     });
   }
 

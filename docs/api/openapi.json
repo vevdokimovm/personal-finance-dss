@@ -1181,6 +1181,10 @@
       "ConsentState": {
         "description": "Состояние одного согласия.\n\n`withdrawable` — не удобство, а требование: по нему интерфейс решает, показывать ли\nкнопку отзыва. Согласие-основание (обработка ПДн) отозвать нельзя иначе как удалением\nаккаунта — кнопка там гарантированно дала бы 409, то есть тупик ([IA-04]).",
         "properties": {
+          "current_version": {
+            "title": "Current Version",
+            "type": "string"
+          },
           "granted": {
             "title": "Granted",
             "type": "boolean"
@@ -1196,6 +1200,10 @@
             ],
             "title": "Granted At"
           },
+          "is_current": {
+            "title": "Is Current",
+            "type": "boolean"
+          },
           "version": {
             "title": "Version",
             "type": "string"
@@ -1208,6 +1216,8 @@
         "required": [
           "granted",
           "version",
+          "current_version",
+          "is_current",
           "withdrawable"
         ],
         "title": "ConsentState",
@@ -6512,7 +6522,7 @@
   },
   "info": {
     "title": "FINPILOT",
-    "version": "9.2.0"
+    "version": "9.6.0"
   },
   "openapi": "3.1.0",
   "paths": {
@@ -8492,7 +8502,26 @@
         ]
       },
       "put": {
+        "description": "Записать курс валюты к доллару.\n\n🔴 Только администратор. `fx_rates` — таблица с ключом по валюте, ОДНА на весь\nэкземпляр, и она читается на каждом расчёте: планирование, анализ и рекомендация\nприводят суммы к базовой валюте через неё. Метод стоял без единой зависимости,\nкроме сессии БД, — то есть любой аноним менял курс и вместе с ним свободный ресурс,\nликвидность, ПДН и рекомендацию у всех пользователей сразу, молча.\n\nСоседний `/fx/refresh` был закрыт `require_admin` с самого начала, и сам\n`require_admin` в этом файле уже импортирован: защиту знали, к этому методу\nне применили. Роутер подключается без гейта гостевой записи, поэтому запрет\nv8.53.0 сюда не доставал.\n\nНе «любой вошедший»: курс — общий ресурс. Меняя его «для себя», пользователь\nменяет его всем.",
         "operationId": "upsert_rate_api_fx_rates_put",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "X-Admin-Key",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Admin-Key"
+            }
+          }
+        ],
         "requestBody": {
           "content": {
             "application/json": {

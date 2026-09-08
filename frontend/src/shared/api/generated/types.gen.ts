@@ -776,6 +776,10 @@ export type ClosedGoal = {
  */
 export type ConsentState = {
     /**
+     * Current Version
+     */
+    current_version: string;
+    /**
      * Granted
      */
     granted: boolean;
@@ -783,6 +787,10 @@ export type ConsentState = {
      * Granted At
      */
     granted_at?: string | null;
+    /**
+     * Is Current
+     */
+    is_current: boolean;
     /**
      * Version
      */
@@ -5617,6 +5625,12 @@ export type ListRatesApiFxRatesGetResponse = ListRatesApiFxRatesGetResponses[key
 
 export type UpsertRateApiFxRatesPutData = {
     body: FxRateUpsert;
+    headers?: {
+        /**
+         * X-Admin-Key
+         */
+        'X-Admin-Key'?: string | null;
+    };
     path?: never;
     query?: never;
     url: '/api/fx/rates';

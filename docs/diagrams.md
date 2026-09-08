@@ -331,12 +331,53 @@ flowchart TD
     S5["5 · Генерация альтернатив<br/><code>alternatives.py</code><br/>stars-and-bars, шаг 10% → 66 комбинаций"]
     S6["6 · Оценка вариантов<br/><code>avalanche.py</code> (Debt Avalanche + OCR) +<br/><code>goals_priority.py</code> (цели: категория × срочность)"]
     S7["7 · Фильтрация<br/><code>filtering.py</code><br/>жёсткие инварианты: Rt≥0 · ПДН≤0.40 · L_min (выкл по умолч.)"]
-    S8["8 · Ранжирование SAW<br/><code>ranking.py</code><br/>min-max нормализация → свёртка по весам профиля риска"]
+    S8["8 · Ранжирование<br/><code>ranking.py</code><br/>ЛЕКСИКОГРАФИЧЕСКИ: сначала floor резерва,<br/>затем SAW-свёртка по весам профиля"]
     S9["9 · Объяснение<br/><code>recommendation.py</code><br/>лучшее распределение + обоснование + топ-3"]
     Out["План: Rt/Lt/Dt/BLR · распределение · прогноз · альтернативы"]
 
     In --> S1 --> S2 --> S3 --> S4 --> S5 --> S6 --> S7 --> S8 --> S9 --> Out
 ```
+
+---
+
+## 3а. Правило выбора — как из 66 вариантов остаётся один
+
+Схема самой матмодели, а не конвейера: чем именно один вариант распределения оказывается
+лучше другого. Канон — `math_model.md`, история калибровок — `model/model_history.md`.
+
+🔴 **Ключевое, что теряется при пересказе «ранжирование по SAW».** Сравнение
+**лексикографическое**: сначала сравнивается уровень floor резерва, и только при равенстве —
+взвешенная свёртка. Причина в самом каноне (§21 п. 9): при весе ликвидности $w_L = 0{.}10$
+у агрессивного профиля никакая нормализация не гарантирует стартовую подушку — гарантирует
+только приоритет уровнем выше свёртки.
+
+```mermaid
+flowchart TD
+    Alts["66 альтернатив (шаг 10%)<br/>доли: долг · резерв · цели"]
+
+    subgraph Hard["Жёсткие инварианты — отсев"]
+        I1["Rt' ≥ 0<br/>план не уводит бюджет в минус"]
+        I2["Dt' ≤ max(0.40, Dt)<br/>план не увеличивает ПДН"]
+        I3["Lt' ≥ L_min<br/>мягкий: L_min = 0 по умолчанию"]
+    end
+
+    subgraph Lex["Лексикографическое сравнение"]
+        L1["1) floor_level = min(Lt', floor)<br/>floor = 2 мес; 1 мес при токсичном долге;<br/>+ надбавка при CV дохода > 0.3"]
+        L2["2) utility — SAW-свёртка<br/>min-max нормализация Rt·Lt·Dt·Si,<br/>веса по риск-профилю (5 профилей)"]
+    end
+
+    Best["Рекомендация + топ-3<br/>+ объяснение вклада каждого критерия"]
+    Rej["Отклонённые с причинами<br/>(violations — текст для экрана)"]
+
+    Alts --> Hard
+    Hard -->|прошли| Lex
+    Hard -->|не прошли| Rej
+    L1 --> L2 --> Best
+```
+
+**Почему отсев только по двум инвариантам.** Жёсткий порог ликвидности на пост-распределении
+массово отсекал бы людей с тонким бюджетом — продукт отказывал бы тем, кому совет нужнее
+всего. Поэтому ликвидность работает мягко: через floor и через свёртку, а не через отказ.
 
 ---
 
@@ -378,20 +419,20 @@ sequenceDiagram
 
 ## 5. Развёртывание и компоненты
 
-Как части системы связаны в проде. Сервер - единый процесс FastAPI под uvicorn (SSR-шаблоны
-+ статика + API в одном приложении). Внешние зависимости немногочисленны и заменяемы; их
+Как части системы связаны в проде. Сервер - единый процесс FastAPI под uvicorn (API
++ раздача собранного SPA в одном приложении). Внешние зависимости немногочисленны и заменяемы; их
 недоступность не роняет приложение (ставка ЦБ имеет фолбэк и кэш в БД, письма/уведомления/
 мониторинг - опциональны).
 
 ```mermaid
 flowchart LR
     subgraph Client["Клиент (браузер)"]
-        UI["Jinja2 SSR-страницы +<br/>vanilla JS: app.js, auth.js<br/>токен в localStorage"]
+        UI["React 19 SPA (Vite, TanStack Router/Query)<br/>сессия — HttpOnly cookie"]
     end
 
     subgraph Server["Сервер — uvicorn · FastAPI (один процесс)"]
         MW["Middleware-цепочка"]
-        Routes["Роуты: страницы (HTML) · /api/* · /v1/analyze (B2B)"]
+        Routes["Роуты: /api/* · /v1/analyze (B2B) · отдача SPA"]
         Svc["Сервисы + ядро (app/core) + ingestion"]
     end
 
@@ -445,13 +486,18 @@ flowchart TD
 Гостевой режим - первоклассный: без токена приложение работает с данными `user_id IS NULL`.
 Регистрация возвращает Bearer сразу; вход - **двухшаговый при включённом MFA** (пароль ->
 TOTP-челлендж). Токены отзываемы на сервере: у каждого JWT есть `jti`, при выходе он попадает в
-`revoked_tokens`; смена/сброс пароля отзывает ВСЕ токены пользователя (mass-ревокация). Токен
-хранится в localStorage и подставляется в `Authorization`.
+`revoked_tokens`; смена/сброс пароля отзывает ВСЕ токены пользователя (mass-ревокация).
+
+🔴 **Токен живёт в HttpOnly cookie, а не в `localStorage`** (описание исправлено 08.09.2026).
+Разница не косметическая: из `localStorage` токен достаёт любой скрипт страницы, из HttpOnly
+cookie — никакой. `Authorization: Bearer` остаётся для API-клиентов и имеет приоритет над
+cookie (`app/dependencies.py::_extract_token`): клиент, передавший токен заголовком, всегда
+работает от своего имени, даже если в запросе затесалась чужая cookie.
 
 ```mermaid
 sequenceDiagram
     autonumber
-    participant U as Браузер (auth.js)
+    participant U as Браузер (React SPA)
     participant API as /api/auth
     participant DB as БД
     participant Rev as revoked_tokens
@@ -463,7 +509,7 @@ sequenceDiagram
     Note over U: Регистрация
     U->>API: POST /register {email, password, consent}
     API->>DB: создать пользователя
-    API-->>U: access_token (Bearer, с jti) — сразу
+    API-->>U: сессия в HttpOnly cookie (jti внутри) — сразу
     API-)Mail: письмо подтверждения (фоном, не блокирует)
     end
 
@@ -481,7 +527,7 @@ sequenceDiagram
     end
     end
 
-    Note over U: токен → localStorage
+    Note over U: сессия → HttpOnly cookie (браузер хранит сам)
 
     U->>API: GET /me (Authorization: Bearer)
     API->>Rev: jti в отозванных?
@@ -499,43 +545,66 @@ sequenceDiagram
 
 ---
 
-## 8. Карта фронта (страницы и навигация)
+## 8. Карта фронта (слои и экраны)
 
-Тонкий SSR-фронт: один каркас `base.html` (навигация + модалка авторизации + подключение JS),
-от которого наследуются все страницы. Логика — два модуля: `app.js` (страницы, расчёты,
-CRUD-вызовы API) и `auth.js` (модалка входа/регистрации). Набор страниц давно стабилен.
+Интерфейс — React 19 + TypeScript SPA (Vite, TanStack Router/Query, Zustand, Radix через
+shadcn/ui). Раскладка по Feature-Sliced Design: слой ниже не знает о слое выше, и это
+не стилистика — именно она не даёт бизнес-логике расползтись по экранам.
+
+🔴 **Диаграмма переписана 08.09.2026.** До этого она описывала снесённый Jinja-слой:
+`base.html`, `app.js`, `auth.js`, модалку `#auth-modal` и токен в `localStorage`. Каталога
+`app/templates` не существует с вехи 8, а сессия живёт в HttpOnly cookie — то есть схема
+рассказывала про архитектуру, которой нет, и про способ хранения токена, который сознательно
+отвергнут. Тот же класс, что PIT-029: обоснование отпало, картинка осталась.
 
 ```mermaid
 flowchart TD
-    Base["base.html — каркас<br/>навигация · модалка #auth-modal · подключение app.js + auth.js"]
-
-    subgraph Core["Рабочие страницы"]
-        Index["/ — index (главная)"]
-        Dash["/dashboard — обзор"]
-        Plan["/planning — планирование (СППР)"]
-        Tx["/transactions — операции"]
-        Obl["/obligations — обязательства"]
-        Goals["/goals — цели"]
-        Banks["/banks — импорт выписок"]
-        Val["/validation — проверка на портретах"]
-        Profile["/profile — профиль и настройки"]
+    subgraph App["app — каркас"]
+        Providers["провайдеры: router · query · тема"]
+        Tokens["семантические токены (tokens.css)"]
     end
 
-    subgraph Legal["Юридические / служебные"]
-        Privacy["/legal/privacy · /legal/terms · /legal/consent"]
-        Contacts["/contacts — реквизиты оператора"]
-        Reset["/reset-password · forgot_password"]
+    subgraph Routes["routes — маршруты TanStack Router"]
+        Public["/login · /register · /legal/* · /contacts"]
+        Private["/dashboard · /planning · /transactions · /obligations<br/>/goals · /assets · /spending · /households · /profile"]
     end
 
-    subgraph JS["JS-модули"]
-        AppJs["app.js — логика страниц, расчёты, вызовы /api/*"]
-        AuthJs["auth.js — модалка авторизации, Bearer-токен"]
+    subgraph Pages["pages — экраны"]
+        Screens["по одному на маршрут; собирают виджеты и фичи"]
     end
 
-    Base --> Core
-    Base --> Legal
-    Base -.-> JS
+    subgraph Widgets["widgets — самостоятельные блоки"]
+        Alloc["allocation-panel — распределение и «что если»"]
+        Forecast["forecast-panel — прогноз"]
+        Nav["app-nav · notification-bell"]
+    end
+
+    subgraph Features["features — пользовательские сценарии"]
+        Feat["demo-sandbox · household-scope · cookie-banner"]
+    end
+
+    subgraph Entities["entities — доменные сущности"]
+        Ent["auth · profile · consents · plan-summary · goals<br/>obligations · assets · budgets · transactions · legal"]
+    end
+
+    subgraph Shared["shared — переиспользуемое"]
+        UIKit["ui: Button · Modal · StatePanel · toast"]
+        Api["api: клиент + сгенерированный из openapi.json SDK"]
+        Lib["lib: деньги · даты · i18n · разбор ошибок API"]
+    end
+
+    App --> Routes --> Pages
+    Pages --> Widgets
+    Pages --> Features
+    Widgets --> Entities
+    Features --> Entities
+    Entities --> Shared
 ```
+
+**Что важно на этой схеме, а не на предыдущей.** Стрелки идут в одну сторону: `shared`
+не знает о сущностях, сущности — об экранах. Поэтому, например, помощник про истёкшую
+сессию живёт в `entities/auth`, а не в `shared`: он знает про состояние сессии, и обратный
+импорт нарушил бы слоистость.
 
 ## 9. Физическое развёртывание (целевое, веха 9)
 

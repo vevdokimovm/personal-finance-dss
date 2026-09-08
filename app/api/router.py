@@ -55,7 +55,13 @@ router.include_router(households_router)
 router.include_router(liquid_assets_router, dependencies=_FIN_W)
 router.include_router(telemetry_router, dependencies=_FIN)
 router.include_router(categories_router)
-router.include_router(user_prefs_router)
+# 🔴 `_GUEST`, а не пусто: `user_prefs` при `user_id IS NULL` — одна глобальная строка
+# на всех гостей сервера, и `l_min` из неё идёт в фильтр допустимости, а `risk_tolerance` —
+# в веса SAW. Аноним, сохранивший свои параметры, менял рекомендацию остальным
+# посетителям. Пропущено при разборе v8.53.0 и найдено вторым проходом аудита 08.09.2026
+# по СПИСКУ подключений, а не по прозе — тем же способом, что дыра в `fx_router`.
+# Чтение остаётся открытым: гейт пропускает безопасные методы сам.
+router.include_router(user_prefs_router, dependencies=_GUEST)
 router.include_router(analysis_router, dependencies=_FIN)
 router.include_router(recommendation_router, dependencies=_FIN)
 router.include_router(demo_router, dependencies=_GUEST)

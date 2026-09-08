@@ -27,18 +27,19 @@ from __future__ import annotations
 import pytest
 
 from app.config import Settings, validate_production_security
+from tests.conftest import VALID_PRODUCTION_ENV
 
 # Значения, при которых секретные проверки молчат: тест про КОНФИГ, а не про секреты,
 # и их шум мешал бы увидеть предмет.
-SECRETS = {
-    "JWT_SECRET": "x" * 40,
-    "ADMIN_API_KEY": "y" * 20,
-    "TOKEN_ENCRYPTION_KEY": "z" * 44,
-    "COOKIE_SECURE": True,
-    # Доверие прокси — часть валидного прод-конфига с v9.1.0: продукт за nginx
-    # без него считает всех пользователей одним клиентом.
-    "TRUST_PROXY_HEADERS": True,
-}
+# 🔴 Секреты берутся из ОБЩЕЙ фабрики (`tests/conftest.py`), а не своей копии.
+# Копий было четыре, и каждое расширение старт-гарда роняло их по очереди:
+# v8.56.0 — CORS/DATABASE_URL, v9.1.0 — TRUST_PROXY_HEADERS (только на CI),
+# v9.6.0 — SMTP. Разбор и мета-гейт — `test_valid_production_config_is_single_sourced.py`.
+# `CORS_ORIGINS` и `DATABASE_URL` исключены намеренно: тесты этого файла их и портят,
+# а фабрика подставляет боевые значения — иначе проверка «дефолтный localhost отвергнут»
+# проверяла бы фабрику, а не гард.
+_VARIED_HERE = {"ENVIRONMENT", "CORS_ORIGINS", "DATABASE_URL"}
+SECRETS = {k: v for k, v in VALID_PRODUCTION_ENV.items() if k not in _VARIED_HERE}
 PROD_DB = "postgresql+psycopg2://finpilot:pass@db:5432/finpilot"
 PROD_ORIGINS = "https://finpilot.ru,https://www.finpilot.ru"
 # 🔴 Дефолт задаётся ЯВНО, а не берётся из окружения. Под PG-матрицей

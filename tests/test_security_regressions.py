@@ -17,6 +17,7 @@ from starlette.responses import PlainTextResponse
 
 from app.config import Settings, validate_production_security
 from app.middleware import SecurityHeadersMiddleware
+from tests.conftest import valid_production_settings
 
 _HEADERS = [
     "X-Content-Type-Options",
@@ -155,28 +156,20 @@ class TestProductionSecretsGuard:
         assert any("TOKEN_ENCRYPTION" in p for p in problems)
 
     def test_explicit_encryption_key_passes(self) -> None:
-        # 🔴 `CORS_ORIGINS` и `DATABASE_URL` заданы явно с v8.56.0: старт-гард
-        # требует их, потому что дефолты ломают прод молча — localhost-origin даёт
-        # 403 на каждое действие пользователя, SQLite в контейнере теряет данные.
-        s = Settings(ENVIRONMENT="production", JWT_SECRET="x" * 40,
-                     COOKIE_SECURE=True, ADMIN_API_KEY="y" * 24,
-                     CORS_ORIGINS="https://finpilot.ru",
-                     DATABASE_URL="postgresql+psycopg2://u:p@db:5432/finpilot",
-                     TOKEN_ENCRYPTION_KEY=_FERNET_KEY,
-                     # 🔴 v9.2.0: проверка `TRUST_PROXY_HEADERS` появилась
-                     # в старт-гарде v9.1.0, а тесты «валидный прод проходит»
-                     # о ней не узнали. Такой тест перечисляет валидный прод
-                     # ЦЕЛИКОМ, значит пополняется вместе с гардом.
-                     TRUST_PROXY_HEADERS=True)
+        """Явный ключ шифрования — валидный прод.
+
+        🔴 Перечень берётся из ОБЩЕЙ фабрики (`tests/conftest.py`), а не пишется здесь:
+        своя копия ломалась при каждом расширении гарда — v8.56.0, v9.1.0, v9.6.0.
+        Мета-гейт — `test_valid_production_config_is_single_sourced.py`.
+        """
+        s = valid_production_settings(TOKEN_ENCRYPTION_KEY=_FERNET_KEY)
         assert validate_production_security(s) == []
 
     def test_encryption_keys_multi_passes(self) -> None:
-        s = Settings(ENVIRONMENT="production", JWT_SECRET="x" * 40,
-                     COOKIE_SECURE=True, ADMIN_API_KEY="y" * 24,
-                     CORS_ORIGINS="https://finpilot.ru",
-                     DATABASE_URL="postgresql+psycopg2://u:p@db:5432/finpilot",
-                     TOKEN_ENCRYPTION_KEYS=_FERNET_KEY,
-                     TRUST_PROXY_HEADERS=True)  # см. соседний тест: v9.2.0
+        """Множественные ключи (ротация) — тоже валидный прод."""
+        s = valid_production_settings(
+            TOKEN_ENCRYPTION_KEY="", TOKEN_ENCRYPTION_KEYS=_FERNET_KEY
+        )
         assert validate_production_security(s) == []
 
     def test_development_still_clean(self) -> None:

@@ -6,6 +6,7 @@ import { getConsentRequiredDetail } from "@shared/lib/api/extractErrorMessage";
 import type { ConsentRequiredDetail } from "@shared/lib/api/extractErrorMessage";
 import { t } from "@shared/lib/i18n/t";
 import "./PlanExportSection.css";
+import { toastMutationError } from "@entities/auth";
 
 /**
  * Выгрузка плана распределения (ROADMAP §8.2 «ГЛАВНОЕ», третья из API-only фич).
@@ -82,7 +83,9 @@ export function PlanExportSection() {
         // на странице (WCAG 2.4.3). Тот же приём уже применён на самой PlanningPage.
         requestAnimationFrame(() => headingRef.current?.focus());
       } else {
-        toast.error(t("Не получилось выгрузить план. Попробуйте ещё раз."));
+        // 🔴 401 здесь — истёкшая сессия, и «Попробуйте ещё раз» отправляет по кругу.
+        // Выгрузка своих данных — право субъекта ПДн, тупик на ней дороже обычного.
+        toastMutationError(error, t("Не получилось выгрузить план. Попробуйте ещё раз."));
       }
     } finally {
       // В `finally`: после отказа кнопка обязана снова стать доступной, иначе экран

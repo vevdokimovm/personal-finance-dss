@@ -17,6 +17,7 @@ import { formatDate } from "@shared/lib/date/formatDate";
 import { t } from "@shared/lib/i18n/t";
 import "@shared/ui/entityForm.css";
 import "./HouseholdsPage.css";
+import { toastMutationError } from "@entities/auth";
 
 /**
  * Семейный доступ — households (P3.7, ROADMAP §8.2 «ГЛАВНОЕ», гипотеза H16).
@@ -74,7 +75,7 @@ export function HouseholdsPage() {
         closeForm();
         toast.success(t("Семейный доступ создан"));
       },
-      onError: () => toast.error(t("Не получилось создать. Попробуйте ещё раз.")),
+      onError: (error) => toastMutationError(error, t("Не получилось создать. Попробуйте ещё раз.")),
     });
   }
 
@@ -252,7 +253,7 @@ function HouseholdCard({
           }
           toast.success(t("Ссылка приглашения готова"));
         },
-        onError: () => toast.error(t("Не получилось создать приглашение.")),
+        onError: (error) => toastMutationError(error, t("Не получилось создать приглашение.")),
       },
     );
   }
@@ -339,7 +340,7 @@ function HouseholdCard({
                                 // на заголовок карточки, а не в пустоту.
                                 headingRef.current?.focus();
                               },
-                              onError: () => toast.error(t("Не получилось убрать участника.")),
+                              onError: (error) => toastMutationError(error, t("Не получилось убрать участника.")),
                             },
                           ),
                       })
@@ -458,8 +459,8 @@ function HouseholdCard({
                                   toast.success(t("Приглашение отозвано"));
                                   headingRef.current?.focus();
                                 },
-                                onError: () =>
-                                  toast.error(t("Не получилось отозвать приглашение.")),
+                                onError: (error) =>
+                                  toastMutationError(error, t("Не получилось отозвать приглашение.")),
                               },
                             ),
                         })
@@ -501,7 +502,7 @@ function HouseholdCard({
                       toast.success(t("Семейный доступ распущен"));
                       onGone();
                     },
-                    onError: () => toast.error(t("Не получилось распустить.")),
+                    onError: (error) => toastMutationError(error, t("Не получилось распустить.")),
                   }),
               })
             }
@@ -526,7 +527,7 @@ function HouseholdCard({
                       toast.success(t("Вы покинули семейный доступ"));
                       onGone();
                     },
-                    onError: () => toast.error(t("Не получилось выйти.")),
+                    onError: (error) => toastMutationError(error, t("Не получилось выйти.")),
                   }),
               })
             }

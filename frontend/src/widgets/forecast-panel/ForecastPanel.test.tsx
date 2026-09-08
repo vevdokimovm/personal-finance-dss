@@ -226,7 +226,7 @@ describe("ForecastPanel — сценарий «что если» и живая �
 
   // Не screen.getByRole("status") — тот же приём, что WhatIfSliders.test.tsx: sr-only регион
   // testing-library в jsdom иногда не засчитывает как accessible по вычисленным стилям.
-  // formatMoney разделяет разряды неразрывным пробелом (U+00A0, канон денег CLAUDE.md п.6) —
+  // formatMoney разделяет разряды неразрывным пробелом (U+00A0, канон денег проекта) —
   // нормализуем в обычный перед сравнением, иначе строковый литерал с обычным пробелом
   // никогда не совпадёт с реальным DOM.
   function anyStatusContains(text: string): boolean {

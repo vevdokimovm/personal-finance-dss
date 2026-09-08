@@ -8,6 +8,7 @@ import {
   type Transaction,
 } from "@entities/transactions";
 import { SharedBadge } from "@features/household-scope";
+import { toastMutationError } from "@entities/auth";
 
 export function TransactionRow({
   transaction,
@@ -33,11 +34,11 @@ export function TransactionRow({
         toast.undo(t("Операция «{label}» удалена.", { label }), () => {
           restoreTransaction.mutate(transaction.id, {
             onSuccess: () => toast.success(t("Операция «{label}» восстановлена.", { label })),
-            onError: () => toast.error(t("Не получилось восстановить. Попробуйте ещё раз.")),
+            onError: (error) => toastMutationError(error, t("Не получилось восстановить. Попробуйте ещё раз.")),
           });
         });
       },
-      onError: () => toast.error(t("Не получилось удалить. Попробуйте ещё раз.")),
+      onError: (error) => toastMutationError(error, t("Не получилось удалить. Попробуйте ещё раз.")),
     });
   }
 

@@ -387,3 +387,57 @@ describe("AllocationPanel — неполные данные альтернати
     expect(screen.queryByLabelText("Досрочное погашение")).not.toBeInTheDocument();
   });
 });
+
+describe("AllocationPanel — пустой план объясняется настоящей причиной", () => {
+  /* 🔴 Гипотеза 3 независимого эксперта, 08.09.2026.
+     `best === null` наступает при ЛЮБОЙ пустоте допустимого множества, а панель
+     называла одну-единственную причину: «расходы и платежи превышают доход».
+     Между тем причина может быть в собственной настройке человека: ползунок
+     «минимальная ликвидность» на экране параметров уходит в `l_min`, и фильтр
+     отсекает по нему жёстко (`app/core/filtering.py`).
+
+     Цена ошибки не косметическая: человек с положительным свободным потоком
+     получает утверждение о СВОИХ финансах, которое неверно, и делает вывод
+     о доходах вместо вывода о своей же настройке. Бэкенд при этом в том же
+     ответе присылает `rejected[].violations` с готовым текстом причины —
+     и фронт их не читал вовсе. */
+
+  const REJECTED_BY_LIQUIDITY: PlanAlternative[] = [
+    alt("r-1", 3, 4, 3, {
+      violations: ["оставил бы подушку меньше требуемых 6 мес. автономии"],
+      is_admissible: false,
+    }),
+    alt("r-2", 5, 2, 3, {
+      violations: ["оставил бы подушку меньше требуемых 6 мес. автономии"],
+      is_admissible: false,
+    }),
+  ];
+
+  const REJECTED_BY_DEFICIT: PlanAlternative[] = [
+    alt("r-3", 3, 4, 3, {
+      violations: ["увёл бы бюджет в минус — свободных денег не осталось бы"],
+      is_admissible: false,
+    }),
+  ];
+
+  it("🔴 не сваливает вину на доход, когда причина — требование к подушке", () => {
+    render(<AllocationPanel best={null} alternatives={[]} rejected={REJECTED_BY_LIQUIDITY} />);
+
+    expect(screen.getByText(/подушк/i)).toBeInTheDocument();
+    expect(screen.queryByText(/превышают доход/i)).not.toBeInTheDocument();
+  });
+
+  it("называет дефицит, когда причина действительно в нём", () => {
+    render(<AllocationPanel best={null} alternatives={[]} rejected={REJECTED_BY_DEFICIT} />);
+
+    expect(screen.getByText(/свободных денег не осталось/i)).toBeInTheDocument();
+  });
+
+  it("без данных об отказах говорит honestly общее, а не выдумывает причину", () => {
+    /* Старые ответы и частичные данные не должны ломать экран: нет `rejected` —
+       нет и утверждения о конкретной причине. */
+    render(<AllocationPanel best={null} alternatives={[]} />);
+
+    expect(screen.getByText(/Плана распределения нет/)).toBeInTheDocument();
+  });
+});

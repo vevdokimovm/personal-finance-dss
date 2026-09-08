@@ -140,7 +140,7 @@ class TestNoSecretsInTree:
 
 
 class TestNoPersonalDataInTree:
-    """🔴 Работа идёт на синтетике (CLAUDE.md §7) — проверяем, что так и есть."""
+    """🔴 Работа идёт на синтетике — правило проекта; проверяем, что так и есть."""
 
     def test_no_card_numbers(self) -> None:
         """Номер карты проверяется алгоритмом Луна, а не длиной."""

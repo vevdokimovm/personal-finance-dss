@@ -1,6 +1,6 @@
 /* Направление «Спокойный» — перенесено из docs/ui_directions/calm/dashboard.html
    (выбор владельца, docs/ui_visual_direction.md). Только токены, ни одного px/hex вне них —
-   see .claude/hooks/check-design-tokens.sh.
+   проверяется автоматически: магические hex и px вне токенов — ошибка сборки.
    MetricsGrid/AllocationPanel/ForecastPanel — вынесены в @widgets/* (Э4 партия 2, planning
    тоже их использует) вместе со своими стилями; .fp-panel общий — @shared/ui/panel.css. */
 

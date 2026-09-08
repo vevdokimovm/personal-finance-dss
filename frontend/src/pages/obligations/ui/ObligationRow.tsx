@@ -3,6 +3,7 @@ import { t } from "@shared/lib/i18n/t";
 import { Button, toast } from "@shared/ui";
 import { useDeleteObligation, useRestoreObligation, type Obligation } from "@entities/obligations";
 import { SharedBadge } from "@features/household-scope";
+import { toastMutationError } from "@entities/auth";
 
 export function ObligationRow({
   obligation,
@@ -26,11 +27,11 @@ export function ObligationRow({
         toast.undo(t("Обязательство «{name}» удалено.", { name }), () => {
           restoreObligation.mutate(obligation.id, {
             onSuccess: () => toast.success(t("Обязательство «{name}» восстановлено.", { name })),
-            onError: () => toast.error(t("Не получилось восстановить. Попробуйте ещё раз.")),
+            onError: (error) => toastMutationError(error, t("Не получилось восстановить. Попробуйте ещё раз.")),
           });
         });
       },
-      onError: () => toast.error(t("Не получилось удалить. Попробуйте ещё раз.")),
+      onError: (error) => toastMutationError(error, t("Не получилось удалить. Попробуйте ещё раз.")),
     });
   }
 

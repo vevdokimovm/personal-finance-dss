@@ -2,6 +2,7 @@ import { useRef, useState } from "react";
 import { useChangePassword, useDeleteAccount } from "@entities/auth";
 import { Button, Modal } from "@shared/ui";
 import { extractErrorMessage } from "@shared/lib/api/extractErrorMessage";
+import { SessionExpiredBanner, isSessionExpired } from "@entities/auth";
 import { t } from "@shared/lib/i18n/t";
 import "./AccountSection.css";
 
@@ -98,14 +99,20 @@ export function AccountSection() {
           {t("Не короче {n} символов.", { n: MIN_PASSWORD_LENGTH })}
         </p>
 
-        {changePassword.isError && (
-          <p className="fp-account__error" role="alert">
-            {extractErrorMessage(
-              changePassword.error,
-              t("Не удалось сменить пароль. Попробуйте ещё раз."),
-            )}
-          </p>
-        )}
+        {changePassword.isError &&
+          (isSessionExpired(changePassword.error) ? (
+            /* 🔴 401 здесь — истёкшая сессия, и «попробуйте ещё раз» отправляет по кругу.
+               Это право L9 по 152-ФЗ: тупик именно на смене пароля и удалении аккаунта
+               дороже, чем на обычной форме. */
+            <SessionExpiredBanner />
+          ) : (
+            <p className="fp-account__error" role="alert">
+              {extractErrorMessage(
+                changePassword.error,
+                t("Не удалось сменить пароль. Попробуйте ещё раз."),
+              )}
+            </p>
+          ))}
         {changed && !changePassword.isError && (
           <p className="fp-account__ok" role="status">
             {t("Пароль обновлён. Войдите заново с новым паролем.")}
@@ -138,14 +145,20 @@ export function AccountSection() {
           )}
         </p>
 
-        {deleteAccount.isError && (
-          <p className="fp-account__error" role="alert">
-            {extractErrorMessage(
-              deleteAccount.error,
-              t("Не удалось удалить аккаунт. Попробуйте ещё раз."),
-            )}
-          </p>
-        )}
+        {deleteAccount.isError &&
+          (isSessionExpired(deleteAccount.error) ? (
+            /* 🔴 401 здесь — истёкшая сессия, и «попробуйте ещё раз» отправляет по кругу.
+               Это право L9 по 152-ФЗ: тупик именно на смене пароля и удалении аккаунта
+               дороже, чем на обычной форме. */
+            <SessionExpiredBanner />
+          ) : (
+            <p className="fp-account__error" role="alert">
+              {extractErrorMessage(
+                deleteAccount.error,
+                t("Не удалось удалить аккаунт. Попробуйте ещё раз."),
+              )}
+            </p>
+          ))}
 
         {/* 🔴 Кнопка НЕ удаляет: она открывает подтверждение. Необратимое действие
             в один клик — то же, чем оказался `/demo/load` в v8.46.0, только здесь

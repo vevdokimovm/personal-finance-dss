@@ -1,9 +1,10 @@
-import { StatePanel, Button, toast } from "@shared/ui";
+import { StatePanel, Button } from "@shared/ui";
 import { t } from "@shared/lib/i18n/t";
 import type { ConsentRequiredDetail } from "@shared/lib/api/extractErrorMessage";
 import { useGrantConsent } from "../api/useConsents";
 import type { ConsentType } from "../model/types";
 import "./ConsentRequiredPanel.css";
+import { toastMutationError } from "@entities/auth";
 
 /** Рабочий минимум вместо полного экрана согласия L3 (ROADMAP §8.2): вместо
  * заглушки «проверьте соединение» на 403 гейта согласия — объяснение + кнопка
@@ -32,7 +33,7 @@ export function ConsentRequiredPanel({
     if (grant.isPending) return;
     grant.mutate(detail.consentType as ConsentType, {
       onSuccess: onGranted,
-      onError: () => toast.error(t("Не получилось сохранить согласие. Попробуйте ещё раз.")),
+      onError: (error) => toastMutationError(error, t("Не получилось сохранить согласие. Попробуйте ещё раз.")),
     });
   }
 

@@ -21,6 +21,20 @@ vi.mock("@entities/consents", () => ({
 
 vi.mock("@entities/legal", () => ({ useLegalDocuments: () => useLegalMock() }));
 
+/* `SessionExpiredPanel` внутри секции ведёт человека на `/login` через `Link`, а тот
+   без роутера падает на `isServer`. Тест проверяет НАЛИЧИЕ выхода, а не работу роутера —
+   поэтому ссылка подменяется простым якорем, как в `SessionExpiredPanel.test.tsx`. */
+vi.mock("@tanstack/react-router", async () => {
+  const actual =
+    await vi.importActual<typeof import("@tanstack/react-router")>("@tanstack/react-router");
+  return {
+    ...actual,
+    Link: ({ children, to }: { children: React.ReactNode; to: string }) => (
+      <a href={to}>{children}</a>
+    ),
+  };
+});
+
 vi.mock("@shared/ui", async () => {
   const actual = await vi.importActual<typeof import("@shared/ui")>("@shared/ui");
   return { ...actual, toast: { ...actual.toast, error: toastError, undo: toastUndo } };
@@ -218,5 +232,58 @@ describe("ConsentsSection — что видно, когда действие н�
     // Нажимаем «Вернуть» — ToastProvider в юнит-тесте не смонтирован, зовём обработчик.
     toastUndo.mock.calls[0][1]();
     expect(toastError).toHaveBeenCalled();
+  });
+});
+
+describe("ConsentsSection — ошибка не прячет право по 152-ФЗ молча", () => {
+  /* 🔴 Гипотеза 4 независимого эксперта, 08.09.2026.
+     Было: `if (query.isLoading || query.isError || !query.data) return null` —
+     блок управления согласиями исчезал при ЛЮБОЙ ошибке, без единого слова.
+
+     Это единственный путь отзыва согласия в интерфейсе, и `routes_consents.py`
+     прямо пишет: невозможность отозвать согласие — нарушение 152-ФЗ, а не дефект
+     интерфейса. Молчаливое исчезновение хуже ошибки: человек не понимает, что
+     функция вообще существует, и не может отличить «права нет» от «сеть моргнула». */
+
+  beforeEach(() => {
+    useLegalMock.mockReturnValue({ data: [], isLoading: false });
+  });
+
+  it("🔴 при истёкшей сессии объясняет и даёт выход, а не исчезает", () => {
+    useConsentsMock.mockReturnValue({
+      data: undefined,
+      isLoading: false,
+      isError: true,
+      error: { status: 401 },
+    });
+
+    render(<ConsentsSection />);
+
+    expect(screen.getByText(/Сессия истекла/)).toBeInTheDocument();
+  });
+
+  it("🔴 при обычной ошибке говорит об этом и даёт повторить", async () => {
+    const refetch = vi.fn();
+    useConsentsMock.mockReturnValue({
+      data: undefined,
+      isLoading: false,
+      isError: true,
+      error: { status: 500 },
+      refetch,
+    });
+
+    render(<ConsentsSection />);
+
+    expect(screen.getByRole("alert")).toBeInTheDocument();
+    await userEvent.click(screen.getByRole("button", { name: /Повторить/ }));
+    expect(refetch).toHaveBeenCalled();
+  });
+
+  it("во время загрузки не показывает ни ошибку, ни пустоту", () => {
+    useConsentsMock.mockReturnValue({ data: undefined, isLoading: true, isError: false });
+
+    render(<ConsentsSection />);
+
+    expect(screen.queryByRole("alert")).toBeNull();
   });
 });

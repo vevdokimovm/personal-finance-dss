@@ -20,3 +20,4 @@ export type {
 export { SessionExpiredPanel } from "./ui/SessionExpiredPanel";
 export { SessionExpiredBanner } from "./ui/SessionExpiredBanner";
 export { isSessionExpired } from "./lib/isSessionExpired";
+export { toastMutationError } from "./lib/toastMutationError";

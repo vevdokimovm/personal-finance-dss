@@ -110,9 +110,20 @@ def consent_state(db: Session, user_id: str) -> dict[str, dict]:
     state: dict[str, dict] = {}
     for consent_type in CONSENT_TYPES:
         record = active.get(consent_type)
+        actual = current_version(consent_type)
+        # 🔴 Согласие даётся на КОНКРЕТНУЮ редакцию (152-ФЗ), а проверка действующего
+        # согласия редакцию не сравнивала вовсе: после публикации новой политики
+        # обработка продолжалась по согласию на прежнюю, и никто ни о чём не спрашивал.
+        # Cookie-баннер в этом же продукте ведёт себя правильно — сравнивает версии.
+        #
+        # Доступ здесь НЕ отзывается автоматически: автоотзыв запер бы человека вне его
+        # собственных данных из-за того, что компания поменяла редакцию документа.
+        # Код обязан дать факт расхождения; что с ним делать — решение владельца.
         state[consent_type] = {
             "granted": record is not None,
-            "version": record.doc_version if record else current_version(consent_type),
+            "version": record.doc_version if record else actual,
+            "current_version": actual,
+            "is_current": record is not None and record.doc_version == actual,
             "granted_at": record.granted_at.isoformat() if record else None,
             "withdrawable": consent_type not in UNWITHDRAWABLE,
         }

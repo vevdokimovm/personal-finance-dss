@@ -105,3 +105,16 @@
   font-size: var(--fs-sm);
   color: var(--c-text3);
 }
+
+/* Причины, по которым ни одна альтернатива не прошла проверки. Показываются только
+   при пустом плане — человеку в этот момент нужен не дизайн, а точная причина. */
+.fp-alloc-reasons {
+  margin: var(--sp-3) 0 0;
+  padding-left: var(--sp-5);
+  color: var(--c-text2);
+  line-height: var(--lh-prose);
+}
+
+.fp-alloc-reasons li + li {
+  margin-top: var(--sp-2);
+}

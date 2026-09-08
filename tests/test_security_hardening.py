@@ -13,6 +13,7 @@ import pytest
 from fastapi.testclient import TestClient
 
 from app.config import Settings, settings, validate_production_security
+from tests.conftest import valid_production_settings
 
 
 # ── A. Fail-loud конфигурация для production ──────────────────────────
@@ -34,22 +35,16 @@ class TestProductionConfigGuard:
         assert validate_production_security(s) == []
 
     def test_secure_production_passes(self) -> None:
-        # 🔴 `CORS_ORIGINS` и `DATABASE_URL` заданы явно с v8.56.0: старт-гард
-        # требует их, потому что дефолты ломают прод молча — localhost-origin даёт
-        # 403 на каждое действие пользователя, SQLite в контейнере теряет данные.
-        s = Settings(ENVIRONMENT="production", JWT_SECRET="x" * 40, COOKIE_SECURE=True,
-                     ADMIN_API_KEY="y" * 24,
-                     CORS_ORIGINS="https://finpilot.ru",
-                     DATABASE_URL="postgresql+psycopg2://u:p@db:5432/finpilot",
-                     TOKEN_ENCRYPTION_KEY="PpUqrWqj3kK0n0a9rO2mWqH3sT6vY8bX1cZ4dF7gH0k=",
-                     # 🔴 Добавлено v9.2.0. Проверка `TRUST_PROXY_HEADERS`
-                     # появилась в старт-гарде v9.1.0, а тесты «валидный прод
-                     # проходит» о ней не узнали — и стали красными на CI при
-                     # зелёном соседе `test_production_config_guard.py`, который
-                     # писался уже с ней. Такой тест перечисляет валидный прод
-                     # ЦЕЛИКОМ, значит обязан пополняться вместе с гардом.
-                     TRUST_PROXY_HEADERS=True)
-        assert validate_production_security(s) == []
+        """Полностью правильный прод не даёт ни одной проблемы.
+
+        🔴 Перечень берётся из ОБЩЕЙ фабрики, а не пишется здесь. Своя копия ломалась
+        трижды подряд при каждом расширении гарда: v8.56.0 (`CORS_ORIGINS`,
+        `DATABASE_URL`), v9.1.0 (`TRUST_PROXY_HEADERS` — и только на CI), v9.6.0 (SMTP).
+        Правило «пополняй вместе с гардом» стояло тут же комментарием и не сработало:
+        правило, которое надо помнить, не работает. Мета-гейт —
+        `test_valid_production_config_is_single_sourced.py`.
+        """
+        assert validate_production_security(valid_production_settings()) == []
 
 
 # ── B. Account lockout на /auth/login ─────────────────────────────────

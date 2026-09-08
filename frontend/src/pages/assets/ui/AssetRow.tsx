@@ -3,6 +3,7 @@ import { t } from "@shared/lib/i18n/t";
 import { Button, toast } from "@shared/ui";
 import { useDeleteAsset, useRestoreAsset, type LiquidAsset } from "@entities/assets";
 import { SharedBadge } from "@features/household-scope";
+import { toastMutationError } from "@entities/auth";
 
 const TYPE_LABELS: Record<string, string> = {
   deposit: "Депозит",
@@ -32,11 +33,11 @@ export function AssetRow({
         toast.undo(t("Актив «{name}» удалён.", { name }), () => {
           restoreAsset.mutate(asset.id, {
             onSuccess: () => toast.success(t("Актив «{name}» восстановлен.", { name })),
-            onError: () => toast.error(t("Не получилось восстановить. Попробуйте ещё раз.")),
+            onError: (error) => toastMutationError(error, t("Не получилось восстановить. Попробуйте ещё раз.")),
           });
         });
       },
-      onError: () => toast.error(t("Не получилось удалить. Попробуйте ещё раз.")),
+      onError: (error) => toastMutationError(error, t("Не получилось удалить. Попробуйте ещё раз.")),
     });
   }
 

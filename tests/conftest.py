@@ -152,3 +152,42 @@ def pytest_collection_modifyitems(config, items):
         source = getattr(module, "__file__", None)
         if source and _imports_core(source):
             item.add_marker(pytest.mark.core)
+
+
+# ── Валидный прод-конфиг: ОДНО определение на все тесты ──────────────────────
+# 🔴 Заведено v9.6.0 после третьего повтора одного класса. Перечень «полностью
+# правильного прода» жил копиями в четырёх файлах, и каждое расширение старт-гарда
+# роняло их по очереди: v8.56.0 — `CORS_ORIGINS`/`DATABASE_URL`, v9.1.0 —
+# `TRUST_PROXY_HEADERS` (и только на CI), v9.6.0 — SMTP.
+#
+# Комментарий в одном из тех тестов уже сформулировал правило («перечисляет валидный
+# прод ЦЕЛИКОМ, значит обязан пополняться вместе с гардом») — но правило, которое надо
+# ПОМНИТЬ, не работает: три повтора это доказали. Теперь место одно, и расширение
+# гарда ломает его сразу, а не через файл.
+VALID_PRODUCTION_ENV: dict[str, object] = {
+    "ENVIRONMENT": "production",
+    "JWT_SECRET": "x" * 48,
+    "COOKIE_SECURE": True,
+    "ADMIN_API_KEY": "k" * 24,
+    "TOKEN_ENCRYPTION_KEY": "t" * 44,
+    "CORS_ORIGINS": "https://finpilot.ru,https://www.finpilot.ru",
+    "TRUST_PROXY_HEADERS": True,
+    "DATABASE_URL": "postgresql+psycopg2://finpilot:pass@db:5432/finpilot",
+    "SMTP_HOST": "smtp.example",
+    "SMTP_USER": "robot@example",
+    "SMTP_PASSWORD": "secret",
+}
+
+
+def valid_production_settings(**overrides):
+    """Настройки боевого стенда, проходящие старт-гард целиком.
+
+    Args:
+        **overrides: поля, которые тест намеренно портит, чтобы проверить свою проверку.
+
+    Returns:
+        Экземпляр `Settings` с боевыми значениями и применёнными правками.
+    """
+    from app.config import Settings
+
+    return Settings(**{**VALID_PRODUCTION_ENV, **overrides})

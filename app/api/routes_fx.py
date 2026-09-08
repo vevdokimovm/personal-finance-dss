@@ -45,8 +45,29 @@ def list_rates(db: Session = Depends(get_db)) -> list[FxRateResponse]:
     ]
 
 
-@router.put("/rates", response_model=FxRateResponse, summary="Обновить/добавить курс")
+@router.put(
+    "/rates",
+    response_model=FxRateResponse,
+    summary="Обновить/добавить курс",
+    dependencies=[Depends(require_admin)],
+)
 def upsert_rate(payload: FxRateUpsert, db: Session = Depends(get_db)) -> FxRateResponse:
+    """Записать курс валюты к доллару.
+
+    🔴 Только администратор. `fx_rates` — таблица с ключом по валюте, ОДНА на весь
+    экземпляр, и она читается на каждом расчёте: планирование, анализ и рекомендация
+    приводят суммы к базовой валюте через неё. Метод стоял без единой зависимости,
+    кроме сессии БД, — то есть любой аноним менял курс и вместе с ним свободный ресурс,
+    ликвидность, ПДН и рекомендацию у всех пользователей сразу, молча.
+
+    Соседний `/fx/refresh` был закрыт `require_admin` с самого начала, и сам
+    `require_admin` в этом файле уже импортирован: защиту знали, к этому методу
+    не применили. Роутер подключается без гейта гостевой записи, поэтому запрет
+    v8.53.0 сюда не доставал.
+
+    Не «любой вошедший»: курс — общий ресурс. Меняя его «для себя», пользователь
+    меняет его всем.
+    """
     code = payload.currency.upper()
     row = db.query(FxRate).filter(FxRate.currency == code).first()
     if row is None:
