@@ -29,8 +29,10 @@ from app.database.models import (
     HouseholdMembership,
     LiquidAsset,
     Notification,
+    NotificationLog,
     Obligation,
     ObligationPayment,
+    PlaidToken,
     PlanAdviceEvent,
     PlanSnapshot,
     Recommendation,
@@ -1307,6 +1309,39 @@ def delete_user(db: Session, user_id: str) -> bool:
     # Аналитика и рекомендации — тоже персональные данные (право на удаление).
     db.execute(delete(Event).where(Event.user_id == user_id))
     db.execute(delete(Recommendation).where(Recommendation.user_id == user_id))
+    # 🔴 Таблицы с НАСТОЯЩИМ внешним ключом на `users.id`. Пропуск любой из них
+    # на PostgreSQL валит удаление аккаунта с 500 — а прод только на PostgreSQL,
+    # SQLite запрещён старт-гардом. На SQLite это невидимо: там FK по умолчанию
+    # не форсятся, о чём прямо предупреждает шапка `tests/test_cascade_delete.py`.
+    # Предупреждение стояло, проверки не было — тест заводил цель, обязательство,
+    # событие и рекомендацию, но ни снимка плана, ни правила категоризации,
+    # ни членства в семье. Найдено седьмым проходом независимого аудита 08.09.2026.
+    #
+    # Среди них `PlanSnapshot` — объект, который соседний комментарий называет самым
+    # чувствительным в продукте: Rt/Lt/Dt/BLR и топ-3 распределения целиком.
+    db.execute(delete(PlanSnapshot).where(PlanSnapshot.user_id == user_id))
+    db.execute(delete(UserCategoryRule).where(UserCategoryRule.user_id == user_id))
+    db.execute(delete(PlanAdviceEvent).where(PlanAdviceEvent.user_id == user_id))
+    db.execute(delete(PlaidToken).where(PlaidToken.user_id == user_id))
+    db.execute(delete(Notification).where(Notification.user_id == user_id))
+    db.execute(delete(NotificationLog).where(NotificationLog.user_id == user_id))
+    # Семейный контур: приглашения ссылаются на человека двумя колонками сразу.
+    db.execute(delete(HouseholdInvite).where(HouseholdInvite.created_by == user_id))
+    db.execute(delete(HouseholdInvite).where(HouseholdInvite.accepted_by == user_id))
+    db.execute(delete(HouseholdMembership).where(HouseholdMembership.user_id == user_id))
+    # 🔴 Семьи, где он владелец, распускаются ЧЕРЕЗ `delete_household`, а не удаляются
+    # напрямую. Та функция возвращает общие строки авторам (`household_id → NULL`)
+    # и объясняет зачем: «данные не теряются и не повисают обезличенными (152-ФЗ)»,
+    # причём обнуляет явно, потому что на SQLite `ON DELETE SET NULL` не форсится.
+    #
+    # Первая редакция этого блока удаляла семью в обход — и записи ДРУГИХ участников,
+    # положенные в общий котёл, сохраняли `household_id` уже несуществующей семьи:
+    # на PostgreSQL это либо блокирует удаление, либо оставляет висячую ссылку,
+    # а для автора записи — данные, пропавшие из его списка без всякого его действия.
+    # Найдено разбором собственной правки, до сдачи батча.
+    for household_id in [row[0] for row in
+                         db.query(Household.id).filter(Household.owner_id == user_id)]:
+        delete_household(db, household_id)
     # Согласия (152-ФЗ, право на удаление): данных, для которых нужно основание,
     # больше нет — значит и хранить доказательство основания незачем.
     purge_consents(db, user_id)

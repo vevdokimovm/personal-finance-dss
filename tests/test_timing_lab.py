@@ -13,7 +13,9 @@
 """
 from __future__ import annotations
 
+import argparse
 import csv
+import sys
 from pathlib import Path
 
 import pytest
@@ -248,3 +250,177 @@ class TestLedgerRobustness:
         with ledger.open("a", encoding="utf-8") as fh:
             fh.write("мусор,без,запятых\n")
         assert "живой" in format_report(summarize(load_measurements(ledger)))
+
+
+class TestLoadIsMeasuredAroundTheRunNotBeforeIt:
+    """🔴 Классификация «спокойно / под нагрузкой» берёт ХУДШИЙ отсчёт, а не первый.
+
+    Прежняя редакция снимала `load average` один раз, **до** `subprocess.run`,
+    и по нему решала, был ли прогон спокойным. Для полного pytest окно замера —
+    15–25 минут, и следствия оба в одну сторону:
+
+    - отсчёт до старта не включает нагрузку **самого прогона**: набор, который сам
+      перегружает машину, записывался как «спокойный»;
+    - собственное обоснование лаборатории — эпизод, где load вырос за минуту, —
+      делает однократный отсчёт негодным по её же аргументу.
+
+    Смещение систематическое и в одну сторону, поэтому «спокойная медиана», по которой
+    планируют батчи, занижена. Найдено третьим проходом независимого аудита 08.09.2026.
+    """
+
+    def test_load_after_the_run_wins_when_it_is_higher(self, tmp_path, monkeypatch) -> None:
+        """Нагрузка выросла во время прогона — замер помечен как «под нагрузкой»."""
+        import tools.timing_lab.record as record
+
+        samples = iter([(2.0, 8), (30.0, 8)])
+        monkeypatch.setattr(record, "host_load", lambda: next(samples))
+        ledger = tmp_path / "timings.csv"
+        args = argparse.Namespace(
+            command=[sys.executable, "-c", "pass"], suite="probe",
+            tests=None, note=None, ledger=str(ledger),
+        )
+        record._cmd_run(args)
+
+        rows = record.load_measurements(ledger)
+        assert len(rows) == 1
+        assert rows[0].load1 == 30.0, "записан отсчёт ДО прогона, а не худший"
+        assert rows[0].loaded is True
+
+    def test_quiet_run_stays_quiet(self, tmp_path, monkeypatch) -> None:
+        """Оба отсчёта низкие — прогон по-прежнему спокойный.
+
+        Иначе починка объявила бы под нагрузкой всё подряд, и «спокойных» замеров
+        не осталось бы вовсе.
+        """
+        import tools.timing_lab.record as record
+
+        samples = iter([(1.0, 8), (2.0, 8)])
+        monkeypatch.setattr(record, "host_load", lambda: next(samples))
+        ledger = tmp_path / "timings.csv"
+        args = argparse.Namespace(
+            command=[sys.executable, "-c", "pass"], suite="probe",
+            tests=None, note=None, ledger=str(ledger),
+        )
+        record._cmd_run(args)
+
+        assert record.load_measurements(ledger)[0].loaded is False
+
+
+class TestFailedRunsDoNotPoisonTheMedian:
+    """🔴 Упавший прогон не участвует в «спокойной медиане».
+
+    `note` при провале несёт `exit=N`, а сводка это поле не читала вовсе. Следствия:
+
+    - опечатка в команде писала замер `0.0 с` под именем набора и навсегда тянула
+      его медиану вниз;
+    - прогон, упавший на пятой минуте из двадцати, засчитывался как полноценный.
+
+    Для «худшего случая» упавший прогон учитывать осмысленно — время потрачено.
+    Для медианы, по которой ПЛАНИРУЮТ, — нет: она должна отвечать на вопрос
+    «сколько занимает полный прогон», а неполный на него не отвечает.
+    """
+
+    def test_failed_run_is_excluded_from_median(self, tmp_path) -> None:
+        import tools.timing_lab.record as record
+
+        ledger = tmp_path / "timings.csv"
+        for seconds, note in ((100.0, ""), (102.0, ""), (0.0, "exit=127")):
+            record.append_measurement(ledger, record.Measurement(
+                date="2026-09-08", suite="probe", seconds=seconds,
+                tests=None, load1=1.0, cores=8, note=note,
+            ))
+
+        summary = record.summarize(record.load_measurements(ledger))
+        assert summary["probe"].calm_median == 101.0, (
+            "провалившийся прогон попал в медиану и утянул её вниз"
+        )
+
+    def test_failed_run_still_counts_for_the_worst_case(self, tmp_path) -> None:
+        """Но время, потраченное на упавший прогон, из «худшего» не исчезает."""
+        import tools.timing_lab.record as record
+
+        ledger = tmp_path / "timings.csv"
+        record.append_measurement(ledger, record.Measurement(
+            date="2026-09-08", suite="probe", seconds=50.0,
+            tests=None, load1=1.0, cores=8, note="",
+        ))
+        record.append_measurement(ledger, record.Measurement(
+            date="2026-09-08", suite="probe", seconds=900.0,
+            tests=None, load1=1.0, cores=8, note="exit=1",
+        ))
+
+        summary = record.summarize(record.load_measurements(ledger))
+        assert summary["probe"].worst == 900.0, (
+            "потраченное на упавший прогон время исчезло из худшего случая"
+        )
+
+
+class TestFailureMarkerSurvivesCustomNote:
+    """🔴 Свой `--note` не вытесняет отметку провала.
+
+    `note=args.note or ("" if ok else f"exit={N}")` — при переданном `--note`
+    маркер `exit=N` терялся, а сводка отсеивает упавшие прогоны именно по нему.
+    То есть дефект, закрытый в этом же батче, восстанавливался **любым**
+    использованием флага, который сам инструмент и предлагает.
+
+    Найдено четвёртым проходом независимого аудита 08.09.2026.
+    """
+
+    def test_exit_marker_is_kept_alongside_the_note(self, tmp_path, monkeypatch) -> None:
+        import tools.timing_lab.record as record
+
+        monkeypatch.setattr(record, "host_load", lambda: (1.0, 8))
+        ledger = tmp_path / "timings.csv"
+        args = argparse.Namespace(
+            command=[sys.executable, "-c", "raise SystemExit(3)"], suite="probe",
+            tests=None, note="фон: сборка", ledger=str(ledger),
+        )
+        record._cmd_run(args)
+
+        note = record.load_measurements(ledger)[0].note
+        assert "exit=3" in note, f"отметка провала потеряна: {note!r}"
+        assert "фон: сборка" in note, f"пояснение потеряно: {note!r}"
+
+    def test_such_run_stays_out_of_the_median(self, tmp_path, monkeypatch) -> None:
+        """И такой прогон по-прежнему не участвует в медиане."""
+        import tools.timing_lab.record as record
+
+        monkeypatch.setattr(record, "host_load", lambda: (1.0, 8))
+        ledger = tmp_path / "timings.csv"
+        record.append_measurement(ledger, record.Measurement(
+            date="2026-09-08", suite="probe", seconds=10.0,
+            tests=None, load1=1.0, cores=8, note="",
+        ))
+        args = argparse.Namespace(
+            command=[sys.executable, "-c", "raise SystemExit(1)"], suite="probe",
+            tests=None, note="ручная пометка", ledger=str(ledger),
+        )
+        record._cmd_run(args)
+
+        summary = record.summarize(record.load_measurements(ledger))
+        assert summary["probe"].calm_median == 10.0
+
+
+class TestAllRunsFailed:
+    """Набор, где упали ВСЕ прогоны, не выдаёт медиану как ни в чём не бывало.
+
+    Прежде при пустом списке завершившихся медиана тихо считалась по упавшим,
+    а отчёт печатал «— только под нагрузкой» — формулировку, не описывающую
+    происходящее.
+    """
+
+    def test_median_is_absent_when_nothing_completed(self, tmp_path) -> None:
+        import tools.timing_lab.record as record
+
+        ledger = tmp_path / "timings.csv"
+        for seconds in (5.0, 7.0):
+            record.append_measurement(ledger, record.Measurement(
+                date="2026-09-08", suite="probe", seconds=seconds,
+                tests=None, load1=1.0, cores=8, note="exit=1",
+            ))
+
+        stats = record.summarize(record.load_measurements(ledger))["probe"]
+        assert stats.calm_median is None, (
+            "медиана посчитана по прогонам, ни один из которых не завершился"
+        )
+        assert stats.worst == 7.0, "потраченное время всё равно должно быть видно"

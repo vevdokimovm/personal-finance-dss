@@ -12,9 +12,9 @@ import numpy as np
 import pandas as pd
 from scipy import stats
 
-from finpilot_survey import config as cfg
-from finpilot_survey import stats_utils as su
-from finpilot_survey.data import SurveyData
+from tools.survey_analysis import config as cfg
+from tools.survey_analysis import stats_utils as su
+from tools.survey_analysis.data import SurveyData
 
 
 class BehavioralValidator:

@@ -35,7 +35,11 @@ from app.database.crud import (
     restore_plan_snapshot,
     soft_delete_plan_snapshot,
 )
-from app.dependencies import get_current_user_id, get_db
+from app.dependencies import (
+    get_current_user_id,
+    get_db,
+    require_account_for_writes,
+)
 from app.services.cbr_rate import get_opportunity_cost_rate
 from app.services.cache import TTLCache
 from app.services.event_logger import log_event, log_recommendation
@@ -285,13 +289,22 @@ def calculate_plan(
     user_id: str | None = Depends(get_current_user_id),
 ) -> dict[str, Any]:
     result = _compute_plan(payload, db, user_id)
-    log_recommendation(result)
+    # 🔴 `user_id` передаётся ОБЯЗАТЕЛЬНО. Без него строка ложится с `user_id IS NULL`,
+    # и каскад `delete_user_account` — где стоит явное `delete(Recommendation).where(
+    # Recommendation.user_id == user_id)` с комментарием «право на удаление» — не уносил
+    # НИЧЕГО НИКОГДА. А запись эта не служебная: полный агрегированный портрет
+    # (доходы, расходы, платежи, баланс, ликвидность, Rt/Lt/Dt/BLR, распределение
+    # и обоснование прозой), отнесённый картой ПДн к финансовым сведениям.
+    # Человек удалял аккаунт, продукт отвечал «удалено», портрет оставался навсегда —
+    # и вернуть его владельцу нельзя было даже по запросу, потому что связи не осталось.
+    # Найдено шестым проходом независимого аудита 08.09.2026.
+    log_recommendation(result, user_id=user_id)
     log_event("recommendation_generated", {
         "risk_profile": result.get("risk_profile"),
         "alternatives_total": result.get("alternatives_total"),
         "admissible_count": result.get("admissible_count"),
         "u_score": (result.get("best") or {}).get("utility"),
-    })
+    }, user_id=user_id)
     # Дисклеймер 39-ФЗ — часть ответа, а не украшение фронта (L5): экран рекомендаций
     # обязан показать его рядом с планом, и текст обязан быть каноническим.
     result["disclaimer"] = DISCLAIMER_39FZ
@@ -594,8 +607,16 @@ def _snapshot_detail(s: Any) -> PlanSnapshotDetail:
     return PlanSnapshotDetail(**_snapshot_summary(s).model_dump(), top3=s.top3 or [])
 
 
+# 🔴 Гостевая запись запрещена на проде отдельно от гейта согласия. `_FIN` на роутере
+# от неё НЕ защищает: `require_financial_consent` гостя пропускает намеренно, чтобы
+# не ломать демо. А снимок плана — самый чувствительный объект продукта: агрегированный
+# портрет целиком (доходы, расходы, обязательства, цели, Rt/Lt/Dt) в общем пуле
+# `user_id IS NULL`, видимом каждому анонимному посетителю. Найдено пятым проходом
+# независимого аудита 08.09.2026: периметр v8.53.0 проверялся по списку из пяти путей,
+# planning в него не входил.
 @router.post("/history", summary="Сохранить снапшот плана в историю (P2.6)",
-             response_model=PlanSnapshotDetail)
+             response_model=PlanSnapshotDetail,
+             dependencies=[Depends(require_account_for_writes)])
 def save_plan_history(
     payload: PlanHistorySave,
     db: Session = Depends(get_db),
@@ -637,7 +658,8 @@ def get_plan_history(
 
 
 @router.delete("/history/{snapshot_id}", summary="Удалить снапшот плана (P2.6)",
-               response_model=PlanSnapshotDeleted)
+               response_model=PlanSnapshotDeleted,
+               dependencies=[Depends(require_account_for_writes)])
 def delete_plan_history(
     snapshot_id: int,
     db: Session = Depends(get_db),
@@ -651,6 +673,7 @@ def delete_plan_history(
 @router.post(
     "/history/{snapshot_id}/restore",
     summary="Восстановить удалённый снимок плана",
+    dependencies=[Depends(require_account_for_writes)],
 )
 def restore_plan_history(
     snapshot_id: int,
@@ -743,7 +766,8 @@ def get_forecast(
     return ForecastResponse(**result)
 
 
-@router.post("/scenarios", summary="Сохранить сценарий что-если (LOG-06)")
+@router.post("/scenarios", summary="Сохранить сценарий что-если (LOG-06)",
+             dependencies=[Depends(require_account_for_writes)])
 def save_scenario_endpoint(
     payload: ScenarioSave,
     db: Session = Depends(get_db),

@@ -94,15 +94,36 @@ class TestGuestCannotWriteInProduction:
         )
         assert response.status_code == 401
 
-    def test_demo_load_is_refused(self, client: TestClient, production) -> None:
-        """`/demo/load` зовёт `_clear_all(user_id=None)` — один гость стирает
-        данные всех остальных гостей."""
+    def test_demo_load_is_allowed_and_why(self, client: TestClient, production) -> None:
+        """🔴 `/demo/load` гостю на проде РАЗРЕШЁН — решение пересмотрено 08.09.2026.
+
+        Прежняя редакция запрещала его с верным доводом: ручка зовёт
+        `_clear_all(user_id=None)`, то есть один гость стирает данные всех остальных
+        гостей. Довод остался верным, но перестал быть решающим, и вот почему.
+
+        **Что было ценой запрета.** Гость получал 401 отсюда, а вошедший — 403 от самой
+        ручки («демо доступны только в гостевом режиме»). Третьего состояния нет: демо
+        на проде было недостижимо ВСЕМ СРАЗУ. Это единственный вход в продукт без
+        аккаунта и витрина, обещанная в README; кнопка во фронте показывается только
+        гостю — ровно тому, кому она вернёт 401. Локально всё работало, поэтому
+        не замечалось.
+
+        **Что стало ценой разрешения.** На проде гостевая ЗАПИСЬ финансовых данных
+        запрещена всем остальным периметром (v8.53.0 и далее), поэтому в пуле
+        `user_id IS NULL` не остаётся ничего, кроме **синтетических демо-портретов**,
+        загруженных такими же гостями. Стереть их — потеря нулевая: следующий клик
+        загружает заново.
+
+        🔴 Ошибка в сторону запрета стоила рабочей витрины всем посетителям; ошибка
+        в сторону разрешения стоит одному гостю повторного клика. Полное решение —
+        сессионный пул с `session_id` (задача вехи 9+), и оно снимает вопрос целиком.
+        """
         client.cookies.clear()
         cases = client.get("/api/demo/cases")
         assert cases.status_code == 200, "список демо-портретов должен читаться всегда"
         key = cases.json()["cases"][0]["key"]
 
-        assert client.post(f"/api/demo/load?case={key}").status_code == 401
+        assert client.post(f"/api/demo/load?case={key}").status_code != 401
 
 
 class TestReadingStaysOpen:
@@ -168,3 +189,121 @@ class TestDevelopmentUnchanged:
             },
         )
         assert response.status_code in (200, 201), response.text
+
+
+class TestPlanningWritesAreGuardedToo:
+    """🔴 Снимки плана и сценарии — тоже финансовые данные, и тоже под запретом.
+
+    Митигация v8.53.0 («на проде гостевая ЗАПИСЬ финансовых данных запрещена») была
+    неполной: `planning_router` подключён только с `_FIN`, а гейт согласия гостя
+    **пропускает намеренно** — «согласие там означало бы сломать демо ради формальности».
+    Значит защиты от гостевой записи у планирования не было вовсе.
+
+    🔴 **И это самый чувствительный объект из всех.** Отдельная транзакция защищена,
+    а снимок плана несёт агрегированный портрет целиком: доходы, расходы, обязательства,
+    цели, Rt/Lt/Dt. Он же лежит в общем пуле `user_id IS NULL`, то есть виден каждому
+    анонимному посетителю того же экземпляра.
+
+    Найдено пятым проходом независимого аудита 08.09.2026. Периметр проверялся
+    по прозаическому списку из пяти путей — planning в него не входил.
+    """
+
+    def test_guest_cannot_save_plan_snapshot(self, client, monkeypatch) -> None:
+        """🔴 Мутация «снять `_GUEST` с сохранения снимка» роняет тест здесь."""
+        from app.config import settings
+
+        monkeypatch.setattr(settings, "ENVIRONMENT", "production", raising=False)
+        response = client.post("/api/planning/history", json={"note": "проба"})
+        assert response.status_code in (401, 403), (
+            f"гость сохранил снимок плана на проде (код {response.status_code}) — "
+            "это агрегированный финансовый портрет в общем пуле"
+        )
+
+    def test_guest_cannot_save_scenario(self, client, monkeypatch) -> None:
+        from app.config import settings
+
+        monkeypatch.setattr(settings, "ENVIRONMENT", "production", raising=False)
+        response = client.post("/api/planning/scenarios", json={})
+        assert response.status_code in (401, 403, 422), response.status_code
+        assert response.status_code != 200
+
+    def test_guest_cannot_delete_someone_elses_snapshot(self, client, monkeypatch) -> None:
+        from app.config import settings
+
+        monkeypatch.setattr(settings, "ENVIRONMENT", "production", raising=False)
+        response = client.delete("/api/planning/history/1")
+        assert response.status_code in (401, 403), (
+            "гость удаляет снимок из общего пула"
+        )
+
+    def test_calculation_stays_open_for_the_sandbox(self, client, monkeypatch) -> None:
+        """🔴 Расчёт плана гостю по-прежнему доступен — на нём держится песочница.
+
+        `POST /planning/calculate` ничего не сохраняет: это чистый расчёт, и запрет
+        на нём сломал бы демо-режим, ради которого анонимный доступ и существует.
+        Разделение проходит по «пишет ли ручка», а не по методу HTTP.
+        """
+        from app.config import settings
+
+        monkeypatch.setattr(settings, "ENVIRONMENT", "production", raising=False)
+        response = client.post("/api/planning/calculate", json={})
+        assert response.status_code not in (401, 403), (
+            f"расчёт плана закрылся для гостя (код {response.status_code}) — "
+            "песочница сломана"
+        )
+
+
+class TestDemoSandboxStaysReachableOnProduction:
+    """🔴 Демо-песочница на проде не должна быть недостижима ВСЕМ сразу.
+
+    Два условия сомкнулись, и каждое по отдельности верно:
+
+    - `demo_router` подключён с `_GUEST` (v8.53.0, против общего пула), а в списке
+      исключений `READ_ONLY_WRITE_PATHS` стоит только `/api/demo/analyze` —
+      значит гостю на проде `POST /demo/load` отвечает **401**;
+    - сами ручки отвечают вошедшему **403**: «демо-портреты доступны только
+      в гостевом режиме» — правило старше и написано под другую эпоху.
+
+    Гость → 401. Вошедший → 403. Третьего состояния нет.
+
+    🔴 **Это единственный вход в продукт для человека без аккаунта и одновременно
+    витрина.** README обещает «один клик — и перед вами полный расчётный цикл
+    на живых данных»; кнопка во фронте показывается **только** гостю, то есть ровно
+    тому, кому она вернёт 401. Предпросмотр при этом работает, поэтому экран выглядит
+    живым и ломается на главной кнопке — а сообщение об отказе отрицает само себя:
+    «демо-портреты доступны для просмотра без регистрации».
+
+    Найдено шестым проходом независимого аудита 08.09.2026. Гейт периметра увидеть
+    это не мог по устройству: он проверяет, закрыта ли ручка, а не может ли её
+    кто-нибудь пройти.
+    """
+
+    def test_guest_can_load_demo_on_production(self, client, monkeypatch) -> None:
+        """🔴 Мутация «убрать /demo/load из исключений» роняет тест здесь."""
+        from app.config import settings
+
+        monkeypatch.setattr(settings, "ENVIRONMENT", "production", raising=False)
+        response = client.post("/api/demo/load", json={"case": "student"})
+        assert response.status_code != 401, (
+            "гость не может загрузить демо-портрет на проде — а это единственный "
+            "вход в продукт без аккаунта и витрина, обещанная в README"
+        )
+
+    def test_guest_can_clear_demo_on_production(self, client, monkeypatch) -> None:
+        from app.config import settings
+
+        monkeypatch.setattr(settings, "ENVIRONMENT", "production", raising=False)
+        assert client.post("/api/demo/clear").status_code != 401
+
+    def test_demo_still_refuses_a_logged_in_user(self, client, monkeypatch) -> None:
+        """А вошедшему демо по-прежнему отказывает — это отдельное правило.
+
+        Демо-портрет подменяет данные, и вошедшему он затёр бы его собственные.
+        Отказ остаётся, меняется только то, что гость до него доходит.
+        """
+        from app.config import settings
+
+        client.post("/api/auth/register", json={
+            "email": "demo-guard@test.io", "password": "verysecret1", "consent": True})
+        monkeypatch.setattr(settings, "ENVIRONMENT", "production", raising=False)
+        assert client.post("/api/demo/load", json={"case": "student"}).status_code == 403

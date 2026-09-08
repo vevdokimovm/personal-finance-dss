@@ -69,7 +69,7 @@ def update_asset(
     )
     if asset is None:
         raise HTTPException(status_code=404, detail="Актив не найден")
-    log_event("liquid_asset_updated", {"asset_id": asset_id})
+    log_event("liquid_asset_updated", {"asset_id": asset_id}, user_id=user_id)
     return asset
 
 
@@ -97,5 +97,5 @@ def restore_asset(
     asset = restore_liquid_asset(db, asset_id, user_id=user_id)
     if asset is None:
         raise HTTPException(status_code=404, detail="Удалённый актив не найден")
-    log_event("liquid_asset_restored", {"asset_id": asset_id})
+    log_event("liquid_asset_restored", {"asset_id": asset_id}, user_id=user_id)
     return asset

@@ -1,18 +1,19 @@
 # FINPILOT — СППР для персональных финансов
 
 <!-- STATUS -->
-> **Сейчас:** `v9.6.0` · 2026-09-08 · веха 9 открыта, идёт предподготовка к деплою:
-> второй проход независимого аудита нашёл две дыры безопасности — ссылка сброса пароля
-> уходила в теле ответа на проде без SMTP, а запись курсов валют стояла без проверки прав.
-> Обе закрыты гейтами.
+> **Сейчас:** `v9.7.0` · 2026-09-08 · веха 9 открыта, идёт предподготовка к деплою:
+> третий проход аудита нашёл, что предыдущий батч научил систему видеть устаревшую
+> редакцию согласия и не дал способа её подтвердить — для обязательного согласия
+> это был тупик без обходного пути. Закрыто вместе с экраном и тремя гейтами,
+> которые оказались зелёными по случайности.
 > Где стоим — [`WATCHLOG.md`](WATCHLOG.md) §0.
 <!-- /STATUS -->
 
 [![CI](https://github.com/vevdokimovm/personal-finance-dss/actions/workflows/ci.yml/badge.svg)](https://github.com/vevdokimovm/personal-finance-dss/actions/workflows/ci.yml)
-![version](https://img.shields.io/badge/version-9.6.0-blue)
+![version](https://img.shields.io/badge/version-9.7.0-blue)
 ![python](https://img.shields.io/badge/python-3.13-blue)
 ![coverage](https://img.shields.io/badge/coverage-gate%2090%25-brightgreen)
-![tests](https://img.shields.io/badge/tests-2114%20%2B%20858-brightgreen)
+![tests](https://img.shields.io/badge/tests-2160%20%2B%20874-brightgreen)
 ![license](https://img.shields.io/badge/license-MIT-green)
 
 **FINPILOT** — система поддержки принятия решений (СППР), которая отвечает на один вопрос,

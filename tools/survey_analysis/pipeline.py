@@ -8,13 +8,13 @@ import json
 import os
 from typing import Any
 
-from finpilot_survey.data import SurveyData
-from finpilot_survey.analyzers_quant import (
+from tools.survey_analysis.data import SurveyData
+from tools.survey_analysis.analyzers_quant import (
     AudienceProfiler, DescriptiveAnalyzer, HypothesisTester,
     PreferenceAnalyzer, RankingAnalyzer, SegmentAnalyzer)
-from finpilot_survey.analyzers_product import (
+from tools.survey_analysis.analyzers_product import (
     BehavioralValidator, BusinessAnalyzer, QualitativeCoder)
-from finpilot_survey.visualization import ChartMaker
+from tools.survey_analysis.visualization import ChartMaker
 
 
 class AnalysisPipeline:

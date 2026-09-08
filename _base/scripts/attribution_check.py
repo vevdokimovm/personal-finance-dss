@@ -34,23 +34,46 @@ import subprocess
 import sys
 from pathlib import Path
 
-# 🔴 ШАБЛОНЫ — ЗДЕСЬ И БОЛЬШЕ НИГДЕ.
-# `claude` ловится как отдельное слово: подстрокой он даёт ложные срабатывания
-# на безобидных словах, а вот `anthropic` и почтовый домен уникальны настолько,
-# что ищутся как есть.
-ЗАПРЕЩЕНО = [
-    (re.compile(r"\banthropic\b", re.I), "упоминание Anthropic"),
-    (re.compile(r"\bclaude\b", re.I), "упоминание Claude"),
-    (re.compile(r"noreply@anthropic\.com", re.I), "чужой адрес noreply@anthropic.com"),
+# 🔴 ДВА РАЗНЫХ НАБОРА, И РАЗДЕЛЕНИЕ ЗДЕСЬ — ГЛАВНОЕ В ЭТОМ ФАЙЛЕ.
+#
+# Первая редакция искала голое слово `claude` ВЕЗДЕ, включая текст сообщения.
+# Проверка на живой истории 07.09.2026 нашла «8 упоминаний» — и все восемь
+# оказались **предметом работы владельца**: «механика сессий Claude Code»,
+# «справочник Claude Code», «claude-context kit», «лимиты claude.ai ≠ Claude
+# Code». Автор везде владелец, атрибуции нет ни в одном.
+#
+# > **Защита блокировала бы законную работу:** коммит «справочник Claude Code»
+# > не прошёл бы хук. Запрет упоминать инструмент в описании документов
+# > об этом инструменте — не защита, а помеха.
+#
+# Поэтому:
+#   АТРИБУЦИЯ — конструкции, которыми ассистент СЕБЯ ПРИПИСЫВАЕТ. Ищутся
+#               везде: в авторе, коммиттере и в тексте сообщения.
+#   ЛИЧНОСТЬ  — голые имена. Ищутся ТОЛЬКО в авторе и коммиттере, где
+#               законной причины их упоминать не существует.
+
+АТРИБУЦИЯ = [
     (re.compile(r"co-authored-by:.*(claude|anthropic)", re.I), "трейлер Co-Authored-By"),
     (re.compile(r"generated with .*claude", re.I), "подпись «Generated with Claude»"),
-    (re.compile(r"claude\.ai/(code|share)", re.I), "ссылка на сессию"),
+    (re.compile(r"claude\.ai/(code|share)/", re.I), "ссылка на сессию"),
+    (re.compile(r"noreply@anthropic\.com", re.I), "чужой адрес noreply@anthropic.com"),
+]
+
+ЛИЧНОСТЬ = [
+    (re.compile(r"\banthropic\b", re.I), "имя Anthropic в подписи"),
+    (re.compile(r"\bclaude\b", re.I), "имя Claude в подписи"),
 ]
 
 
-def найти(текст: str) -> list[str]:
-    """Все запрещённые упоминания в куске текста."""
-    return [имя for шаблон, имя in ЗАПРЕЩЕНО if шаблон.search(текст)]
+def найти(текст: str, подпись: bool = False) -> list[str]:
+    """Запрещённое в куске текста.
+
+    Args:
+        текст: что проверяем.
+        подпись: True для автора и коммиттера — там запрещены и голые имена.
+    """
+    шаблоны = АТРИБУЦИЯ + ЛИЧНОСТЬ if подпись else АТРИБУЦИЯ
+    return [имя for шаблон, имя in шаблоны if шаблон.search(текст)]
 
 
 def _git(репа: Path, *аргументы: str) -> str:
@@ -81,7 +104,7 @@ def проверить_конфиг(репа: Path) -> list[str]:
         if not значение:
             беды.append(f"git config {ключ} не задан локально — подпись непредсказуема")
             continue
-        for имя in найти(значение):
+        for имя in найти(значение, подпись=True):
             беды.append(f"git config {ключ} = «{значение}»: {имя}")
     return беды
 
@@ -99,10 +122,10 @@ def проверить_историю(репа: Path) -> list[str]:
         if len(части) < 6:
             continue
         sha, an, ae, cn, ce, тело = части[:6]
-        for поле, значение in (("автор", f"{an} <{ae}>"),
-                               ("коммиттер", f"{cn} <{ce}>"),
-                               ("сообщение", тело)):
-            for имя in найти(значение):
+        for поле, значение, подпись in (("автор", f"{an} <{ae}>", True),
+                                        ("коммиттер", f"{cn} <{ce}>", True),
+                                        ("сообщение", тело, False)):
+            for имя in найти(значение, подпись=подпись):
                 беды.append(f"{sha[:8]} — {поле}: {имя}")
     return беды
 
@@ -133,18 +156,31 @@ def selftest() -> bool:
     🔴 Без неё «бед нет» неотличимо от «проверка сломана и молчит» — ровно
     тот отказ, против которого вся эта защита и заводится.
     """
-    грязное = [
+    # Атрибуция — запрещена везде, включая текст сообщения.
+    атрибуция = [
         "Co-Authored-By: Claude <noreply@anthropic.com>",
         "🤖 Generated with Claude Code",
-        "https://claude.ai/code/abc",
-        "Anthropic",
+        "См. https://claude.ai/code/abc123",
     ]
+    # 🔴 ГЛАВНОЕ В КАНАРЕЙКЕ: голое имя в СООБЩЕНИИ законно, в ПОДПИСИ нет.
+    # Без этой пары проверка снова начнёт блокировать коммиты вида
+    # «справочник Claude Code» — восемь таких нашлось в живой истории.
+    предмет = [
+        "base-repo v4.45.0 — механика сессий Claude Code: разбор",
+        "feat: v1.2.0 — infra docs 11-17 + claude-context kit",
+        "Лимиты изображений: claude.ai ≠ Claude Code, точный ресёрч",
+    ]
+    подписи_плохие = ["Claude <noreply@anthropic.com>", "Anthropic Assistant <x@y.z>"]
     чистое = [
         "Vasilii Evdokimov <vevdokimovm@gmail.com>",
         "base-repo v4.189.0 — гейт проверяет паспорт работы",
         "fix: убрать лишний клод в переменной",  # 🔴 намеренно: «клод» кириллицей
     ]
-    return all(найти(т) for т in грязное) and not any(найти(т) for т in чистое)
+    return (all(найти(т) for т in атрибуция)
+            and not any(найти(т) for т in предмет)          # в сообщении — можно
+            and all(найти(т, подпись=True) for т in предмет)  # в подписи — нельзя
+            and all(найти(т, подпись=True) for т in подписи_плохие)
+            and not any(найти(т, подпись=True) for т in чистое))
 
 
 def main() -> int:
@@ -174,7 +210,7 @@ def main() -> int:
         for поле in ("GIT_AUTHOR_IDENT", "GIT_COMMITTER_IDENT"):
             значение = subprocess.run(["git", "var", поле], capture_output=True,
                                       text=True).stdout.strip()
-            беды += [f"{поле}: {и}" for и in найти(значение)]
+            беды += [f"{поле}: {и}" for и in найти(значение, подпись=True)]
 
     if a.repo:
         беды += проверить_конфиг(a.repo)

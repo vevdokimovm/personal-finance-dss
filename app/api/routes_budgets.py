@@ -61,7 +61,11 @@ def add_budget(
         user_id=user_id,
         household_id=payload.household_id,
     )
-    log_event("budget_set", {"category": payload.category, "limit": payload.limit_amount})
+    log_event(
+        "budget_set",
+        {"category": payload.category, "limit": payload.limit_amount},
+        user_id=user_id,
+    )
     return budget
 
 
@@ -77,7 +81,7 @@ def remove_budget(
 ) -> None:
     if not delete_budget(db, budget_id, user_id=user_id):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Бюджет не найден.")
-    log_event("budget_deleted", {"budget_id": budget_id})
+    log_event("budget_deleted", {"budget_id": budget_id}, user_id=user_id)
 
 
 @router.post(
@@ -95,5 +99,5 @@ def restore_budget_endpoint(
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Удалённый бюджет не найден."
         )
-    log_event("budget_restored", {"budget_id": budget_id})
+    log_event("budget_restored", {"budget_id": budget_id}, user_id=user_id)
     return budget

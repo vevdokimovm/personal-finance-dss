@@ -2,7 +2,15 @@
 Точка входа анализа исследования FINPILOT.
 
 Запуск из корня проекта:
-    python run_analysis.py [--data PATH] [--out DIR]
+    python -m tools.survey_analysis.run_analysis [--data PATH] [--out DIR]
+
+🔴 Именно модулем, а не файлом: после перевода импортов на `tools.survey_analysis`
+прямой `python run_analysis.py` падает `ModuleNotFoundError` — каталог инструмента
+не является корнем пакета. Прежняя строка обещала способ, который не работает.
+
+Зависимости у конвейера свои — `tools/survey_analysis/requirements.txt`
+(pandas, numpy, openpyxl, scipy, matplotlib, factor_analyzer); в основном окружении
+проекта их нет, ставятся отдельно.
 
 Результат:
     <out>/finpilot_report.html   — HTML-отчёт
@@ -13,9 +21,9 @@ from __future__ import annotations
 
 import argparse
 
-from finpilot_survey.data import DATA_PATH
-from finpilot_survey.pipeline import AnalysisPipeline
-from finpilot_survey.report import build_report
+from tools.survey_analysis.data import DATA_PATH
+from tools.survey_analysis.pipeline import AnalysisPipeline
+from tools.survey_analysis.report import build_report
 
 
 def main() -> None:

@@ -10,7 +10,8 @@ from functools import lru_cache
 import numpy as np
 import pandas as pd
 
-from finpilot_survey import config as cfg
+from tools.survey_analysis import config as cfg
+from pathlib import Path
 
 
 class SurveyData:
@@ -145,8 +146,13 @@ def _apply_rules(value: object, rules: list[tuple[str, float]]) -> float:
     return np.nan
 
 
-# Путь к данным задаётся снаружи (run_analysis.py), значение по умолчанию ниже
-DATA_PATH = (
-    "/mnt/user-data/uploads/"
-    "Исследование__Выбор_финансовых_стратегий__Ответы_385_респондентов_.xlsx"
+# 🔴 Умолчание указывает В РЕПОЗИТОРИЙ, а не в чужое окружение. Прежнее значение
+# вело в `/mnt/user-data/uploads/` — mount той машины, где конвейер когда-то
+# прогоняли; ни на macOS владельца, ни в CI такого пути нет. Запуск без `--data`
+# падал бы `FileNotFoundError` по адресу, которого не существует, — ровно в тот
+# момент, когда владелец пришлёт финальную выгрузку и будет ждать «одной команды».
+# Найдено четвёртым проходом независимого аудита 08.09.2026.
+_REPO_ROOT = Path(__file__).resolve().parents[2]
+DATA_PATH = str(
+    _REPO_ROOT / "knowledge" / "survey_auditory" / "raw" / "survey_responses_385.xlsx"
 )

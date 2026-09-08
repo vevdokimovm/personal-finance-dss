@@ -287,3 +287,248 @@ describe("ConsentsSection — ошибка не прячет право по 152
     expect(screen.queryByRole("alert")).toBeNull();
   });
 });
+
+describe("ConsentsSection — устаревшая редакция видна и подтверждается", () => {
+  /* 🔴 Шестой случай класса `CONSENT-GATE-NO-UI`, найден третьим проходом аудита
+     08.09.2026 — через СУТКИ после того, как он был заведён предыдущим батчем.
+
+     v9.6.0 научил бэкенд считать `is_current`/`current_version` и положил их
+     в контракт «чтобы фронт показал». Фронт не показывал: экран печатал
+     `ред. {state.version}` — редакцию, на которую человек когда-то согласился, —
+     и ничем не отличал её от действующей.
+
+     Полутора десятков версий на этот раз не понадобилось: хватило одного дня.
+     Значит дело не в забывчивости, а в отсутствии механической сверки — и гейт,
+     заведённый в тот же день против этого класса, схему `ConsentState` в периметр
+     не включал. */
+
+  beforeEach(() => {
+    useLegalMock.mockReturnValue({ data: LEGAL, error: null, isLoading: false });
+  });
+
+  const OUTDATED = {
+    ...ALL_CONSENTS,
+    personal_data: {
+      ...ALL_CONSENTS.personal_data,
+      version: "1.0",
+      current_version: "2.0",
+      is_current: false,
+    },
+  };
+
+  it("🔴 говорит, что согласие дано на прежнюю редакцию", () => {
+    useConsentsMock.mockReturnValue({ data: OUTDATED, isLoading: false, isError: false });
+
+    render(<ConsentsSection />);
+
+    expect(screen.getByText(/действует ред\. 2\.0/i)).toBeInTheDocument();
+  });
+
+  it("🔴 даёт подтвердить новую редакцию — иначе расхождение неустранимо", async () => {
+    /* Для `personal_data` обходного пути нет вовсе: тип неотзываемый, отозвать
+       и выдать заново нельзя. Кнопка здесь — единственный выход. */
+    useConsentsMock.mockReturnValue({ data: OUTDATED, isLoading: false, isError: false });
+
+    render(<ConsentsSection />);
+
+    const confirm = screen.getByRole("button", {
+      name: /Подтвердить новую редакцию: Персональные данные/,
+    });
+    await userEvent.click(confirm);
+    expect(grantMock).toHaveBeenCalledWith("personal_data", expect.anything());
+  });
+
+  it("на актуальной редакции лишнего не показывает", () => {
+    const current = {
+      ...ALL_CONSENTS,
+      personal_data: {
+        ...ALL_CONSENTS.personal_data,
+        current_version: "1.0",
+        is_current: true,
+      },
+    };
+    useConsentsMock.mockReturnValue({ data: current, isLoading: false, isError: false });
+
+    render(<ConsentsSection />);
+
+    expect(screen.queryByText(/действует ред\./i)).toBeNull();
+    expect(screen.queryByRole("button", { name: /Подтвердить новую редакцию/ })).toBeNull();
+  });
+
+  it("старый ответ без новых полей не ломает экран", () => {
+    /* Совместимость: ответ, собранный до v9.6.0, полей не несёт — экран обязан
+       работать как раньше, а не решать, что всё устарело. */
+    useConsentsMock.mockReturnValue({ data: ALL_CONSENTS, isLoading: false, isError: false });
+
+    render(<ConsentsSection />);
+
+    expect(screen.queryByText(/действует ред\./i)).toBeNull();
+  });
+});
+
+describe("ConsentsSection — отзыв не исчезает при смене редакции", () => {
+  /* 🔴 Дефект, внесённый ЧАСОМ РАНЬШЕ в этом же батче и найденный четвёртым проходом
+     аудита. Ветка «Подтвердить новую редакцию» поглощала ветку отзыва: пока
+     `is_current === false`, отозвать маркетинговое или финансовое согласие из
+     интерфейса было нельзя вообще — единственная кнопка предлагала согласиться ещё раз.
+
+     Условие писалось «под personal_data» (тип неотзываемый, у него отзыва и нет),
+     но типов не различало, а `withdrawable` в этой ветке не читался вовсе.
+
+     🔴 Шапка этого же файла описывает ровно такой дефект как уже случившийся:
+     «отозвать маркетинговое было невозможно, хотя 152-ФЗ даёт на это право». Он
+     вернулся — теперь условно, по флагу расхождения редакций. Регулятор читает это
+     как понуждение к повторному согласию: чтобы отозвать, сначала согласись заново. */
+
+  beforeEach(() => {
+    useLegalMock.mockReturnValue({ data: LEGAL, error: null, isLoading: false });
+  });
+
+  const OUTDATED_WITHDRAWABLE = {
+    ...ALL_CONSENTS,
+    marketing: {
+      ...ALL_CONSENTS.marketing,
+      version: "1.0",
+      current_version: "2.0",
+      is_current: false,
+    },
+  };
+
+  it("🔴 отзываемое согласие можно отозвать и при устаревшей редакции", () => {
+    useConsentsMock.mockReturnValue({
+      data: OUTDATED_WITHDRAWABLE,
+      isLoading: false,
+      isError: false,
+    });
+
+    render(<ConsentsSection />);
+
+    expect(
+      screen.getByRole("button", { name: /Отозвать согласие: Рекламная рассылка/ }),
+    ).toBeInTheDocument();
+  });
+
+  it("и подтвердить новую редакцию — тоже, оба действия доступны сразу", () => {
+    useConsentsMock.mockReturnValue({
+      data: OUTDATED_WITHDRAWABLE,
+      isLoading: false,
+      isError: false,
+    });
+
+    render(<ConsentsSection />);
+
+    expect(
+      screen.getByRole("button", { name: /Подтвердить новую редакцию: Рекламная рассылка/ }),
+    ).toBeInTheDocument();
+  });
+
+  it("у неотзываемого типа кнопки отзыва по-прежнему нет", () => {
+    /* `personal_data` отозвать нельзя иначе как удалением аккаунта — кнопка там
+       гарантированно дала бы 409, то есть тупик. */
+    const outdatedPersonal = {
+      ...ALL_CONSENTS,
+      personal_data: {
+        ...ALL_CONSENTS.personal_data,
+        current_version: "2.0",
+        is_current: false,
+      },
+    };
+    useConsentsMock.mockReturnValue({
+      data: outdatedPersonal,
+      isLoading: false,
+      isError: false,
+    });
+
+    render(<ConsentsSection />);
+
+    expect(
+      screen.queryByRole("button", { name: /Отозвать согласие: Персональные данные/ }),
+    ).toBeNull();
+  });
+});
+
+describe("ConsentsSection — все сочетания состояния дают действие", () => {
+  /* 🔴 Перебор вместо примеров. Ветвление переписывалось дважды за час, и первый раз
+     дало состояние без единого действия (кнопка отзыва исчезала при устаревшей
+     редакции). Перечисление сочетаний ловит такое механически, а не по догадке
+     о том, какой случай проверить. */
+
+  beforeEach(() => {
+    useLegalMock.mockReturnValue({ data: LEGAL, error: null, isLoading: false });
+  });
+
+  const CASES: Array<[boolean, boolean, boolean]> = [];
+  for (const granted of [true, false]) {
+    for (const isCurrent of [true, false]) {
+      for (const withdrawable of [true, false]) {
+        CASES.push([granted, isCurrent, withdrawable]);
+      }
+    }
+  }
+
+  it.each(CASES)(
+    "granted=%s is_current=%s withdrawable=%s — человеку есть что сделать",
+    (granted, isCurrent, withdrawable) => {
+      useConsentsMock.mockReturnValue({
+        data: {
+          ...ALL_CONSENTS,
+          marketing: {
+            granted,
+            version: "1.0",
+            current_version: isCurrent ? "1.0" : "2.0",
+            is_current: isCurrent,
+            granted_at: granted ? "2026-02-01T10:00:00" : null,
+            withdrawable,
+          },
+        },
+        isLoading: false,
+        isError: false,
+      });
+
+      render(<ConsentsSection />);
+
+      const marketingActions = [
+        ...screen.queryAllByRole("button", { name: /Рекламная рассылка/ }),
+      ];
+      /* `queryAllByText`, а не `queryByText`: подсказку про неотзываемое согласие
+         показывает и `personal_data`, и множественное совпадение бросало бы
+         исключение — тест падал бы на собственной ошибке, а не на дефекте. */
+      const hints = screen.queryAllByText(/нельзя отозвать без удаления аккаунта/);
+      expect(
+        marketingActions.length > 0 || hints.length > 0,
+        `состояние granted=${granted} is_current=${isCurrent} ` +
+          `withdrawable=${withdrawable} не даёт ни одного действия и не объясняет почему`,
+      ).toBe(true);
+    },
+  );
+
+  it("🔴 двух primary-кнопок рядом не бывает", () => {
+    /* Подтверждение редакции и «Дать согласие» — обе primary. Если бы они могли
+       появиться вместе, экран предлагал бы два одинаково выглядящих действия
+       с разным смыслом. */
+    useConsentsMock.mockReturnValue({
+      data: {
+        ...ALL_CONSENTS,
+        marketing: {
+          granted: false,
+          version: "1.0",
+          current_version: "2.0",
+          is_current: false,
+          granted_at: null,
+          withdrawable: true,
+        },
+      },
+      isLoading: false,
+      isError: false,
+    });
+
+    render(<ConsentsSection />);
+
+    expect(
+      screen.queryByRole("button", { name: /Подтвердить новую редакцию: Рекламная/ }),
+    ).toBeNull();
+    expect(
+      screen.getByRole("button", { name: /Дать согласие: Рекламная рассылка/ }),
+    ).toBeInTheDocument();
+  });
+});

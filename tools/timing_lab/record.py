@@ -142,13 +142,21 @@ def summarize(measurements: list[Measurement]) -> dict[str, SuiteStats]:
 
     stats: dict[str, SuiteStats] = {}
     for suite, items in by_suite.items():
-        calm = [m.seconds for m in items if not m.loaded]
-        loaded = [m.seconds for m in items if m.loaded]
-        counts = [m.tests for m in items if m.tests is not None]
+        # 🔴 Медианы считаются по ЗАВЕРШИВШИМСЯ прогонам. `note` при провале несёт
+        # `exit=N`, и раньше сводка это поле не читала вовсе: опечатка в команде
+        # писала замер `0.0 с` под именем набора и навсегда тянула медиану вниз,
+        # а прогон, упавший на пятой минуте из двадцати, засчитывался как полный.
+        # Медиана отвечает на вопрос «сколько занимает полный прогон» — неполный
+        # на него не отвечает. В `worst` упавший остаётся: время потрачено.
+        complete = [m for m in items if not m.note.startswith("exit=")]
+        calm = [m.seconds for m in complete if not m.loaded]
+        loaded = [m.seconds for m in complete if m.loaded]
+        counts = [m.tests for m in complete if m.tests is not None]
         stats[suite] = SuiteStats(
             suite=suite,
             runs=len(items),
-            median=statistics.median([m.seconds for m in items]),
+            median=(statistics.median([m.seconds for m in complete])
+                    if complete else statistics.median([m.seconds for m in items])),
             calm_runs=len(calm),
             loaded_runs=len(loaded),
             calm_median=statistics.median(calm) if calm else None,
@@ -220,11 +228,36 @@ def update_doc(doc: Path, table: str) -> None:
     doc.write_text(f"{head}{_BEGIN}\n{table}\n{_END}{tail}", encoding="utf-8")
 
 
+def _compose_note(note: str | None, returncode: int) -> str:
+    """Пометка замера: отметка провала впереди, пояснение человека следом.
+
+    Args:
+        note: Пояснение, переданное через `--note`, если было.
+        returncode: Код возврата прогона.
+
+    Returns:
+        Строку вида `exit=3; фон: сборка`, либо только одну из частей, либо пустую.
+    """
+    parts = []
+    if returncode != 0:
+        parts.append(f"exit={returncode}")
+    if note:
+        parts.append(note)
+    return "; ".join(parts)
+
+
 def _cmd_run(args: argparse.Namespace) -> int:
     if not args.command:
         print("нечего запускать: укажите команду после `--`", file=sys.stderr)
         return 2
-    load1, cores = host_load()
+    # 🔴 Нагрузка снимается ДО и ПОСЛЕ, классификация идёт по худшему отсчёту.
+    # Однократный замер до старта не видит нагрузки САМОГО прогона: полный pytest
+    # идёт 15–25 минут, и набор, который сам перегружает машину, записывался как
+    # «спокойный». Смещение систематическое и в одну сторону, поэтому «спокойная
+    # медиана», по которой планируют батчи, была занижена. Найдено третьим проходом
+    # независимого аудита 08.09.2026 — и ровно тем доводом, которым обоснована сама
+    # лаборатория: load вырастает за минуту, значит один отсчёт ничего не описывает.
+    load_before, cores = host_load()
     started = time.monotonic()
     try:
         returncode = subprocess.run(args.command).returncode
@@ -234,6 +267,9 @@ def _cmd_run(args: argparse.Namespace) -> int:
         print(f"не удалось запустить {args.command[0]!r}: {exc}", file=sys.stderr)
         returncode = 127
     elapsed = round(time.monotonic() - started, 2)
+    load_after, cores_after = host_load()
+    load1 = max(load_before, load_after)
+    cores = cores or cores_after
 
     append_measurement(Path(args.ledger), Measurement(
         date=date.today().isoformat(),
@@ -244,7 +280,12 @@ def _cmd_run(args: argparse.Namespace) -> int:
         cores=cores,
         # Провал тоже записывается: упавший прогон занимает время так же, как
         # успешный, и при планировании это время всё равно тратится.
-        note=args.note or ("" if returncode == 0 else f"exit={returncode}"),
+        # 🔴 Маркер `exit=N` идёт ПЕРВЫМ и не вытесняется своим `--note`. Прежняя
+        # редакция писала `args.note or exit=N`, и любое пояснение стирало отметку
+        # провала — а сводка отсеивает упавшие прогоны именно по ней. То есть дефект
+        # «упавший прогон в медиане», закрытый в этом же батче, восстанавливался
+        # использованием флага, который инструмент сам и предлагает.
+        note=_compose_note(args.note, returncode),
     ))
     print(f"замер: {args.suite} — {_human(elapsed)} (load {load1} на {cores} ядрах)")
     return returncode

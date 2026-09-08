@@ -45,7 +45,7 @@ def log_event(
     event_type: str,
     payload: Optional[dict] = None,
     session_id: Optional[str] = None,
-    user_id: Optional[int] = None,
+    user_id: Optional[str] = None,
 ) -> None:
     """LOG-01 / LOG-03: фиксирует продуктовое событие в таблице events."""
     db = SessionLocal()
@@ -64,7 +64,7 @@ def log_event(
         db.close()
 
 
-def log_recommendation(result: dict, user_id: Optional[int] = None) -> None:
+def log_recommendation(result: dict, user_id: Optional[str] = None) -> None:
     """LOG-02: сохраняет полный снимок сгенерированной рекомендации."""
     db = SessionLocal()
     try:

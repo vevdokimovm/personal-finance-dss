@@ -249,7 +249,12 @@ RSYNC_EXCLUDES=(
 # Список считается по факту импорта, а не ведётся руками: добавили тест на
 # инструмент — он исключается сам, без правки этого файла.
 collect_internal_tool_tests() {
-  "$GREP" -rl -E '(from|import) tools[. ]' "$SOURCE_REPO/tests" 2>/dev/null \
+  # 🔴 Ловится и СТРОКОВАЯ ссылка на пакет (`PACKAGE = "tools.survey_analysis"`),
+  # а не только буквальный импорт. Тест, обращающийся к инструменту через
+  # `importlib.import_module`, буквального импорта не содержит вовсе — и уезжал
+  # в зеркало, хотя предмет его проверки там отсутствует. Поймано собственным
+  # гейтом приватности: файл называл каталог с живыми ПДн.
+  "$GREP" -rlE '(from|import) tools[. ]|["'"'"']tools\.' "$SOURCE_REPO/tests" 2>/dev/null \
     | while read -r f; do /usr/bin/basename "$f"; done | sort -u
 }
 
