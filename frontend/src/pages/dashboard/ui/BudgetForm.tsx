@@ -2,6 +2,7 @@ import { useRef, useState, type FormEvent } from "react";
 import { Button, Modal, toast } from "@shared/ui";
 import { t } from "@shared/lib/i18n/t";
 import { extractErrorMessage } from "@shared/lib/api/extractErrorMessage";
+import { SessionExpiredBanner, isSessionExpired } from "@entities/auth";
 import { useCreateBudget, type BudgetStatus } from "@entities/budgets";
 import "@shared/ui/entityForm.css";
 import { HouseholdScopeField } from "@features/household-scope";
@@ -87,10 +88,17 @@ export function BudgetForm({ open, onOpenChange, budget }: BudgetFormProps) {
       description={t("Лимит расходов по категории на месяц.")}
     >
       <form className="fp-entity-form" onSubmit={handleSubmit} noValidate>
-        {errorMessage && (
-          <p className="fp-entity-form__banner" role="alert">
-            {errorMessage}
-          </p>
+        {/* 🔴 401 на СОХРАНЕНИИ — истёкшая сессия, а не сбой связи. Общий текст
+            «Попробуйте ещё раз» здесь вреден: повтор возвращает 401 бесконечно.
+            v9.1.0 закрыл этот разбор только на загрузке экрана; форму пропустили. */}
+        {mutationError && isSessionExpired(mutationError) ? (
+          <SessionExpiredBanner />
+        ) : (
+          errorMessage && (
+            <p className="fp-entity-form__banner" role="alert">
+              {errorMessage}
+            </p>
+          )
         )}
         <div className="fp-entity-form__field">
           <label htmlFor="budget-form-category">{t("Категория *")}</label>

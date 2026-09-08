@@ -2,6 +2,7 @@ import { useRef, useState, type FormEvent } from "react";
 import { Button, Modal, toast } from "@shared/ui";
 import { t } from "@shared/lib/i18n/t";
 import { extractErrorMessage } from "@shared/lib/api/extractErrorMessage";
+import { SessionExpiredBanner, isSessionExpired } from "@entities/auth";
 import { useCreateGoal, useUpdateGoal, GOAL_CATEGORY_OPTIONS, type Goal } from "@entities/goals";
 import { useLiquidAssets } from "@entities/assets";
 import type { GoalCategory } from "@shared/api/generated";
@@ -121,10 +122,17 @@ export function GoalForm({ open, onOpenChange, goal }: GoalFormProps) {
       description={t("Название, сумма и срок цели. Стартовое накопление вносится отдельно.")}
     >
       <form className="fp-entity-form" onSubmit={handleSubmit} noValidate>
-        {errorMessage && (
-          <p className="fp-entity-form__banner" role="alert">
-            {errorMessage}
-          </p>
+        {/* 🔴 401 на СОХРАНЕНИИ — истёкшая сессия, а не сбой связи. Общий текст
+            «Попробуйте ещё раз» здесь вреден: повтор возвращает 401 бесконечно.
+            v9.1.0 закрыл этот разбор только на загрузке экрана; форму пропустили. */}
+        {mutationError && isSessionExpired(mutationError) ? (
+          <SessionExpiredBanner />
+        ) : (
+          errorMessage && (
+            <p className="fp-entity-form__banner" role="alert">
+              {errorMessage}
+            </p>
+          )
         )}
         <div className="fp-entity-form__field">
           <label htmlFor="goal-form-name">{t("Название *")}</label>

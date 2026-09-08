@@ -117,7 +117,9 @@ class TestNoLinkDependsOnLocalOnlyFile:
         # git отвечает про существующий путь. Локально каталоги собраны, на CI нет,
         # и тест краснел ТОЛЬКО в CI. Тот же класс, что он сам и ловит (PIT-032):
         # проверка зависела от состояния машины, а не от правил.
-        probe = lambda prefix: f"{prefix.rstrip('/')}/probe.txt"
+        def probe(prefix: str) -> str:
+            return f"{prefix.rstrip('/')}/probe.txt"
+
         wrong = [prefix for prefix in GENERATED_PREFIXES if not _is_ignored_by_git(probe(prefix))]
         assert not wrong, (
             f"эти префиксы объявлены порождаемыми, но git их не игнорирует: {wrong} — "

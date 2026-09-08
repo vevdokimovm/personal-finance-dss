@@ -18,4 +18,5 @@ export type {
   ChangePasswordRequest,
 } from "./model/types";
 export { SessionExpiredPanel } from "./ui/SessionExpiredPanel";
+export { SessionExpiredBanner } from "./ui/SessionExpiredBanner";
 export { isSessionExpired } from "./lib/isSessionExpired";

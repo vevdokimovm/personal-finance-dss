@@ -1,0 +1,4 @@
+# file: /Users/vasyaevdokimov/repos/personal-finance-dss/app/core/ranking.py
+# hypothesis_version: 6.155.7
+
+[0.0, 1e-09, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5, 1.0, 2.0, 3.0, 3.5, 4.5, 5.0, 6.0, 'Dt', 'Dt_new', 'Dt_norm', 'Lt', 'Lt_capped', 'Lt_new', 'Lt_norm', 'Rt', 'Rt_new', 'Rt_norm', 'Si', 'Si_norm', 'amount', 'floor_level', 'interest_rate', 'is_recommended', 'label', 'lt_target', 'scores', 'utility', 'w_dt', 'w_goals', 'w_lt', 'w_rt', 'weighted_scores', 'Агрессивный', 'Консервативный', 'Сбалансированный', 'Умеренно-агрессивный']

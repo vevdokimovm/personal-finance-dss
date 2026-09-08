@@ -30,6 +30,7 @@ from __future__ import annotations
 import argparse
 import os
 import re
+import subprocess
 from urllib.parse import unquote
 import sys
 from pathlib import Path
@@ -3018,6 +3019,42 @@ def selftest_exception_budget() -> bool:
         return len(fails) == 1 and not warns
 
 
+def check_attribution(root: Path) -> list[str]:
+    """В истории и настройках репы нет никого, кроме владельца.
+
+    🔴 ЗАЧЕМ В ГЕЙТЕ, А НЕ ТОЛЬКО В ХУКЕ. `git commit --no-verify` обходит
+    любой хук — это свойство git, а не дыра. Значит нужен слой, который
+    ловит просочившееся ПОСТФАКТУМ, и он обязан срабатывать сам, при каждом
+    закрытии батча. Требование владельца 04.09.2026: «ни в контрибьюторах
+    гита, ни в коммитах, ни в релизах, нигде».
+
+    🔴 ЧЕГО НЕ ЛОВИТ: тело релиза на GitHub (живёт не в git) и уже
+    запушенную грязь — её чистка требует force-push, а это необратимое
+    действие вовне, то есть решение владельца, а не вахты.
+    """
+    инструмент = root / "scripts" / "attribution_check.py"
+    if not инструмент.is_file():
+        return ["scripts/attribution_check.py отсутствует — атрибуция ничем не проверена"]
+    res = subprocess.run([sys.executable, str(инструмент), "--repo", str(root)],
+                         capture_output=True, text=True, encoding="utf-8")
+    if res.returncode == 0:
+        return []
+    return [l.strip(" ·") for l in res.stdout.splitlines()
+            if l.strip().startswith("·")] or ["атрибуция нарушена, подробности в attribution_check.py"]
+
+
+def check_shell_ascii(root: Path) -> list[str]:
+    """Имена переменных в shell-скриптах — только ASCII (`PIT-202`, 3 повтора)."""
+    инструмент = root / "scripts" / "shell_ascii_check.py"
+    if not инструмент.is_file():
+        return []
+    res = subprocess.run([sys.executable, str(инструмент), str(root)],
+                         capture_output=True, text=True, encoding="utf-8")
+    if res.returncode == 0:
+        return []
+    return [l.strip(" ·") for l in res.stdout.splitlines() if l.strip().startswith("·")]
+
+
 def check_tools_linked(root: Path) -> list[str]:
     """Каждый инструмент в `<кит>/bin/` упомянут в README своего кита.
 
@@ -3781,6 +3818,29 @@ def main() -> int:
             print(f"[FAIL] Карточка без ответа о разрешении: {len(unresolved)}")
             for line in unresolved[:5]:
                 print(f"    · {line}")
+
+    # 🔴 ВЫЗОВ ПО ИМЕНИ, А НЕ ЧЕРЕЗ ЦИКЛ ПО КОРТЕЖУ. Первая редакция
+    # регистрировала обе проверки списком и звала их через переменную —
+    # мета-гейт (`gate_monitor.py`) объявил их «определены, но не
+    # вызываются», и был прав: косвенный вызов не отследить текстом.
+    # Проверка, которую не видно, для мета-гейта не существует.
+    грязь = check_attribution(root)
+    if грязь:
+        failures.extend(грязь)
+        print(f"[FAIL] Атрибуция: в истории или настройках упомянут ассистент: {len(грязь)}")
+        for line in грязь[:5]:
+            print(f"    · {line}")
+    else:
+        print("[OK] Атрибуция: в истории и настройках только владелец")
+
+    не_ascii = check_shell_ascii(root)
+    if не_ascii:
+        failures.extend(не_ascii)
+        print(f"[FAIL] Имена переменных в shell не ASCII (PIT-202): {len(не_ascii)}")
+        for line in не_ascii[:5]:
+            print(f"    · {line}")
+    else:
+        print("[OK] Имена переменных в shell — только ASCII")
 
     if not selftest_tools_linked():
         failures.append("канарейка связки инструментов сломана: не отличает "

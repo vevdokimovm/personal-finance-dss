@@ -1,17 +1,19 @@
 # FINPILOT — СППР для персональных финансов
 
 <!-- STATUS -->
-> **Сейчас:** `v9.4.0` · 2026-09-06 · веха 9 открыта, идёт предподготовка к деплою:
-> три контура тестов вместо двух — фронт (90 %), бэкенд (90 %), **ядро модели (95 %)**;
-> E2E воскрешён — все 38 селекторов вели на снесённую вёрстку.
+> **Сейчас:** `v9.5.0` · 2026-09-07 · веха 9 открыта, идёт предподготовка к деплою:
+> сквозные сценарии реального пользователя (пункт E) прошли путь целиком и нашли тупик:
+> 401 на отправке формы советовал чинить исправный интернет — починка v9.1.0 закрыла
+> загрузку экрана и оставила форму.
+> Разбор — [`incidents/anonymous_pool_after_session_expiry_incident.md`](docs/reports/incidents/anonymous_pool_after_session_expiry_incident.md).
 > Где стоим — [`WATCHLOG.md`](WATCHLOG.md) §0.
 <!-- /STATUS -->
 
 [![CI](https://github.com/vevdokimovm/personal-finance-dss/actions/workflows/ci.yml/badge.svg)](https://github.com/vevdokimovm/personal-finance-dss/actions/workflows/ci.yml)
-![version](https://img.shields.io/badge/version-9.4.0-blue)
+![version](https://img.shields.io/badge/version-9.5.0-blue)
 ![python](https://img.shields.io/badge/python-3.13-blue)
 ![coverage](https://img.shields.io/badge/coverage-gate%2090%25-brightgreen)
-![tests](https://img.shields.io/badge/tests-1762%20%2B%20454-brightgreen)
+![tests](https://img.shields.io/badge/tests-1762%20%2B%20847-brightgreen)
 ![license](https://img.shields.io/badge/license-MIT-green)
 
 **FINPILOT** — система поддержки принятия решений (СППР), которая отвечает на один вопрос,

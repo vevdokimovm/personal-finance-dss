@@ -2,6 +2,7 @@ import { useRef, useState, type FormEvent } from "react";
 import { Button, Modal, toast } from "@shared/ui";
 import { t } from "@shared/lib/i18n/t";
 import { extractErrorMessage } from "@shared/lib/api/extractErrorMessage";
+import { SessionExpiredBanner, isSessionExpired } from "@entities/auth";
 import { useAddGoalContribution, type Goal } from "@entities/goals";
 import "@shared/ui/entityForm.css";
 
@@ -63,10 +64,17 @@ export function GoalContributionForm({ open, onOpenChange, goal }: GoalContribut
       }
     >
       <form className="fp-entity-form" onSubmit={handleSubmit} noValidate>
-        {errorMessage && (
-          <p className="fp-entity-form__banner" role="alert">
-            {errorMessage}
-          </p>
+        {/* 🔴 401 на СОХРАНЕНИИ — истёкшая сессия, а не сбой связи. Общий текст
+            «Попробуйте ещё раз» здесь вреден: повтор возвращает 401 бесконечно.
+            v9.1.0 закрыл этот разбор только на загрузке экрана; форму пропустили. */}
+        {addContribution.error && isSessionExpired(addContribution.error) ? (
+          <SessionExpiredBanner />
+        ) : (
+          errorMessage && (
+            <p className="fp-entity-form__banner" role="alert">
+              {errorMessage}
+            </p>
+          )
         )}
         <div className="fp-entity-form__field">
           <label htmlFor="goal-contribution-amount">{t("Сумма, ₽ *")}</label>
