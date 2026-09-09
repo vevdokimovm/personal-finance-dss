@@ -135,6 +135,49 @@ class TestCounting:
         assert hook.warning_for(state) is not None
 
 
+class TestExhaustionKinds:
+    """🔴 Два разных лимита, и они гасятся по-разному.
+
+    Поймано 09.09.2026 на первом же живом применении гейта: агент упал по лимиту
+    АККАУНТА (429), в ответе оказалось «rate limit», хук записал исчерпание ПОИСКОВОГО
+    бюджета — и заблокировал запуск при 7 израсходованных поисках из 400. Аккаунтный
+    лимит восстанавливается по часам, поисковый — только с новой сессией; смешивать их
+    нельзя, иначе один 429 глушит работу до конца сессии.
+    """
+
+    def test_ceiling_exhaustion_is_marked_as_ceiling(self, hook):
+        state = hook.blank_state()
+        state["used"] = hook.LIMIT - 1
+        state = hook.record_search(state, LIVE)
+        assert state["reason"] == "ceiling"
+
+    def test_marker_exhaustion_is_marked_as_heuristic(self, hook):
+        state = hook.record_search(hook.blank_state(), "rate limit exceeded")
+        assert state["reason"] == "heuristic"
+
+    def test_heuristic_exhaustion_expires(self, hook):
+        state = hook.record_search(hook.blank_state(), "rate limit exceeded")
+        state["updated"] = state["updated"] - hook.HEURISTIC_TTL - 1
+        assert hook.thaw(state)["exhausted"] is False
+
+    def test_ceiling_exhaustion_never_expires(self, hook):
+        state = hook.blank_state()
+        state["used"] = hook.LIMIT
+        state = hook.record_search(state, LIVE)
+        state["updated"] = state["updated"] - hook.HEURISTIC_TTL * 100
+        assert hook.thaw(state)["exhausted"] is True
+
+    def test_fresh_heuristic_exhaustion_still_holds(self, hook):
+        state = hook.record_search(hook.blank_state(), "rate limit exceeded")
+        assert hook.thaw(state)["exhausted"] is True
+
+    def test_block_message_says_how_to_reset(self, hook):
+        state = hook.blank_state()
+        state["exhausted"] = True
+        _, reason = hook.agent_verdict(state, "исследуй")
+        assert hook.RESET_HINT in reason
+
+
 class TestAgentVerdict:
     def test_agent_allowed_while_search_is_alive(self, hook):
         allowed, _ = hook.agent_verdict(hook.blank_state(), "исследуй тему")
@@ -225,6 +268,16 @@ class TestEndToEnd:
         assert result.returncode == 0
         assert result.stdout.strip() == ""
         assert not (tmp_path / "s7.json").exists()
+
+    def test_stale_heuristic_block_lets_the_agent_through(self, tmp_path):
+        """Лимит аккаунта обновился — гейт обязан отпустить сам, без вмешательства."""
+        run_hook(search_event("s10", "rate limit exceeded"), tmp_path)
+        path = tmp_path / "s10.json"
+        state = json.loads(path.read_text())
+        state["updated"] -= 100000
+        path.write_text(json.dumps(state))
+        result = run_hook(agent_event("s10"), tmp_path)
+        assert result.stdout.strip() == ""
 
     def test_broken_stdin_never_blocks_work(self, tmp_path):
         result = subprocess.run(

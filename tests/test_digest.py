@@ -9,12 +9,23 @@ from datetime import datetime
 
 from app.database import crud
 from app.database.models import NotificationLog
+from app.core.legal import CONSENT_FINANCIAL_DATA
+from app.services.consent import grant_consent
 from app.services.notifications import build_monthly_digest, run_user_notifications
 from app.utils.time import utcnow
 
 
 def _user(db, email="digest@test.io"):
-    return crud.create_user(db, email=email, password_hash="hashed")
+    """Пользователь с согласием на обработку финданных.
+
+    Согласие выдаётся НАМЕРЕННО: с v9.8.0 рассылка проверяет его на пути доставки,
+    и без него дайджест не уходит вовсе — тест проверял бы отсутствие согласия
+    вместо дедупликации. Отказ и отзыв согласия проверяются отдельно,
+    в `test_notifications_respect_consent.py`.
+    """
+    user = crud.create_user(db, email=email, password_hash="hashed")
+    grant_consent(db, user.id, CONSENT_FINANCIAL_DATA)
+    return user
 
 
 class TestBuildDigest:

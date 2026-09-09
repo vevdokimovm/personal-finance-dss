@@ -37,6 +37,12 @@ WARN_AT = 350
 EMPTY_STREAK_FOR_EXHAUSTION = 2
 MIN_LIVE_ANSWER = 40
 STATE_TTL_DAYS = 7
+# 🔴 Эвристическое исчерпание протухает, потолочное — нет. Поймано 09.09.2026 на первом
+# живом применении: агент упал по лимиту АККАУНТА (429), в ответе было «rate limit», хук
+# записал исчерпание ПОИСКОВОГО бюджета и заблокировал запуск при 7 поисках из 400.
+# Лимиты разные: аккаунтный восстанавливается по часам, поисковый — только с новой
+# сессией. Смешивать их нельзя, иначе один 429 глушит работу до конца сессии.
+HEURISTIC_TTL = 1800
 
 LIMIT_MARKERS = re.compile(
     r"rate limit|quota|limit reached|limit exceeded|exceeded your|too many requests"
@@ -50,6 +56,12 @@ NOSEARCH = re.compile(r"\bNOSEARCH\b")
 # харнесса. Гейт обязан держать оба имени: промах по имени = молчаливо снятый гейт.
 AGENT_TOOLS = {"Agent", "Task"}
 
+RESET_HINT = (
+    "Если лимит уже обновился, а гейт держит — сотри файл состояния сессии в "
+    "~/.claude/state/websearch-budget/ либо подожди 30 минут: догадка по маркеру "
+    "протухает сама, потолок 400 — никогда."
+)
+
 ADVICE = (
     "Поиск в этой сессии кончился. Запускать агентов бессмысленно: у подагентов нет "
     "ни WebSearch, ни Bash, они вернутся с пересказом по памяти.\n"
@@ -61,7 +73,7 @@ ADVICE = (
 
 def blank_state() -> dict:
     """Пустое состояние счётчика для новой сессии."""
-    return {"used": 0, "empty_streak": 0, "exhausted": False, "updated": 0.0}
+    return {"used": 0, "empty_streak": 0, "exhausted": False, "reason": "", "updated": 0.0}
 
 
 def classify_response(response: object) -> str:
@@ -78,14 +90,32 @@ def record_search(state: dict, response: object) -> dict:
     updated = dict(state)
     updated["used"] = state["used"] + 1
     updated["empty_streak"] = state["empty_streak"] + 1 if verdict == "empty" else 0
-    updated["exhausted"] = bool(
-        state["exhausted"]
-        or verdict == "exhausted"
-        or updated["empty_streak"] >= EMPTY_STREAK_FOR_EXHAUSTION
-        or updated["used"] >= LIMIT
-    )
+    heuristic = verdict == "exhausted" or updated["empty_streak"] >= EMPTY_STREAK_FOR_EXHAUSTION
+    ceiling = updated["used"] >= LIMIT
+    updated["exhausted"] = bool(state["exhausted"] or heuristic or ceiling)
+    if ceiling:
+        updated["reason"] = "ceiling"
+    elif heuristic and not state["exhausted"]:
+        updated["reason"] = "heuristic"
     updated["updated"] = time.time()
     return updated
+
+
+def thaw(state: dict) -> dict:
+    """Снять исчерпание, если оно эвристическое и достаточно старое.
+
+    Потолок 400 — факт, он не протухает никогда. Маркер в ответе — догадка, и её
+    источником мог быть лимит аккаунта, который восстанавливается сам.
+    """
+    if not state["exhausted"] or state.get("reason") == "ceiling":
+        return state
+    if time.time() - state.get("updated", 0.0) < HEURISTIC_TTL:
+        return state
+    thawed = dict(state)
+    thawed["exhausted"] = False
+    thawed["empty_streak"] = 0
+    thawed["reason"] = ""
+    return thawed
 
 
 def warning_for(state: dict) -> str | None:
@@ -108,7 +138,8 @@ def agent_verdict(state: dict, prompt: str) -> tuple[bool, str]:
     return False, (
         f"Запуск агента заблокирован: WebSearch в этой сессии исчерпан "
         f"({state['used']} из {LIMIT}).\n{ADVICE}\n"
-        "Если агенту поиск не нужен — добавь NOSEARCH в его промпт, и запуск пройдёт."
+        "Если агенту поиск не нужен — добавь NOSEARCH в его промпт, и запуск пройдёт.\n"
+        f"{RESET_HINT}"
     )
 
 
@@ -170,7 +201,10 @@ def handle_search(payload: dict) -> None:
 
 
 def handle_agent(payload: dict) -> None:
-    state = load_state(state_path(payload.get("session_id", "")))
+    path = state_path(payload.get("session_id", ""))
+    state = thaw(load_state(path))
+    if not state["exhausted"]:
+        path.write_text(json.dumps(state, ensure_ascii=False))
     prompt = (payload.get("tool_input") or {}).get("prompt", "")
     allowed, reason = agent_verdict(state, prompt)
     if not allowed:

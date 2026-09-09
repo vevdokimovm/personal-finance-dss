@@ -112,7 +112,7 @@ def run_user_notifications(db: Session, user: User) -> dict[str, int]:
 
     🔴 **Согласие на финданные проверяется ЗДЕСЬ, на пути доставки, а не только на чтении
     ленты.** Гейт `require_financial_consent` стоял на `GET /notifications/feed` — и его
-    собственное обоснование в `routes_notifications.py` называет письмо и Telegram дословно:
+    собственное обоснование в `routes_notifications.py` называет письмо и Telegram прямо:
     «та же сводка уходит письмом и в Telegram». До письма и Telegram гейт не дошёл, и человек
     без согласия — или **отозвавший** его — продолжал получать доход, расход и чистый поток
     на почту. `financial_data` не входит в `REQUIRED_AT_REGISTRATION` и отзываемо, то есть
