@@ -14,6 +14,8 @@ from sqlalchemy.orm import Session
 from app.core.money import format_money
 from app.database.crud import create_notification, get_budget_status, get_goals, get_transactions
 from app.database.models import Goal, NotificationLog, User
+from app.core.legal import CONSENT_FINANCIAL_DATA
+from app.services.consent import has_consent
 from app.services.email_service import email_service
 from app.services.telegram import telegram_service
 from app.utils.time import utcnow
@@ -107,9 +109,21 @@ def run_user_notifications(db: Session, user: User) -> dict[str, int]:
     """Проверяет условия для пользователя, шлёт недостающие уведомления, дедупит.
 
     Возвращает счётчики реально отправленного (без дублей).
+
+    🔴 **Согласие на финданные проверяется ЗДЕСЬ, на пути доставки, а не только на чтении
+    ленты.** Гейт `require_financial_consent` стоял на `GET /notifications/feed` — и его
+    собственное обоснование в `routes_notifications.py` называет письмо и Telegram дословно:
+    «та же сводка уходит письмом и в Telegram». До письма и Telegram гейт не дошёл, и человек
+    без согласия — или **отозвавший** его — продолжал получать доход, расход и чистый поток
+    на почту. `financial_data` не входит в `REQUIRED_AT_REGISTRATION` и отзываемо, то есть
+    это не гипотетический пользователь. Гипотеза H1 девятого прохода независимого аудита;
+    гейт — `tests/test_notifications_respect_consent.py`.
     """
-    month = utcnow().strftime("%Y-%m")
     sent = {"goal_deadline": 0, "budget_overrun": 0, "digest": 0}
+    if not has_consent(db, user.id, CONSENT_FINANCIAL_DATA):
+        return sent
+
+    month = utcnow().strftime("%Y-%m")
 
     for goal, days_left in goals_near_deadline(db, user.id):
         key = f"goal_deadline:{goal.id}:{month}"

@@ -22,7 +22,9 @@ from __future__ import annotations
 
 from datetime import timedelta
 
+from app.core.legal import CONSENT_FINANCIAL_DATA
 from app.database import crud
+from app.services.consent import grant_consent
 from app.database.db import SessionLocal
 from app.database.models import Notification, User
 from app.utils.time import utcnow
@@ -239,7 +241,15 @@ class TestEmailHookCreatesInApp:
     in-app (в колокольчике). Иначе пользователь без открытой почты пропустит его."""
 
     def _user(self, db, email="hook@test.io"):
-        return crud.create_user(db, email=email, password_hash="hashed")
+        """Пользователь с согласием на финданные.
+
+        🔴 Согласие — предусловие самой рассылки с v9.8.0 (гипотеза H1 девятого прохода
+        аудита), а не декорация фикстуры. Без него `run_user_notifications` не доходит
+        до отправки вовсе, и тест проверял бы гейт вместо связи «письмо → in-app».
+        """
+        user = crud.create_user(db, email=email, password_hash="hashed")
+        grant_consent(db, user.id, CONSENT_FINANCIAL_DATA)
+        return user
 
     def test_goal_deadline_creates_inapp(self, db_session) -> None:
         from app.services.notifications import run_user_notifications

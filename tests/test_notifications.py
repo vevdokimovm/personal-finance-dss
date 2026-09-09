@@ -7,8 +7,10 @@ from __future__ import annotations
 
 from datetime import timedelta
 
+from app.core.legal import CONSENT_FINANCIAL_DATA
 from app.database import crud
 from app.database.models import NotificationLog
+from app.services.consent import grant_consent
 from app.services.notifications import (
     budgets_over,
     goals_near_deadline,
@@ -20,7 +22,16 @@ from app.utils.time import utcnow
 
 
 def _user(db, email="notify@test.io"):
-    return crud.create_user(db, email=email, password_hash="hashed")
+    """Пользователь с согласием на финданные — иначе рассылка молчит по построению.
+
+    🔴 Согласие здесь не декорация фикстуры, а предусловие самой рассылки (v9.8.0,
+    гипотеза H1 девятого прохода аудита): `run_user_notifications` шлёт суммы только
+    тому, кто дал согласие на обработку финансовых данных. Тест без согласия проверял бы
+    не механику уведомлений, а сам гейт — и был бы зелёным при любой поломке дедупа.
+    """
+    user = crud.create_user(db, email=email, password_hash="hashed")
+    grant_consent(db, user.id, CONSENT_FINANCIAL_DATA)
+    return user
 
 
 def _goal(db, days_from_now: int, name="Цель", user_id=None):

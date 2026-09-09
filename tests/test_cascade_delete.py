@@ -117,6 +117,15 @@ class TestForeignKeysAreEnforcedDuringDeletion:
     @pytest.fixture()
     def strict_fk(self, db_session):
         """SQLite с включённой проверкой внешних ключей — как PostgreSQL."""
+        # 🔴 `PRAGMA` — синтаксис SQLite; на PostgreSQL это `ProgrammingError:
+        # syntax error at or near "PRAGMA"`. Первая редакция выполняла её безусловно,
+        # и тесты, написанные РАДИ PostgreSQL, падали бы именно на нём — с ошибкой,
+        # не связанной с предметом проверки. Матрица SQLite + PG обязательна при любом
+        # изменении схемы (правило проекта §3) и прогоняет весь набор целиком.
+        # На PostgreSQL включать нечего: внешние ключи там форсятся всегда.
+        if db_session.bind.dialect.name != "sqlite":
+            yield db_session
+            return
         db_session.execute(text("PRAGMA foreign_keys=ON"))
         yield db_session
         db_session.execute(text("PRAGMA foreign_keys=OFF"))
@@ -189,6 +198,15 @@ class TestDeletingOwnerDoesNotOrphanOthersData:
 
     @pytest.fixture()
     def strict_fk(self, db_session):
+        # 🔴 `PRAGMA` — синтаксис SQLite; на PostgreSQL это `ProgrammingError:
+        # syntax error at or near "PRAGMA"`. Первая редакция выполняла её безусловно,
+        # и тесты, написанные РАДИ PostgreSQL, падали бы именно на нём — с ошибкой,
+        # не связанной с предметом проверки. Матрица SQLite + PG обязательна при любом
+        # изменении схемы (правило проекта §3) и прогоняет весь набор целиком.
+        # На PostgreSQL включать нечего: внешние ключи там форсятся всегда.
+        if db_session.bind.dialect.name != "sqlite":
+            yield db_session
+            return
         db_session.execute(text("PRAGMA foreign_keys=ON"))
         yield db_session
         db_session.execute(text("PRAGMA foreign_keys=OFF"))

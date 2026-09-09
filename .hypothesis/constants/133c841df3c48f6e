@@ -1,4 +1,0 @@
-# file: /Users/vasyaevdokimov/repos/personal-finance-dss/tools/preflight.py
-# hypothesis_version: 6.155.7
-
-['## §3', '## §4', '&&\\s*grep\\b', '*.md', '*.sh', '*.zsh', '--repo', '.git', '.repo-id', '=== PREFLIGHT ===', 'CHANGELOG.md', 'README.md', 'VERSION', 'WATCHLOG', '[0-9]*.py', '^- \\*\\*v\\d', '_', '__main__', 'alembic/versions', 'app/config.py', 'docs/WATCHLOG.md', 'utf-8', 'v', '|| true', '\xad']

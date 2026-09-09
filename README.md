@@ -1,16 +1,16 @@
 # FINPILOT — СППР для персональных финансов
 
 <!-- STATUS -->
-> **Сейчас:** `v9.7.0` · 2026-09-08 · веха 9 открыта, идёт предподготовка к деплою:
-> третий проход аудита нашёл, что предыдущий батч научил систему видеть устаревшую
-> редакцию согласия и не дал способа её подтвердить — для обязательного согласия
-> это был тупик без обходного пути. Закрыто вместе с экраном и тремя гейтами,
-> которые оказались зелёными по случайности.
+> **Сейчас:** `v9.8.0` · 2026-09-09 · веха 9 открыта, идёт предподготовка к деплою:
+> девятый проход аудита нашёл, что рассылка уведомлений слала финансовые суммы тем,
+> кто согласия не давал или отозвал его — гейт стоял на чтении ленты и не дошёл
+> до письма и Telegram. Починено на пути доставки. Отдельно закрыт разбор рынка:
+> продукта с оптимизационным ядром не существует ни одного, и разобрано, почему.
 > Где стоим — [`WATCHLOG.md`](WATCHLOG.md) §0.
 <!-- /STATUS -->
 
 [![CI](https://github.com/vevdokimovm/personal-finance-dss/actions/workflows/ci.yml/badge.svg)](https://github.com/vevdokimovm/personal-finance-dss/actions/workflows/ci.yml)
-![version](https://img.shields.io/badge/version-9.7.0-blue)
+![version](https://img.shields.io/badge/version-9.8.0-blue)
 ![python](https://img.shields.io/badge/python-3.13-blue)
 ![coverage](https://img.shields.io/badge/coverage-gate%2090%25-brightgreen)
 ![tests](https://img.shields.io/badge/tests-2160%20%2B%20874-brightgreen)

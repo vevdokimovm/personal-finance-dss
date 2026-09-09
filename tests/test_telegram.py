@@ -14,7 +14,9 @@
 """
 from __future__ import annotations
 
+from app.core.legal import CONSENT_FINANCIAL_DATA
 from app.database import crud
+from app.services.consent import grant_consent
 from app.database.db import SessionLocal
 from app.database.models import User
 from app.services.security import token_service
@@ -240,6 +242,9 @@ class TestTelegramNotificationHook:
 
         db = db_session
         u = crud.create_user(db, email="tg_hook@test.io", password_hash="x")
+        # Согласие на финданные — предусловие рассылки с v9.8.0 (гипотеза H1 аудита):
+        # уведомление несёт суммы, и без согласия оно не уходит никуда, включая Telegram.
+        grant_consent(db, u.id, CONSENT_FINANCIAL_DATA)
         crud.link_telegram(db, u.id, "hookchat-1")
         crud.create_goal(db, name="Отпуск", target_amount=100000, current_amount=10000,
                          deadline=utcnow() + timedelta(days=4), user_id=u.id)
@@ -258,6 +263,9 @@ class TestTelegramNotificationHook:
 
         db = db_session
         u = crud.create_user(db, email="tg_nohook@test.io", password_hash="x")  # без привязки
+        # 🔴 Согласие выдаём НАМЕРЕННО: иначе тест зелен по чужой причине — рассылка
+        # молчала бы из-за отсутствия согласия, а проверяется здесь отсутствие привязки.
+        grant_consent(db, u.id, CONSENT_FINANCIAL_DATA)
         crud.create_goal(db, name="Цель", target_amount=100000, current_amount=10000,
                          deadline=utcnow() + timedelta(days=4), user_id=u.id)
 
