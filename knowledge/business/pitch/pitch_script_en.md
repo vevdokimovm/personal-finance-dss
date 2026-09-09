@@ -35,7 +35,7 @@ Leaves ~12 seconds of buffer. Better to land at 5:50 than to blow past 6:00.
 
 ## Slide 2 — Problem · ~30s · by 0:48
 
-> Nearly 52% of people say it outright: they know the basics, but they get lost in complex financial decisions. "Pay off debt or save" is the most common question — and there's no simple answer. So what does the market offer? Banking apps show where your money went — the past. Seventy percent of people live inside that built-in dashboard. But nobody tells them what to do next.
+> Nearly 52% of people say it outright: they know the basics, but they get lost in complex financial decisions. "Pay off debt or save" is the most common question — and there's no simple answer. So what does the market offer? Banking apps show where your money went — the past. Seventy percent of people live inside that built-in dashboard. But not one of the products we reviewed tells them what to do next.
 
 ---
 
@@ -47,7 +47,7 @@ Leaves ~12 seconds of buffer. Better to land at 5:50 than to blow past 6:00.
 
 ## Slide 4 — Why now · ~22s · by 1:42
 
-> And here's the key insight. We asked people what they trust more — a transparent algorithm, or AI as a black box. Transparency won: thirty-two percent to twenty-two. Right now everyone is building AI assistants. Our explainability is the counter-positioning. And the prescriptive layer — the part that actually advises — nobody does it yet.
+> And here's the key insight. We asked people what they trust more — a transparent algorithm, or AI as a black box. Transparency won: thirty-two percent to twenty-two. Right now everyone is building AI assistants. Our explainability is the counter-positioning. And the prescriptive layer — the part that actually advises — we found it in none of the products we reviewed.
 
 ---
 
@@ -81,7 +81,7 @@ Leaves ~12 seconds of buffer. Better to land at 5:50 than to blow past 6:00.
 
 ## Slide 9 — Competition · ~22s · by 4:00
 
-> Who are the competitors? Bank PFM — free, but it's a blind spot: the past only. Trackers — pretty, but they describe, they don't advise. Excel — abandoned in two weeks. We're the only ones who tell you what to do, explain why, and give a forecast. That's our moat.
+> Who are the competitors? Bank PFM — free, but it's a blind spot: the past only. Trackers — pretty, but they describe, they don't advise. Excel — abandoned in two weeks. Not one of the forty-one sources we reviewed combines what to do, why, and a forecast. That's our moat.
 
 ---
 

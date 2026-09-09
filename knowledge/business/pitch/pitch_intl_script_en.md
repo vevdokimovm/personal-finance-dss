@@ -67,7 +67,7 @@
 
 ## Slide 7 — Competition · ~24s · by 3:08
 
-> Who are the competitors? After Mint closed, the field consolidated — Monarch, Rocket Money, YNAB, Cleo. But look closely: trackers describe the past; YNAB is manual budgeting with no forecast; Cleo gives advice, but as a black box. No one owns transparent, holistic, prescriptive advice. That open space is ours.
+> Who are the competitors? After Mint closed, the field consolidated — Monarch, Rocket Money, YNAB, Cleo. But look closely: trackers describe the past; YNAB is manual budgeting with no forecast; Cleo gives advice, but as a black box. In everything we reviewed, no one offers transparent, holistic, prescriptive advice. That open space is ours.
 
 ---
 

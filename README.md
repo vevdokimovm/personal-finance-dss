@@ -1,15 +1,16 @@
 # FINPILOT — СППР для персональных финансов
 
 <!-- STATUS -->
-> **Сейчас:** `v9.9.1` · 2026-09-09 · веха 9 открыта, идёт предподготовка к деплою:
+> **Сейчас:** `v9.9.2` · 2026-09-09 · веха 9 открыта, идёт предподготовка к деплою:
 > бюджет веб-поиска стал машинным гейтом, три красных теста закрыты (полный прогон
 > 2241 / 0), разбор рынка переделан на живых источниках. Ключевое: расчёт со ставками
-> у конкурентов существует в патентах, но не в продуктах — формулировка новизны требует
-> правки. Где стоим — [`WATCHLOG.md`](WATCHLOG.md) §0.
+> у конкурентов существует в патентах, но не в продуктах — формулировка новизны сведена
+> к канону [`docs/novelty_statement.md`](docs/novelty_statement.md). Где стоим —
+> [`WATCHLOG.md`](WATCHLOG.md) §0.
 <!-- /STATUS -->
 
 [![CI](https://github.com/vevdokimovm/personal-finance-dss/actions/workflows/ci.yml/badge.svg)](https://github.com/vevdokimovm/personal-finance-dss/actions/workflows/ci.yml)
-![version](https://img.shields.io/badge/version-9.9.1-blue)
+![version](https://img.shields.io/badge/version-9.9.2-blue)
 ![python](https://img.shields.io/badge/python-3.13-blue)
 ![coverage](https://img.shields.io/badge/coverage-gate%2090%25-brightgreen)
 ![tests](https://img.shields.io/badge/tests-2160%20%2B%20874-brightgreen)
@@ -533,6 +534,7 @@ Dockerfile, docker-compose.yml, gunicorn_conf.py
 | [`docs/reports/incident_postmortem_guide.md`](docs/reports/incident_postmortem_guide.md) | Практический шаблон/метод инцидента (post-mortem, SEV, RCA) |
 | [`docs/documentation_methodology.md`](docs/documentation_methodology.md) | Общая теория документирования: blameless, RCA, runbook, ADR/RFC, SLO/error budget |
 | [`docs/math_model.md`](docs/math_model.md) | Каноническая математическая модель (источник истины по параметрам) |
+| [`docs/novelty_statement.md`](docs/novelty_statement.md) | Канон формулировки новизны: что опровергнуто патентами, что устояло, как формулировать без переусиления |
 | [`docs/algorithm_stack.md`](docs/algorithm_stack.md) | Девятишаговый конвейер ядра по шагам в коде |
 | [`docs/diagrams.md`](docs/diagrams.md) | 8 диаграмм: слои, ER, конвейер, потоки, развёртывание, auth, фронт |
 | [`docs/testing_infrastructure.md`](docs/testing_infrastructure.md) | Карта тестов: уровни, три категории, PG-матрица, E2E |
