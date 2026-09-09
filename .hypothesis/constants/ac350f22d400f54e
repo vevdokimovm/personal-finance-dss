@@ -1,0 +1,4 @@
+# file: /Users/vasyaevdokimov/repos/personal-finance-dss/app/api/routes_budgets.py
+# hypothesis_version: 6.155.7
+
+['/budgets', '/status', '/{budget_id}', '/{budget_id}/restore', 'budget_deleted', 'budget_id', 'budget_restored', 'budget_set', 'category', 'limit', 'Бюджет не найден.', 'Бюджеты', 'Список бюджетов', 'Удалить бюджет']

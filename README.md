@@ -1,16 +1,15 @@
 # FINPILOT — СППР для персональных финансов
 
 <!-- STATUS -->
-> **Сейчас:** `v9.8.0` · 2026-09-09 · веха 9 открыта, идёт предподготовка к деплою:
-> девятый проход аудита нашёл, что рассылка уведомлений слала финансовые суммы тем,
-> кто согласия не давал или отозвал его — гейт стоял на чтении ленты и не дошёл
-> до письма и Telegram. Починено на пути доставки. Отдельно закрыт разбор рынка:
-> продукта с оптимизационным ядром не существует ни одного, и разобрано, почему.
-> Где стоим — [`WATCHLOG.md`](WATCHLOG.md) §0.
+> **Сейчас:** `v9.9.0` · 2026-09-09 · веха 9 открыта, идёт предподготовка к деплою:
+> бюджет веб-поиска стал машинным гейтом — исчерпание объявляется владельцу и запуск
+> исследовательского агента в мёртвую сессию блокируется. Закрыта тема 12 очереди
+> исследований (портфельная теория): аргумент 1/N к долговой стороне ядра не переносится,
+> но ошибка оценки смещается в прогноз потока. Где стоим — [`WATCHLOG.md`](WATCHLOG.md) §0.
 <!-- /STATUS -->
 
 [![CI](https://github.com/vevdokimovm/personal-finance-dss/actions/workflows/ci.yml/badge.svg)](https://github.com/vevdokimovm/personal-finance-dss/actions/workflows/ci.yml)
-![version](https://img.shields.io/badge/version-9.8.0-blue)
+![version](https://img.shields.io/badge/version-9.9.0-blue)
 ![python](https://img.shields.io/badge/python-3.13-blue)
 ![coverage](https://img.shields.io/badge/coverage-gate%2090%25-brightgreen)
 ![tests](https://img.shields.io/badge/tests-2160%20%2B%20874-brightgreen)
