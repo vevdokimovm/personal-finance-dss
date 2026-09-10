@@ -1,7 +1,7 @@
 # FINPILOT — СППР для персональных финансов
 
 <!-- STATUS -->
-> **Сейчас:** `v9.9.3` · 2026-09-09 · веха 9 открыта, идёт предподготовка к деплою:
+> **Сейчас:** `v9.9.4` · 2026-09-09 · веха 9 открыта, идёт предподготовка к деплою:
 > бюджет веб-поиска стал машинным гейтом, три красных теста закрыты (полный прогон
 > 2241 / 0), разбор рынка переделан на живых источниках. Ключевое: расчёт со ставками
 > у конкурентов существует в патентах, но не в продуктах — формулировка новизны сведена
@@ -10,7 +10,7 @@
 <!-- /STATUS -->
 
 [![CI](https://github.com/vevdokimovm/personal-finance-dss/actions/workflows/ci.yml/badge.svg)](https://github.com/vevdokimovm/personal-finance-dss/actions/workflows/ci.yml)
-![version](https://img.shields.io/badge/version-9.9.3-blue)
+![version](https://img.shields.io/badge/version-9.9.4-blue)
 ![python](https://img.shields.io/badge/python-3.13-blue)
 ![coverage](https://img.shields.io/badge/coverage-gate%2090%25-brightgreen)
 ![tests](https://img.shields.io/badge/tests-2160%20%2B%20874-brightgreen)

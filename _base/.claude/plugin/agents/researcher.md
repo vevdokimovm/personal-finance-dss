@@ -1,7 +1,7 @@
 ---
 name: researcher
 description: Многошаговое веб-исследование темы — построено на РЕАЛЬНОЙ, официально опубликованной архитектуре Anthropic (lead agent → параллельные subagents → citations pass), не на собственной реконструкции. Источники — `.claude/agents/prompts/research_lead_agent.md`, `research_subagent.md`, `citations_agent.md` (сняты дословно с `github.com/anthropics/claude-cookbooks`, 28.08.2026). Вызывать на содержательные "разберись, как это устроено в индустрии/науке" вопросы, не на быстрые справки (для тех — просто WebSearch).
-tools: WebSearch, WebFetch, Read, Write, Grep, Glob, Agent
+tools: WebSearch, WebFetch, Bash, Read, Write, Grep, Glob, Agent
 model: opus
 ---
 
