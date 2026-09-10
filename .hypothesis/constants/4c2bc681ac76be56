@@ -1,0 +1,4 @@
+# file: /Users/vasyaevdokimov/repos/personal-finance-dss/app/core/envelopes.py
+# hypothesis_version: 6.155.7
+
+[0.0, 'amount', 'category', 'current_amount', 'deadline', 'id', 'interest_rate', 'linked_asset_id', 'material', 'name', 'savings_rate', 'target_amount']

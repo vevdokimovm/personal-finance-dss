@@ -1,0 +1,4 @@
+# file: /Users/vasyaevdokimov/repos/personal-finance-dss/app/middleware.py
+# hypothesis_version: 6.155.7
+
+[403, 429, 1000, ',', 'DENY', 'GET', 'HEAD', 'OPTIONS', 'Permissions-Policy', 'Referrer-Policy', 'Retry-After', 'TRACE', 'X-Frame-Options', 'X-Request-ID', 'authorization', 'bearer ', 'client', 'csrf_blocked', 'detail', 'finpilot.request', 'latency_ms', 'method', 'nosniff', 'origin', 'path', 'rate_limit_exceeded', 'request', 'request failed', 'request_id', 'status_code', 'unknown', 'x-api-key', 'x-forwarded-for']

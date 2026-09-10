@@ -1,0 +1,4 @@
+# file: /Users/vasyaevdokimov/repos/personal-finance-dss/app/config.py
+# hypothesis_version: 6.155.7
+
+[0.0, 0.16, 1.0, 168, 587, ',', '.env', '/api', '127.0.0.1', '9.9.2', 'FINPILOT', 'HS256', 'INFO', 'RUB', 'complete', 'contact_email', 'development', 'doc_date', 'fp_access', 'http://', 'ignore', 'localhost', 'operator_address', 'operator_inn', 'operator_name', 'production', 'retention_months', 'sandbox', 'sqlite', 'utf-8', 'Логин SMTP.', 'Название проекта.', 'Пароль/токен SMTP.', 'сервис FINPILOT']
