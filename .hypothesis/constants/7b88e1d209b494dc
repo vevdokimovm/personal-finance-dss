@@ -1,4 +1,0 @@
-# file: /Users/vasyaevdokimov/repos/personal-finance-dss/app/main.py
-# hypothesis_version: 6.155.7
-
-[200, 303, 503, '\n  - ', '*', '/', '/api/analysis', '/api/auth/login', '/api/auth/register', '/api/banks', '/api/recommendation', '/banks', '/contacts', '/dashboard', '/goals', '/health', '/legal/consent', '/legal/cookies', '/legal/privacy', '/legal/terms', '/obligations', '/planning', '/static', '/transactions', '/v1/analyze', '/validation', 'SELECT 1', 'app_version', 'banks.html', 'contacts.html', 'current_user', 'dashboard.html', 'database', 'degraded', 'error', 'frontend', 'goals.html', 'legal', 'legal/consent.html', 'legal/cookies.html', 'legal/privacy.html', 'legal/terms.html', 'obligations.html', 'ok', 'planning.html', 'project_name', 'request', 'static', 'status', 'templates', 'transactions.html', 'validation.html', 'version', 'Журнал операций', 'Обзорная панель', 'Обязательства', 'Цели накопления']

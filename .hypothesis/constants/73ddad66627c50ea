@@ -1,4 +1,0 @@
-# file: /Users/vasyaevdokimov/repos/personal-finance-dss/app/i18n.py
-# hypothesis_version: 6.155.7
-
-[',', ';', 'Add', 'Cancel', 'Dashboard', 'Delete', 'Goals', 'Not found.', 'Obligations', 'Planning', 'Save', 'Transactions', 'action.add', 'action.cancel', 'action.delete', 'action.save', 'auth.email_taken', 'common.not_found', 'common.unauthorized', 'en', 'nav.dashboard', 'nav.goals', 'nav.obligations', 'nav.planning', 'nav.transactions', 'ru', 'Дашборд', 'Добавить', 'Не найдено.', 'Обязательства', 'Операции', 'Отмена', 'Прогнозирование', 'Сохранить', 'Удалить', 'Цели']

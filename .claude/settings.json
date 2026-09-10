@@ -31,15 +31,6 @@
             "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/block-relative-read-path.py\""
           }
         ]
-      },
-      {
-        "matcher": "Agent|Task",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/websearch-budget.py\""
-          }
-        ]
       }
     ],
     "PostToolUse": [

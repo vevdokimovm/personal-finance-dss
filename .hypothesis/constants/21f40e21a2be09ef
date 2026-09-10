@@ -1,4 +1,0 @@
-# file: /Users/vasyaevdokimov/repos/personal-finance-dss/app/core/amortization.py
-# hypothesis_version: 6.155.7
-
-[0.0, 360, '0', 'amount', 'id', 'interest_rate', 'monthly_payment']

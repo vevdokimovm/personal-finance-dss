@@ -1,16 +1,18 @@
 # FINPILOT — СППР для персональных финансов
 
 <!-- STATUS -->
-> **Сейчас:** `v9.9.4` · 2026-09-09 · веха 9 открыта, идёт предподготовка к деплою:
-> бюджет веб-поиска стал машинным гейтом, три красных теста закрыты (полный прогон
-> 2241 / 0), разбор рынка переделан на живых источниках. Ключевое: расчёт со ставками
-> у конкурентов существует в патентах, но не в продуктах — формулировка новизны сведена
-> к канону [`docs/novelty_statement.md`](docs/novelty_statement.md). Где стоим —
-> [`WATCHLOG.md`](WATCHLOG.md) §0.
+> **Сейчас:** `v9.9.5` · 2026-09-09 · веха 9 открыта, идёт предподготовка к деплою.
+> Закрыты темы 16-17 очереди исследований: заявление о новизне **по методу и объяснимости
+> опровергнуто** первоисточниками школы constraint-based рекомендаций (формула свёртки
+> совпадает с FSAdvisor, IAAI-05; объяснение через вклад критерия — канонический
+> HOW-explanation). Устоял зазор **по объекту оптимизации**: обзоры домена формализуют его
+> через каталог продуктов, а FINPILOT распределяет собственный поток пользователя.
+> Канон новизны — [`docs/novelty_statement.md`](docs/novelty_statement.md), правка
+> формулировки открыта. Где стоим — [`docs/WATCHLOG.md`](docs/WATCHLOG.md) §0.
 <!-- /STATUS -->
 
 [![CI](https://github.com/vevdokimovm/personal-finance-dss/actions/workflows/ci.yml/badge.svg)](https://github.com/vevdokimovm/personal-finance-dss/actions/workflows/ci.yml)
-![version](https://img.shields.io/badge/version-9.9.4-blue)
+![version](https://img.shields.io/badge/version-9.9.5-blue)
 ![python](https://img.shields.io/badge/python-3.13-blue)
 ![coverage](https://img.shields.io/badge/coverage-gate%2090%25-brightgreen)
 ![tests](https://img.shields.io/badge/tests-2160%20%2B%20874-brightgreen)

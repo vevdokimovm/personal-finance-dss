@@ -1,4 +1,0 @@
-# file: /Users/vasyaevdokimov/repos/personal-finance-dss/app/core/investment.py
-# hypothesis_version: 6.155.7
-
-[0.0, 0.05, 0.08, 0.12, 0.13, 0.2, 0.4, 0.6, 0.8, 12.0, 36.0, 400000.0, 'A', 'amount', 'bonds', 'cushion_part', 'deduction', 'deposits', 'eligible_amount', 'equity', 'equity_share', 'future_value', 'growth_illustration', 'investment_tranche', 'none', 'note', 'rate', 'split', 'x_reserve', 'years']

@@ -1,27 +1,42 @@
 #!/usr/bin/env python3
-"""Бюджет WebSearch: считает поиски и не пускает агента в исчерпанную сессию.
+"""Счётчик WebSearch: наблюдает расход и НИЧЕГО не запрещает.
 
-🔴 Оплачено ходом 08.09.2026. Тема 12 очереди исследований (портфельная теория)
-отработала при счётчике 400/400 ДО первого запроса: WebSearch молча возвращал пустоту,
-`Bash` у подагентов отключён, обходных каналов у них нет вовсе. Оба подагента честно
-отчитались по памяти обучения — 629 строк, ни одного живого первоисточника. Ход потрачен,
-тему пришлось перезапускать в новой сессии.
+🔴 Ограничение снято 09.09.2026 по прямому решению владельца: «сними нахер это
+ограничение вовсе… чтобы бесконечные запросы можно было делать если это искуственный
+лимит». Прежняя версия (v9.9.0) считала поиски, объявляла бюджет исчерпанным и
+запрещала запуск `Agent`.
 
-Разрыв был не в дисциплине, а в наблюдаемости: признака «поиск кончился» не существовало
-нигде. Пустой ответ на узкий запрос и пустой ответ на исчерпанном лимите выглядят
-одинаково, поэтому вахта узнавала об исчерпании постфактум, разбирая отчёт агента.
+**Почему снято — три факта, а не усталость от гейта.**
 
-Хук закрывает это с двух сторон:
-  * `PostToolUse:WebSearch` — считает вызовы и распознаёт исчерпание по ответу;
-  * `PreToolUse:Agent` — при исчерпании ЗАПРЕЩАЕТ запуск и говорит владельцу прямым
-    текстом, что нужен новый чат или `/clear`. Агент в исчерпанной сессии бесполезен.
+1. **Числа 400 не существует за пределами этого файла.** Оно было нашей выдумкой.
+   Публичного лимита «N поисков за сессию» нет: по докам платформы ограничения — это
+   `max_uses` на один запрос и квота на уровне организации.
 
-Ложное срабатывание дороже пропуска: хук, глушащий исправный запуск, будет снят. Поэтому
-одиночный пустой ответ исчерпанием не считается — нужны два подряд либо явный маркер
-лимита. Агент, которому поиск не нужен, проходит по метке `NOSEARCH` в промпте.
+2. **Гейт измерял не ту величину.** Наблюдаемый в Claude Code отказ описан в
+   `anthropics/claude-code` issue #27074: WebSearch делает побочный запрос
+   (`source:"side_query"`), и тот отбивается 429 **по типу авторизации** — на подписке
+   Pro/Max падает, на API-ключе те же запросы проходят. Число сделанных поисков к этому
+   отношения не имеет, поэтому счётчик в принципе не мог предсказывать отказ.
 
-Счётчик живёт на `session_id`: новая сессия (`/clear`, новый чат) — новый файл, то есть
-сброс происходит ровно тогда же, когда его делает сам харнесс.
+3. **Он дважды за один день заглушил исправную работу.** 09.09.2026 сначала при 7
+   поисках из 400, затем при 42 из 400 — оба раза приняв 429 от лимита АККАУНТА за
+   исчерпание ПОИСКА, потому что в маркерах стояли `429`, `rate limit`,
+   `too many requests`. Второй случай стоил темы 18: агент был заблокирован при живом
+   поиске, что тут же опровергнуто прямым запросом из вахты. Первый случай пытались
+   лечить протуханием метки через 30 минут — починка не удержала, потому что лечила
+   следствие, а не причину.
+
+Собственное правило прежней версии гласило: «Ложное срабатывание дороже пропуска: хук,
+глушащий исправный запуск, будет снят». Два ложных срабатывания подряд — этот случай
+наступил.
+
+**Что осталось.** Хук считает вызовы `WebSearch` в файле состояния по `session_id` —
+чистое наблюдение для замеров расхода, без вердиктов и без вывода владельцу. Вердиктов
+он больше не выносит вовсе, поэтому ложно сработать ему нечем.
+
+**Признак настоящего исчерпания поиска для вахты — не счётчик, а ответ:** пустые выдачи
+подряд на заведомо широких запросах. Это решение живого человека по месту, а не
+автоматика: отличить исчерпание от узкого запроса машинно не удалось за две попытки.
 """
 from __future__ import annotations
 
@@ -32,115 +47,44 @@ import sys
 import time
 from pathlib import Path
 
-LIMIT = 400
-WARN_AT = 350
-EMPTY_STREAK_FOR_EXHAUSTION = 2
-MIN_LIVE_ANSWER = 40
 STATE_TTL_DAYS = 7
-# 🔴 Эвристическое исчерпание протухает, потолочное — нет. Поймано 09.09.2026 на первом
-# живом применении: агент упал по лимиту АККАУНТА (429), в ответе было «rate limit», хук
-# записал исчерпание ПОИСКОВОГО бюджета и заблокировал запуск при 7 поисках из 400.
-# Лимиты разные: аккаунтный восстанавливается по часам, поисковый — только с новой
-# сессией. Смешивать их нельзя, иначе один 429 глушит работу до конца сессии.
-HEURISTIC_TTL = 1800
-
-LIMIT_MARKERS = re.compile(
-    r"rate limit|quota|limit reached|limit exceeded|exceeded your|too many requests"
-    r"|429|not available|unavailable|search is disabled",
-    re.IGNORECASE,
-)
-
-NOSEARCH = re.compile(r"\bNOSEARCH\b")
-
-# Инструмент запуска субагентов зовётся `Agent` здесь и `Task` в других сборках
-# харнесса. Гейт обязан держать оба имени: промах по имени = молчаливо снятый гейт.
-AGENT_TOOLS = {"Agent", "Task"}
-
-RESET_HINT = (
-    "Если лимит уже обновился, а гейт держит — сотри файл состояния сессии в "
-    "~/.claude/state/websearch-budget/ либо подожди 30 минут: догадка по маркеру "
-    "протухает сама, потолок 400 — никогда."
-)
-
-ADVICE = (
-    "Поиск в этой сессии кончился. Запускать агентов бессмысленно: у подагентов нет "
-    "ни WebSearch, ни Bash, они вернутся с пересказом по памяти.\n"
-    "Что делать: новый чат или /clear — счётчик сбрасывается только вместе с сессией.\n"
-    "Если искать нужно прямо сейчас и уходить не хочется — ищи из главной сессии через "
-    "curl (замерено 08.09.2026: html.duckduckgo.com отдаёт 202, arxiv.org — 200)."
-)
 
 
 def blank_state() -> dict:
     """Пустое состояние счётчика для новой сессии."""
-    return {"used": 0, "empty_streak": 0, "exhausted": False, "reason": "", "updated": 0.0}
-
-
-def classify_response(response: object) -> str:
-    """Что ответ WebSearch говорит о живости поиска: ok, empty или exhausted."""
-    text = response if isinstance(response, str) else json.dumps(response, ensure_ascii=False)
-    if LIMIT_MARKERS.search(text):
-        return "exhausted"
-    return "ok" if len(text.strip()) >= MIN_LIVE_ANSWER else "empty"
+    return {"used": 0, "updated": 0.0}
 
 
 def record_search(state: dict, response: object) -> dict:
-    """Учесть один вызов WebSearch и пересчитать признак исчерпания."""
-    verdict = classify_response(response)
+    """Учесть один вызов WebSearch.
+
+    Args:
+        state: Текущее состояние счётчика сессии.
+        response: Ответ инструмента; не анализируется — содержимое ни на что не влияет.
+
+    Returns:
+        Новое состояние с увеличенным счётчиком.
+    """
     updated = dict(state)
-    updated["used"] = state["used"] + 1
-    updated["empty_streak"] = state["empty_streak"] + 1 if verdict == "empty" else 0
-    heuristic = verdict == "exhausted" or updated["empty_streak"] >= EMPTY_STREAK_FOR_EXHAUSTION
-    ceiling = updated["used"] >= LIMIT
-    updated["exhausted"] = bool(state["exhausted"] or heuristic or ceiling)
-    if ceiling:
-        updated["reason"] = "ceiling"
-    elif heuristic and not state["exhausted"]:
-        updated["reason"] = "heuristic"
+    updated["used"] = state.get("used", 0) + 1
     updated["updated"] = time.time()
     return updated
 
 
-def thaw(state: dict) -> dict:
-    """Снять исчерпание, если оно эвристическое и достаточно старое.
-
-    Потолок 400 — факт, он не протухает никогда. Маркер в ответе — догадка, и её
-    источником мог быть лимит аккаунта, который восстанавливается сам.
-    """
-    if not state["exhausted"] or state.get("reason") == "ceiling":
-        return state
-    if time.time() - state.get("updated", 0.0) < HEURISTIC_TTL:
-        return state
-    thawed = dict(state)
-    thawed["exhausted"] = False
-    thawed["empty_streak"] = 0
-    thawed["reason"] = ""
-    return thawed
-
-
-def warning_for(state: dict) -> str | None:
-    """Текст владельцу, когда бюджет требует внимания; иначе None."""
-    if state["exhausted"]:
-        return f"🔴 WebSearch исчерпан (израсходовано {state['used']} из {LIMIT}).\n{ADVICE}"
-    if state["used"] >= WARN_AT:
-        return (
-            f"🟡 WebSearch на исходе: {state['used']} из {LIMIT}. "
-            f"Осталось {LIMIT - state['used']} запросов — тяжёлую тему в эту сессию "
-            "лучше не запускать."
-        )
-    return None
-
-
 def agent_verdict(state: dict, prompt: str) -> tuple[bool, str]:
-    """Пускать ли запуск Agent при текущем состоянии бюджета."""
-    if not state["exhausted"] or NOSEARCH.search(prompt):
-        return True, ""
-    return False, (
-        f"Запуск агента заблокирован: WebSearch в этой сессии исчерпан "
-        f"({state['used']} из {LIMIT}).\n{ADVICE}\n"
-        "Если агенту поиск не нужен — добавь NOSEARCH в его промпт, и запуск пройдёт.\n"
-        f"{RESET_HINT}"
-    )
+    """Пускать ли запуск `Agent`.
+
+    Всегда да. Функция сохранена, чтобы гарантия «агент не блокируется никогда»
+    оставалась проверяемой тестом, а не подразумевалась отсутствием кода.
+
+    Args:
+        state: Состояние счётчика; на решение не влияет.
+        prompt: Промпт агента; на решение не влияет.
+
+    Returns:
+        Пара (разрешено, причина отказа) — всегда (True, "").
+    """
+    return True, ""
 
 
 def state_dir() -> Path:
@@ -164,6 +108,11 @@ def state_path(session_id: str) -> Path:
 
 
 def load_state(path: Path) -> dict:
+    """Прочитать состояние сессии.
+
+    Ключи прежней версии (`exhausted`, `empty_streak`, `reason`) отбрасываются:
+    файлы старых сессий не должны влиять на поведение.
+    """
     try:
         stored = json.loads(path.read_text())
     except (OSError, json.JSONDecodeError, ValueError):
@@ -173,44 +122,12 @@ def load_state(path: Path) -> dict:
     return state
 
 
-def emit(system_message: str, deny_reason: str | None = None) -> None:
-    payload: dict = {"systemMessage": system_message}
-    if deny_reason is not None:
-        payload["hookSpecificOutput"] = {
-            "hookEventName": "PreToolUse",
-            "permissionDecision": "deny",
-            "permissionDecisionReason": deny_reason,
-        }
-    else:
-        payload["hookSpecificOutput"] = {
-            "hookEventName": "PostToolUse",
-            "additionalContext": system_message,
-        }
-    print(json.dumps(payload, ensure_ascii=False))
-
-
 def handle_search(payload: dict) -> None:
+    """Учесть поиск и промолчать."""
     path = state_path(payload.get("session_id", ""))
-    was_exhausted = load_state(path).get("exhausted", False)
     state = record_search(load_state(path), payload.get("tool_response", ""))
     path.write_text(json.dumps(state, ensure_ascii=False))
     sweep(path.parent)
-    message = warning_for(state)
-    if message and not (was_exhausted and state["exhausted"]):
-        emit(message)
-
-
-def handle_agent(payload: dict) -> None:
-    path = state_path(payload.get("session_id", ""))
-    state = thaw(load_state(path))
-    if not state["exhausted"]:
-        path.write_text(json.dumps(state, ensure_ascii=False))
-    prompt = (payload.get("tool_input") or {}).get("prompt", "")
-    allowed, reason = agent_verdict(state, prompt)
-    if not allowed:
-        emit(reason, deny_reason=reason)
-    elif state["used"] >= WARN_AT:
-        emit(warning_for(state) or "")
 
 
 def main() -> int:
@@ -218,12 +135,8 @@ def main() -> int:
         payload = json.load(sys.stdin)
     except (json.JSONDecodeError, ValueError):
         return 0
-    tool = payload.get("tool_name")
-    event = payload.get("hook_event_name")
-    if tool == "WebSearch" and event == "PostToolUse":
+    if payload.get("tool_name") == "WebSearch" and payload.get("hook_event_name") == "PostToolUse":
         handle_search(payload)
-    elif tool in AGENT_TOOLS and event == "PreToolUse":
-        handle_agent(payload)
     return 0
 
 
