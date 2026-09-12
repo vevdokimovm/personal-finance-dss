@@ -1,27 +1,31 @@
-"""Счётчик WebSearch: наблюдает и НИЧЕГО не запрещает (v9.9.5).
+"""Гейт WebSearch: считает расход, а на РЕАЛЬНОМ отказе бюджета кричит
+и не пускает агента.
 
-🔴 Ограничение снято по прямому решению владельца 09.09.2026: «сними нахер это
-ограничение вовсе… чтобы бесконечные запросы можно было делать если это искуственный
-лимит». Число 400 было нашей выдумкой, а не лимитом Anthropic.
+**Что изменилось 11.09.2026 (решение владельца, дословно): «обнови созданные гейты чтобы
+они фейл лауд когда лимит в миллиарды закончится и без вебсера агенты не запусклись
+а тербовали перезапустить сессию».**
 
-**Чем оплачено решение.** Гейт версии 9.9.0 дважды подряд заглушил исправную работу:
-09.09.2026 первый раз при 7 поисках из 400 (записано в комментарии самого хука), второй
-раз в тот же день при 42 из 400 — оба раза он принял HTTP 429 от лимита АККАУНТА за
-исчерпание ПОИСКА, потому что в списке маркеров стояли `429`, `rate limit`,
-`too many requests`. Второй случай стоил темы 18: запуск агента был заблокирован при
-живом поиске, что проверено прямым запросом из вахты.
+Версия 9.9.5 была чистым счётчиком без вердиктов, и это оплачено двумя ложняками
+09.09.2026 (при 7 и при 42 поисках): гейт принимал HTTP 429 от лимита АККАУНТА за
+исчерпание ПОИСКА, потому что смотрел на маркеры `429`, `rate limit`,
+`too many requests`. Второй случай стоил темы 18.
 
-**Почему счётчика достаточно и почему замер вообще не про то.** Публичного лимита
-«N поисков за сессию» не существует: по докам платформы ограничения — это `max_uses`
-на один запрос и квота организации. А наблюдаемый в Claude Code отказ описан в
-`anthropics/claude-code` issue #27074 — WebSearch делает побочный запрос
-(`source:"side_query"`), и тот отбивается 429 **по типу авторизации** (подписка Pro/Max
-против API-ключа), а не по числу поисков. Считать поиски и объявлять их кончившимися
-по такому 429 — значит измерять не ту величину.
+**Почему новый гейт не повторяет тот класс.** Он не считает и не угадывает. Он ищет
+в ответе инструмента ДОСЛОВНЫЙ отказ харнесса, замеренный 10–11.09.2026:
+«This session has used its web search budget (400 of 400 WebSearch calls)». Это
+единственный вход, на котором он срабатывает. Тексты аккаунтного 429 оставлены в тестах
+регрессией: на них гейт молчит, как и после снятия.
 
-Поэтому хук оставлен наблюдателем: считает вызовы для статистики расхода и не выносит
-ни одного вердикта. Ложных срабатываний у него больше нет по построению — запрещать
-нечего.
+**Почему лечение — перезапуск сессии, а не ожидание.** Бюджет выдаётся на сессию и
+делится с подагентами; метка живёт в файле по `session_id`, поэтому новая сессия
+получает чистое состояние сама. Протухание метки по таймеру (v9.9.1) уже пробовали —
+лечило следствие. Здесь лечения по времени нет вовсе: пока сессия та же, канал считается
+мёртвым, и правило владельца «канал мёртв → агент НЕ ЗАПУСКАЕТСЯ» держит механизм,
+а не внимательность вахты.
+
+**Лимит на 11.09.2026** — `CLAUDE_CODE_MAX_WEB_SEARCHES_PER_SESSION=999999999`
+в `~/.claude/settings.json`. Гейт к самому числу не привязан: он ждёт отказ, каким бы
+число ни было.
 """
 from __future__ import annotations
 
@@ -77,7 +81,23 @@ def agent_event(session: str, prompt: str = "исследуй тему") -> dict
     }
 
 
-LIVE = "1. Optimal Versus Naive Diversification — academic.oup.com — DeMiguel 2009"
+LIVE = (
+    'Web search results for query: "portfolio theory"\n\n'
+    'Links: [{"title":"Optimal Versus Naive Diversification",'
+    '"url":"https://academic.oup.com/x"}]'
+)
+
+# Дословный отказ харнесса, замеренный 10–11.09.2026 на доборах Д3–Д6.
+REFUSAL = (
+    "This session has used its web search budget (400 of 400 WebSearch calls). "
+    "Continue with the information already gathered instead of issuing more searches."
+)
+# Тот же отказ при поднятом лимите: гейт привязан к тексту, а не к числу.
+REFUSAL_BILLIONS = (
+    "This session has used its web search budget "
+    "(999999999 of 999999999 WebSearch calls). Continue with the information "
+    "already gathered instead of issuing more searches."
+)
 
 # Тексты, на которых прежний гейт ложно срабатывал. Все три — признаки лимита АККАУНТА
 # или транзиентной ошибки, ни один не говорит об исчерпании поискового бюджета.
@@ -89,7 +109,7 @@ ACCOUNT_LIMIT_TEXTS = [
 
 
 class TestCounting:
-    """Счётчик считает — это всё, что он делает."""
+    """Счётчик считает — расход по-прежнему замеряется."""
 
     def test_counts_every_call(self, hook):
         state = hook.blank_state()
@@ -102,42 +122,68 @@ class TestCounting:
         assert state["used"] == 1
 
     def test_counting_has_no_upper_bound(self, hook):
-        """Потолка нет: 400 было выдумкой, а не лимитом Anthropic."""
+        """Потолка своей выдумки нет: гейт ждёт отказ, а не считает до числа."""
         state = hook.blank_state()
         state["used"] = 10_000
         state = hook.record_search(state, LIVE)
         assert state["used"] == 10_001
+        assert state["exhausted"] is False
+
+    def test_no_limit_constant_remains(self, hook):
+        """Константы собственного потолка в модуле нет."""
+        assert not hasattr(hook, "LIMIT")
 
     def test_state_survives_round_trip(self, hook, tmp_path):
         path = tmp_path / "s.json"
-        state = hook.record_search(hook.blank_state(), LIVE)
+        state = hook.record_search(hook.blank_state(), REFUSAL)
         path.write_text(json.dumps(state, ensure_ascii=False))
-        assert hook.load_state(path)["used"] == 1
+        restored = hook.load_state(path)
+        assert restored["used"] == 1
+        assert restored["exhausted"] is True
 
 
-class TestNoVerdicts:
-    """Хук не выносит вердиктов — ни по одному входу."""
+class TestRefusalDetection:
+    """Срабатывание — только на дословный отказ бюджета."""
+
+    @pytest.mark.parametrize("text", [REFUSAL, REFUSAL_BILLIONS])
+    def test_literal_refusal_marks_exhausted(self, hook, text):
+        state = hook.record_search(hook.blank_state(), text)
+        assert state["exhausted"] is True
+        assert "web search budget" in state["reason"].lower()
 
     @pytest.mark.parametrize("text", ACCOUNT_LIMIT_TEXTS)
-    def test_account_limit_text_does_not_produce_exhaustion(self, hook, text):
-        """🔴 Тот самый ложняк: 429 аккаунта больше не значит «поиск кончился»."""
+    def test_account_limit_text_is_not_exhaustion(self, hook, text):
+        """🔴 Регрессия обоих ложняков 09.09.2026."""
         state = hook.record_search(hook.blank_state(), text)
-        assert state.get("exhausted", False) is False
+        assert state["exhausted"] is False
 
-    def test_repeated_empty_answers_do_not_produce_exhaustion(self, hook):
-        """Два пустых подряд — узкий запрос, а не конец бюджета."""
+    def test_repeated_empty_answers_are_not_exhaustion(self, hook):
+        """Два пустых подряд — узкий запрос; машинно это не отличается."""
         state = hook.blank_state()
         state = hook.record_search(state, "")
         state = hook.record_search(state, "")
-        assert state.get("exhausted", False) is False
+        assert state["exhausted"] is False
 
-    def test_no_limit_constant_remains(self, hook):
-        """Константы потолка в модуле больше нет."""
-        assert not hasattr(hook, "LIMIT")
+    def test_results_merely_mentioning_the_phrase_are_not_exhaustion(self, hook):
+        """Вахта ищет сам текст отказа — выдача с ним гейт не поднимает."""
+        response = (
+            'Web search results for query: "claude code used its web search budget"\n\n'
+            'Links: [{"title":"issue #27074: This session has used its web '
+            'search budget (400 of 400 WebSearch calls)",'
+            '"url":"https://github.com/anthropics/claude-code"}]'
+            + "\n\nПодробный разбор отказа и обходных каналов. " * 20
+        )
+        state = hook.record_search(hook.blank_state(), response)
+        assert state["exhausted"] is False
+
+    def test_dict_response_is_inspected_too(self, hook):
+        """Ответ может прийти структурой, а не строкой."""
+        state = hook.record_search(hook.blank_state(), {"result": REFUSAL})
+        assert state["exhausted"] is True
 
 
-class TestAgentNeverBlocked:
-    """🔴 Ядро решения: запуск агента не блокируется никогда."""
+class TestAgentVerdict:
+    """Правило владельца: канал мёртв → агент не запускается."""
 
     def test_agent_allowed_on_fresh_state(self, hook):
         allowed, reason = hook.agent_verdict(hook.blank_state(), "исследуй тему")
@@ -151,43 +197,59 @@ class TestAgentNeverBlocked:
         assert allowed is True
 
     def test_agent_allowed_after_account_limit_seen(self, hook):
-        """Сессия видела 429 аккаунта — агент всё равно запускается."""
         state = hook.blank_state()
         for text in ACCOUNT_LIMIT_TEXTS:
             state = hook.record_search(state, text)
         allowed, _ = hook.agent_verdict(state, "исследуй тему")
         assert allowed is True
 
-    def test_legacy_exhausted_flag_in_state_is_ignored(self, hook):
-        """Файлы состояния прошлых сессий несут exhausted:true — он больше не действует."""
-        state = hook.blank_state()
-        state["exhausted"] = True
-        allowed, _ = hook.agent_verdict(state, "исследуй тему")
-        assert allowed is True
+    def test_agent_blocked_after_real_refusal(self, hook):
+        state = hook.record_search(hook.blank_state(), REFUSAL)
+        allowed, reason = hook.agent_verdict(state, "исследуй тему")
+        assert allowed is False
+        assert "перезапус" in reason.lower()
+
+    def test_block_demands_restart_not_waiting(self, hook):
+        """Лечение — новая сессия. Протухание по таймеру уже пробовали, не лечит."""
+        state = hook.record_search(hook.blank_state(), REFUSAL)
+        _, reason = hook.agent_verdict(state, "исследуй тему")
+        assert "сесси" in reason.lower()
+        assert not hasattr(hook, "STALE_AFTER_SECONDS")
 
 
 class TestEndToEnd:
-    def test_search_event_writes_state_and_stays_silent(self, tmp_path):
+    def test_live_search_writes_state_and_stays_silent(self, tmp_path):
         result = run_hook(search_event("s1", LIVE), tmp_path)
         assert result.returncode == 0
         assert json.loads((tmp_path / "s1.json").read_text())["used"] == 1
 
+    def test_refusal_fails_loud_on_the_search_itself(self, tmp_path):
+        """🔴 Fail loud: вахта узнаёт об отказе в тот же ход, а не потом."""
+        result = run_hook(search_event("s2", REFUSAL), tmp_path)
+        assert result.returncode == 2
+        assert "web search budget" in result.stderr.lower()
+        assert "перезапус" in result.stderr.lower()
+        assert json.loads((tmp_path / "s2.json").read_text())["exhausted"] is True
+
+    def test_agent_denied_after_refusal_end_to_end(self, tmp_path):
+        run_hook(search_event("s3", REFUSAL), tmp_path)
+        result = run_hook(agent_event("s3"), tmp_path)
+        assert result.returncode == 2
+        assert "перезапус" in result.stderr.lower()
+
     @pytest.mark.parametrize("text", ACCOUNT_LIMIT_TEXTS)
     def test_agent_launch_survives_account_limit_end_to_end(self, tmp_path, text):
         """🔴 Регрессия обоих случаев 09.09.2026, сквозь процесс целиком."""
-        run_hook(search_event("s2", text), tmp_path)
-        result = run_hook(agent_event("s2"), tmp_path)
+        run_hook(search_event("s4", text), tmp_path)
+        result = run_hook(agent_event("s4"), tmp_path)
         assert result.returncode == 0
-        if result.stdout.strip():
-            payload = json.loads(result.stdout)
-            decision = payload.get("hookSpecificOutput", {}).get("permissionDecision")
-            assert decision != "deny"
-
-    def test_agent_launch_never_denied_whatever_the_history(self, tmp_path):
-        for _ in range(3):
-            run_hook(search_event("s3", ""), tmp_path)
-        result = run_hook(agent_event("s3"), tmp_path)
         assert "deny" not in result.stdout
+
+    def test_fresh_session_is_not_poisoned_by_another(self, tmp_path):
+        """Метка живёт по session_id: перезапуск сессии и есть лечение."""
+        run_hook(search_event("dead", REFUSAL), tmp_path)
+        result = run_hook(agent_event("alive"), tmp_path)
+        assert result.returncode == 0
 
     def test_malformed_payload_is_survived(self, tmp_path):
         result = subprocess.run(
@@ -195,6 +257,9 @@ class TestEndToEnd:
             input="not json",
             capture_output=True,
             text=True,
-            env={"PATH": "/usr/bin:/bin", "FINPILOT_WEBSEARCH_STATE_DIR": str(tmp_path)},
+            env={
+                "PATH": "/usr/bin:/bin",
+                "FINPILOT_WEBSEARCH_STATE_DIR": str(tmp_path),
+            },
         )
         assert result.returncode == 0
