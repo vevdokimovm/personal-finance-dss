@@ -1166,3 +1166,946 @@ B5.3, главный вопрос задания) через 5 разных PDF/
 - **Противоречия между источниками, названные прямо:** snowball против avalanche (§1.5);
   Fernandes против Kaiser против «Correcting the Record» (§3.1-тер); present bias «нет для денег»
   против мета-анализа (§1.2); fresh start (§2, A1.5).
+
+---
+
+## ДОБОР Д11 — Д11.1 snowball против avalanche (2026-09-11)
+
+Исполнитель: ведущий добора Д11, без подагентов. Все числа ниже — из полных текстов, проверены
+`pdftotext -layout` / grep по HTML самим, не пересказом WebFetch.
+
+### Д11.1.1 Hamilton 2023 — ПОЛНЫЙ ТЕКСТ ДОБЫТ 🟢
+
+- Канал: Unpaywall `oa_status = hybrid`, лицензия CC-BY-NC-ND, `best_oa_location.pdf_url =
+  onlinelibrary.wiley.com/doi/pdfdirect/10.1002/soej.12612` — **статья в открытом доступе**, в
+  первом прогоне мешал не пейволл, а антибот Cloudflare. curl на pdfdirect → HTTP 403 (5 787 байт
+  HTML-заглушки); r.jina.ai → HTTP 200, но 520 байт «Just a moment… Performing security
+  verification» (пустышка). **Сработал Wayback:** CDX нашёл снимок `doi/full` от 2024-04-09 →
+  `https://web.archive.org/web/20240409182224id_/https://onlinelibrary.wiley.com/doi/full/10.1002/soej.12612`
+  → HTTP 200, 394 845 байт HTML → 86 595 символов текста. Полный текст статьи с таблицами.
+- Данные: SCF 2016, 6 254 домохозяйства, 15 567 импутаций; для каждого **симулируются** два пути
+  погашения при ОДИНАКОВОМ ежемесячном платеже. Поведение не наблюдается. Модель по построению
+  считает, что оба пути доведены до конца.
+
+Дословно, абстракт:
+> «the average household pays an additional 1.8%–4.3% in interest, leading to an aggregate transfer
+> of wealth from borrowers to lenders of between $46.2 and $53.9 billion»
+
+🔴 **Уточнение к записанному в §1.5 и в строке 6 итоговой таблицы.** «+1,8–4,3 %» — это прирост
+**суммы ПРОЦЕНТОВ**, а не долга и не платежей. Это **СРЕДНЕЕ**, и распределение сильно скошено:
+> «For 38.7% of households in the sample, these orderings are identical across strategies; for 97%
+> of those, there is no difference in interest costs»
+> «the median penalty from following the Debt Snowball is relatively small: ranging from 0.03% to
+> 0.25% of interest costs for the different payment levels. The mean increase in interest costs is
+> larger, ranging from 1.77% to 4.30%.»
+> «the difference is greater than 10% for between 4.5% and 11.3% of households depending on
+> expenditure levels»
+
+От чего зависит цена (дословно):
+> «For a household with three debts, following the Debt Avalanche rather than the Debt Snowball
+> lowers interest costs by 1.3% on average … that figure doubles to 2.6% for households with four
+> debts and increases to more than 4% as the number of debts rises further.»
+> «paying an additional $500 above P h per month instead of $100 increases the average cost savings
+> of the Debt Avalanche from 2.48% to 4.30%.»
+> «Compared to the Debt Snowball, 15.1% (4.6%) of households completely pay off all debts at least
+> one (two) month(s) faster when adhering to the Debt Avalanche»
+
+Агрегат, базовый сценарий (только минимальные платежи), табл. 2: $46.402 млрд = **2.37 %** всех
+процентов; «a per-household increase in interest payments of $1064». Столбцы средних по табл. 3:
+2.470 % (без доплаты) · 1.772 % (+1 %) · 1.894 % (+2.5 %) · 2.083 % (+5 %) · 2.425 % (+10 %) ·
+2.479 % (+$100) · 4.287 % (+$500). Отсюда и диапазон абстракта «1.8–4.3».
+
+Оговорка самого автора, дословно (про то, что он НЕ мерил):
+> «Households may prioritize paying debts off sooner if doing so decreases the administrative burden
+> … or they may receive motivational gains … An important avenue for future work will be to determine
+> which of these factors drive borrowers' repayment decisions.»
+
+Структура долга американская (ипотека, авто, студенческие кредиты, карты) — масштаб цены на
+российскую структуру долга напрямую не переносится.
+
+### Д11.1.2 Gal & McShane 2012 — ПОЛНЫЙ ТЕКСТ ДОБЫТ 🟢
+
+- Канал: WebSearch дал авторскую копию → `curl -sk --http1.1` с браузерным UA
+  `https://www.blakemcshane.com/Papers/jmr_debt.pdf` → HTTP 200, 1 116 368 байт, application/pdf,
+  8 страниц (опубликованная вёрстка JMR) → `pdftotext -layout` → 126 676 байт.
+
+Выборка и база (дословно): «a random sample of 5943 clients who enrolled prior to January 1, 2007»;
+«4169 of the 5943 clients who successfully settle at least one account»; основной анализ — «2609
+clients who are active one year after enrollment». Общая доля успешного завершения:
+> «The overall probability of successful completion is 43.2%»
+
+Главная регрессия, табл. 5 (логит, успешное завершение; через год после входа):
+
+| Переменная | Model 1D | Model 1N | Model 2 (обе) |
+|---|---|---|---|
+| Dollar ratio (доля погашенного в долларах) | 1.91** | — | **−.25 (незначимо)** |
+| Number ratio (доля закрытых счетов) | — | 3.21** | **3.40**** |
+| Deviance | 3549.4 | 3474.2 | 3473.7 |
+
+(`**` — p от 0 до .001). Графически: в нижнем квинтиле доли погашенных долларов вероятность успеха
+растёт «from approximately 35% in the lowest group to approximately 80% in the highest group» по
+квинтилям доли закрытых счетов. Симуляция по модели:
+> «one year from enrollment, a client who has consistently paid down the smallest balances is 14%
+> more likely to complete the program than one who paid down random balances»
+(в тексте «14% more likely» — относительная это или абсолютная разница, из формулировки не
+следует; на рисунке 6 значение не подписано.)
+
+🔴 **Три ограничения, которых в §1.5 не было и которые меняют вес работы:**
+1. **Порядок закрытия выбирает НЕ человек, а фирма по урегулированию долгов** (дословно: «the
+   decisions regarding which accounts to negotiate and close at which times are made by the debt
+   settlement firm rather than the consumer»). Это одновременно сила (квази-эксперимент: выбор
+   порядка не отражает характер человека) и слабость для нас: измерен эффект **закрытого счёта
+   как события**, а не эффект **стратегии snowball, выбранной самим человеком**.
+2. **Это урегулирование долгов, а не погашение по графику.** Человек перестаёт платить
+   кредиторам, копит на спецсчёте, фирма договаривается о списании примерно половины
+   («Reductions typically amount to approximately half the outstanding balance»). **Процентных
+   ставок в модели нет вообще**, поэтому о цене snowball против avalanche работа ничего не говорит.
+3. Наблюдательные данные: есть поправки на ковариаты, рандомизации нет. Авторы сами оговаривают
+   возможный отбор по числу счетов на входе.
+
+Позиция авторов, дословно:
+> «when the interest rates and account balances of a given consumer's various debts diverge
+> sufficiently, the benefits of engaging in the more rational strategy advocated by Amar et al.
+> (2011) will outweigh the benefits of the extra motivation … the reverse might also often be the case.»
+
+### Д11.1.3 Amar, Ariely, Ayal, Cryder, Rick 2011 — ПОЛНЫЙ ТЕКСТ ДОБЫТ 🟢
+
+- Канал: WebSearch → зеркало Russell Sage `https://www.russellsage.org/sites/default/files/u137/jmr-E-s038-s050-online-cx.pdf`
+  → curl → HTTP 200, 858 043 байта, PDF → `pdftotext -layout` → 86 518 байт.
+
+🔴 **Исправление классификации в §1.5.** В сырье Amar et al. стоит в лагере «за snowball
+(смежное)». По полному тексту работа — **против snowball**: она документирует «debt account
+aversion» как ОШИБКУ и тестирует интервенции, которые её гасят. Дословно из абстракта:
+> «four experiments reveal evidence of debt account aversion: Participants consistently pay off small
+> debts first, even though the larger debts have higher interest rates. The authors also find that
+> restricting participants' ability to completely pay off small debts, and focusing their attention on
+> the amount of interest each debt has accumulated, helps them reduce overall debt more quickly.»
+
+Числа (лабораторная игра, стимулирование бонусом за низкий итоговый долг, 25 раундов, 6 долгов):
+- оптимальный игрок заканчивает с $29 428 долга, «чистый» snowball-игрок — с $47 861;
+- Эксп. 1: доля денег, направленных неоптимально, M = 51 % (без сбережений) и 59 % (со сбережениями);
+- Эксп. 3 (консолидация мелких долгов в один): итоговый долг $38 649 (контроль) против $37 063,
+  p < .07 (маргинально);
+- 🔴 **Эксп. 4 (N = 75 студентов) — прямо про интерфейс:** показ **уже накопленных процентов в
+  деньгах** по каждому долгу снизил итоговый долг: $36 089 против $38 848 в контроле (p < .07) и
+  $38 672 при показе **прогнозных** процентов (p = .08). Прогнозный показ не отличался от контроля
+  (p = .91). Закрыли самый мелкий долг против самого дорогого: 76 % против 48 % в
+  контроле/прогнозе, 60 % против 68 % в ретроспективном условии.
+
+Для продукта это ценнее всего в работе: **ретроспективная рамка («этот долг уже стоил вам N ₽
+процентов») работает, прогнозная («будет стоить») — нет.** Эффект маргинальный, выборка малая,
+лаборатория, независимой репликации не искал.
+
+### Д11.1.4 Brown & Lahey 2014/2015 — ПОЛНЫЙ ТЕКСТ ДОБЫТ 🟢
+
+- Канал: CFPB `files.consumerfinance.gov/.../P2d_-_Brown_-_Small_Victories.pdf` → curl → HTTP 403
+  (462 байта). NBER `https://www.nber.org/system/files/working_papers/w20125/w20125.pdf` → curl →
+  HTTP 200, 769 726 байт → `pdftotext -layout` → 110 658 байт.
+- Дизайн: **лаборатория, задача — перепечатывание ячеек, не долги.** Деньги и ставки не участвуют.
+
+Числа, дословно:
+> «subjects in the ascending ordering, on average, complete a cell in 11.08 seconds compared to 12.50
+> seconds in the descending ordering … subjects in the ascending ordering are about 13% more productive
+> than descending.»
+> «A higher percentage of subjects (71%, 22 of 31) complete the task in ascending than descending
+> (48%, 14 of 29) or even (58%, 18 of 31)» (χ², уровень 10 %).
+
+Два наблюдения против snowball как универсального режима:
+> «when subjects are given the choice over three different orderings, subjects choose the ascending
+> ordering least often.»
+> «Those with higher self-control … benefit more from having chosen ascending. We argue a plausible
+> extension of this result suggests the people least in need of this intervention are the ones most
+> likely to benefit from it.»
+
+🔴 **Единственный найденный в литературе расчёт точки безубыточности** (иллюстративный, сами авторы
+предупреждают, что 13 % из лаборатории нельзя переносить в поле): два займа по $10 000, первый под
+10 %, второй под 10–20 %, платёж $300 в месяц; если snowball даёт +13 % к платежу ($369), то
+> «for all interest rates 16% and below, this individual would pay back both loans faster following
+> the small victories method … But for rates 17% and higher, the conventional economic method of paying
+> down debts with a higher rate of interest still produces faster debt repayment even though one is
+> paying less per month.»
+То есть при мотивационном приросте платежа +13 % snowball окупается при разнице ставок до ~6 п.п.
+и проигрывает при разнице от ~7 п.п. Вывод авторов: «it will only be useful to borrowers in specific
+cases of debt-reduction where interest rates between loans do not differ greatly.» И прямой призыв:
+«Field experiments that randomly assign repayment strategies to consumers with debt are also a
+promising future direction.» — **такого полевого RCT в 2014 г. не было; в этом доборе тоже не найден.**
+
+### Д11.1.5 Связка с Д5 — Gathergood, Mahoney, Stewart, Weber (AER 2019) 🟢 проверено по первоисточнику
+
+- Канал: AEA PDF → curl → HTTP 403 (5 779 байт, антибот). NBER w24161
+  `https://www.nber.org/system/files/working_papers/w24161/w24161.pdf` → HTTP 200, 993 745 байт →
+  `pdftotext -layout` → 215 960 байт (ревизия август 2018; журнальная версия могла сдвинуть числа).
+
+Числа Д5 подтверждены дословно:
+> «individuals should allocate 97.1% of payments in excess of the minimum to the high APR card, whereas
+> in practice they actually allocate 51.5% to that card.»
+> «interest rates have low variable importance … balances have the highest variable importance»
+
+🟡 Внутреннее расхождение в самом препринте: во введении «85% of individuals should put 100% … but
+only 10% do so», в разделе 3 — «over 90% of individuals should put 100% … but fewer than 10% do so».
+
+🔴 **Главное для сопоставления со snowball — Gathergood находят НЕ snowball, а balance matching.**
+Snowball проверен у них как отдельная эвристика (Heuristic 4: «Repay the card with the lowest
+balance») и описывает данные хуже balance matching: «the optimal repayment rule and the other
+heuristic models do not come close to balance matching … capturing less than a quarter of the
+predictable variation for most measures». То есть «снежный ком» в поле **не модальное поведение**:
+люди не закрывают мелкий счёт целиком, а размазывают платёж пропорционально балансам. Это
+snowball-ПОДОБНО только в одном — ставка игнорируется, ориентир — баланс.
+
+Цена в фунтах, двухкарточная выборка, табл. A5 (годовая экономия процентов относительно
+ФАКТИЧЕСКОГО поведения):
+
+| Правило | Среднее, £ | Медиана, £ | 90-й перцентиль, £ |
+|---|---|---|---|
+| Оптимальное (avalanche) | 64.82 | 24.78 | 167.41 |
+| Balance matching | −4.59 | −0.32 | 49.06 |
+| Snowball (Heuristic 4) | −1.68 | 0.60 | 69.62 |
+
+Перевод: snowball в среднем стоит примерно столько же, сколько люди уже теряют своим фактическим
+поведением. **Переход с фактического поведения на snowball ничего не стоит в среднем; переход на
+avalanche экономит в среднем £65 в год** (от £65 для двух карт до £248 для пяти, 90-й перцентиль
+до £927). Числа — годовые, по картам, в устойчивом состоянии.
+
+### Д11.1.6 ИТОГ УЧАСТКА — прямой ответ для продукта
+
+**Перевешивает ли выигрыш snowball в доведении до конца его денежную цену? Данных для ответа нет.**
+Ни одна из пяти прочитанных работ не измеряет вероятность доведения до конца при
+**самостоятельно выбранной** стратегии snowball против avalanche на реальных долгах со ставками:
+- Gal & McShane мерят эффект закрытого счёта, но порядок выбирает фирма, а ставок в данных нет;
+- Hamilton мерит цену и предполагает доведение до конца в обоих вариантах;
+- Amar et al. и Brown & Lahey — лаборатория, у Brown & Lahey даже не долги;
+- Gathergood — поле, но фиксирует balance matching, а не snowball, и о доведении до конца не говорит.
+
+Что при этом можно утверждать по данным:
+1. **Конфликта часто нет вообще.** У 38.7 % домохозяйств США порядок по ставке и по балансу
+   совпадает (Hamilton); медиана цены snowball — 0.03–0.25 % процентов. Первое, что должен делать
+   продукт, — проверить, есть ли у пользователя конфликт порядков. Если нет — режим snowball не нужен.
+2. **Цена растёт с числом долгов и разбросом ставок.** 3 долга — 1.3 %, 4 — 2.6 %, больше — свыше 4 %
+   процентов (Hamilton). Иллюстрация Brown & Lahey: при мотивационном приросте платежа +13 % snowball
+   окупается при разнице ставок до ~6 п.п. и проигрывает от ~7 п.п.
+3. **Мотивационный выигрыш не измерен в поле, а в лаборатории он неравномерен.** Люди сами реже всего
+   выбирают восходящий порядок, а выигрывают больше те, у кого самоконтроль выше (Brown & Lahey).
+4. **Есть приём, закрывающий спор без отказа от avalanche:** показ уже накопленных процентов в
+   деньгах по каждому долгу (Amar et al., Эксп. 4, маргинально, N = 75) и индикатор прогресса как
+   **доля закрытых счетов**, а не доля погашенных рублей (прямая рекомендация Gal & McShane,
+   дословно: «visual progress indicators … might be more effective … when they display progress in
+   terms of the share of tasks completed (e.g., a task checklist) rather than … absolute progress»).
+
+**Правило-кандидат для продукта (НАША ГИПОТЕЗА, не из источника):** avalanche остаётся расчётом по
+умолчанию. Режим «сначала мелкие» предлагается, только если одновременно (а) порядки по ставке и
+по балансу расходятся, (б) разница ставок между первым долгом avalanche и первым долгом snowball
+мала (ориентир по Brown & Lahey — несколько п.п.), (в) цена режима в рублях за весь срок ниже
+порога, который видит пользователь. Цена показывается рублями, не процентами от процентов: «+1,8 %»
+пользователь прочитает как ставку.
+
+**Что нужно измерить самим (данных в литературе нет):** рандомизированно на своих пользователях с
+≥ 2 долгами и конфликтом порядков — долю тех, кто через 6 и 12 месяцев следует плану, при
+avalanche и при snowball-режиме. Точка безубыточности: snowball оправдан, если
+ΔP(доведения) × (стоимость недоведения) > Δпроцентов. Отдельно проверить приём Amar et al.
+(ретроспективные проценты в рублях) как третью ветку — он дешевле всего и не требует второго режима.
+
+**Сопоставление с Gathergood (Д5).** Поле показывает не snowball, а игнорирование ставки в пользу
+баланса. Практический смысл: у реального человека конкурент avalanche — не snowball, а размазывание
+платежа пропорционально балансам. Против него avalanche выигрывает в среднем £65 в год на двух
+картах, snowball — нет (−£1.68, то есть на уровне фактического поведения). Это аргумент **за**
+Avalanche-фильтр канона как расчёт и **за** работу над исполнением (напоминание, прогресс по
+закрытым счетам, ретроспективные проценты), а не за смену расчёта.
+
+---
+
+## ДОБОР Д11 — Д11.2 сверка упоминаний 22-МР с полным текстом (2026-09-11)
+
+- Канал: `curl -sk --http1.1` с браузерным UA `https://cbr.ru/crosscut/lawacts/file/9937` → HTTP 200,
+  216 984 байта, application/pdf, 31 страница → `pdftotext -layout` → 108 137 байт. Полный текст
+  документа (в §4.0 была только глава 2 через base.garant.ru).
+- Сверено по ключевым словам: «родствен», «геймифик», «предпочтительнее», «по умолчанию»,
+  «предустанов», «третьих лиц».
+
+Дословно, на что опираются выводы:
+
+> **1.3.** «Настоящие Методические рекомендации адресованы кредитным организациям,
+> микрофинансовым организациям, страховщикам, страховым брокерам, профессиональным участникам
+> рынка ценных бумаг, управляющим компаниям … операторам финансовых платформ, операторам
+> инвестиционных платформ … саморегулируемым организациям в сфере финансового рынка …»
+
+> **1.10.** «Положения настоящих Методических рекомендаций Банка России носят рекомендательный
+> характер, за исключением положений, обязательность которых установлена нормативными правовыми
+> актами, в том числе нормативными актами Банка России.»
+
+> **Вводная к главе 2:** «При предоставлении потребителям финансовых продуктов (дополнительных
+> услуг) в дистанционных каналах финансовым организациям рекомендуется придерживаться следующих
+> общих подходов:»
+
+> **2.5.** «Исключать из клиентского пути **при приобретении финансового продукта (дополнительной
+> услуги)** практики применения следующих «темных паттернов»: маркетинговые – акцентирование
+> внимания потребителя исключительно на информации об отдельных преимуществах, условиях финансового
+> продукта (дополнительной услуги), а равно сокрытие от потребителя невыгодных условий и рисков
+> посредством использования визуальных приемов (разный по размеру шрифт, выделение цветом
+> информации, отдельного блока, кнопки, на которую предпочтительнее нажать); психологические –
+> акцентирование внимания потребителя на ответственности потребителя и (или) третьих лиц (например,
+> его родственников) в случае неисполнения потребителем взятых на себя обязательств; акцентирование
+> внимания потребителя только на наиболее привлекательной процентной ставке … включение в процесс
+> взаимодействия с потребителем элементов игры («геймификации»), снижающих критичность восприятия
+> потребителями существенной информации о финансовых продуктах.»
+
+> **Сноска 13 к п. 2.1:** «следует исключить практики, предусматривающие предустановленное
+> несогласие, когда, снимая отметку (галочку, передвижной переключатель), потребитель соглашается
+> на приобретение дополнительной услуги.»
+
+Выводы по тексту:
+1. **«Давление через ответственность и близких» в п. 2.5 ЕСТЬ, почти дословно**, но с двумя
+   рамками: (а) речь об ответственности «в случае неисполнения потребителем взятых на себя
+   обязательств», то есть о должнике перед финорганизацией; (б) весь п. 2.5 действует «при
+   приобретении финансового продукта (дополнительной услуги)». Слово «запрет» к документу неточно:
+   это «рекомендуется исключать» (вводная гл. 2 + п. 1.10).
+2. **Выделение кнопки запрещено не само по себе**, а как визуальный приём «сокрытия … невыгодных
+   условий и рисков». **Геймификация — только та, что «снижает критичность восприятия …
+   существенной информации о финансовых продуктах».** Подтверждает вывод Д10.
+3. **Нормы о предзаполненном ЧИСЛОВОМ значении нет.** Пп. 2.1–2.2 и сноски 13–14 касаются
+   **отметок согласия** (галочка, переключатель) на условия продукта или допуслугу. Черновик суммы
+   в собственном плане пользователя ими не охватывается. Подтверждает §4.0 и Д10.
+4. **FINPILOT в перечне адресатов п. 1.3 нет**: мы не финорганизация и не оператор финплатформы.
+   Даже для адресатов документ рекомендательный (п. 1.10).
+
+### Таблица: утверждение темы 26 → текст 22-МР → обязательность для нас
+
+| Место в теме 26 | Утверждение | Что дословно в 22-МР | Обязательно для FINPILOT? |
+|---|---|---|---|
+| «Во что НЕ вкладываться», п. 7 | «Давление через ответственность и близких. **Прямой запрет** 22-МР, п. 2.5» | п. 2.5, «психологические»: «акцентирование внимания потребителя на ответственности потребителя и (или) третьих лиц (например, его родственников) в случае неисполнения … обязательств». Формулировка — «рекомендуется исключать», контекст — приобретение финпродукта | **Нет.** Адресат — финорганизации (п. 1.3), характер рекомендательный (п. 1.10). 🔴 Слово «прямой запрет» неверно. Как ориентир регулятора для «не делай так» — годится |
+| «Во что НЕ вкладываться», п. 3 | «Геймификация … **прямо названа** в 22-МР, п. 2.5, среди тёмных паттернов» | п. 2.5: только «элементы игры («геймификации»), **снижающих критичность восприятия** потребителями существенной информации о финансовых продуктах» | **Нет.** 🟡 Названа, но с условием. Серия «3 месяца подряд по плану» информацию о продукте не скрывает и под определение прямо не подпадает. Довод «не делать» держится на отсутствии эмпирики эффекта, а не на 22-МР |
+| Итоговая таблица, приём 3 | «🟢 если без автопринятия и без выделенной “предпочтительной” кнопки (п. 2.1, 2.5)» | п. 2.1: автопроставление отметок согласия на условия продукта или допуслугу; п. 2.5: кнопка как приём сокрытия рисков при приобретении продукта | **Нет** в части предзаполненного числа. Про автопринятие плана п. 2.1 прямо не говорит — мы не продаём продукт. Реально обязательно: ЗоЗПП ст. 16 п. 3.1 (только если появятся платные допуслуги) и ст. 10.2-2 149-ФЗ (раскрытие рекомендательных технологий) — по Д10 |
+| Итоговая таблица, приём 7 | «🟢 только без геймификации (п. 2.5)» | как выше | **Нет.** Заменить на «без механик, скрывающих цену решения» |
+| §2.0, Sharif & Shu | «не ставит отметок по умолчанию, не выделяет “предпочтительную кнопку”, не геймифицирует» | пп. 2.1, 2.5 | Вывод верен; ссылка на 22-МР здесь избыточна, но не ошибочна |
+| §4.2 | «Разрешено (с опорой на 22-МР, п. 2.1–2.2 и 2.5)» / «визуально выделенная кнопка “Принять” … — прямо “кнопка, на которую предпочтительнее нажать” из п. 2.5» | п. 2.5 ограничивает кнопку как приём **сокрытия невыгодных условий и рисков** | 🟡 Необязательно. Кнопка «Принять план» без скрытия цены альтернатив п. 2.5 не нарушает даже для финорганизации. Ориентир — показывать цену альтернатив рядом, а не приглушать «Изменить» |
+| §4.4 | «нельзя: “Не рискуйте — ваши близкие рассчитывают на вас” — … из п. 2.5» | п. 2.5 — да, но про неисполнение обязательств перед финорганизацией | Не обязательно. Как этическое правило продукта — оставить |
+| §4.0 | «22-МР на нас напрямую не распространяется» | пп. 1.3, 1.10 | Верно, подтверждено полным текстом |
+
+Предлагаемые формулировки (для переписывания, в самой таблице не правлю):
+- п. 7 «Во что НЕ вкладываться»: «Давление через ответственность и близких. 22-МР, п. 2.5, относит
+  его к психологическим тёмным паттернам (для финорганизаций, рекомендательно). Нам не обязателен,
+  держим как собственное этическое правило».
+- п. 3: «Геймификация. Поддержки эффекта в добытых источниках нет. 22-МР, п. 2.5, осуждает только
+  геймификацию, снижающую критичность восприятия существенной информации (для финорганизаций,
+  рекомендательно)».
+- Колонку «22-МР» в итоговой таблице переименовать в «Регуляторика» и для приёмов 3 и 7
+  указывать реальные обязательства: ст. 10.2-2 149-ФЗ, ЗоЗПП ст. 16 п. 3.1 (по Д10).
+
+---
+
+## ДОБОР Д11 — Д11.3 дефолт в советующем, а не исполняющем продукте (2026-09-11)
+
+Вопрос: какой эффект у предзаполненного значения, если деньги продукт не двигает и человеку всё равно
+надо самому совершить действие. Прямого измерения «советующий продукт, исполнение в другой системе»
+не найдено и во втором заходе. Найдено пять работ, которые подходят к вопросу с разных сторон:
+предзаполненное значение **с обязательным активным подтверждением** (Altmann; Goswami & Urminsky),
+**подсказка суммы без автоисполнения** (Choi et al.; OES), **обязательный выбор без дефолта**
+(Carroll et al.).
+
+### Д11.3.1 Carroll, Choi, Laibson, Madrian, Metrick 2009, QJE — «Optimal Defaults and Active Decisions» 🟢
+
+- Канал: WebSearch → авторская копия `https://www.economics.utoronto.ca/gabriel.carroll/odad.pdf` →
+  curl → HTTP 200, 454 427 байт, PDF 36 страниц (журнальная вёрстка QJE) → `pdftotext -layout` →
+  100 081 байт.
+
+Дословно:
+> «compelling new hires to make active decisions about 401(k) enrollment raises the initial fraction that
+> enroll by 28 percentage points relative to a standard opt-in enrollment procedure, producing a savings
+> distribution three months after hire that would take thirty months to achieve under standard enrollment.»
+> «average three-month enrollment rate is 69% for the active decision cohort, versus 41% for the standard
+> enrollment cohort»
+> «the active decision cohort's enrollment rate exceeds the standard enrollment cohort's by 17 percentage
+> points at 24 months of tenure, and by 5 percentage points at 42 months.»
+> «Active decisions are optimal when consumers have a strong propensity to procrastinate and savings
+> preferences are highly heterogeneous. Financial illiteracy, however, favors default enrollment over
+> active decision enrollment.»
+
+Как переносить на нас: обязательный выбор без дефолта даёт больше половины эффекта автозачисления,
+но **после выбора взнос удерживает работодатель**, решение и исполнение совпадают. У нас «принять
+план» — это решение, а перевод остаётся отдельным действием. Carroll показывает, что ВЫНУДИТЬ
+решение ценно. Что решение превратится в перевод, он не показывает. Разрыв со временем сходится
+(17 п.п. через 24 мес., 5 п.п. через 42 мес.): эффект — это ускорение решения, а не разница в итоге.
+
+### Д11.3.2 Choi, Haisley, Kurkoski, Massey 2012, NBER w17843 — «Small Cues Change Savings Choices» 🟢
+
+- Канал: ссылка из сноски 13 PDF OES → curl `https://www.nber.org/system/files/working_papers/w17843/w17843.pdf`
+  → HTTP 200, 235 152 байта → `pdftotext -layout` → 154 440 байт.
+- Дизайн: подсказки в письмах сотрудникам. **Автоисполнения нет**: чтобы изменить взнос, человек сам
+  заходит в систему. Это ближайший к нам по механике случай.
+
+Дословно, абстракт полного текста:
+> «anchors increase or decrease 401(k) contribution rates by up to 1.9% of income. A high savings goal
+> example raises contribution rates by up to 2.2% of income. Highlighting a higher savings threshold in the
+> match incentive structure raises contributions by up to 1.5% of income relative to highlighting the lower
+> threshold. Highlighting the maximum possible contribution rate raises contribution rates by up to 2.9% of
+> income among low savers.»
+«Up to» — это лучший рукав, не среднее по всем подсказкам. Числа по рукавам и доле сменивших взнос
+я из таблиц не выписывал.
+
+### Д11.3.3 OES 2016 — «Anchoring & TSP Enrollment», 699 674 военнослужащих 🟢
+
+- Канал: WebSearch → страница `https://oes.gsa.gov/projects/tsp-anchoring/` → curl → HTTP 200,
+  29 563 байта → ссылка на PDF `https://oes.gsa.gov/assets/abstracts/16xx-anchoring-tsp-enrollment.pdf`
+  → curl → HTTP 200, 110 647 байт, 2 страницы → `pdftotext -layout` → 10 037 байт.
+- Дизайн: RCT по номеру SSN, 10 групп (без письма; письмо без суммы; 8 писем с подсказкой ставки
+  1–8 %). **Автоисполнения нет**: надо самому зайти на сайт и выбрать ставку.
+
+Дословно:
+> «One month after the emails were sent, 18,451 service members had enrolled: 1,362 in the no-email group
+> (1.94 percent), compared with 1,813 who received an email with no suggested contribution rate (2.58
+> percent) and 15,276 across those sent the eight anchoring emails (2.73 percent). Overall, receiving an
+> email resulted in an increase of 0.77 percentage points (p < 0.01, 95% CI [0.66, 0.88]).»
+> «Emails with suggested contribution rates ranged from a low of 2.49 percent enrollment (for a 7 percent
+> suggestion) to a high of 2.97 percent (for a 1 percent suggestion).»
+> «While an increase in suggested contribution rates led to slightly lower new enrollments, the average
+> contribution rate increased with higher suggested contributions, which resulted in no substantial net
+> difference in actual savings between groups.»
+> «service members were more likely to contribute at exactly the suggested rate than those who were not
+> given a suggested rate.»
+
+🔴 Разложение (моя арифметика по числам из PDF): эффект **письма** против его отсутствия —
+2.58 − 1.94 = +0.64 п.п.; эффект **подсказанной суммы** поверх письма — 2.73 − 2.58 = **+0.15 п.п.**
+Подсказка суммы почти не влияет на то, сделает ли человек хоть что-то. Она влияет на то, **сколько**
+он внесёт, если внесёт, и это влияние двустороннее: высокая подсказка поднимает сумму у действующих
+и снижает их долю, в итоге сбережения не отличаются.
+
+### Д11.3.4 Altmann, Falk, Heidhues, Jayaraman, Teirlinck 2018 — дефолт суммы с активным подтверждением 🟢
+
+- Канал: WebSearch → `https://www.dice.hhu.de/.../294_Altmann_Falk_Heidhues_Jayaraman_Teirlinck.pdf` →
+  curl → HTTP 200, 3 883 626 байт → `pdftotext -layout` → 261 154 байта. DICE Discussion Paper 294,
+  июль 2018 (журнальную версию не искал).
+- Дизайн — **ровно наш случай**: сумма в форме предзаполнена, но срабатывает только после активного
+  подтверждения (в тексте: default donation levels «only become effective after users actively confirm»).
+  Платформа Betterplace, около 680 000 визитов страницы пожертвования, почти 23 000 пожертвований,
+  €1.17 млн.
+
+Дословно:
+> «in each of our treatments, the modal positive contributions in both choice dimensions invariably
+> correspond to the specified default amounts. Defaults, nevertheless, have no significant effects on
+> average donation levels. This is because defaults in the donation domain induce some people to donate
+> more and others to donate less.»
+> «At the e50 default, we observe an additional extensive-margin effect, with more people opting out of
+> the donation process altogether.»
+> «defaults increase donors' propensity to make the corresponding contribution by 30-90%.»
+(22.9 %, 22.8 %, 21.7 % дарителей выбирают сумму по умолчанию против 12–14 % без дефолта.)
+Исключение: дефолт процентной надбавки в пользу самой платформы монотонно поднимает её выручку.
+
+### Д11.3.5 Goswami & Urminsky 2016, JMR — «When Should the Ask Be a Nudge?» 🟢
+
+- Канал: WebSearch → `https://home.uchicago.edu/ourminsky/Charity_Default_Goswami_Urminsky.pdf` →
+  curl → HTTP 200, 2 740 282 байта → `pdftotext -layout` → 223 336 байт (версия «Forthcoming, JMR»).
+
+Дословно:
+> «In eight studies, comprising 11,508 participants … We find (1) a "lower-bar" effect, where defaulting a
+> low amount increases donation rate, (2) a "scale-back" effect where low defaults reduce average donation
+> amounts and (3) a "default-distraction" effect … defaults can sometimes be a "self-cancelling"
+> intervention»
+> «making an option the default increased its choice share by 1.8 percentage points (weighted), relative to
+> no default (bootstrapped 95% confidence interval [+0.9%, +2.4%], p < .001)»
+> «The average revenue per person was $4.43 when no default was present and $4.20 when a default was used
+> (difference = 22 cents, t = 1.13, p = .26)»
+В натурном полевом исследовании (Study 3) дефолты выручку подняли, по абстракту: «defaults increased
+revenue in our field study». Числа Study 3 не выписывал.
+
+### Д11.3.6 Grinstein-Weiss, Cryder, Despard, Perantie, Oliphant, Ariely 2017 — R2S, TurboTax 🟡
+
+- Канал: Unpaywall `oa_status = closed`; r.jina.ai поверх `journals.sagepub.com/doi/full/10.1177/237946151700300203`
+  → HTTP 200, 65 939 байт, но в выдаче **только абстракт и список литературы**, тело статьи не пришло.
+- Абстракт, дословно: «the most effective intervention increased the average savings deposits by about 50%
+  … the mention of a savings option did not increase allocations by itself, but a heavy emphasis on savings
+  or the ability to easily put money into savings did increase allocations.»
+- Число «разница подсказок 25 % и 75 % → 30 п.п. разницы в доле возврата, ушедшей в сбережения» —
+  **сниппет пресс-релиза (Newswise/Futurity), первоисточник не открыт.** Оговорка: в TurboTax
+  распределение возврата исполняется в той же форме, трение исполнения почти нулевое, чистым
+  «советующим» случаем это не является.
+
+### Д11.3.7 ИТОГ УЧАСТКА — ожидаемый размер приёма №3
+
+1. **Предзаполненная сумма сильно двигает ВЕЛИЧИНУ** и почти не двигает **факт действия**.
+   Сколько: пик выбора в дефолте в 1.3–1.9 раза выше, чем без него (Altmann), ±1.9 % дохода в
+   ставке взноса (Choi et al.). Факт действия: +0.15 п.п. от подсказки суммы поверх письма (OES),
+   +1.8 п.п. доли выбора (Goswami), ноль в средней сумме (Altmann; Goswami, эксперименты).
+2. **Эффект двусторонний.** Высокая подсказка поднимает сумму у действующих и отсекает часть людей
+   (OES: подсказка 1 % → 2.97 % записавшихся, 7 % → 2.49 %; Altmann: дефолт €50 увеличил отказы).
+   Итог в деньгах часто ноль.
+3. **Порядок величин против Madrian & Shea:** там +48.5 п.п. участия (37.4 → 85.9 %, см. Д11.4),
+   а у советующих механик эффект на факт действия — доли п.п. или единицы п.п. Разница — это
+   ровно инерция исполнения, которой у нас нет.
+4. **Обязательный явный выбор (Carroll) даёт +28 п.п.**, но только потому, что за решением следует
+   автоматическое удержание. Для нас из этого следует одно: шаг «принять или изменить план» должен
+   быть обязательным и явным, а не фоновым.
+
+**Как переформулировать приём №3 (предложение, таблицу не правлю):** «Предзаполненная сумма шага
+определяет, СКОЛЬКО человек переведёт, если переведёт. На сам факт перевода влияет слабо (+0.15 п.п.
+в OES, 699 674 чел.). Слишком высокая сумма снижает долю действующих. Эффект 49/37 → 86 %
+(Madrian & Shea) к нам не переносится: он получен на автоисполнении». Факт действия закрывают
+приёмы 1 (напоминание с целью) и 2 (запас на срыв), а не дефолт.
+
+**Что измерить самим:** A/B на размер предзаполненного шага (расчётный / −25 % / +25 %) → доля
+выполнивших шаг в течение 7 дней и средняя переведённая сумма. Гипотеза по OES и Altmann:
+сумма растёт с подсказкой, доля выполнивших падает, в деньгах итог около нуля.
+
+---
+
+## ДОБОР Д11 — Д11.4 остатки таблицы «Что не добыто» (2026-09-11)
+
+### Д11.4.1 Madrian & Shea — NBER w7682 ОТКРЫТ 🟢, и он правит число темы
+
+- Канал: curl `https://www.nber.org/system/files/working_papers/w7682/w7682.pdf` → HTTP 200, 479 053 байта,
+  application/pdf. `pdfinfo`: **70 страниц** (утилита `file` показала «6 pages» ошибочно) →
+  `pdftotext -layout` → 173 691 байт. Рабочая версия, май 2000; журнальная QJE 2001 могла сдвинуть числа.
+
+N по когортам, табл. 4 (активные сотрудники на 30.06.1999): **OLD N = 3 286, WINDOW N = 4 257,
+NEW N = 5 812.** OLD — наняты 01.04.1996–31.03.1997; WINDOW — 01.04.1997–31.03.1998, получили
+право участия 01.04.1998, но без автозачисления; NEW — наняты 01.04.1998–31.03.1999, с автозачислением.
+
+Табл. 5, участие в 401(k), дословно:
+
+| Когорта и дата | Стаж | Участие | N |
+|---|---|---|---|
+| WINDOW на 30.06.1998 | 3–15 мес. | **37.4 %** | 4 249 |
+| NEW на 30.06.1999 | 3–15 мес. | **85.9 %** | 5 801 |
+| OLD на 30.06.1998 | 15–27 мес. | 48.7 % | 3 275 |
+| WINDOW на 30.06.1999 | 15–27 мес. | 49.4 % | 4 247 |
+
+> «The 401(k) participation rate of the WINDOW cohort at 3-15 months of tenure was 37%. This is less than
+> half the 86% participation rate of the NEW cohort with a similar amount of tenure.»
+
+🔴 **«49 → 86 %» в теме сопоставляет разный стаж.** 49 % — это участие при стаже 15–27 мес.
+(OLD 48.7 %, WINDOW 49.4 %), 86 % — при стаже 3–15 мес. Сравнение при одинаковом стаже, которое
+делают сами авторы: **37.4 % → 85.9 %, +48.5 п.п.** Число 49 % пришло из Thaler & Benartzi 2004, где
+сослались на версию «Madrian and Shea (1999)», её я не открывал. Эффект автозачисления, таким образом,
+**больше**, чем записано (+48.5 п.п. против +37). Carroll et al. 2009 пересказывают его как «more than
+fifty percentage points». Для FINPILOT это ничего не меняет: эффект получен на автоисполнении (Д11.3).
+
+### Д11.4.2 Dai, Milkman & Riis 2014 — числа по трём исследованиям добыты 🟢
+
+- Канал: curl Wharton PDF → HTTP 200, 334 120 байт, 21 страница → `pdftotext -layout` → 304 853 байта.
+  В `-layout` колонки не слипаются, числа читаются из текста (не из таблиц).
+
+Рост относительно базового уровня, дословно из текста:
+- **Study 1, поиск «diet» в Google:** начало недели +14.4 %, месяца +3.7 %, года +82.1 %, после
+  федеральных праздников +10.2 %.
+- **Study 2, посещение спортзала студентами:** начало недели +33.4 %, месяца +14.4 %, года +11.6 %,
+  семестра +47.1 %, после каникул +24.3 %; после дня рождения (кроме 21-го) +7.5 %.
+- **Study 3, контракты-обязательства stickK, цели не про здоровье** (N контрактов = 15 213, дней 866,
+  пользователей 10 074): начало недели +62.9 %, месяца +23.6 %, года +145.3 %, после федеральных
+  праздников +55.1 %, после дня рождения +2.6 %.
+- Рис. 3 в абсолютных вероятностях: создать контракт в первый день недели против последнего +0.072 п.п.,
+  в первый день месяца против 31-го +0.030 п.п.
+
+Относительные приросты большие, абсолютные вероятности крошечные (сотые доли процента на человеко-день).
+Это архивные корреляции по календарю. Проверки того, что фрейминг «начни с понедельника» меняет
+поведение, здесь нет. Оценка «fresh start — не основной механизм» (п. 5 «Во что НЕ вкладываться»)
+остаётся, а привязку напоминания к началу месяца или к зарплате данные поддерживают.
+
+### Д11.4.3 «Correcting the Record on Financial Education» — авторы установлены, полный текст НЕ ДОБЫТ
+
+- Авторы: **Daniel Fernandes, John G. Lynch Jr., Lena Kim** (Semantic Scholar paperId
+  9745e2af37e57bc91c8f03019d7d11e152329ff3; Crossref DOI 10.2139/ssrn.5385386, SSRN, 12.08.2025).
+  Crossref даёт и вторую запись тех же авторов: 10.2139/ssrn.5772062 (24.11.2025), «Publication Bias in
+  Financial Economics: The Case of Studies of the Effects of Financial Education on Financial Behavior».
+  Вероятно, переименованная версия (не проверено). По сниппету WebSearch работа пересчитывает
+  мета-анализ Kaiser et al. 2022 (76 RCT), и после поправки эффекты «fall in line with Fernandes et al.
+  (2014)». Сниппет, первоисточник не открыт.
+- Попытки: SSRN abstract → curl HTTP 403 (5 782 байта, Cloudflare); SSRN Delivery.cfm → HTTP 403
+  (5 842 байта); r.jina.ai → HTTP 200, **491 байт (пустышка)** для обоих ID; Wayback CDX — единственный
+  снимок 2025-08-13 со статусом 403; OpenAlex `oa_status = green`, но `oa_url` указывает на тот же SSRN
+  DOI, `pdf_url` нет; Semantic Scholar `openAccessPdf` → тот же SSRN DOI; ResearchGate → 403 + CAPTCHA
+  (первый прогон). Числа 0.018–0.033 SD в §3.1-тер остаются на сниппете.
+
+### Д11.4.4 Vohs et al. 2021 — ПОЛНЫЙ ТЕКСТ ДОБЫТ 🟢
+
+- Канал: WebSearch → `https://gwern.net/doc/psychology/willpower/2021-vohs.pdf` → curl → HTTP 200,
+  193 160 байт → `pdftotext -layout` → 103 308 байт (Psychological Science 32(10), DOI
+  10.1177/0956797621989733). Причина пустого pdftotext в первом прогоне — другой URL (зеркало UPenn),
+  повторно не проверял.
+
+Дословно:
+> «We conducted a preregistered multilaboratory project (k = 36; N = 3,531) … Confirmatory tests found a
+> nonsignificant result (d = 0.06). Confirmatory Bayesian meta-analyses using an informed-prior hypothesis
+> (δ = 0.30, SD = 0.15) found that the data were 4 times more likely under the null»
+Второй независимый многолабораторный тест тоже показал ноль. Пункт 6 «Во что НЕ вкладываться»
+теперь опирается на два теста: Hagger 2016, d = 0.04, 23 лаборатории; Vohs 2021, d = 0.06, 36 лабораторий.
+
+### Д11.4.5 Gollwitzer & Sheeran 2006 и Hagger et al. 2010 — НЕ ДОБЫТЫ (низший приоритет)
+
+- Gollwitzer & Sheeran 2006 (DOI 10.1016/S0065-2601(06)38002-1): Unpaywall `oa_status = green`, но
+  единственная OA-локация — репозиторий без `url_for_pdf`. Дальше не шёл: число d = 0.65 перекрыто
+  мета-анализом 2024/25 (642 теста).
+- Hagger et al. 2010 (DOI 10.1037/a0019486): Unpaywall `oa_status = closed`, OA-локаций нет. Число
+  d = 0.62 остаётся на сниппете, вывод перекрыт Hagger 2016 и Vohs 2021.
+
+---
+
+## ДОБОР Д11 — ИЗМЕНЕНИЯ ВЫВОДОВ (2026-09-11)
+
+### Подтвердилось по полным текстам
+- Hamilton: «1.8–4.3 %», «$46.2–53.9 млрд», SCF 2016 — дословно из абстракта и таблиц.
+- Gal & McShane: цитата о доле закрытых счетов дословная; выборка — 5 943 клиента («~6000» в сырье).
+- Gathergood et al.: 51.5 % против 97.1 %, ставка с низкой важностью, баланс с высшей — дословно (Д5 верен).
+- 22-МР на FINPILOT не распространяется (пп. 1.3, 1.10) — полный текст cbr.ru.
+- Ego depletion не реплицируется — второй независимый тест (Vohs 2021, d = 0.06).
+- Fresh start: оригинальные эффекты есть, но они архивные и в абсолютных долях малы; вывод темы «не основной механизм» стоит.
+
+### 🔴 Опровергнуто или существенно уточнено
+1. 🔴 **Цена snowball — не «+1.8–4.3 % процентов» для каждого.** Это СРЕДНИЙ прирост суммы процентов.
+   Медиана 0.03–0.25 %, у 38.7 % домохозяйств разницы нет вообще, у 4.5–11.3 % разница больше 10 %.
+   Цена растёт с числом долгов (3 → 1.3 %, 4 → 2.6 %, больше → свыше 4 %) и с размером доплаты.
+2. 🔴 **Gal & McShane — не доказательство того, что snowball, выбранный человеком, повышает шанс
+   дойти до конца.** Порядок закрытия выбирала фирма по урегулированию долгов, ставок в данных нет,
+   дизайн наблюдательный. Измерено: закрытый счёт как событие предсказывает доведение урегулирования
+   до конца (коэффициент 3.40 при незначимом −.25 у долларовой доли; +14 % по симуляции через год).
+3. 🔴 **Amar et al. 2011 стоит в сырье в лагере «за snowball» — это ошибка.** Работа документирует
+   debt account aversion как ошибку и находит, что показ накопленных процентов в деньгах её ослабляет.
+4. 🔴 **В поле люди ведут себя НЕ по snowball, а по balance matching** (Gathergood). Snowball описывает
+   данные хуже. У реального пользователя конкурент avalanche — размазывание платежа пропорционально
+   балансам, и против него avalanche выигрывает в среднем £65 в год (две карты), а snowball — нет.
+5. 🔴 **Полевого RCT «snowball против avalanche» нет ни одного** (Brown & Lahey прямо называют его
+   будущей работой; в доборе не найден). Противоречие §1.5 не разрешено данными: выигрыш snowball
+   в исполнении не измерен.
+6. 🔴 **Madrian & Shea: «49 → 86 %» — это разный стаж.** Сравнение при одинаковом стаже: 37.4 % → 85.9 %
+   (N 4 249 / 5 801), +48.5 п.п.
+7. 🔴 **Дефолт в советующем продукте почти не влияет на ФАКТ действия** (OES, 699 674 человека:
+   +0.15 п.п. от подсказки суммы поверх письма; Altmann и Goswami: средняя сумма не меняется). Он
+   двигает величину и бывает двусторонним. Строка «дефолт: 49 → 86 %» в приёме №3 вводит в заблуждение.
+8. 🔴 **22-МР: «прямой запрет» — неверно** в п. 7 и п. 3 «Во что НЕ вкладываться». Это рекомендации
+   финорганизациям. Геймификация осуждается только тогда, когда она «снижает критичность восприятия
+   существенной информации», выделение кнопки — только как приём сокрытия рисков. «Ответственность
+   … третьих лиц (например, его родственников)» в п. 2.5 есть почти дословно, но про неисполнение
+   обязательств перед финорганизацией.
+
+### Что переписать (предлагаемые формулировки; сами строки в файле не правлю)
+
+**Итоговая таблица «Прямой ответ»:**
+- Колонку «22-МР» переименовать в «Регуляторика»: для всех строк «22-МР — ориентир, не обязанность
+  (п. 1.3, 1.10)», а там, где применимо, — реальные нормы по Д10 (ст. 10.2-2 149-ФЗ; ЗоЗПП ст. 16
+  п. 3.1 при платных допуслугах).
+- **Строка 3:** «Предзаполненный план с правкой одним действием и обязательным явным “принять или
+  изменить”» · эффект: «сумма смещается к подсказке (пик выбора в 1.3–1.9 раза, Altmann; ±1.9 % дохода,
+  Choi et al. 2012), на факт действия +0.15 п.п. (OES, 699 674); высокая подсказка снижает долю
+  действующих; обязательный явный выбор без автоисполнения +28 п.п., но при автоудержании после
+  выбора (Carroll 2009); контроль 32 → 73–76 % (Dietvorst, тема 17)» · репликация: «🟡 перенос на
+  советующий продукт — косвенные данные из 4 работ, прямого измерения нет».
+- **Строка 6:** «Прогресс как доля закрытых долгов + накопленные проценты в рублях по каждому долгу;
+  режим “сначала мелкие” — только при расхождении порядков по ставке и балансу и малой разнице ставок,
+  с ценой в рублях» · эффект: «цена snowball: среднее +1.8–4.3 % суммы процентов, медиана 0.03–0.25 %,
+  у 38.7 % ноль (Hamilton 2023, SCF, симуляция); закрытый счёт предсказывает доведение урегулирования
+  (Gal & McShane, 5 943; порядок выбирала фирма); показ накопленных процентов: итоговый долг $38 848 →
+  $36 089 (Amar et al., лаб., p < .07)» · репликация: «🟡 полевого RCT snowball против avalanche нет».
+- **Строка 7:** регуляторика — «без механик, скрывающих цену решения»; ссылку «только без геймификации
+  (п. 2.5)» убрать.
+
+**«Во что НЕ вкладываться»:**
+- п. 3 → «Геймификация (очки, серии, значки). Эффекта в добытых источниках нет. 22-МР, п. 2.5, осуждает
+  только геймификацию, снижающую критичность восприятия существенной информации (для финорганизаций,
+  рекомендательно)».
+- п. 6 → добавить «Vohs 2021, 36 лабораторий, N = 3 531, d = 0.06».
+- п. 7 → «Давление через ответственность и близких. 22-МР, п. 2.5, относит его к психологическим тёмным
+  паттернам (для финорганизаций, рекомендательно). Для нас — собственное этическое правило».
+- **Новый пункт:** «Высокая предзаполненная сумма шага “чтобы человек больше отложил”. Поднимает сумму у
+  тех, кто действует, и снижает их долю; в деньгах итог около нуля (OES 2016; Altmann et al. 2018)».
+
+**Прочие места:**
+- §3.4, строка 🟢: «дефолты (49→86%)» → «дефолты при автоисполнении (37→86 %, Madrian & Shea w7682)».
+- §3.4, строка 🟡: «snowball vs avalanche» → «snowball vs avalanche: цена измерена (симуляция), выигрыш
+  в исполнении — нет».
+- §1.5, абзац «Разрешение противоречия»: «Цена snowball известна: 1.8–4.3 %» → «Средняя цена snowball —
+  1.8–4.3 % суммы процентов, медианная — почти ноль; выигрыш в доведении до конца при самостоятельном
+  выборе стратегии не измерен».
+- §4.4, последний абзац: «(Hamilton: +1.8–4.3% процентов)» → «цена в рублях по конкретной структуре
+  долгов пользователя; в среднем по США — 1.8–4.3 % суммы процентов, медиана близка к нулю».
+- «Что не добыто»: строки Hamilton, Gal & McShane, Madrian & Shea, Dai, Vohs — закрыты Д11.
+  «Correcting the Record» — авторы установлены, полный текст нет. «Дефолт в советующем продукте» —
+  «прямого измерения нет, косвенные данные из 4 работ (Д11.3)».
+
+### Журнал вызовов добора Д11
+- Подагентов: **0** (обе части работы ведущий сделал сам, по очереди).
+- WebSearch: **12**. WebFetch: 0. Bash: около 30 (curl, r.jina.ai, OpenAlex, Crossref, Unpaywall,
+  Semantic Scholar, Wayback CDX, pdftotext, grep).
+- Каналы, которые сработали: авторские и институтские копии через curl (Gal & McShane, Amar, Carroll,
+  Goswami, Altmann, Vohs); NBER через curl (Brown & Lahey, Gathergood, Madrian & Shea, Choi);
+  **Wayback `id_` поверх `doi/full` Wiley** (Hamilton); cbr.ru через curl (22-МР).
+- Каналы, которые не сработали: Wiley pdfdirect (403 Cloudflare; r.jina.ai — 520 байт капчи); AEA (403);
+  CFPB (403); SSRN (403 во всех формах; r.jina.ai — 491 байт); Wayback API availability (429, затем
+  «Temporarily Offline»; CDX работал).
+
+---
+
+# ДОБОР Г8 (11.09.2026)
+
+Очередь: `docs/research/queue/GAP_QUEUE.md`, раздел «Г8 — Поведенческие остатки».
+Пункты Г8.1, Г8.4, Г8.5 — в этот файл; Г8.2 — в `calibration_ground_truth_2026-09-10.md`;
+Г8.3 — в `behavioral_finance_field_2026-09-10.md`.
+
+## ДОБОР Г8 — Г8.1 Brown & Lahey, «Small Victories»: реквизиты обеих версий и сверка
+
+🔴 **Частично закрыт ещё в Д11** (блок Д11.1.4 выше: рабочая версия NBER w20125 добыта целиком,
+расчёт точки безубыточности по срокам выписан). Ниже — **только то, чего в Д11 не было**:
+точные реквизиты журнальной версии, дизайн экспериментов с числами, вторая половина расчёта
+(по деньгам, не по срокам) и результат сверки WP против журнала.
+
+### Реквизиты (установлены точно)
+
+**Рабочая версия.** Alexander L. Brown, Joanna N. Lahey. «Small Victories: Creating Intrinsic
+Motivation **in Savings and Debt Reduction**». NBER Working Paper No. 20125, May 2014.
+JEL: C91, D03, D14. PDF: `https://www.nber.org/system/files/working_papers/w20125/w20125.pdf`
+(curl с браузерным UA → HTTP 200, 769 726 байт; `pdftotext -layout` → 1 608 строк).
+Титул дословно: «SMALL VICTORIES: CREATING INTRINSIC MOTIVATION IN SAVINGS AND DEBT REDUCTION»,
+с. 1. Финансирование субъектов — International Foundation for Research in Experimental Economics,
+Small Grants Program (с. 1, благодарности).
+
+**Журнальная версия.** Alexander L. Brown, Joanna N. Lahey. «Small Victories: Creating Intrinsic
+Motivation **in Task Completion and Debt Repayment**». *Journal of Marketing Research*, **vol. 52,
+no. 6 (December 2015), pp. 768–783**. DOI **10.1509/jmr.14.0281**.
+Реквизиты сверены по двум независимым API: Crossref (`api.crossref.org/works/10.1509/jmr.14.0281`
+→ том 52, вып. 6, с. 768–783, published-print 2015-12) и OpenAlex
+(`api.openalex.org/works/doi:10.1509/jmr.14.0281` → те же biblio, `oa_status: "closed"`,
+`any_repository_has_fulltext: false`, `best_oa_location: null`).
+🔴 **Полный текст журнальной версии НЕ добыт** — закрытый доступ, OA-копии в репозиториях нет
+по данным OpenAlex; SAGE (`journals.sagepub.com/doi/10.1509/jmr.14.0281`) в этой сессии закрыт,
+авторская копия на `people.tamu.edu/~alexbrown/papers/smallvictories.pdf` → HTTP 404.
+
+**Что на самом деле лежит по ссылке CFPB.** `files.consumerfinance.gov/f/documents/
+P2d_-_Brown_-_Small_Victories.pdf` — это **НЕ статья, а слайды доклада**: «Consumer Financial
+Protection Bureau Research Panel 2, May 7, 2015», 33 слайда, колонтитул «Brown and Lahey (2015)»
+(с. 1 деки). curl с браузерным UA → HTTP 403; добыт через `WebFetch`, который отказался
+разбирать PDF, но сохранил файл на диск (713,7 КБ) → `pdftotext -layout` → 711 строк.
+🔴 Прежняя запись в §«Источники» этого файла (строка ~190) ссылается на этот URL как на статью —
+формально это доклад по ней, заголовок на деке уже журнальный.
+
+### Сверка WP против журнальной версии
+
+Полный текст журнала недоступен, поэтому сверка — по **аннотациям** (Crossref JATS-абстракт
+журнальной версии против абстракта WP, с. 2) и по **деке CFPB 2015**, которая идёт под журнальным
+заголовком. Результат: **состав экспериментов тот же** (два исследования: initial/baseline и
+choice; та же задача перепечатывания; те же таблицы — дека воспроизводит Table 6 с N = 16/31/23
+и теми же временами). **Добавлено в журнальной версии: калибровка модели.**
+
+Абстракт WP: «discuss, model, and empirically examine **alternative** behavioral theories…
+Using a laboratory computer task, we test the validity of these predictions by breaking down this
+approach into component parts».
+Абстракт JMR (Crossref): «discuss, model, and empirically examine **two related** behavioral
+theories… A laboratory experiment tests this prediction and **provides data for model calibration**.
+**The calibrated model is consistent with the directional predictions of each theory**».
+В деке CFPB есть отдельный слайд «Model Calibration»: «we estimate the h and v functions up to
+fourth-degree polynomials (P = 4)» (с. 29 деки) — в WP такого раздела нет.
+
+Вывод: 🟢 **разница названий не означает разного состава экспериментов.** Меняется рамка
+(«Savings and Debt Reduction» → «Task Completion and Debt Repayment» — честнее, задача не про
+деньги) и добавлена калибровка структурной модели. **Числа экспериментов, на которые мы
+опираемся, в обеих версиях одни и те же** — подтверждено совпадением Table 6 деки с Table 6 WP.
+🔴 Оговорка: сверены только те числа, что попали в деку; построчной сверки журнальной статьи
+не было и быть не могло без полного текста.
+
+### Дизайн экспериментов (с числами, из WP)
+
+- Задача: перепечатать в Microsoft Excel **150 строк по 10 символов**, разбитых на **5 колонок**,
+  лимит **30 минут**; до этого — практика из 10 строк для оценки скорости (с. 8–9 WP).
+  Порядок длин колонок: ascending / descending / even. После каждой колонки — сообщение
+  «You have completed X columns. Only 5-X to go!» (с. 9).
+- 🔴 **Долгов, ставок и денег в задаче нет вовсе.** Среда сознательно абстрагирована от
+  погашения долга, «so as not to use popular debt-snowball heuristics» (с. 15).
+- Исследование 1 (случайное назначение): **91 участник**, 6 декабря 2011 — (даты набора, с. 10).
+  Распределение: ascending 31, descending 29, even 31 (Table 1).
+- Исследование 2 (выбор порядка самим участником): **70 участников**, 30–31 января 2013 (с. 10).
+- Заработок: в среднем **$11,25 за 35-минутную сессию** (initial $10,95, choice $11,63), с. 10,
+  сноска 12; с учётом второго пилотного блока — $21,67 за 75 минут (сноска 456).
+- Рекрутинг: сайт econdollars.tamu.edu, ORSEE (Greiner 2004), с. 10.
+
+**Главные числа с ошибками (Table 1, с. 27 WP):**
+
+| Порядок | Среднее время на ячейку, с | N | Разница с ascending | p (двусторонний) |
+|---|---|---|---|---|
+| Ascending | 11,08 | 31 | — | — |
+| Not ascending | 12,31 | 60 | 1,23 | 0,019 |
+| Even | 12,13 | 31 | 1,05 | 0,078 |
+| Descending | 12,50 | 29 | 1,42 | 0,015 |
+
+Kruskal–Wallis по трём порядкам: p = 0,084. Cuzick trend test p = 0,0260,
+Jonckheere–Terpstra p = 0,0265 (с. 13–14). Panel II (пробит на «завершил все 150 ячеек»,
+опущенная категория — even): ascending 0,13248 (ст. ош. 0,1222), descending −0,0963 (0,1280),
+N = 91, χ² ascending-vs-descending p = 0,08.
+Доля завершивших: ascending **71 % (22 из 31)**, descending **48 % (14 из 29)**, even
+**58 % (18 из 31)** (с. 14).
+Goal-gradient: последние 5 ячеек колонки на **1,11 с** быстрее первых пяти, p = 0,0000
+(Table 2, ascending; N 775 и 730 ячеек).
+
+**Исследование 2 (Table 6, с. 30 деки и WP):** ascending выбрали **16 из 70 (22 %)**,
+even 31, descending 23; χ² p = 0,0894. Среднее время: ascending 10,85 с, even 11,03,
+descending 11,44; в целом выбор быстрее случайного назначения (11,12 против 11,89 с).
+Модераторы (с. 16–17 WP): выше самоконтроль → −0,139 с на ячейку от выбора ascending;
+выше Cognitive Reflection Test → −1 с (10 %); выше неприятие риска → −0,71 с (10 %).
+
+### 🔴 Расчёт точки безубыточности — ОБЕ половины
+
+Условие (с. 18 WP): два займа по **$10 000**, первый под **10 %**, второй — от 10 % до 20 %;
+располагаемый платёж **$300/мес**; snowball даёт **+13 %** к платежу → **$369/мес**
+(13 % = 11,08 против 12,50 с/ячейку, т.е. 325 против 288 ячеек/час, с. 17).
+Сами авторы: «The 13% figure is for illustrative purposes… The actual number used is unimportant;
+for any number, there exists a difference in interest rates in which the small victory approach
+will not be beneficial» (с. 17).
+
+**По срокам (Figure 3)** — в Д11 уже записано: до **16 % включительно** snowball быстрее,
+с **17 %** быстрее обычный метод.
+
+**По деньгам (Figure 4, с. 18) — этого в Д11 не было:**
+> «For rates 12% and lower, the additional psychological boost of the small victories and subsequent
+> increase in debt repayment leads to a lower amount spent on loans than under the standard economic
+> strategy. For rates between 13% and 16% inclusive, more is spent in total using the small victory
+> method, but that is only when one includes the assumed $69 boost each month from following that
+> method. Depending on whether one believes that money would have been wasted or put to good use,
+> the small victories method may or may not achieve a greater benefit for this individual. For values
+> 17% and above, it is clear the individual is spending more on loans following the small victories
+> method than the conventional method.»
+
+То есть **три зоны, а не две** (при мотивационном приросте платежа +13 %, т.е. +$69/мес):
+
+| Разница ставок | Срок | Деньги | Трактовка |
+|---|---|---|---|
+| 0–2 п.п. (ставка 2-го займа ≤ 12 %) | snowball быстрее | snowball дешевле | snowball выигрывает безусловно |
+| 3–6 п.п. (13–16 %) | snowball быстрее | snowball дороже, **но только если считать $69 «своими»** | зависит от того, были бы эти $69 потрачены впустую |
+| ≥ 7 п.п. (≥ 17 %) | обычный метод быстрее | обычный метод дешевле | snowball проигрывает безусловно |
+
+Вывод авторов дословно (с. 19): «the strength of the small victories effect could be strong enough
+to overcome **small deviations** in loan interest rates. However… this increase in motivation may
+not offset the additional interest accrued by not paying off the highest-interest-rate debts first
+if there are relatively different interest rates across debts» и «this method works best when
+individuals have debts with **similar** interest rates» (с. 18).
+Дека CFPB формулирует то же как «A final caveat about the debt snowball»: «Whatever the benefit of
+the debt snowball, there exists a difference in interest rates that will overcome it. In such cases
+one should follow the standard economic approach» (с. 20 и 33 деки).
+
+🔴 **Ограничение, которое нельзя опускать при переносе в продукт.** Порог «6 п.п.» не является
+эмпирической константой: он целиком производен от (а) взятого из лаборатории +13 % к платежу,
+(б) конкретных $10 000/$10 000/$300. Авторы называют пример «illustrative» и «stylized» и дважды
+предупреждают, что величину эффекта в поле должен дать полевой эксперимент, которого нет.
+Кроме того **прирост +13 % измерен на скорости печати, а не на платёжеспособности**: допущение
+«мотивированный человек находит на 13 % больше денег» сами авторы называют «heroic»
+(дека CFPB, с. 33: «Heroic debt-reduction implication: 13% higher payment»).
+
+**Статус Г8.1: 🟢 добыт**, за вычетом полного текста журнальной версии (закрыт, OA-копии нет).
+
+## ДОБОР Г8 — Г8.4 Первоисточник «all rules and gating»
+
+🟢 **Закрыт ещё до этого добора, в другом файле.** Утверждение живёт в §1.3 темы 37 —
+`causal_effect_measurement_2026-09-10.md`, а не в этом файле; разрешено там же, блок перепроверки
+(строки ~3347–3378):
+- источник установлен — **блог Somayeh Farhadi, Medium, 29.01.2026**; `WebFetch` → 403,
+  `r.jina.ai` → HTTP 200, 17 764 байта, полный текст;
+- формулировка дословно (строка 36 извлечения): «The correct propensity is the probability of the
+  chosen action under the exact decision process that ran in production, after all rules and gating,
+  using the same inputs and the same state reads.»;
+- **научной ссылки на эту фразу в самой статье нет** — то есть первоисточник и есть блог.
+
+**Вердикт по Г8.4:** научного первоисточника у **формулировки** нет, и искать его дальше нет смысла:
+это пересказ практика. **Содержание** при этом верное и имеет научную опору — Bottou et al. (§4.3)
+и Sachdeva et al. (Definition 1), уже добытые в том же файле. Цитату снимать как цитату;
+утверждение оставлять **своими словами со ссылкой на Bottou / Sachdeva**, блог — не более чем
+«см. также». В этом доборе повторно не искалось (разрешение сделано полным текстом, выдача не
+нужна).
+
+## ДОБОР Г8 — Г8.5 Madrian & Shea 1999: ранняя версия
+
+**Какая именно версия цитируется — установлено точно.** Список литературы Thaler & Benartzi
+(препринт SMarT, `anderson.ucla.edu/.../smartjpe226.pdf`, curl HTTP 200, 555 179 байт,
+`pdftotext`, строки 1390–1392 извлечения), дословно:
+> «Madrian, Brigitte C., and Dennis Shea, 1999, The Power of Suggestion: **An Analysis of 401(k)
+> Participation and Saving Behavior**, Working Paper, University of Chicago.»
+Подзаголовок **другой**, чем у NBER w7682 и QJE 2001 («**Inertia in** 401(k) Participation and
+Savings Behavior»). Текст с числом там же, строки 334–336: «In one plan studied by Madrian and Shea
+(1999), participation rates for newly eligible workers increased from 49 percent to 86 percent.»
+
+**Сама версия 1999 г. — 🔴 НЕ ДОБЫТА. Замер каналов:**
+- OpenAlex, поиск по заголовку версии 1999 → **0 записей**. По общему заголовку — ровно три:
+  QJE 2001 (10.1162/003355301753265543), SSRN 2000 (10.2139/ssrn.223635), NBER 2000
+  (10.3386/w7682). Версии 1999 г. в индексе нет.
+- Semantic Scholar → HTTP 429 (лимит без ключа).
+- ResearchGate: запись с заголовком 1999 г. **существует** (publication/244298260), страница → 403.
+- BYU ScholarsArchive (facpub/9087): карточка открылась, но это **журнальная версия QJE 2001**,
+  не 1999; PDF (`viewcontent.cgi?article=9988&context=facpub`) → curl 403 (5 841 байт HTML),
+  `WebFetch` → 403. 🔴 Файл `/private/tmp/g8/ms_byu.pdf` — **не статья, а HTML-страница отказа**;
+  выводов на нём не строить.
+- QJE: Unpaywall `is_oa: false`, OA-локаций нет.
+- Wayback: CDX по `gsbwww.uchicago.edu` отвечает (снимки 1998–1999 есть), но адрес рабочего
+  доклада неизвестен, перебор не делался.
+
+**Отличаются ли числа — что можно сказать без текста 1999 г.** Прямой сверки нет. Косвенно
+(🟡 вывод, не факт): «49 %» у Thaler & Benartzi совпадает с участием при стаже **15–27 месяцев**
+в Table 5 рабочей версии w7682 (OLD 48,7 %, WINDOW 49,4 %), а «86 %» — с NEW при стаже 3–15 мес.
+(85,9 %). То есть либо версия 1999 г. сама сопоставляла когорты с разным стажем, либо Thaler &
+Benartzi взяли числа из разных строк. Сравнение при равном стаже, которое делают авторы в w7682, —
+**37,4 % → 85,9 %** (Д11.4.1) — остаётся единственным проверенным по первоисточнику.
+**Для FINPILOT вывод не меняется** в любом варианте: эффект получен на автоисполнении, которого
+у нас нет.
+
+---
+
+## ИТОГ ДОБОРА Г8
+
+| Пункт | Статус | Где раздел |
+|---|---|---|
+| Г8.1 Brown & Lahey | 🟢 добыт: WP целиком, реквизиты журнала, расчёт безубыточности по срокам **и по деньгам**; полный текст JMR 2015 закрыт (OA нет) | этот файл, «ДОБОР Г8 — Г8.1» |
+| Г8.2 50/30/20 | 🟢 добыт: полный текст книги (неофициальная копия, без пагинации) | `calibration_ground_truth_2026-09-10.md`, «ДОБОР Г8 — Г8.2» |
+| Г8.3а Hagger 2010 | ⛔ оригинал закрыт (OA-локаций ноль); d = 0,62 и 198 тестов подтверждены по полному тексту Hagger 2016, с. 547 | `behavioral_finance_field_2026-09-10.md`, «Г8.3.а» |
+| Г8.3б Hogarth & Karelaia 2007 | ⛔ журнал закрыт; WP UPF № 974 (июнь 2006) — признанная Unpaywall OA-версия той же статьи | там же, «Г8.3.б» |
+| Г8.3в Meyer 2015 | 🟢 полный текст (сайт журнала CTLJ) | там же, «Г8.3.в» |
+| Г8.4 «all rules and gating» | 🟢 закрыт ранее: первоисточник — блог Farhadi (Medium), научной ссылки нет; цитату снять, содержание — через Bottou / Sachdeva | этот файл, «ДОБОР Г8 — Г8.4» (отсылка на `causal_effect_measurement`) |
+| Г8.5 Madrian & Shea 1999 | ⛔ не добыт: рабочий доклад Чикагского университета 1999 г. не индексирован, запись RG закрыта; версия, на которую ссылаются, установлена точно | этот файл, «ДОБОР Г8 — Г8.5» |
+
+### 🔴 Продуктовый вопрос: нужен ли второй режим (snowball) рядом с Avalanche
+
+**Короткий ответ: основания давать snowball как равноправный второй РЕКОМЕНДУЕМЫЙ режим нет.
+Основание есть для snowball как пользовательского ПЕРЕОПРЕДЕЛЕНИЯ порядка с показом цены
+в рублях — и оно в основном этическое и продуктовое, а не доказательное.**
+
+Почему нет равноправного режима:
+1. **Выигрыш snowball в исполнении не измерен ни на одних реальных деньгах.** Единственная работа
+   с расчётом (Brown & Lahey) меряет скорость печати в лаборатории; +13 % к платежу сами авторы
+   называют «heroic». Полевого RCT нет (записано ранее, Г8 не изменил).
+2. **Без мотивационного прироста snowball не выигрывает никогда** — это следует из самой
+   арифметики: при равном платеже avalanche минимизирует проценты. Зона, где snowball
+   «окупается», существует только при допущении прироста платежа.
+3. **Люди сами редко выбирают восходящий порядок** (22 %, 16 из 70), а выигрывают от него
+   те, у кого выше самоконтроль (Brown & Lahey) — то есть не целевая аудитория snowball.
+4. **Цена в среднем мала, но хвост тяжёлый:** медиана 0,03–0,25 % против среднего 1,8–4,3 %
+   (Hamilton) — у большинства разницы почти нет, у меньшинства она существенная. Режим «для всех»
+   бьёт по тем, у кого разброс ставок велик.
+
+Когда snowball оправдан — условия, при которых его можно **разрешить** (не рекомендовать):
+- **(а) Разброс ставок между досрочно гасимыми долгами мал.** Ориентир из единственного расчёта:
+  до ~2 п.п. snowball не хуже даже по деньгам — **но только при допущении +13 % к платежу**;
+  без этого допущения ориентир — «цена отклонения в рублях пренебрежимо мала». Порог
+  по разнице ставок как константу в модель **не переносить**: у Brown & Lahey он производен
+  от $10 000/$10 000/$300 и лабораторных 13 %. Правильный критерий — **посчитанная для
+  пользователя разница переплаты avalanche против snowball** (у нас она вычисляется точно,
+  симуляция уже есть).
+- **(б) Пользователь выбирает сам и видит цену**: «ваш порядок обойдётся на N ₽ дороже за весь
+  срок». Это закрывает довод Meyer (не навязывать непроверенную практику всем) и довод этики
+  совета: отклонение — осознанное.
+- **(в) Приоритет по последствиям неплатежа важнее и ставки, и размера.** Это не snowball,
+  но это единственное, в чём первоисточник 50/30/20 (Warren & Warren Tyagi) расходится с каноном
+  содержательно: просрочка по жилью → авто/алименты → остальное. Для РФ-аналогов (просрочка
+  с риском взыскания залога) это стоит проверить на соответствие инвариантам модели — вне Г8.
+
+Что это меняет в записанном:
+- Сквозная формулировка «snowball окупается при разнице ставок до ~6 п.п.» (Д11.1.4) — **неполная**:
+  по деньгам безусловная зона только до **2 п.п.**, 3–6 п.п. — лишь если считать мотивационные
+  $69/мес «спасёнными», с 7 п.п. проигрывает всегда. И всё — при допущении +13 %.
+- Если продукт ссылается на 50/30/20, он ссылается на источник, прямо советующий **не сравнивать
+  ставки** («it just doesn't matter very much which debt you pay off first»). Это либо снимать
+  как ориентир, либо цитировать с оговоркой.
+- Тестировать snowball-переопределение против чистого avalanche на своих пользователях — этически
+  допустимо и даже предпочтительно по Meyer 2015; это единственный путь получить недостающее
+  полевое число.
+
+### Журнал вызовов добора Г8
+- Подагентов: **0** (всё сделал ведущий; запуск прерывался лимитом аккаунта на записи Г8.3,
+  продолжен после смены аккаунта — Г8.3 проверен, дописан целиком, потерь нет).
+- WebSearch: **6**. WebFetch: **4** (2 × 403, 1 сохранил PDF деки CFPB, 1 × 403 Colorado).
+  Bash — около 40 (curl, Crossref, OpenAlex, Unpaywall, Semantic Scholar, Wayback CDX, pdftotext).
+- Сработало: NBER напрямую; `WebFetch` с сохранением PDF на диск (CFPB, где curl 403); сайт журнала
+  CTLJ вместо институционального репозитория; dokumen.pub (книга); Crossref-абстракт для сверки
+  версий; полный текст цитирующей работы вместо закрытого оригинала (Hagger).
+- Не сработало: SAGE, APA, QJE (закрыты); scholar.law.colorado.edu (403 и антибот, r.jina.ai —
+  228 байт пустышки); BYU (403); HKU (500); ResearchGate (403); Semantic Scholar (429);
+  **Exa — MCP-сервер не подключён в этой сессии**.

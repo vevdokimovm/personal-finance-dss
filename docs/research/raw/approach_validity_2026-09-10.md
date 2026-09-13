@@ -2375,3 +2375,915 @@ Rt ≥ 0 и ПДН ≤ 0,40 — это *reservation levels* по Вежбицк�
 **Что делать первым:** проверка 6 (инвариантность к нормировке). Дешевле всех, опровергает
 больше всех, и её провал обесценивает пять раундов калибровки и согласие 78,63 %.
 
+
+---
+
+# ПЕРЕПРОВЕРКА Д3 С ПОИСКОМ — 11.09.2026
+
+Прогон с работающим WebSearch (лимит в `~/.claude/settings.json` поднят). Вахта-лид работает
+сама, подагентов по ходу не запускала. Файл только дописывается; каждый источник пишется сразу
+после добычи.
+
+## ПЕРЕПРОВЕРКА Д3 С ПОИСКОМ — П2 DeMiguel, Garlappi & Uppal (1/N)
+
+🔴 **Д.6.3 и Д.5.1 п. 3 («цитировать нельзя, текст закрыт») — ОПРОВЕРГНУТЫ в части чисел.
+Прав добор темы 40 (Д2), но с оговоркой о версии.**
+
+**Канал:** `curl -skL --http1.1` с браузерным UA →
+`https://users.nber.org/~confer/2006/si2006/ap/uppal.pdf` → **HTTP 200, 409 581 байт,
+`application/pdf`**, `pdfinfo`: 54 страницы. Разбор `pdftotext -layout`, постранично.
+Это **рабочая версия** («1/N», First draft: March 2005, This draft: June 2006, NBER Summer
+Institute 2006, AP 7/13/06; сноска: «This paper was earlier circulated under the title,
+"How Inefficient is the 1/N Asset-Allocation Strategy?"»). **Журнальная версия RFS 22(5)
+1915–1953 по-прежнему не открыта**, номера страниц ниже — листы PDF рабочей версии.
+
+Поиск (WebSearch «DeMiguel Garlappi Uppal Optimal Versus Naive Diversification pdf») дополнительно
+выдал: scribd.com/document/85831670 (журнальная версия RFS 2009 — зеркало, Scribd требует
+входа, не открывалось), SSRN `abstract_id=1376199` (карточка журнальной версии), EFMA 2013
+(`efmaefm.org/.../EFMA2013_0360_fullpaper.pdf` — **другая** работа, критика DGU).
+SSRN `papers.cfm?abstract_id=1376199` через `curl` → **HTTP 403, 5 782 байта, `<title>Just
+a moment...`** (Cloudflare). Вывод: SSRN теперь закрыт и на `papers.cfm`, не только на
+`Delivery.cfm`.
+
+**Три числа, дословно, по `pdftotext` (не по пересказу):**
+
+(а) Число моделей и наборов — абстракт, **л. 2**:
+> «Of the fourteen models of optimal portfolio choice that we evaluate across seven empirical
+> datasets, we find that none is consistently better than the 1/N rule in terms of Sharpe ratio,
+> certainty-equivalent return, or turnover.»
+
+(б) Перекрытие выигрыша ошибкой оценки — абстракт, **л. 2**:
+> «This finding indicates that, out of sample, the gain from optimal diversification is more
+> than offset by estimation error.»
+
+(в) Окно оценки — абстракт, **л. 2**:
+> «…for a portfolio with only 25 assets, the estimation window needed is more than 3,000 months,
+> and for a portfolio with 50 assets, it is more than 6,000 months, although in practice these
+> parameters are estimated using 120 months of data.»
+Введение, **л. 6** — формулировка другая: «is 3,000 months for a portfolio with only 25 assets,
+and more than 6,000 months for a portfolio with 50 assets». Симуляции, **л. 25** и выводы
+**л. 35** — снова «more than 3,000 … more than 6,000». **л. 28**: «…6,000 months for the case
+with 25 assets to outperform the 1/N policy, and when there are 50 risky assets even 6,000
+months of data is not enough» (это про другую, более сильную модель внутри симуляций).
+
+**Сверка с Д2 темы 40** (`optimization_solvers_2026-09-10_dobor_lit.md`, раздел D): совпадает
+побайтно по всем трём цитатам и по номерам листов (2, 6, 25). Д2 записал версию честно
+(«полный текст РАБОЧЕЙ версии, не журнальной»); ошибка — у Д.6.3 этого файла, который искал
+только журнальную версию и не видел препринт на NBER.
+
+**Совпадение с аннотацией журнальной версии:** WebSearch-сниппет аннотации RFS/SSRN 1376199
+даёт те же 14 / seven / «around 3000 months … about 6000 months» — сниппет, первоисточник
+журнала не открыт. Итог: числа 14 / 7 / 3 000 / 6 000 **цитировать можно** со ссылкой на
+рабочую версию 2006 и пометкой, что в журнальной версии аннотация говорит «around/about».
+Оговорка по существу (л. 25, 28): 3 000 и 6 000 — не константы, а результат калибровки
+к рынку США при конкретных коэффициентах Шарпа; при Sharpe 1/N = 0,08 — «more than 1,600»
+и «more than 3,200» (л. 25).
+
+## ПЕРЕПРОВЕРКА Д3 С ПОИСКОМ — П1 Dawes & Corrigan 1974 (ДОБЫТО, полный текст журнала)
+
+Dawes R. M., Corrigan B. «Linear models in decision making». *Psychological Bulletin* 81(2),
+February 1974, 95–106. **Новый источник, в первом доборе его не было.**
+Канал: WebSearch («Dawes Corrigan 1974 "Linear models in decision making" Psychological Bulletin
+pdf») → `https://gwern.net/doc/statistics/decision/1974-dawes.pdf` → `curl -skL --http1.1`
+с UA → **HTTP 200, 505 970 байт, `application/pdf`**, 12 страниц (скан журнала, OCR-слой).
+Разбор `pdftotext`. Страницы журнала = лист PDF + 94. Угаданные соседние пути у gwern
+(`1979-dawes`, `1975-einhorn`, `1976-wainer`, `1978-meehl`, `2000-grove`) → все **HTTP 404,
+165 667 байт HTML**.
+
+**Абстракт, с. 95, дословно:**
+> «A review of these contexts indicates that they have common structural characteristics:
+> (a) Each input variable has a conditionally monotone relationship with the output; (b) there
+> is error of measurement; and (c) deviations from optimal weighting do not make much practical
+> difference. These characteristics ensure the success of linear models. In fact linear models
+> are so appropriate in such contexts that random linear models (i.e., models whose weights are
+> randomly chosen except for sign) may perform quite well. […] In all four, random linear models
+> yield predictions that are superior to those of human judges.»
+
+**Табл. 1, с. 102 — корреляции предсказаний с критерием** (OCR снимает таблицу по столбцам;
+раскладка ниже восстановлена по порядку столбцов «judge / judge's model / random model /
+equal weighting / cross-validated regression / optimal linear»; 🟡 привязку чисел к строкам
+проверить глазами по скану, OCR таблицы ненадёжен):
+
+| Пример | Судья | Модель судьи | Случайные веса | **Равные веса** | Регрессия, кросс-вал. | Оптимальная (на обучающей) |
+|---|---|---|---|---|---|---|
+| Невроз vs психоз | .28 | .31 | .30 | **.34** | .46 | .46 |
+| GPA, Illinois | .33 | .50 | .51 | **.60** | .57 | .69 |
+| GPA, Oregon | .37 | .43 | .51 | **.60** | .57 | .69 |
+| Оценки факультета, Oregon | .19 | .25 | .39 | **.70** | — | .92 |
+| Yntema & Torgerson | .87 | 1.00 | — | … | … | … |
+
+🔴 Последняя строка OCR-ом собрана неполно — цитировать только первые четыре, и то с оговоркой.
+
+**Ключевое место для нашей темы, с. 102–103 дословно:**
+> «…equal weighting scheme had a higher correlation with the criterion than did the
+> cross-validated optimal weighting scheme. This anomalous result is explained by the fact that
+> the ratio of observations of variables was too low to obtain stable beta weights…»
+> «…linear models are robust not only in the three ways described earlier in this article, but
+> they are robust over deviations from optimal weighting as well. […] the solution to the problem
+> of obtaining optimal weights is one that — in terms of von Winterfeldt and Edwards — has a
+> "flat maximum." Weights that are near to optimal lead to almost the same output as do optimal
+> beta weights.»
+> «(But note that in all cases equal weighting is superior to the models based on judges'
+> behavior.)»
+
+**Условие соотношения «наблюдений к предикторам» — с. 104, дословно (пересказ Schmidt 1971
+и Marks 1966):**
+> «Schmidt found that in the presence of suppressor variables the ratio of observations to
+> predictors should be approximately 15 to 1 before optimally derived weights are superior to
+> unit weights in cross-validation and, in the absence of suppressors, this ratio should be
+> 25 to 1. In a similar study, Marks found that a ratio of approximately 20 to 1 was necessary.»
+
+**Вывод статьи, с. 105, дословно:**
+> «In short, given the fact that in many contexts equal weights yield predictions very highly
+> correlated with those obtained from optimal weights, equal weights may be superior. In contrast
+> (Meehl, personal communication, 1972), beta coefficients are extremely unstable and most
+> extrapolations are to samples from populations that differ somewhat from those on which the
+> betas are estimated.»
+> «The whole trick is to decide what variables to look at and then to know how to add.»
+
+**Что это значит для П1.** Условия ЕСТЬ, и они другие, чем у Гигеренцера: не «≤ 10 объектов
+на признак», а **«от 15–25 наблюдений на предиктор оптимальные веса начинают выигрывать»**
+(Schmidt по пересказу Dawes & Corrigan). Плюс три структурных условия успеха линейной модели
+вообще: условная монотонность каждого входа, ошибка измерения, **плоский максимум** — отклонение
+от оптимальных весов почти не меняет выход. 🔴 Всё это — задачи **предсказания наблюдаемого
+критерия** (GPA, диагноз, оценки), как и у Гигеренцера; вывод Д.1.4 («к прескриптивной SAW
+переносится только по аналогии») подтверждается и этим первоисточником.
+
+## ПЕРЕПРОВЕРКА Д3 С ПОИСКОМ — П1 Grove et al. 2000 (ДОБЫТО, полный текст журнала)
+
+Grove W. M., Zald D. H., Lebow B. S., Snitz B. E., Nelson C. «Clinical versus mechanical
+prediction: A meta-analysis». *Psychological Assessment* 12(1), 2000, 19–30.
+DOI 10.1037//1040-3590.12.1.19. **Новый источник, в первом доборе не пробовался.**
+Канал: WebSearch → `http://zaldlab.psy.vanderbilt.edu/resources/wmg00pa.pdf` (лаборатория
+второго автора) → `curl` → **HTTP 200, 1 096 631 байт, `application/pdf`**, 12 страниц, скан
+журнала. Разбор `pdftotext -layout`.
+
+**Абстракт, с. 19, дословно:**
+> «On average, mechanical-prediction techniques were about 10% more accurate than clinical
+> predictions. Depending on the specific analysis, mechanical prediction substantially
+> outperformed clinical prediction in 33%–47% of studies examined. Although clinical predictions
+> were often as accurate as mechanical predictions, in only a few studies (6%–16%) were they
+> substantially more accurate.»
+С. 20: «Of the 163 studies, 136 qualified for inclusion». С. 21: «only eight studies (6%)
+notably favor clinical prediction». С. 25: «in the entire set of 136 studies, no such factor
+produced a sizable influence on study outcomes».
+
+🔴 **Для П1 Grove — не аргумент «равные веса не хуже подогнанных».** Он сравнивает **механику
+вообще** (регрессия, актуарные таблицы, алгоритмы) с **клиническим суждением**, а не равные
+веса с оптимальными. Его место в теме — довод, что формализованная свёртка бьёт интуитивное
+экспертное решение, то есть аргумент **за** наличие у нас формального правила, и против
+«пусть решает человек/эксперт». Про наш выбор между откалиброванными и равными весами он
+не говорит ничего.
+
+## ПЕРЕПРОВЕРКА Д3 С ПОИСКОМ — П3 Netemeyer et al. 2018 (ЧАСТИЧНО: дословный абстракт; полный текст НЕ добыт)
+
+**Полный текст: не добыт. Канал из Д.6.5 («брать через `papers.cfm`») больше не рабочий.**
+- SSRN `https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3485990` через `curl -skL --http1.1`
+  с UA → **HTTP 403, 5 782 байта, `<title>Just a moment...`** (Cloudflare). То же для 1376199.
+- То же через `r.jina.ai` → **HTTP 200, 491 байт**: «Title: Just a moment… Performing security
+  verification» — пустышка.
+- OUP `academic.oup.com/jcr/article-pdf/45/1/68/29010715/ucx109.pdf` (адрес из выдачи
+  WebSearch) → **HTTP 403, 5 813 байт HTML**.
+- Wayback `web/2022id_/…Delivery.cfm/SSRN_ID3485990_code17371.pdf…` → **HTTP 404, 4 700 байт**;
+  CDX `papers.ssrn.com/sol3/Delivery.cfm*3485990*` → **HTTP 200, 0 байт** (снимков PDF нет).
+- Репозиторий UCP (Fernandes), `ciencia.ucp.pt/en/publications/how-am-i-doing-…` →
+  HTTP 200, 58 164 байта — карточка без файла (только DOI и PlumX).
+- ResearchGate 337543922 — в выдаче есть, но ResearchGate отдаёт Cloudflare и через `r.jina.ai`
+  (проверено на соседней записи: HTTP 200, 514 байт, «Security check required»).
+
+**Что добыто — абстракт SSRN-версии дословно.** Канал: Wayback
+`https://web.archive.org/web/2022id_/https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3485990`
+→ **HTTP 200, 71 509 байт**, `text/html` (карточка SSRN со встроенным абстрактом). Абстракт
+у S2 изъят издателем, а у SSRN — нет:
+> «Though perceived financial well-being is viewed as an important topic of consumer research,
+> the literature contains no accepted definition of this construct. […] perceived financial
+> well-being is conceptualized as two related, but separate constructs: 1) stress related to the
+> management of money today (current money management stress); and 2) a sense of security in
+> one's financial future (expected future financial security). We develop and validate measures
+> of these constructs (web appendix A) and then demonstrate their relationship to overall
+> well-being, controlling for other life domains and objective measures of the financial domain.
+> Our findings demonstrate that perceived financial well-being is a key predictor of overall
+> well-being and comparable in magnitude to the combined effect of other life domains (job
+> satisfaction, physical health assessment, and relationship support satisfaction). Further, the
+> relative importance of current money management stress to overall well-being varies by income
+> groups and that current money management stress and expected future financial security have
+> differing antecedents.»
+
+**Что это даёт разд. 2.2.** Дословно подтверждены: (1) два раздельных конструкта с их точными
+названиями; (2) **«the literature contains no accepted definition of this construct»** — это
+тот же вывод, что Д.5.1 п. 2 вывел из Aubrey et al. 2022, теперь из второго, независимого
+источника; (3) разные антецеденты у двух конструктов; (4) модели контролировали
+**объективные финансовые меры** — то есть субъективное благополучие несёт объяснительную
+силу сверх денег. Не добыто: списки антецедентов, коэффициенты, пункты шкал (web appendix A).
+Цитировать можно только абстракт.
+
+## ПЕРЕПРОВЕРКА Д3 С ПОИСКОМ — П6 Meehl 1978 (ДОБЫТО, полный текст)
+
+Meehl P. E. «Theoretical Risks and Tabular Asterisks: Sir Karl, Sir Ronald, and the Slow
+Progress of Soft Psychology». *JCCP* 46, 1978, 806–834.
+Канал: WebSearch («Meehl 1978 "Theoretical risks and tabular asterisks" pdf meehl.umn.edu»)
+→ `http://users.cla.umn.edu/~nwaller/prelim/meehtablularasterisks.pdf` (страница N. Waller,
+U. Minnesota) → `curl` → **HTTP 200, 831 343 байта, `application/pdf`**, 29 страниц,
+текстовый слой 153 863 байта. Это перенабор (метка «#113» из списка трудов Meehl), журнальные
+страницы указаны в шапке «1978, Vol. 46, 806-834»; ниже номер листа PDF и расчётная страница
+журнала (лист + 805), 🟡 расчётная — не сверена со сканом.
+
+Дословно, лист 12 (≈ с. 817):
+> «I believe that the almost universal reliance on merely refuting the null hypothesis as the
+> standard method for corroborating substantive theories in the soft areas is a terrible
+> mistake, is basically unsound, poor scientific strategy, and one of the worst things that ever
+> happened in the history of psychology.»
+> «A theory is corroborated to the extent that we have subjected it to such risky tests; the
+> more dangerous tests it has survived, the better corroborated it is.»
+
+Лист 14 (≈ с. 819):
+> «The situation in which A is merely conjoined to T in setting up our test of T makes it hard
+> for us social scientists to fulfill a Popperian falsifiability requirement—to state before the
+> fact what would count as a strong falsifier.»
+
+Лист 17 (≈ с. 822):
+> «Putting it crudely, if you have enough cases and your measures are not totally unreliable,
+> the null hypothesis will always be falsified, regardless of the truth of the substantive
+> theory.»
+
+Абстракт (лист 1, с. 806): «Multiple paths to estimating numerical point values ("consistency
+tests") are better, even if approximate with rough tolerances; and lacking this, ranges,
+orderings, second-order differences, curve peaks and valleys, and function forms should be used.»
+
+**Что это даёт теме.** Требование «объявить порог опровержения заранее» (разд. 5–6, табл.
+Д.5.4) теперь стоит на первоисточнике не только SR 11-7, но и Мила: «state before the fact what
+would count as a strong falsifier». И второе, прямо в нашу пользу: Мил предлагает вместо
+значимости **числовые предсказания с допусками** — наши пороги («совпадение > 90 %», «< 1 %
+переплаты») и есть такие «rough tolerances». 🟡 Лист 17 бьёт по любой нашей будущей проверке
+на больших синтетических выборках: при сотнях тысяч профилей «статистически значимое» различие
+будет всегда — порог обязан быть в единицах практической величины (рубли, месяцы, п. п.),
+а не p-value.
+
+## ПЕРЕПРОВЕРКА Д3 С ПОИСКОМ — П1 Einhorn & Hogarth 1975: оригинал НЕ добыт, добыт пересказ соавтора
+
+**Оригинал** (OBHP 13(2), 171–192, DOI 10.1016/0030-5073(75)90044-6) — **не добыт и сейчас**.
+Поиск (два запроса, в т.ч. `filetype:pdf`) полного текста не показал: только S2, PhilPapers,
+ScienceDirect (абстракт), PsycNET, LAMSADE-библиография. Путь gwern `1975-einhorn.pdf` → HTTP 404.
+**Новое против первого добора — абстракт журнала, сниппет WebSearch (первоисточник не открыт):**
+«The minimum correlation between the two types of composites is found to be an increasing function
+of the intercorrelation of the components and a decreasing function of the number of predictors,
+and the minimum is fairly high for most applied situations.»
+
+**Добыт взамен — пересказ одним из двух авторов.** Hogarth R. M. «On ignoring scientific
+evidence: The bumpy road to enlightenment». UPF Economics Working Paper 973, May 19, 2006.
+Канал: WebSearch («Einhorn Hogarth "unit weighting schemes for decision making" 1975
+filetype:pdf») → `https://econ-papers.upf.edu/papers/973.pdf` → `curl` → **HTTP 200, 226 084 байта,
+`application/pdf`**, 33 страницы. Благодарность в сноске — Dawes, Makridakis, Armstrong.
+
+Дословно, с. 17–18 WP:
+> «Dawes and Corrigan outlined four reasons for the success of their method: (1) in prediction,
+> having the appropriate variables in the equation may be more important than the precise form of
+> the function; (2) each predictor has a conditionally monotone relationship with the criterion;
+> (3) the presence of error of measurement; and (4) deviations from optimal weighting may not make
+> much practical difference. Subsequently, Einhorn and I examined the phenomenon analytically
+> (Einhorn & Hogarth, 1975). To do so, we first transformed the Dawes and Corrigan model by
+> assuming an equal weight model (i.e., all regression coefficients are given equal weight)
+> subject only to knowing the correct sign (zero-order correlation) of each variable. […] We then
+> went on to show the rather general conditions under which such equal- or unit-weighting models
+> correlate highly with so-called optimal weights calculated using least squares. Furthermore, we
+> indicated how predictions based on unit weights are not subject to shrinkage on cross-validation
+> and that conditions exist under which such simpler models would predict more accurately than
+> ordinary least squares.»
+> «In addition, Wainer (1976) […] also showed that least-squares regression weights could often be
+> replaced by equal weights with little or no loss in accuracy.»
+> «Moreover, to show real effects of differential sizes of coefficients, one should put estimated
+> models to predictive tests where equal weight models provide a baseline.»
+С. 16: «the smaller the ratio n/k the greater the shrinkage».
+С. 20: «the equal weighting model correlates perfectly with the arithmetic mean of the x variables
+(assuming that they have equal standard deviations)».
+
+**Что это даёт.** (1) Соавтор сам формулирует результат 1975 как **«conditions exist under which»**
+— равные веса выигрывают **при условиях**, а не всегда. Это совпадает с осторожным «Early
+attempts … indicated» у Гигеренцера (Д.1.3). (2) 🔴 Три числовых условия (R² ≤ .5; ≤ 10 объектов на
+признак; коррелированные признаки) у Хогарта **не названы**; первоисточник их не открыт. Они
+по-прежнему стоят только на пересказе Гигеренцера. (3) Хогарт прямо формулирует **методическое
+требование, совпадающее с нашей проверкой N5**: дифференцированные веса надо проверять против
+модели с равными весами как базовой линии. Это первоисточник под N5 лучше, чем аналогия
+с Гигеренцером. (4) Важное условие, которое у Гигеренцера не звучит: равные веса работают
+**при известном знаке** каждого признака (Einhorn & Hogarth по пересказу соавтора). У нас знаки
+критериев известны (переплата — хуже, резерв — лучше), так что это условие мы выполняем.
+(5) С. 20: равные веса корректно сравнимы только **при равных стандартных отклонениях**
+признаков — то есть смысл «равных весов» сам зависит от нормировки. Это прямая стыковка
+с Тофаллисом (Д.3.2): проверка N5 без канонизированной нормировки не определена.
+
+## ПЕРЕПРОВЕРКА Д3 С ПОИСКОМ — П4 Fleming & DeMets 1996: текст НЕ добыт; замена — сам Флеминг, NCBI Bookshelf
+
+**Оригинал — не добыт.** Поиск выдал прямую ссылку издателя
+`https://www.acpjournals.org/doi/pdf/10.7326/0003-4819-125-7-199610010-00011`:
+- `curl -skL --http1.1` с UA → **HTTP 403, 5 849 байт HTML**;
+- `r.jina.ai` → **HTTP 200, 519 байт**, «Just a moment… Performing security verification» — пустышка;
+- Wayback `web/2020id_/…` → **HTTP 404, 4 678 байт**.
+Авторских PDF, курсовых выкладок с текстом статьи в выдаче нет. Вывод Д.6.4 (абстракта нет
+в MEDLINE/EuropePMC) поиском не опровергнут.
+
+**Замена из открытого первоисточника, где Флеминг излагает тот же тезис сам.**
+IOM (Institute of Medicine) 2010, «Evaluation of Biomarkers and Surrogate Endpoints in Chronic
+Disease», прил. «Presentation by Thomas Fleming: Biomarkers and Surrogate Endpoints in Chronic
+Disease», NCBI Bookshelf `https://www.ncbi.nlm.nih.gov/books/NBK209571/` → `curl` → **HTTP 200,
+74 512 байт, HTML**. Это **конспект доклада составителями отчёта**, не текст Флеминга; прямые
+цитаты в кавычках — его слова.
+Дословно:
+> «Fleming's work, and in particular, his publication with David DeMets (Fleming and DeMets,
+> 1996), was influential to the committee and its recommendations.»
+> «The Prentice criteria provide guidance, he said: first, the potential surrogate needs to be
+> a correlate; second, the surrogate endpoint must fully capture the net effect of the
+> intervention on all mechanisms that influence the clinical outcome.»
+> «However, determination of the net effect of an intervention on a surrogate endpoint does not
+> exclude the possibility that the intervention produces off-target effects on the clinical
+> endpoint, he noted.»
+> «"From the clinical perspective, it is key to have a comprehensive understanding of the causal
+> pathways of the disease process, and of the off-target as well as the on-target effects of the
+> intervention," he said.»
+
+**Что это даёт разд. 2.4.** Аналогию «SAW-полезность = суррогат» можно поставить на этот источник
+с честной ссылкой (IOM 2010, конспект доклада Флеминга), а Fleming & DeMets 1996 оставить без
+цитат. Два условия переносятся к нам буквально: (1) суррогат должен коррелировать с исходом —
+у нас это не показано вовсе (разд. 2); (2) **суррогат должен улавливать ВЕСЬ чистый эффект
+вмешательства на исход** — наш SAW-балл заведомо не видит «off-target» эффектов рекомендации
+(стресс от агрессивного погашения, срыв плана, отказ от резерва). Корреляция суррогата с исходом
+**не достаточна** — это и есть главный тезис, ради которого разд. 2.4 ссылался на Fleming & DeMets.
+
+## ПЕРЕПРОВЕРКА Д3 С ПОИСКОМ — П5 Методрекомендации ЦБ № 3-МР от 16.06.2026 (ДОБЫТО, полный текст)
+
+🔴 **Д.6.6 («на cbr.ru файла нет») — ОПРОВЕРГНУТ.** Файл лежит на cbr.ru; его не было в выдаче
+внутреннего поиска ЦБ, но он привязан к пресс-релизу.
+Канал: WebSearch («Банк России методические рекомендации 3-МР 16.06.2026 искусственный интеллект»)
+→ пресс-релиз `https://www.cbr.ru/press/event/?id=32627` (`curl -sk --http1.1` с UA, **HTTP 200,
+31 377 байт**) → единственная файловая ссылка `/Crosscut/LawActs/File/12204` →
+**HTTP 200, 200 444 байта, `application/pdf`**, PDF 1.7, **34 страницы**, текстовый слой
+116 299 байт. Российский корневой сертификат не ставился. Вместо реквизитов в шапке файла
+плейсхолдеры `[REGDATESTAMP] № [REGNUMSTAMP]`; принадлежность к 3-МР подтверждается
+(1) привязкой к пресс-релизу ЦБ от той же даты и (2) дословным совпадением п. 1.1 и п. 2.5 с
+обзором КонсультантПлюс `consultant.ru/law/hotdocs/94506.html` (HTTP 200, 45 109 байт), где
+документ назван «(утв. Банком России 16.06.2026 N 3-МР)». garant.ru → **HTTP 403, 902 байта**;
+через `r.jina.ai` → HTTP 200, 368 байт, «Checking your browser» — пустышка.
+
+**Дословно, п. 1.1, стр. 1–2 (адресаты):** «…кредитных организаций, иностранных банков,
+осуществляющих деятельность на территории Российской Федерации через свои филиалы, некредитных
+финансовых организаций, лиц, оказывающих профессиональные услуги на финансовом рынке, субъектов
+национальной платежной системы (далее – организации)…» — в соответствии с Кодексом этики в сфере
+ИИ на финрынке (информационное письмо ЦБ от 09.07.2025 № ИН-016-13/91).
+
+**Дословно, п. 2.1.4, стр. 4 (риск, прямо касающийся нас)** — 🟡 OCR двухколоночной таблицы
+перемешал слова; восстановленный порядок: «Риски отсутствия достаточной объяснимости и (или)
+предсказуемости действий модели ИИ, обусловленные сложностью интерпретации результатов исполнения
+модели ИИ, приводящие к некорректным выводам и решениям модели ИИ.» Порядок слов сверить по
+PDF глазами.
+
+**Дословно, п. 2.5, стр. 5 (человек в контуре)** — текст восстановлен из того же перемешанного
+слоя и совпадает с обзором КонсультантПлюс слово в слово:
+> «В случае использования ИИ для выполнения операций в автоматическом режиме в критически важных
+> процессах (например, в платежных процессах, процессах учетных систем, которые отражают факты
+> основной деятельности организации), когда риски информационной безопасности ИИ оценены
+> организацией как высокие, организации рекомендуется реализовать валидацию результатов операций,
+> выполненных ИИ в автоматическом режиме, человеком с возможностью изменения таких результатов.»
+
+**Дословно, приложение, п. 1.5, стр. 31 (политика ИБ):**
+> «1.5. Достаточная объяснимость и (или) предсказуемость. Рекомендуется закрепить необходимость
+> применения механизмов интерпретации поведения модели ИИ в целях обеспечения достаточной
+> объяснимости и (или) предсказуемости действий модели ИИ (в релевантных случаях).»
+Там же, стр. 31: п. 3 «Минимальные персональные данные» — «использования минимальных
+персональных данных, на обработку которых … получено согласие субъекта персональных данных»;
+п. 4 «Безопасная разработка» со ссылкой на ГОСТ Р 71539-2024 (ИСО/МЭК 5338:2023) и
+ГОСТ Р 70889-2023 (ИСО/МЭК 8183:2023). Стр. 2: термины «объяснимость», «предсказуемость»,
+«надёжность» — в значениях национальной стратегии развития ИИ (Указ Президента).
+
+**Что меняется для разд. 3.6 и строки 6 табл. разд. 7.**
+1. 🔴 Разд. 3.6 пересказывал Хабр как «контролировать … **прозрачность и предсказуемость её
+   работы**» и «**валидацию результатов человеком с возможностью их изменения**» как общий
+   принцип. По тексту: (а) человек в контуре рекомендован **только** для операций ИИ
+   **в автоматическом режиме** в **критически важных процессах** (платежи, учётные системы)
+   **при высоких рисках ИБ** — это узкое условие, а не общий принцип; (б) слова «прозрачность»
+   в найденных местах нет — есть «достаточная объяснимость и (или) предсказуемость»,
+   **«в релевантных случаях»**. Формулировку разд. 3.6 и строки 6 разд. 7 надо перевести
+   на эти слова.
+2. Документ — про **информационную безопасность** ИИ, а не про валидацию качества моделей:
+   модели угроз (гл. 3, по методике ФСТЭК 05.02.2021), политика ИБ, поставщики и open source.
+   Как аналог SR 11-7 он **слабее**, чем выглядел по пересказу.
+3. Вывод 3.6 «нас не касается напрямую, пока мы не партнёр поднадзорного лица» — подтверждён
+   п. 1.1: FINPILOT ни к одной категории адресатов не относится.
+4. Наш принцип «пользователь редактирует распределение» формально **перекрывает** п. 2.5:
+   FINPILOT не выполняет операций в автоматическом режиме вообще — рекомендация без исполнения.
+
+## ПЕРЕПРОВЕРКА Д3 С ПОИСКОМ — П1 Dawes 1979 (ДОБЫТО, полный текст журнала)
+
+Dawes R. M. «The robust beauty of improper linear models in decision making». *American
+Psychologist* 34(7), July 1979, 571–582. **В первом доборе не пробовался вовсе** (Д.1.4:
+«реквизиты по списку литературы Гигеренцера; сам текст Дауэса не добывался»).
+Канал: WebSearch («"Dawes" "robust beauty of improper linear models" syllabus reading pdf
+571-582»; четыре предыдущих запроса полного текста не дали) →
+`https://www.cmu.edu/dietrich/sds/docs/dawes/the-robust-beauty-of-improper-linear-models-in-decision-making.pdf`
+(Dept. of Social and Decision Sciences, CMU — кафедра Дауэса) → `curl -skL --http1.1` с UA →
+**HTTP 200, 1 205 823 байта, `application/pdf`**, 12 страниц, текстовый слой 71 365 байт.
+Страница журнала = лист + 570 (колонтитулы «574 • JULY 1979 • AMERICAN PSYCHOLOGIST» совпадают).
+Попутно в выдаче: `scispace.com/pdf/the-robust-beauty-…-gxnq55pw2w.pdf` — не открывался.
+
+**Абстракт, с. 571:**
+> «Improper linear models are those in which the weights of the predictor variables are obtained
+> by some nonoptimal method; for example, they may be obtained on the basis of intuition, derived
+> from simulating a clinical judge's predictions, or set to be equal. This article presents
+> evidence that even such improper linear models are superior to clinical intuition when
+> predicting a numerical criterion from numerical predictors. In fact, unit (i.e., equal)
+> weighting is quite robust for making such predictions.»
+
+**Главное численное условие, с. 574, дословно** (в OCR «IS» = «15»):
+> «In multiple regression, for example, b weights are notoriously unstable; the ratio of
+> observations to predictors should be as high as 15 or 20 to 1 before b weights, which are the
+> optimal weights, do better on cross-validation than do simple unit weights. Schmidt (1971),
+> Goldberg (1972), and Claudy (1972) have demonstrated this need empirically through computer
+> simulation, and Einhorn and Hogarth (1975) and Srinivisan (Note 3) have attacked the problem
+> analytically. The general solution depends on a number of parameters such as the multiple
+> correlation in the population and the covariance pattern between predictor variables.»
+
+**Случай без измеримого критерия — прямо про нас, с. 574:**
+> «Another situation in which proper linear models cannot be used is that in which there are no
+> measurable criterion variables. We might, nevertheless, have some idea about what the important
+> predictor variables would be and the direction they would bear to the criterion if we were able
+> to measure the criterion.»
+
+**Табл. 1, с. 576 — корреляции с критерием** (OCR снял таблицу столбцами; 29 чисел разложены
+по 6 столбцам 5+5+5+5+4+5, пустая ячейка — кросс-валидация у Yntema & Torgerson):
+
+| Пример | Судья | Модель судьи | Случайные веса | **Равные веса** | **Регрессия, кросс-вал.** | Оптимальная |
+|---|---|---|---|---|---|---|
+| Невроз vs психоз (861 пациент, 11 шкал MMPI) | .28 | .31 | .30 | **.34** | **.46** | .46 |
+| GPA, Illinois (90 студентов, 10 признаков) | .33 | .50 | .51 | **.60** | **.57** | .69 |
+| GPA, Oregon (те же 90 и 10) | .37 | .43 | .51 | **.60** | **.57** | .69 |
+| Оценки факультета, Oregon (111 студентов) | .19 | .25 | .39 | **.48** | **.38** | .54 |
+| Yntema & Torgerson (эллипсы) | .84 | .89 | .84 | **.97** | — | .97 |
+
+🔴 **Поправка к моей же записи выше (Dawes & Corrigan 1974, табл. 1):** строка «Оценки факультета»
+там собрана OCR неверно (.70 и .92 — числа не из этой строки), строка Yntema & Torgerson —
+неполна. Правильные значения — эта таблица 1979 г. (тот же набор пяти исследований, Дауэс
+прямо ссылается: «(Dawes & Corrigan, 1974, p. 102)»). Первые три строки 1974 г. совпадают с 1979.
+
+С. 576, дословно: «On the average, these random linear models perform about as well as the
+paramorphic models of the judges […]. Equal-weighting models, presented in the fourth column, do
+even better. (There is a mathematical reason why equal-weighting models must outperform the
+average random model.)» Сноска 5: «Equal or random weighting of incomparable variables — for
+example, GRE score and GPA — without prior standardization would be nonsensical.»
+С. 577: «The solution to the problem of obtaining optimal weights is one that — in terms of von
+Winterfeldt and Edwards — has a "flat maximum." Weights that are near to optimal level produce
+almost the same output as do optimal beta weights.» И: «This result seems to hold generally as
+long as these intercorrelations are not negative; for example, the correlation between X + 2Y and
+2X + Y is .80 when X and Y are uncorrelated.» (в OCR «X + 27» — это «X + 2Y»).
+
+**🔴 Что таблица показывает против тезиса в сильной форме.** «Равные веса не хуже подогнанных»
+верно **не всегда даже в собственной таблице Дауэса**: в самом большом исследовании (861 пациент,
+11 предикторов, ≈ 78 наблюдений на предиктор) кросс-валидированная регрессия бьёт равные веса
+**.46 против .34**. В трёх малых выборках (90–111 объектов на 10 признаков, ≈ 9–11 на признак)
+равные веса выигрывают (.60 vs .57, .60 vs .57, .48 vs .38). Это ровно условие с. 574 —
+15–20 наблюдений на предиктор. Равные веса **всегда** бьют модель судьи и самого судью — это
+и есть устойчивая часть тезиса.
+
+## ПЕРЕПРОВЕРКА Д3 С ПОИСКОМ — П6 Mohammadi & Rezaei 2020 (ДОБЫТО, финальная журнальная версия, CC BY)
+
+Mohammadi M., Rezaei J. «Ensemble ranking: Aggregation of rankings produced by different
+multi-criteria decision-making methods». *Omega* 96 (2020) 102254. DOI 10.1016/j.omega.2020.102254.
+Канал: Unpaywall API (`api.unpaywall.org/v2/10.1016/j.omega.2020.102254`, HTTP 200, 3 652 байта)
+→ OA-локация `http://resolver.tudelft.nl/uuid:592fbf1f-5f2a-4437-9bf1-345ba3d7a6ba` → редирект на
+`repository.tudelft.nl/record/…` (HTTP 200, 28 391 байт) → ссылка на файл
+`https://repository.tudelft.nl/file/File_6a282e29-e6f3-4252-b1ce-67546c87ae0d` → **HTTP 200,
+770 588 байт, `application/pdf`**. Обложка TU Delft: «Document Version: Final published version».
+Статья под **CC BY 4.0** («This is an open access article under the CC BY license»). Страницы
+ниже — листы PDF (лист 1 — обложка репозитория).
+
+Дословно, лист 2 (Введение):
+> «One of the main controversial issues in this area is that different MCDM methods, even when
+> they use the same input, produce different and potentially conflicting rankings, which means that
+> finding an overall aggregated ranking of alternatives is of the essence. Some studies ignore the
+> existence of such a conflict [29], or use a simple ranking statistic, like averages [43], while yet
+> other methods attempt to reconcile the difference and work out a compromise [28,42].»
+Лист 3: «The MCDM methods may provide different rankings for the same problem because they use
+different mechanisms, making it hard to provide sufficient support for the ranking of one MCDM
+method compared to the others.»
+Метод: веса методов через half-quadratic минимизатор (оценщик Уэлша), плюс **consensus index**
+(«the extent to which all MCDM methods agree upon the final ranking», лист 5) и **trust level**.
+Примеры — оценка систем ontology alignment OAEI 2018; значения consensus index в примерах
+около 0,77–0,91 (листы 8–11; OCR обрезает десятичные — точные числа не выписываю).
+
+**Что это даёт Д.3.5 («метод определяет ответ больше, чем данные» — было «добыто частично»).**
+Тезис теперь стоит на дословной формулировке журнала: одни и те же входы — разные методы —
+разные, в том числе конфликтующие ранжирования. 🟡 Но Mohammadi & Rezaei это **постулируют
+со ссылками**, а не меряют на своей задаче как главный результат; как количественное доказательство
+«насколько сильно расходятся» статья не годится. Практический довод для нас: их **consensus
+index** — готовая метрика для нашей проверки 6 (инвариантность к нормировке) и N5 (равные
+веса): считать согласие топ-1/ранжирования между вариантами SAW, а не только долю совпадений.
+
+## ПЕРЕПРОВЕРКА Д3 С ПОИСКОМ — П6 Keeney & Raiffa 1976, preferential independence (оригинал НЕ добыт; вторичная выкладка)
+
+Монография (Wiley 1976; переиздание CUP 1993) — открытой копии поиск не показал (Google Books,
+ResearchGate-обзоры). **Взамен — учебная выкладка:** Panchal J. H., Purdue, «07: Multi-attribute
+Utility Theory», слайды курса Decision Making in Engineering Design
+(`engineering.purdue.edu/DELP/education/decision_making_slides/Module_07___Multi_attribute_Utility_Theory.pdf`,
+`curl` → **HTTP 200, 5 087 134 байта, PDF**, 67 слайдов). 🟡 Вторичный источник.
+
+Дословно, слайд 39:
+> «Definition (Preference Independence (PI)) A subset S of attributes is preferentially independent
+> of its complement S̄ if the preference order of the consequences involving only changes in levels
+> of S does not depend on the levels at which attributes in S̄ are held fixed.»
+Слайд 41 — для трёх атрибутов: если X utility-independent от {Y, Z}, а {X, Y} и {X, Z}
+preferentially independent от Z и Y соответственно, то u(x, y, z) — **мультилинейная** форма
+с членами k·k1·k2·u1·u2 и т. д.; аддитивная — частный случай (k = 0).
+Сниппет WebSearch (первоисточник не открыт): «An additive value function … if and only if the
+attributes are mutually preferentially independent (Keeney and Raiffa, 1976; Krantz et al., 1971)».
+
+**Что это даёт Д.3.4.** Определение теперь не «по памяти», а по учебной выкладке. Для нас условие
+читается так: предпочтение между двумя распределениями, различающимися только долей в долги и
+резерв, **не должно зависеть** от того, сколько уходит в цели. 🔴 У нас доли **связаны
+симплексом** (сумма = 100 %): изменить две доли при фиксированной третьей нельзя вовсе, так что
+условие в классической форме к долям неприменимо — оно применимо к **критериям** (переплата,
+срок закрытия, резерв в месяцах, ПДН). А для них взаимозависимость очевидна (Д.1.4, условие 3:
+«критерии коррелированы»). Проверка «независимы ли наши критерии по предпочтению» остаётся
+открытой и должна быть сформулирована на уровне критериев, не долей.
+
+## ПЕРЕПРОВЕРКА Д3 С ПОИСКОМ — П6 «A comparison between TOPSIS and SAW methods» (ДОБЫТО, журнальная версия, CC BY)
+
+Ciardiello F., Genovese A. «A comparison between TOPSIS and SAW methods». *Annals of Operations
+Research* 325 (2023) 967–994. DOI 10.1007/s10479-023-05339-w. **Авторы в первом доборе не были
+установлены** (стояло только название).
+Канал: WebSearch («"A comparison between TOPSIS and SAW" Annals of Operations Research 2023») →
+White Rose Research Online `https://eprints.whiterose.ac.uk/id/eprint/199927/1/s10479-023-05339-w.pdf`
+→ `curl` → **HTTP 200, 1 294 821 байт, `application/pdf`**, 29 листов (лист 1 — обложка
+репозитория, «Version: Published Version», CC BY). Страницы журнала = лист + 965.
+
+Абстракт, с. 967: «Results show that TOPSIS, when used in combination with a Manhattan distance,
+produces rankings which are extremely similar to the ones resulting from SAW. […] Experimental
+results confirm that rankings produced by TOPSIS methods are closer to SAW ones when similar formal
+properties are satisfied.»
+С. 968: «Also, it has been shown that TOPSIS methods suffers from the rank reversal phenomenon,
+which does not affect SAW approaches (García-Cascales & Lamata, 2012).»
+С. 987 (разд. 6): «TOPSIS methods suffer from rank reversals, while SAW does not.»
+С. 988: «TOPSIS with Manhattan distance inherits a nice property of SAW, i.e., the lack of rank
+reversals, in this random instance.» (добавление 26-й альтернативы к 25 — табл. 2; с Tchebychev —
+«many rank reversals appear», табл. 3).
+🔴 **Решающая оговорка, с. 974, дословно:** «Therefore our analysis does not take into account
+normalisation techniques occurring before the aggregation processes.» С. 979: «Nevertheless,
+similarities might change if different normalisation techniques for ratings and trade-off weights
+are chosen.»
+
+**🔴 Противоречие источников, которое НЕ сглаживаю:** Ciardiello & Genovese 2023 (через
+García-Cascales & Lamata 2012) — **«SAW не страдает rank reversal»**; Wang & Luo 2009 (через
+дословный пересказ Aires & Ferreira 2018, с. 343, Д.3.1) — **RR «occurs … in … SAW»**.
+Разрешение по добытому тексту, а не по догадке: Ciardiello & Genovese **явно исключили
+нормировку** из анализа (с. 974). Значит их «SAW без RR» — утверждение о **свёртке по
+ненормированным (или фиксированно нормированным) оценкам**. Как RR возникает у Wang & Luo, мы
+не видели (первоисточник не открыт), поэтому механизм «RR у SAW порождается нормировкой,
+зависящей от набора альтернатив (max, sum, vector)» — 🟡 **наша гипотеза**, согласная с
+Тофаллисом (Д.3.2), но не цитата. Для нас это одно и то же требование, что и проверка 6:
+если нормировка критерия в модели зависит от **набора** 66 альтернатив (деление на максимум по
+сетке, сумму по сетке), RR и нестабильность весов приходят через неё; если нормировка задана
+**внешними** константами (например, в рублях и месяцах относительно цели пользователя), SAW
+от RR типа #1 защищён по результату Ciardiello & Genovese.
+
+## ПЕРЕПРОВЕРКА Д3 С ПОИСКОМ — П6 «Jones & Tamiz 2009»: 🔴 ОШИБКА АВТОРСТВА в файле
+
+Crossref `https://api.crossref.org/works/10.1002/mcda.442` → **HTTP 200, 7 242 байта**:
+«Goal Programming: realistic targets for the near future» — авторы **Rafael Caballero, Trinidad
+Gómez, Francisco Ruiz**; *JMCDA* **16(3–4)**, **79–110**, май 2009. Выдача WebSearch
+(`onlinelibrary.wiley.com/doi/abs/10.1002/mcda.442`, «Caballero - 2009») это подтверждает.
+🔴 В файле (Д.4.4, стр. ~1701; таблица «не добыто» ~1795; Д.5.5 ~2311) статья приписана
+**Jones D., Tamiz M.** и указан выпуск **16(5–6)** — **оба реквизита неверны**. Jones и Tamiz —
+авторы других обзоров GP (напр., «A Review of Goal Programming», Springer ISOR 2016,
+DOI 10.1007/978-1-4939-3094-4_21; «Practical Goal Programming», Springer 2010). Полный текст
+Caballero et al. не добыт (Wiley 403 в первом доборе; открытых копий поиск не показал).
+На выводы Д.4.4 это не влияет: дефект GP там стоит на дословной цитате тома IIASA 1989, с. 21.
+
+## ПЕРЕПРОВЕРКА Д3 С ПОИСКОМ — П6 Roy 1991 и Wang & Luo 2009: НЕ добыты и с поиском
+
+**Roy B.** «The outranking approach and the foundations of ELECTRE methods». *Theory and Decision*
+31, 1991, **49–73**, DOI 10.1007/BF00134132 (страницы — из выдачи Springer/WebSearch).
+Попытки: WebSearch (карточки Springer, scispace, PhilPapers, S2 — полного текста нет);
+Springer `content/pdf/10.1007/BF00134132.pdf` → **HTTP 200, 3 038 байт HTML** (проверочная
+страница, как в первом доборе); Wayback `web/2019id_/…` → **HTTP 404, 4 739 байт**; Unpaywall →
+`is_oa: False`, OA-локаций нет; scispace карточка → **HTTP 202, 0 байт** (JS-челлендж).
+Статус не изменился: ELECTRE в Д.4.1 изложен по памяти.
+
+**Wang Y.-M., Luo Y.** «On rank reversal in decision analysis». *Mathematical and Computer
+Modelling* 49(5–6), 2009, **1221–1229**, DOI 10.1016/j.mcm.2008.06.019 (реквизиты — сниппет
+WebSearch). Попытки: WebSearch (ScienceDirect, ResearchGate «Request PDF»); Wayback
+`web/2015id_/…/pii/S0895717708002860/pdf` → **HTTP 404, 4 719 байт**. Вложение ResearchGate
+с García-Cascales & Lamata 2012 (другая работа, «On rank reversal and TOPSIS method», MCM 56
+(2012) 123–132) → **HTTP 403, 24 203 байта HTML**. Статус не изменился: известен только через
+пересказ Aires & Ferreira.
+
+## ПЕРЕПРОВЕРКА Д3 С ПОИСКОМ — П1 Wainer 1976: оригинал НЕ добыт; добыто свидетельство спора
+
+Wainer H. «Estimating coefficients in linear models: It don't make no nevermind». *Psychological
+Bulletin* 83, 1976, 213–217 (реквизиты — сниппеты WebSearch). Четыре запроса полного текста:
+S2, ResearchGate (Cloudflare), PsycNET, Springer-соседи. Сниппет выдачи упоминал архивную копию
+на `dionysus.psych.wisc.edu` — Wayback CDX по этому хосту (`mimetype:application/pdf`, 2 000
+записей, HTTP 200) файла Уэйнера **не содержит**. Путь gwern `1976-wainer.pdf` → HTTP 404.
+Блог John D. Cook (WebFetch) Уэйнера по существу не излагает — только комментарий читателя.
+Сниппет аннотации (первоисточник не открыт): «under very general circumstances coefficients in
+multiple regression models can be replaced with equal weights with almost no loss in accuracy on
+the original data sample».
+
+**Добыто — свидетельство, что тезис оспаривался в самой литературе.** de Rooij M. et al.
+«The Early Roots of Statistical Learning in the Psychometric Literature: A review and two new
+results», arXiv:1911.11463 (Leiden), `curl` → **HTTP 200, 334 561 байт, PDF**, 22 стр.
+Дословно, с. 5–6: «Equal weighting obviously does not give an unbiased estimate of the true
+regression equation, but because the data are not used for estimation the sample to sample
+variance is zero. This may be beneficial in some data analysis situations while harmful in others.
+This caused an argument between Wainer (1976) and Pruzek and Frederick (1978): Wainer claimed equal
+regression weights are beneficial in almost any circumstance, while Pruzek and Frederick claimed
+that only in very limited situations equal weighting is beneficial.»
+С. 5: Lawshe & Schucker (1959) — четыре схемы весов (сырые суммы, по SD, по 1/SD, МНК) — «found
+NO evidence in favor of one of them over the others».
+
+---
+
+# ИЗМЕНЕНИЯ ВЫВОДОВ ПОСЛЕ ПЕРЕПРОВЕРКИ С ПОИСКОМ (11.09.2026)
+
+Писала вахта-лид сама, подагентов не было. Опровержения помечены 🔴.
+
+## И.1 Держится ли на первоисточниках тезис «равные веса не хуже подогнанных»
+
+**Держится в ограниченной форме; в сильной форме («не хуже всегда») опровергнут собственной
+таблицей Дауэса.** Теперь в полном тексте есть три первоисточника блока (Dawes & Corrigan 1974,
+Dawes 1979, Grove et al. 2000) и пересказ соавтора Einhorn & Hogarth (Hogarth 2006).
+Что устойчиво:
+1. **Равные веса лучше модели эксперта и самого эксперта — во всех пяти исследованиях табл. 1
+   Dawes 1979, с. 576:** .34/.31, .60/.50, .60/.43, .48/.25, .97/.89 (равные / модель судьи).
+   Дословно: «in all cases equal weighting is superior to models based on judges' behavior» (с. 577).
+2. Отклонение от оптимальных весов почти не меняет результат: «flat maximum» (с. 577).
+Что условно:
+3. 🔴 **Против кросс-валидированной регрессии равные веса выигрывают только при малом числе
+   наблюдений на признак.** Порог по первоисточнику: **15–20:1** (Dawes 1979, с. 574), а у
+   Dawes & Corrigan 1974 (с. 104, пересказ Schmidt 1971) **15:1 с супрессорами и 25:1 без них,
+   20:1 по Marks**. В таблице самого Дауэса на выборке 861/11 (≈ 78:1) регрессия бьёт равные
+   веса, **.46 против .34**. В трёх выборках с ≈ 9–11 наблюдениями на признак выигрывают равные.
+4. Тезис требует известного знака каждого признака, условно-монотонной связи с критерием, ошибки
+   измерения, **стандартизации** (Dawes 1979, сноска 5: без неё равные веса «would be
+   nonsensical») и неотрицательных интеркорреляций (с. 577).
+5. Сам тезис оспаривался: Pruzek & Frederick 1978 против Уэйнера (de Rooij et al. 2019, с. 6).
+
+**Сверка с условиями Гигеренцера и Брайтона (ToCS 2009, с. 112).** Условие «≤ 10 объектов на
+признак» с первоисточниками **согласуется**: 10:1 лежит ниже их порога 15–25:1. Условие
+«коррелированы признаки» согласуется с Хогартом («rather general conditions … correlate highly»)
+и абстрактом Einhorn & Hogarth из сниппета: минимальная корреляция двух композитов растёт
+с интеркорреляцией. 🔴 **Условие «R² ≤ .5» не найдено ни в одном добытом первоисточнике**:
+оно по-прежнему держится только на пересказе Гигеренцера, а сам Einhorn & Hogarth 1975 не открыт.
+
+**🔴 Главная новая находка для нас — сильнее прежнего вывода Д.1.4.** Д.1.4 писал: «не известно,
+что экспертно назначенные веса бьют единичные». Добытый текст говорит больше, и в обратную
+сторону: **документировано, что веса, выведенные из поведения экспертов (paramorphic /
+bootstrapping), проигрывают равным весам везде, где их сравнивали** (Dawes 1979, табл. 1).
+Наши веса откалиброваны по согласию с экспертами (пять раундов, 78,63 %) — по конструкции это
+ближе всего именно к «модели судьи». Априорное ожидание для проверки N5, таким образом, —
+**не в пользу откалиброванных весов**. Оговорка та же, что в Д.1.4: у Дауэса это задачи
+предсказания наблюдаемого критерия. Но Дауэс сам разбирает случай «no measurable criterion
+variables» (с. 574) — наш случай — и рекомендует для него improper linear model с известными
+направлениями признаков. Это довод **за** формальную свёртку против интуиции и **ничего** —
+за экспертные веса против равных. Хогарт (2006, с. 18) формулирует методическое требование
+прямо: дифференцированные веса проверять против модели с равными весами как базовой линии.
+Это первоисточник под N5 вместо аналогии.
+
+Grove et al. 2000 (+10 % точности у механики, 136 исследований) — довод за формальное правило
+против экспертного суждения. **К вопросу «равные или подогнанные» он не относится.**
+
+## И.2 Что меняется для главной угрозы (нормировка, linearity trap) и для выхода (Вежбицкий)
+
+1. **Произвол нормировки усилился: теперь его подтверждают три независимые линии.** (а) Тофаллис —
+   смысл весов (Д.3.2). (б) **Дауэс, сноска 5, и Хогарт, с. 20:** сами «равные веса»
+   определены только относительно стандартизации, поэтому **проверка N5 без канонизированной
+   нормировки не определена**. Порядок проверок из Д.5.4 (сначала 6, потом 4) теперь не
+   предпочтение, а логическая зависимость. (в) **Rank reversal у SAW:** Ciardiello & Genovese 2023
+   («SAW does not») против Wang & Luo 2009 («occurs … in SAW»). Первые явно исключили нормировку
+   (с. 974). 🟡 Гипотеза, не цитата: RR у SAW приходит через нормировку, зависящую от набора
+   альтернатив. Практически: если нормировка критериев в модели считается по сетке 66 альтернатив
+   (max, sum), угрозу RR типа #1 из Д.5.2 п. 2 нельзя списывать как «структурно неприменимую» —
+   сетка фиксирована, но нормирующие константы могут зависеть от входа пользователя. Если
+   нормировка задана внешними константами, SAW от RR защищён.
+2. **Linearity trap — поиском не опровергнут и не ослаблен.** «Flat maximum» Дауэса (с. 577)
+   указывает в ту же сторону: если выход почти не чувствителен к весам, пять риск-профилей
+   рискуют давать одни и те же угловые решения. Значит, проверки 4 (N5) и 5 (доля угловых)
+   ожидаемо провалятся **вместе**, если провалятся.
+3. **Выход через reference point / aspiration-based (Вежбицкий) остаётся лучшим кандидатом;
+   поиск против него ничего не дал.** Два новых довода в его пользу: (а) цели пользователя
+   задают внешние нормирующие константы, и это прямо закрывает п. 1(в) и сноску 5 Дауэса;
+   (б) 3-МР, прил. п. 1.5 (стр. 31): «достаточная объяснимость и (или) предсказуемость» — формат
+   «цель достигнута на 80 %» ей отвечает. Готовая метрика для проверок 4 и 6 — consensus index
+   Mohammadi & Rezaei 2020.
+
+## И.3 🔴 Что добор Д3 (и я сам в этом прогоне) записал неверно
+
+1. 🔴 **Д.6.3 / Д.5.1 п. 3 — DeMiguel «цитировать нельзя».** Неверно: полный текст рабочей версии
+   NBER SI 2006 открыт, числа 14 / 7 / 3 000 / 6 000 сверены по `pdftotext` (л. 2, 6, 25). **Прав
+   Д2 темы 40.** Ограничение одно: цитировать как рабочую версию, не как вёрстку RFS.
+2. 🔴 **Д.6.6 — «файла 3-МР на cbr.ru нет».** Неверно: `cbr.ru/Crosscut/LawActs/File/12204`,
+   34 стр., привязан к пресс-релизу 32627.
+3. 🔴 **Разд. 3.6 и стр. 6 разд. 7 — пересказ 3-МР.** Человек в контуре рекомендован только
+   для **автоматических операций в критически важных процессах при высоком риске ИБ** (п. 2.5).
+   Слова «прозрачность» в найденных местах нет: там «достаточная объяснимость и (или)
+   предсказуемость … (в релевантных случаях)». Документ — про ИБ, не про валидацию качества.
+4. 🔴 **Авторство «Jones & Tamiz 2009» — неверно.** Правильно: Caballero, Gómez, Ruiz, *JMCDA*
+   16(3–4), 79–110 (Crossref).
+5. 🔴 **Д.6.5 / Д.5.5 — «канал Netemeyer: брать через `papers.cfm`».** На 11.09.2026 `papers.cfm`
+   тоже за Cloudflare (403). Абстракт взят через Wayback, полный текст не добыт.
+6. 🔴 **Д.5.5 — Meehl 1978 «не добыт».** Добыт (UMN, 29 стр.).
+7. 🔴 **Моя собственная запись в этом прогоне, раздел Dawes & Corrigan 1974:** строки таблицы 1
+   «оценки факультета» и Yntema & Torgerson собраны OCR неверно. Правильные значения — в разделе
+   Dawes 1979 (исправлено там же).
+8. 🔴 **Моя собственная запись в этом прогоне, раздел Keeney & Raiffa:** фраза «для критериев
+   взаимозависимость очевидна (Д.1.4, условие 3: „критерии коррелированы“)» **смешивает два
+   разных понятия**. Preferential independence — свойство **предпочтений**, а не статистическая
+   некоррелированность. Коррелированные критерии могут быть независимыми по предпочтению.
+   Вопрос о preferential independence наших критериев остаётся **открытым**, аргументом «они
+   коррелированы» он не решается.
+
+## И.4 Что подтвердилось
+
+- Д.1.3: у Гигеренцера — пересказ Einhorn & Hogarth с оговоркой «early attempts»; соавтор сам
+  пишет «conditions exist under which» (Hogarth 2006, с. 18).
+- Д.1.4: перенос на прескриптивную SAW — аналогия; все добытые первоисточники блока — задачи
+  предсказания.
+- Д.5.1 п. 2: у FWB нет принятого определения — теперь и дословно у Netemeyer et al. 2018 («the
+  literature contains no accepted definition of this construct»).
+- Д.6.4: у Fleming & DeMets 1996 открытого текста нет. Замена для разд. 2.4 найдена: IOM 2010,
+  конспект доклада Флеминга (NBK209571), с критериями Прентиса и «off-target effects».
+- Фальсифицируемость (разд. 5–6): теперь и на Meehl 1978 («state before the fact what would count
+  as a strong falsifier»), плюс предостережение: пороги задавать в практических единицах, не
+  через p-value.
+
+## И.5 Метод и замеры перепроверки
+
+- Классификация: breadth-first по списку источников П1–П6, лид работал сам, **подагентов 0**
+  (потолок два, не понадобились). **WebSearch — 28 вызовов**, отказа по бюджету не было.
+  **WebFetch — 1**. Остальное — `curl -skL --http1.1` с браузерным UA, `r.jina.ai`, Wayback
+  (`id_` и CDX), Unpaywall и Crossref API, `pdftotext`.
+- **Что дал поиск против первого добора** (первый добор этих адресов не видел):
+  gwern.net (Dawes & Corrigan 1974); CMU SDS (Dawes 1979); zaldlab Vanderbilt (Grove 2000);
+  users.cla.umn.edu/~nwaller (Meehl 1978); econ-papers.upf.edu (Hogarth 2006); NBER SI 2006
+  (DeMiguel, адрес был у Д2 темы 40, но не у Д.6.3); пресс-релиз cbr.ru → File/12204 (3-МР);
+  consultant.ru (сверка 3-МР); White Rose (Ciardiello & Genovese); NCBI Bookshelf NBK209571
+  (Флеминг); arXiv 1911.11463 (спор Уэйнера). TU Delft (Mohammadi & Rezaei) взят **без поиска**,
+  по OA-локации Unpaywall, которую первый добор не успел попробовать.
+- **Что не открылось и почему:** SSRN (`papers.cfm` и `Delivery.cfm`) — Cloudflare 403, в том
+  числе через `r.jina.ai` (пустышка 491 байт); ResearchGate — Cloudflare, в том числе через
+  `r.jina.ai` (514 байт) и на вложениях (403, 24 203 байта); acpjournals — 403, `r.jina.ai`
+  пустышка 519 байт, Wayback 404; OUP article-pdf — 403; garant.ru — 403, `r.jina.ai` 368 байт;
+  Springer `content/pdf` — 200 + 3 038 байт HTML; meehl.umn.edu — 403; Semantic Scholar batch
+  API — 429; Wayback availability API — 429.
+
+---
+
+# ДОБОР Г4 (11.09.2026) — MCDM: выбор метода под задачу, первоисточник
+
+## ДОБОР Г4 — «Generalised framework for multi-criteria method selection»: 🔴 АВТОРЫ И ГОД В НАШЕЙ ЗАПИСИ ОШИБОЧНЫ
+
+### Реквизиты — проверены по Crossref и по титулу самого PDF
+
+В очереди пробелов работа записана как «**Cinelli et al.**, "Generalised framework for
+multi-criteria method selection", **Omega 2018**». Обе части неточны.
+
+**Правильно (Crossref `query.bibliographic`, HTTP 200, и титул препринта):**
+> **Wątróbski J., Jankowski J., Ziemba P., Karczmarczyk A., Zioło M. «Generalised framework
+> for multi-criteria method selection». Omega, том 86, страницы 107–124, июль 2019.
+> DOI 10.1016/j.omega.2018.07.004.**
+
+Аффилиации по титулу PDF: Wątróbski, Ziemba, Zioło — Faculty of Economics and Management,
+University of Szczecin, Mickiewicza 64, 71-101 Szczecin, Poland; Jankowski, Karczmarczyk —
+Faculty of Computer Science and Information Systems, West Pomeranian University of Technology,
+Żołnierska 49, 71-210 Szczecin, Poland.
+
+🔴 **Фамилии Cinelli среди авторов НЕТ.** Год: статья принята 12 июля 2018 (штамп в PDF:
+«Received 10 September 2017, Accepted 12 July 2018, Available online xxx»,
+`[m5G;August 3, 2018;19:32]`), но выпуск журнала — **86 (2019), с. 107–124**. Ссылка «Omega
+2018» допустима только как год онлайн-публикации; полная ссылка — 2019, том 86.
+
+**Есть парная публикация данных** (тоже не Cinelli): Wątróbski, Jankowski, Ziemba,
+Karczmarczyk, Zioło. «Generalised framework for multi-criteria method selection: Rule set
+database and exemplary decision support system implementation blueprints». **Data in Brief 22
+(февраль 2019), 639–642, DOI 10.1016/j.dib.2018.12.015.** 🔴 Это прямой источник **базы
+правил** — если рамку применять, брать её оттуда, а не переписывать из статьи.
+
+**Канал добычи:** Unpaywall `10.1016/j.omega.2018.07.004` — HTTP 200, `is_oa: True`,
+**`oa_status: "hybrid"`**, две локации: издатель ScienceDirect и репозиторий
+`https://arxiv.org/pdf/1810.11078`. Взят arXiv: `curl -sk --http1.1` —
+**HTTP 200, 2 518 978 байт, `application/pdf`**; `pdftotext -layout` → 275 505 байт.
+(Первая попытка с `-m 60` дала обрыв на 2 179 072 байтах и битый PDF — `pdftotext` ругался
+«Invalid XRef entry 0 / Top-level pages object is wrong type (null)». 🔴 **Замер: частично
+скачанный PDF выглядит как файл и имеет HTTP 200 — проверять `pdftotext` на ошибки, а не
+только код ответа.** Повтор с `-m 240` дал полный файл.)
+
+### Что рамка делает (аннотация, дословно)
+
+> «Multi-Criteria Decision Analysis (MCDA) methods are widely used in various fields and
+> disciplines. While most of the research has been focused on the development and improvement
+> of new MCDA methods, **relatively limited attention has been paid to their appropriate
+> selection for the given decision problem. Their improper application decreases the quality of
+> recommendations, as different MCDA methods deliver inconsistent results.** The current paper
+> presents a methodological and practical framework for selecting suitable MCDA methods for a
+> particular decision situation. **A set of 56 available MCDA methods was analysed** and, based
+> on that, a hierarchical set of methods' characteristics and the rule base were obtained…
+> The proposed framework was implemented within a web platform available for public use at
+> **www.mcda.it**.»
+
+**Масштаб базы правил (§4, дословно):** «As a result, the original set of **450 thousand rules**
+was reduced to **4,536 rules**. Furthermore, after the removal of the rules returning 0 methods,
+a **final set of 656 rules** was obtained.»
+
+### 🔴 ЧТО РАМКА ГОВОРИТ ПРО НАШ СЛУЧАЙ — прямые находки
+
+**1. SAW в их классификации — Table 1, строка «Simple Additive Weighting (SAW)», дословные
+значения признаков:** доступные бинарные отношения **I = 1, P = 1** (безразличие и
+предпочтение; Q = 0, R = 0, S = 0 — то есть **нет слабого предпочтения, несравнимости и
+outranking**); «Linear compensation effect»: **No = 0, Total = 1, Partial = 0** — то есть
+**ПОЛНАЯ линейная компенсация**; «Type of aggregation»: **Single criterion = 1**, Outranking =
+0, Mixed = 0; «Type of preferential information»: **Deterministic = 1, Cardinal = 1**,
+Non-deterministic = 0, Ordinal = 0, Fuzzy = 0.
+
+🔴 **Это ровно наш случай и подтверждает выбор:** у нас детерминированные кардинальные оценки
+критериев, веса от экспертов числом, полная компенсация между критериями (плохое по одному
+критерию можно окупить хорошим по другому — именно это и делает взвешенная сумма), дискретное
+множество из 66 альтернатив, задача типа γ (ranking). **Строка SAW в Table 1 совпадает с
+профилем нашей задачи по всем пяти группам признаков.** Оговорка честности: это сверка по
+таблице признаков, а не прогон их веб-инструмента (www.mcda.it в этом доборе не запускался).
+
+**2. Описание SAW в приложении статьи (дословно):** «[evaluations] with regard to individual
+criteria should be **proportionally normalized to the highest evaluation** regarding each of the
+criteria. Preference aggregation comes down to determining a **product of weights of a criterion
+and the evaluation of a variant regarding this criterion. Next, all such products for a given
+variant are added up.**» 🔴 Обратить внимание: у них нормировка — **деление на максимум по
+критерию**, а не min-max. Если у нас min-max — это отклонение от их канонического SAW, и его
+надо назвать явно.
+
+**3. 🔴 Место SAW в иерархии методов — дословно (§4):**
+> «The **SAW method** … **is the simplest case of the MAVT method, where the additive value
+> function is normalized to the [0,1] interval.** … It can be, therefore, concluded that
+> **the MAVT, SAW, SMART and UTA methods are special cases of the MAUT method.**»
+
+И там же про соседей: «The MAVT method is basically a simplification of the MAUT method, with
+the only significant difference being the fact that during the aggregation MAVT uses a **value
+function**, and MAUT — a **utility function**. The value function, in contrast to the utility
+function, **does not take into account the risk (probability)**.»
+
+🔴 **Это важное следствие для нашей архитектуры.** SAW — частный случай MAVT, а **MAVT (в
+отличие от MAUT) не учитывает риск/вероятность**. У нас риск живёт ОТДЕЛЬНО — в блоке
+SES + Монте-Карло, — и это методологически корректное разделение, а не пробел: ранжируем
+детерминированной ценностной функцией, а неопределённость оцениваем отдельным прогоном.
+Если бы мы захотели загнать риск ВНУТРЬ свёртки, правильный ход — переход от SAW/MAVT к MAUT,
+а не подкрутка весов SAW.
+
+**4. Правило R14 — почему восемь методов дают почти одно и то же (дословно):** «Based on this
+rule, **eight methods are indicated as appropriate** to solve a problem of a specific character:
+**EVAMIX, MAUT, MAVT, SAW, SMART, TOPSIS, UTA, VIKOR.** The high number of methods in this rule
+results from the **great similarity of the majority of the methods included in it.**»
+Дальше авторы делят их на три подмножества похожих. 🔴 **Практический вывод: спор "SAW или
+TOPSIS" для нашего профиля задачи — во многом ложный**, обе попадают в одно правило R14;
+по этой рамке выбор между ними не детерминирован характером задачи.
+
+**5. Почему вообще выбор метода не безразличен (§2.2, дословно):**
+> «**The selection of a proper MCDA method for a given decision situation is salient, since
+> various methods can yield different results for the same problem.** The difference in results
+> when applying various calculating procedures can be influenced by the following factors:
+> **(a) various techniques use weights differently in their calculations; (b) algorithms differ
+> in their approach to selecting the "best" solution; (c) many algorithms attempt to scale the
+> objectives, which affects the weights already chosen; (d) some algorithms introduce additional
+> parameters affecting the final recommendations.**»
+
+🔴 Пункт (c) бьёт прямо в нас: **нормировка критериев меняет фактический вес, уже выбранный
+экспертами.** То есть наши откалиброванные веса неотделимы от конкретной схемы нормировки;
+менять нормировку без перекалибровки весов — значит молча изменить модель. Это проверяемое
+утверждение для наших тестов.
+
+**6. Диагноз практики, который стоит признать про себя (§2.2, дословно):**
+> «Decision-makers are often unable to fully justify their choice of the method which was
+> applied to solve their decision situation. The selection of a multi-criteria method is
+> usually carried out [on the basis of the] software, which they are familiar with. On this
+> account, **it is not an MCDA method that is selected for a decision problem, but the decision
+> problem is adjusted to a chosen multi-criteria method.**»
+
+**7. Стадии Роя, на которые опирается рамка (§2.1, дословно):** «According to Roy, there are
+four stages in the decision-making process: (I) defining an object of the decision and the set
+of potential decision variants A as well as the determination of the reference problematics
+on A; (II) analysing consequences and developing the consistent set of criteria C;
+(III) modelling comprehensive preferences and operationally aggregating performances;
+(IV) investigating and developing the recommendation…» и четыре «проблематики» Роя:
+«**α - selection, β - sorting, γ - ranking, δ - description**». Наша задача — **γ (ranking)**
+плюс α (выбор одной рекомендуемой альтернативы из ранжированного списка).
+
+**8. Честная оценка предшественников, показывающая планку точности (§2.2, дословно):**
+«The IDEA approach achieves an accuracy of **63–73%**, depending on the matched MCDA method.»
+То есть даже формальные рамки выбора метода ошибаются в трети случаев — на их рекомендацию
+нельзя ссылаться как на доказательство правильности нашего выбора, только как на
+подтверждающий аргумент.
+
+**9. Ограничение применимости самих рекомендаций (§2.2, дословно):** «The guidelines for the
+selection of the MCDA method may be **redundant for some classes of decision problems**.
+The degree of criteria compensation is essential for the problems in the field of
+sustainability, but for other classes of problems, such a guideline is unnecessary.»
+
+### Ранняя цитата, которую стоит держать под рукой (§2.2, дословно, цитата авторов из [18])
+
+> «the great diversity of MCDA procedures may be seen as a strong point, it can also be a
+> weakness. **Up to now, there has been no possibility of deciding whether one method makes
+> more sense than another in a specific problem situation.** A systematic axiomatic analysis of
+> decision procedures and algorithms is yet to be carried out.»
+

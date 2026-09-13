@@ -1433,3 +1433,1189 @@ US8412622B2 (повторно, полный список 36 claims).
 индикатора Banco de España) и один блока А (формула CA3162417C) не закрыты по бюджету,
 а не по недоступности — все каналы к ним рабочие. Разумно вынести отдельной короткой темой,
 а не догонять внутри темы 20.
+
+---
+
+## ДОБОР Г3 — Г3.1: семья Intuit «Customized credit card debt reduction plans» (2026-09-11)
+
+Канал: `curl -sk --http1.1` с браузерным UA → `https://patents.google.com/patent/<номер>/en`, разбор HTML
+(itemprop `claims`, `docdbFamily`, `countryStatus`, `legalEvents`). Сырые HTML — `/private/tmp/g3/*.html`.
+
+| Документ | HTTP | Байт | Статус по Google Patents (legalStatusIfi) |
+|---|---|---|---|
+| US11544780B2 | 200 | 340 650 | **Active**, выдан 2023-01-03, ожидаемое истечение 2040-07-23 |
+| CA3162417C | 200 | 170 576 | **Active**, выдан 2025-03-25, ожидаемое истечение 2041-05-24; пошлина за 4-й год уплачена 2025-05-16 |
+| CA3162417A | 404 | 1 449 | такой страницы нет; в семье есть **CA3162417A1** (публикация заявки 2022-01-27) |
+| EP4049226A1 | 200 | 263 609 | **Withdrawn** — «Application deemed to be withdrawn», effective 2022-12-13 (запись 2023-05-24); патент НЕ выдан |
+| AU2021311376A1 | 200 | 156 608 | **Abandoned** — «MK5 Application lapsed section 142(2)(e) — patent request and compl. specification not accepted» (2024-06-13) |
+| WO2022020000A1 | 200 | 267 494 | **Ceased** (PCT-стадия завершена, 2023-01-23) |
+
+**Библиография US11544780B2:** заявка US16/937,400, подача и приоритет 2020-07-23; публикация заявки
+US20220027983A1 (2022-01-27); выдача 2023-01-03. Правообладатель — Intuit Inc. Изобретатели — Daniel Ben David,
+Yehezkel Shraga Resheff, Yair Horesh, Nirmala Ranganathan. Экспертиза: FINAL REJECTION 2022-03-03 → ответ
+2022-05-06 → Advisory action 2022-06-01 → Notice of Allowance 2022-08-31 → PATENTED CASE 2022-12-14.
+**CA3162417C:** подача 2021-05-24 (нацфаза PCT/US2021/033871), приоритет 2020-07-23, запрос экспертизы 2022-05-19,
+выдача 2025-03-25.
+
+### Семья (DOCDB, блок «Family» Google Patents — одинаков на всех пяти страницах)
+
+CA3162417A1 · CA3162417C · EP4049226A1 · US20220027983A1 · US11544780B2 · AU2021311376A1 · WO2022020000A1.
+Страны: **US, CA, EP, AU, WO. Российского (RU) и евразийского (EA) члена нет.**
+
+Проверка тремя путями:
+1. DOCDB-семья Google Patents (выше) — RU/EA нет.
+2. Правовые события WO2022020000A1 (INPADOC, как их показывает Google Patents), дословно:
+   «ENP Entry into the national phase … CA» (2022-05-19); «… EP … Effective date: 20220523» (2022-05-27);
+   «… AU … 20210524» (2022-06-09); «NENP Non-entry into the national phase Ref country code: DE» (2023-02-24).
+   Вход в нацфазу RU не зарегистрирован; 31-месячный срок для RU от приоритета 2020-07-23 истёк 2023-02-23.
+3. Обратный поиск в RU-массиве: `POST searchplatform.rospatent.gov.ru/search`, `ru_since_1994`,
+   q = `WO2022020000 OR "2022/020000" OR "US2021/033871" OR "PCT/US2021/033871"` → HTTP 200, 181 байт, **total 0**.
+   Ранее (тема 30, §4б) `"Интьюит" OR "ИНТУИТ ИНК" OR "Intuit Inc"` → 1 (Mastercard, упоминание).
+   Patentscope (`detail.jsf?docId=WO2022020000&tab=NATIONALPHASE`) → HTTP 200, 41 400 байт, но это оболочка
+   без карточки (docId в Patentscope не равен номеру публикации) — канал не дал данных, вывод на нём не строится.
+
+**Итог по действию в РФ:** ни одного члена семьи с действием на территории РФ; EP-ветка отозвана до выдачи
+(и EP-патент в РФ не действует в любом случае); действуют только **US11544780B2** и **CA3162417C**.
+
+### Формула — независимые пункты ДОСЛОВНО
+
+**US11544780B2, п. 1** (независимые: 1 — способ, 9 — система с тем же набором операций):
+> «1. A method performed by one or more processors of a computer-based debt reduction system and comprising: determining a set of financial attributes and a demographic profile of each of a plurality of consumers, each set of financial attributes indicative of credit card debt associated with a respective consumer of the plurality of consumers; identifying a number of the consumers who successfully repaid credit card debt based at least in part on their respective sets of financial attributes; determining a plurality of debt reduction techniques used by the identified consumers to repay their respective credit card debts; identifying correlations, using a correlation engine including at least one classifier, between at least one of financial attributes of a user and the sets of financial attributes or a demographic profile of the user and the demographic profiles; training a machine learning model, using the correlations, to predict, for each of the debt reduction techniques, a likelihood of the user repaying the credit card debt using the debt reduction technique; predicting, using the trained machine learning model, a likelihood, for each of the debt reduction techniques, that, given the user's financial attributes and demographic profile, the user will successfully repay the credit card debt using the debt reduction technique; identifying, based on the predicted likelihoods, the one of the debt reduction techniques that, if used by the user, is most likely to result in the user successfully repaying the credit card debt; retrieving feedback data representative of whether the user is successfully repaying the credit card debt using the identified debt reduction technique; and retraining the trained machine learning model, using the feedback data, to more accurately predict a likelihood that a given debt reduction technique will result in a given user successfully repaying credit card debt.»
+
+**US11544780B2, п. 9** — «A system comprising: one or more processors; a machine learning model communicatively coupled with the one or more processors; a correlation engine including at least one classifier; and a memory … storing instructions that … cause the system to perform operations including:» — далее операции **слово в слово как в п. 1**.
+
+**CA3162417C, п. 1 и п. 9** — тот же текст с ОДНИМ отличием в независимых пунктах: в операции корреляции
+«between at least one of financial attributes of a user and the sets of financial attributes **and** a demographic
+profile of the user and the demographic profiles» — у US стоит **«or»**. То есть канадская формула **уже**:
+требует корреляции И по финансовым атрибутам, И по демографическому профилю. (В зависимых пп. 2, 3, 8, 10, 11
+канадская версия тоже заменяет перечисление «or» на «and».)
+
+**Где avalanche/snowball.** 🔴 **В формуле их НЕТ ни в US, ни в CA** (ни в одном из 20 пунктов). Слова стоят
+только в описании: «the debt reduction plans can include any one or more of an avalanche technique (which calls
+for paying down credit card debt having the highest APR first), a snowball technique (which calls for paying down
+credit card debt having the lowest outstanding balances first), and a fireball technique (which may be a hybrid of
+the avalanche and snowball techniques)». Прежняя запись (строка 1281 этого файла и Г3.1 очереди: «где
+avalanche/snowball в формуле») — **неверна**: они в описании как примеры «debt reduction techniques».
+Зависимый п. 19 — предпочтения пользователя (платить минимум/не более максимума в месяц/в заданный срок)
+и взвешивание предсказанных вероятностей по ним.
+
+### Сравнение по признакам с методом FINPILOT (признаки — по §5 `fips_patent_clearance_2026-09-10.md`)
+
+| Признак независимого пункта (US п. 1 / CA п. 1) | У FINPILOT |
+|---|---|
+| (a) финансовые атрибуты и демографический профиль **множества других потребителей** с кредитно-карточным долгом | **нет** — работаем с данными одного домохозяйства, популяции не собираем |
+| (b) выявление потребителей, **успешно погасивших** долг | **нет** |
+| (c) определение техник погашения, которыми они пользовались | **нет** (техника у нас одна — Avalanche, задана методом, а не выведена из чужой истории) |
+| (d) корреляции через correlation engine **с классификатором** | **нет** |
+| (e) **обучение ML-модели** предсказывать вероятность успешного погашения по каждой технике | **нет** (SAW с весами профиля; SES + Монте-Карло — прогноз потока, не классификатор успеха) |
+| (f) предсказание вероятности по каждой технике для пользователя | **нет** |
+| (g) выбор техники с максимальной вероятностью успеха | **частично по форме** (выбираем лучшую альтернативу), но по иному критерию — взвешенная сумма, не вероятность успеха |
+| (h) сбор обратной связи, следует ли пользователь технике | **нет** в методе (канон v3.0.0) |
+| (i) **переобучение** модели по обратной связи | **нет** |
+
+Вывод исследователя (не заключение о патентной чистоте): формула **уже, а не шире** метода «перебор вариантов
+погашения»: все её признаки завязаны на обучаемую по популяции модель вероятности успеха с обратной связью.
+У FINPILOT отсутствуют как минимум (a), (b), (d), (e), (i) — признаки, которые по правилу «все признаки
+независимого пункта» исключают совпадение. Плюс территориальное: действует только в US и CA, в РФ членов нет.
+Граница вывода: пригодно для США/Канады ТОЛЬКО пока в FINPILOT не появится обучаемая на пользователях модель
+выбора стратегии погашения с переобучением по факту исполнения — такой модуль на экспортных рынках надо сверять
+с этой формулой заново.
+
+
+### Г3.1, дополнение — «та же семья идей»: поиск по смежным заявителям и формулировкам (2026-09-11)
+
+Канал: `GET https://patents.google.com/xhr/query?url=<urlencoded>` (внутренний JSON-эндпоинт Google Patents),
+`curl -sk --http1.1`, браузерный UA. Все запросы HTTP 200; размер ответа указан.
+
+| # | Запрос (как передан в `url=`) | Байт | Всего | Что в выдаче |
+|---|---|---|---|---|
+| 1 | `q=("debt avalanche" OR "avalanche method" OR "avalanche technique")&q=(snowball)&q=(debt)` | 6 704 | 3 | CA3162417C (Intuit); **US12524803B1** «Financial autopilot», USAA, выдан 2026-01-13; **US20250335982A1** «System and method for financial health robo-advisor», Wells Fargo, публ. 2025-10-30 |
+| 2 | `q=("debt payoff plan" OR "debt repayment plan" OR "debt reduction plan")&assignee=Intuit` | 3 298 | 1 | только US20220027983A1 (та же семья) |
+| 3 | `q=("debt payoff" OR "debt repayment")&assignee=Credit Karma` | 140 | **0** | — |
+| 4 | `q=("debt payoff" OR "debt repayment" OR "pay down debt")&assignee=Capital One` | 24 759 | 10 | US8538880B1 (debt recovery, 2013); US20230252559A1 и US11023967B1 «Guidance engine»; **US12393978B2 «Systems and methods for debt management with spending recommendation», Capital One Services, выдан 2025-08-19**; US20210358027A1 (визуализация процентов по вариантам платежа); прочее — ML-профилирование |
+| 5 | `q=("debt payoff" OR "debt repayment")&assignee=SoFi` | 140 | **0** | — |
+| 6 | `q=("debt payoff" OR "debt repayment")&assignee=Chime` | 140 | **0** | — |
+| 7 | `q=("debt payoff" OR "debt repayment" OR "credit card")&assignee=Tally` | 7 613 | 3 | шум (Texas Instruments, CN-распознавание лиц) — заявителя «Tally» в индексе Google Patents по этим строкам нет |
+| 8 | `q=("highest interest rate first" OR "highest APR first")&q=(debt)` | 18 459 | 6 | US10453125B2 (MX Technologies, transaction-based debt management); CA3162417C; US20250335982A1 (Wells Fargo); US11948195B2 (Ajou University, обучающее устройство по управлению долгом); US11023967B1 (Capital One); US20070112668A1 (Celano) |
+
+Замечания: (1) единственные документы, где «avalanche»+«snowball» встречаются вместе, — семья Intuit,
+USAA «Financial autopilot» и заявка Wells Fargo «financial health robo-advisor»; **ни в одном из трёх
+avalanche/snowball не вынесены в независимый пункт** (у Intuit проверено дословно выше; у USAA и Wells Fargo
+формулы в рамках этого добора не снимались — см. НЕ ДОБЫТО). (2) Отсутствие результатов у Credit Karma,
+SoFi, Chime — это отрицательный результат ПО СТРОКЕ запроса и полю `assignee` Google Patents, а не
+доказательство отсутствия портфеля (Credit Karma с 2020 принадлежит Intuit, и её документы могут быть
+записаны на Intuit). (3) Российских членов ни у одного из перечисленных документов в блоке «Also published as»
+не отмечено; отдельная проверка по RU-массиву не проводилась для новых номеров — см. НЕ ДОБЫТО.
+
+---
+
+# ДОБОР Г7 (11.09.2026) — индексы финансового здоровья, методики
+
+> Добор по очереди `docs/research/queue/GAP_QUEUE.md`, раздел «Г7 — Конкуренты, индексы
+> здоровья, каналы», пункты 1–4 + российский сосед. Каналы и коды ответа указаны у каждого числа.
+
+## ДОБОР Г7 — FinHealth Score, редакция 2026 («From Insight to Impact») — ✅ ДОБЫТО ДОСЛОВНО
+
+**Реквизиты.** «From Insight to Impact: The Next Phase of Financial Health Measurement.
+Updates to the FinHealth Score® and Definitions», Financial Health Network, **март 2026**, 28 стр.
+Авторы: Taylor C. Nelms, Meghan Greene (+ методологический вклад: Lisa Berdie, Necati Celik,
+Kennan Cepa, Wanjira Chege, Angela Fontes, Shira Hammerslough, Amber Jackson, Andrew Warren).
+Финансирование — **Citi Foundation**.
+
+**Канал добычи.** Страница `https://finhealthnetwork.org/research/from-insight-to-impact-the-next-phase-of-financial-health-measurement/`:
+`curl -sk`+браузерный UA → **HTTP 403, 1 745 байт** (антибот, тот же класс, что замерен ранее);
+`r.jina.ai` по той же странице → **HTTP 200, 111 593 байта**, из тела извлечён прямой адрес PDF.
+Сам PDF `https://finhealthnetwork.org/wp-content/uploads/2026/03/From-Insight-to-Impact_-The-Next-Phase-of-Financial-Health-Measurement.pdf`
+через `r.jina.ai` → **HTTP 200, 61 306 байт** текста (прокси сам разобрал PDF в markdown,
+`Published Time: Tue, 10 Mar 2026 15:20:08 GMT`, `Number of Pages: 28`). Четвёртый
+подтверждённый случай «`r.jina.ai` пробил антибот Financial Health Network».
+
+### Что изменилось против редакции 2021
+
+**1. Определение конструкта переписано целиком.** Дословно, Приложение A («Prior Definition» →
+«Updated Definition»):
+
+> **Prior:** «Financial health is a composite measurement of an individual's financial life that
+> assesses whether people are spending, saving, borrowing, and planning in ways that will enable
+> them to be resilient and pursue opportunities. Individuals who are Financially Healthy are able
+> to manage their day-to-day expenses, absorb financial shocks, and progress toward meeting their
+> long-term financial goals.»
+
+> **Updated:** «Financial health is the state of a household's finances. A Financially Healthy
+> household is able to meet current financial needs and obligations, is on track to meet future
+> financial needs and obligations, and is able to absorb and recover from unexpected expenses or
+> drops in income.»
+
+🔴 Три содержательных сдвига: (а) единица наблюдения сменилась с **индивида на домохозяйство**
+(«It centers the household as the unit of analysis»); (б) убраны неизмеримые термины
+(«resilient», «pursue opportunities») — дословно: «this way we avoid using terms that themselves
+require definitions in our definition of financial health» (сноска 25); (в) определение
+разбито на три временны́х среза — настоящее, будущее, шок.
+
+**2. Четвёртый столп переименован: «Plan» → «Plan and Protect».** Дословно: «This includes
+updating the name of the fourth pillar of our measurement framework from "Plan" to "Plan and
+Protect"». Мотив — «to acknowledge the independent importance of protection via adequate
+insurance coverage».
+
+**3. Число столпов и число индикаторов НЕ изменилось: 4 столпа, 8 индикаторов.** Дословно:
+«The four-pillar framework remains foundational». Состав:
+
+| Столп | Индикатор |
+|---|---|
+| Spend | 1. Spending relative to income |
+| Spend | 2. On-time bill payment |
+| Save | 3. Liquid savings levels |
+| Save | 4. Progress on long-term savings goals |
+| Borrow | 5. Debt manageability |
+| Borrow | 6. Credit score |
+| Plan and Protect | 7. Adequacy of insurance coverage |
+| Plan and Protect | 8. Planning ahead financially |
+
+**4. Изменены формулировки вопросов и шкалы ответов.** Дословный перечень изменений
+(Приложение A, «Changes to the eight indicator questions and corresponding response options»):
+
+> ● Standardizing all items to 5-point response scales with balanced midpoint options.
+> ● Simplifying language and changing to active voice to improve readability and reduce cognitive load.
+> ● Adding clear timeframes ("Thinking about the last 12 months…") and examples to improve recall and reduce interpretation differences.
+> ● On item #2 (on-time bill payment), switching from proportion-based ("pay most bills") to frequency-based ("always/most of the time") response options […]
+> ● On item #4 (long-term savings), reframing from an estimate of "confidence in meeting long-term goals" to an estimate of current progress toward long-term savings goals. This reduces optimism bias and is less perceptual and more objective.
+> ● On item #5 (debt manageability), restructuring the question into two parts—a simple debt screener followed by a graded manageability question—to clarify confusion around "no debt" responses and ensure a true midpoint.
+> ● On item #7 (insurance coverage), revising from "confidence" to "adequacy of protection" using a five-point "how well protected" scale to reduce subjectivity and align with how households assess risk coverage.
+
+🔴 **Для нас прямо применимо два из этих решений.** (а) Вопрос №4 переведён с *уверенности*
+на *фактический прогресс* именно «to reduce optimism bias» — это внешнее подтверждение
+того, что самооценочный вопрос о целях систематически завышен. (б) Вопрос №5 разбит на
+скринер «есть ли долг вообще» + градуированную оценку, потому что «no debt» ломал середину
+шкалы — тот же класс проблемы, что у любого показателя долговой нагрузки при нулевом долге.
+
+### Полные тексты восьми вопросов редакции 2026 (Table 1, стр. 14–16), дословно
+
+1. **Spending relative to income:** «Thinking about the last 12 months, how did your household's
+   total spending compare to total income (after taxes)?» — 1. Spent much less than income /
+   2. Spent a little less / 3. Spent about the same / 4. Spent a little more / 5. Spent much more.
+2. **On-time bill payment:** «Thinking about the past 12 months, how often was your household able
+   to pay all bills on time? Please include all of the bills your household must regularly pay,
+   such as rent or mortgage, utilities, car payments, insurance, and other loan payments.» —
+   Always / Most of the time / About half of the time / Less than half of the time / Rarely or never.
+3. **Liquid savings levels:** «At your current level of spending, how long could your household
+   afford to cover expenses if you had to live only off the money you have readily available,
+   without borrowing, selling something, or withdrawing from retirement savings?» —
+   6 months or more / 3-5 months / 1-2 months / Less than 1 month but more than 1 week / Less than 1 week.
+4. **Progress on long-term savings goals:** «Thinking about your household's long-term savings,
+   how would you describe your progress toward meeting your savings goals? Long-term savings
+   include money set aside for retirement, education, investments, and saving for a home or other
+   major purchase. Do NOT include regular checking accounts, everyday savings, or emergency cash
+   in your response.» — Ahead of schedule / About on track / A little behind / Moderately behind / Far behind.
+5. **Debt manageability (два вопроса):** (a) «Does your household currently have any debt or
+   outstanding loans? Please include mortgage or home equity loans, auto loans, student loans,
+   personal loans, medical debt, credit card balances carried over from prior months, past-due or
+   unpaid bills, and money owed to other people.» — Yes / No. (b) «Thinking about your household's
+   current debt or outstanding loans, how manageable is your household's overall debt right now?» —
+   Completely manageable / Mostly / Somewhat / Barely / Not at all manageable.
+6. **Credit score:** «Your credit score is a number that tells lenders how risky or safe you are
+   as a borrower. How would you rate your credit score?» — Excellent / Very good / Good / Fair /
+   Poor / **Don't know** (шестой вариант — единственный индикатор, где есть «не знаю»).
+7. **Adequacy of insurance coverage:** «Thinking about all the insurance policies you and others
+   in your household might have, how well protected do you feel your household is today in case
+   of a major expense or loss? […] Please answer the question to the best of your ability even if
+   your household has no insurance.» — Very well protected / Mostly / Somewhat / A little / Not at all.
+8. **Planning ahead financially:** «To what extent do you agree or disagree with the following
+   statement: "My household plans ahead financially."» — Agree strongly / Agree somewhat /
+   Neither agree nor disagree / Disagree somewhat / Disagree strongly.
+
+### 🔴 Ключевое ограничение: формула агрегации в редакции 2026 ЕЩЁ НЕ ОПУБЛИКОВАНА
+
+Дословно, раздел «The Next Phase of Financial Health Measurement»:
+
+> «we expect to roll out the revised FinHealth Score survey and scoring methodology in the 2026
+> Financial Health Pulse, to be fielded in **spring 2026**» … «we expect to roll out the refreshed
+> Score in the Financial Health Pulse 2026 U.S. Trends Report **before finalizing a new scoring
+> rubric, including updated financial health tiers, and publishing a revised user guide** to
+> accompany new benchmark data **later in 2026**.»
+
+То есть на 11.09.2026 опубликованы **новые вопросы и шкалы, но не новая рубрика подсчёта
+и не новые пороги тиров** (Financially Healthy / Coping / Vulnerable). Старый Score объявлен
+действующим: «Current users of the FinHealth Score can rest assured that the original score is
+still valid.» **Практический вывод для нас:** редакция 2021, уже записанная в Б.1, остаётся
+единственным источником формулы; редакция 2026 меняет содержание вопросов, а не арифметику.
+
+### Что ещё сказано про режим использования и про будущее
+
+- 🔴 **Коммерческая имплементация закрыта эксклюзивным партнёром.** Дословно: «Organizations
+  seeking to implement the FinHealth Score® in software or digital products should contact
+  **Attune**, the **exclusive technology partner** for FinHealth Score® implementation.» Это
+  ужесточение против редакции 2021 (там был просто контакт «schedule a demo»). Для нас:
+  **брать FinHealth Score как методику в продукт нельзя без договора с Attune** — знак
+  зарегистрирован, канал имплементации назван единственным.
+- **Куда движется измерение (три заявленных направления):** (1) уточнение самого опросника
+  (кластерный анализ для новых тиров); (2) **гибридная модель «balanced scorecard»** —
+  самоотчёт + транзакционные/административные данные; (3) фреймворк измерения воздействия
+  (impact measurement).
+- **Прецеденты перевода на транзакционные данные, названные в брифе:** ING Netherlands
+  «adapted the FinHealth Score framework into a **transactional data scorecard**»; **OCC
+  Vital Signs (2024)** — три метрики по транзакционным данным: «**positive cash flow, liquidity
+  buffers, and on-time payments**». Последнее прямо релевантно нам: это государственный
+  (OCC, США) минимальный набор из трёх наблюдаемых величин, без опроса.
+- **Кто ещё использует Score:** J.D. Power встроил методику в свою Financial Health and Advice
+  Program; Habitat for Humanity — для оценки эффекта. Тестирование редакции 2026 шло двумя
+  вендорами: **J.D. Power** (большая нерепрезентативная выборка клиентов финуслуг) и
+  **NORC при Чикагском университете** (split-sample тест на национально репрезентативной выборке).
+- Мировой контур: в 2025 **Global Findex Всемирного банка** добавил вопросы про финансовое
+  здоровье; ООН назначила спецадвоката по финансовому здоровью (королева Максима, сентябрь 2024).
+
+## ДОБОР Г7 — 🔴 «Карма» БКИ «Скоринг Бюро» (РФ): ближайший сосед на российском рынке — ✅ ДОБЫТО с первоисточника
+
+**Что это.** Трекер финансового здоровья физлица от АО «БКИ СБ» («Скоринг Бюро»,
+квалифицированное БКИ, реестр ЦБ № 078–00012–002, Москва, Каланчевская 16 стр. 1).
+Запуск объявлен **17 февраля 2026**, презентация в Москве при поддержке фонда «Сколково»
+(Sk Финтех Хаб) и Ассоциации развития финансовой грамотности.
+
+**Каналы добычи.** `scoring.ru/karma` → `curl -sk`+UA **HTTP 200, 240 185 байт**;
+`scoring.ru/karma-subscription` → **HTTP 200, 177 150 байт**;
+`rustore.ru/catalog/app/com.creditbureau.app` → **HTTP 200, 362 878 байт**;
+`sk.ru/news/...` → **HTTP 200, 34 423 байта**; `fintech.sk.ru/tpost/kfxl7oxl31-...` →
+`WebFetch` **«self signed certificate»**, `curl -sk`+UA → **HTTP 200, 41 487 байт**.
+`vedomosti.ru/business/news/2026/02/17/1176966-zdorovya-karma` → **HTTP 200, 207 993 байта**,
+но **тело статьи не отрендерено** (JS/пейволл, в HTML только меню и лента новостей) —
+цитат из Ведомостей не беру.
+
+### 🔴 Поправка к заданию: компонентов НЕ десять, публично названы ПЯТЬ групп факторов
+
+Задание добора говорило «10 компонентов». **На первоисточнике `scoring.ru/karma`
+перечислено пять факторов**, дословно (блок «Как работает?» → «В основе оценки лежат
+понятные факторы, отражающие финансовое поведение»):
+
+> Кредитный рейтинг · Налоговые обязательства · Платежи ЖКХ · Штрафы · Банкротства
+
+Та же пятёрка — в описании приложения в RuStore, дословно: «Он анализирует ваши платежи
+по кредитам, налогам, ЖКУ, а также информацию о **штрафах и банкротствах**».
+Число «10» ни на сайте, ни в сторе, ни в релизах «Сколково» не встречается.
+🟡 **Цифра 10, которая в источниках ЕСТЬ** — это «мониторинг событий и рисков по **13
+триггерам**» в подписке, и она про уведомления, а не про компоненты индекса.
+Полный состав факторов и веса **не публикуются** — формулы в открытом доступе нет
+(тот же режим закрытости, что у BBVA Health Score и у скоринговых баллов БКИ вообще).
+
+### Что именно измеряется — и чем это отличается от нас
+
+Дословно с `scoring.ru/karma`:
+
+> «Карма **объективно и независимо** оценивает вашу финансовую дисциплину **за последние 3 года**»
+
+Дословно из сводки Sk/пресс-релиза: «На основе этого формируется многомерный показатель…
+**При этом доходы и сбережения не учитываются**».
+
+Дословно, позиционирование от компании (Олег Лагуткин, гендиректор БКИ «Скоринг Бюро»):
+
+> «Это не кредитный рейтинг, не оценка платёжеспособности и не банковский скоринг.
+> Это персональный навигатор… Люди активно интересуются своей кредитной историей, но
+> кредитный отчёт отражает, прежде всего, отношения клиента с кредитором — а это лишь
+> одна составляющая, а не вся картина финансового здоровья в целом».
+
+🔴 **Вывод по конкурентному контуру.** «Карма» — ретроспективный **индекс платёжной
+дисциплины по данным БКИ и госисточников** (кредиты, ФНС, ЖКУ, ГИБДД/ФССП, банкротства).
+Доходы, расходы, сбережения, цели и свободный денежный поток в него **не входят по
+прямому заявлению разработчика**. Это значит: **пересечения по предмету расчёта у нас
+с ней нет** — она считает, как человек платил в прошлом, мы распределяем то, что у него
+свободно сейчас. Пересечение — **по рынку и по слову «финансовое здоровье»**: она первой
+заняла в РФ и термин, и нишу «трекер финансового здоровья для физлица», и заняла её
+именем крупного БКИ с доступом к данным, которых у нас нет и не будет.
+
+### 🔴 Поправка к записи добора Г5: базовый продукт БЕСПЛАТНЫЙ, платная — надстройка
+
+Запись «Скоринг Бюро продаёт физлицам трекер финансового здоровья за 299 ₽ первый месяц
+и 499 ₽ далее» **неточна и её надо поправить**. По первоисточникам:
+
+- Сам трекер «Карма» — **бесплатный**. Дословно (sk.ru, fintech.sk.ru): «Компания
+  представила «Карму» — **бесплатный** цифровой сервис для оценки и улучшения финансового
+  здоровья»; заголовок страницы `scoring.ru/karma`: «Карма — **бесплатный** трекер
+  финансового здоровья «Скоринг Бюро»».
+- Платная — отдельная подписка **«Карма Плюс»**: `scoring.ru/karma-subscription`, дословно
+  «**30 дней за 299 ₽. Далее стоимость подписки 499 ₽**», в карточке — «Первые 30 дней
+  299 ₽ / Далее 499 ₽/30 дн.». То есть **499 ₽ за 30 дней**, не за календарный месяц.
+- Граница free/paid — дословно из FAQ той же страницы: «В бесплатной версии доступны
+  **базовые инструменты и общая оценка финансового профиля**. В Карма Плюс появляются
+  расширенные данные, мониторинг изменений, защита от мошеннических кредитов и
+  рекомендации по улучшению финансового профиля».
+
+**Полный состав подписки «Карма Плюс» (18 пунктов, четыре группы), дословно:**
+
+| Группа | Пункты |
+|---|---|
+| Профиль | Безлимитные кредитные отчёты · Объяснение рейтинга («какие факторы влияют на рейтинг и что улучшить в первую очередь») · Долговая нагрузка и обязательства («структура обязательств и ближайшие платежи») · Справка о финансовом профиле |
+| Контроль | Мониторинг событий и рисков **по 13 триггерам** · Уведомления о новых заявках · Запросы кредитной истории · Изменения рейтинга · Календарь ближайших платежей · Расширенные уведомления по СМС/email |
+| Защита | Помощь специалиста в спорных ситуациях · Уведомления о подозрительной активности · Контроль доступа к кредитной истории |
+| Улучшение | **Пошаговый план улучшения рейтинга** · **Прогноз изменения рейтинга** («оценим и подскажем, какие действия могут повлиять на рейтинг») · Поиск ошибок в истории · Помощь в составлении обращений · **Рекомендации по снижению нагрузки** («какие обязательства стоит закрыть или пересмотреть первыми») |
+
+🔴 **«Персональные рекомендации» у них — это ровно две вещи, и одна из них наша.**
+(1) «Пошаговый план улучшения **рейтинга**» — рекомендации о кредитной истории:
+что исправить, какие ошибки оспорить, как поднять балл. (2) 🔴 **«Рекомендации по снижению
+нагрузки: узнайте, какие обязательства стоит закрыть или пересмотреть первыми»** — это
+**прямой сосед нашей очереди досрочного погашения**. Формально это подсказка о приоритете
+закрытия обязательств, то есть тот же класс совета, что даёт наш Avalanche-фильтр. Отличия,
+которые видны из описания: у них это (а) рекомендация по данным БКИ, без учёта свободного
+денежного потока и резерва, (б) целевая функция — **кредитный рейтинг**, а не стоимость
+обслуживания долга и не срок выхода из долга, (в) без расчёта альтернатив распределения.
+Дословного текста рекомендаций из приложения не снято (требует авторизации через Госуслуги) —
+см. НЕ ДОБЫТО.
+
+Сформулированная ими польза (блок «Когда подписка Плюс особенно полезна»), дословный кейс,
+ближайший к нам: «**Хотел взять кредит — сначала проверил шансы.** Посмотрел полную картину
+по обязательствам и заранее понял, что стоит улучшить перед подачей заявки» — то есть их
+сценарий *перед взятием* кредита, наш — *во время погашения*.
+
+### Трекшн и качество — единственные публичные числа
+
+RuStore, карточка `com.creditbureau.app` (**HTTP 200, 362 878 байт**, снято 11.09.2026):
+**70 тыс.+ скачиваний**, рейтинг **4,3** при **258 оценках** и **57 отзывах**, размер 22,7 МБ,
+версия **1.86 от 25.08.2026**, минимальная Android 9, возраст 0+, разработчик АО «БКИ СБ»,
+поддержка `hotline@scoring.ru`. Отрицательный отзыв (Ольга, 27.07.2026), дословно: «Даёт
+ложную информацию, при оспаривании ошибки молчат… Зато хорошо принимают деньги за отчёт».
+🟡 Скачивания RuStore — только один стор из трёх (есть ещё Google Play и App Store);
+суммарной установочной базы нет.
+
+### Два побочных наблюдения, полезных нам напрямую
+
+1. 🔴 **В подвале `scoring.ru` стоит дословно: «На информационном ресурсе применяются
+   рекомендательные технологии»** — это исполнение ст. 10.2-2 149-ФЗ. То есть российский
+   игрок нашего класса **публично квалифицировал свои подсказки как рекомендательные
+   технологии** и поставил обязательное уведомление. Это прямой прецедент для нашего
+   юрблока: спорить о том, «рекомендательная ли у нас технология», ближайший сосед
+   не стал.
+2. **Заявленные сценарии использования показателя за пределами финансов** (с сайта):
+   аренда жилья, наём на работу, выбор няни/сиделки/репетитора, **сайты знакомств**,
+   сделки с предоплатой; плюс B2B-контур «в найме Карма позволит проверить уровень
+   финансовой надёжности будущих сотрудников». Их модель монетизации смотрит в сторону
+   **шеринга показателя третьим лицам** (QR-код и справка), а не только в подписку.
+   У нашего продукта такого контура нет, и это осознанная разница, а не пробел.
+
+## ДОБОР Г7 — методики корпоративных индексов финансового здоровья
+
+Сводка по шести названным в очереди организациям. Качество каждой строки помечено отдельно:
+🟢 первоисточник открыт · 🟡 вторичный источник или сниппет · ❌ не добыто / опровергнуто.
+
+### 🟢 Fidelity Financial Wellness Score — ДОБЫТО, формула публикуется
+
+**Источник.** Fidelity Plan Sponsor WebStation, «Measuring and predicting financial wellness»,
+`https://sponsorcqa.fidelity.com/pspublic/pca/psw/public/library/designbenefits/measuring_predicting_fw.html`
+— `WebFetch` **HTTP 200** (страница отдалась, размер инструментом не печатается).
+
+- **Четыре домена**, дословно: «budget, debt, savings/investment, and protection», каждый —
+  «**25% each to the overall score, for a total of 100%**».
+- **Шкала:** «The sum of all four domains yields a total score from **0 to 100**, where 0
+  represents extreme financial distress and 100 indicates the maximum level of financial wellness».
+- 🔴 **Ключевая особенность — смешение объективного и субъективного с ФИКСИРОВАННЫМИ весами**,
+  дословно: «Overall, the **objective factors are assigned a total weight of 70%** and overall
+  **subjective factors are weighted at 30%**». Внутри доменов объективная часть весит **20 %**
+  у долга и сбережений/инвестиций и **15 %** у бюджета и защиты; субъективная — дополнение
+  до 25 % (соответственно 5 % и 10 %).
+- **Тиры** (🟡 из сводки выдачи, на открытой странице не подтверждены): Excellent 80–100,
+  Good 60–79, Fair 40–59, Needs Attention 0–39. **Числа тиров считать непроверенными.**
+- Число вопросов не публикуется.
+
+**Чем полезно нам.** Это единственная из шести методик, где **веса компонентов названы
+числами и опубликованы**, и где явно разведены объективная и субъективная части с заданной
+пропорцией 70/30. Наш показатель состояния финансов целиком объективный — это отличие,
+которое стоит уметь назвать, а не прятать.
+
+### 🟢 Prudential «Prutection Score» — ДОБЫТО, формула отношения, но НЕ про финздоровье целиком
+
+**Источник.** `https://www.prudential.com/employers/group-insurance/prutection-score`,
+`WebFetch` **HTTP 200**.
+
+- **Три риска**, дословно: «(1) premature death, (2) loss of income due to an illness or injury,
+  (3) out-of-pocket expenses related to an illness or injury».
+- **Формула**, дословно: «For each of these risks, the Prutection Score is the **ratio of Funds
+  Available to Funds Needed**». Шкала **1–100**, «with 100 being the most prepared», тиры —
+  «Baseline, Moderate, or Strong protection level».
+- **Вход «доступно»:** «financial assets, spousal or partner income, investment income, Social
+  Security benefits, and insurance benefits». **Вход «нужно»:** «age, marital status, number of
+  children, income, essential monthly expenses» + таблицы смертности и госданные.
+- 🔴 **Прямое ограничение применимости, заявленное самим Prudential:** результаты применимы
+  только к группам и крупным демографиям — «**not to be used at an individual level**».
+
+**Чем полезно нам.** Это не индекс благополучия, а **страховой gap-анализ**: отношение
+«есть / надо». Формально это тот же класс, что наш расчёт достаточности резерва, и
+оговорка «не для индивидуального уровня» — честное признание точности такой оценки
+на одном домохозяйстве. Наш резервный блок считает по факту пользователя, а не по
+демографическим таблицам, и в этом он сильнее.
+
+### 🟡 Prudential «Financial Wellbeing Tracker» (Азия) — четыре столпа, формула не публикуется
+
+Дословно из сводки выдачи: четыре столпа — «**Security Now**», «**Security in the Future**»,
+«**Financial Freedom Now**», «**Financial Freedom in the Future**», общий индекс «measured out
+of 100 points». Значения по возрасту (Prudential, исследование по Азии, публикация 05.03.2026):
+**59,8 из 100** у 18–35 лет, **57,7** у 50–60 лет — то есть у Prudential благополучие
+**снижается с возрастом**. 🟡 Первоисточник не открыт: `malaymail.com/.../452552` →
+`WebFetch` **HTTP 403 Forbidden**; страница Prudential HK в выдаче есть, но не открывалась
+(бюджет). Числа считать вторичными.
+
+### 🔴❌ «Westpac Financial Health Index» — ПОСЫЛКА ОЧЕРЕДИ НЕ ПОДТВЕРЖДЕНА
+
+Три поиска не дали ни одного документа с таким названием. У Westpac есть **Westpac–Melbourne
+Institute Leading Index** и **Westpac Consumer Sentiment Index** — это **макроэкономические
+индикаторы делового цикла и потребительских настроений**, а не индексы финансового здоровья
+домохозяйства. Австралийский банковский индекс финансового благополучия, который, судя по
+описанию, имелся в виду, — это **ANZ Roy Morgan Financial Wellbeing Indicator (FWBI)**,
+и он добыт целиком (ниже). Это опровергнутая посылка, а не пробел добычи — тот же класс
+ошибки, что «индекс НАФИ» в исходном задании.
+
+### 🟢 ANZ Roy Morgan Financial Wellbeing Indicator (FWBI) — ДОБЫТО с техническим приложением
+
+**Источник.** «ANZ Roy Morgan Financial Wellbeing Indicator, Quarterly Update: March 2023»,
+`https://www.anz.com.au/content/dam/anzcomau/about-us/anz-financial-wellbeing-indicator-march-2023.pdf`
+→ `curl -sk`+UA **HTTP 200, 649 075 байт**; `pdftotext -layout` → 49 855 символов.
+
+- **Три компонента**: **Meeting commitments** · **Feeling comfortable** · **Resilience (for the
+  future)**. Каждый — балл из 100; общий балл — их среднее (по описанию методики: «added
+  together and divided by three»).
+- 🔴 **Но в квартальном индикаторе это НЕ простое среднее.** Дословно, Technical Appendix:
+  «The indicator is calculated by an **algorithm that transforms responses to these questions,
+  weighing the relative importance of each component**. The algorithm was developed based on
+  calibrated responses to the financial wellbeing questions in the **2017 and 2021 ANZ Financial
+  Wellbeing Surveys**». То есть веса откалиброваны по отдельным волнам обследования и
+  **сами по себе не опубликованы**.
+- **Состав вопросов (дословно, Technical Appendix):**
+  - *Meeting commitments:* «Meeting my bills and commitments is a struggle from time to time»;
+    «In the past 12 months I have sometimes been unable to pay bills or loan commitments at the
+    final reminder due to lack of money»; «I sometimes run short of money for food or other
+    regular expenses».
+  - *Feeling comfortable:* «I feel financially stable at the moment»; «I have planned enough to
+    make sure I will be financially secure in the future»; «Would you say you and your family are
+    better-off financially – or worse-off than you were at this time last year?»; «Looking ahead
+    to this time next year…».
+  - *Resilience:* **два расчётных показателя, не мнения** — (1) «Number of months' income in
+    savings», считается из дохода домохозяйства до налогов и остатков на счетах; (2) «Managing
+    a drop in income **by a third**», считается из дохода, остатков на счетах и
+    **недельных расходов на всё хозяйство**.
+- **Замеренные уровни (12-месячное скользящее, декабрь 2022):** общий индекс **54,2 из 100**
+  (спот-минимум после COVID; сентябрь 2022 — 56,5); **Meeting commitments 69,3**;
+  **Resilience for the future 52,3**; разброс по штатам — от **54,6** (минимум) до
+  «+5,1 пункта к среднему по стране» (максимум).
+
+🔴 **Прямо применимо к нам.** Третий компонент ANZ — «сколько месяцев дохода в сбережениях»
+и «переживёт ли домохозяйство падение дохода на треть» — это **ровно та величина, которую
+считает наш резервный блок**, и считается она у ANZ из тех же трёх входов (доход, остатки,
+расходы). Внешнее подтверждение, что резерв в месяцах расходов/дохода — не наша выдумка,
+а компонент национального индикатора крупного банка.
+
+### 🟡 Morgan Stanley at Work Financial Wellness — только объём, не формула
+
+По сводке выдачи: программа включает «a **12-question** financial assessment and score to
+determine financial fitness» плюс «80+ articles». Состава вопросов, весов и шкалы в открытом
+доступе не найдено; портал закрыт корпоративным доступом. ❌ Методика **не добыта**;
+единственное надёжное — порядок величины опросника (12 вопросов против 8 у FinHealth Score).
+
+### ❌ Discover и Truist — методик не найдено, причина точная
+
+- **Discover.** Три поисковых прохода выводят либо на сторонние скоринг-приложения
+  (`myfinancialwellnessscore.scoreapp.com` — не Discover), либо на общие обзоры. Собственного
+  опубликованного «Discover Financial Wellness Score» с методикой в выдаче нет.
+  **Не добыто; вероятно, посылка очереди неточна так же, как с Westpac.**
+- **Truist.** Выдача даёт **Truist Confidence Account** — это счёт второго шанса
+  (second-chance checking) с бесплатным финобразованием, оповещениями и кредитным
+  мониторингом, **а не индекс**. Публичной методики «Truist financial confidence score»
+  не найдено. **Не добыто.**
+
+### 🟢 Banco de España, Box 2 — состав индикатора уязвимости ДОБЫТ ПОЛНОСТЬЮ
+
+**Источник.** «Box 2. A composite indicator of aggregate household financial vulnerability»,
+авторы **Fernando Nieto и Javier Martín**, в «Report on the Financial Situation of Households
+and Firms, Second Half of 2024», стр. 34. Канал: `curl -sk`+UA по
+`https://www.bde.es/f/webbe/SES/Secciones/Publicaciones/Informesituacionfinancierafamiliasyempresas/2024/S2/Files/SituacionFinanciera_Box2_022024.pdf`
+→ **HTTP 200, 249 131 байт**; `pdftotext -layout` → 16 688 символов.
+
+**Устройство — дословно:** индикатор «is constructed as the **arithmetic mean of the following
+five sub-indicators**», следуя подходу ЕЦБ:
+
+| № | Субиндикатор | Из чего считается (дословно) |
+|---|---|---|
+| 1 | **Debt servicing capacity** | «gross interest payments-to-income ratio, the saving ratio and expectations of personal financial situation over the next 12 months» |
+| 2 | **Leverage** | «households' gross debt-to-income and gross debt-to-total assets ratios» |
+| 3 | **Financing** | «the interest rate on households' outstanding amount of bank loans and the **credit impulse**, measured as the annual change in net credit flows as a share of GDP» |
+| 4 | **Income** | «households' real income growth and the income-to-GDP ratio» |
+| 5 | **Labour activity** | «the labour force participation rate and unemployment expectations» |
+
+**Агрегация — дословно:** «Each of these sub-indicators is, in turn, a **simple arithmetic mean
+of the individual indicators**. Each indicator is first **standardised against a reference
+period** … converted into a common scale with a **mean of zero and a standard deviation of one**.
+Therefore, the value of each indicator is a **z-score** … All variables are included with a sign
+whereby **positive (negative) values can be interpreted as a higher (lower) degree of
+vulnerability**». Референсный период — **2005 Q1 – 2024/2025 Q4** (в версии S2-2024 — 2005–2024).
+
+**Оговорки и расхождения с ЕЦБ, названные авторами дословно:** «Strictly speaking, the debt
+burden **should include principal repayments**» (то есть в знаменателе только проценты — это
+признанное упрощение); «Unlike the ECB indicator, the short-term debt-to-long-term debt ratio
+and the current financial assets-to-current liabilities ratio are **not included**, since in
+Spain's case these variables are influenced by pension advances».
+
+**Замеренные свойства (те же страницы):** корреляция индикатора с ростом ВВП **−0,6**
+одновременно и **−0,7** с лагом в три квартала; с потребительской уверенностью **0,6**;
+с качеством кредитного портфеля банков **0,8** одновременно. В 2024 Q3 индикатор был
+«very close to 20-year lows» и в Испании, и в еврозоне.
+
+🔴 **Два урока, прямо ложащихся на нашу матмодель.** (1) **Агрегация — равновзвешенное среднее
+z-оценок, а не веса экспертов.** Центральный банк с полным доступом к данным выбрал самую
+простую свёртку и явно об этом пишет — это аргумент того же класса, что «простая сумма ≈ IRT»
+у CBA–MI, и он поддерживает нашу SAW-свёртку. (2) **Индикатор относительный, а не абсолютный:**
+он меряет отклонение от среднего за референсный период, а не «хорошо/плохо» само по себе.
+Любой показатель состояния финансов, построенный на z-оценках, теряет смысл без явно
+названной базы сравнения.
+
+### 🔴 Economic Record 2022, Comerton-Forde et al. — расхождение с нашей записью НАЙДЕНО
+
+**Что добыто.** Журнальная версия за пейволлом Wiley (`r.jina.ai` по
+`onlinelibrary.wiley.com/doi/abs/10.1111/1475-4932.12664` → **HTTP 200, 519 байт**, тело =
+антибот-заглушка «Performing security verification» — прокси антибот Wiley НЕ пробил).
+Реквизиты сняты через **OpenAlex API** (`api.openalex.org/works/doi:10.1111/1475-4932.12664`
+→ **HTTP 200, 21 069 байт**): заголовок «**Measuring Financial Wellbeing with Self-Reported
+and Bank-Record Data**», **том 98, выпуск 321, стр. 133–151**, `is_oa: true`, `oa_status:
+hybrid`. Полный текст взят из депонированной версии **IZA Discussion Paper No. 13884,
+ноябрь 2020** (`https://docs.iza.org/dp13884.pdf` → `curl -sk`+UA **HTTP 200, 1 930 633 байта**;
+`pdftotext -layout` → 184 918 символов). Авторы: Carole Comerton-Forde (UNSW), John de New
+(Melbourne Institute), Nicolás Salamanca (Melbourne Institute, IZA), David C. Ribar
+(Georgia State, IZA), Andrea Nicastro (CBA), James Ross (CBA).
+
+**🔴 Числа НЕ совпадают с тем, что записано в Б.3 по Technical Report № 1:**
+
+| Величина | Записано у нас (Tech Report № 1) | IZA DP 13884 / журнальная версия |
+|---|---|---|
+| Корреляция Reported и Observed шкал | Spearman **ρ = 40 %** | **«a Spearman rank correlation of 46 per cent»** (повторено дважды) |
+| Множитель Observed-шкалы | **100/9** (максимум суммы 9) | **100/19**, дословно: «multiplying the sum by **100/19** to produce a 0-100 scale with **20 possible outcomes**» |
+
+То есть **Observed Financial Wellbeing Scale в журнальной версии другая** — с бо́льшим числом
+градаций (20 исходов против 10) при тех же пяти пунктах банковской записи. Это ровно то,
+что в разделе «Что не добыто» называлось «версия 2 Observed-шкалы»: она существует и она
+здесь. Reported-шкала осталась **10-вопросной**.
+
+**Числа надёжности, которых у нас не было (IZA DP 13884, дословно):**
+- «The summative reported scale is correlated **99.2 percent** with the IRT empirical Bayes mean
+  prediction, and the summative observed scale is correlated **98.0 percent** with the IRT
+  empirical Bayes mean prediction.»
+- «Cronbach's alpha coefficients of **0.92** (reported) and **0.85** (observed).»
+- Средний балл Observed-шкалы в выборке — **54,0**, медиана **57,9**.
+
+🔴 **Это усиливает главный аргумент раздела Б.3, а не ослабляет его:** простое суммирование
+категориальных ответов воспроизводит полноценную IRT-модель с точностью **98–99 %**.
+Для нас это прямое основание не усложнять свёртку показателя состояния финансов.
+Одновременно — **правку в Б.3 надо внести**: ρ = 46 %, множитель 100/19, 20 исходов;
+записанные там 40 % и 100/9 относятся к более ранней редакции Technical Report № 1
+и в журнальной версии не действуют.
+
+---
+
+# ИТОГ ДОБОРА Г7 (11.09.2026)
+
+Батч Г7 очереди `docs/research/queue/GAP_QUEUE.md` — «Конкуренты, индексы финансового
+здоровья, каналы», 12 пунктов. Вахта работала одна, подагенты не запускались
+(потолок «не более двух» соблюдён с запасом).
+
+## Постатейно
+
+| № | Пункт очереди | Статус | Где раздел |
+|---|---|---|---|
+| 1 | FinHealth Score, редакция 2026 | ✅ **добыт дословно** (28 стр., все 8 вопросов, весь перечень изменений) | `bank_patents_wellness_scoring`, «ДОБОР Г7 — FinHealth Score, редакция 2026» |
+| 2 | Методики Westpac, Discover, Truist, Fidelity, Prudential, Morgan Stanley | 🟡 **частично: 2 из 6 с формулами** (Fidelity, Prudential Prutection), Westpac — посылка опровергнута и заменена на ANZ FWBI (добыт целиком), Morgan Stanley — только объём опросника, Discover и Truist — не найдены | там же, «методики корпоративных индексов» |
+| 3 | Banco de España, Box 2 | ✅ **добыт полностью** (5 субиндикаторов, формула, оговорки, корреляции) | там же |
+| 4 | Economic Record 2022, Comerton-Forde et al. | ✅ **добыт через IZA DP 13884 + OpenAlex**; 🔴 **найдено расхождение с нашей записью** | там же |
+| 4а | Методика «Кармы» Скоринг Бюро (сверх очереди) | ✅ **добыт с первоисточника**; 🔴 две поправки к записи Г5 | там же, «Карма» |
+| 5 | CAC MoneyLion, Acorns, Intuit/Credit Karma | 🟡 **MoneyLion — точно ($9/$16, 8-K SEC); Acorns — косвенно (LTV и LTV:CAC); Intuit — CAC не существует как метрика** | `competitor_marketing_positioning`, «ДОБОР Г7.2» |
+| 6 | Starling round-ups, первоисточник | ✅ **добыт** (с `starlingbank.com`, причина недоступности `help.` установлена) | `banks_apac_neobanks`, «ДОБОР Г7.3» |
+| 7 | KakaoBank: IR и механики | ✅ **IR добыт целиком через API сайта**; блог про теги не искался | там же |
+| 8 | CPA-ставки банков и брокеров РФ | 🟡 **розничные ставки банки не раскрывают публично** (установлено, а не предположено); B2B-ставки добыты вторично; брокеры — реферальные подарки, не CPA | `telegram_channel`, «ДОБОР Г7.4» |
+| 8а | Перечень РКН 10 000+ и Telegram (сверх очереди) | 🟡 регистрация каналов идёт, санкция описана; 🔴 **найден налоговый запрет на признание расхода** | там же |
+| 9 | Статья Финуслуг про ипотеку и вклад | ✅ **добыта дословно**, но это **другая, переписанная статья 2026 года** с полным расчётом | `marketplaces_ds_practice_rf`, «ДОБОР Г7.5» |
+| 10 | Data Fest 2024/2025/2026, Aha!, PyCon | 🟡 **Data Fest 2024 и 2025 проверены** (официальный список 34 секций); Aha! и PyCon не проверялись | там же |
+| 11 | Практика по 211-ФЗ, письма ЦБ | ❌ **не добыто** (нет в открытых источниках); 🔴 закрыто с другой стороны — разграничением Финуслуг | там же |
+| 12 | Хабр о «Финздоровье» | ✅ **добыт дословно**; 🔴 **это Т-Банк, а не Сбер** | там же |
+
+**Счёт:** полностью закрыто **7 пунктов**, частично **4**, отрицательный результат с
+точной причиной **1**. Плюс два пункта сверх очереди («Карма» и налоговый режим рекламы).
+
+## 🔴 Что из добытого меняет картину конкуренции и позиционирования
+
+1. 🔴 **Российских соседей с продуктом «финансовое здоровье» не один, а минимум три, и все
+   крупнее нас.** (а) **«Карма» Скоринг Бюро** — бесплатный трекер + подписка «Карма Плюс»
+   299 ₽/499 ₽ за 30 дней, 70 тыс.+ установок только в RuStore, за ним крупное БКИ.
+   (б) **«Финздоровье» Т-Банка** — с августа 2024, пять параметров, внутри крупнейшего
+   розничного банка. (в) **«Финансовое Здоровье» Финуслуг** (Московская биржа) — найдено
+   в навигации, содержание ещё не снято. Формулировка «в РФ такого нет» больше не работает
+   ни в каком виде; работать надо на различии предмета расчёта.
+2. 🔴 **Поправка к записи добора Г5: «Карма» — БЕСПЛАТНАЯ, платная только надстройка.**
+   299 ₽/499 ₽ — это подписка «Карма Плюс» (мониторинг, защита от мошеннических кредитов,
+   безлимитные отчёты), а сам трекер и оценка бесплатны. И **компонентов не 10, а пять
+   публично названных групп** (кредитный рейтинг, налоги, ЖКХ, штрафы, банкротства);
+   число 13 в источниках есть, но это триггеры уведомлений.
+3. 🔴 **Но предмет расчёта у «Кармы» другой, и это наша защита.** Прямое заявление
+   разработчика: «доходы и сбережения не учитываются». Она меряет **платёжную дисциплину
+   за 3 года по данным БКИ и госисточников**. Единственное пересечение — пункт подписки
+   «Рекомендации по снижению нагрузки: какие обязательства стоит закрыть или пересмотреть
+   первыми», и целевая функция там — **кредитный рейтинг**, а не стоимость обслуживания
+   долга и не срок выхода из долга.
+4. 🔴 **Т-Банк ещё в августе 2024 публично заявил план построить ровно наш продукт** —
+   «планирование будущего финансового состояния… предсказать будущие расходы, составить
+   реалистичный бюджет на следующий месяц, а также **запланировать финансовые цели и план
+   по их достижению**» на сервисе ETNA. Реализовано это или нет — не проверено. Новизну
+   надо формулировать не через «такого нет», а через «что устроено иначе»: распределение
+   свободного потока между конкурирующими назначениями с объяснением выбора.
+5. 🔴 **Бесплатный массовый контент уже отвечает на наш главный вопрос, и отвечает хорошо.**
+   Статья Финуслуг от 18.08.2026 даёт точку равновесия «ипотека против вклада» с поправкой
+   на НДФЛ (**14,5 % без налога, 12,6 % с налогом**), таблицу экономии по пяти ставкам,
+   три сценария на живом примере и честное предупреждение, что 1,12 млн ₽ и 72 500 ₽
+   сравнивать напрямую некорректно. Наше преимущество — не логика (она совпадает), а
+   персонализация, охват всех долгов сразу и пересчёт при изменении входов.
+6. 🔴 **Позиционирование «наш индекс — объективный» получило внешнюю опору.** Fidelity
+   смешивает объективное и субъективное в пропорции **70/30**; FinHealth Score целиком
+   самоотчётный и в редакции 2026 специально переписывает вопросы, чтобы **снизить
+   оптимистическое смещение**; Т-Банк выдаёт запас прочности словами («меньше месяца /
+   один-два / полгода и больше»). Наш показатель считается из фактических чисел
+   пользователя — это осмысленное отличие, а не придирка.
+7. 🔴 **Простая свёртка подтверждена ещё двумя независимыми источниками.** Banco de España
+   (вслед за ЕЦБ) агрегирует пять субиндикаторов **равновзвешенным средним z-оценок**;
+   Comerton-Forde et al. в журнальной версии: простая сумма коррелирует с полной
+   IRT-моделью на **99,2 % (Reported)** и **98,0 % (Observed)**, α = 0,92 и 0,85.
+   Аргумент за нашу SAW-свёртку усилен.
+8. 🔴 **Правка, которую надо внести в Б.3 этого файла:** корреляция Reported и Observed
+   шкал — **46 %**, а не 40 %; множитель Observed-шкалы — **100/19 при 20 исходах**,
+   а не 100/9. Записанные значения относятся к Technical Report № 1; журнальная версия
+   (Economic Record 98(321):133–151) даёт другие.
+9. 🔴 **FinHealth Score нельзя взять в продукт без договора.** Редакция 2026 прямо
+   называет **Attune** «the exclusive technology partner for FinHealth Score®
+   implementation». Знак зарегистрирован, канал имплементации — единственный.
+10. 🔴 **KakaoBank оказался не тем, чем считался.** По первоисточнику IR за 2Q26
+    платформенная выручка — **25,3 из 829,0 млрд вон (≈3 %)** при процентной **83 %**,
+    и расходы «Fee & Platform» (52,5) **вдвое больше** платформенной выручки. Три четверти
+    платформенных денег — **сравнение кредитов (34 %) и реклама (31 %)**, то есть модель
+    Credit Karma. Тезис «неободанк зарабатывает на платформе» в этом примере не
+    подтверждается.
+11. 🔴 **Против платного Telegram появился третий, финансовый довод.** По п. 44 ст. 270
+    НК РФ расходы на рекламу на ресурсе иностранного лица, не исполнившего 236-ФЗ,
+    **не уменьшают налог на прибыль**; Telegram Messenger, Inc. исполнил две обязанности
+    из трёх («филиал/представительство» — «В стадии согласования»). Цепочка: письма
+    Минфина 11.12.2024 № 03-03-06/1/125078 и 27.05.2025 № 03-03-06/3/51670 → письмо
+    РКН 20.02.2025 № 03-72707 → письмо ФНС 27.02.2025 № СД-4-3/2042@. **Проверить
+    проекцию на УСН отдельно.**
+12. 🔴 **Разграничение по 211-ФЗ можно не выводить, а скопировать.** Финуслуги развели
+    один сайт на две правовые зоны через **два юрлица**: сделки — ПАО «Московская Биржа»
+    (оператор финансовой платформы, в реестре ЦБ с 27.08.2020, метка «Открытие онлайн на
+    Финуслугах»), всё остальное — ООО «МБ Маркетплейс», **не оператор платформы**.
+    Наш продукт целиком во второй зоне.
+13. 🔴 **И ещё один прецедент, снимающий спор в юрблоке:** в подвале `scoring.ru` стоит
+    «На информационном ресурсе применяются рекомендательные технологии» — ближайший
+    российский сосед сам квалифицировал свои подсказки по ст. 10.2-2 149-ФЗ и поставил
+    уведомление, спорить об этом не стал.
+14. **Три опровергнутые посылки очереди** (не пробелы добычи): «Westpac Financial Health
+    Index» — не существует, имелся в виду ANZ Roy Morgan FWBI; «Хабр о «Финздоровье»
+    **Сбера**» — это Т-Банк; «10 компонентов Кармы» — публично названы пять групп.
+    Это третий подряд добор, где часть задания оказалась неверной посылкой (ср. «индекс
+    НАФИ» в исходном задании темы).
+15. **Ориентиры юнит-экономики, которые теперь есть в цифрах:** CAC $9 (MoneyLion, fully
+    loaded, включая бренд), CAC ≈$20–$71 (Acorns, производно), отток **1,3 %/мес**
+    (Acorns), целевая доля S&M в выручке **40 %** (долгосрочная модель Acorns) против
+    ~70 % (NerdWallet). Прямого переноса на РФ нет; переносима структура.
+
+## Что осталось неизвестным после Г7
+
+- Методики **Discover** и **Truist** — не найдены ни одним запросом; вероятно, посылка
+  очереди неточна, как с Westpac.
+- **Morgan Stanley at Work** — известен только объём (12 вопросов), формула закрыта
+  корпоративным доступом.
+- **Journal-версия Economic Record** за пейволлом Wiley (`r.jina.ai` → 200, но 519 байт
+  антибот-заглушки); содержание взято из депонированной IZA-версии.
+- **Prudential Financial Wellbeing Tracker** (Азия) — четыре столпа известны, формула нет;
+  `malaymail` → 403.
+- **Розничные CPA-ставки банков РФ и рублёвые CPA брокеров** — публично не раскрываются
+  (повторный отрицательный результат).
+- **Судебная и надзорная практика по 211-ФЗ, письма ЦБ** — в открытых источниках нет.
+- **Письма ФНС о моменте признания дохода по Telegram Stars** — не существует;
+  есть только экспертное мнение про момент конвертации в TON.
+- **Дословный текст ТАСС** о регистрации Telegram-канала в перечне РКН — `WebFetch` 403.
+- **Программы Aha! и PyCon Russia** — не проверялись, бюджет.
+- **Блог KakaoBank про теги и заметки** — не искался; в английской IR-презентации 2Q26
+  PFM как продукт не упоминается вовсе.
+- **Сервис «Финансовое Здоровье» Финуслуг** — найден в навигации, содержание и цена не сняты.
+- **Проекция п. 44 ст. 270 НК РФ на УСН «доходы минус расходы»** — не проверялась.
+
+
+## ДОБОР Г15 — Г15.1(а): US12524803B1, USAA, «Financial autopilot» (2026-09-12)
+
+Канал: `curl -sk --http1.1` с браузерным UA → `https://patents.google.com/patent/US12524803B1/en` → **HTTP 200, 202 629 байт**;
+разбор HTML (itemprop `claims`, `description`, `applications`, `docdbFamily`, `legalEvents`). Сырой HTML —
+`/private/tmp/g15/US12524803B1.html`. Проверка содержимого: формула 20 пунктов, 13 470 байт секции `claims`.
+
+**Библиография.** Заявка US18/912,285, подана 2024-10-10; приоритет 2018-09-28 (провизорная US62/738,544);
+выдан **2026-01-13**; правовое событие «STCF … PATENTED CASE» 2025-12-30; статус Google Patents — **Active**.
+Правообладатель — United Services Automobile Association (USAA). Изобретатели — Nathan Mahoney, Luis Daniel Silva,
+Gunjan C. Vijayvergia, Jason Paul Hendry. Continuation от US18/393,397 (US12141861B1).
+
+**Семья (блок applications / docdbFamily Google Patents), все — «Financial autopilot», приоритет 2018-09-28:**
+US16/585,519 → **US11127075B1** (выдан 2021-09-21, Active) · US17/410,473 → **US11861694B1** (выдан 2024-01-02,
+Active, расч. истечение 2040-03-31) · US18/393,397 → **US12141861B1** (выдан 2024-11-12, Active) ·
+US18/912,285 → **US12524803B1** (2026-01-13, Active). Страны: **только US**. RU/EA/WO/EP членов нет.
+
+**Независимые пункты — 1 (способ), 8 (носитель), 15 (система); тексты операций совпадают. П. 1 дословно:**
+> «1. A method implemented by a data processing system, comprising: receiving training data including (i) transaction histories of a plurality of users during a specific period of time, and (ii) for each of the plurality of users, data specifying expenses that occurred to the respective user during the specific period of time; training a neural network to predict an expense for a given transaction history using a supervised learning technique based on the training data, wherein the neural network is configured to receive as input the given transaction history and to process the input to generate an output that specifies a specified expense for the given transaction history, wherein the neural network comprises a plurality of artificial neurons that are connected through edges and are aggregated into a plurality of neural network layers comprising at least an input layer and an output layer, wherein each of the edges is configured to transmit a signal from one artificial neuron to another artificial neuron, and wherein an output of each of the plurality of artificial neurons is computed based on inputs of the artificial neuron in accordance with a plurality of weights; setting values of the plurality of weights based on the training of the neural network; and storing, in a hardware storage device, the trained neural network with the set values of the plurality of weights.»
+
+П. 8 — «A non-transitory computer storage medium encoded with computer program instructions that when executed by one or
+more computers cause the one or more computers to perform operations comprising:» + операции п. 1 слово в слово.
+П. 15 — «A system comprising: one or more computers and one or more storage devices storing instructions that are
+operable, when executed by the one or more computers, to cause the one or more computers to perform operations
+comprising:» + те же операции.
+
+**Где avalanche/snowball.** Счёт по тексту формулы (все 20 пунктов): avalanche **0**, snowball **0**, interest rate 0,
+savings 0, goal 0, emergency 0; «neural» — 26. **В формуле их нет; только в описании**, одно место, дословно:
+> «…the user can approve or modify the algorithmically suggested amount to be paid above the minimum payment and the system 100 will offer multiple debt reduction automation options. Examples, of algorithms include: debt snowball (highest interest paid off first), debt avalanche (lowest balance paid first) or a custom option all to be automatically paid according to a pre-agreed upon plan with the user.” In some implementations, the mathematical algorithm used includes to following: disposable income=income−(recurring transaction cashflow+debt re-payment+savings t…»
+
+🔴 Побочно: в описании USAA **определения перепутаны** — «snowball» назван «highest interest paid off first»,
+«avalanche» — «lowest balance paid first» (в общепринятом словаре наоборот). Для формулы значения не имеет —
+слова в неё не вынесены.
+
+**Сравнение по признакам с методом FINPILOT (признаки — §5 `fips_patent_clearance_2026-09-10.md`):**
+
+| Признак независимого пункта US12524803B1 | У FINPILOT |
+|---|---|
+| (a) получение обучающих данных: истории транзакций **множества пользователей** за период + их расходы | **нет** — одно домохозяйство, популяции не собираем |
+| (b) **обучение нейронной сети** с учителем предсказывать расход по истории транзакций | **нет** — SES + Монте-Карло, без обучаемых моделей |
+| (c) структура сети: нейроны, рёбра, слои, веса | **нет** |
+| (d) установка весов по итогам обучения | **нет** |
+| (e) хранение обученной сети в аппаратном хранилище | **нет** |
+
+Вывод исследователя (не заключение о патентной чистоте): независимые пункты US12524803B1 — это **обучение
+нейросети предсказанию расходов** по популяции; распределения денег, долгов, погашения в них нет вовсе.
+У FINPILOT отсутствуют все пять признаков. Формула **уже**, а не шире «перебора вариантов погашения».
+Формулы трёх родительских патентов семьи разобраны ниже (Г15.1(в)), потому что в continuation-семье
+широкий пункт мог остаться у родителя.
+
+**Российский член.** DOCDB-семья — только US. Обратный поиск по RU-массиву (`POST searchplatform.rospatent.gov.ru/search`,
+`ru_since_1994`): q = `"USAA" OR "United Services Automobile Association" OR "Юнайтед Сервисез Аутомобиль"` →
+HTTP 200, 23 991 байт, total 2 — оба мимо (RU2670030C2 Яндекс; RU2644245C2 фармацевтика, KR), совпадение по
+полному тексту, не заявитель. q = `US12524803 OR US11127075 OR US12393978 OR US11532041 OR US12361480 OR US20250335982` →
+HTTP 200, 182 байта, **total 0**. **Российского и евразийского члена нет.**
+
+
+## ДОБОР Г15 — Г15.2: US12393978B2, Capital One, «Systems and methods for debt management with spending recommendation» (2026-09-12)
+
+Канал: `curl -sk --http1.1` → `https://patents.google.com/patent/US12393978B2/en` → **HTTP 200, 209 247 байт**;
+секция `claims` 15 840 байт, 20 пунктов. Сырой HTML — `/private/tmp/g15/US12393978B2.html`.
+
+**Библиография.** Заявка US18/394,321, подана 2023-12-22; приоритет **2020-07-08**; публикация заявки US20240127329A1
+(2024-04-18); Notice of Allowance 2025-05-01; пошлина за выдачу 2025-07-30; PATENTED CASE 2025-08-06; выдан **2025-08-19**;
+расчётное истечение **2040-08-09**; статус **Active**. Правообладатель — Capital One Services, LLC (Virginia); изобретатели —
+Austin Walters, Vincent Pham, Jeremy Goodsitt (переуступка, reel/frame 065943/0517, effective 2020-07-08).
+Continuation от US18/057,522 (US11893630B2).
+
+**Семья (все — то же название, приоритет 2020-07-08):** US16/923,405 → US20220012803A1 → **US11532041B2**
+(выдан 2022-12-20, Active, истечение 2040-09-03) · US18/057,522 → US20230093371A1 → **US11893630B2** (выдан 2024-02-06,
+Active, истечение 2040-07-08) · US18/394,321 → US20240127329A1 → **US12393978B2**. Страны: **только US**.
+
+**Независимые пункты — 1 (способ), 11 (система), 20 (способ). П. 1 дословно:**
+> «1. A computer-implemented method for providing an adaptive goal management recommendation, the method comprising: receiving, by one or more processors, account information regarding a user; receiving, by the one or more processors and a chat bot feature of an interface of a user device, a query from the user, the query representing text or user voice data; in response to the query, presenting, by the one or more processors and the chat bot feature, a portion of the account information including categorized account information of the user; receiving, by the one or more processors and the chat bot feature, at least one goal preference of the user and at least one interests preference of the user; determining, by the one or more processors, using a trained machine learning model, one or more activities available to the user based on the at least one goal preference and the at least one interests preference of the user received via the chat bot feature, the trained machine learning model having been trained based on (i) training user data that includes information regarding goal preferences and interests preference data associated with persons other than the user; and (ii) training activities data that includes prior available activities data associated with persons other than the user, to learn relationships between the training user data and the training activities data, such that the trained machine learning model is configured to output one or more activities available to the user upon receipt of the at least one goal preference and the at least one interests preference of the user; determining, by the one or more processors, for each of the one or more activities available to the user, a respective estimated influence on the at least one goal preference; filtering, by the one or more processors, the one or more activities available to the user with a respective estimated influence greater than a threshold; and presenting, by the one or more processors and the chat bot feature, a recommendation of action relating to at least one activity of the filtered one or more activities, the recommendation being presented as a voice notification, text notification, graphic notification, or tactile notification.»
+
+П. 11 — «A computer system for providing an adaptive goal management recommendation, the computer system comprising: a memory
+having processor-readable instructions stored therein; and at least one processor configured to … perform a plurality of
+functions, including functions for:» + операции п. 1 (без «by the one or more processors»).
+П. 20 — операции п. 1 до фильтрации включительно, затем вместо последнего шага, дословно: «…determining, by the one or more
+processors, a respective satisfaction value based on a respective monetary cost of each of the filtered one or more
+activities available to the user; and presenting, by the one or more processors and the chat bot feature, a recommendation
+of action based on ranking the determined satisfaction values.»
+
+**Где avalanche/snowball.** Формула: avalanche 0, snowball 0, interest rate 0, «machine learning» 9, «goal» 23.
+**Описание: avalanche 0, snowball 0** — слов нет вовсе. Несмотря на слово «debt» в названии, независимые пункты
+этого члена семьи о долге не говорят: предмет — «adaptive goal management recommendation» через чат-бот.
+
+**Сравнение по признакам с методом FINPILOT:**
+
+| Признак независимого пункта US12393978B2 (п. 1 / п. 20) | У FINPILOT |
+|---|---|
+| (a) получение информации о счетах пользователя | **частично** — пользователь вводит доходы/долги/цели вручную; счета не подключаются (агрегации нет) |
+| (b) **чат-бот** интерфейса: запрос текстом или голосом | **нет** |
+| (c) показ категоризированной информации о счетах в ответ через чат-бот | **нет** |
+| (d) получение через чат-бот предпочтений по цели **и по интересам** | **нет** (цели есть, «interests preference» нет; ввод — формы, не чат) |
+| (e) **обученная ML-модель** на данных других людей выдаёт доступные «activities» | **нет** |
+| (f) оценка влияния каждой activity на цель | **частично по форме** — оцениваем влияние альтернативы распределения на критерии, но не activity из ML |
+| (g) фильтр activities по порогу влияния | **частично по форме** — у нас фильтр допустимости по инвариантам, не порог влияния на цель |
+| (h) п. 1: показ рекомендации через чат-бот голосом/текстом/графикой/тактильно | **нет** (веб-интерфейс, не чат-бот) |
+| (h') п. 20: «satisfaction value» по денежной стоимости activity + ранжирование | **частично по форме** — ранжируем SAW, но не activity, выданные ML |
+
+Вывод исследователя (не заключение о патентной чистоте): формула **уже** и завязана на связку «чат-бот + обученная
+на чужих данных ML-модель выбора activities». У FINPILOT нет (b), (c), (d), (e), (h) — пять признаков.
+Формула перебора вариантов погашения не покрывает. Граница: вывод держится, пока в FINPILOT нет чат-бота
+с ML-подбором действий; если появится разговорный интерфейс с обученной на пользователях моделью подбора, формулу
+надо сверять заново (на экспортных рынках; в РФ семья не действует). Формулы родителей — ниже, Г15.2(б).
+
+**Российский член.** DOCDB-семья — только US. RU-массив: q = `"Capital One" OR "Кэпитал Уан" OR "КЭПИТАЛ ВАН"` →
+HTTP 200, 21 076 байт, total 4 — все мимо (RU2728953C1, RU2713761C1 — Сбербанк; RU2795371C1 — Группа АйБи;
+RU2841233C1 — Яндекс; упоминания в тексте). Поиск по номерам семьи — total 0 (см. выше). **RU/EA-члена нет.**
+
+
+## ДОБОР Г15 — Г15.1(б): US20250335982A1 и выданный родитель US12361480B1, Wells Fargo, «System and method for financial health robo-advisor» (2026-09-12)
+
+Канал: `curl -sk --http1.1` → Google Patents. `US20250335982A1` → **HTTP 200, 228 532 байта** (формула 20 пп.);
+`US12361480B1` → **HTTP 200, 235 557 байт** (формула 15 пп.). Сырые HTML — `/private/tmp/g15/`.
+
+**Библиография.** US20250335982A1: заявка US19/264,619, подана 2025-07-09, приоритет **2022-11-10**, публикация
+**2025-10-30**, статус **Pending** (последнее событие — «DOCKETED NEW CASE - READY FOR EXAMINATION», 2025-07-27);
+continuation от US18/054,300. Родитель US18/054,300 (подан 2022-11-10) → **US12361480B1, выдан 2025-07-15, Active**.
+Правообладатель — Wells Fargo Bank, N.A.; изобретатель — Cathy Ann Costa.
+🔴 **Поправка к записи Г3:** в семье есть не только заявка, но и **ВЫДАННЫЙ патент US12361480B1** — Г3 его не видел.
+**Семья:** только эти два US-документа (DOCDB). RU/EA/WO/EP нет.
+
+**US20250335982A1 (заявка), независимые пп. 1, 17, 19 — операции совпадают. П. 1 дословно:**
+> «1. A method, comprising: receiving, via a processor, a financial health goal from a user, wherein the financial health goal does not include an investment goal; training a machine learning model using historical peer transaction data and location data to identify spending patterns, wherein the training comprises: preprocessing anonymized user transaction histories and associated location data as training input; applying a selected machine learning algorithm to detect correlations between geographic locations and spending behaviors; and generating a trained neural network that predicts purchase probabilities based on a geographic location; monitoring, via a GPS system, one or more geographic locations of a user device; detecting that the user device has entered a predefined geographic area; inputting the geographic area data into the trained neural network to determine a probability of the user making a purchase that would impact the financial health goal; and generating, via the trained neural network, a preventative alert when the probability exceeds a threshold value.»
+
+П. 17 — «A non-transitory machine-readable medium storing instructions that, when executed by a computer system, cause the
+computer system to perform operations comprising:» + те же операции. П. 19 — «A system, comprising: a robo-advisor system
+configured to:» + те же операции.
+
+**US12361480B1 (выданный родитель), независимые пп. 1, 14, 15 — операции совпадают. П. 1 дословно:**
+> «1. A method, comprising: receiving, via a processor, a financial health goal from a user, wherein the financial health goal does not include an investment goal; retrieving, from a data store, one or more financial health templates based on the financial health goal, wherein each of the one or more financial health templates comprise a trained artificial intelligence (AI) model having one or more neural networks trained from a dataset of anonymized peer financial transaction histories using a selected training algorithm, wherein the trained AI model is trained to identify one or more success patterns in the peer financial transaction histories that are predictive of achieving one or more specific financial health goals by training, via the processor, the one or more neural networks based on the selected training algorithm by providing the dataset of anonymized peer financial transaction histories as training input to the one or more neural networks; deriving, via the processor, a financial health advice action based on using the financial health goal as input to the trained AI model of the one or more financial health templates, wherein the trained AI model is configured to identify the one or more success patterns based on the financial health goal, wherein the financial health goal comprises increasing a credit score, reducing a discretionary spending, reducing a total spending, reducing a category of spending, achieving a savings goal amount, creating an emergency fund, repaying a loan, or a combination thereof; providing, via the processor, the financial health advice action, wherein the one or more financial health templates are created based on consumer financial data; monitoring, via a financial network, financial transactions of a user of the financial health advice action; determining, via the processor, that one or more of the financial transactions are not following the financial health advice action; and alerting, via the processor, the user that the financial health advice action is not being followed based on the determination, wherein the one or more financial health templates are created, via the processor, by: selecting a success metric; collecting the consumer financial data related to the success metric; deriving one or more financial success patterns from the consumer financial data by training the trained AI model; and storing the one or more financial success patterns as the trained AI model of the one or more financial health templates, wherein deriving the one or more financial success patterns from the consumer financial data by training the trained AI model based on the selected training algorithm comprises applying machine learning, deep learning, state vector machines, data mining, or a combination thereof, to extract the one or more financial success patterns from the consumer financial data, and wherein applying machine learning, deep learning, state vector machines, data mining, or the combination thereof, comprises creating the one or more neural networks and training the one or more neural networks to detect the one or more financial success patterns, extracting rules via data mining rule extraction, or a combination thereof.»
+
+П. 14 — носитель, п. 15 — «A system, comprising: a robo-advisor system configured to:», операции те же.
+
+**Где avalanche/snowball.** Счёт по формуле: A1 — avalanche 0, snowball 0 (machine learning 6, neural 15); B1 — avalanche 0,
+snowball 0 (neural 15, emergency 5). **В формулах обоих нет.** В описании A1 — два упоминания, дословно:
+> «…taking out a loan at lower interest rates to pay off a higher interest rate loan, setting up of an automatic payment, creating of a payment plan (e.g., loan payment plan, emergency fund payment plan), making a payment at a certain schedule (e.g., using the “snowball” method to pay off debts from smallest to largest, using the “avalanche” method to pay the debt with highest interest rate first), maintaining an account balance at a certain amount by setting spending limits, and so on. Once the user customizes a financial health plan, the robo-advisor system 102 can aid in the execution of the financial health plan via monit…»
+
+В описании выданного B1 на странице Google Patents счёт avalanche/snowball = **0** (замер тем же скриптом) — то есть
+абзац со словами есть только в тексте, опубликованном с continuation-заявкой. Причину (дополненное описание или
+неполная OCR-страница родителя) не устанавливал.
+
+**Сравнение по признакам с методом FINPILOT — выданный US12361480B1 (он ближе по предмету: цель «creating an emergency
+fund, repaying a loan» прямо названа в формуле):**
+
+| Признак независимого пункта US12361480B1 | У FINPILOT |
+|---|---|
+| (a) получение от пользователя финансовой цели, не инвестиционной | **есть** (цели, резерв, погашение) |
+| (b) выборка из хранилища «financial health templates» по цели | **нет** |
+| (c) шаблон содержит **обученную ИИ-модель с нейросетями** на обезличенных историях транзакций **других людей (peer)** | **нет** |
+| (d) модель выявляет «success patterns», предсказывающие достижение цели | **нет** |
+| (e) вывод «financial health advice action» подачей цели на вход обученной модели | **нет** — совет выводится расчётом (перебор 66 альтернатив, SAW), не моделью |
+| (f) перечень целей: кредитный балл, траты, накопления, **резервный фонд, погашение кредита** | **частично** — предмет совпадает (резерв, долг), но это альтернатива внутри признака (e) |
+| (g) **мониторинг транзакций пользователя через финансовую сеть** | **нет** — агрегации и мониторинга нет |
+| (h) определение, что транзакции не следуют совету, и **оповещение** | **нет** |
+| (i) создание шаблонов: метрика успеха → сбор данных потребителей → обучение → хранение | **нет** |
+| (j) ML / deep learning / SVM / data mining, нейросети или извлечение правил | **нет** |
+
+**US20250335982A1 (заявка):** признаки — цель; **обучение ML на peer-транзакциях и геолокации**; нейросеть вероятности
+покупки по месту; **GPS-мониторинг** устройства; вход в заданную геозону; превентивное оповещение по порогу.
+У FINPILOT есть только (a) цель; нет ни одного из остальных пяти.
+
+Вывод исследователя (не заключение о патентной чистоте): обе формулы Wells Fargo **уже** метода «перебор вариантов
+распределения»: выданная требует обученной на чужих транзакциях нейросетевой модели + мониторинга транзакций + оповещения
+о неисполнении; заявка — геолокации и GPS. Ни одна не содержит перебора альтернатив, инвариантов, очерёдности погашения.
+🔴 Граница: из всех разобранных в Г15 документов **US12361480B1 единственный, где в независимом пункте прямо стоят
+«creating an emergency fund, repaying a loan»** — то есть предмет наш. Держит его от FINPILOT исключительно связка
+«обученная на peer-данных модель + мониторинг транзакций + алерт о неисполнении». Если на экспортных рынках появится
+модуль «следим за транзакциями и предупреждаем, что пользователь отклонился от плана» **вместе** с обучаемой моделью —
+сверять заново. В РФ членов семьи нет.
+
+**Российский член.** RU-массив: `"Wells Fargo" OR "Уэллс Фарго" OR "ВЕЛЛС ФАРГО"` → HTTP 200, 18 639 байт, total 3,
+все мимо (RU2479864C1 — Дайер/Сибирски; RU2754240C1 — КуРэйт; RU2839053C1 — Сбербанк; упоминания в тексте).
+По номерам семьи — total 0 (запрос выше). **RU/EA-члена нет.**
+
+
+## ДОБОР Г15 — Г15.1(в): родительские патенты семьи USAA «Financial autopilot» (2026-09-12)
+
+Зачем: в continuation-семье широкий пункт может стоять у родителя, а не у последнего члена. Каналы — Google Patents, curl:
+`US11127075B1` HTTP 200, 243 005 байт (15 пп.); `US11861694B1` HTTP 200, 229 851 байт (18 пп.); `US12141861B1` HTTP 200,
+228 258 байт (18 пп.). Все Active. Счёт по формулам всех трёх: avalanche 0, snowball 0, debt 0, interest 0, saving 0;
+в описаниях всех трёх avalanche/snowball = 0 (абзац со словами есть только в US12524803B1).
+
+**US11127075B1 (заявка US16/585,519 от 2019-09-27, выдан 2021-09-21), независимые пп. 1, 6, 11. П. 1 дословно:**
+> «1. A method implemented by a data processing system, comprising: receiving training data including (i) transaction histories of a plurality of users during a specific period of time, and (ii) for each of the plurality of users, data specifying unexpected expenses that occurred to the respective user during the specific period of time; training a neural network to predict an unexpected expense for a given transaction history using a supervised learning technique based on the training data, wherein the neural network is configured to receive as input the given transaction history and to process the input to generate an output that specifies a specified expense for the given transaction history, wherein the neural network comprises a plurality of artificial neurons that are connected through edges and are aggregated into a plurality of neural network layers comprising at least an input layer and an output layer, wherein each of the edges is configured to transmit a signal from one artificial neuron to another artificial neuron, and wherein an output of each of the plurality of artificial neurons is computed by a specified function of a sum of inputs of the artificial neuron in accordance with a plurality of weights; setting values of the plurality of weights based on the training of the neural network; receiving new data indicating a list of historic transactions of a particular user from a plurality of financial institutions; based on the list of historic transactions, creating a plurality of categories using a clustering algorithm; generating a hierarchy among the plurality of categories; processing, by the data processing system, the new data using the plurality of artificial neurons in the trained neural network in accordance with the values of the plurality of weights to identify at least one specified expense for the particular user, wherein the artificial neurons in the input layer are configured to receive the new data as input and the artificial neurons in the output layer are configured to generate output that identifies the at least one specified expense; determining a plan to account for the at least one specified expense, wherein the plan comprises deducting a payment for the at least one specified expense from a lowest ranked category in the hierarchy; and automatically transferring, by the data processing system, an amount from a first account of the particular user to a second account of the particular user based on the plan.»
+Пп. 6 (носитель) и 11 (система) — те же операции.
+
+**US11861694B1 (заявка US17/410,473 от 2021-08-24, выдан 2024-01-02, расч. истечение 2040-03-31), независимые пп. 1, 7, 13.**
+Отличие от US11127075B1: убраны кластеризация категорий, иерархия и «deducting … from a lowest ranked category»; остались
+обучение нейросети на неожиданных расходах популяции → данные транзакций пользователя **«from a plurality of financial
+institutions»** → выявление расхода → «determining a plan to account for the at least one specified expense; and
+automatically transferring, by the data processing system, an amount from a first account of the particular user to a second
+account of the particular user based on the plan.» (дословно, конец п. 1).
+
+**US12141861B1 (заявка US18/393,397 от 2023-12-21, выдан 2024-11-12), независимые пп. 1, 7, 13.** Ещё шире по концовке:
+«unexpected expenses» → «expenses»; нет «plurality of financial institutions»; нет автоперевода; п. 1 оканчивается,
+дословно: «…receiving new data indicating a list of historic transactions of a particular user; processing, by the data
+processing system, the new data using the plurality of artificial neurons in the trained neural network … to identify at
+least one specified expense for the particular user …; and determining a plan to account for the at least one specified
+expense.»
+
+**Сравнение по признакам (для всей семьи USAA):** обязательный во всех независимых пунктах всех четырёх патентов блок —
+**обучающие данные по множеству пользователей + обучение нейросети с учителем + структура сети с весами** (+ в двух
+старших: агрегация транзакций из нескольких банков и **автоматический перевод между счетами** пользователя). У FINPILOT
+нет ни обучаемой модели, ни популяционных данных, ни агрегации, ни автоперевода. Самый широкий член — US12141861B1
+(«determining a plan to account for the specified expense») — всё равно требует, чтобы расход выявила обученная нейросеть.
+
+Вывод исследователя: семья USAA к методу FINPILOT не подходит ни одним независимым пунктом: её ядро — предсказание
+расхода нейросетью, а не распределение свободного потока. Граница: сверять заново, если FINPILOT начнёт
+**предсказывать расходы обучаемой на пользователях нейросетью** (на экспортных рынках; в РФ членов нет).
+
+
+## ДОБОР Г15 — Г15.2(б): родительские патенты семьи Capital One (2026-09-12)
+
+Каналы — Google Patents, curl: `US11532041B2` HTTP 200, 311 768 байт (20 пп.); `US11893630B2` HTTP 200, 309 919 байт (20 пп.).
+Оба Active. Счёт: avalanche 0, snowball 0 и в формулах, и в описаниях обоих.
+
+**US11532041B2 (заявка US16/923,405 от 2020-07-08, публ. US20220012803A1, выдан 2022-12-20, истечение 2040-09-03) — ЕДИНСТВЕННЫЙ
+член семьи, у которого родовое понятие «debt management recommendation». Независимые пп. 1, 11, 20. П. 1 дословно:**
+> «1. A computer-implemented method for providing a debt management recommendation, the method comprising: generating, by one or more processors, a user interface of a user device associated with a user, the user interface including a navigation bar, a home view, a preference view, an activities view, and a chatbot feature; receiving, by one or more processors, financial information regarding a user; categorizing, by the one or more processors, transaction information of the user based on the financial information; receiving, by the one or more processors, via the chatbot feature of the user interface, a query from the user; in response to the query, presenting, by the one or more processors, via the chatbot feature of the user interface, a portion of the categorized transaction information of the user; receiving, by the one or more processors, information regarding at least one financial preference and at least one transaction preference of the user via the chatbot feature of the user interface; determining, by the one or more processors, using a trained machine learning model, one or more activities available to the user based on the at least one financial preference and the at least one transaction preference of the user, wherein the trained machine learning model is trained based on (i) training user data that includes information regarding financial preferences and transaction preference data associated with persons other than the user; and (ii) training activities data that includes prior available activities data associated with persons other than the user, to learn relationships between the training user data and the training activities data, such that the trained machine learning model is configured to determine one or more activities available to the user upon the input of the at least one financial preference and the at least one transaction preference of the user; calculating, by the one or more processors, for each of the one or more activities available to the user, an estimated influence on the at least one financial preference; presenting, by the one or more processors, via the chatbot feature of the user interface, the estimated influence on the at least one financial preference based on a user selected one of the one or more activities available to the user; filtering, by the one or more processors, the one or more activities available to the user with a positive estimated influence to the at least one financial preference; and presenting, by the one or more processors, via the chatbot feature of the user interface, a recommendation of action relating to the one of the one or more activities available to the user, wherein the recommendation of action relating to the one of the one or more activities available to the user is presented by at least one of voice notification, application notification, tactile notification, or graphic notification.»
+
+П. 11 — система с теми же функциями. П. 20 — те же операции, плюс: запрос через чат-бот финансового и транзакционного
+предпочтения, «assigning … an expected value to the at least one transaction preference», «calculating … a value of
+satisfaction based on a monetary cost of the one or more activities … with positive estimated influence and the expected
+value; ranking … based on the value of satisfaction; … recommending … one of the one or more activities … based on the
+ranking» (дословные фрагменты).
+
+**US11893630B2 (заявка US18/057,522 от 2022-11-21, выдан 2024-02-06, истечение 2040-07-08), независимые пп. 1, 11, 20** —
+«adaptive goal management recommendation»; интерфейс с «navigation bar, a chat bot feature, and a text bar»; далее по
+существу тот же набор, что у US12393978B2 (цель и «interests preference» через чат-бот → обученная на других людях
+ML-модель → activities → оценка влияния → фильтр положительного влияния → рекомендация через чат-бот; п. 20 — satisfaction
+value по денежной стоимости и ранжирование).
+
+**Сравнение по признакам (вся семья Capital One):** обязательные во всех независимых пунктах трёх патентов признаки —
+**чат-бот интерфейса** (запрос, показ категоризированных транзакций, сбор предпочтений) и **обученная на данных других
+людей ML-модель, выдающая «activities»**. У FINPILOT нет ни того, ни другого. Совпадает у нас только общая схема
+«оценить влияние варианта → отфильтровать → ранжировать» (п. 20 всех трёх), но она в формуле применена к
+activities, выданным ML-моделью, и подаётся через чат-бот. Название «debt management» у US11532041B2 формулой не
+раскрыто в сторону долга: ни ставок, ни очерёдности, ни сумм погашения в независимых пунктах нет.
+
+
+## ДОБОР Г15 — Г15.3: соседние патенты с приоритетом от 2018 года (2026-09-12)
+
+Канал: `GET https://patents.google.com/xhr/query?url=<urlencoded>&exp=` (curl, браузерный UA), `after=priority:20180101`,
+`num=100`. Скрипт — `/private/tmp/g15/gpq.py`, ответы — `/private/tmp/g15/gpq_*.json`. Все запросы HTTP 200.
+
+| # | Запрос | Байт | Всего | Новое против Г3 |
+|---|---|---|---|---|
+| Q1 | `("debt avalanche")` | 4 998 | 2 | US12524803B1 (USAA, разобран выше); US20250315893A1 (Insphire, уже в А.6) |
+| Q2 | `("debt snowball")` | 5 042 | 2 | US12524803B1; **US20210142402A1 Capital One «Guidance Engine»** |
+| Q3 | `(allocate) ("surplus cash flow" OR "surplus income" OR "excess cash") (debt) (savings goal)` | 35 849 | 18 | корпоративное казначейство, токенизация, CME; US20230401644A1 (Apriority); JP2025154093A (Money Forward) — ни одного про домохозяйство с распределением в формуле, кроме USAA |
+| Q4 | `("emergency fund") ("debt payoff" OR "debt repayment" OR "pay down debt") (recommendation)` | 25 967 | 13 | US20240135456A1 (Ahora); **US11669897B2 Capital One «Guidance engine»**; US12254518B1 (Freedom Financial Network); WO2026074314A1 (1Finance); KR102121857B1 (RunInvest); остальное — CN/KR про корпорации |
+| Q5 | `("multi-criteria" OR "multiple criteria" OR "weighted sum") (allocation) ("personal finance" OR household) (debt)` | 293 747 | 343 | шум (NFT, фитнес-трекеры, авиация); по предмету — US11783252B1 (Double Diamond), US11663668B1 (Diane Money), US11900227B1 (Gravystack) |
+| Q6 | `("pay off" OR payoff) ("highest interest" OR "highest APR") ("emergency fund" OR "savings goal")` | 12 975 | 5 | US20250335982A1 (Wells Fargo); **US12008644B2 Capital One «Guidance engine»**; US12254518B1 |
+
+Все кандидаты открыты на Google Patents (curl, HTTP 200, размеры ниже), формулы разобраны скриптом `claims.py`.
+
+### 🔴 Г15.3(а): семья Capital One «Guidance engine: an automated system and method for providing financial guidance» — БЛИЖАЙШИЙ по признакам документ из всех найденных за Г3 и Г15
+
+Страницы: US11023967B1 HTTP 200, 593 928 байт; US11669897B2 HTTP 200, 599 617; US12008644B2 HTTP 200, 624 118; публикации заявок
+US20210142402A1 (741 646), US20210342939A1 (624 381), US20230252559A1 (632 641). Правообладатель — **Capital One Services, LLC**;
+изобретатели — Katharine Schlesinger, John Rush, Zheyu Yang, Matthew Davis. Приоритет у всех — **2019-11-12**.
+
+| Патент | Заявка, подача | Публикация заявки | Выдача | Статус |
+|---|---|---|---|---|
+| **US11023967B1** | US16/680,793, 2019-11-12 | US20210142402A1 (2021-05-13) | 2021-06-01 | Active; пошлина за 4-й год уплачена 2024-11-22 |
+| **US11669897B2** | US17/322,968, 2021-05-18 (continuation) | US20210342939A1 (2021-11-04) | 2023-06-06 | Active; расчётное истечение **2040-01-10** |
+| **US12008644B2** | US18/137,023, 2023-04-20 (continuation) | US20230252559A1 (2023-08-10) | 2024-06-11 | Active (PATENTED CASE 2024-05-22) |
+
+Семья — **только US** (DOCDB: шесть US-документов). RU-массив: q = `US11023967 OR US11669897 OR US12008644 OR US20230252559 OR
+US12254518 OR US20240135456` → HTTP 200, 184 байта, **total 0**; `"Capital One" OR "Кэпитал Уан" OR "Капитал Уан"` → total 4,
+все мимо (Сбербанк ×2, Группа АйБи, Яндекс — упоминания). **RU/EA-члена нет.**
+
+**Почему этот документ важнее Intuit, USAA, Wells Fargo.** Во всех прежних формулах обязательный признак — обучаемая
+модель (ML/нейросеть). **Здесь ML нет** (счёт по формуле: «machine learning» 0, «neural» 0). Формула — детерминированный
+«decision tree engine» над теми же величинами, что у нас: **ежемесячные расходы, ежемесячный доход, уровень резервного
+фонда, уровень высокопроцентного долга** → «financial action». Счёт по формулам: emergency 46–55, debt 25–34, interest 26–37.
+
+**US12008644B2 — самый широкий член семьи. Независимые пп. 1 (система), 11 (способ), 16 (носитель). П. 1 дословно:**
+> «1. A system comprising: a data integration engine comprising: one or more first processors; and first memory storing first instructions that, when executed by the one or more first processors, cause the data integration engine to: determine user data associated with an estimated monthly expenses of a user, an estimated monthly income of the user, an estimated emergency fund level of the user, and an estimated high interest debt level of the user, wherein at least a portion of the user data is in a non-compliant format; and convert the portion of the user data in the non-compliant format into a compliant format; a decision tree engine comprising: one or more second processors; and second memory storing second instructions that, when executed by the one or more second processors, cause the decision tree engine to: receive, from the data integration engine, the user data having the converted portion; determine, based on the user data having the converted portion, a financial action for the user, wherein determining the financial action comprises determining results for each branch of a decision tree that associates the financial action with combinations of values of the estimated monthly expenses, the estimated monthly income, the estimated emergency fund level, and the estimated high interest debt level; and cause, via a guidance user interface, an output of the financial action.»
+
+П. 11 — способ с теми же шагами **плюс**, дословно: «validating, by the data integration engine, the converted portion of the
+user data by generating a plurality of test cases to test compliance of the converted portion of the user data and applying the
+plurality of test cases to the converted portion of the user data; sending, by the data integration engine and to a decision tree
+engine, the user data having the converted portion;» — далее как в п. 1. П. 16 — носитель, те же шаги, что в п. 11.
+
+**US11669897B2, п. 1 (система; пп. 8 — способ, 15 — носитель, те же шаги), ключевые отличия от US12008644B2, дословно:**
+«receive, via a guidance user interface, first input data … monthly expenses, monthly income, emergency fund level, or high interest
+debt level; receive, from one or more data servers, second input data …; optimize the second input data by integrating the first
+input data into the second input data; generate … first output data associated with an estimated committed monthly expenses …
+wherein the estimated committed monthly expenses are associated with a total monthly fixed expense incurred by the user to cover
+essential needs, and the estimated monthly income comprises a gross income or a net income; and generate … second output data
+associated with an estimated emergency fund level of the user and an estimated high interest debt level of the user, wherein the
+estimated emergency fund level is based on an amount of liquid assets available to cover the estimated committed monthly expenses,
+and wherein the estimated high interest debt level is associated with one or more loans with interest rates above a pre-set
+threshold;» → decision tree engine → «cause, via the guidance user interface, an output of the financial action, the estimated
+committed monthly expenses, the estimated monthly income, the estimated emergency fund level, and the estimated high interest debt
+level.» Формата «non-compliant» в этом члене нет, но есть **второй источник данных — внешние серверы** и их слияние с вводом.
+
+**US11023967B1 (самый узкий), п. 1 (пп. 8, 15 — те же шаги):** всё, что в US11669897B2, **плюс** «non-compliant format» внешних данных,
+валидация тест-кейсами, доход «gross, a net and a discretionary income» и **третий выход — confidence score**, дословно:
+«data indicating a variability score for each of the estimated committed monthly expenses, the estimated monthly income, the
+estimated emergency fund level, and the estimated high interest debt level, wherein the variability score is based on a ratio of an
+interquartile range (IQR) or standard deviation to a value … and data indicating a reasonableness score for each of …» — и вывод
+этого балла в интерфейс.
+
+**Сравнение по признакам с методом FINPILOT (признаки метода — §5 `fips_patent_clearance_2026-09-10.md`; реализация кода не
+сверялась — это граница вывода):**
+
+| Признак независимого пункта | US12008644B2 п. 1 | US11669897B2 п. 1 | US11023967B1 п. 1 | У FINPILOT |
+|---|---|---|---|---|
+| (a) данные: расходы в месяц, доход в месяц, уровень резервного фонда, уровень высокопроцентного долга | да | да (+ «committed expenses» как обязательные на базовые нужды; резерв = ликвидные активы к обязательным расходам; долг = кредиты со ставкой выше порога) | да | **ЕСТЬ по существу**: доход, расходы, резерв, долги со ставками. «Высокопроцентный долг по порогу ставки» как отдельной величины у нас нет — долги упорядочиваются по ставке (Avalanche), а не делятся порогом |
+| (b) часть данных в «non-compliant format» и конвертация в «compliant format» | да | нет | да | **НЕ ОПРЕДЕЛЕНО по канону метода** — зависит от того, считать ли нормализацию пользовательского ввода (разбор сумм, приведение типов) таким признаком. Нужна сверка с кодом и толкование поверенного |
+| (c) валидация конвертированных данных генерацией тест-кейсов | только пп. 11, 16 | нет | да | **нет** в методе |
+| (d) второй источник — внешние серверы данных, слияние с вводом | нет | да | да | **нет** — только ручной ввод, агрегации нет |
+| (e) confidence score: variability (IQR или σ к значению) + reasonableness по каждой из четырёх величин | нет | нет | да | **нет** (Монте-Карло даёт интервал прогноза потока, но не балл вариабельности входов по IQR/σ) |
+| (f) **decision tree engine**: действие определяется результатами **по каждой ветви дерева решений**, связывающего действие с **комбинациями значений** четырёх величин | да | да | да | **НЕТ по форме**: действие у нас не выбирается ветвлением по комбинациям значений, а получается перебором 66 альтернатив распределения, фильтром по инвариантам (Rt ≥ 0, ПДН ≤ 0,40) и ранжированием взвешенной суммой (SAW). Результат — доли распределения, а не одно «действие» из дерева |
+| (g) вывод действия через «guidance user interface» | да | да (+ вывод четырёх величин) | да (+ confidence score) | **есть** |
+| раздельные «engine» на разных процессорах/памяти (системный пункт) | да | да | да | формально: веб-сервис на одном сервере; значение этого признака — вопрос толкования |
+
+**Вывод исследователя (не заключение о патентной чистоте).**
+1. Это **первый найденный документ без ML, чей предмет совпадает с нашим почти полностью**: те же четыре входа, тот же
+   жанр («что делать со свободными деньгами: резерв или высокопроцентный долг»), детерминированное правило. Он опровергает
+   общий тезис прежних добор «все формулы соседей держатся на обучаемой модели».
+2. Отличие FINPILOT от самого широкого члена (US12008644B2 п. 1) держится на **двух** признаках: (f) дерево решений
+   по комбинациям значений против перебора альтернатив + инварианты + SAW и (b) конвертация «non-compliant format», наличие
+   которой в нашей реализации по канону не определить. Если (b) у нас есть, отличие остаётся **одно — (f)**, и оно
+   сводится к вопросу, эквивалентен ли наш перебор с фильтром и ранжированием «дереву решений» по смыслу формулы.
+   Это вопрос для патентного поверенного США, не для исследователя.
+3. **Территория:** семья только в US; RU/EA/WO/EP нет. На российский рынок документ не действует (ст. 1345 и ст. 1350 ГК РФ —
+   патент США прав в РФ не создаёт); вывод «блокера в РФ нет в проверенном объёме» не меняется.
+4. 🔴 **Для экспортных рынков (США)** US12008644B2 — **главный документ для сверки** перед любым запуском в США; истечение
+   семьи — не раньше 2040-01-10 (по US11669897B2). И прямое следствие для продукта на любых рынках: **не реализовывать
+   рекомендацию как дерево правил вида «если резерв меньше X месяцев обязательных расходов и есть долг со ставкой выше Y,
+   то …» над этими четырьмя величинами** — именно такую конструкцию формула описывает дословно; перебор + инварианты + SAW
+   от неё отличается по форме.
+
+### Г15.3(б): прочие кандидаты — одна строка о сути
+
+| Документ | Правообладатель, приоритет | Статус | Суть независимого пункта (по тексту формулы) | RU-член | Признаки, которых у FINPILOT нет |
+|---|---|---|---|---|---|
+| **US20240135456A1** «Personal financial management and coaching tool» (HTTP 200, 406 688 байт) | Ahora Inc., 2022-01-07 | **Pending**; окончательные отказы 2024-06-26 и 2026-01-30, заявка снова на экспертизе с 2026-04-30 | п. 1 дословно: «A method comprising: receiving financial data associated with a user; updating budget information based at least in part on the received financial data; determining a state of personal finance of the user based at least in part on the received financial data; facilitating presentation of the state of personal finance in association with the updated budget information via a graphical user interface (GUI); receiving goal information associated with the user, the goal information indicative of one or more financial goals of the user; determining progress of the one or more financial goals based at least in part on the state of personal finance; and facilitating presentation of a notification based at least in part on the progress of the one or more financial goals via the GUI.» | нет (семья только US; RU-поиск `"Ahora"` → 0) | 🔴 **формула очень широкая, совпадает с любым PFM**; у FINPILOT по канону есть приём данных, состояние финансов, GUI, цели; «updating budget information» и «notification based on progress» — зависят от реализации. Это заявка, прав не даёт; дважды отклонена окончательно. **Следить за выдачей** — на экспортных рынках |
+| **US12254518B1** «Real-time individualized action plan for clients of a financial assistance service» (HTTP 200, 411 943) | Freedom Financial Network LLC, 2021-05-04 (семья: + US12333599B1) | Active | система: финданные → «personalized balance sheet and an individualized action plan … providing a set of priorities»; **в реальном времени** обнаруживает изменения через источник данных финсчёта пользователя, обновляет план, передаёт контент со ссылкой на ресурс для выполнения действия | нет | реальное время, подключение к источнику данных счёта, ссылка на исполнение действия |
+| **US20230401644A1** «Systems and methods for conducting mass market holistic loan optimization» (HTTP 200, 384 576) | Apriority Financial Inc., 2022-06-13 | Pending | п. 1: профиль (доход, кредитный балл, активы, долговой портфель) → **получение котировок ставок** → «optimizer engine» → «optimum loan product or an optimum loan portfolio» | нет | котировки ставок кредиторов, подбор кредитного продукта (у нас нет подбора продуктов) |
+| **US11783252B1** «Apparatus for generating resource allocation recommendations» (HTTP 200, 620 785) | Double Diamond Interests LLC, 2022-10-31 | Active | данные о **недвижимости** пользователя → метрика улучшения → **обученная ML-модель** распределения ресурсов | нет | недвижимость, ML |
+| **US11663668B1** «Apparatus and method for generating a pecuniary program» (HTTP 200, 453 412) | Diane Money IP LLC, 2022-07-15 | Active | тренды в денежных данных → **ML-классификация** в приоритетный балл с переобучением → программа | нет | ML с переобучением |
+| **US11900227B1** «Apparatus for producing a financial target strategy» (HTTP 200, 505 458) | Gravystack Inc., 2022-07-25 | Active | история + цель → **ML-модель** паттернов → рейтинг необходимости → скорректированная цель через вторую ML-модель | нет | две ML-модели |
+| **WO2026074314A1** «Method and system for recommending a financial plan» (HTTP 200, 149 331) | 1Finance Private Ltd (Индия), 2024-10-02 | PCT, pending | **формула на странице не извлечена** (0 пунктов в разметке `claims`); в тексте есть «emergency», «interest» | PCT-стадия: 31-мес. срок для RU истекает ~2027-05-02 — **следить** | не определено — см. НЕ ДОБЫТО |
+| **KR102121857B1** «Method for providing financial design service» (HTTP 200, 164 722) | 런인베스트 (RunInvest), 2018-05-02 | Active | формула на английской странице не извлечена (0 пунктов); в тексте «debt» ×6, «emergency» ×2 | нет (семья KR: + KR20190126682A) | не определено |
+| US20250315893A1 (Insphire) | — | — | уже разобран в А.6 (RL-оптимизация) | — | — |
+
+Глубоко разобран только документ, где алгоритм распределения/выбора действия — в независимом пункте без обучаемой модели
+(Guidance engine). Apriority (оптимизатор) — предмет кредитный продукт, не распределение потока; разбирать глубже не стал.
+
+
+# ИТОГ ДОБОРА Г15 (патенты, 12.09.2026)
+
+| Пункт | Статус | Где раздел |
+|---|---|---|
+| **Г15.1** US12524803B1 (USAA) — формула, статус, семья, RU-член, сравнение | **добыт полностью** | «ДОБОР Г15 — Г15.1(а)» и «Г15.1(в)» (три родительских патента семьи) |
+| **Г15.1** US20250335982A1 (Wells Fargo) — то же | **добыт полностью и расширен** | «Г15.1(б)»: разобрана не только заявка, но и **выданный родитель US12361480B1**, которого Г3 не видел |
+| **Г15.2** US12393978B2 (Capital One, «debt management with spending recommendation») | **добыт полностью** | «Г15.2» + «Г15.2(б)» (родители US11532041B2 и US11893630B2) |
+| **Г15.3** поиск соседних патентов с приоритетом от 2018 | **добыт**: 6 запросов к JSON-эндпоинту Google Patents, 9 новых документов разобрано | «Г15.3», глубоко — «Г15.3(а)» семья Capital One «Guidance engine» |
+
+## 🔴 Прямой ответ на главный вопрос пункта
+
+**1. Есть ли avalanche/snowball в НЕЗАВИСИМЫХ пунктах формул? — НЕТ. Ни у одного из проверенных.**
+Машинный счёт по полному тексту формул (скрипт `/private/tmp/g15/claims.py`, все пункты каждого документа):
+
+| Документ | avalanche в формуле | snowball в формуле | где слова есть |
+|---|---|---|---|
+| US12524803B1 (USAA, выдан 2026-01-13) | 0 | 0 | только в описании, один абзац (причём определения перепутаны: «snowball (highest interest paid off first), debt avalanche (lowest balance paid first)») |
+| US11127075B1 / US11861694B1 / US12141861B1 (родители USAA) | 0 | 0 | в описаниях тоже 0 |
+| US20250335982A1 (Wells Fargo, заявка) | 0 | 0 | только в описании, один абзац |
+| US12361480B1 (Wells Fargo, выдан 2025-07-15) | 0 | 0 | в описании на странице Google Patents тоже 0 |
+| US12393978B2 / US11893630B2 / US11532041B2 (Capital One, «debt management») | 0 | 0 | в описаниях 0 |
+| US11023967B1 / US11669897B2 / US12008644B2 (Capital One, «Guidance engine») | 0 | 0 | в описаниях 0 |
+| (для полноты, из Г3) US11544780B2 и CA3162417C (Intuit) | 0 | 0 | только в описании |
+
+То есть картина Intuit из Г3 — «слова в описании, в формуле нет» — **подтверждена для всех остальных кандидатов**.
+Ни одна проверенная формула не монополизирует ни Avalanche как очерёдность, ни перебор вариантов погашения вообще.
+
+**2. Есть ли российский или евразийский член семьи? — НИ У ОДНОЙ ИЗ ТРЁХ СЕМЕЙ НЕТ.**
+- USAA «Financial autopilot» — 4 патента, DOCDB-страны **только US**;
+- Wells Fargo «financial health robo-advisor» — 2 документа, **только US**;
+- Capital One «debt management with spending recommendation» — 3 патента + 2 публикации, **только US**;
+- Capital One «Guidance engine» (найдена в Г15.3) — 3 патента + 3 публикации, **только US**.
+Обратный поиск по RU-массиву (`POST searchplatform.rospatent.gov.ru/search`, `ru_since_1994`): по номерам всех семей —
+HTTP 200, 182–184 байта, **total 0**; по именам правообладателей («USAA / United Services Automobile Association»,
+«Wells Fargo», «Capital One», «Freedom Financial», «Ahora», «Apriority») — попадания только текстовые, в чужих RU-патентах
+(Яндекс, Сбербанк, Группа АйБи и др.), ни одного документа этих компаний.
+
+**3. Формула шире или уже «перебора вариантов погашения»? — УЖЕ, у всех, но по РАЗНЫМ причинам.**
+- USAA — обучение нейросети предсказанию расхода (5 признаков, у нас нет ни одного);
+- Wells Fargo — обученная на peer-транзакциях модель + мониторинг транзакций + алерт о неисполнении (у выданного B1);
+  геолокация и GPS (у заявки);
+- Capital One «debt management» — чат-бот + обученная на чужих данных ML-модель «activities»;
+- Capital One «Guidance engine» — **без ML**, но через «decision tree engine» по комбинациям значений четырёх величин.
+
+## 🔴 Меняется ли вывод «блокера нет в проверенном объёме»?
+
+**Для рынка РФ — НЕТ, вывод не меняется и территориально усилен:** ни одна из четырёх разобранных в Г15 семей не имеет
+российского или евразийского члена, ни один документ не действует в РФ. Новых RU-документов Г15 не нашёл (обратные поиски
+дали 0). Вывод Г3 и Д12 остаётся в силе.
+
+**Для экспортных рынков (США) — ДА, картина изменилась, и вот чем именно.**
+1. 🔴 Найден документ, которого не было ни в Г3, ни в прежних доборах: **US12008644B2 (и семья US11023967B1 / US11669897B2),
+   Capital One «Guidance engine», приоритет 2019-11-12, все Active, US11669897B2 действует до ~2040-01-10.** Это **первая
+   найденная формула без машинного обучения**, работающая ровно с нашими четырьмя величинами — ежемесячные расходы,
+   ежемесячный доход, уровень резервного фонда, уровень высокопроцентного долга — и выдающая «financial action».
+   Отличие FINPILOT держится на признаке «decision tree engine … determining results for each branch of a decision tree
+   that associates the financial action with combinations of values» (у нас — перебор 66 альтернатив, фильтр инвариантов,
+   SAW) и на признаке конвертации «non-compliant format», наличие которого в нашей реализации по канону метода определить
+   нельзя. Это **сравнение по признакам, а не заключение о патентной чистоте**; вопрос эквивалентности «перебор + SAW» и
+   «дерево решений» — к патентному поверенному США.
+2. Практическое следствие для продукта (решение — за владельцем): **не оформлять рекомендацию как дерево правил** вида
+   «если резерв ниже X месяцев обязательных расходов и есть долг со ставкой выше порога Y — то действие Z» над этими
+   четырьмя величинами; именно такая конструкция описана в формуле дословно.
+3. Второе изменение: у Wells Fargo, кроме заявки, есть **выданный US12361480B1**, и в его независимом пункте прямо стоят
+   цели «creating an emergency fund, repaying a loan» — то есть наш предмет. Держат его от FINPILOT обученная на
+   peer-данных нейросетевая модель, мониторинг транзакций через финансовую сеть и алерт о неисполнении совета.
+   Если продукт когда-нибудь получит связку «следим за транзакциями → предупреждаем об отклонении от плана» вместе
+   с обучаемой моделью — сверять заново.
+4. Опровергнут общий тезис прежних доборов «все соседние формулы держатся на обучаемой модели»: у «Guidance engine» её нет.
+
+## НЕ ДОБЫТО в Г15 (с точными причинами)
+
+- **Формула WO2026074314A1** (1Finance Private Ltd, Индия, приоритет 2024-10-02, «Method and system for recommending a
+  financial plan») — страница Google Patents отдала HTTP 200, 149 331 байт, но секция `claims` содержит **0 пунктов**
+  (у PCT-публикации формула в разметку не попала); Patentscope не пробовал — канал ранее давал оболочку без карточки.
+  🔴 **Следить:** 31-месячный срок входа в нацфазу RU истекает около 2027-05-02.
+- **Формула KR102121857B1** (RunInvest, приоритет 2018-05-02) — на английской странице `claims` пуст (0 пунктов),
+  корейский оригинал не запрашивался; семья только KR.
+- **Расчётная дата истечения US12008644B2 и US11023967B1** — на страницах Google Patents поля `expiration` нет
+  (у US11669897B2 оно есть: 2040-01-10); терминальные дисклеймеры не проверялись.
+- **Есть ли в реализации FINPILOT признак «конвертация non-compliant format → compliant format»** — по канону метода
+  (`docs/math_model.md`, §5 `fips_patent_clearance_2026-09-10.md`) не определяется; сверка с кодом в объём Г15 не входила
+  и относится к компетенции поверенного, а не исследователя.
+- **INPADOC-семьи через Espacenet/OPS** — не запрашивались (Espacenet отдаёт Cloudflare, OPS без ключа 403, Lens 401 —
+  по заданию не более одной попытки); использованы DOCDB-семьи Google Patents + обратный поиск по RU-массиву.
+- **Заявки Capital One и Wells Fargo, поданные после 2025 года и ещё не опубликованные** — принципиально недоступны
+  (18-месячный срок публикации); это ограничение метода, а не канала.

@@ -236,3 +236,674 @@ WebSearch: 2 вызова. WebFetch: 2. curl: 4.
 - **Сверка с FCA PROD / Consumer Duty / ESMA по первоисточникам** — не делалась по условию задачи
   («без нового исследования»).
 - Разъяснение СРО «МиР» получено только в пересказе WebFetch, дословно страница не сохранена.
+
+---
+
+# ДОБОР Д14 (2026-09-11)
+
+Лидер-агент, подагентов 0 (всё сделано самим, последовательно). Каналы: `curl -sk --http1.1` с
+браузерным UA (основной), `pdftotext`. Сырьё дописывается по ходу, по участкам.
+
+## ДОБОР Д14 — Д14.4: Приложение 5 к 19-МР и ответ ЦБ для СРО «МиР» (закрыт)
+
+### Приложение 5 — ДОБЫТО
+Канал: curl -sk --http1.1, https://www.cbr.ru/Queries/XsltBlock/File/87500/-1/2474 → HTTP 200,
+application/pdf, 661 718 байт; `pdftotext -layout` → 3100 строк. Вестник Банка России № 78 (2474)
+от 29.12.2023; 19-МР занимает стр. 27–44 номера; Приложение 5 — стр. 43–44.
+
+Дословно (pdftotext, таблица сплющена в строки):
+«Приложение 5 к Методическим рекомендациям Банка России по управлению финансовым продуктом от
+27 декабря 2023 года № 19-МР
+Уведомление Банка России о добровольном присоединении к Принципам
+Общие сведения
+1 Полное наименование организации
+2 Идентификационный номер налогоплательщика (ИНН)
+3 Основной государственный регистрационный номер (ОГРН)
+4 Номер лицензии на осуществление деятельности, в части которой организация присоединяется к Принципам
+5 Полное наименование саморегулируемой организации / профессионального объединения (при отсутствии
+  саморегулирования), членом которого является финансовая организация
+6 ФИО, должность, контакты сотрудника, уполномоченного осуществлять взаимодействие с Банком России
+  по вопросам, касающимся представленной информации
+Соответствие Принципам
+7 Количество разрабатываемых продуктов, соответствующих Принципам
+8 Перечень разрабатываемых продуктов, соответствующих Принципам
+9 Количество реализуемых продуктов, соответствующих Принципам
+10 Перечень реализуемых продуктов, соответствующих Принципам
+11 Принципы — [таблица: № п/п | Наименование | Соответствие (выпадающий список) | Комментарий]
+  1 Системный подход в организации управления финансовым продуктом
+  2 Непрерывность управления жизненным циклом финансового продукта
+  3 Ответственное поведение финансовой организации
+  4 Риск-ориентированный подход к управлению финансовым продуктом
+  5 Клиентская ценность финансового продукта
+  6 Полнота и корректность информации о финансовом продукте
+  Комментарий по каждой строке: «Описание параметров/причин соответствия/несоответствия. Внутренние
+  документы, внедренные для целей соответствия принципу. Внутренние документы, планируемые к
+  внедрению, с указанием планового срока внедрения»»
+
+Вывод для нас: название формы — «о ДОБРОВОЛЬНОМ присоединении»; поле 4 требует **номер лицензии**,
+«в части которой организация присоединяется». Субъект без лицензии ЦБ форму заполнить не может
+по построению. Это пятое, формальное подтверждение вывода «не адресат» (к п. 1.2).
+
+### Разъяснение СРО «МиР» и первоисточник — ответ ЦБ — ДОБЫТО ДОСЛОВНО
+1) Новость СРО: https://npmir.ru/news/regulation/answers/7801/ — curl → HTTP 200, text/html, 55 679 байт.
+Дата публикации 14.08.2024. Дословно:
+«Служба по защите прав потребителей и обеспечению доступности финансовых услуг Банка России
+(далее - Служба) ответила на вопросы СРО «МиР» о применении Методических рекомендации Банка России
+по управлению финансовым продуктом от 27.12.2023 № 19-МР.
+Как разъяснила Служба:
+1. МФО самостоятельно определяет, как классифицировать финансовые продукты, применяя
+риск-ориентированный подход для оптимизации процесса управления финансовым продуктом.
+2. Дополнительные услуги, являющиеся неотъемлемой частью договора микрозайма, являются частью
+финансового продукта.
+3. Страховые полисы, продаваемые МФО при заключении договора микрозайма, являются отдельным
+финансовым продуктом.
+4. МФО вправе принять решение в отношении внедрения в свою деятельность системы управления продуктом
+как до, так и после 30.09.24, уведомив об этом Банк России. Если МФО принимает решение не
+реализовывать систему управления продуктом, информировать Банк России не нужно.
+5. Следование Методическим рекомендациям № 19-МР может быть учтено Банком России при оценке
+деятельности МФО и ее поведенческих рисков.»
+
+2) Карточка документа: https://npmir.ru/vzaimodeystvie-s-regulyatorami/?ELEMENT_ID=7800 → HTTP 200,
+55 229 байт. «Ответ на исх. № 986 О порядке применения ... от 17.12.2023 г. № 19-МР», дата 09.08.2024.
+(Примечание: в заголовке СРО дата документа ошибочна — «17.12.2023»; верно 27.12.2023.)
+
+3) Сам ответ ЦБ (первоисточник): https://npmir.ru/upload/iblock/adc/jprzs9ig0pafgwjqezeydltq5cdtd9bu/CBR_SZPP_09082024.PDF
+→ curl HTTP 200, application/pdf, 144 145 байт, 3 стр., pdftotext 11 007 байт. Письмо Службы по
+защите прав потребителей и обеспечению доступности финансовых услуг Банка России директору СРО «МиР»
+Е.С. Стратьевой на обращение от 22.07.2024 № 385705 (исх. № 986). Подпись: И.о. руководителя Службы
+Е.А. Бутова. Номер/дата ЦБ в PDF заменены штампами [REGNUMDATESTAMP]; дата 09.08.2024 — по карточке СРО.
+Дословно ключевое:
+- По вопросу 1: «Методические рекомендации Банка России по управлению финансовым продуктом адресованы
+  финансовым организациям и их саморегулируемым организациям. Банк России рекомендует следовать
+  Методическим рекомендациям № 19-МР в первую очередь финансовым организациям, разрабатывающим и
+  (или) реализующим сложные финансовые продукты, понимание которых требует от потребителя из целевой
+  клиентской группы специальных знаний и (или) опыта для оценки выгод и рисков ... Одновременно
+  финансовая организация вправе распространить подходы Методических рекомендаций № 19-МР на все
+  разрабатываемые и (или) реализуемые продукты.»
+  Сноска 4: «Перечень сложных финансовых продуктов, приведенный в Приложении 3 ..., не является
+  исчерпывающим. Критерии сложности финансового продукта содержит Приложение 4».
+  «... при отсутствии закрепленных на уровне СРО соответствующих правил, компания самостоятельно
+  принимает решение об оптимизации внедряемых процессов (например, определение целевых клиентских
+  групп для совокупности договоров микрозайма, схожих по своим характеристикам и рискам ...)».
+- По вопросу 2: «Следование Принципам ... рекомендуется как производителям (разработчикам)
+  финансовых продуктов, так и организациям, являющимся поставщиками финансовых продуктов. ...
+  Дополнительные услуги, которые являются неотъемлемой частью договора, – часть финансового продукта.
+  Если при продаже дополнительной финансовой услуги с потребителем заключается отдельный договор –
+  это отдельный финансовый продукт, в отношении которого МФО является либо производителем и
+  поставщиком финансового продукта, либо только поставщиком. Например, договор страхования ...
+  (МФО – поставщик, страховая организация – производитель финансового продукта).»
+- По вопросу 3: «Информирование Банка России о статусе внедрения Принципов ... не позднее III квартала
+  2024 года достаточно осуществить однократно. Формат Приложения 5 ... предоставляет ... выбор
+  подходящего варианта ответа, отражающего текущий статус (соответствует / частично соответствует /
+  не соответствует) ... В случае принятия МФО решения ... после 30.09.2024, МФО вправе
+  проинформировать Банк России по факту принятия такого решения. При этом, если МФО принято решение
+  о том, что она не будет внедрять Принципы в свою деятельность, информировать Банк России не нужно.»
+- По вопросу 4: «Методические рекомендации № 19-МР транслируют финансовому рынку хорошие практики и
+  носят рекомендательный характер. ... Вместе с тем, следование Методическим рекомендациям № 19-МР
+  может быть учтено Банком России при оценке деятельности поднадзорной организации и ее поведенческих
+  рисков. Дополнительно Служба обращает внимание на роль СРО ...: в соответствии с Методическими
+  рекомендациями № 19-МР СРО могут быть разработаны методики или детальные требования к ним. Также
+  СРО могут быть установлены единые правила, обеспечивающие создание справедливой конкурентной среды,
+  в том числе через внедрение соответствующих требований в базовые стандарты.»
+
+Что это меняет:
+- Подтверждено первоисточником: адресат — «финансовые организации и их СРО»; характер —
+  «рекомендательный»; инструмент — учёт «при оценке деятельности поднадзорной организации и ее
+  поведенческих рисков». Слово «поднадзорной» — ещё одно подтверждение, что вне надзора документ
+  рычага не имеет.
+- Уточнение к первому прогону: пересказ WebFetch (п. 4 новости) верен, но в письме есть то, чего в
+  пересказе не было: (а) ЦБ прямо называет путь превращения 19-МР в обязательное — **через базовые
+  стандарты СРО**; (б) перечень сложных продуктов прил. 3 — «не является исчерпывающим».
+
+## ДОБОР Д14 — Д14.1: FCA PROD / Consumer Duty / FG21/1 / PERG 17 и ESMA — по первоисточникам (закрыт)
+
+### Журнал добычи (все — curl -sk --http1.1 с браузерным UA, 11.09.2026)
+| URL | HTTP | Байт | Чем разобран |
+|---|---|---|---|
+| https://www.handbook.fca.org.uk/handbook/PRIN/2A/1.html | 200 | 256 238 | html→text |
+| https://www.handbook.fca.org.uk/handbook/PRIN/3/2.html | 200 | 245 931 | html→text |
+| https://www.handbook.fca.org.uk/handbook/PRIN/2A/3.html (…/4, /5, /6) | 200 | 318 928 / 332 696 / 251 153 / 220 798 | html→text |
+| https://www.handbook.fca.org.uk/handbook/PROD/3/1.html (…/3/2, /3/3) | 200 | 207 038 / 317 849 / 313 027 | html→text |
+| https://www.handbook.fca.org.uk/handbook/PROD/4/1.html (…/4/2, /4/3) | 200 | 197 509 / 549 364 / 297 059 | html→text |
+| https://www.handbook.fca.org.uk/handbook/PERG/17/2.html … /17/7.html | 200 | 195–215 тыс. каждая | html→text |
+| https://www.handbook.fca.org.uk/handbook/PERG/2/9.html | 200 | 257 146 | html→text |
+| https://www.fca.org.uk/publication/finalised-guidance/fg22-5.pdf | 200 | 1 194 617 (PDF) | pdftotext, 6874 строки |
+| https://www.fca.org.uk/publication/finalised-guidance/fg21-1.pdf | 200 | 875 880 (PDF) | pdftotext, 3229 строк |
+| https://www.fca.org.uk/publication/policy/ps22-9.pdf | 200 | 1 380 128 (PDF) | pdftotext, 8886 строк (не цитировался — всё нужное есть в PRIN 2A и FG22/5) |
+| https://www.esma.europa.eu/sites/default/files/2023-08/ESMA35-43-3448_Guidelines_on_product_governance.pdf | 200 | 316 792 (PDF) | pdftotext, 1204 строки |
+
+Даты у пунктов Handbook — «last updated» из самой страницы (26/06/2026 и т.п.): текст актуален на сентябрь 2026.
+
+### A. Consumer Duty — к кому применяется (дословно)
+- **PRIN 3.2.6R(1):** «The Consumer Duty applies to a firm’s retail market business, including in respect of
+  existing products and closed products.»
+- **PRIN 3.2.7R:** «Where the Consumer Duty applies to the activities of a firm operating in a distribution
+  chain, it applies only to the extent that the person is responsible in the course of carrying out those
+  activities for determining or materially influencing retail customer outcomes.»
+- **PRIN 3.2.8R:** «... the Consumer Duty does not apply to activities to the extent that those activities are
+  not included in a rule which sets out the scope of protections offered to retail customers by COBS, ICOBS,
+  MCOB, BCOBS, CMCOB, FPCOB, PROD or CONC.»
+- **PRIN 2A.1.4G:** «The definition of a product for the purposes of the Consumer Duty includes both products and services.»
+- **PRIN 2A.1.11G:** «The Consumer Duty does not change the nature of a firm’s relationship with any given retail
+  customer. In particular, it does not create a fiduciary relationship where one would not otherwise exist nor
+  require a firm to provide advice or carry out any other regulated activity where it would not otherwise have done so.»
+- **PRIN 2A.1.13G:** «(1) The Consumer Duty imposes obligations on firms towards retail customers of products
+  irrespective of whether the customer is a client of the firm. (2) This extended application aims to ensure the
+  effectiveness of obligations ... which may properly relate to activities which determine or materially influence
+  retail customer outcomes carried out by a firm with whom the retail customer is not in a client relationship.
+  (3) A firm’s role in the distribution chain may mean it is unable to determine or materially influence retail
+  customer outcomes in connection with the product. If so, the firm may not be subject to any obligation under the Consumer Duty.»
+- **PRIN 2A.1.15G:** «... A firm which determines or has a material influence over retail customer outcomes is
+  accountable notwithstanding that the retail customer may not be its client due to the indirect nature of their relationship.»
+- **FG22/5 п. 2.12:** «The Duty applies across the distribution chain ... By the ‘distribution chain’, we mean all
+  firms involved in the manufacture, provision, sale and ongoing administration and management of a product or
+  service to the end retail customer.»
+- **FG22/5 п. 2.17:** «Firms that can determine or materially influence retail customer outcomes need to consider
+  the end customers in the distribution chain, whether or not they are a direct client of the firm.»
+- 🔴 **FG22/5 п. 2.41:** «The Duty only applies within the FCA’s regulatory perimeter, so will not apply to
+  unregulated business.»
+- **FG22/5 пп. 2.42–2.43:** «the Duty applies to authorised firms conducting ancillary activities. These are
+  unregulated activities in connection with, or held out for the purposes of, regulated activities ... For example,
+  the design of a product or service, and ongoing customer support services, are not themselves regulated
+  activities. They are, however, necessary activities linked to regulated activities.»
+- **FG22/5 п. 2.22 (буллет):** «Firms considering working with unregulated entities in the distribution chain should
+  consider the impact such firms could have on customer outcomes. ... Regulated firms should consider whether
+  including an unregulated entity in the distribution chain leads to too great a risk of poor outcomes. Where they
+  decide to work with an unregulated entity, firms should consider whether it is necessary to introduce additional
+  steps to guard against risks materialising. For example, they could consider further due diligence or monitoring.»
+- **FG22/5 п. 2.24 (буллеты):** «Where firms outsource activities to third parties, they remain responsible for
+  compliance under ... SYSC.» и «In line with guidance on the use of third-party tools to fulfil part of their own
+  obligations under our rules, in FG11/05, firms remain responsible for meeting those rules. Firms should use a tool
+  only where they are satisfied that it provides outputs that are appropriate and fit for purpose.»
+- **PRIN 2A.4.14R:** «Where a firm collaborates with a person who is not a firm to manufacture a product, it remains
+  fully responsible for discharging all its obligations under PRIN 2A.4.»
+
+🔴 **Ответ на главный вопрос Д14.1 (Consumer Duty).** Широкая формула «влияет на исход без договора» (PRIN 2A.1.13,
+3.2.7) распространяется только на **firm** — лицо внутри регуляторного периметра FCA (FG22/5 п. 2.41 прямо:
+«will not apply to unregulated business»). Нерегулируемый поставщик советующего ПО Consumer Duty не подпадает сам;
+он ловится **опосредованно** — через обязанности регулируемого партнёра: due diligence и мониторинг
+нерегулируемого участника цепочки (FG22/5 п. 2.22), ответственность за сторонний инструмент (FG22/5 п. 2.24,
+отсылка к FG11/05), полная ответственность при совместной разработке с «person who is not a firm» (PRIN 2A.4.14R).
+Это ровно та конструкция, которую первый прогон описал для B2B в РФ («банк перенесёт требования договором») —
+в UK она записана в правилах явно.
+
+### B. 🔴 Что реально ловит советующий инструмент в UK — не Consumer Duty, а РЕГУЛИРУЕМАЯ ДЕЯТЕЛЬНОСТЬ debt counselling (PERG 17)
+Первый прогон этого не рассматривал вовсе. Дословно:
+- **PERG 17.2 Q2.1:** «(1) It is advice given to: (a) a borrower about the liquidation of a debt due under a credit
+  agreement ... (2) The advice must relate to a particular debt and debtor ... (3) It covers the giving of advice.
+  It does not cover just giving mere information. ... (4) If an exclusion applies, the activity is not a regulated activity.»
+- **PERG 17.3 Q3.1:** «What does liquidation of a debt mean? It has a wide meaning. For example, it would cover the
+  following: • paying off the debt in full and in time; • agreeing a rescheduling ...»
+- **PERG 17.3 Q3.2:** «Debt counselling is not limited to debts that are overdue. It also covers debts that are not overdue.»
+- **PERG 17.3 Q3.3:** «If advice is given to a debtor about his debts, some of which are not payable under a credit
+  agreement ..., that advice is regulated as long as some of the debts are due under a credit agreement ...»
+- **PERG 17.4 Q4.1:** «General advice open to everyone on a website is unlikely to be debt counselling ... On the other
+  hand advice given to a particular debtor over the Internet may be regulated.»
+- **PERG 17.5 Q5.1:** «The concept of advice is broad enough to include any communication with the debtor which, in
+  the particular context in which it is given, goes beyond the mere provision of information and is objectively
+  likely to influence the debtor's decision ...»
+- **PERG 17.5 Q5.2:** «a recommendation to carry out a specific course of action to liquidate a relevant debt is
+  likely to be debt counselling. ... Any element of evaluation, value judgment or persuasion is likely to mean that
+  advice is being given.»
+- **PERG 17.5 Q5.3:** «... information ... is itself the product of a process of selection involving a value
+  judgment so that the information will tend to influence the decision of the recipient. In both these scenarios,
+  the information acquires the character of a recommendation.»
+- **PERG 17.5 Q5.5 (decision tree):** «(2) The questioner may go on to advise the debtor on the merits of one
+  particular course of action over another. This would be debt counselling.» и «(5) The scripted questioning may
+  lead to the identification of one or more particular courses of action. This is likely to be debt counselling.»
+- 🔴 **PERG 17.5 Q5.7:** «The medium used to give advice should make no material difference ... Advice can be
+  provided in many ways including: ... • through the provision of an interactive software system.»
+- **PERG 17.7 Q7.1, пример (14):** «Adviser: “I recommend you prioritise the repayment of your electricity bill over
+  all other debts” — This is likely to constitute debt counselling ... since there is an implied recommendation that
+  the debtor should postpone repaying his consumer credit related debts until he has repaid another debt or debts.»
+- **PERG 17.7, пример (15):** «A person ... helps a debtor to draw up a budget, e.g. providing a budget planner ...
+  This is not debt counselling if all the adviser does is to provide a debtor with information about his budget
+  and the process is limited to, and likely to be perceived by the debtor as, assisting him to make his own choice ...»
+- 🔴 **PERG 17.7, пример (16):** «An adviser gives budgetary advice — This is debt counselling if the adviser goes
+  beyond the services in example (15) and advises the debtor on how to match income and debts. For example, the
+  adviser may advise the debtor to reduce discretionary spending to a set amount each month to enable him to pay
+  off a certain amount of a large credit card bill each month. It does not matter if the result of the advice is
+  that the debtor should pay off his debts in full, rather than by instalments ...»
+- **PERG 17.6 Q6.1 (исключения):** ст. 39H (связь с договором), 39I (энергопоставщики), 39J (ипотека), 39K (юристы),
+  72A «Information society services», 72G (местные власти), 72H (управляющие по несостоятельности).
+  Исключения для разработчика ПО как такового в списке нет. (Текст PERG 2.9 про ст. 72A скачан, но строка
+  «PERG 2.9.18» в нём не найдена — пункт, вероятно, удалён/перенумерован после Brexit; не проверено.)
+
+**Проекция на FINPILOT (вывод добора, не норма):** ядро продукта — «распределить свободный поток: какой долг гасить
+досрочно первым и сколько» — совпадает с примерами (14) и (16) почти дословно; Q5.7 снимает возражение «это софт».
+Значит, в UK такой продукт с персональной рекомендацией по конкретным кредитным долгам **требовал бы авторизации
+FCA на debt counselling** (номер статьи RAO — 39E — по памяти модели, в скачанных страницах PERG 17.2–17.7 он не
+встретился; источник квалификации — сама PERG 17). Уже после авторизации на него лёг бы и Consumer Duty в полном
+объёме (retail market business). Граница, которая выводит из режима, — пример (15) и Q5.5(1): нейтральный бюджетный
+планировщик, показывающий ВСЕ варианты без выбора одного. Режим «SAW выбирает лучшую альтернативу» по этой границе —
+совет, не информация.
+
+### C. PROD 3 (MiFID-инструменты) и PROD 4 (страхование) — предмет и адресат
+- **PROD 3.1.2R(1):** «A firm must, when manufacturing financial instruments or deciding on the range of financial
+  instruments and investment services it intends to distribute to clients, comply, in a way that is appropriate and
+  proportionate, with the requirements set out in this chapter.»
+- **PROD 3.2.1R:** «A manufacturer must: (1) ensure that the financial instruments it manufactures are designed to meet
+  the needs of an identified target market of end clients ...; (2) ensure that the strategy for distribution ... is
+  compatible with the identified target market; and (3) take reasonable steps to ensure that the financial instrument
+  is distributed to the identified target market.»
+- **PROD 3.2.3R:** «A manufacturer must maintain, operate and review a process for the approval of: (1) each financial
+  instrument, and (2) significant adaptations of existing financial instruments, in each case before they are marketed
+  or distributed to clients.»
+- **PROD 3.2.7R:** «Where firms collaborate, including with entities which are not authorised and supervised in
+  accordance with UK provisions implementing MiFID ..., to create, develop, issue and/or design a financial
+  instrument, they must outline their mutual responsibilities in a written [agreement]» (выгрузка обрезана на «written»).
+- **PROD 3.2.8R:** «... (1) specify the type or types of client for whose needs, characteristics and objectives the
+  financial instrument is compatible; and (2) identify any group or groups of client for whose needs, characteristics
+  and objectives the financial instrument is not compatible.»  ← прямой аналог «перечня событий выхода за ЦКГ» 19-МР.
+- **PROD 3.2.10R(2):** «whether the design of the financial instrument is driven by features that benefit the client
+  and not by a business model which relies on poor client o[utcomes]».
+- **PROD 3.3.1R:** «A distributor must: (1) understand the financial instruments it distributes to clients; (2) assess
+  the compatibility ... taking into account the manufacturer’s identified target market of end clients; and (3) ensure
+  that financial instruments are distributed only when this is in the best interests of the client».
+- **PROD 3.3.5R(1):** «Distributors must take all reasonable steps to comply with PROD 3.3 when distributing financial
+  instruments manufactured by any firm to which product governance requirements in PROD 3.2 do not apply.»
+- **PROD 4.1.1R:** глава не отменяет прочих требований к insurance distribution — «(2) suitability (COBS 9 or COBS 9A);
+  (3) appropriateness (COBS 10A); (4) ... conflicts of interest ...; (5) inducements» [Note: art. 25(3) IDD].
+  PROD 4.2 (manufacturers) / 4.3 (distributors) скачаны (549 364 / 297 059 байт), не цитируются: адресат —
+  страховщики и страховые дистрибьюторы, для нас нерелевантно.
+Вывод: PROD 3/4 — режим для производителя/дистрибьютора финансового инструмента или страхового продукта.
+Советующий инструмент, не производящий и не распространяющий инструмент, под PROD 3/4 не подпадает; PROD 3.2.7R —
+единственная точка, где «неавторизованное лицо» появляется, и то как соразработчик инструмента.
+
+### D. Price and value / consumer understanding / consumer support (PRIN 2A.3–2A.6)
+- **PRIN 2A.4.1R:** «(1) value is the relationship between the amount paid by a retail customer for the product and the
+  benefits they can reasonably expect to get from the product; and (2) a product provides fair value where the amount
+  paid for the product is reasonable relative to the benefits of the product.»
+- **PRIN 2A.4.2R:** «A manufacturer must: (1) ensure that its products provide fair value to retail customers in the
+  target markets ...; and (2) carry out a value assessment of its products and review that assessment on a regular basis».
+- **PRIN 2A.4.16R(1):** «A distributor must not distribute a product unless its distribution arrangements are consistent
+  with the product providing fair value to retail customers.»
+- **PRIN 2A.4.17R:** «Where a distributor distributes a product manufactured by a person to whom the rules in PRIN 2A.4
+  do not apply, it must take all reasonable steps to comply with PRIN 2A.4.16R.»
+- **PRIN 2A.5.3R:** «(1) A firm must support retail customer understanding so that its communications: (a) meet the
+  information needs of retail customers; (b) are likely to be understood by retail customers; and (c) equip retail
+  customers to make decisions that are effective, timely and properly informed. (2) ... clear, fair and not misleading.»
+- **PRIN 2A.5.7G(2):** «use plain and intelligible language and, where use of jargon or technical terms is unavoidable, explain ...»
+- **PRIN 2A.5.8R:** tailor communications, «taking into account: (1) the characteristics of retail customers, including
+  any characteristics of vulnerability; (2) the complexity of the product; (3) the communication channel(s) used; and
+  (4) the role of the firm, including whether the firm is providing regulated advice or information only.»
+- **PRIN 2A.6.2R:** support must «(1) meet the needs of retail customers, including those with characteristics of
+  vulnerability; ... (3) ... include appropriate friction in its customer journeys to mitigate the risk of harm ...;
+  (4) ensure that retail customers do not face unreasonable barriers (including unreasonable additional costs) ...»
+- **PRIN 2A.3.2R / 2A.3.7R / 2A.3.9R(1):** product approval до маркетинга; регулярный пересмотр, включая «whether the
+  product is being distributed to the target market or reaching retail customers outside the target market»;
+  «Manufacturers must test their products appropriately, including scenario analyses where relevant.»
+- **PRIN 2A.3.8R:** при выявлении вреда — «take appropriate action to mitigate ... and (2) where appropriate, promptly
+  inform other relevant persons in the distribution chain».
+
+### E. FG21/1 (уязвимые клиенты)
+- **п. 1.1:** «A vulnerable customer is someone who, due to their personal circumstances, is especially susceptible to
+  harm, particularly when a firm is not acting with appropriate levels of care.»
+- **п. 1.11:** «This Guidance applies to all firms where the Principles apply, regardless of sector. It applies to the
+  supply of products or services to retail customers who are natural persons, even if a firm does not have a direct
+  client relationship with the customer.»
+Адресат опять — «firms where the Principles apply», т.е. авторизованные лица.
+
+### F. ESMA35-43-3448 (03.08.2023), Guidelines on MiFID II product governance
+- **п. 1 (Who?):** «These guidelines apply to: • Firms. • Competent authorities.»
+- **п. 2 (What?):** «These guidelines apply in relation to the manufacturing or distribution of financial instruments and
+  structured deposits», во исполнение ст. 9(3), 16(3), 16(6), 24(1), 24(2) MiFID II и ст. 9–10 Delegated Directive 2017/593.
+- Определения (раздел 2): «firms» — investment firms (ст. 4(1)(1) MiFID II) и credit institutions (строки 125–128
+  выгрузки, дословно не выписано); «distributor — a firm that offers, recommends or sells a product and service to a client».
+- **п. 11:** применять «in a way that is appropriate and proportionate, taking into account the nature of the product,
+  the investment service and the target market».
+- **пп. 17/19:** пять обязательных категорий target market (по оглавлению выгрузки; сами категории не выписаны).
+- **п. 38:** distributors «should decide which products are going to be recommended (also through the provision of
+  portfolio management) or offered or actively marketed to certain groups of clients».
+- 🔴 **п. 39 (редакция 2023):** «where firms intend to use nudging and digital engagement practices such as
+  gamification techniques for the distribution of certain products, distributors should carefully assess whether using
+  such techniques would be in the best interests of the client group ... certain gamification techniques (such as those
+  used in trading apps designed to nudge the (potential) client towards harmful behaviour, e.g., maximise the number of
+  trades) will never be in the interest of the client. Additionally, nudging and digital engagement practices can
+  contribute to the distribution of products outside of their target market.»
+- **п. 40:** если продукт «will never be compatible with the needs and characteristics of its existing or prospective
+  clients, it should not include the product in its product assortment».
+Вывод: ESMA-режим — строго для investment firms и кредитных организаций в части финансовых инструментов и
+структурированных депозитов. Рекомендация «гаси кредит X» — не рекомендация по финансовому инструменту MiFID.
+Под ESMA-режим FINPILOT не попадает.
+
+### G. Таблица: требование 19-МР → аналог FCA/ESMA → обязательность → ловит ли советующий инструмент
+| Требование 19-МР | Аналог (пункт) | Обязательность там | Ловит советующий инструмент без продажи? |
+|---|---|---|---|
+| Адресат — финорганизации и СРО (п. 1.2) | PRIN 3.2.6–3.2.8; ESMA п. 1 «Firms»; PROD 3.1.2 | правила (R) / guidelines comply-or-explain | Нет: только authorised firm / investment firm (FG22/5 п. 2.41) |
+| Продукт = инструмент или услуга (п. 1.3) | PRIN 2A.1.4G «products and services» | G | Понятие шире, но адресат тот же — firm |
+| ЦКГ и её исключения, «перечень событий» (п. 1.3, прил. 1) | PROD 3.2.1R, 3.2.8R(1)–(2); PRIN 2A.3; ESMA пп. 17–19 | R | Нет (адресат — manufacturer инструмента) |
+| Одобрение продукта до запуска, оценка риска (п. 1.5, прил. 2) | PROD 3.2.3R; PRIN 2A.3.2R | R | Нет |
+| Стресс-тест/сценарии (п. 2.4) | PRIN 2A.3.9R(1) «scenario analyses where relevant» | R | Нет |
+| Мониторинг продаж вне ЦКГ (прил. 1) | PRIN 2A.3.7R(2); ESMA п. 39 (nudging выводит за target market) | R / guidelines | Нет |
+| Клиентская ценность, комиссии не против ценности (пп. 2.3, 2.5) | PRIN 2A.4.1R–2A.4.2R fair value; 2A.4.16–17R | R | Нет напрямую; через дистрибьютора — да (2A.4.17R) |
+| Информирование понятным языком, пояснять термины (п. 2.6) | PRIN 2A.5.3R, 2A.5.7G(2), 2A.5.8R | R/G | Нет напрямую |
+| Уязвимые группы (прил. 1, 2) | FG21/1 пп. 1.1, 1.11; PRIN 2A.5.8R(1), 2A.6.2R(1) | guidance / R | Нет: «firms where the Principles apply» |
+| Контроль поставщиков/третьих лиц, тайный покупатель (прил. 1) | FG22/5 пп. 2.22, 2.24; PRIN 2A.4.14R; PROD 3.2.7R | G / R | **Опосредованно да**: регулируемый партнёр обязан проверять нерегулируемого участника и отвечает за его инструмент |
+| (в 19-МР нет) | **PERG 17 debt counselling**, пр. (14), (16), Q5.7 | закон (RAO) — авторизация | 🔴 **Да, напрямую**: персональная рекомендация по погашению конкретных кредитных долгов, в т.ч. через ПО, — регулируемая деятельность |
+| (в 19-МР нет) | ESMA п. 39 — nudging / gamification | guidelines | Нет напрямую; ориентир для UX |
+
+Сила аргумента «структура 19-МР — прямой аналог»: **подтверждается** по составу требований (target market,
+approval, testing, monitoring, fair value, understanding, vulnerable, distribution chain — всё находит пункт).
+**Уточняется**: в UK аналог 19-МР — не один документ, а PROD 3/4 + PRIN 2A (Consumer Duty) + FG21/1; по составу
+19-МР ближе всего к PRIN 2A.3 (products and services outcome) + PROD 3.2/3.3.
+
+## ДОБОР Д14 — Д14.2: надзорная практика ЦБ по 19-МР (закрыт; ответ — «формальность в публичном поле, но не мёртвый документ»)
+
+### Каналы и замеры
+| Источник | Канал | HTTP / размер | Результат |
+|---|---|---|---|
+| Годовой отчёт ЦБ за 2024 — https://www.cbr.ru/Collection/Collection/File/55239/ar_2024.pdf | curl -sk --http1.1 | 200, application/pdf, 46 382 422 байт; pdftotext 19 310 строк | текст читается (слово «поведенческ» — 10 вхождений); **«19-МР» — 0 вхождений; «управлени… финансов… продукт» — 0; «целев… клиентск…» — 0** |
+| Годовой отчёт ЦБ за 2025 — https://www.cbr.ru/Collection/Collection/File/59752/ar_2025.pdf | curl -sk --http1.1 | 200, application/pdf, 57 456 170 байт; pdftotext 20 747 строк | «поведенческ» — 8; **«19-МР» — 0; «управлени… финансов… продукт» — 0**; найдено «клиентской ценности» и «требования к управлению страховыми продуктами» (ниже) |
+| Страница «Поведенческий надзор: практики и рекомендации» — https://www.cbr.ru/protection_rights/behavioral_surveillance/ | curl | 200, 215 562 байт | 19-МР не упомянуты; перечень писем о лучших/недобросовестных практиках (мотивация клиентских менеджеров, комбинированные продукты, ИСЖ/НСЖ пожилым, продажа высокорисковых продуктов) |
+| Письмо Службы ЦБ для СРО «МиР» от 09.08.2024 (см. Д14.4) | curl, npmir.ru | 200, 144 145 байт | единственный найденный публичный надзорный документ по применению 19-МР |
+| Базовый стандарт для СРО брокеров КФНП-14 от 30.04.2025 — https://normativ.kontur.ru/document?documentId=505120&moduleId=1 | curl → 373 266 байт HTML, но текст 2 символа (JS-рендер); r.jina.ai → HTTP 200, 252 417 байт полного текста | **«19-МР», «целев…», «управлени… продукт», «жизненн… цикл» — 0 вхождений** |
+| Базовый стандарт для СРО КПК (утв. 10.07.2025) — https://base.garant.ru/412325450/ | curl | 200, 84 812 байт, cp1251; текст 11 674 симв. — только шапка/оглавление | содержание не добыто; в шапке совпадений нет |
+| ОННРФР, «Направление 2», consultant.ru cons_doc_LAW_522339 | curl | 200, 29 709 байт, текст 2 332 симв. — только шапка | НЕ ДОБЫТО: некоммерческая версия вне окна 20–24 ч |
+| WebSearch ×3 («19-МР итоги внедрения», «"управления финансовым продуктом" надзор 2025», «годовой отчет 2024 управление продуктом») | — | — | ни одного обзора, доклада или выступления об итогах внедрения 19-МР |
+
+### Дословно из годовых отчётов
+- **ГО-2024, стр. 70–71 (строки 3917–3923 выгрузки):** «Противодействие мисселингу и иным недобросовестным практикам на
+  финансовом рынке. Банк России подготовил методические рекомендации по продаже финансовых продуктов и дополнительных
+  услуг в дистанционных каналах [сн. 38: «Методические рекомендации Банка России от 27.12.2024 № 22‑МР ...»], которые
+  затрагивают все виды финансовых продуктов и дополнительных услуг, предлагаемых онлайн, и нацелены на минимизацию
+  потребительских рисков.» Там же: «В 2 раза за 2024 год снизилось число случаев мисселинга ... Средневзвешенный индекс
+  мисселинга по итогам 2024 года составил 0,28 (в 2023 году – 0,37).» → в отчёте за год, когда истёк срок уведомления
+  по 19-МР (III кв. 2024), ЦБ отчитывается по 22-МР, а о 19-МР молчит.
+- **ГО-2025, стр. ~94:** «Число жалоб на недобросовестные продажи снизилось на 13,6%. Существенному сокращению числа
+  жалоб на навязывание дополнительных услуг при потребительском (на 31,1%) и автокредитовании (на 64,6%) способствовало
+  обязательное информирование ...»
+- 🔴 **ГО-2025, раздел ОФВ (строки 9118–9131 выгрузки):** «Страхование жизни и здоровья заемщика по договору
+  потребительского кредита (займа). Установлено, что регулирование не в полной мере достигло своих целей. Этот вид
+  страхования характеризуется низким уровнем выплат (10% от собранных страховых премий) и высокими комиссиями (в среднем
+  более 50%), что говорит о недостаточной клиентской ценности. Для решения этой проблемы предложено в будущем
+  установить требования к управлению страховыми продуктами.»
+  → Терминология 19-МР («клиентская ценность», «управление продуктом») переходит из рекомендаций в план
+  **обязательных требований** — пока для одного сегмента (страховые продукты), без акта и без даты.
+- **ГО-2025 (строки 5818–5826):** ЦБ «рекомендовал ПУРЦБ при взаимодействии с распространителями финансовой информации
+  в социальных сетях (блогерами) обеспечить маркировку ими информации»; «рекомендовал участникам рынка размещать
+  информацию о [сложных] продуктах в специальных разделах сайтов и приложений ... после подтверждения статуса
+  квалифицированного инвестора».
+
+### Ответ Д14.2: живой ли документ
+- **Публичной надзорной отчётности по 19-МР нет**: ни итогов уведомлений по форме прил. 5, ни упоминания в годовых
+  отчётах за 2024 и 2025, ни на странице поведенческого надзора. Найдено одно адресное разъяснение (письмо Службы от
+  09.08.2024, для МФО). Сколько организаций подало уведомления к III кв. 2024 — **неизвестно** (не публиковалось,
+  по крайней мере в найденных каналах).
+- **Базовых стандартов СРО, обязывающих следовать 19-МР, не найдено**: КФНП-14 (брокеры, 30.04.2025) проверен полным
+  текстом — ноль ссылок; стандарт КПК (10.07.2025) — только шапка. Для МФО/страховщиков/банков полнотекстовой проверки
+  не было — вывод «ни один стандарт» не доказан, доказано «в брокерском нет».
+- **Но документ не мёртв:** (а) ЦБ в письме 09.08.2024 прямо держит рычаг «может быть учтено ... при оценке ...
+  поведенческих рисков» и называет путь в обязательное — базовые стандарты СРО; (б) в ГО-2025 ЦБ по итогам ОФВ
+  предлагает ввести **обязательные** «требования к управлению страховыми продуктами», мотивируя это термином 19-МР
+  «клиентская ценность». Итог: 19-МР — фон и словарь надзора, а не предмет самостоятельного контроля; движение к
+  обязательности идёт по сегментам (страхование) — не через сам документ.
+
+## ДОБОР Д14 — Д14.3: не стали ли принципы 19-МР / 1-МР обязательными для небанковских сервисов (2025–2026)
+
+Итог участка: **акта, который переводит принципы 19-МР или 1-МР в обязательные для небанковского советующего
+сервиса, не найдено.** Найдены четыре движения рядом, ни одно FINPILOT не накрывает на 11.09.2026.
+
+### 1. 289-ФЗ «Об отдельных вопросах регулирования платформенной экономики» — не про нас
+- Канал: curl -sk --http1.1, https://base.garant.ru/412423594/ → HTTP 200, 82 312 байт, cp1251; текст 11 070 симв.
+  (аннотация + оглавление; полный текст статей garant не отдаёт).
+- Дословно (аннотация garant): «Закон вступает в силу с 1 октября 2026 г. Акты с обязательными требованиями,
+  принимаемые в целях его реализации, вступают в силу не ранее чем через 90 дней после их опубликования.»;
+  «Федеральный закон от 31 июля 2025 г. N 289-ФЗ ... Опубликование: ... pravo.gov.ru 31 июля 2025 г.
+  N 0001202507310020 ... СЗ РФ, 4 августа 2025 г. N 31 ст. 4643».
+- Оглавление: ст. 4 «Цифровая платформа. Реестр посреднических цифровых платформ»; гл. 2 — взаимодействие
+  «оператора, партнеров и владельцев пунктов выдачи заказов» (карточки товаров, скидки, поисковая выдача, жалобы).
+- Сниппет WebSearch (первоисточник статьи 1 не открыт): закон «не распространяется на сервисы, работающие на
+  финансовом рынке: кредитные организации, брокеры, инвестиционные платформы».
+- Для нас: предмет — посреднические платформы «оператор — партнёр — покупатель». FINPILOT не посредник: не
+  сводит продавцов с покупателями и не проводит сделки. Под 289-ФЗ по предмету не подпадает (вывод по оглавлению;
+  ст. 2 с определениями дословно не прочитана).
+
+### 2. Поправки ЦБ о защите потребителей финуслуг на маркетплейсах — законопроект, не закон
+- Interfax, https://www.interfax.ru/forumspb/1094198 → curl HTTP 200, 60 678 байт. Дословно: «Москва. 5 июня.
+  INTERFAX.RU - Банк России подготовил поправки, которые расширяют меры по защите прав потребителей финансовых услуг
+  на продукты, продаваемые через электронные платформы, заявил на ПМЭФ первый зампред ЦБ Владимир Чистюхин.»;
+  «ЦБ разработал и направил в правительство изменения в законодательство, которые добавляют операции, проводимые
+  через электронные платформы, в комплекс мер по защите прав потребителей на рынке финансовых услуг.»;
+  «Нет никакой разницы, предоставляется кредит напрямую через офис банка, через маркетплейс, через
+  микрофинансовую организацию. Если речь о займе, все правила должны быть едиными»; «маркетплейсы сами по себе
+  не подпадают под регулирование Банка России».
+- marketpower.pro (curl HTTP 200, 621 373 байт) — пересказ того же. tvspb.ru (сниппет WebSearch, страница не
+  разобрана): предложения «могут стать частью закона о платформенной экономике, который вступит в силу с 1 октября».
+- Статус на 11.09.2026: внесено в Правительство (июнь 2026), текста и номера законопроекта не найдено.
+- Для нас: касается **продажи** финпродуктов через платформы. FINPILOT ничего не продаёт. Риск второго порядка:
+  если FINPILOT когда-нибудь станет показывать офферы банков (рефинансирование) с переходом к оформлению, он может
+  попасть в «электронные платформы» этих поправок — формулировок пока нет.
+
+### 3. Доклад ЦБ «О подходах к регулированию деятельности финансовых инфлюенсеров» (17.02.2026) — не про нас, но близко
+- Канал: curl, https://www.cbr.ru/Content/Document/File/187191/Consultation_Paper_17022026.pdf → HTTP 200,
+  application/pdf, 182 016 байт; pdftotext 988 строк. Консультации до 30.04.2026.
+- Дословно, рабочее определение (раздел 2.1): «Для целей настоящего доклада под финансовым инфлюенсером следует
+  понимать физическое лицо, распространяющее публично на систематической основе финансовый контент (в том числе
+  об инвестициях, финансовых инструментах и услугах). Он доступен неопределенному кругу лиц в Интернете, в социальных
+  медиа (видеохостингах, телеграм-каналах, социальных сетях, подкастах и так далее), который прямо или косвенно
+  оказывает влияние на принятие финансовых решений, в частности побуждает потребителей контента совершать сделки на
+  финансовом рынке, и имеет объем аудитории более 10 тыс. пользователей ...»
+- «Важно учитывать, что финансовый инфлюенсер без наличия лицензии инвестиционного советника не вправе
+  предоставлять индивидуальные инвестиционные рекомендации.»
+- Предложения (раздел 2.2): закрепить понятие; реестр с надзором ЦБ — «Поднадзорные организации смогут сотрудничать
+  только с финансовыми инфлюенсерами, состоящими в реестре»; критерии включения — экономическое образование,
+  сертификат аналитика, опыт > 1 года, членство в СРО, отсутствие судимости.
+- Раздел 2.3: «Отсутствие законодательных требований к распространяемой финансовыми инфлюенсерами информации,
+  включая обучающие курсы, тренинги и приложения, не позволяет обеспечить должный уровень защиты ...»
+- Приведено как зарубежный пример (Австралия): «лица, предоставляющие консультации по финансовым продуктам ...
+  консультацией ... служат рекомендация или выражение мнения, которые призваны повлиять ... на лицо, принимающее
+  решение в отношении финансовых инструментов».
+- Для нас: определение — **публичный** контент неопределённому кругу лиц; персональная выдача в приложении по данным
+  конкретного пользователя под него не подходит. Но слово «приложения» в 2.3 и уклон в «финансовые решения», а не
+  только сделки с инструментами, показывают направление: ЦБ ищет форму для **нелицензируемых источников финансовых
+  советов**. Это законодательная инициатива на стадии консультаций, не норма.
+
+### 4. Страховые продукты — первое заявленное превращение управления продуктом в обязательное
+- ГО ЦБ за 2025 (см. Д14.2): по итогам ОФВ «предложено в будущем установить требования к управлению страховыми
+  продуктами». Проекта акта не найдено (WebSearch «Банк России требования к управлению страховыми продуктами
+  проект указания» — в выдаче только старые проекты 2021 г. о раскрытии информации страховщиками).
+- Адресат — страховщики. Для нас не прямо.
+
+### 5. 211-ФЗ о финансовых платформах — изменений в сторону советующих сервисов не видно
+- Канал: curl, https://base.garant.ru/74399619/ → HTTP 200, 82 642 байт; текст 11 005 симв. (шапка). Дословно:
+  «С изменениями и дополнениями от: 2 июля 2021 г., 28 июня, 14 июля 2022 г., 24 июня, 4 августа 2023 г.,
+  11 марта, 23 ноября, 28 декабря 2024 г., 27 октября 2025 г.» Содержание правок из шапки не видно; тексты статей
+  garant не отдаёт — НЕ ДОБЫТО. Предмет закона — сделки через платформу оператора из реестра ЦБ; FINPILOT сделок
+  не проводит.
+
+### 6. Что проверить не удалось (для полноты отрицательного вывода)
+- Прямого поиска по «законопроект о финансовых советниках / цифровых советниках» — 1 WebSearch, выдача о ЦФА, не
+  по теме. Инициатив по лицензированию некредитного «финансового консультирования» (кроме инвестсоветника по 39-ФЗ
+  и доклада об инфлюенсерах) не найдено.
+- Указаний ЦБ о поведенческом надзоре 2025–2026, распространяющих требования на неподнадзорных, не найдено: ЦБ сам
+  говорит, что маркетплейсы «не подпадают под регулирование Банка России» (Interfax, 05.06.2026) — мандата на
+  неподнадзорных у ЦБ без закона нет.
+
+### 7. Доклад ЦБ «О геймификации, наджинге и иных практиках вовлечения потребителей на рынке инвестиционных услуг» (14.07.2026)
+- Канал: curl, https://www.cbr.ru/Content/Document/File/194058/Consultation_Paper_14072026_59.pdf → HTTP 200,
+  application/pdf, 759 721 байт; pdftotext 1270 строк. Консультации до 31.08.2026 (по странице
+  https://www.cbr.ru/analytics/d_ok/, curl 200, 137 603 байт).
+- Дословно (раздел о направлениях регулирования): «В настоящее время регулирование «темных паттернов» и геймификации
+  при предоставлении потребителям финансовых продуктов (дополнительных услуг) в дистанционных каналах находится
+  в плоскости рекомендаций (Методических рекомендаций № 22‑МР и Методических рекомендаций № 1‑МР). Вместе с тем
+  геймификация дистанционных каналов, подталкивание инвесторов к совершению определенных действий ... требуют
+  собственной регуляторной базы ...»
+- Предложения: «1. Определить и закрепить критерии геймификации ... 2. Ограничить виды геймификации, обладающие
+  повышенными рисками ... 3. ... элементы дизайна интерфейса дистанционного канала, подталкивающие потребителя
+  к совершению сделок путем выделения преимуществ финансовых инструментов при одновременном сокрытии информации
+  о рисках ... 5. Установить требование к ПУРЦБиКИ о необходимости проведения предварительной комплаенс-оценки
+  элементов и материалов, предназначенных для размещения в дистанционном канале ...»
+- Опирается на ESMA (сноски «Final Report by ESMA», стр. 41–42) — та же линия, что ESMA35-43-3448 п. 39 (Д14.1 F).
+- Адресат — ПУРЦБиКИ (профучастники и управляющие коллективными инвестициями). Для нас не прямо.
+- Значение: **второй после страхования документ ЦБ, где прямо сказано о переводе части 1-МР/22-МР из рекомендаций
+  в «собственную регуляторную базу»** — по сегменту инвестуслуг и по теме интерфейса. 19-МР в докладе не упомянуты.
+
+## ДОБОР Д14 — ИЗМЕНЕНИЯ ВЫВОДОВ
+
+**Подтвердилось (первоисточниками, а не пересказом):**
+1. 19-МР нас не обязывают. Подтверждено ещё двумя независимыми основаниями: (а) письмо Службы ЦБ от 09.08.2024:
+   «адресованы финансовым организациям и их саморегулируемым организациям», «носят рекомендательный характер»;
+   (б) форма прил. 5 — «Уведомление ... о добровольном присоединении», поле 4 требует номер лицензии.
+2. Инструмент влияния ЦБ — учёт «при оценке деятельности поднадзорной организации и ее поведенческих рисков» (письмо ЦБ,
+   дословно; пересказ первого прогона был верен).
+3. «Структура 19-МР — прямой аналог FCA/ESMA» — по составу требований подтверждается пункт в пункт (таблица Д14.1 G).
+   Отличие «там обязательно, здесь рекомендации» тоже подтверждается: PROD 3.2.1R, PRIN 2A.3.2R, 2A.4.2R — rules (R).
+4. B2B-перенос требований договором — в UK эта конструкция записана в правилах: FG22/5 п. 2.22 (due diligence
+   нерегулируемого участника цепочки), п. 2.24 (ответственность за сторонний инструмент, FG11/05), PRIN 2A.4.14R.
+   Первый прогон вывел её для РФ по логике — UK даёт прямой прецедент того, чего потребует банк.
+
+**Уточнено:**
+5. Аналог 19-МР в UK — не один документ, а связка PROD 3/4 + PRIN 2A (Consumer Duty) + FG21/1.
+6. Путь превращения в обязательное ЦБ называет сам: базовые стандарты СРО (письмо 09.08.2024). В брокерском КФНП-14
+   (30.04.2025) ссылок на 19-МР нет; по другим отраслям не проверено.
+7. 19-МР не упоминаются ни в годовом отчёте ЦБ за 2024, ни за 2025, ни на странице поведенческого надзора. Итогов
+   уведомлений ЦБ не публиковал. Живой в надзоре документ — 22-МР (ГО-2024 отчитывается им), а 19-МР — словарь
+   («клиентская ценность») и фоновое ожидание.
+
+🔴 **Опровергнуто / существенно дополнено:**
+8. 🔴 Раздел 4 первого прогона: «Consumer Duty — применяется к фирмам, которые влияют на исход ... даже без прямого
+   договора» (формулировка задания Д14.1) — **верно только для authorised firms**. FG22/5 п. 2.41: «The Duty only
+   applies within the FCA’s regulatory perimeter, so will not apply to unregulated business.» Нерегулируемый
+   советующий сервис Consumer Duty напрямую не ловит.
+9. 🔴 **Главное.** Неявная посылка первого прогона «советующий инструмент без продажи продукта в развитых юрисдикциях
+   под product governance не попадает, значит свободен» — **неверна для UK**: там такой продукт ловит не product
+   governance, а **регулируемая деятельность debt counselling** (PERG 17): персональная рекомендация по погашению
+   конкретных кредитных долгов, в том числе досрочному и не просроченных (Q3.1–3.2), в том числе через «interactive
+   software system» (Q5.7); пример (16) почти дословно описывает ядро FINPILOT («advises the debtor on how to match
+   income and debts ... to pay off a certain amount of a large credit card bill each month»). Для UK-версии продукта
+   нужна авторизация FCA, либо уход в нейтральный планировщик (пример (15), Q5.5(1)). Для РФ аналога debt
+   counselling нет (тема 18: 39-ФЗ не ловит; Д4: ловит только ст. 10.2-2 149-ФЗ) — это и есть реальная разница
+   режимов, а не «рекомендации против правил».
+10. 🔴 «Движения к обязательности нет» (неявно в первом прогоне) — **опровергнуто частично**: ЦБ в ГО-2025 предложил
+   «в будущем установить требования к управлению страховыми продуктами», а в докладе от 14.07.2026 — перевести
+   регулирование геймификации/наджинга из 22-МР и 1-МР в «собственную регуляторную базу» для ПУРЦБиКИ. Оба —
+   для поднадзорных, без акта и даты. Небанковских сервисов не касаются.
+
+**Для 149-ФЗ / ЗоЗПП (Д14.3):** противоречий с доборами Д4 и ст. 16 п. 3.1 ЗоЗПП не найдено. Нового обязательного
+акта для небанковского советующего сервиса на 11.09.2026 нет. Ближайшие к нам инициативы — поправки ЦБ о финуслугах
+на платформах (в Правительстве с июня 2026) и доклад об инфлюенсерах (консультации закрыты 30.04.2026), обе —
+не в силе и по нынешним формулировкам не про персональный советующий сервис без продаж.
+
+### Выдерживает ли ПРЯМОЙ ОТВЕТ проверку
+Пункты 1–3 ПРЯМОГО ОТВЕТА по существу выдерживают. Пункт 1 надо **сузить**: он верен для РФ, но в нынешнем
+виде читается как «советующий инструмент регуляторно свободен», а сверка с UK это опровергает. Предлагаемая
+редакция (текст первого прогона не тронут):
+
+> **ПРЯМОЙ ОТВЕТ (редакция Д14, 11.09.2026).**
+> 1. **В РФ 19-МР нас не обязывают** — по адресату (п. 1.2; письмо Службы ЦБ от 09.08.2024: «адресованы финансовым
+>    организациям и их саморегулируемым организациям»), по определению продукта (п. 1.3, сн. 1), по форме
+>    присоединения (прил. 5 требует номер лицензии) и по силе («носят рекомендательный характер»). Публичного
+>    надзора по ним нет; обязательными они могут стать для членов СРО через базовые стандарты — для небанковского
+>    сервиса и это путь не прямой. Обязательное для нас в РФ — ст. 10.2-2 149-ФЗ и ст. 16 п. 3.1 ЗоЗПП, не МР.
+> 2. **Зарубежный ориентир — не «там это обязательно, здесь нет»**, а: product governance (FCA PROD/Consumer Duty,
+>    ESMA) и там ловит только поднадзорных, а советующий по долгам сервис в UK ловится **лицензируемой
+>    деятельностью debt counselling** (PERG 17, пр. (14), (16), Q5.7). Если в РФ появится регулирование советующих
+>    сервисов, наиболее вероятная модель — именно это (лицензия на совет), а не распространение 19-МР.
+>    Практический вывод для формулировок продукта: граница «информация / совет» из PERG 17.5 и пример (15) —
+>    лучший из найденных критериев, как описывать режим работы FINPILOT.
+> 3. **Добровольно взять из 19-МР** — как в первом прогоне (ЦКГ и триггеры «не для вас», сценарии в понятной форме,
+>    объяснение рекомендаций, простая альтернатива при равенстве, режим для уязвимых, метрики исхода, пилот).
+> 4. **B2B** — как в первом прогоне, плюс: банк будет смотреть на нас как на «нерегулируемого участника цепочки»
+>    и на «сторонний инструмент», за который он отвечает (UK прямо: FG22/5 пп. 2.22, 2.24; PRIN 2A.4.14R). Готовить
+>    пакет due diligence: описание ЦКГ модели, методика тестирования, журнал изменений модели, мониторинг исхода.
+
+## ДОБОР Д14 — НЕ ДОБЫТО
+- **Число и состав уведомлений ЦБ по форме прил. 5 к III кв. 2024** — ни в годовых отчётах (0 вхождений «19-МР»
+  в 19 310 и 20 747 строках), ни на странице поведенческого надзора, ни через 3 WebSearch. Вероятно, не публиковалось.
+- **Базовые стандарты СРО МФО, страховщиков, банков (АРБ) на предмет ссылок на 19-МР** — не проверялись полным текстом;
+  брокерский КФНП-14 проверен (0); стандарт КПК (base.garant.ru/412325450/) — HTTP 200, 84 812 байт, но только шапка,
+  текст статей garant не отдаёт.
+- **ОННРФР «Направление 2»** (consultant.ru cons_doc_LAW_522339) — HTTP 200, 29 709 байт, текст 2 332 симв.: вне окна
+  20–24 ч некоммерческая версия отдаёт только шапку.
+- **Статья РБК о докладе по инфлюенсерам** (rbc.ru/quote/news/article/699432809a794734500a75b2) — HTTP 200, 0 байт,
+  application/octet-stream. Не нужна: первоисточник (PDF ЦБ) добыт.
+- **Тексты статей 289-ФЗ и 211-ФЗ** на garant — только аннотация/шапка (82 312 и 82 642 байт HTML, 11 070 и 11 005
+  симв. текста). Исключение финансового рынка из 289-ФЗ — только по сниппету WebSearch.
+- **Номер статьи RAO для debt counselling (39E)** — по памяти модели; в PERG 17.2–17.7 номер не встретился.
+- **PERG 2.9.18 (исключение 72A для information society services)** — страница PERG 2.9 скачана (257 146 байт), строка
+  с номером не найдена; содержание исключения не проверено.
+- **Текст законопроекта ЦБ о финуслугах на платформах** — только пресса (Interfax 05.06.2026); номера и текста нет.
+- **FCA PS22/9** скачан (1 380 128 байт), дословно не цитировался — нужное покрыто PRIN 2A и FG22/5.
+
+Итог Д14 по каналам: WebSearch 13 вызовов; curl ≈ 40 запросов; r.jina.ai 1 (Kontur, спас JS-рендер);
+WebFetch 0; подагентов 0. Отказа по бюджету поиска не было.
+
+
+---
+
+## ДОБОР Г1 — Базовые стандарты защиты прав потребителей СРО: есть ли ссылки на 19-МР
+
+> Добыто 11.09.2026. Метод: полные тексты PDF с cbr.ru и сайта СРО → `pdftotext -layout` → поиск по «19-МР», «методическ… рекомендац…», «целев… рын…», «управлени… продукт…», «тестирован…», «продуктов…».
+
+### 1. Страховщики (ВСС) — Базовый стандарт, утверждён Банком России (решение от 03.10.2024), применяется с 08.05.2025
+
+> `https://www.cbr.ru/queries/xsltblock/file/166235/55` — `curl`, HTTP 200, 562 341 байт PDF, 120 410 байт текста. Реквизиты утверждения — новость ЦБ `cbr.ru/press/event/?id=21058` от 03.10.2024 (HTTP 200, 30 772 байта): согласован Комитетом по стандартам 19.09.2024, одновременно ЦБ отказал в утверждении версии от 21.08.2024 «в связи с несоответствием отдельных положений… статье 6.2 Закона… № 4015-I». Дата применения 08.05.2025 — сниппет выдачи, не сверена. Что именно лежит по ссылке 166235/55 — действующая редакция или проект — по титулу не установлено (реквизитов на титуле нет).
+
+Результат поиска: **«19-МР» и «методическ… рекомендац…» Банка России — 0 вхождений.** Сродные 19-МР механизмы есть в собственной форме — тестирование получателя услуг (гл. 7, пп. 7.1–7.9) и оговорка о предложении продуктов. Дословно фрагменты:
+
+```
+страхованию)1;
+
+
+    8) тестирование – тестирование физического лица, не являющегося
+квалифицированным инвестором, проведение которого страховщиком
+предусмотрено пунктом 5 статьи 3 Закона Российской Федерации от 27 ноября
+     3.2.2. Страховщикам запрещается ставить заключение договора
+страхования по одному виду страхования в зависимость от наличия
+(заключения) договора по другому виду страхования, а также от наличия
+(заключения) договоров оказания иных видов финансовых услуг, за
+исключением договоров комбинированного страхования.
+    Не является нарушением предложение страховых продуктов, которые
+предполагают наличие у получателя страховых услуг других договоров
+страхования или договоров оказания финансовых услуг (например,
+страхования рисков заемщиков кредита при наличии кредитного договора).
+    3.2.3. Запрещается дискриминация получателей страховых услуг по полу,
+расе, национальности, языку, происхождению, имущественному и
+    7. Тестирование физических лиц - получателей страховых услуг, не
+являющихся квалифицированными инвесторами
+
+
+     7.1. Страховщик проводит тестирование физического лица, не
+являющегося квалифицированным инвестором, имеющего намерение
+заключить договор добровольного страхования жизни, указанный в пункте 5
+статьи 3 3акона Российской Федерации от 27 ноября 1992 года № 4015-1 «Об
+организации страхового дела в Российской Федерации», за исключением
+случаев, указанных в пункте 8 статьи 3 Закона Российской Федерации от 27
+ноября 1992 года № 4015-I «Об организации страхового дела в Российской
+Федерации».
+    7.2. Страховщик проводит тестирование, а также оценивает результат
+
+                                                                       22
+тестирования до заключения договора добровольного страхования жизни,
+указанного в пункте 5 статьи 3 Закона Российской Федерации от 27 ноября
+1992 года № 4015-1 «Об организации страхового дела в Российской
+Федерации».
+    7.3. Тестирование проводится страховщиком путем получения ответов
+тестируемого лица на вопросы, определенные Приложениями № № 1-2 к
+Стандарту.
+    7.4. Перечень вопросов для тестирования формируется страховщиком
+```
+
+### 2. КПК — Базовый стандарт, утверждён Банком России 10.07.2025
+
+> `https://www.cbr.ru/queries/xsltblock/file/90010/64` — HTTP 200, 509 126 байт PDF, 90 796 байт текста. На титуле «Утвержден Банком России (Протокол № от)» — реквизиты не проставлены, т.е. это может быть версия к утверждению; дата 10.07.2025 — сниппеты Гаранта/КонсультантПлюс.
+
+Результат поиска: «19-МР», «целевой рынок», «управление продуктом», «тестирование» — **0 вхождений**; «рекомендации» встречаются только в смысле «рекомендации по обслуживанию» (строки 55, 500) и «рекомендации по включению в обращение» (строка 679). Ссылок на методрекомендации ЦБ нет.
+
+### 3. МФО — базовые стандарты с сайта СРО «МиР»
+
+> Страница `https://npmir.ru/about/sro-mir/docs/standarts.php` (HTTP 200, 54 006 байт) даёт два PDF:
+> - `npmir.ru/upload/standarts/Standart_MFO_22062017.pdf` — HTTP 200, 462 481 байт, 130 102 байт текста: «Утвержден Банком России 22.06.2017. Базовый стандарт защиты прав и интересов физических и юридических лиц - получателей финансовых услуг, оказываемых членами СРО… объединяющих микрофинансовые организации» (в силе с 01.07.2017 по сниппету выдачи);
+> - `npmir.ru/upload/docs/basic_standart_mfo_28042018.pdf` — HTTP 200, 369 516 байт: «Базовый стандарт совершения микрофинансовой организацией операций на финансовом рынке», утв. Банком России, протокол № КФНП-12 от 27.04.2018.
+> Является ли версия 2017 г. действующей редакцией (были ли поздние изменения) — НЕ установлено; сайт СРО выкладывает её как текущую.
+
+Результат поиска по обоим: «19-МР», «методическ… рекомендац…», «целевой рынок», «управление продуктом» — **0 вхождений**. Хронологически ожидаемо: оба документа старше 19-МР (27.12.2023).
+
+### 4. Банки / АРБ
+
+Базового стандарта защиты прав потребителей для кредитных организаций в выдаче не найдено (два широких запроса WebSearch: выдача — только МФО, страховщики, КПК, СКПК, брокеры, регистраторы). Объяснение, не проверенное первоисточником: СРО в сфере финрынка по 223-ФЗ объединяют некредитные финорганизации, банки членством в СРО не обязаны, поэтому канала «базовый стандарт» для банков нет; 19-МР для банков остаётся рекомендацией. Это отсутствие находки, а не опровержение.
+
+### Итог по пункту
+
+В трёх открытых полных текстах (страховщики 2024, КПК 2025, МФО 2017/2018) **ссылок на 19-МР нет**. Путь «рекомендации → базовый стандарт → обязательность», названный письмом ЦБ от 09.08.2024, по состоянию добытых текстов **не реализован явной ссылкой**; у страховщиков есть собственное тестирование получателя услуг (гл. 7) — механизм смежный с 19-МР, но оформлен как самостоятельная норма, без отсылки. Для FINPILOT вывод legal_final (19-МР не обязательна) не меняется: базовые стандарты адресованы членам СРО, FINPILOT — не финорганизация.

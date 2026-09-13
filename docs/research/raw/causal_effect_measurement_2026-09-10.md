@@ -2875,3 +2875,784 @@ decisions». Рандомизация, при которой пользоват�
 **Статус темы 37 после добора: ЗАВЕРШЕНО, добор выполнен.** Недобытое перечислено в §Д5.4
 с кодами возврата. Все числа в разделах Д1–Д5 сверены с PDF/исходным текстом, не с пересказом
 `WebFetch`.
+
+---
+
+# ПЕРЕПРОВЕРКА Д4 С ПОИСКОМ (2026-09-11)
+
+Задание: перепроверить правовую и регуляторную часть добора Д4 (шёл с мёртвым WebSearch 400/400),
+участки П4.1–П4.6. Подагентов: 0 (вся работа — лидером, последовательно). Каналы и коды — у каждой нормы.
+Разделы дописываются по ходу, по одному на участок.
+
+## ПЕРЕПРОВЕРКА Д4 С ПОИСКОМ — П4.1 EU AI Act и DSA
+
+### Журнал добычи (11.09.2026)
+| Документ | URL | Канал | HTTP | Размер |
+|---|---|---|---|---|
+| AI Act, Регламент (ЕС) 2024/1689, OJ-текст | `http://publications.europa.eu/resource/celex/32024R1689` (Accept: application/xhtml+xml) | curl -sk --http1.1 | 200 | 1 262 391 байт HTML → 585 354 симв. текста |
+| (EUR-Lex HTML того же текста) | `eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32024R1689` | curl | **202, 0 байт** (антибот-заглушка); с `OJ:L_202401689` — 202, 2 035 байт | — |
+| Digital Omnibus on AI, Регламент (ЕС) **2026/1744** от 08.07.2026, OJ L 24.7.2026 | `http://publications.europa.eu/resource/celex/32026R1744` | curl | 200 | 351 287 байт → 148 345 симв. |
+| DSA, Регламент (ЕС) 2022/2065 | `http://publications.europa.eu/resource/celex/32022R2065` | curl | 200 | 838 166 байт → 416 879 симв. (EUR-Lex HTML — 202, 0 байт) |
+| Руководство Комиссии по запрещённым практикам, C(2025) 5052 final (29.07.2025; первая редакция C(2025) 884, 04.02.2025) | `ai-act-service-desk.ec.europa.eu/sites/default/files/2025-08/guidelines_on_prohibited_artificial_intelligence_practices_established_by_regulation_eu_20241689_ai_act_english_ied3r5nwo50xggpcfmwckm3nuc_112367-1.PDF` | curl + pdftotext -layout | 200 | 1 204 912 байт PDF, 6 361 строка |
+| Руководство Комиссии по определению «AI system» | `ai-act-service-desk.ec.europa.eu/sites/default/files/2025-08/commission_guidelines_on_the_definition_of_an_artificial_intelligence_system_established_by_regulation_eu_20241689_ai_actenglish_nf2skcqfrtjdfggjavcodopcwz4_112455.PDF` | curl + pdftotext | 200 | 333 765 байт, 591 строка |
+| ПРОЕКТ руководства Комиссии по классификации high-risk, часть «Annex III» (опубл. 19.05.2026, консультация до 23.07.2026) | `https://ec.europa.eu/newsroom/dae/redirection/document/128561` (ссылка со страницы `digital-strategy.ec.europa.eu/en/library/draft-commission-guidelines-classification-high-risk-ai-systems`) | curl + pdftotext | 200 | 1 547 742 байт PDF, 148 стр., 7 669 строк |
+| Сервис-деск AI Act, Annex III | `ai-act-service-desk.ec.europa.eu/en/ai-act/annex-3` | WebFetch | — | пересказ, сверен с OJ-текстом ниже |
+
+Приём: EUR-Lex HTML отдаёт 202/0 байт (антибот), а **Publications Office `publications.europa.eu/resource/celex/<CELEX>` с `Accept: application/xhtml+xml` отдаёт тот же OJ-текст с HTTP 200** — переносимо на любой акт ЕС.
+WebSearch по участку: 7 вызовов, отказов бюджета нет.
+
+### A. AI Act — дословно
+
+**Ст. 3 п. 1 (определение):** «‘AI system’ means a machine-based system that is designed to operate with varying levels
+of autonomy and that may exhibit adaptiveness after deployment, and that, for explicit or implicit objectives, infers,
+from the input it receives, how to generate outputs such as predictions, content, recommendations, or decisions that can
+influence physical or virtual environments;»
+
+**Ст. 5 п. 1 (a):** «the placing on the market, the putting into service or the use of an AI system that deploys
+subliminal techniques beyond a person’s consciousness or purposefully manipulative or deceptive techniques, with the
+objective, or the effect of materially distorting the behaviour of a person or a group of persons by appreciably impairing
+their ability to make an informed decision, thereby causing them to take a decision that they would not have otherwise
+taken in a manner that causes or is reasonably likely to cause that person, another person or group of persons
+significant harm;»
+
+**Ст. 5 п. 1 (b):** «the placing on the market, the putting into service or the use of an AI system that exploits any of
+the vulnerabilities of a natural person or a specific group of persons due to their age, disability or a specific social
+or economic situation, with the objective, or the effect, of materially distorting the behaviour of that person or a
+person belonging to that group in a manner that causes or is reasonably likely to cause that person or another person
+significant harm;»
+
+**Ст. 5 п. 8:** «This Article shall not affect the prohibitions that apply where an AI practice infringes other Union law.»
+
+**Сообр. 29 (выдержки):** «...whereby significant harms, in particular having sufficiently important adverse impacts on
+physical, psychological health or financial interests are likely to occur, are particularly dangerous and should therefore
+be prohibited.» / «...a specific social or economic situation that is likely to make those persons more vulnerable to
+exploitation such as persons living in extreme poverty...» / «In any case, it is not necessary for the provider or the
+deployer to have the intention to cause significant harm, provided that such harm results from the manipulative or
+exploitative AI-enabled practices.» / «...common and legitimate commercial practices, for example in the field of
+advertising, that comply with the applicable law should not, in themselves, be regarded as constituting harmful
+manipulative AI-enabled practices.»
+
+**Ст. 6 п. 2:** «In addition to the high-risk AI systems referred to in paragraph 1, AI systems referred to in Annex III
+shall be considered to be high-risk.»
+**Ст. 6 п. 3 (дерогация):** «By derogation from paragraph 2, an AI system referred to in Annex III shall not be considered
+to be high-risk where it does not pose a significant risk of harm to the health, safety or fundamental rights of natural
+persons, including by not materially influencing the outcome of decision making.» — при условиях (a) narrow procedural
+task; (b) improve the result of a previously completed human activity; (c) detect decision-making patterns...; (d)
+«perform a preparatory task to an assessment relevant for the purposes of the use cases listed in Annex III».
+🔴 «Notwithstanding the first subparagraph, an AI system referred to in Annex III shall always be considered to be
+high-risk where the AI system performs profiling of natural persons.»
+**Ст. 6 п. 4:** провайдер, считающий систему из Annex III не высокорисковой, «shall document its assessment before that
+system is placed on the market» и подлежит регистрации по ст. 49(2).
+
+**Приложение III п. 5 (b):** «AI systems intended to be used to evaluate the creditworthiness of natural persons or
+establish their credit score, with the exception of AI systems used for the purpose of detecting financial fraud»
+(сверено: сервис-деск и OJ-текст совпадают).
+**Сообр. 58:** «...AI systems used to evaluate the credit score or creditworthiness of natural persons should be
+classified as high-risk AI systems, since they determine those persons’ access to financial resources or essential
+services such as housing, electricity, and telecommunication services.»
+
+**Ст. 10 п. 1–2 (данные):** «1. High-risk AI systems which make use of techniques involving the training of AI models
+with data shall be developed on the basis of training, validation and testing data sets that meet the quality criteria
+referred to in paragraphs 2 to 5 whenever such data sets are used. 2. Training, validation and testing data sets shall be
+subject to data governance and management practices appropriate for the intended purpose... (a) the relevant design
+choices; (b) data collection processes and the origin of data, and in the case of personal data, the original purpose of
+the data collection; (c) relevant data-preparation processing operations...» (Omnibus 2026/1744, ст. 1 п. 9, заменил п. 1 —
+ссылка теперь на «paragraphs 2, 3 and 4 of this Article and in Article 4a(1)».)
+**Ст. 12 п. 1–2 (логи):** «1. High-risk AI systems shall technically allow for the automatic recording of events (logs)
+over the lifetime of the system. 2. ... logging capabilities shall enable the recording of events relevant for: (a)
+identifying situations that may result in the high-risk AI system presenting a risk ... or in a substantial modification;
+(b) facilitating the post-market monitoring referred to in Article 72; and (c) monitoring the operation of high-risk AI
+systems referred to in Article 26(5).»
+**Ст. 14 п. 1 (надзор человека):** «High-risk AI systems shall be designed and developed in such a way, including with
+appropriate human-machine interface tools, that they can be effectively overseen by natural persons during the period in
+which they are in use.»
+
+**🔴 Ст. 60–61 — «testing in real world conditions» (в своде темы 37 не упоминались вовсе).**
+Ст. 60 п. 1: «Testing of high-risk AI systems in real world conditions outside AI regulatory sandboxes may be conducted by
+providers or prospective providers of high-risk AI systems listed in Annex III, in accordance with this Article and the
+real-world testing plan referred to in this Article, without prejudice to the prohibitions under Article 5.»
+Ст. 60 п. 4 — условия (выдержки): план испытаний подан и одобрен органом рыночного надзора; срок «not longer than six
+months, which may be extended for an additional period of six months»; «the subjects of the testing in real world
+conditions who are persons belonging to vulnerable groups due to their age or disability, are appropriately protected»;
+«the subjects of the testing in real world conditions have given informed consent in accordance with Article 61».
+Ст. 60 п. 5: субъекты «may, without any resulting detriment and without having to provide any justification, withdraw
+from the testing at any time». Ст. 61 п. 1: «freely-given informed consent shall be obtained from the subjects of testing
+prior to their participation in such testing and after their having been duly informed...». Ст. 3: «‘informed consent’
+means a subject’s freely given, specific, unambiguous and voluntary expression of his or her willingness to participate
+in a particular testing in real-world conditions...».
+Чтение (вывод, не цитата): это режим ДО вывода на рынок и только для high-risk; A/B после вывода на рынок этой статьёй
+не описан. Но это единственная найденная в ЕС норма, где эксперимент на людях с ИИ-системой прямо требует
+информированного согласия.
+
+**Ст. 113 (даты) — в редакции Omnibus 2026/1744, ст. 1 п. 40:**
+«(a) Chapters I and II shall apply from 2 February 2025, with the exception of Article 5(1), first subparagraph, points
+(ba) and (bb), and Article 5(1a) and (1b) which shall apply from 2 December 2026;»
+«(c) Chapter III, Sections 1, 2, and 3, with the exception of Article 6(5), shall apply from: (i) 2 December 2027 as
+regards AI systems classified as high-risk pursuant to Article 6(2) and Annex III; and (ii) 2 August 2028 as regards AI
+systems classified as high-risk pursuant to Article 6(1) and Annex I;»
+Исходная редакция 2024 г.: общая дата — 2 August 2026; ст. 6(1) — 2 August 2027. Новые пп. (ba), (bb) ст. 5 —
+про интимные дипфейки и CSAM, к нам не относятся. Ст. 5(1)(a),(b) действуют с 02.02.2025 без изменений.
+
+### B. Руководства Комиссии (не обязательны, но это официальное толкование)
+
+**Определение AI system:** п. 26: AI-системы отличаются от «simpler traditional software systems or programming approaches
+and should not cover systems that are based on the rules defined solely by natural persons to automatically execute
+operations.» П. 42: «Systems used to improve mathematical optimisation or to accelerate and approximate traditional, well
+established optimisation methods, such as linear or logistic regression methods, fall outside the scope of the AI system
+definition.» П. 46: «Basic data processing system refers to a system that follows predefined, explicit instructions or
+operations... They operate based on fixed human-programmed rules, without using AI techniques, such as machine learning or
+logic-based inference, to generate outputs.» П. 48 (classical heuristics) и п. 49 (simple prediction systems) — тоже вне
+определения. (стр. 8–9 PDF)
+🔶 Вывод (не цитата): детерминированное ядро SAW с фиксированными весами + Avalanche + SES/Монте-Карло с высокой
+вероятностью подпадает под «rules defined solely by natural persons» / «well established optimisation methods» и
+**вообще не является AI system** в смысле ст. 3(1). Это ломается в момент, когда веса/политику начнут учить по логам
+(контекстный бандит, uplift-модель, обучаемая политика из темы 37) — тогда определение ст. 3(1) выполняется.
+Сноска 6 там же: системы, выведенные на рынок до 02.08.2026, пользуются «grandfathering» ст. 111(2).
+
+**Запрещённые практики (C(2025) 5052), п. 128, стр. 40–41:** «Manipulation involves, in most cases, covert techniques
+undermining autonomy... By contrast, persuasion operates within the bounds of transparency and respect for individual
+autonomy. It involves presenting arguments or information in a way that appeals to reason and emotions, but explains the
+AI system’s objectives and functioning, provide relevant and accurate information to ensure informed decision-making...»
+«For example, an AI system using personalised recommendations based on transparent algorithms and user preferences and
+controls engages in persuasion.»
+П. 130: «In persuasive interactions, individuals are aware of the influence attempt and can freely and autonomously choose
+it. In manipulative interactions, the lack of awareness of the techniques or their impact negates the freedom of choice».
+П. 133 (стр. 42): «AI systems used for providing banking services, such as mortgages and loans, that use the age or the
+specific socio- economic situation of the client as an input, in compliance with Union legislation ... do not qualify as
+the exploitation of vulnerabilities within the meaning of Article 5(1)(b) AI Act when they are designed to protect and
+support people identified as vulnerable...» Отдельный пример там же: техники, чтобы «push people to take significantly
+harmful financial decisions». Прямо про A/B-тесты — grep «A/B» по 6 361 строке: 0 вхождений.
+
+**ПРОЕКТ руководства по high-risk, Annex III (19.05.2026):**
+П. 296: «The evaluation of creditworthiness refers to the assessment of a natural person’s ability and willingness to
+fulfil its contractual obligations to pay for the services provided or the credit granted.»
+П. 302: из финуслуг «essential» только: bank account; payment services; «the offering of loans and credit; the offering
+of extension of a credit line or of credit card limit; the offering of mortgage; and public financial services».
+П. 304: не essential — «stocks and securities; ... margin trading; ... complex financial instruments; premium credit
+cards; and special loans, such as leisure/travel loans».
+Примеры ВНЕ п. 5(b) (стр. 88): «An AI system intended to classify customers, for example, to fulfil information
+obligations, to provide tailored information to customers, to assess the suitability of a product or to make personalised
+marketing offers, so long as the classification does not play a part in the assessment of the creditworthiness of a
+natural person.» и «AI systems intended for customer support related to the assessment of their creditworthiness ...
+may assist applicants in understanding or completing the credit application form ... or provide dynamic feedback on how
+specific answers may influence the likelihood of approval. If they are not intended to be used as part of the
+creditworthiness assessment or credit-scoring process ... they fall outside the use case of point 5(b).»
+П. 75: «split architectures are assessed as a whole» — если выход компонента материально влияет на индивидуальное
+решение, связка оценивается как одна система.
+grep по 7 669 строкам: «debt» — 0 по теме, «budget» — 1 (логистика), «advice» — только voter advice. **Прямого примера
+«советчик по погашению долгов / PFM» в проекте нет.**
+
+**Ответ на вопрос П4.1 (вывод, не цитата).** Советующий по долгам сервис, адресованный самому пользователю, по тексту
+п. 5(b) и проекту руководства **не является** оценкой кредитоспособности: он не оценивает «ability and willingness to
+fulfil contractual obligations» в целях доступа к кредиту; ближайшие аналоги в примерах — «tailored information to
+customers» и «customer support», оба ВНЕ 5(b). Высокий риск возникает в одном сценарии: **B2B, если банк использует наш
+выход (ПДН, «рекомендуемый» лимит заимствования) в своём решении о выдаче/лимите** — тогда по п. 75 связка оценивается
+целиком, а профилирование (ст. 6(3) последний абз.) закрывает дерогацию. Даты: с 02.12.2027 (Omnibus).
+
+### C. DSA — сверка ссылки свода темы 37
+
+**Ст. 3 (i):** «‘online platform’ means a hosting service that, at the request of a recipient of the service, stores and
+disseminates information to the public, unless that activity is a minor and purely ancillary feature of another
+service...». **Ст. 3 (s):** «‘recommender system’ means a fully or partially automated system used by an online platform to
+suggest in its online interface specific information to recipients of the service...».
+**Ст. 25 п. 1** (текст в §4.1 Д3 сверен — совпадает): «Providers of online platforms shall not design, organise or operate
+their online interfaces in a way that deceives or manipulates ...». **Ст. 25 п. 2:** «The prohibition in paragraph 1 shall
+not apply to practices covered by Directive 2005/29/EC or Regulation (EU) 2016/679.»
+**Ст. 19 п. 1:** «This Section, with the exception of Article 24(3) thereof, shall not apply to providers of online
+platforms that qualify as micro or small enterprises as defined in Recommendation 2003/361/EC.» (ст. 25 и 27 — в этой
+секции: Глава III, Раздел 3.)
+**Ст. 38:** «In addition to the requirements set out in Article 27, providers of very large online platforms and of very
+large online search engines that use recommender systems shall provide at least one option for each of their recommender
+systems which is not based on profiling...». **Ст. 33 п. 1:** VLOP — «equal to or higher than 45 million» среднемесячных
+активных получателей в ЕС.
+**Ст. 40 п. 1, 3, 4:** доступ к данным — только VLOP/VLOSE; п. 3: «explain the design, the logic, the functioning and the
+testing of their algorithmic systems, including their recommender systems»; п. 4: доступ «vetted researchers ... for the
+sole purpose of conducting research that contributes to the detection, identification and understanding of systemic
+risks». **Ст. 93 п. 2:** DSA применяется с 17.02.2024.
+
+🔴 **Ссылка свода темы 37 (раздел 5 п. 4: «нарушает ... ст. 25 DSA») по тексту НЕКОРРЕКТНА как утверждение
+о применимости.** Ст. 25 адресована только «providers of online platforms», а платформа по ст. 3(i) — хостинг, который
+хранит и распространяет информацию пользователей «to the public». FINPILOT (персональный советник без публикации
+пользовательского контента) онлайн-платформой не является, и ст. 25/27 его не связывают. Даже для платформ ст. 25(2)
+отсылает практики, покрытые UCPD 2005/29/EC и GDPR, к этим актам, а ст. 19 освобождает микро- и малые предприятия.
+Для B2C-сервиса в ЕС рамка про манипулятивный интерфейс — **UCPD 2005/29/EC + GDPR + ст. 5(1)(a),(b) AI Act**
+(последняя — если система является AI system), а не DSA. Правильная формулировка: «ст. 25 DSA — ориентир формулировки
+(что считается манипулятивным дизайном), а не применимая норма». Цитата сама по себе верна (сверена дословно).
+Ст. 38 и 40 — только VLOP (≥45 млн), к нам не относятся ни при каком сценарии.
+
+## ПЕРЕПРОВЕРКА Д4 С ПОИСКОМ — П4.2 CFPB
+
+### Журнал добычи (11.09.2026)
+| Документ | URL | Канал | HTTP | Размер |
+|---|---|---|---|---|
+| CFPB Circular 2023-01 «Unlawful negative option marketing practices», 19.01.2023 | `files.consumerfinance.gov/f/documents/cfpb_unlawful-negative-option-marketing-practices-circular_2023-01.pdf` | WebFetch (PDF не разобран, сохранён на диск) → pdftotext -layout | — | 195,1 КБ PDF, 389 строк |
+| Federal Register 90 FR 20084 (12.05.2025), FR Doc 2025-08286 «Interpretive Rules, Policy Statements, and Advisory Opinions; Withdrawal» | `federalregister.gov/documents/full_text/text/2025/05/12/2025-08286.txt` (URL из API `federalregister.gov/api/v1/documents/2025-08286.json`) | curl | 200 | 21 969 байт |
+| 12 U.S.C. §5481 (определения CFPA) | `law.cornell.edu/uscode/text/12/5481` | curl | 200 | 160 811 байт |
+| 12 U.S.C. §5531 (UDAAP) | `law.cornell.edu/uscode/text/12/5531` | curl | 200 | 45 718 байт |
+| (uscode.house.gov — те же разделы) | `uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title12-section5481...` | curl | **000, 0 байт**, таймаут 120 с, exit 35 (TLS) | — |
+| 12 CFR §1033.421 (Section 1033, обязанности третьих лиц) | `ecfr.gov/api/versioner/v1/full/2026-09-01/title-12.xml?part=1033&section=1033.421` | curl `--compressed` (без него — 406 «requires response compression») | 200 | 2 635 байт (gzip) → 8 276 симв. |
+| Статус правила 1033 | `cozen.com/news-resources/publications/2026/section-1033-compliance-date-open-banking-rule-enjoined-and-under-reconsideration` (09.04.2026) | WebFetch | — | пересказ |
+
+WebSearch по участку: 5 вызовов.
+
+### A. 🔴 Главное: советующий по долгам сервис в США — это «consumer financial product or service»
+
+**12 U.S.C. §5481(15)(A)(viii)** (дословно): «providing financial advisory services (other than services relating to
+securities provided by a person regulated by the Commission or a person regulated by a State securities Commission, but
+only to the extent that such person acts in a regulated capacity) to consumers on individual financial matters or
+relating to proprietary financial products or services (other than by publishing any bona fide newspaper, news magazine,
+or business or financial publication of general and regular circulation, including publishing market data, news, or data
+analytics or investment information or recommendations that are not tailored to the individual needs of a particular
+consumer), including— (I) providing credit counseling to any consumer; and (II) providing services to assist a consumer
+with debt management or debt settlement, modifying the terms of any extension of credit, or avoiding foreclosure;»
+**§5481(6):** «The term “covered person” means— (A) any person that engages in offering or providing a consumer financial
+product or service; ...»
+
+Чтение (вывод): FINPILOT в США был бы **covered person** по закону, без всякой лицензии и без продажи продукта —
+«financial advisory services ... on individual financial matters ... including ... debt management». Исключение
+«recommendations that are not tailored to the individual needs of a particular consumer» к нам неприменимо: наша
+рекомендация персональная. Значит на нас прямо распространяется запрет UDAAP (§5531, §5536). Это прямой аналог
+вывода Д14 по UK (PERG 17, debt counselling), только в США это не лицензия, а подпадание под надзорный закон.
+
+**12 U.S.C. §5531(d) — «abusive» (дословно):** «The Bureau shall have no authority under this section to declare an act
+or practice abusive in connection with the provision of a consumer financial product or service, unless the act or
+practice— (1) materially interferes with the ability of a consumer to understand a term or condition of a consumer
+financial product or service; or (2) takes unreasonable advantage of— (A) a lack of understanding on the part of the
+consumer of the material risks, costs, or conditions of the product or service; (B) the inability of the consumer to
+protect the interests of the consumer in selecting or using a consumer financial product or service; or (C) the
+reasonable reliance by the consumer on a covered person to act in the interests of the consumer.»
+
+🔴 Чтение для exploration (вывод, не цитата CFPB): п. (d)(2)(C) — **ровно та граница, которую свод темы 37 выводил
+из Freedman**. Пользователь советующего сервиса по определению полагается на то, что совет — в его интересах.
+Показ под видом рекомендации альтернативы, о худшести которой система знает, ради данных для оценки — кандидат
+на «takes unreasonable advantage of ... the reasonable reliance by the consumer on a covered person to act in the
+interests of the consumer». Это статутная норма, не отозванное руководство, и она сильнее этического аргумента.
+Прямой позиции CFPB по A/B-тестам (circular, bulletin, report) не найдено — см. ниже.
+
+### B. Dark patterns — Circular 2023-01 (дословно) и 🔴 его отзыв
+
+Circular 2023-01, «Response»: «Yes. “Covered persons” and “service providers” must comply with the prohibition on unfair,
+deceptive, or abusive acts or practices in the CFPA. Negative option marketing practices may violate that prohibition
+where a seller (1) misrepresents or fails to clearly and conspicuously disclose the material terms of a negative option
+program; (2) fails to obtain consumers’ informed consent; or (3) misleads consumers who want to cancel, erects
+unreasonable barriers to cancellation, or fails to honor cancellation requests...» (стр. 1).
+Стр. 3: «Recently, the CFPB and FTC have taken action to combat the rise of digital dark patterns, which are design
+features used to deceive, steer, or manipulate users into behavior that is profitable for a company, but often harmful
+to users or contrary to their intent.» Стр. 4 (Consent): «Consent will generally not be informed if, for example, a
+seller mischaracterizes or conceals the negative option feature, provides contradictory or misleading information, or
+otherwise interferes with the consumer’s understanding of the agreement.»
+
+🔴 **90 FR 20084 (12.05.2025), «The withdrawals are applicable as of May 12, 2025».** В перечне отозванного
+(стр. 20086, дословно по пунктам):
+- Policy Statements, п. 3: «Statement of Policy Regarding Prohibition on Abusive Acts or Practices, 88 FR 21883 (Apr. 12, 2023).»
+- Interpretive Rules, п. 2: «Limited Applicability of Consumer Financial Protection Act's `Time or Space' Exception to
+  Digital Marketers, 87 FR 50556 (Aug. 17, 2022).»
+- Circulars, п. 9: «Consumer Financial Protection Circular 2023-01: Unlawful negative option marketing practices, 88 FR
+  5727 (Jan. 30, 2023).»
+Всего отозвано 67 документов (8 policy statements, 7 interpretive rules, 13 advisory opinions, 39 прочих — по
+пересказу Holland & Knight / Consumer Finance Monitor; сам перечень в FR сверен по трём нужным пунктам).
+Вывод: **документы CFPB о dark patterns и о цифровом маркетинге как «service provider» с 12.05.2025 — не действующая
+позиция агентства.** Статут (§5531, §5536) при этом не изменился и продолжает применяться (в том числе генпрокурорами
+штатов по §5552 — не проверялось в этом заходе). Цитировать Circular 2023-01 можно только как историческое толкование.
+
+### C. Section 1033 — только часть про использование данных
+
+**12 CFR §1033.421(a)** (действующая редакция eCFR на 01.09.2026, дословно): «(1) In general. The third party will limit its
+collection, use, and retention of covered data to what is reasonably necessary to provide the consumer's requested
+product or service. (2) Specific purposes. For purposes of paragraph (a)(1) of this section, the following are not part
+of, or reasonably necessary to provide, any other product or service: (i) Targeted advertising; (ii) Cross-selling of
+other products or services; or (iii) The sale of covered data.»
+**§1033.421(c)(4)** — разрешённое использование: «Uses that are reasonably necessary to improve the product or service
+the consumer requested.» §1033.421(b)(2) — сбор не дольше года после последней авторизации.
+Чтение: если бы FINPILOT получал данные через 1033-доступ, **оценка эффекта рекомендаций и обучение политики
+подпадают под (c)(4) «improve the product or service the consumer requested»**, а монетизация через кросс-продажи
+или таргетированную рекламу — прямо нет.
+Статус (Cozen, 09.04.2026, пересказ WebFetch): правило enjoined федеральным судом (E.D. Ky.), CFPB «prevented from
+enforcing the rule» на время пересмотра; ANPR о пересмотре — 90 FR, 22.08.2025; дата 01.04.2026 не наступила
+в обязательном смысле. Текст правила в eCFR остаётся опубликованным.
+
+### D. Отрицательные результаты участка
+- **Позиция CFPB именно об A/B-тестах/экспериментах на потребителях** — не найдена: WebSearch «CFPB A/B testing consumers
+  experiments» выдал только interpretive rule 2022 о digital marketers (отозван, см. B). Сам CFPB проводил
+  исследования с рандомизацией (Office of Research), но нормы-позиции для поднадзорных не выпускал — по выдаче не
+  видно; утверждать «позиции нет» можно только как «не найдено в 5 поисках», не как доказанное отсутствие.
+- **Отдельная позиция CFPB о «советующих» инструментах по долгам** — не найдена; есть только статутное определение
+  §5481(15)(A)(viii) (выше) и потребительские страницы Ask CFPB о credit counseling / debt settlement.
+
+## ПЕРЕПРОВЕРКА Д4 С ПОИСКОМ — П4.3 Корпоративные этические комитеты для A/B
+
+### Журнал добычи (11.09.2026)
+| Документ | URL | Канал | HTTP | Размер |
+|---|---|---|---|---|
+| PNAS Editorial Expression of Concern (Verma), 22.07.2014, PNAS 111(29):10779, doi 10.1073/pnas.1412469111, + Correction + сама статья Kramer et al. | `socialmedialab.sites.stanford.edu/.../kramer-pnas-experimental-evidence.pdf` | curl + pdftotext | 200 | 549 866 байт PDF, 283 строки |
+| Jackman M., Kanerva L. «Evolving the IRB: Building Robust Review for Industry Research», 72 Wash. & Lee L. Rev. Online 442 (2016) | прямой `scholarlycommons.law.wlu.edu/cgi/viewcontent.cgi?article=1042&context=wlulr-online` | curl → **403** (Cloudflare «Just a moment»); r.jina.ai → 200, **240 байт — пустышка** с тем же 403 | — |
+|  | `https://web.archive.org/web/2022id_/<тот же URL>` | curl | **200** | 451 354 байт PDF, 6+ стр. → 723 строки |
+| Polonetsky J., Tene O., Jerome J. «Beyond the Common Rule: Ethical Structures for Data Research in Non-Academic Settings», 13 Colo. Tech. L.J. 333 (2015) | см. раздел «НЕ ДОБЫТО» ниже | — | — | — |
+| Meyer M.N. et al. «Objecting to experiments that compare two unobjectionable policies or treatments», PNAS 116(22):10723 (2019), doi 10.1073/pnas.1820701116, PMC6561206, CC BY-NC-ND | `ebi.ac.uk/europepmc/webservices/rest/PMC6561206/fullTextXML` | curl | 200 | 86 264 байт XML |
+| Polonioli A. et al. «The Ethics of Online Controlled Experiments (A/B Testing)», Minds & Machines (2023), doi 10.1007/s11023-023-09644-y | link.springer.com (HTML и /content/pdf/) | curl → 200, **3 038 байт** (заглушка); r.jina.ai → 200, 160 691 байт, 502 строки полного текста | — |
+
+WebSearch по участку: 6 вызовов.
+
+### A. Facebook 2014 — что последовало (дословно, PNAS 111(29):10779)
+«Questions have been raised about the principles of informed consent and opportunity to opt out in connection with the
+research in this paper. The authors noted in their paper, “[The work] was consistent with Facebook’s Data Use Policy, to
+which all users agree prior to creating an account on Facebook, constituting informed consent for this research.” When
+the authors prepared their paper for publication in PNAS, they stated that: “Because this experiment was conducted by
+Facebook, Inc. for internal purposes, the Cornell University IRB [Institutional Review Board] determined that the
+project did not fall under Cornell’s Human Research Protection Program.” This statement has since been confirmed by
+Cornell University. Obtaining informed consent and allowing participants to opt out are best practices in most instances
+under the US Department of Health and Human Services Policy for the Protection of Human Research Subjects (the “Common
+Rule”). Adherence to the Common Rule is PNAS policy, but as a private company Facebook was under no obligation to conform
+to the provisions of the Common Rule when it collected the data used by the authors, and the Common Rule does not preclude
+their use of the data. ... It is nevertheless a matter of concern that the collection of the data by Facebook may have
+involved practices that were not fully consistent with the principles of obtaining informed consent and allowing
+participants to opt out.» — Inder M. Verma, Editor-in-Chief.
+Чтение: юридически частная компания Common Rule не связана (это сказал сам журнал); последствие было репутационным
+и институциональным — ответом стал внутренний процесс ревью (ниже), а не норма.
+
+### B. 🔴 Внутренний процесс Facebook — первоисточник (Jackman & Kanerva 2016, стр. 451–455)
+- **Обучение (стр. 451):** «...substantive area experts and members of the research review group—complete the National
+  Institute of Health’s (NIH) human subjects training. The NIH training, however, is just a starting point.»
+- **Первая ступень — руководитель по предмету (стр. 451–452):** «The senior managers of each research team ... provide the
+  first review of research proposals. At this point in the process, the manager determines whether an expedited review
+  (“standard review”) is appropriate, or whether the proposal should be referred to the cross-functional research review
+  group (“extended review”).» / «...managers may refer a project to the research review group at any stage—not just at the
+  project's inception.» / 🔴 «We do not have categories of research—including product improvements—that are automatically
+  approved.» / «...research that also touches on privacy is considered by a separate privacy review group».
+- **Вторая ступень — группа (стр. 452):** «The research review group consists of a standing committee of five, and
+  includes experts in the substantive area of the research as well as law, ethics, communications, and policy.» / «Most of
+  the research Facebook conducts relates to small product tests—for example, evaluating whether the size or placement of a
+  comment box affects people’s engagement. The research area expert may expedite the review of these studies...» /
+  «Once extended review has been triggered, we require consensus among all members of the group before the research
+  proposal is approved.»
+- **Внешний член (сн. 29):** «We have considered including an external member on our review board, following the IRB
+  model. To this point, however, we have instead taken the approach of engaging external stakeholders on a case-by-case
+  basis».
+- **Четыре критерия (стр. 454–455):** (1) «how the research will improve our society, our community, and Facebook»;
+  (2) «whether there are potentially adverse consequences that could result from the study, and whether every effort has
+  been taken to minimize them. ... Our review pays attention to the impact of research focused on vulnerable populations
+  (e.g., teen bullying) or sensitive topics (e.g., suicide prevention)»; (3) «whether the research is consistent with
+  people’s expectations»; (4) «we ensure that we have taken appropriate precautions designed to protect people’s
+  information».
+
+### C. Эмпирика «A/B illusion» (Meyer et al. 2019, PNAS, дословно из абстракта)
+«...people frequently rate A/B tests designed to establish the comparative effectiveness of two policies or treatments
+as inappropriate even when universally implementing either A or B, untested, is seen as appropriate. This “A/B effect” is
+as strong among those with higher educational attainment and science literacy and among relevant professionals. It
+persists even when there is no reason to prefer A to B...» — 16 исследований, 5 873 участника, 9 областей.
+Одно из объяснений из того же абстракта: «a belief that consent is required to impose a policy on half of a population
+but not on the entire population». Вывод авторов: оценка через рандомизацию «may provoke greater objection than simply
+implementing» (цитата оборвана в извлечённом тексте — дальше не цитирую). В тексте статьи: примеры Facebook, OkCupid,
+Pearson как один паттерн; сама идея — Meyer M.N. (2015) «Two cheers for corporate experimentation: The A/B illusion and
+the virtues of data-driven innovation», Colo Tech Law J 13:273–331 (тот же номер журнала, что и Polonetsky et al.; сам текст 2015 г. не добыт).
+Значение для нас: даже этичный exploration в зоне equipoise **воспринимается хуже, чем любая из ветвей по отдельности**
+— аргумент за раскрытие в правилах (ст. 10.2-2) именно в формулировке «мы сравниваем равноценные варианты», а не
+«мы проводим эксперименты».
+
+### D. Обзор отрасли (Polonioli et al. 2023, Minds & Machines, через r.jina.ai)
+«While participant protection protocols are considered the norm in behavioral, medical, and social research, the
+situation is different when it comes to company-sponsored A/B testing.» / §3.1: «Companies such as Microsoft and Meta
+have been launching internal IRBs over the past years, but it is unclear to what extent these boards can be truly
+independent (Wong & Floridi, 2023). The issue is especially relevant considering that the social contagion study
+mentioned above was approved by Facebook’s IRB (Kramer, 2014)». Рамка статьи — четыре принципа Beauchamp & Childress;
+про equipoise: «a user should partake in an A/B test only if there is uncertainty ... about which condition is most
+likely...» (обрыв в извлечении). Уязвимые группы: «additional safeguards must be included in experiments involving
+vulnerable subjects such as children, prisoners, pregnant women, mentally disabled persons, or econo[mically disadvantaged]».
+🔶 Замечание: утверждение «исследование эмоционального заражения было одобрено IRB Facebook» у Polonioli —
+**противоречит** хронологии Jackman & Kanerva (процесс описан как созданный ПОСЛЕ, по итогам 2014) и тексту PNAS
+(там говорится об IRB Корнелла, не Facebook). Полагаться на эту фразу Polonioli не следует.
+
+### E. Практика Microsoft, LinkedIn, Booking, Airbnb — первоисточников не найдено
+3 поиска («LinkedIn Microsoft experimentation ethics review board», «Kohavi ... ethics minimal risk IRB», «ethics of
+A/B testing financial services»): первоисточников с описанием процесса у Microsoft/LinkedIn/Booking/Airbnb нет.
+Kohavi, Tang, Xu (2020) — по пересказу обзорных сайтов (не первоисточник) рекомендуют внутренний процесс,
+аналогичный IRB, с эскалацией при более чем минимальном риске; главу не открывал — книга под копирайтом Cambridge.
+По финтеху найдены только отраслевой блог GrowthBook и препринт на ResearchGate (не рецензируемый) —
+не цитирую.
+
+### F. Ответ: какой минимальный внутренний процесс одобрения считается нормой отрасли (вывод)
+Единственный первоисточник, где отраслевой процесс описан изнутри, — Jackman & Kanerva. Из него «минимум»:
+1. обучение всех, кто одобряет, по курсу защиты участников исследований (у них — NIH human subjects training);
+2. двухступенчатый отбор: руководитель по предмету решает, хватает ли ускоренного ревью или нужно расширенное;
+3. **никаких автоматически одобряемых категорий**, в том числе «улучшений продукта»;
+4. расширенное ревью — постоянная кросс-функциональная группа (предмет + право + этика + коммуникации + политика),
+   решение консенсусом, внешние эксперты по случаю;
+5. отдельное ревью приватности;
+6. четыре критерия: польза; вред и его минимизация (особо — уязвимые группы и чувствительные темы); соответствие
+   ожиданиям людей; защита данных.
+Для FINPILOT-масштаба перенос: пп. 2, 3, 6 и журнал решений; «группа из пяти» на старте — избыточна.
+Норма отрасли ≠ правовая обязанность: PNAS прямо фиксирует, что Common Rule частную компанию не связывает.
+
+### НЕ ДОБЫТО по П4.3
+- **Polonetsky, Tene, Jerome (2015), полный текст.** scholar.law.colorado.edu viewcontent (article=1195) — curl **403**
+  (Cloudflare), r.jina.ai — 200, **228 байт пустышка** с «Target URL returned error 403»; Wayback
+  `web/2022id_/...` — **404**; archive.org availability API — **429 Too Many Requests** (дважды); SSRN
+  `Delivery.cfm?abstractid=2621559` — **403**; SSRN-зеркало из OpenAlex (`...SSRN_ID2621559_code1513383.pdf...&mirid=2`)
+  — **403**. OpenAlex: doi нет, OA-URL — только SSRN. Цитат из статьи не привожу. Косвенно: Jackman & Kanerva
+  ссылаются на неё (сн. 2, «13 COLO. TECH. L.J. 333, 337 (2015)») как на обоснование того, что традиционных принципов
+  приватности для корпоративных исследований недостаточно.
+- **Meyer 2015 «Two cheers for corporate experimentation»** — не искался отдельно (бюджет участка).
+
+## ПЕРЕПРОВЕРКА Д4 С ПОИСКОМ — П4.5 Freedman 1987, полный текст
+
+### Журнал добычи (11.09.2026)
+| Канал | URL | HTTP | Размер | Результат |
+|---|---|---|---|---|
+| WebSearch «Freedman "Equipoise and the ethics of clinical research" 1987 full text ...» | — | — | — | выдача: scispace, wikipedia, researchgate, ovid, scilit, nejm (abs), studocu, taylorfrancis (2 перепечатки главой) |
+| curl ovid.com fulltext | `ovid.com/journals/nejm/fulltext/10.1056/nejm198707163170304~equipoise-and-the-ethics-of-clinical-research` | 200 | 135 465 байт HTML → **2 375 симв. текста** | **только тот же авторский абстракт**, полный текст за подпиской |
+| curl studocu | `studocu.com/en-gb/document/glasgow-caledonian-university/clinical-research-methods-14/nejm-1987-freedman-equipoise-and-the-ethics-of-clinical-research/109629870` | **403** | 59 394 байт | Cloudflare |
+| r.jina.ai studocu | то же | 200 | **378 байт** | пустышка «Verifying you are human» |
+| Wayback `web/2025id_/<studocu>` | — | **404** | 5 013 байт | снимка нет |
+| curl scispace | `scispace.com/papers/equipoise-and-the-ethics-of-clinical-research-4lfnppdyqq` | **202** | 0 байт | антибот |
+| WebSearch «bios601 mcgill Freedman ... pdf» | — | — | — | зеркала McGill в выдаче нет; есть перепечатки главой у Taylor & Francis (10.4324/9781315244426-17, 10.4324/9781315198231-25) — за пейволлом, не пробовались |
+| curl A.J. London «Two Dogmas of Research Ethics», J Med Philos 32 (2007) — **вторичный** источник | `cmu.edu/dietrich/philosophy/docs/london/London--2DogmasResearchEthics.pdf` | 200 | 153 366 байт PDF → 976 строк | разбор позиции Freedman со страницами журнала |
+
+**Итог по полному тексту: НЕ ДОБЫТ.** Причины по каналам — в таблице. Дословная формулировка «обязанности прекратить»
+со страницей не получена; цитирую только абстракт (как в §Д3 п. 2.1) и вторичный разбор.
+
+### 🔴 Сверка свода раздела 5 п. 3 с абстрактом и вторичным источником
+Свод (раздел 5 п. 3): «Рандомизация этична при genuine uncertainty на уровне экспертного сообщества, и обязана
+прекращаться, как только превосходство одной ветви установлено». §Д3 п. 2.1, условие 3, строит «обязанность прекратить»
+на фразе абстракта «Should the investigator discover that one treatment is of superior therapeutic merit, he or she is
+ethically obliged to offer that treatment».
+**Проблема прочтения.** В абстракте эта фраза стоит в изложении ПРИНЯТОГО понимания, которое Freedman затем
+критикует: следующее предложение — «The current understanding of this requirement, which entails that the investigator
+have no "treatment preference" throughout the course of the trial, presents nearly insuperable obstacles...», а затем
+«I suggest an alternative concept of equipoise...». Вторичный разбор это подтверждает (London 2007, стр. 104–105,
+дословно): «Freedman, in contrast, argues for a robust epistemic threshold according to which uncertainty exists so long
+as there is a lack of consensus in the expert medical community about the relative therapeutic benefits of the set of
+interventions.» и «...the charge that Freedman’s view is insensitive to the interests of particular clinical trial
+participants because it permits clinical trials to begin, or to continue, even though the individual clinician may have
+formed a considered option about which of the interventions are best for him or her.» (в PDF «option»; по смыслу
+«opinion» — привожу как в тексте).
+🔴 **Вывод:** у Freedman условие прекращения — **исчезновение неопределённости в экспертном сообществе** (консенсус
+на публично представленных данных), а **не** момент, когда у исследователя появилось предпочтение или точечная оценка
+разошлась. Формулировка свода «обязана прекращаться, как только превосходство одной ветви установлено» верна только если
+«установлено» понимать как «доказано по стандарту, который убедил бы сообщество». Перенос на FINPILOT в §Д3
+(«показ второй по рангу при близких оценках — equipoise; показ заведомо худшей — нарушение») по существу
+совместим с clinical equipoise, но ярлык «обязанность из Freedman» в Д5.6 п. 8 надо переформулировать:
+«exploration выключается, когда преимущество установлено по заранее заданному статистическому критерию (интервал
+разности не содержит нуля), а не по точечной оценке модели». Иначе правило жёстче Freedman и само по себе мешает
+набрать данные — ровно то, против чего Freedman и писал.
+Честная оговорка: без полного текста нельзя исключить, что в теле статьи есть отдельная формулировка про остановку
+испытаний. Абстракт и London её не содержат.
+
+## ПЕРЕПРОВЕРКА Д4 С ПОИСКОМ — П4.6 Перепроверка перечня Д5.4
+
+| Пункт Д5.4 | Что сделано (канал, код, размер) | Результат |
+|---|---|---|
+| **Freedman 1987, полный текст** | см. П4.5 | 🔴 НЕ ДОБЫТ; но найдено расхождение прочтения абстракта (П4.5) |
+| **Radcliffe 2007 (Qini)** | WebSearch: Direct Marketing Analytics Journal, 14–21; карточка Edinburgh Research Explorer `research.ed.ac.uk/en/publications/using-control-groups-to-target-on-predicted-lift-building-and-ass/` — curl 200, 37 338 байт, ссылок на PDF/«Full text» в HTML нет | НЕ ДОБЫТ (репозиторий держит только метаданные). Влияние нулевое, как и было: формула сверена по Belbahri (§Д4.2) |
+| **Первоисточник «выученный propensity неидентифицируем»** | WebSearch → Hanna J.P., Niekum S., Stone P. «Importance Sampling Policy Evaluation with an Estimated Behavior Policy», ICML 2019, PMLR 97:2605–2613; PDF `cs.utexas.edu/~pstone/Papers/bib2html-links/ICML2019-Hanna.pdf` — curl 200, 2 872 104 байт, pdftotext 1 182 строки | 🔴 **Найден источник, который опровергает тезис в общем виде** (ниже) |
+| **Цитата «propensity after all rules and gating»** | WebSearch → блог Somayeh Farhadi, Medium, 29.01.2026; WebFetch **403**; r.jina.ai 200, 17 764 байт, полный текст | Источник установлен: **блог, не научная работа**; научной ссылки для этой фразы в статье нет (см. ниже) |
+| **Подзаконный акт Роскомнадзора по ч. 1 п. 2 ст. 10.2-2** | WebSearch → Приказ РКН от 06.10.2023 № 149; Контур.Норматив `normativ.kontur.ru/document?documentId=460885&moduleId=1` — curl 200, 373 228 байт, но разбор HTML дал пустой текст (рендер JS); r.jina.ai 200, 7 258 байт, полный текст | ✅ ДОБЫТ целиком (ниже) |
+| **22-МР по официальной публикации cbr.ru** | WebSearch: документ на consultant.ru (`cons_doc_LAW_494821`), normativ.kontur.ru (documentId=485702), страница cbr.ru с ним в выдаче не появилась | НЕ ДОБЫТ с cbr.ru; вне приоритета — Д10 уже установил, что 22-МР для нас рекомендательны и не адресованы нам |
+| **353-ФЗ, 38-ФЗ, 135-ФЗ/ФАС** | не проверялись в этом заходе | НЕ ДОБЫТО: бюджет ушёл на зарубежный контур (П4.1–П4.3), который по заданию приоритетнее. ЗоЗПП ст. 16 п. 3.1 — установлен добором Д10, повторно не качал |
+| **FCA Consumer Duty** | не качалось по заданию — добыто Д14 (`cbr_19mr_product_governance_2026-09-10.md`, «ДОБОР Д14 — Д14.1») | Закрыто ссылкой. Для нашего вопроса из Д14 важно: FG22/5 п. 2.41 — Duty не применяется к нерегулируемому бизнесу; PERG 17 — персональный совет по погашению долгов = регулируемая деятельность debt counselling |
+| **CFPB, DSA ст. 40, EU AI Act, корпоративный IRB** | П4.1–П4.3 | Закрыто, кроме Polonetsky et al. (П4.3) |
+| **Российская практика** | П4.4 | см. П4.4 |
+
+### Hanna, Niekum, Stone (ICML 2019) — дословно
+Абстракт: «In this paper, we study importance sampling with an estimated behavior policy where the behavior policy estimate
+comes from the same set of data used to compute the importance sampling estimate. We find that this estimator often
+lowers the mean squared error of off-policy evaluation compared to importance sampling with the true behavior policy or
+using a behavior policy that is estimated from a separate data set. Intuitively, estimating the behavior policy in this
+way corrects for error due to sampling in the action-space.»
+Введение: «It is natural to assume that such an estimator will yield worse performance since it replaces a known quantity
+with an estimated quantity. However, research in the multi-armed bandit (Li et al., 2015; Narita et al., 2019), causal
+inference (Hirano et al., 2003; Rosenbaum, 1987), and Monte Carlo integration (Henmi et al., 2007; Delyon & Portier,
+2016) literature has demonstrated that estimating the behavior policy...» (обрыв строки в извлечении).
+Предложение 1: «For all n, RIS(n) is a biased estimator, however, it is consistent provided πb ∈ Πn».
+🔴 **Следствие для §1.3 п. 3 первой редакции и §Д4.3 п. 1.** Тезис «выученный propensity неидентифицируем» в общем
+виде **неверен**: если логирующая политика зависит только от залогированного контекста и лежит в классе модели
+(πb ∈ Πn), оценённый propensity даёт состоятельную оценку и часто МЕНЬШУЮ MSE, чем истинный. Верная граница:
+восстановление ломается, когда решение зависело от **незалогированного** состояния (бюджеты, кэш, гейтинг, скрытые
+признаки) — это и Farhadi пишет прямо: «you can only model what you observed. If the real decision depended on hidden
+state (budgets, caps, caches), missing features, or hard-to-reconstruct gatin[g]...». Итог для И1 **не меняется**:
+писать propensity в момент решения по-прежнему правильно (это единственный способ гарантировать, что скрытого
+состояния нет). Меняется обоснование: не «иначе неидентифицируемо», а «иначе нет гарантии, что πb зависит только
+от записанного, и нельзя проверить πb ∈ Πn».
+Farhadi (Medium, 29.01.2026), строка 36 извлечения, дословно: «The correct propensity is the probability of the chosen
+action under the exact decision process that ran in production, after all rules and gating, using the same inputs and
+the same state reads.» — это и есть формулировка из §1.3 первой редакции. Статус: блог практика; в научный текст —
+только своими словами со ссылкой на Bottou / Sachdeva, как и рекомендовал Д4.3 п. 2.
+
+### Приказ Роскомнадзора от 06.10.2023 № 149 (зарег. в Минюсте 30.11.2023 № 76197) — дословно, все пункты
+Преамбула: «В соответствии с пунктом 2 части 1 статьи 10.2-2 Федерального закона от 27 июля 2006 г. N 149-ФЗ ...
+приказываю: Утвердить прилагаемые требования к содержанию информации о применении информационных технологий
+предоставления информации на основе сбора, систематизации и анализа сведений, относящихся к предпочтениям пользователей
+сети "Интернет" ...»
+«1. На информационном ресурсе, на котором применяются ... (далее - рекомендательные технологии, информационный ресурс
+соответственно), должна быть размещена следующая информация: "На информационном ресурсе применяются рекомендательные
+технологии".
+2. Информация, предусмотренная пунктом 1 настоящих требований, должна включать ссылку на отдельную страницу
+информационного ресурса, на которой указываются следующие сведения: "На информационном ресурсе при применении
+информационных технологий предоставления информации осуществляется сбор, систематизация и анализ сведений, относящихся
+к предпочтениям пользователей сети "Интернет", находящихся на территории Российской Федерации".
+3. Информация, предусмотренная пунктом 1 настоящих требований, размещается на русском языке в общедоступном режиме на
+информационном ресурсе и (или) на персональных страницах пользователей, созданных на таком информационном ресурсе.
+4. Доступ к информации о применении рекомендательных технологий должен осуществляться беспрепятственно, без
+дополнительной регистрации и безвозмездно.
+5. При размещении информации о применении рекомендательных технологий не допускается ее наложение на иную информацию,
+размещенную на информационном ресурсе, на котором применяются рекомендательные технологии.»
+Чтение: приказ регулирует только **уведомление** (ч. 1 п. 2 ст. 10.2-2) — две фиксированные фразы и ссылка.
+Про содержание «правил применения» (ч. 2 ст. 10.2-2: «описание процессов и методов ... способов осуществления») приказ
+ничего не добавляет. Требование описать exploration остаётся выводом из самой ч. 2 ст. 10.2-2, как в §Д3 — приказ его
+не усиливает и не ослабляет.
+
+## ПЕРЕПРОВЕРКА Д4 С ПОИСКОМ — П4.4 Российская практика причинной оценки финтех-продуктов
+
+Пробел, сохранявшийся с первой редакции (§И4 п. 7) и с добора (§Д4.3 п. 3). Ниже — то, что реально нашлось,
+и прямо названное отсутствующее.
+
+### Журнал добычи (11.09.2026, все — curl -sk --http1.1 с браузерным UA, если не указано иное)
+| Источник | URL | HTTP | Размер |
+|---|---|---|---|
+| Кодекс этики в сфере разработки и применения ИИ на финансовом рынке (прил. к информационному письму Банка России от 09.07.2025 № ИН-016-13/91) | `cbr.ru/content/document/file/178667/code_09072025.pdf` | 200 | 490 151 байт PDF → pdftotext 394 строки |
+| Т-Банк, «Perseus: фреймворк для универсальной персонализации на основе гетерогенных событий», Хабр, 21.07.2026 | `habr.com/ru/companies/tbank/articles/1061236/` | 200 | 171 354 байт → 17 859 симв. |
+| «Архитектура банковского RecSys», Хабр, 02.09.2026 (автор ToxaBes, не корпоративный блог) | `habr.com/ru/articles/1077822/` | 200 | 202 950 байт → 27 793 симв. |
+| Альфа-Банк, «Волков бояться — uplift в прод не катить, или AUF 2.0», Хабр, 22.04.2026 | `habr.com/ru/companies/alfa/articles/1024090/` | 200 | 222 253 байт → 25 582 симв. |
+| Альфа-Банк, отчёт о Data Science Meet Up #2, Хабр, 19.09.2022 (в т.ч. доклад «Uplift-моделирование в ценообразовании кредитных продуктов», М. Коматовский; видео — RUTUBE `rutube.ru/video/e07b39e41eecfa310886208f6a446d81/`, 02.08.2024, 00:25:06 — **видео не смотрел**) | `habr.com/ru/companies/alfa/articles/688438/` | 200 | 193 293 байт → 13 378 симв. |
+| Сбер, «Causal Inference: прозрение и практика. Лекция 2. Рандомизированные контролируемые испытания», Хабр, 03.10.2024 | `habr.com/ru/companies/sberbank/articles/847406/` | 200 | 195 189 байт → 13 598 симв. |
+| Сбер, «Подготовка датасета для офлайн-оценки рекомендательных моделей», Хабр, 04.09.2026 | `habr.com/ru/companies/sberbank/articles/1076666/` | 200 | 205 674 байт → 23 471 симв. |
+| «Модель обещает uplift. А сколько это в рублях?», Хабр, 08.09.2026 (А. Москвин, независимый) | `habr.com/ru/articles/1079904/` | 200 | 178 776 байт → 19 142 симв. |
+| Ozon Tech, «Без А/B результат ХЗ, или Как построить высоконагруженную платформу А/B-тестов», Хабр, 21.09.2022 | `habr.com/ru/companies/ozontech/articles/689052/` | 200 | 282 047 байт → 29 868 симв. |
+| Ozon Tech, «Как с помощью A/B-платформы найти лучшее решение, если вариантов слишком много», Хабр, 23.03.2026 | `habr.com/ru/companies/ozontech/articles/1012750/` | 200 | 266 431 байт → 22 791 симв. |
+| Сравни (финансовый маркетплейс), «Особенности и подводные камни A/B/n-тестирования», Хабр, 20.03.2023 | `habr.com/ru/companies/sravni/articles/723662/` | 200 | 202 624 байт → 22 499 симв. |
+| СберЗдоровье (блог docdoc), «Платформа А/В-экспериментов», Хабр, 15.05.2024 | `habr.com/ru/companies/docdoc/articles/814415/` | 200 | 190 010 байт → 18 967 симв. |
+| Kuper, «База: айсберг A/B-тестов», Хабр, 22.11.2023 | `habr.com/ru/companies/kuper/articles/774608/` | 200 | 212 895 байт → 20 089 симв. |
+| АРБ / НБЖ, М. Сёмов о наджинге и «Финансовом плане», 31.12.2025 | `nbj.ru/publs/maksim_syemov_arb_vsye_chto_vy_khoteli_uzn/70334/` | 200 | 127 939 байт → 41 261 симв. |
+| X5 Tech, «От A/B-тестирования к Causal Inference в офлайн ритейле» | `habr.com/ru/companies/X5Tech/articles/768008/` | **403** | 67 081 байт (антибот Хабра на этой статье; остальные статьи Хабра отдались) |
+
+WebSearch по участку: 9 вызовов. Отказа «web search budget» не было.
+
+### A. Какие методы применяют — по первоисточникам
+1. **Uplift-моделирование — рабочая, промышленная практика в банках РФ, но применяется к МАРКЕТИНГОВОЙ коммуникации,
+   а не к советам по долгам.** Альфа-Банк, AUF 2.0 (открытая библиотека, дословно из статьи): конфиг с
+   `opt_metric = 'qini_auc'`, модели `SoloModel`, `TwoModels`, `AufXLearner`, `n_uplift_bins=10`; «AUF позволил обучить
+   и вывести в промышленное использование уже 4 модели, при этом более 10 моделей находятся в стадии пилота. Все эти
+   модели помогают избежать спама клиентов, сделать персонализированный прайсинг и привлекать новых клиентов». Про
+   контрольную группу: «В бинарном случае достаточно было указать контрольную и одну целевую группу. Для мультитритмента
+   нужно передать все группы, при этом ключ 'control' обязателен — именно относительно него будет считаться эффект
+   каждого воздействия.» Диагностика по бакетам: «процент целевых действий (продаж, сделок, кликов) в контрольной
+   и целевой группах, попавших в каждый бакет. ... Представь, что верхний бакет ... содержит 60% всех органических
+   сделок — то есть тех, которые произошли бы и без коммуникации. Возможно, стоит оставить этих клиентов в покое и не
+   рисковать падением маржинальности или лояльности от лишнего спама».
+   🔴 Это тот же метод, что в §3 темы 37 (мета-обучатели, Qini), с тем же критерием качества — **подтверждение, что наш
+   инструментарий совпадает с российской банковской практикой**, а не только с академической литературой.
+2. **Uplift в ценообразовании кредитных продуктов** — доклад Альфа-Банка (М. Коматовский, Junior DS), пересказ в отчёте
+   о митапе, дословно из отчёта: «Дальше берём Up-lift-модель, готовимся и проводим эксперименты. „Нужно следить за
+   экспериментом от начала и до конца. Может случиться, чт[о] контрольную группу вы начали обзванивать на 2 дня раньше,
+   а эксперимент через неделю закончился и в контрольной группе с позитивным воздействием Target Rate выше“». В докладе
+   также «Специфические метрики под Up-lift. Сортировка скоров, подсчёт topK% и разницы Response Rate».
+   Статус: **пересказ статьи о докладе; видео (25 мин) не просмотрено** — числа доклада не подтверждены.
+3. **Причинный вывод как учебная программа Сбера.** Цикл «Causal Inference: прозрение и практика» (блог Сбера),
+   лекция 2 — про RCT и виды рандомизации (дословно: «Простая рандомизация — каждому участнику испытания случайным
+   образом назначается либо исследуемое вмешательство, либо контрольное. Стратифицированная рандомизация ...
+   Кластерная рандомизация ...»). Это методический материал, не описание продовой практики.
+4. **Офлайн-оценка рекомендательных моделей — есть, но не off-policy.** Сбер, статья 04.09.2026 об офлайн-оценке
+   посвящена подготовке датасета: временные утечки («Самый простой случай утечки данных возникает в случае ошибок
+   логирования или предобработки, когда одинаковые взаимодействия присутствуют и в обучающей выборке, и в данных для
+   оценки»), сдвиги распределений, статистика Колмогорова—Смирнова, свой инструмент SplitLight. **Слов «propensity»,
+   «IPS», «off-policy» в тексте нет** (grep = 0).
+5. 🔴 **Единственный найденный русскоязычный текст, где IPS назван прямо** — «Архитектура банковского RecSys»
+   (Хабр, 02.09.2026, автор не из банка, обзор): «Обычно используется классический метод Inverse Propensity Scoring
+   (IPS) из работы Joachims с соавторами [22], где клики взвешиваются обратно пропорционально вероятности увидеть
+   позицию». Там же про exploration: «Этого достаточно, чтобы обучать модель почти в реальном времени и активно
+   исследовать пространство рекомендаций с помощью бандитов» (со ссылкой на промышленную работу Kuaishou). И про
+   специфику банка против маркетплейса: «У банка есть лишь десятки или сотни офферов для каждого клиента. Задача поиска
+   кандидатов здесь почти не возникает, поскольку практически весь каталог и без того помещается в отбор.» — прямая
+   поддержка нашего случая |A| = 66 из §Д1.6.
+6. **Бандиты и exploration на платформе A/B — у маркетплейса, не у банка.** Ozon Tech (23.03.2026): оптимизация
+   параметров рекомендательного алгоритма поверх A/B-платформы, стратегии выбора — «Thompson Sampling (TS) из
+   нормального распределения ... Стратегия семплирует для каждого возможного набора параметров аплифт метрик из оценок
+   матожидания и стандартного отклонения»; для категориальных параметров — «многорукие бандиты»; и прямое
+   предупреждение, дословно: **«Не используйте оптимизатор для оценки истинного эффекта от набора параметров. Для
+   корректной оценки необходимо зафиксировать конкретный набор и провести отдельный А/B-тест.»** (это ровно разделение
+   «exploration ≠ оценка», которое у нас в И1/И2).
+7. **Глобальный холдаут против теста политик** — «Модель обещает uplift...» (08.09.2026), дословно: «Глобальный holdout
+   отвечает ещё на один вопрос: какой суммарный эффект даёт оговорённая CVM-программа на выбранном горизонте. Контроль
+   отдельной кампании отвечает за конкретное воздействие, а тест политик — за преимущество нового способа отбора. Эти
+   конструкции нельзя незаметно подменять друг другом.» Это ровно различение «оценка политики» и «оценка воздействия»
+   из §Д1.
+
+### B. Какая доля трафика идёт на эксперименты — 🔴 В РОССИЙСКИХ ИСТОЧНИКАХ ЧИСЛА НЕТ
+Проверено в 8 текстах (Ozon ×2, Сравни, СберЗдоровье, Kuper, Альфа ×2, «uplift в рублях»): описывается **механика**
+сплитования, не доля. Максимум конкретики — Ozon Tech (2022): «Пользователь при запросе токена авторизации
+автоматически получает А/B-группу как рандом с равномерным распределением от 0 до 99. abGroup = random % 100 ...
+Бэкенд-монолит при старте читает конфиг с указанием набора фич и указанием, для какого процента пользователей»
+(то есть доля задаётся конфигом и не публикуется), и Ozon Tech (2026): «Вариант №1 (50% аудитории) / Вариант №2
+(50% аудитории)» — пример на два варианта.
+Косвенный ориентир по CVM-контролю (не банк, маркетинговые платформы, **пересказ выдачи WebSearch, первоисточники
+не открывал**): «обычно это 5-10% аудитории, иногда больше, но, как правило, не более 20-25%», срок изоляции 1–3
+месяца (altcraft, mindbox, vc.ru). Как число для работы это не годится — уровень доверия «маркетинговый блог».
+**Вывод: измеренное число доли exploration остаётся одно — 10,1% у ZOZO (§Д1.2), по открытому датасету.
+Российского аналога нет в открытых источниках.** Отрицательный результат, не «не искал».
+
+### C. Как решают этическую сторону — 🔴 в технических публикациях НИКАК
+Ни в одном из 13 добытых технических текстов нет слов «этика», «согласие», «информирование» применительно
+к эксперименту (grep по каждому = 0; единственное вхождение «этик» — в статье АРБ/НБЖ, не о A/B). Ближайшее
+к этическому ограничению в отрасли — не этика, а **маржинальность и лояльность**: Альфа-Банк про «не рисковать
+падением маржинальности или лояльности от лишнего спама».
+Этическая рамка в РФ существует отдельно от практики экспериментов:
+1. 🔴 **Кодекс этики в сфере разработки и применения ИИ на финансовом рынке** (прил. к ИН-016-13/91 от 09.07.2025) —
+   документ, которого не было ни в первой редакции, ни в доборе. Дословно, п. 1.1(1): цели — «повышение доверия
+   физических и юридических лиц (далее – клиенты) к применению искусственного интеллекта **кредитными организациями,
+   иностранными банками ... некредитными финансовыми организациями, лицами, оказывающими профессиональные услуги на
+   финансовом рынке, субъектами национальной платежной системы** (далее – организации)». П. 1.2: пять принципов —
+   «человекоцентричность; справедливость; прозрачность; безопасность, надежность и эффективность; ответственное
+   управление рисками». Формулировки везде «организациям **рекомендуется**».
+   🔴 **Норма, которая касается нас напрямую даже без поднадзорности, п. 1.4 (дословно):** «В случае привлечения при
+   разработке и применении искусственного интеллекта организациями лиц, в отношении которых Банк России не осуществляет
+   контроль (надзор), организациям рекомендуется обеспечивать соблюдение такими лицами настоящего Кодекса.» То есть
+   в B2B-сценарии банк-заказчик будет транслировать Кодекс на нас договором — тот же механизм, что Д14 нашёл в UK
+   (FG22/5 пп. 2.22, 2.24).
+   Что из Кодекса ложится на тему 37 (дословные пункты): п. 2.1(2) «предоставление клиентам возможности отказаться
+   от взаимодействия с применением искусственного интеллекта» и п. 2.3 — «предоставить клиентам возможность
+   взаимодействовать с сотрудником организации»; п. 2.1(3), 2.4 — пересмотр решения сотрудником по запросу клиента;
+   п. 2.5 — разъяснять клиенту, «действия, которые клиенту необходимо совершить для принятия искусственным интеллектом
+   решения», с оговоркой «Организация вправе не предоставлять указанные разъяснения, если имеются разумные основания
+   полагать, что такое информирование может снизить эффективность применения искусственного интеллекта»; п. 2.6 —
+   учитывать «факторы уязвимости клиентов (возраст, образование, ограниченные возможности и другие)»; п. 4.2 —
+   «сообщать клиентам о применении искусственного интеллекта ..., если применение искусственного интеллекта неочевидно
+   из обстоятельств»; п. 5.3 — показатели качества и проверка «в том числе посредством валидации, добровольной
+   сертификации»; п. 5.4 — регулярный мониторинг качества; п. 6.3 — семь процессов управления рисками, включая
+   «учет применяемых моделей искусственного интеллекта» и «ведение базы риск-событий»; п. 6.4 — «централизованный учет
+   моделей ... с учетом присвоенного уровня риска»; п. 6.7 — факторы уровня риска, среди них «(4) количество клиентов,
+   при оказании услуг которым применяется искусственный интеллект», «(5) объяснимость решений», «(6) применение
+   искусственного интеллекта, разработанного третьим лицом»; п. 6.9 — «обеспечивать контроль сотрудников организации
+   за решениями искусственного интеллекта, которому присвоен высокий уровень риска».
+   🔴 **Про эксперименты, рандомизацию, A/B и согласие на участие в Кодексе нет ни слова** (проверено grep по всем
+   394 строкам: «эксперимент» — 0, «тестир» — 0 в смысле A/B; «отказ» — только про отказ от взаимодействия с ИИ).
+   Ближайший к нашей теме механизм — п. 2.1(2)/2.3 «право отказаться от взаимодействия с ИИ»: если exploration
+   реализован внутри ИИ-контура, право отказа де-факто даёт пользователю выход из него.
+2. **Кодекс этики в сфере ИИ от 26.10.2021** (Альянс в сфере ИИ; открыт для присоединения любых, в том числе
+   небанковских, организаций) — URL текста найден (`a-ai.ru/wp-content/uploads/2021/10/Кодекс_этики_в_сфере_ИИ_финальный.pdf`,
+   также base.garant.ru/406862712), **сам текст в этом заходе не качал** — бюджет ушёл на Кодекс ЦБ. НЕ ДОБЫТО.
+3. **АРБ/НБЖ (31.12.2025), наджинг** — единственный найденный отраслевой текст РФ, где этика названа в одном ряду
+   с воздействием на поведение клиента: «методами наджинга – набором приёмов, позволяющих, в рамках этики, существенно
+   снижать риски потребителей финансовых продуктов». 🔴 Побочная находка, важная для продукта: автор (председатель
+   Комитета АРБ по финансовой грамотности) строит концепцию «**Финансового плана**» — «кредитная организация предлагает
+   продукт „от цели“ клиента, снабжая клиента финансовым планом – системой этапов и мероприятий», с «рекомендациями по
+   размещению части свободных средств» — и прямо вешает на неё принципы 19-МР: «Распределение клиентской базы по ЦКГ
+   проводится в соответствии с Методическими рекомендациями Банка России от 27.12.2023 №19-МР», «Принцип 5: Клиентская
+   ценность Финансового плана». Это ближайший российский отраслевой аналог нашего продукта, описанный на языке 19-МР,
+   и он подтверждает вывод Д14/Д10: в РФ такой сервис регулируется через **поднадзорную организацию**, а не напрямую.
+   Статус: мнение автора в отраслевом журнале, не акт.
+
+### D. НЕ ДОБЫТО по П4.4 — с причинами
+- **Доля трафика на эксперименты в конкретном российском банке** — числа не публикуются; проверено 8 технических
+  публикаций (список выше), в них только механика сплитования. Не «не искал» — отрицательный результат.
+- **Видео доклада Альфа-Банка про uplift в ценообразовании** (RUTUBE, 25 мин) — не просматривалось (нет канала
+  транскрипции); цитаты взяты только из текстового отчёта о митапе.
+- **X5 Tech, «От A/B-тестирования к Causal Inference в офлайн ритейле»** — Хабр отдал **403** (67 081 байт) именно
+  на эту статью, r.jina.ai не пробовал (ретейл, не финтех — вне приоритета).
+- **Т-Банк: собственная статья про A/B-платформу или оценку эффекта** — не найдена: в блоге tbank добыт Perseus
+  (инфраструктура персонализации, про офлайн-инференс и «бизнес-метрики от 3% до 17%», но без A/B-методологии),
+  поиски «Т-Банк A/B платформа/CUPED» выдают статьи МТС, Otus, X5, Kuper — не Т-Банка.
+- **ВТБ: публикация с методологией** — профиль `habr.com/ru/users/VTB/posts/` отдал 200/74 203 байта и «здесь пока нет
+  ни одной публикации» (63 статьи лежат в другом разделе профиля, не проверял); по выдаче — только подкаст «Деньги
+  любят техно», выпуск про A/B-тестирование (аудио, не транскрибировано) и вакансии с упоминанием NBO/uplift.
+- **Кодекс этики ИИ 2021 (Альянс ИИ), полный текст** — URL известен, не качал (бюджет).
+- **Off-policy оценка (IPS/DR) в продакшене российского банка** — **не найдено ни одного описания**. Единственное
+  упоминание IPS — в обзорной статье независимого автора (п. A.5). Это существенный отрицательный результат:
+  для научного текста темы 37 российских продовых кейсов OPE нет, ссылаться придётся на ZOZO/Open Bandit.
+
+## ПЕРЕПРОВЕРКА Д4 — ИЗМЕНЕНИЯ ВЫВОДОВ ПОСЛЕ ПЕРЕПРОВЕРКИ С ПОИСКОМ
+
+Перепроверка закрыла участки П4.1 (AI Act + DSA), П4.2 (CFPB), П4.3 (корпоративные IRB), П4.4 (практика РФ),
+П4.5 (Freedman), П4.6 (перечень Д5.4). Подагентов: 0. WebSearch: 27 вызовов, отказа по бюджету не было ни разу
+(в доборе Д4 было 400/400 — ограничение снято).
+
+### ✅ Подтвердилось
+1. **Цитаты DSA ст. 25 и 27 из §4.1 Д3 сверены по OJ-тексту дословно** — расхождений нет.
+2. **Приложение III п. 5(b) AI Act процитировано в задании верно** (сверено с OJ и сервис-деском).
+3. **Инструментарий темы 37 совпадает с российской банковской практикой** — Qini/uplift-метрики, обязательная
+   контрольная группа, мета-обучатели (Альфа-Банк AUF 2.0, П4.4.A.1), различение «оценка политики / оценка
+   воздействия» (П4.4.A.7), запрет использовать оптимизатор вместо честного A/B (Ozon, П4.4.A.6).
+4. **Правило «exploration в зоне equipoise, без показа заведомо худшего»** — устояло и получило второе, теперь
+   статутное, основание в США: 12 U.S.C. §5531(d)(2)(C), «takes unreasonable advantage of ... the reasonable reliance
+   by the consumer on a covered person to act in the interests of the consumer» (П4.2.A).
+5. **Ст. 10.2-2 149-ФЗ остаётся единственной прямо применимой к нам нормой в РФ**; подзаконный приказ РКН № 149
+   добыт целиком и ничего к «правилам применения» не добавляет (П4.6).
+
+### 🔴 Опровергнуто или существенно изменено
+1. 🔴 **Раздел 5 п. 4 свода: «показ заведомо худшей альтернативы ... нарушает ... ст. 25 DSA» — ссылка неприменима.**
+   Ст. 25 DSA адресована «providers of online platforms», а платформа по ст. 3(i) — хостинг, распространяющий
+   информацию пользователей «to the public». FINPILOT ею не является. Плюс ст. 25(2) выводит из-под себя практики,
+   покрытые UCPD 2005/29/EC и GDPR, а ст. 19 освобождает микро- и малые предприятия. Правильно: ст. 25 DSA —
+   **формулировочный ориентир, а не применимая норма**; применимая рамка для B2C в ЕС — UCPD + GDPR + ст. 5(1)(a),(b)
+   AI Act (П4.1.C).
+2. 🔴 **§Д3 п. 2.1 условие 3 и Д5.6 п. 8: «обязанность прекратить, как только превосходство установлено» —
+   прочтение абстракта Freedman неверно.** Фраза «ethically obliged to offer that treatment» относится к ПРИНЯТОМУ
+   пониманию, которое Freedman критикует; его собственный порог — исчезновение отсутствия консенсуса в экспертном
+   сообществе (вторичное подтверждение: London 2007, стр. 104–105). Нужная редакция правила: exploration выключается,
+   когда преимущество установлено **по заранее заданному статистическому критерию**, а не когда разошлись точечные
+   оценки (П4.5).
+3. 🔴 **§1.3 п. 3 / §Д4.3 п. 1: «выученный propensity неидентифицируем» — неверно в общем виде.** Hanna, Niekum,
+   Stone (ICML 2019): оценка политики поведения по тем же данным «often lowers the mean squared error of off-policy
+   evaluation compared to importance sampling with the true behavior policy»; RIS(n) смещён, но состоятелен при
+   πb ∈ Πn. Ломается не идентифицируемость, а случай зависимости решения от **незалогированного** состояния (П4.6).
+   Вывод И1 «писать propensity в момент решения» не меняется — меняется обоснование.
+4. 🔴 **§4.2 Д3 и Д5.4: «CFPB не пробовалось» закрыто, и главное — статус документов CFPB изменился.**
+   Circular 2023-01 (dark patterns / negative option), interpretive rule о digital marketers и Statement of Policy
+   on Abusive Acts **отозваны 12.05.2025** (90 FR 20084). Ссылаться на них как на действующую позицию нельзя;
+   действует статут — §5531, §5536 (П4.2.B).
+5. 🔴 **Новое обязательство, которого не было ни в одной редакции: в США советующий по долгам сервис —
+   «covered person» по прямому тексту закона.** 12 U.S.C. §5481(15)(A)(viii) включает «financial advisory services ...
+   to consumers on individual financial matters ... including ... (II) providing services to assist a consumer with
+   debt management». То есть UDAAP применяется к нам без лицензии и без продажи продукта (П4.2.A). Это третий
+   независимый режим после РФ (ст. 10.2-2) и UK (PERG 17 debt counselling, Д14).
+6. 🔴 **Даты AI Act в любом прежнем пересказе устарели: Регламент (ЕС) 2026/1744 (Digital Omnibus on AI) от
+   08.07.2026, OJ 24.07.2026, перенёс применение требований к high-risk из Annex III на 02.12.2027**, из Annex I —
+   на 02.08.2028 (ст. 1 п. 40). Запреты ст. 5(1)(a),(b) действуют с 02.02.2025 без изменений (П4.1.A).
+7. 🔴 **Вероятно, FINPILOT вообще не «AI system» в смысле AI Act** — руководство Комиссии по ст. 3(1) выводит
+   из определения «systems that are based on the rules defined solely by natural persons», «well established
+   optimisation methods, such as linear or logistic regression», basic data processing и classical heuristics (п. 26,
+   42, 46, 48). Детерминированный SAW с фиксированными весами попадает в эти исключения; обучаемая по логам политика
+   из темы 37 — уже нет. **Это делает вопрос «high risk или нет» вторичным по отношению к вопросу «учим ли мы модель
+   на логах»** (П4.1.B).
+8. 🔴 **Российская этическая рамка для ИИ на финрынке существует и в теме 37 отсутствовала**: Кодекс этики
+   (ИН-016-13/91 от 09.07.2025). Рекомендательный и адресован организациям финрынка, но п. 1.4 прямо просит
+   транслировать его на неподнадзорных исполнителей — то есть на нас в B2B (П4.4.C.1).
+9. 🔶 **Практика РФ: пробел §И4 п. 7 закрыт наполовину и с отрицательным результатом.** Uplift и A/B в банках РФ —
+   есть и промышленно; **off-policy оценка в продакшене российского банка не описана ни в одном найденном источнике**,
+   доля трафика на эксперименты не публикуется, этическая сторона экспериментов в технических публикациях
+   не обсуждается вовсе (П4.4.B, П4.4.C, П4.4.D).
+
+### Ответ на вопрос (1): выдерживает ли вывод раздела 5 проверку зарубежными режимами
+**Частично — и его надо сузить.** «Прямого запрета рандомизации нет» выдерживает: ни AI Act, ни DSA, ни CFPA не
+запрещают A/B-тест как таковой; в добытых текстах слово «A/B» встречается 0 раз (AI Act, руководства Комиссии, DSA).
+Единственная найденная зарубежная норма, где эксперимент на людях с ИИ-системой требует **информированного согласия
+и одобрения органа**, — ст. 60–61 AI Act, но она применяется к «testing in real world conditions» **до** вывода
+high-risk системы на рынок, то есть к нам в сегодняшнем виде не относится.
+🔴 А вот вторая половина вывода — «применимая норма одна и она про раскрытие» — **верна только для РФ**. Зарубежные
+режимы дают не раскрытие, а иную конструкцию: оценку по **последствиям для потребителя** независимо от раскрытия —
+UDAAP §5531(d)(2)(C) (США, прямо применимо к debt-management-советнику), Consumer Duty/PERG 17 (UK, через
+регулируемую деятельность, Д14), ст. 5(1)(a),(b) AI Act (ЕС, если система — AI system). Раскрытие в них
+не оправдывает вреда. Практический итог: формулировка §5 остаётся верной как ответ «что обязательно в РФ»,
+и её нельзя обобщать словами «регуляторно свободны».
+
+### Ответ на вопрос (2): что из AI Act/DSA стало бы обязательным при выходе в ЕС или B2B с европейским банком
+1. **DSA — ничего.** Ни в B2C, ни в B2B: ст. 25, 27 — только для online platforms (ст. 3(i)), ст. 38, 40 — только
+   для VLOP/VLOSE (≥45 млн, ст. 33(1)), ст. 19 освобождает микро/малые. Ст. 40 «доступ исследователей» к нам
+   не относится ни при каком росте, пока мы не хостинг с публичным распространением контента.
+2. **AI Act, ст. 5(1)(a) и (b) — обязательны уже сейчас (с 02.02.2025) и независимо от риск-класса**, если система
+   квалифицируется как AI system. Практическая граница дана руководством C(2025) 5052: «persuasion» с раскрытыми
+   алгоритмами и контролем пользователя допустима, «covert techniques» с непониманием пользователем — нет (п. 128,
+   130). Скрытый exploration под видом рекомендации — прямой кандидат в ст. 5(1)(a) при значимом финансовом вреде
+   (сообр. 29 прямо включает «financial interests»); exploration с раскрытыми альтернативами и оценками — нет.
+3. **AI Act, глава III (ст. 8–17: управление рисками, ст. 10 данные, ст. 12 логи, ст. 14 надзор человека, ст. 49
+   регистрация) — обязательны ТОЛЬКО если система попадает в Annex III п. 5(b), и с 02.12.2027.** Для B2C-советника
+   по нашему чтению п. 5(b) не срабатывает (проект руководства, стр. 88: «tailored information to customers»
+   и «customer support» — вне 5(b)). 🔴 **Срабатывает в B2B-сценарии, если банк использует наш выход в решении
+   о выдаче/лимите/цене кредита**: п. 75 проекта требует оценивать «split architectures ... as a whole», а
+   профилирование физлиц закрывает дерогацию ст. 6(3). В этом случае обязательны и ст. 12 (логирование —
+   совпадает с нашей И1), и ст. 14 (человеческий надзор), и ст. 10 (data governance), и ст. 6(4) —
+   документированная оценка «мы не high-risk» до вывода на рынок, если мы считаем иначе.
+4. **Ст. 60–61 (испытания в реальных условиях с информированным согласием, план испытаний, одобрение органа
+   рыночного надзора, срок ≤6+6 мес., право выйти без последствий)** — обязательны, только если мы одновременно
+   high-risk **и** тестируем до вывода на рынок. Как ориентир этичной конструкции exploration они полезны и сейчас.
+5. **Практический минимум для B2B с европейским банком** (вывод, не норма): пакет как в Д14 плюс наше собственное
+   решение по ст. 3(1) — письменная квалификация «AI system / не AI system» с обоснованием по п. 42/46/48 руководства
+   Комиссии, и, если политика учится по логам, документированная оценка по ст. 6(3)–6(4).

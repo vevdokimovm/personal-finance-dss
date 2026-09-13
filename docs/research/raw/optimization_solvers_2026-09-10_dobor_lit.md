@@ -298,3 +298,121 @@ URL: https://arxiv.org/pdf/2503.11107 — канал: curl с браузерны
 | tandfonline.com (Michaud) | пейволл | Taylor & Francis |
 
 **Итог по трём пунктам:** ни один первоисточник полным текстом не добыт; по всем трём есть вторичные источники с полным текстом и дословными цитатами (Fox — arXiv:2503.11107; Federgruen–Groenevelt — arXiv:1608.08000; Michaud — Palomar §7.5). Номеров страниц первоисточников нет ни у одного, включая знаменитое «estimation-error maximizers, p. 33» — эту атрибуцию подтвердить не удалось.
+
+---
+
+# ДОБОР Г4 (11.09.2026) — Fox / Federgruen–Groenevelt / Michaud, повторный заход
+
+## Г4 — реквизиты: что подтвердилось, что было перепутано В САМОМ ЗАДАНИИ
+
+Задание на добор Г4 содержало строку «**Fox (1966), Operations Research 34(6):909–918**».
+🔴 **Это склейка двух разных работ, и файл `optimization_solvers_2026-09-10_dobor_lit.md`
+уже содержал правильный вариант** — то есть исправлять надо не файл, а задание. Проверка
+по Crossref (`query.bibliographic`, HTTP 200) даёт:
+
+| Что | Правильные реквизиты | DOI |
+|---|---|---|
+| **Fox B.** «Discrete Optimization Via Marginal Analysis» | **Management Science, том 13, выпуск 3, страницы 210–216, ноябрь 1966** | 10.1287/mnsc.13.3.210 |
+| **Federgruen A., Groenevelt H.** «The Greedy Procedure for Resource Allocation Problems: Necessary and Sufficient Conditions for Optimality» | **Operations Research, том 34, выпуск 6, страницы 909–918, декабрь 1986** | 10.1287/opre.34.6.909 |
+
+Пагинация **34(6):909–918 принадлежит Federgruen & Groenevelt (1986)**, а не Fox. Записывать
+в любых наших текстах строго раздельно.
+
+**Полные тексты обоих — НЕ ДОБЫТЫ, причина измерена:** Unpaywall (HTTP 200) даёт для
+`10.1287/mnsc.13.3.210` — **`is_oa: False`, `oa_status: "closed"`**, и для
+`10.1287/opre.34.6.909` — **`is_oa: False`, `oa_status: "closed"`**. То есть **легальной
+открытой копии не существует ни для одной**; это не неудача поиска, а состояние прав.
+INFORMS-пейволл подтверждён на уровне метаданных, зеркала искать бессмысленно без
+библиотечного доступа. Содержательные выводы по обеим работам в этом файле выше опираются на
+обзор Frank–Murota и обзорные пересказы — это остаётся вторичным материалом и так и должно
+цитироваться.
+
+## 🔴 Г4 — Michaud (1989): цитата «estimation-error maximizers, p. 33» ПЕРВОИСТОЧНИКОМ НЕ ПОДТВЕРЖДЕНА. ВЕРДИКТ: НЕ ЦИТИРОВАТЬ В ТАКОМ ВИДЕ
+
+### Реквизиты подтверждены полностью (три независимых источника)
+
+- **Crossref:** Michaud R. «The Markowitz Optimization Enigma: Is 'Optimized' Optimal?»
+  **Financial Analysts Journal, том 45, выпуск 1, страницы 31–42, январь 1989**,
+  DOI **10.2469/faj.v45.n1.31**.
+- **CFA Institute Research Portal** (страница издателя, добыта через `r.jina.ai`, **HTTP 200,
+  1 880 байт**): «1 January 1989 **Financial Analysts Journal Volume 45, Issue 1** …
+  Publisher Information: Association for Investment Management and Research, **12 pages**,
+  doi.org/10.2469/faj.v45.n1.31, **ISSN/ISBN: 0015-198X**.» 12 страниц согласуется с 31–42.
+- **JSTOR** `stable/4479185` (через `r.jina.ai`, HTTP 200, 10 861 байт): «Published Time:
+  1989-01-01T00:00:00Z», далее только экран регистрации («Read 10 articles per month free»).
+
+Существует также **вторая, отдельная публикация того же текста**: «The Markowitz Optimization
+Enigma: Is Optimized Optimal?», **ICFA Continuing Education Series, 1989, выпуск 4,
+страницы 43–54**, DOI 10.2469/cp.v1989.n4.6 (Crossref). 🔴 **У неё ДРУГАЯ пагинация (43–54).**
+Это само по себе объясняет, почему ссылки «p. 33» могут не сходиться: существуют два издания
+с разной нумерацией, и вторичные источники могли брать страницу из любого. Плюс SSRN-запись
+того же названия с датой **2014** (DOI 10.2139/ssrn.2387669) — третья точка расхождения
+по году.
+
+### Все испробованные каналы полного текста и их отказы
+
+| Канал | Результат |
+|---|---|
+| Unpaywall `10.2469/faj.v45.n1.31` | HTTP 200, **`is_oa: False`, `oa_status: "closed"`** — открытой копии нет |
+| Semantic Scholar по DOI | HTTP 200, `openAccessPdf: {"url": "", "status": "CLOSED"}`, `citationCount: 1502` |
+| SSRN `sol3/Delivery.cfm/SSRN_ID2387669…` | **HTTP 403 при теле 896 437 байт** — заглушка, не текст |
+| SSRN `sol3/papers.cfm?abstract_id=2387669` | **HTTP 403, 896 437 байт** |
+| JSTOR через `r.jina.ai` | HTTP 200, 10 861 байт — экран доступа, текста нет |
+| CFA Institute через `r.jina.ai` | HTTP 200, 1 880 байт — аннотация есть, текст «CFA Institute Premium Member Content» |
+| `newfrontieradvisors.com/media/1136/…pdf` (сайт автора) | **HTTP 404, 0 байт** |
+| ResearchGate (две записи) | Cloudflare, закрыт (замер сессии) |
+| Michaud & Michaud «Estimation Error and Portfolio Optimization: A Resampling Solution» (сайт автора, HTTP 200, 927 901 байт, `pdftotext` успешно) | **`grep` по «estimation-error maximiz» — НОЛЬ совпадений.** Единственное упоминание: «…providing a scientific veneer for marketing purposes (Michaud 1989)» |
+| Centaur Reading «Why estimation alone causes Markowitz portfolio selection to fail» (HTTP 200, 250 192 байта, текст извлечён, 86 551 байт) | **`grep` по «maximiz» — НОЛЬ совпадений.** Michaud цитируется 6 раз, но только как «'Markowitz optimisation enigma' (Michaud, 1989)» и по работам 2007 года |
+
+### 🔴 Что можно утверждать, а что нельзя
+
+**МОЖНО — дословно из аннотации самого издателя (CFA Institute, страница статьи):**
+> «The indifference of many investment practitioners to mean-variance optimization technology,
+> despite its theoretical appeal, is understandable in many cases. **The major problem with MV
+> optimization is its tendency to maximize the effects of errors in the input assumptions.
+> Unconstrained MV optimization can yield results that are inferior to those of simple equal
+> weighting schemes.** Nevertheless, MV optimization is superior to many ad hoc techniques in
+> terms of integration of portfolio objectives with client constraints and efficient use of
+> information. Its practical value may be enhanced by the sophisticated adjustment of inputs and
+> the imposition of constraints based on fundamental investment considerations and the
+> importance of priors. The operating principle should be that, **to the extent that reliable
+> information is available, it should be included as part of the definition of the optimization
+> procedure.**»
+
+Это **авторская аннотация от издателя**, а не пересказ. Тезис «MV-оптимизация максимизирует
+влияние ошибок входных оценок» ей подтверждён полностью. Подтверждён и второй тезис —
+«безусловная MV-оптимизация может уступать простому равновзвешиванию».
+
+🔴 **НЕЛЬЗЯ:**
+1. **Ставить кавычки вокруг «estimation-error maximizers» со ссылкой на Michaud 1989** —
+   выражение в добытых первичных материалах (аннотация издателя, два авторских текста самого
+   Michaud) **не встречается ни разу**. Оно есть только во вторичных пересказах.
+2. **Указывать страницу 33.** Она не проверена, а существование издания ICFA с пагинацией
+   43–54 делает её сомнительной даже как заимствование.
+3. Любая формулировка вида «Michaud (1989, p. 33) назвал оптимизаторы "estimation-error
+   maximizers"» — **снять из всех наших текстов**.
+
+### Как писать вместо этого (готовая формулировка)
+
+> Майкл Майкод показал, что главная проблема средне-дисперсионной оптимизации — «its tendency
+> to maximize the effects of errors in the input assumptions», и что безусловная MV-оптимизация
+> способна давать результат хуже простого равновзвешивания (Michaud R.O. «The Markowitz
+> Optimization Enigma: Is 'Optimized' Optimal?», Financial Analysts Journal, 1989, 45(1):31–42,
+> DOI 10.2469/faj.v45.n1.31; цитируется по авторской аннотации издателя — полный текст закрыт,
+> `oa_status: closed`).
+
+Так утверждение остаётся истинным и проверяемым, а кавычки стоят вокруг фразы, которая
+действительно есть в первичном материале. Если оригинал понадобится дословно — единственный
+оставшийся путь **библиотечный доступ к FAJ или членство CFA Institute**; открытых каналов
+не существует, и повторять добор без такого доступа бессмысленно.
+
+### Почему это важно для нас по существу, а не только по цитированию
+
+Тезис Michaud — аргумент **в пользу** нашей архитектуры: чем сложнее оптимизатор, тем сильнее
+он усиливает ошибки во входных оценках. У нас входы (ожидаемые доходности, ставки, инфляция)
+оцениваются с большой погрешностью, а перебор 66 фиксированных точек с шагом 10 % —
+намеренно грубая сетка, которая **не даёт оптимизатору места, где разгуляться на шуме**.
+Это ровно в духе последней фразы аннотации: включать в процедуру ровно столько информации,
+сколько её надёжно есть. 🔴 Но сформулировать это в наших документах надо **своими словами со
+ссылкой на реквизиты**, а не поддельной цитатой.
+

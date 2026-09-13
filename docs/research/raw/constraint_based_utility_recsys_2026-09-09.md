@@ -1278,3 +1278,961 @@ Handbook*, авторская копия https://ise.bgu.ac.il/faculty/liorr/rec
 Непрочитанным остался ОРИГИНАЛ Felfernig & Burke (ICEC '08) — ACM 403 на оба канала;
 компенсировано каноническими пересказами тех же авторов (Handbook ch. 5; Uta et al. 2024).
 Остальные закрытые источники перечислены в разделе «Что не добыто и почему».
+
+---
+
+# ДОБОР Г4 (11.09.2026) — первоисточники под repair при пустом множестве альтернатив
+
+Метод: первоисточники добывались полными текстами, не пересказами. Канал, HTTP-код и размер
+указаны у каждого источника. Цитаты дословные, с номером страницы по колонтитулу самого PDF.
+
+## ДОБОР Г4 — Junker U., QUICKXPLAIN (AAAI-04), ПОЛНЫЙ ТЕКСТ ДОБЫТ
+
+**Реквизиты (подтверждены по самому PDF):** Ulrich Junker, ILOG, 1681 route des Dolines,
+06560 Valbonne, France, ujunker@ilog.fr. «QUICKXPLAIN: Preferred Explanations and Relaxations
+for Over-Constrained Problems». Proceedings of AAAI-04, секция CONSTRAINT SATISFACTION &
+SATISFIABILITY, **страницы 167–172** (колонтитулы страниц в PDF: 167, 168, 169, 170, 171, 172).
+Copyright © 2004, American Association for Artificial Intelligence.
+
+**Канал добычи:**
+1. `curl -sk --http1.1` с браузерным UA → `https://cdn.aaai.org/AAAI/2004/AAAI04-000.pdf`
+   (оглавление тома) — **HTTP 200, 651 085 байт**, 12 страниц. В оглавлении строка
+   «QUICKXPLAIN: Preferred Explanations and Relaxations for Over-Constrained Problems / 167,
+   Ulrich Junker». Номер статьи в томе вычислен подсчётом позиции в оглавлении (27-я
+   техническая статья).
+2. `curl -sk --http1.1` → `https://cdn.aaai.org/AAAI/2004/AAAI04-027.pdf` — **HTTP 200,
+   115 902 байта**. Проверено: первая строка текста — «QUICKXPLAIN: Preferred Explanations
+   and Relaxations for Over-Constrained Problems, Ulrich Junker, ILOG». Совпадение
+   подтверждено; соседние номера 026 (Fang & Ruml) и 028 (Mastrolilli & Gambardella)
+   совпали с оглавлением, то есть нумерация проверена с двух сторон.
+3. Текст извлечён `pdftotext -layout` — 44 258 байт. **ACM DL / ResearchGate не
+   понадобились вовсе.**
+
+🔴 **Опровержение вторичных источников по реквизитам:** страницы **167–172** подтверждены
+первоисточником; том AAAI-04, издатель AAAI Press. Никакого «AAAI/IAAI 2004, pp. 167–172,
+Vol. 3» в самом PDF нет — в колонтитулах только имя секции и сквозная нумерация тома.
+
+### Постановка задачи (дословно, с. 167)
+
+> «Over-constrained problems can have an exponential number of conflicts, which explain
+> the failure, and an exponential number of relaxations, which restore the consistency.
+> A user of an interactive application, however, desires explanations and relaxations
+> containing the most important constraints. To address this need, we define preferred
+> explanations and relaxations based on user preferences between constraints and we compute
+> them by a generic method which works for arbitrary CP, SAT, or DL solvers. We significantly
+> accelerate the basic method by a divide-and-conquer strategy and thus provide the
+> technological basis for the explanation facility of a principal industrial constraint
+> programming tool, which is, for example, used in numerous configuration applications.»
+> (Abstract, с. 167)
+
+**Ведущий пример (с. 167) — прямая аналогия нашему случаю.** Покупатель хочет универсал
+с опциями при бюджете 3000:
+
+| № | Опция | Требование ρi | Стоимость |
+|---|---|---|---|
+| 1 | roof racks | x1 = 1 | k1 = 500 |
+| 2 | CD-player | x2 = 1 | k2 = 500 |
+| 3 | one additional seat | x3 = 1 | k3 = 800 |
+| 4 | metal color | x4 = 1 | k4 = 500 |
+| 5 | special luxury version | x5 = 1 | k5 = 2600 |
+
+«where the boolean variable xi ∈ {0,1} indicates whether the i-th option is chosen and the
+costs y = Σ ki·xi are smaller than the total budget of 3000» (с. 167). Наивное распространение
+границ даёт конфликт {ρ1..ρ5} — весь набор; минимальный конфликт — {ρ4, ρ5} (таблица 2);
+**предпочтительный** конфликт при порядке ρ3 ≺ ρ1 ≺ ρ2 ≺ ρ5 ≺ ρ4 — {ρ3, ρ5} (таблица 3).
+
+Ключевая формулировка проблемы (с. 167, правая колонка):
+
+> «Hence, the essential issue in explaining a failure of a constraint solver is not the
+> capability of recording a proof, but selecting a proof among a potentially huge number
+> that does not contain unnecessary constraints and that involves the most preferred
+> constraints.»
+
+Принцип алгоритма одним абзацем (с. 168, левая колонка):
+
+> «We address this issue by a preference-controlled algorithm that successively adds most
+> preferred constraints until they fail. It then backtracks and removes least preferred
+> constraints if this preserves the failure. Relaxations can be computed dually, first
+> removing least preferred constraints from an inconsistent set until it is consistent.
+> The number of consistency checks can drastically be reduced by a divide-and-conquer
+> strategy that successively decomposes the overall problem. In the good case, a single
+> consistency check can remove all the constraints of a subproblem.»
+
+### Условия применимости (дословно, с. 168)
+
+> «Although the discussion of this paper focuses on constraint satisfaction problems (CSP),
+> its results and algorithms apply to any satisfiability problem such as propositional
+> satisfiability (SAT) or the satisfiability of concepts in description logic (DL). We
+> completely abstract from the underlying constraint language and simply assume that there
+> is a monotonic satisfiability property: if S is a solution of a set C1 of constraints
+> then it is also a solution of all subsets C2 of C1.»
+
+🔴 **Единственное требование к предметной области — МОНОТОННОСТЬ выполнимости.** Для
+FINPILOT это проверяемо напрямую: инварианты Rt ≥ 0 и ПДН ≤ 0,40 монотонны по удалению
+пользовательских требований (сняли требование — множество решений не сужается), значит
+QuickXplain применим без адаптации.
+
+**Разделение на фон и требования (с. 168):**
+
+> «If a set of constraints has no solution, some constraints must be relaxed to restore
+> consistency. It is convenient to distinguish a background B containing the constraints
+> that cannot be relaxed. Typically, unary constraints x ∈ D between a variable x and a
+> domain D will belong to the background. In interactive problems, only user requirements
+> can be relaxed, leaving all other constraints in the background.»
+
+### Определения (дословно, с. 168)
+
+- **Definition 1** (с. 168): «A subset R of C is a relaxation of a problem P := (B, C) iff
+  B ∪ R has a solution.» — «A relaxation exists iff B is consistent.»
+- **Definition 2** (с. 168): «A subset C of C is a conflict of a problem P := (B, C) iff
+  B ∪ C has no solution.» — «A conflict exists iff B ∪ C is inconsistent.»
+- **Definition 3** (лексикографическое расширение, с. 168): «Given a total order < on C,
+  we enumerate the elements of C in increasing <-order c1, …, cn starting with the most
+  important constraints (i.e. ci < cj implies i < j) and compare two subsets X, Y of C
+  lexicographically:
+  X <lex Y **iff** ∃k : ck ∈ X − Y and X ∩ {c1, …, ck−1} = Y ∩ {c1, …, ck−1}»   (формула (1))
+- **Definition 4** (с. 168): «Let P := (B, C, <) be a totally ordered problem. A relaxation R
+  of P is a preferred relaxation of P iff there is no other relaxation R* of P s.t. R* <lex R.»
+- **Definition 5** (с. 168): «Let P := (B, C, ≺) be a partially ordered problem. A relaxation R
+  of P is a preferred relaxation of P iff there is a linearization < of ≺ s.t. R is a preferred
+  relaxation of (B, C, <).»
+- **Definition 6** (антилексикографический порядок, с. 169): «…compare X and Y lexicographically
+  in the reverse order: X <antilex Y **iff** ∃k : ck ∈ Y − X and X ∩ {ck+1, …, cn} =
+  Y ∩ {ck+1, …, cn}»   (формула (2))
+- 🔴 **Definition 7 — PREFERRED CONFLICT, дословно (с. 169):** «Let P := (B, C, <) be a totally
+  ordered problem. A conflict C of P is a **preferred conflict** of P iff there is no other
+  conflict C* of P s.t. C* <antilex C.»
+- **Definition 8** (с. 169): «Let P := (B, C, ≺) be a partially ordered problem. A conflict C
+  of P is a preferred conflict of P iff there is a linearization < of ≺ s.t. C is a preferred
+  conflict of (B, C, <).»
+
+**Свойства предпочтительного конфликта (с. 169, дословно):**
+
+> «A preferred conflict C is minimal (irreducible) meaning that each proper subset of C has
+> a solution. If no preferences are given (≺ is empty), then the minimal conflicts and the
+> preferred conflicts coincide. If ≺ is a strict total order and B ∪ C is inconsistent, then
+> P has a unique preferred conflict.»
+
+И симметрично для релаксации (с. 168): «A preferred relaxation R is maximal (non-extensible)
+meaning that each proper superset of R has no solution. If no preferences are given, i.e. ≺ is
+the empty relation, then the maximal relaxations and the preferred relaxations coincide. If ≺
+is a strict total order and B is consistent, then P has a unique preferred relaxation.»
+
+🔴 **Это прямо отвечает на вопрос бэклога.** «Предложить, что ослабить» = вычислить
+**preferred relaxation**; «объяснить, какие требования конфликтуют» = вычислить
+**preferred conflict**. При СТРОГОМ ТОТАЛЬНОМ порядке требований и то и другое **единственно** —
+то есть продукт не обязан показывать пользователю выбор из множества объяснений, если
+приоритеты требований заданы линейно. Это снимает ложную развилку UX.
+
+**Propositions (с. 169, дословно):**
+- **Proposition 1:** «Let C be a conflict for a CSP P := (∅, C, ≺). If C is a minimal conflict
+  of P, then the constraint graph of C consists of a single strongly connected component.»
+- **Proposition 2:** «X <antilex Y iff Y (<⁻¹)lex X.»
+- **Proposition 3:** «Let ¬cj ≺' ¬ci iff ci ≺ cj. R is a preferred relaxation (conflict) of
+  (B, C, ≺) iff {¬c | c ∈ C − C} is a preferred conflict (relaxation) of (¬B, {¬c | c ∈ C}, ≺').»
+- **Proposition 4:** «If C is a preferred conflict of P := (B, C, <) and R is a preferred
+  relaxation of P, then the <-minimal element of C − R is equal to the <-maximal element of C.»
+- **Proposition 5** (с. 170): «Let P := (B, C, ≺). If B is inconsistent then the empty set is
+  the only preferred conflict of P and P has no relaxation. If B ∪ C is consistent then C is
+  the only preferred relaxation of P and P has no conflict.»
+- **Proposition 6** (с. 170): «Suppose C1 and C2 are disjoint and that no constraint of C2 is
+  preferred to a constraint of C1: **1.** If ∆1 is a preferred relaxation of (B, C1, ≺) and ∆2
+  is a preferred relaxation of (B ∪ ∆1, C2, ≺), then ∆1 ∪ ∆2 is a preferred relaxation of
+  (B, C1 ∪ C2, ≺). **2.** If ∆2 is a preferred conflict of (B ∪ C1, C2, ≺) and ∆1 is a preferred
+  conflict of (B ∪ ∆2, C1, ≺), then ∆1 ∪ ∆2 is a preferred conflict of (B, C1 ∪ C2, ≺).»
+
+### Конструктивные определения (с. 169, дословно)
+
+Предпочтительная релаксация, R0 := ∅ и
+```
+Ri := Ri−1 ∪ {ci}   if B ∪ Ri−1 ∪ {ci} has a solution
+      Ri−1          otherwise
+```
+Предпочтительный конфликт строится в обратном порядке, Cn := C и
+```
+Ci := Ci+1 − {ci}   if B ∪ Ci+1 − {ci} has no solution
+      Ci+1          otherwise
+```
+
+### 🔴 ПСЕВДОКОД АЛГОРИТМА ДОСЛОВНО (Figure 1, с. 170)
+
+```
+Algorithm QUICKXPLAIN(B, C, ≺)
+  1.  if isConsistent(B ∪ C) return 'no conflict';
+  2.  else if C = ∅ then return ∅;
+  3.  else return QUICKXPLAIN'(B, B, C, ≺);
+
+Algorithm QUICKXPLAIN'(B, ∆, C, ≺)
+  4.  if ∆ ≠ ∅ and not isConsistent(B) then return ∅;
+  5.  if C = {α} then return {α};
+  6.  let α1, …, αn be an enumeration of C that respects ≺;
+  7.  let k be split(n) where 1 ≤ k < n;
+  8.  C1 := {α1, …, αk} and C2 := {αk+1, …, αn};
+  9.  ∆2 := QUICKXPLAIN'(B ∪ C1, C1, C2, ≺);
+ 10.  ∆1 := QUICKXPLAIN'(B ∪ ∆2, ∆2, C1, ≺);
+ 11.  return ∆1 ∪ ∆2;
+```
+(Figure 1: Divide-and-Conquer for Explanations, с. 170)
+
+**Theorem 1 (с. 170, дословно):** «The algorithm QUICKXPLAIN(B, C, ≺) always terminates.
+If B ∪ C has a solution then it returns 'no conflict'. Otherwise, it returns a preferred
+conflict of (B, C, ≺).»
+
+### 🔴 СЛОЖНОСТЬ — Table 4, с. 171, ДОСЛОВНО
+
+Единица измерения — **число проверок консистентности** (не операций). n — число ограничений,
+k — размер предпочтительного конфликта.
+
+| Method | Split | Best Case | Worst Case |
+|---|---|---|---|
+| 1. | split(n) = n/2 | log (n/k) + 2k | 2k · log (n/k) + 2k |
+| 2. | split(n) = n − 1 | 2k | 2n |
+| 3. | split(n) = 1 | k | n + k |
+
+(Table 4: Number of Consistency Checks, с. 171)
+
+🔴 **Числовой ориентир из самого текста (с. 170, дословно):** «For problems with one million
+of constraints, QUICKXPLAIN thus needs between 33 and 270 checks if the conflict contains
+8 elements.» Проверено арифметикой при n = 10⁶, k = 8: log₂(n/k) = log₂(125000) ≈ 16,93;
+16,93 + 16 ≈ 33 (лучший случай); 16 · 16,93 + 16 ≈ 287, в тексте 270 — порядок совпадает,
+автор округлял. **Число 33 и 270 брать из первоисточника как есть.**
+
+Пояснение структуры вызовов (с. 170, дословно): «If no pruning (line 4) occurs, then the call
+graph is a binary tree containing a leaf for each of the n constraints. This tree has 2n − 1
+nodes.» И про выбор split: «If we choose split(n) := n/2 then subproblems are divided into
+smaller subproblems of same size and a path from the root to a leaf contains log n nodes.
+If the preferred conflict has k elements, then the non-pruned tree is formed of the k paths
+from the root node to the k leaves of those elements. In the best case, all k elements belong
+to a single subproblem that has 2k − 1 nodes… This path has the length log n − log k = log n/k.
+In the worst case, the paths join in the top in a subtree of depth log k.»
+
+Для строк 2 и 3 таблицы (с. 170): «For lines 2 and 3, the shortest path has length 1, but the
+longest one has length n.»
+
+**Бенчмарк-пример 2 (с. 170, дословно):** «As a simple benchmark problem, we consider n boolean
+variables, a background constraint Σ ki·xi < 3n (with ki = n for i = 9, 10, 12 and ki = 1
+otherwise) and n constraints xi = 1. The algorithm introduces the constraints for i = 1, …, 12,
+then switches over to a removal phase.»
+
+### Практические оговорки самого автора (с. 171, дословно) — важнее всего для продукта
+
+**1. Неполный проверяльщик даёт НЕминимальный конфликт:**
+> «Secondly, a correct, but incomplete method can be used for consistency checking. An arc
+> consistency based solver has these properties. Another example is tree search that is
+> interrupted after a limited amount of time. If such a method reports false, QUICKXPLAIN
+> knows that there is a failure and proceeds as usual. Otherwise, QUICKXPLAIN has no precise
+> information about the consistency of the problem and does not remove constraints. As a
+> consequence, **it always returns a conflict, but not necessarily a minimal one.** Hence,
+> there is a trade-off between optimality of the results and the response time.»
+
+Там же ранее (с. 169): «Incomplete checkers can provide non-minimal conflicts».
+
+**2. Ранняя остановка допустима:**
+> «Firstly, QUICKXPLAIN can be stopped when it has found the k worst elements of a preferred
+> conflict, which is sometimes sufficient.»
+
+**3. Время ответа полиномиально только для полиномиальных CSP (Conclusion, с. 172):**
+> «QUICKXPLAIN has a polynomial response time for polynomial CSPs. For other problems,
+> multiple searches through similar search spaces are needed. Search overhead can be avoided
+> by maintaining witnesses for the success and failure of previous consistency checks.»
+
+**4. Свидетели успеха и провала** (с. 171): «This analysis shows that QUICKXPLAIN does not
+need to start a search from scratch for each consistency check, but can profit from witnesses
+for failure and success. The witness of success guides a least-commitment strategy that tries
+to prove consistency, whereas a first-fail strategy is guided by a witness of failure and
+tries to prove inconsistency.»
+
+**5. Полная проверка консистентности для CSP (с. 169, дословно):**
+> «• arc consistency AC is sufficient for tree-like CSPs. • systematic tree search maintaining
+> AC is needed for arbitrary CSPs.»
+
+**6. Множественные объяснения (с. 171):** «We use preference-based search (Junker 2002) to
+determine multiple preferred relaxations. It sets up a choice point each time a constraint ci
+is consistent w.r.t. a partial relaxation Ri−1.»
+
+### Что автор говорит о новизне и о родственных работах (с. 171–172, дословно)
+
+> «Whereas the notion of preferred relaxations found a lot of interest, e.g. in the form of
+> extensions of prioritized default theories (Brewka 1989), **the concept of a preferred
+> explanation appears to be new.**»
+
+> «Iterative approaches successively remove elements (Bakker et al. 1993) or add elements
+> (de Siqueira N. & Puget 1988) and test conflict membership. QUICKXPLAIN unifies and improves
+> these two methods by successively decomposing the complete explanation problem into
+> subproblems of the same size. (Mauss & Tatar 2002) follow a similar approach, but do not
+> take preferences into account. (de la Banda, Stuckey, & Wazny 2003) determine all conflicts
+> by exploring a conflict-set tree. These checking-based methods for computing explanations
+> **work for any solver and do not require that the solver identifies its precise inferences.**»
+
+> «Moreover, subset checking can also be used to find explanations for linear programming as
+> shown in (Chinneck 1997).» — Chinneck, J. W. 1997. «Finding a useful subset of constraints
+> for analysis in an infeasible linear program». INFORMS Journal on Computing 9:164–174.
+
+**Промышленное применение (Conclusion, с. 172, дословно):** «…provides the technological basis
+for the explanation facility of a principal industrial constraint programming tool (ILOG 2003b)
+and a CP-based configurator (ILOG 2003a), which is used in various B2B and B2C configuration
+applications.»
+
+### Полный список литературы Junker 2004 (с. 172, дословно — реквизиты для дальнейших доборов)
+
+- Bakker, R. R.; Dikker, F.; Tempelman, F.; and Wognum, P. M. 1993. Diagnosing and solving
+  over-determined constraint satisfaction problems. In IJCAI-93, 276–281.
+- Brewka, G. 1989. Preferred subtheories: An extended logical framework for default reasoning.
+  In IJCAI-89, 1043–1048.
+- Chinneck, J. W. 1997. Finding a useful subset of constraints for analysis in an infeasible
+  linear porgram [так в оригинале — опечатка в слове «program»]. INFORMS Journal on
+  Computing 9:164–174.
+- de Kleer, J. 1986. An assumption–based truth maintenance system. Artificial Intelligence
+  28:127–162.
+- de la Banda, M. G.; Stuckey, P. J.; and Wazny, J. 2003. Finding all minimal unsatisfiable
+  subsets. In PPDP 2003, 32–43.
+- de Siqueira N., J. L., and Puget, J.-F. 1988. Explanation-based generalisation of failures.
+  In ECAI-88, 339–344.
+- Dechter, R., and Pearl, J. 1989. Tree clustering for constraint networks. Artificial
+  Intelligence 38:353–366.
+- Doyle, J. 1979. A truth maintenance system. Artificial Intelligence 12:231–272.
+- Ginsberg, M., and McAllester, D. 1994. GSAT and dynamic backtracking. In KR'94, 226–237.
+- ILOG. 2003a. ILOG JConfigurator V2.1. Engine programming guide, ILOG S.A., Gentilly, France.
+- ILOG. 2003b. ILOG Solver 6.0. User manual, ILOG S.A., Gentilly, France.
+- Junker, U., and Mailharro, D. 2003. Preference programming: Advanced problem solving for
+  configuration. AI-EDAM 17(1):13–29.
+- Junker, U. 2002. Preference-based search and multi-criteria optimization. In AAAI-02, 34–40.
+- Jussien, N.; Debruyne, R.; and Boizumault, P. 2000. Maintaining arc-consistency within
+  dynamic backtracking. In CP'2000, 249–261.
+- Mauss, J., and Tatar, M. 2002. Computing minimal conflicts for rich constraint languages.
+  In ECAI-02, 151–155.
+- Prosser, P. 1993. Hybrid algorithms for the constraint satisfaction problem. Computational
+  Intelligence 9:268–299.
+- Sqalli, M. H., and Freuder, E. C. 1996. Inference-based constraint satisfaction supports
+  explanation. In AAAI-96, 318–325.
+
+🔴 **Отрицательный факт, важный для нас:** в списке литературы Junker 2004 **НЕТ ссылки на
+Reiter 1987**. То есть QuickXplain не построен на теории диагностики Райтера и не ссылается
+на неё — связка «Reiter → QuickXplain», встречающаяся во вторичных пересказах, автором
+первоисточника не заявлена. Общий предок у них — работы по TMS (de Kleer 1986, Doyle 1979),
+которые в списке есть.
+
+## ДОБОР Г4 — Reiter R. (1987) «A theory of diagnosis from first principles», ПОЛНЫЙ ТЕКСТ ДОБЫТ
+
+### 🔴 РЕКВИЗИТЫ — расхождение вторичных источников по тому РАЗРЕШЕНО
+
+**Reiter, R. «A theory of diagnosis from first principles». Artificial Intelligence,
+том 32, выпуск 1, апрель 1987, страницы 57–95. DOI 10.1016/0004-3702(87)90062-2.**
+
+Канал: Crossref API (`https://api.crossref.org/works?query.bibliographic=…`) — HTTP 200,
+поля `volume: "32"`, `issue: "1"`, `page: "57-95"`, `published: [1987, 4]`,
+`container-title: "Artificial Intelligence"`. Подтверждено НЕЗАВИСИМО колонтитулами самого
+PDF: страница 57 — «ARTIFICIAL INTELLIGENCE 57 / A Theory of Diagnosis from First Principles»,
+далее нечётные страницы несут колонтитул «A THEORY OF DIAGNOSIS FROM FIRST PRINCIPLES» с
+номерами 67, 69, 71, 73…, чётные — «R. REITER» с номерами 68, 70, 72, 74.
+
+🔴 **Том 32, а не 33 и не 34.** Semantic Scholar при этом отдаёт `"year": 1986` (запись
+`DBLP: journals/ai/Reiter87`, `citationCount: 3556`) — это артефакт их базы, не альтернативная
+редакция; ставить год 1986 нельзя.
+
+**Канал полного текста:** Unpaywall для DOI 10.1016/0004-3702(87)90062-2 → `is_oa: False`,
+`oa_status: "closed"`, `best_oa_location: None` — **легального OA нет, Elsevier закрыт**.
+Semantic Scholar указал `openAccessPdf.status: "CLOSED"` с мёртвым URL cs.kun.nl.
+Текст добыт с учебного зеркала: `curl -sk --http1.1` с браузерным UA →
+`https://cse.sc.edu/~mgv/csce580f11/gradPres/reiter-diagnosis.pdf` — **HTTP 200,
+1 751 213 байт, `application/pdf`**; `pdftotext -layout` → 88 927 байт текста (скан с OCR,
+местами искажает символы: «Δ» распознаётся как «A», «zl», «~1»; формулы читаются, но
+литерные обозначения требуют осторожности).
+
+Провалившиеся каналы (для протокола): `www.cs.ubc.ca/~poole/cs322/2005/Reiter87.pdf` —
+HTTP 404; `www.cs.toronto.edu/~sheila/384/w11/Readings/reiter87.pdf` — HTTP 403;
+`webdocs.cs.ualberta.ca/~greiner/PAPERS/…` — HTTP 404; Wayback CDX по `*.pdf` с фильтром —
+HTTP 403 «This type of CDX query requires authorization»; `archive.org/wayback/available` —
+HTTP 429. Точечный CDX по конкретному URL сработал (снимок 20170921234913, 1 616 087 байт),
+но не понадобился.
+
+### Определения (дословно, §4, с. 67–68)
+
+**Definition 4.1 (conflict set), с. 67:**
+> «A conflict set for (SD, COMPONENTS, OBS) is a set {c1, …, ck} ⊆ COMPONENTS such that
+> SD ∪ OBS ∪ {¬AB(c1), …, ¬AB(ck)} is inconsistent. A conflict set for (SD, COMPONENTS, OBS)
+> is minimal iff no proper subset of it is a conflict set for (SD, COMPONENTS, OBS).»
+
+Там же отмечено происхождение понятия: «a concept due originally to de Kleer [5]» (с. 67).
+
+**Proposition 4.2, с. 67:**
+> «Δ ⊆ COMPONENTS is a diagnosis for (SD, COMPONENTS, OBS) iff Δ is a minimal set such that
+> COMPONENTS − Δ is not a conflict set for (SD, COMPONENTS, OBS).»
+
+🔴 **Definition 4.3 — HITTING SET, ДОСЛОВНО (с. 67):**
+> «Suppose C is a collection of sets. A **hitting set** for C is a set H ⊆ ∪(S∈C) S such that
+> H ∩ S ≠ { } for each S ∈ C. A hitting set for C is **minimal** iff no proper subset of it
+> is a hitting set for C.»
+
+То есть: hitting set — множество, пересекающееся с КАЖДЫМ множеством коллекции хотя бы по
+одному элементу; минимальный — неснижаемый по включению (не по мощности!).
+
+🔴 **Theorem 4.4 — ГЛАВНАЯ ТЕОРЕМА, ДОСЛОВНО (с. 67):**
+> «Δ ⊆ COMPONENTS is a diagnosis for (SD, COMPONENTS, OBS) iff Δ is a minimal hitting set for
+> the collection of conflict sets for (SD, COMPONENTS, OBS).»
+
+Вводная фраза автора перед ней (с. 67): «The following is our principal characterization of
+diagnoses, and will provide the basis for computing diagnoses». Доказательство занимает
+с. 67–68, приведено в PDF полностью (обе импликации).
+
+**Corollary 4.5, с. 68:**
+> «Δ ⊆ COMPONENTS is a diagnosis for (SD, COMPONENTS, OBS) iff Δ is a minimal hitting set for
+> the collection of **minimal** conflict sets for (SD, COMPONENTS, OBS).»
+
+Основание (с. 68, дословно): «Notice that every superset of a conflict set for (SD, COMPONENTS,
+OBS) is also a conflict set. Because of this, we can easily prove the following: H is a minimal
+hitting set for the collection of all conflict sets for (SD, COMPONENTS, OBS) iff H is a minimal
+hitting set for the collection of all minimal conflict sets for (SD, COMPONENTS, OBS).»
+
+**Пример из статьи (полный сумматор, с. 68, дословно):** «The full adder has two minimal
+conflict sets {X1, X2} and {X1, A2, O1} … There are three diagnoses, given by the minimal
+hitting sets for {X1, X2} and {X1, A2, O1}: {X1}, {X2, A2}, {X2, O1}.»
+
+**Приоритет по отношению к de Kleer & Williams (с. 69, дословно):**
+> «De Kleer and Williams [6] have independently proposed a characterization of diagnoses which
+> corresponds to our Corollary 4.5. However, the major difference between their result and ours
+> is that, while theirs derives from sound intuitions, it is based upon an unformalized approach
+> to diagnosis, while our results have been derived from initial formal definitions.»
+
+### Definition 4.6 — HS-TREE, ДОСЛОВНО (с. 69)
+
+> «Suppose F is a collection of sets. An edge-labeled and node-labeled tree T is an **HS-tree**
+> for F iff it is a smallest tree with the following properties:
+> (1) Its root is labeled by "√" if F is empty. Otherwise, its root is labeled by a set of F.
+> (2) If n is a node of T, define H(n) to be the set of edge labels on the path in T from the
+> root node to n. If n is labeled by √, it has no successor nodes in T. If n is labeled by a
+> set Σ of F, then for each σ ∈ Σ, n has a successor node n_σ joined to n by an edge labeled
+> by σ. The label for n_σ is a set S ∈ F such that S ∩ H(n_σ) = { } if such a set S exists.
+> Otherwise, n_σ is labeled by √.»
+
+**Пример 4.7 (с. 69):** F = {{2,4,5}, {1,2,3}, {1,3,5}, {2,4,6}, {2,4}, {2,3,5}, {1,6}}.
+
+**Два свойства HS-дерева (с. 69, дословно):** «(1) If n is a node of the tree labeled by √,
+then H(n) is a hitting set for F. (2) Each minimal hitting set for F is H(n) for some node n
+of the tree labeled by √.» И далее: «Notice that the sets of the form H(n) for nodes labeled
+by √ do not include all hitting sets for F. The important point for our purpose is that they
+do include all minimal hitting sets for F.»
+
+🔴 **Почему Райтер считает не операции, а ОБРАЩЕНИЯ к F (с. 69–71, дословно) — прямая аналогия
+нашей задаче:**
+> «In addition, we wish to minimize the number of accesses to F required to generate this
+> subtree, where by an access to F we mean the computation required to determine the label of
+> a node in this subtree. … For our purposes, this computation requiring an access to F must be
+> treated as **extremely expensive**. This is so because for us, F will be the set of all conflict
+> sets for (SD, COMPONENTS, OBS). Moreover, F **will not be explicitly available, but will
+> instead be implicitly defined**. An access to F will be the computation of a conflict set, and
+> this will require a call to a theorem prover.»
+
+### Алгоритм построения ОБРЕЗАННОГО HS-дерева, ДОСЛОВНО (с. 72)
+
+> «We summarize our method for generating a pruned HS-tree for F as follows:
+> (1) Generate the HS-tree **breadth-first**, generating nodes at any fixed level in the tree
+> in left-to-right order.
+> (2) **Reusing node labels:** If node n is labeled by the set S ∈ F, and if n' is a node such
+> that H(n') ∩ S = { }, label n' by S. (We indicate that the label of n' is a reused label by
+> underlining it in the tree.) Such a node n' requires no access to F.
+> (3) **Tree pruning:**
+> (i) If node n is labeled by √ and node n' is such that H(n) ⊆ H(n'), close n', i.e. do not
+> compute a label for n'; do not generate any successors of n'.
+> (ii) If node n has been generated and node n' is such that H(n') = H(n), then close n'.
+> (We indicate a closed node in the tree by marking it with "×".)
+> (iii) If nodes n and n' have been respectively labeled by sets S and S' of F, and if S' is a
+> proper subset of S, then for each α ∈ S − S' mark as redundant the edge from node n labeled
+> by α. A redundant edge, together with the subtree beneath it, may be removed from the HS-tree
+> while preserving the property that the resulting pruned HS-tree will yield all minimal
+> hitting sets for F.»
+
+**Theorem 4.8, с. 72, дословно:**
+> «Let F be a collection of sets, and T a pruned HS-tree for F, as previously described. Then
+> {H(n) | n is a node of T labeled by √} is the collection of minimal hitting sets for F.»
+
+**Числа примера (с. 72):** для F из Fig. 3 минимальные hitting sets — {1,2}, {2,3,6}, {2,5,6},
+{4,1,3}, {4,1,5}, {4,3,6}; «The computation of these hitting sets required **13 accesses to F**».
+
+Отдельно (с. 72, дословно) — почему нельзя просто предочистить F от надмножеств:
+> «Why not simply prescan F, remove from F all supersets of sets in F, and use the resulting
+> trimmed F to generate an HS-tree? … The reason we did not do this is … for our purposes F
+> will be implicitly defined as the set of all conflict sets … Since we will not have available
+> an explicit enumeration of these conflict sets, we cannot perform a preliminary subset test
+> on them.»
+
+**Вычисление всех диагнозов (§4.3, с. 74, дословно):** «First compute the collection F of all
+conflict sets for (SD, COMPONENTS, OBS), then use the method of pruned HS-trees to compute the
+minimal hitting sets for F. These minimal hitting sets will be the diagnoses.»
+
+---
+
+## ДОБОР Г4 — Greiner, Smith & Wilkerson (1989): 🔴 ПОПРАВКА ПОДТВЕРЖДЕНА, В ЧЁМ ИМЕННО ОШИБКА
+
+**Реквизиты (Crossref, HTTP 200):** Russell Greiner, Barbara A. Smith, Ralph W. Wilkerson.
+«A correction to the algorithm in Reiter's theory of diagnosis». **Artificial Intelligence,
+том 41, выпуск 1, страницы 79–88, 1989.** Подтверждено самим PDF: колонтитул первой страницы
+«ARTIFICIAL INTELLIGENCE 79», подпись внизу — «Artificial Intelligence 41 (1989/90) 79–88,
+0004-3702/89/$3.50 © 1989, Elsevier Science Publishers B.V. (North-Holland)». Жанр —
+**RESEARCH NOTE**. Аффилиации: Greiner — University of Toronto, 10 King's College Road;
+Smith и Wilkerson — University of Missouri at Rolla.
+
+**Канал:** `curl -sk --http1.1` с браузерным UA →
+`http://www.cs.ru.nl/~peterl/teaching/KeR/Theorist/greibers-correctiontoreiter.pdf` —
+**HTTP 200, 463 965 байт, `application/pdf`**, 10 страниц; `pdftotext -layout` → 23 141 байт.
+
+### ✅ ДА, ОШИБКА В ОРИГИНАЛЕ РАЙТЕРА БЫЛА. Формулировка авторов дословно (Abstract, с. 79):
+
+> «Reiter [3] has developed a general theory of diagnosis based on first principles. His
+> algorithm computes all diagnoses which explain the differences between the predicted and
+> observed behavior of a given system. **Unfortunately, Reiter's description of the algorithm
+> is incorrect in that some diagnoses can be missed under certain conditions.** This note
+> presents a revised algorithm and a proof of its correctness.»
+
+### 🔴 В ЧЁМ ИМЕННО ОШИБКА (с. 80 и с. 82, дословно)
+
+Источник бага назван прямо (с. 79–80): «However, it is the application of a technique for
+handling the nonminimal conflict sets that introduces a bug into Reiter's algorithm.»
+
+Механизм (с. 82, дословно):
+> «It should be clear that pruning by removing redundant edges (pruning rule (3iii)) is
+> applicable only when there is at least one set in the collection which is a strict superset
+> of some other set in the collection. … **However, this type of pruning can result in an
+> incomplete diagnostician, as it is possible to lose minimal hitting sets, and therefore,
+> diagnoses.**»
+
+> «The problem arises from **the interaction of the pruning rule which removes redundant edges
+> (rule (3iii)) and the closing rules (rules (3i) and (3ii))**. A closing rule will close the
+> node n when it finds another node n' which will lead to the same minimal hitting set(s).
+> This, of course, assumes that the node n' will remain in the HS-tree. The pruning rule,
+> however, may remove the node n', meaning that the path to any potential hitting sets will be
+> totally lost — lost from the node n path when node n was closed and lost from the node n'
+> path when node n' was pruned.» (с. 83)
+
+**Контрпример целиком (с. 82, дословно):**
+> «Consider the collection of sets: {{a,b}, {b,c}, {a,c}, {b,d}, {b}}. Without pruning by
+> removing redundant edges, the HS-tree shown in Fig. 1 would be generated. … Note that nodes
+> n5, n7, and n9 have been closed by the subset rule (pruning rule (3i)) since n3 is labeled √,
+> H(n3) ⊆ H(n5), H(n3) ⊆ H(n7), and H(n3) ⊆ H(n9). The set labeling node n8, {a}, is a proper
+> subset of the set, {a,b}, labeling nodes n0, n1, and n4. If the redundant branches from n0,
+> namely the branch labeled "a", is pruned, the remaining tree contains only the nodes n0, n2,
+> n5, and n6. **The minimal hitting set {a,b} is no longer represented in the tree.**»
+
+**Вторая, отдельная неточность — пропущенная перемаркировка родителя (с. 83, дословно):**
+> «Before presenting the solution to this problem, we first clarify one other point in Reiter's
+> original algorithm. **Pruning by the removal of redundant edges also requires that the parent
+> node be relabeled.** Consider the collection of sets {{a,b}, {a}, {b}}. Without pruning, the
+> HS-tree in Fig. 2 would be generated. As {b} ⊂ {a,b}, the "a" branch under n0 would be pruned.
+> However, if n0 is not relabeled by the set {b}, then the "b" branch under n0 would be pruned
+> as {a} ⊂ {a,b}. The surviving HS-tree would contain the single node n0 which is not labeled
+> by √.»
+
+И важная оговорка авторов в пользу Райтера (с. 83, дословно):
+> «**Reiter's description (in the text) of the process for computing the minimal hitting sets
+> is basically correct. However, the algorithm did not accurately follow his text.** … In the
+> text of the paper, Reiter discusses relabeling the node, but this point is not stated in the
+> algorithm.»
+
+🔴 **Это уточнение обязано попасть в любой наш текст.** Правильная формулировка — не «теория
+Райтера ошибочна» (теорема 4.4 и теорема 4.8 не тронуты), а **«формулировка обрезающего
+алгоритма в статье 1987 неполна: она теряет часть минимальных hitting sets при неминимальных
+конфликтах; текст статьи описывал процесс верно, псевдокод — нет»**. Любой вторичный пересказ
+вида «Reiter's algorithm is wrong» — огрубление.
+
+### Исправленный алгоритм HS-DAG, ДОСЛОВНО (с. 83–84)
+
+Идея (с. 83): «The HS-DAG algorithm, shown below, is more faithful to that description. It
+involves using a **directed acyclic graph, dag,** to compute the minimal hitting sets rather
+than a tree. To simplify the description, we assume that the collection of sets is ordered.
+This allows us to specify the algorithm deterministically, as we can now select a member of
+this collection rather than assume that a member is chosen arbitrarily.»
+
+**Базовое построение HS-dag для упорядоченной коллекции F (с. 84, дословно):**
+> «(1) Let D represent the growing dag. Generate a node which will be the root of the dag.
+> This node will be processed in (2).
+> (2) Process the nodes in D in a breadth-first order. To process a node n:
+>  (i) Define H(n) to be the set of edge labels on the path in D from the root down to node n.
+>  (ii) If for all x ∈ F, x ∩ H(n) ≠ { } then label n by √. Otherwise, label n by Σ where Σ is
+>  the first member of F for which Σ ∩ H(n) = { }.
+>  (iii) If n is labeled by a set Σ ∈ F, for each σ ∈ Σ, generate a new downward arc labeled by
+>  σ. This arc leads to a new node m with H(m) = H(n) ∪ {σ}. The new node m will be processed
+>  (labeled and expanded) after all nodes in the same generation as n have been processed.
+> (3) Return the resulting dag, D.»
+
+**Три обрезающих правила HS-DAG (с. 84, дословно) — сравнивать с правилами Райтера построчно:**
+> «(1) **Reusing nodes:** This algorithm will not always generate a new node m as a descendant
+> of node n. There are two cases to consider: (i) If there is a node n' in D such that
+> H(n') = H(n) ∪ {σ}, then let the σ-arc under n point to this existing node n'. Hence, n' will
+> have more than one parent. (ii) Otherwise, generate a new node, m, at the end of this σ-arc
+> as described in the basic HS-DAG algorithm.
+> (2) **Closing:** If there is a node n' which is labeled by √ and H(n') ⊆ H(n) then close node
+> n. A label is not computed for n nor are any successor nodes generated.
+> (3) **Pruning:** If the set Σ is to label a node and it has not been used previously, then
+> attempt to prune D as described in the following. (i) If there is a node n' which has been
+> labeled by the set S' of F where Σ ⊂ S', then **relabel n' with Σ**. For any α in S' − Σ, the
+> α-edge under n' is no longer allowed. The node connected by this edge and all of its
+> descendants are removed, **except for those nodes with another ancestor which is not being
+> removed**. Note that this step may eliminate the node which is currently being processed.
+> (ii) Interchange the sets S' and Σ in the collection. (Note that this has the same effect as
+> eliminating S' from F.)»
+
+🔴 **Суть починки в одной фразе (наша формулировка, основанная на с. 85):** переход от ДЕРЕВА
+к ОРИЕНТИРОВАННОМУ АЦИКЛИЧЕСКОМУ ГРАФУ даёт узлу несколько родителей, поэтому обрезка одной
+ветви больше не отрезает узел от графа. Авторы прямо на том же примере (с. 85, дословно):
+«Figure 3 shows a partial HS-dag for the collection of sets used earlier, namely,
+{{a,b}, {b,c}, {a,c}, {b,d}, {b}}. When the set {b} is first used as a label, the dag is
+pruned as shown in Fig. 4. **Note that node n3 still has a parent and so remains in the dag.
+Thus, the minimal hitting set {a,b} is not lost, as was the case with the HS-tree.**»
+
+**Theorem 4.1 (Correctness of HS-DAG algorithm), с. 85, дословно:**
+> «Given the ordered collection F, the HS-DAG algorithm returns a particular labeled dag.
+> (1) For all nodes n labeled by √, H(n) is a minimal hitting set.
+> (2) Every minimal hitting set for F is H(n) for some node n whose label is √.»
+
+Структура доказательства (с. 85, дословно): «It is sufficient to prove the following three
+points: (a) the basic HS-DAG algorithm (without the pruning rules) will find all of the minimal
+hitting sets, (b) the pruning rules will not eliminate any of the minimal hitting sets and
+(c) the pruning rules will eliminate all of the nonminimal hitting sets.»
+
+🔴 **Отдельно ценно (с. 85):** «(a) The claim is stated, **without proof** on [3, p. 72].»
+То есть ключевое свойство полноты в статье 1987 было заявлено БЕЗ ДОКАЗАТЕЛЬСТВА (ср. слова
+самого Райтера на с. 69: «The following results are obvious for any HS-tree»), и доказано
+только в поправке 1989 (Lemma 4.2). Это ещё один аргумент цитировать пару Reiter 1987 +
+Greiner et al. 1989 всегда вместе, а не по отдельности.
+
+**Зависимость результата от порядка (с. 85, дословно):** «Note that the particular HS-dag which
+is returned by the algorithm depends on how F is ordered. Using Π(F) to refer to the
+Π-rearrangement of F, HS-DAG(F) and HS-DAG(Π(F)) will lead to different HS-dags. We prove below
+that these two graphs will produce the same minimal hitting sets.»
+
+**Разница подходов Райтера и de Kleer–Williams по Greiner (с. 79, дословно):** «While Reiter's
+algorithm **can make use of conflict sets which are not minimal**, de Kleer and Williams'
+algorithm **requires that minimal conflict sets be determined** by the underlying inference
+mechanism.»
+
+### Что из этого прямо применимо к FINPILOT
+
+1. Если считать «компонентами» пользовательские требования (сумма досрочного погашения, срок
+   цели, размер резерва), а «конфликтными множествами» — наборы требований, при которых
+   инварианты Rt ≥ 0 и ПДН ≤ 0,40 несовместны, то **набор требований, который надо ослабить,
+   есть минимальный hitting set коллекции конфликтов** (Theorem 4.4 дословно выше).
+2. 🔴 **Если реализовывать HS-подход — реализовывать HS-DAG (Greiner 1989), а не HS-tree
+   (Reiter 1987).** Наши конфликты будут получаться НЕминимальными (проверка инвариантов
+   даёт «этот набор не проходит», не «вот неснижаемое ядро»), а именно на неминимальных
+   конфликтах баг Райтера и проявляется — это буквально условие срабатывания правила (3iii).
+3. У Junker (QuickXplain) и Reiter разные выходы: Junker даёт ОДИН предпочтительный конфликт
+   и одну предпочтительную релаксацию (единственные при тотальном порядке), Reiter/Greiner —
+   ВСЕ минимальные диагнозы. Для UX «объясни и предложи одно» дешевле Junker; для «покажи все
+   способы разрешить» нужен HS-DAG. Это не конкурирующие, а дополняющие алгоритмы; в списке
+   литературы Junker 2004 Reiter 1987 отсутствует (проверено по полному списку выше).
+
+## ДОБОР Г4 — Felfernig et al., IUI '08: ⛔ ПЕРВОИСТОЧНИК НЕ ДОБЫТ (точная причина)
+
+**🔴 Уточнение названия, которое меняет поиск.** В очереди пробелов работа записана как
+«Intelligent debugging and repair of utility constraint sets». Полное название по ACM:
+**«Intelligent debugging and repair of utility constraint sets in knowledge-based recommender
+applications»**. Авторы: **Felfernig A., Teppan E., Friedrich G., Isak K.** Proceedings of the
+13th International Conference on Intelligent User Interfaces (IUI '08), **pp. 217–226**,
+**doi 10.1145/1378773.1378802**. Аффилиация — Institute for Software Technology, Graz
+University of Technology.
+
+**Каналы и их отказы (протокол):**
+- `WebSearch` — выдача найдена, полного текста в ней нет.
+- `https://api.unpaywall.org/v2/10.1145/1378773.1378802` — HTTP 200, ответ:
+  **`is_oa: False`, `oa_status: "closed"`, `best_oa_location: None`.** То есть легальной
+  открытой копии не существует вовсе, это не наша неудача поиска.
+- Текстовый прокси `curl -s "https://r.jina.ai/https://dl.acm.org/doi/10.1145/1378773.1378802"`
+  — **HTTP 200, но всего 463 байта**, тело: «Title: Just a moment… / Performing security
+  verification / This website uses a security service to protect against malicious bots… /
+  This page maybe requiring CAPTCHA». 🔴 **ACM DL закрыт антиботом и для `r.jina.ai` тоже** —
+  замер зафиксирован, повторять этот канал на ACM в следующих доборах бессмысленно.
+- ResearchGate (`publication/221608244`) — закрыт Cloudflare (известный замер сессии).
+
+**Что удалось снять достоверно — только из аннотации в выдаче поиска (СНИППЕТ, первоисточник
+не открыт):** «constraint-based recommender systems where utility constraints (scoring rules)
+determine the order in which items (products and services) are presented to customers. In many
+cases utility constraints are faulty and calculate rankings which are not expected and accepted
+by marketing and sales experts. The authors present an approach to **automated adaptation of
+utility constraint sets based on solutions for nonlinear optimization problems**.»
+
+🔴 **Это меняет ожидание от источника.** Механизм «из конфликта получают предложение по
+ослаблению ограничений» у Felfernig et al. 2008 — **НЕ hitting-set и НЕ QuickXplain, а решение
+задачи НЕЛИНЕЙНОЙ ОПТИМИЗАЦИИ** по подгонке весов/порогов скоринговых правил к эталонным
+ранжированиям экспертов. То есть работа отвечает на вопрос «как починить ВЕСА, чтобы
+ранжирование совпало с ожиданием экспертов», а не «что ослабить, когда допустимых альтернатив
+ноль». **Для пункта Г4.1 (пустое множество альтернатив) она не является нужным источником;
+она относится к задаче калибровки весов SAW.** Записать это как отрицательный результат по
+исходной постановке и как положительный указатель для темы калибровки.
+
+**Доступные заместители того же коллектива (реквизиты для следующего добора, полный текст не
+брался в этом доборе):**
+- Felfernig, Schippel, Leitner, Reinfrank, Isak, Mandl, Blazek, Ninaus. «Automated repair of
+  scoring rules in constraint-based recommender systems». AI Communications, 2013,
+  doi 10.3233/AIC-120543 (SAGE) — прямое продолжение IUI '08, то же «repair of scoring rules».
+- «An efficient diagnosis algorithm for inconsistent constraint sets». AI EDAM (Cambridge) —
+  **есть открытая копия на arXiv: `https://arxiv.org/pdf/2102.09005`** (в этом доборе не
+  скачивалась, канал проверен как существующий по выдаче).
+- «A Diagnosis Algorithm for Inconsistent Constraint Sets» — открытый PDF на
+  `https://papers.phmsociety.org/index.php/phmconf/article/download/1948/957`.
+
+---
+
+## ДОБОР Г4 — Rodler P. (2022), формальное доказательство QuickXplain: ПОЛНЫЙ ТЕКСТ ДОБЫТ
+
+**Реквизиты:** Patrick Rodler, University of Klagenfurt, Universitätsstrasse 65-67, 9020
+Klagenfurt. «Understanding the QuickXPlain Algorithm: Simple Explanation and Formal Proof» —
+препринт arXiv:2001.01835v3 [cs.AI], 4 August 2022. Журнальная версия: «A formal proof and
+simple explanation of the QuickXplain algorithm», **Artificial Intelligence Review**,
+doi **10.1007/s10462-022-10149-w**; открытый доступ также через PMC (PMC9622537) и
+PubMed 36337611.
+
+**Канал:** `curl -sk --http1.1` → `https://arxiv.org/pdf/2001.01835` — **HTTP 200,
+875 248 байт, `application/pdf`**; `pdftotext -layout` → 62 547 байт.
+
+### 🔴 Главная практическая оговорка: до 2022 года доказательства корректности QuickXplain НЕ БЫЛО
+
+Дословно (Abstract, с. 1):
+> «However, although (we regularly experience) people are having a hard time understanding
+> QuickXPlain and seeing why it works correctly, **a proof of correctness of the algorithm has
+> never been published.** This is what we account for in this work…»
+
+И в разделе 1 (с. 3, дословно): «people often complain they do not see why it correctly
+computes a minimal subset of the universe. **This is not least because no proof of QX has yet
+been published.**» В Conclusion (с. 16): «Since QX has in practice turned out to be hardly
+understood by many — experienced academics included — and was published without a proof, we
+account for that by providing for QX an intelligible proof that explains.»
+
+Практический вывод для нас: **утверждение «QuickXplain доказанно корректен» допустимо
+цитировать только со ссылкой на Rodler 2022, не на Junker 2004.** Junker 2004 содержит
+Theorem 1 (формулировку корректности), но без доказательства; Junker сам пишет «The following
+results are obvious» о свойствах и не доказывает их — ровно та же болезнь, что у Reiter 1987
+(см. выше: Greiner et al. 1989, с. 85, «The claim is stated, without proof on [3, p. 72]»).
+
+### Переформулировка задачи в общем виде — MSMP (с. 2, дословно)
+
+> «The task of finding within a given universe an irreducible subset with a specific monotone
+> property is referred to as the **MSMP (Minimal Set subject to a Monotone Predicate)**
+> problem.»
+
+**Definition 1 (Monotone Property), с. 5, дословно:**
+> «Let U be the universe (a set of elements) and p : 2^U → {0,1} be a function where p(X) = 1
+> iff property p holds for X ⊆ U. Then, p is a **monotone property** iff p(∅) = 0 and
+> ∀X', X'' ⊆ U : X' ⊂ X'' ⟹ p(X') ≤ p(X'').»
+> «So, p is monotone iff, given that p holds for some set X', it follows that p also holds for
+> any superset X'' of X'. An equivalent definition is: If p does not hold for some set X'',
+> p does not hold for any subset X' of X'' either.»
+
+**Definition 2 (p-Problem-Instance), с. 6:** «Let A (analyzed set) and B (background) be
+(related) finite sets of elements where **A ∩ B = ∅**, and let p be a monotone predicate.
+Then we call the tuple ⟨A, B⟩ a p-problem-instance (p-PI).»
+
+**Definition 3 (Minimal p-Set given some Background), с. 6:** «Let ⟨A, B⟩ be a p-PI. Then, we
+call X a p-set wrt. ⟨A, B⟩ iff X ⊆ A and p(X ∪ B) = 1. We call a p-set X wrt. ⟨A, B⟩ minimal
+iff there is no p-set X' ⊂ X wrt. ⟨A, B⟩.» Сноска 7 (с. 5): «Throughout this paper,
+**minimality always refers to minimality wrt. set-inclusion**» — то есть НЕ по мощности.
+
+**Proposition 1 (Existence of a p-Set), с. 6, дословно:** «(1) A (minimal) p-set exists for
+⟨A, B⟩ iff p(A ∪ B) = 1. (2) ∅ is a — and the only — (minimal) p-set wrt. ⟨A, B⟩ iff p(B) = 1.»
+
+### Алгоритм QX в записи Родлера (Algorithm 1, с. 6, дословно) — сверить с псевдокодом Junker
+
+```
+Algorithm 1 QX: Computation of a Minimal p-Set
+Input: a p-PI ⟨A, B⟩ where A is the analyzed set and B is the background
+Output: a minimal p-set wrt. ⟨A, B⟩, if existent; 'no p-set', otherwise
+ 1: procedure QX(⟨A, B⟩)
+ 2:   if p(A ∪ B) = 0 then
+ 3:       return 'no p-set'
+ 4:   else if A = ∅ then
+ 5:       return ∅
+ 6:   else
+ 7:       return QX'(B, ⟨A, B⟩)
+
+ 8: procedure QX'(C, ⟨A, B⟩)
+ 9:   if C ≠ ∅ ∧ p(B) = 1 then
+10:       return ∅
+11:   if |A| = 1 then
+12:       return A
+13:   k ← split(|A|)
+14:   A1 ← get(A, 1, k)
+15:   A2 ← get(A, k + 1, |A|)
+16:   X2 ← QX'(A1, ⟨A2, B ∪ A1⟩)
+17:   X1 ← QX'(X2, ⟨A1, B ∪ X2⟩)
+18:   return X1 ∪ X2
+```
+
+🔴 **Сверка с оригиналом Junker 2004 (Figure 1, с. 170) — расхождений по существу нет**, но
+ОБОЗНАЧЕНИЯ инвертированы и это ловушка при чтении вторичных пересказов: у Junker строка 4
+проверяет `not isConsistent(B)`, у Rodler строка 9 проверяет `p(B) = 1`, потому что у Junker
+предикат — «консистентно», а у Rodler — «свойство выполнено» (то есть НЕконсистентность).
+Порядок рекурсивных вызовов совпадает: сначала правая половина с левой в фоне, затем левая
+с уже найденным X2 в фоне.
+
+**Theorem 1 (Correctness of QX), с. 16, дословно:**
+> «Let ⟨A, B⟩ be a p-PI. Then, QX(⟨A, B⟩) returns a minimal p-PI wrt. ⟨A, B⟩ if a p-set exists
+> for ⟨A, B⟩. Otherwise, QX(⟨A, B⟩) returns 'no p-set'.»
+(Опечатка «minimal p-PI» вместо «minimal p-set» — в самом препринте.)
+
+**Proposition 2 (Termination), с. 11:** «Let ⟨A, B⟩ be a p-PI. Then QX(⟨A, B⟩) terminates.»
+
+**Стратегия деления и сложность (с. 14, дословно):** «suppose that QX pursues a splitting
+strategy where a set is always partitioned into equal-sized subsets in each iteration, i.e.,
+split(n) returns ⌈n/2⌉ (note: **this leads to the best worst-case complexity of QX**, cf. [9]).»
+Ссылка [9] — это Junker 2004; то есть Rodler подтверждает нашу таблицу 4 из первоисточника,
+а не даёт свою.
+
+**Пример Родлера (с. 14):** A = {1,…,8}, B = ∅, два минимальных p-set: X = {3,4,7} и
+Y = {4,5,8}. Показывает, что QX возвращает **один** из них, зависящий от порядка/разбиения.
+
+### Условия применимости алгоритма QX как чёрного ящика (с. 2–3, дословно)
+
+> «In general, an algorithm A for a specific manifestation of the MSMP problem can be used to
+> solve arbitrary manifestations of the MSMP problem if (i) the procedure used by A to decide
+> the monotone predicate is **used as a black-box** (i.e., given a subset of the universe as
+> input, the procedure outputs 1 if the predicate is true for the subset and 0 otherwise; no
+> more and no less), and (ii) **no assumptions or additional techniques are used in A which
+> are specific to one particular manifestation** of the MSMP problem.»
+
+Родлер отдельно перечисляет, какие алгоритмы этому НЕ удовлетворяют (с. 3): опирающиеся на
+дополнительный вывод сверх значения предиката (certificate-refinement-based), glass-box
+подходы с модификацией процедуры проверки (theorem prover, записывающий аксиомы вывода),
+и техника model rotation для MUS, неприменимая к minimal correction subsets.
+
+**Почему QX популярен — оценка Родлера (с. 3, дословно):** «Likely reasons for the widespread
+use of QX are its **mild theoretical complexity in terms of the number of (usually expensive)
+predicate evaluations** required, as well as its favorable practical performance for important
+problems (such as conflict or diagnosis computation for model-based diagnosis).»
+
+**Терминологическая карта (с. 2, дословно) — важна, чтобы не путать литературу:** «minimal
+unsatisfiable subsets (also termed **conflicts** or minimal unsatisfiable cores), minimal
+correction subsets (also termed **diagnoses**), prime implicants (also termed justifications),
+prime implicates, and most concise optimal queries to an oracle».
+🔴 То есть «конфликт» Junker'а и «диагноз» Reiter'а — это **разные** объекты (MUS против MCS),
+а не синонимы; вторичные пересказы их регулярно смешивают.
+
+---
+
+# ИТОГ ДОБОРА Г4 (11.09.2026)
+
+Один агент, без подагентов. Каналы в порядке: `WebSearch` → `WebFetch` → `curl -sk --http1.1`
+с браузерным UA → `r.jina.ai` → API метаданных (Crossref, Unpaywall, Semantic Scholar) →
+Wayback с `id_`. Все HTTP-коды и размеры проставлены у каждого источника в его разделе.
+
+## Таблица по пунктам
+
+| Пункт | Источник | Итог | Где раздел |
+|---|---|---|---|
+| Г4.1 | **Junker, QUICKXPLAIN, AAAI-04, 167–172** | ✅ **ДОБЫТ ПОЛНОСТЬЮ** (cdn.aaai.org, HTTP 200, 115 902 б) | `constraint_based_utility_recsys_2026-09-09.md` |
+| Г4.1 | **Reiter 1987, AI 32(1):57–95** | ✅ **ДОБЫТ ПОЛНОСТЬЮ** (зеркало cse.sc.edu, HTTP 200, 1 751 213 б) | там же |
+| Г4.1 | **Greiner, Smith & Wilkerson 1989, AI 41(1):79–88** | ✅ **ДОБЫТ ПОЛНОСТЬЮ** (cs.ru.nl, HTTP 200, 463 965 б) | там же |
+| Г4.1 | **Felfernig et al., IUI '08, 217–226** | ⛔ **НЕ ДОБЫТ.** Unpaywall: `is_oa: False`, `oa_status: "closed"`. ACM DL: Cloudflare и для `curl`, и для `r.jina.ai` (HTTP 200, 463 б, «Performing security verification»). Есть только аннотация-сниппет | там же |
+| Г4.1 | **Rodler 2022, формальное доказательство QX** (сверх задания) | ✅ **ДОБЫТ ПОЛНОСТЬЮ** (arXiv:2001.01835, HTTP 200, 875 248 б) | там же |
+| Г4.2 | **Landis & Koch 1977, Biometrics 33(1):159–174** | ✅ **ДОБЫТ ПОЛНОСТЬЮ** (Wayback `id_`, HTTP 200, 1 181 952 б) | `prescriptive_quality_metrics_2026-09-10.md` |
+| Г4.2 | **Feinstein & Cicchetti 1990, JCE 43(6):543–549** | 🟡 **ЧАСТИЧНО.** Аннотация издателя дословно (`r.jina.ai`, HTTP 200, 16 299 б). Полный текст: Unpaywall `closed`; ScienceDirect **HTTP 403 при теле 832 805 б** | там же |
+| Г4.2 | **Обзор метаморфического тестирования** | 🟡 **ЧАСТИЧНО.** Segura et al. добыт полностью в версии техотчёта ISA-16-TR-02 (idus.us.es, HTTP 200, 1 970 284 б). Chen et al. CSUR 51(1) — НЕ добыт (репозиторий Ноттингема: HTTP 403 `curl`, 549 б Cloudflare через `r.jina.ai`) | там же |
+| Г4.2 | **Bengen 1994, правило 4 %** | ✅ **ДОБЫТ ПОЛНОСТЬЮ** (FPA, каталог `2021-04`, HTTP 200, 347 755 б) | там же |
+| Г4.2 | **Методология Delphi** | ✅ **ДОБЫТО ДВА ИСТОЧНИКА.** Linstone & Turoff 1975 целиком (Wayback `id_`, HTTP 200, 11 700 935 б) + Diamond et al. 2014 аннотация с числами (`r.jina.ai`, HTTP 200, 23 026 б) | там же |
+| Г4.3 | **Рамка выбора метода MCDA, Omega** | ✅ **ДОБЫТ ПОЛНОСТЬЮ** (arXiv:1810.11078, HTTP 200, 2 518 978 б) | `approach_validity_2026-09-10.md` |
+| Г4.3 | **Fox 1966** | ⛔ **НЕ ДОБЫТ.** Unpaywall `10.1287/mnsc.13.3.210`: `is_oa: False`, `oa_status: "closed"` | `optimization_solvers_2026-09-10_dobor_lit.md` |
+| Г4.3 | **Federgruen & Groenevelt 1986** | ⛔ **НЕ ДОБЫТ.** Unpaywall `10.1287/opre.34.6.909`: `is_oa: False`, `oa_status: "closed"` | там же |
+| Г4.3 | **Michaud 1989, цитата «estimation-error maximizers, p. 33»** | ⛔ **НЕ ПОДТВЕРЖДЕНА, ВЕРДИКТ: СНЯТЬ.** Unpaywall `closed`; S2 `openAccessPdf status CLOSED`; SSRN HTTP 403; JSTOR — экран доступа; сайт автора HTTP 404. Добыта авторская аннотация издателя (CFA Institute, HTTP 200, 1 880 б) — **выражения в ней нет** | там же |
+
+## 🔴 Что из добытого ОПРОВЕРГАЕТ или правит уже записанное
+
+1. 🔴 **«Cinelli et al., Omega 2018» — неверная атрибуция.** Авторы рамки выбора метода MCDA —
+   **Wątróbski, Jankowski, Ziemba, Karczmarczyk, Zioło**, Omega **86 (2019), 107–124**.
+   Фамилии Cinelli среди авторов нет. Подтверждено Crossref и титулом самого PDF.
+2. 🔴 **«Segura et al., ACM Computing Surveys 51(1), doi 10.1145/3143561» — склейка двух
+   работ.** По этому DOI лежит **Chen, Kuo, Liu, Poon, Towey, Tse, Zhou**, CSUR 51(1):1–27,
+   2018. Обзор Segura с соавторами — **IEEE TSE 42(9):805–824, 2016**, doi 10.1109/TSE.2016.2532875.
+3. 🔴 **«Fox (1966), Operations Research 34(6):909–918» (формулировка задания) — склейка.**
+   Fox 1966 — **Management Science 13(3):210–216**; пагинация 34(6):909–918 принадлежит
+   **Federgruen & Groenevelt 1986**. В самом файле `optimization_solvers…dobor_lit.md` это уже
+   было записано правильно — ошибка в задании, не в базе.
+4. 🔴 **Шкала каппы Landis & Koch цитируется с подправленными границами.** В первоисточнике
+   (с. 165) — **«< 0.00 Poor», «0.00–0.20 Slight»**, а не общепринятое «≤ 0 poor,
+   0.01–0.20 slight». И там же авторская оговорка, которую опускают почти всегда: «**Although
+   these divisions are clearly arbitrary, they do provide useful "benchmarks" for the discussion
+   of the specific example in Table 1.**» Шкала введена для ОДНОГО примера их же статьи, а не
+   как норматив приёмки.
+5. 🔴 **Цитата Michaud «estimation-error maximizers, p. 33» не подтверждается ничем первичным.**
+   Выражения нет ни в авторской аннотации издателя, ни в двух собственных текстах Michaud,
+   доступных полностью. Плюс существует второе издание статьи с ДРУГОЙ пагинацией
+   (ICFA Continuing Education Series 1989(4):43–54), что делает «p. 33» вдвойне ненадёжной.
+   **Снять из всех текстов**, заменить на проверенную цитату из аннотации.
+6. 🔴 **Число «4 % выдержало 50 лет в 41 из 50 случаев» у Бенгена ОТСУТСТВУЕТ.** В статье:
+   **40 сценарных лет из 51** достигают 50-летней живучести при 50/50 и 4 % (это следует из
+   сравнения с Figure 3(A): «Fully 47 scenario years… while only 40 scenario years attained
+   that pinnacle in the earlier chart»). И сам Бенген даёт два разных минимума для одного и
+   того же графика: «about 35 years» в описании Figure 1(B) и «**before 33 years**» в выводах.
+7. 🔴 **Итоговая рекомендация Бенгена по активам — не 50/50, а «as close to 75 percent
+   [stocks] as possible, and in no cases less than 50 percent».** 50/50 — «an arbitrary asset
+   allocation chosen for purposes of illustration», а горизонт 50 лет — «chosen arbitrarily»,
+   то есть столбцы «50 лет» на графиках цензурированы справа.
+8. 🔴 **Felfernig et al. IUI '08 отвечает не на тот вопрос, под который стоял в очереди.** По
+   аннотации — «automated adaptation of utility constraint sets based on solutions for
+   **nonlinear optimization problems**», то есть подгонка ВЕСОВ скоринговых правил под
+   ожидания экспертов, а **не** алгоритм repair при пустом множестве альтернатив. Пункт надо
+   переклассифицировать из Г4.1 (repair) в тему калибровки весов.
+9. 🔴 **Reiter 1987 и QuickXplain не связаны так, как утверждают вторичные пересказы.**
+   В списке литературы Junker 2004 (снят полностью) **ссылки на Reiter нет**. Общий предок —
+   работы по TMS (de Kleer 1986, Doyle 1979). И это разные объекты: QuickXplain ищет
+   **минимальный конфликт (MUS)**, Reiter перечисляет **все минимальные диагнозы (MCS)** —
+   Rodler 2022 прямо перечисляет их как разные манифестации задачи MSMP.
+10. 🔴 **Поправка Greiner et al. 1989 подтверждена, но её обычная формулировка — огрубление.**
+    Правильно: **теоремы Райтера (4.4, 4.8) не тронуты; неполон ПСЕВДОКОД обрезки** — он теряет
+    минимальные hitting sets при НЕминимальных конфликтах из-за взаимодействия правила (3iii)
+    с правилами (3i)/(3ii); плюс в алгоритме не была записана перемаркировка родителя, хотя в
+    тексте статьи она обсуждалась. Дословно у Greiner: «Reiter's description (in the text)…
+    is basically correct. However, the algorithm did not accurately follow his text.»
+    **Следствие для нас: реализовывать HS-DAG, а не HS-tree** — наши конфликты будут
+    неминимальными, то есть ровно в условии срабатывания бага.
+11. 🔴 **Корректность QuickXplain доказана только в 2022 (Rodler), у Junker 2004 доказательства
+    нет.** Утверждение «QuickXplain доказанно корректен» цитировать через Rodler, а не Junker.
+    Симметрично: ключевое свойство полноты HS-tree у Reiter 1987 заявлено без доказательства
+    («The following results are obvious»), доказано только Greiner et al. 1989 (их слова:
+    «The claim is stated, **without proof** on [3, p. 72]»).
+12. 🔴 **Пять раундов нашей калибровки весов — сверх методической нормы.** Linstone & Turoff:
+    «**three rounds proved sufficient to attain stability**; further rounds tended to show very
+    little change and **excessive repetition was unacceptable to participants**». И критерий
+    остановки методологически иной, чем принято думать: «**Stability of the distribution…
+    is a more significant measure for developing a stopping criterion than degree of
+    convergence.**»
+13. 🔴 **Каппу нельзя публиковать в одиночку.** Оба парадокса Feinstein & Cicchetti бьют
+    в наш сценарий перекошенных экспертных оценок; рост κ между раундами может быть артефактом
+    изменения маргиналов, а не ростом согласия. Плюс: после Delphi-процедуры с обратной связью
+    оценки экспертов **не независимы**, а каппа определена для независимых наблюдателей —
+    это дополнительное, отдельное ограничение на её интерпретацию у нас.
+14. 🔴 **Условие применимости QuickXplain к нашей задаче проверяемо и выполняется:**
+    единственное требование — **монотонность** предиката (Junker, с. 168: «monotonic
+    satisfiability property»; Rodler, Def. 1). Инварианты Rt ≥ 0 и ПДН ≤ 0,40 монотонны по
+    снятию пользовательских требований. При СТРОГОМ ТОТАЛЬНОМ порядке требований
+    предпочтительные конфликт и релаксация **единственны** — значит UX не обязан показывать
+    пользователю выбор из множества объяснений.
+15. 🔴 **SAW — частный случай MAVT, а MAVT не учитывает риск** (Omega-статья, §4, дословно).
+    Наше разделение «SAW ранжирует — SES+Монте-Карло оценивает риск» методологически
+    корректно. И отдельно: нормировка меняет фактический вес, уже заданный экспертами
+    (там же, фактор (c)), — значит менять схему нормировки без перекалибровки весов нельзя.
+16. 🔴 **Методологический пробел, вскрытый Бенгеном:** правило 4 % построено прогоном политики
+    по ВСЕМ историческим стартовым датам с отчётом по ХУДШЕЙ когорте. У нас такого backtest'а
+    по скользящим когортам на исторических рядах РФ нет, и он дешевле Монте-Карло.
+
+## Замеры каналов, добавленные этим добором (для протокола)
+
+- **cdn.aaai.org отдаёт труды AAAI напрямую**, шаблон `AAAI04-NNN.pdf`; номер статьи
+  вычисляется подсчётом позиции в оглавлении `AAAI04-000.pdf` и проверяется соседями.
+- **`r.jina.ai` НЕ пробивает Cloudflare** — подтверждено трижды: ACM DL (463 б),
+  dentalage.co.uk (862 б), nottingham-repository (549 б). Он лечит антибот-заглушки
+  издательских SPA (jclinepi, biomedcentral, rpc.cfainstitute сработали), но не Cloudflare.
+- **Wayback с `id_` сработал дважды в этом доборе** (Landis & Koch; книга Linstone & Turoff),
+  оба раза на файлах, недоступных на живом сайте. Точечный CDX по КОНКРЕТНОМУ URL работает;
+  CDX с масками и фильтрами — **HTTP 403 «This type of CDX query requires authorization»**,
+  а `archive.org/wayback/available` — **HTTP 429**.
+- 🔴 **Частично скачанный PDF выглядит валидно по HTTP-коду.** arXiv:1810.11078 при `-m 60`
+  дал HTTP 200 и 2 179 072 байта, но `pdftotext` выдал «Invalid XRef entry 0 / Top-level pages
+  object is wrong type (null)». Проверять вывод `pdftotext` на ошибки, а не только код ответа
+  и размер.
+- **ScienceDirect: HTTP 403 при теле 832 805 байт** — подтверждён прежний замер сессии.
+- **SSRN: HTTP 403 при теле 896 437 байт** — тот же класс, вопреки записи «SSRN берётся
+  `curl`-ом»; на `papers.cfm` и на `Delivery.cfm` одинаково.
+- **Unpaywall различает «не нашли» и «открытого доступа нет»** — за добор это дало пять
+  твёрдых отрицательных результатов (`oa_status: closed`) вместо бесконечного перебора зеркал:
+  Reiter (Elsevier), Felfernig (ACM), Landis & Koch (JSTOR), Feinstein (Elsevier), Fox и
+  Federgruen (INFORMS), Michaud (FAJ).
+
+**Конец добора Г4.**

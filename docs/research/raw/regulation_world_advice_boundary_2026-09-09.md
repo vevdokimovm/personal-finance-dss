@@ -1343,3 +1343,925 @@ handbook.fca.org.uk, fca.org.uk, esma.europa.eu, EUR-Lex по MiFID II) и те�
 `r.jina.ai` там, где EUR-Lex отдавал 202/0, а `sec.gov` и `justia` — 403. PDF разбирались
 `pdftotext`.
 
+
+---
+
+## ДОБОР Г2 — Г2.1 Mortgage Credit Directive 2014/17/EU (дословно)
+
+Добыто 11.09.2026. Источник: Directive 2014/17/EU of the European Parliament and of the Council of 4 February 2014 on credit agreements for consumers relating to residential immovable property (CELEX 32014L0017), https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32014L0017 .
+Каналы: прямой `curl -sk --http1.1` с браузерным UA — HTTP 200, 544 103 байта (HTML); текстовый прокси `r.jina.ai` — HTTP 200, 258 284 байта (цитаты ниже сняты из него). Редакция — исходная (as adopted); консолидированные поправки не сверялись.
+
+**Article 4, point (21) — определение:**
+
+> (21) ‘Advisory services’ means the provision of personal recommendations to a consumer in respect of one or more transactions relating to credit agreements and constitutes a separate activity from the granting of a credit and from the credit intermediation activities set out in point 5.
+
+Проверочная формулировка вахты подтверждена дословно.
+
+**Article 4, point (5) — credit intermediary (нужно для понимания, кто «допущен»):**
+
+> (5) ‘Credit intermediary’ means a natural or legal person who is not acting as a creditor or notary and not merely introducing, either directly or indirectly, a consumer to a creditor or credit intermediary, and who, in the course of his trade, business or profession, for remuneration …: (a) presents or offers credit agreements to consumers; (b) assists consumers by undertaking preparatory work or other pre-contractual administration in respect of credit agreements other than as referred to in point (a); or (c) concludes credit agreements with consumers on behalf of the creditor.
+
+**Article 3(1) — сфера:** «(a) credit agreements which are secured either by a mortgage or by another comparable security … on residential immovable property …; and (b) credit agreements the purpose of which is to acquire or retain property rights in land or in an existing or projected building.»
+
+**Article 22 — Standards for advisory services (ключевые части дословно):**
+
+> 1. Member States shall ensure that the creditor, credit intermediary or appointed representative explicitly informs the consumer, in the context of a given transaction, whether advisory services are being or can be provided to the consumer.
+>
+> 2. … before the provision of advisory services … provides the consumer with the following information on paper or another durable medium:
+> (a) **whether the recommendation will be based on considering only their own product range** in accordance with point (b) of paragraph 3 **or a wide range of products from across the market** in accordance with point (c) of paragraph 3 so that the consumer can understand the basis on which the recommendation is made;
+> (b) where applicable, the fee payable by the consumer for the advisory services or … the method used for its calculation.
+>
+> 3. Where advisory services are provided to consumers, Member States shall ensure, in addition to the requirements set out in Articles 7 and 9, that:
+> (a) … obtain the necessary information regarding the consumer’s personal and financial situation, his preferences and objectives so as to enable the recommendation of suitable credit agreements. Such an assessment shall be based on information that is up to date … and shall take into account reasonable assumptions as to risks to the consumer’s situation over the term of the proposed credit agreement;
+> (b) creditors, tied credit intermediaries … consider a sufficiently large number of credit agreements in their product range and recommend a suitable credit agreements or several suitable credit agreements from among their product range …;
+> (c) non-tied credit intermediaries … consider a sufficiently large number of credit agreements available on the market and recommend a suitable credit agreement or several … available on the market …;
+> (d) … act in the best interests of the consumer …; and
+> (e) … give the consumer a record on paper or on another durable medium of the recommendation provided.
+>
+> 4. Member States may prohibit the use of the term ‘advice’ and ‘advisor’ … [условия на ‘independent advice’: sufficiently large number of credit agreements available on the market; не вознаграждение от кредиторов] … Member States may impose more stringent requirements in relation to the use of the terms ‘independent advice’ or ‘independent advisor’ …, including a ban on receiving remuneration from a creditor.
+>
+> 5. Member States may provide for an obligation … to warn a consumer when, considering the consumer’s financial situation, a credit agreement may induce a specific risk for the consumer.
+>
+> 🔴 **6. Member States shall ensure that advisory services are only provided by creditors, credit intermediaries or appointed representatives.**
+>
+> Member States may decide not to apply the first subparagraph to persons:
+> (a) carrying out the credit intermediation activities … or providing advisory services where those activities are carried out or services are provided **in an incidental manner** in the course of a professional activity and that activity is regulated …;
+> (b) **providing advisory services in the context of managing existing debt** which are insolvency practitioners where that activity is regulated by legal or regulatory provisions **or public or voluntary debt advisory services which do not operate on a commercial basis**; or
+> (c) providing advisory services who are not creditors, credit intermediaries or appointed representatives where such persons are **admitted and supervised by competent authorities in accordance with the requirements for credit intermediaries under this Directive**.
+>
+> Persons benefiting from the waiver in the second subparagraph shall not benefit from the right referred to in Article 32(1) to provide services for the entire territory of the Union.
+>
+> 🟢 **7. This Article shall be without prejudice to Article 16 and to Member States’ competence to ensure that services are made available to consumers to help them understand their financial needs and which types of products are likely to meet those needs.**
+
+**Article 29(1) — допуск (admission):**
+
+> 1. Credit intermediaries shall be duly admitted to carry out all or part of the credit intermediation activities set out in point 5 of Article 4 **or to provide advisory services** by a competent authority in their home Member State. …
+
+Art. 29(2): требования допуска — (a) professional indemnity insurance (минимальная сумма — RTS EBA), (b) good repute (чистая судимость по имущественным/финансовым преступлениям, не банкрот), (c) knowledge and competence по Annex III.
+
+**Article 7(1)** — conduct of business: при оказании advisory services «the activity shall in addition be based on the information required under point (a) of Article 22(3)». **Art. 7(4)**: при advisory services вознаграждение персонала «is not contingent on sales targets».
+
+**Article 25 — Early repayment (право потребителя):** «1. Member States shall ensure that the consumer has a right to discharge fully or partially his obligations under a credit agreement prior to the expiry of that agreement. …» **Art. 25(4)**: «Where a consumer seeks to discharge his obligations … prior to the expiry of the agreement, **the creditor shall provide the consumer** without delay … with the information necessary to consider that option. That information shall at least **quantify the implications for the consumer** of discharging his obligations prior to the expiry of the credit agreement and clearly set out any assumptions used.»
+
+**Article 43(1) — переходное:** «This Directive shall not apply to credit agreements existing before 21 March 2016.» **Art. 42**: транспозиция до 21.03.2016, применение с 21.03.2016.
+
+**Преамбула, дословно, что НЕ является personal recommendation:**
+- Recital (48): кредиторы должны объяснять характеристики продуктов «in a personalised manner … **Such explanations should not in itself constitute a personal recommendation.**»
+- Recital (63): «Providing advice in the form of a personalised recommendation is a distinct activity which may but need not be combined with other aspects of granting or intermediating credit.»
+- Recital (64): «Those providing advisory services should be able to specialise in certain ‘niche’ products such as bridging finance …»
+
+### Разбор Г2.1 (исследовательский, не юридическое заключение)
+
+1. **Режим MCD — резервирование + допуск, как в CCD II.** Art. 22(6) — ровно та же конструкция, что Art. 16(6) CCD II (найдена ранее в §5.8): оказывать advisory services могут только кредиторы, кредитные посредники и их представители; третье лицо — только через допуск «in accordance with the requirements for credit intermediaries» (Art. 22(6)(c) + Art. 29). В отличие от CCD II, MCD **оставляет государству выбор** («Member States may decide not to apply»), то есть независимый ипотечный советник возможен лишь там, где государство открыло дерогацию (c), и паспорта на весь ЕС у него нет (последний абзац Art. 22(6)).
+2. 🔴 **Главный вопрос — «покрывает ли совет о досрочном погашении уже существующей ипотеки»: текст директивы даёт косвенный аргумент ЗА.** Дерогация (b) говорит о лицах, «providing advisory services **in the context of managing existing debt**». Если бы советы в контексте управления существующим долгом вообще не были «advisory services», изымать их из резервирования было бы не нужно. Это аргумент систематического толкования, а не прямая норма; противоположный аргумент — стандарты Art. 22(3)(b)–(c) целиком описывают **выбор кредитного договора** («recommend a suitable credit agreement … available on the market»), и для совета «гасить досрочно» они неисполнимы по смыслу. Официального толкования Комиссии/EBA по этому вопросу в этом доборе не найдено (см. ниже).
+3. 🟢 **Нейтральная зона прямо названа в тексте — Art. 22(7):** государства вправе обеспечивать услуги, которые помогают потребителю «understand their financial needs and **which types of products** are likely to meet those needs». Это та же линия, что generic advice в MiFID (тип, а не конкретный продукт). Для FINPILOT она покрывает объяснение «тип: досрочное погашение/рефинансирование/резерв», но не «гасите ипотеку X ₽ сейчас» — последнее ближе к personal recommendation.
+4. **Art. 25(4) важен продуктово:** количественные последствия досрочного погашения ипотеки обязан раскрыть **кредитор** по запросу потребителя. То есть в ЕС сам расчёт «что будет, если погасить досрочно» — нормированная обязанность банка, а не зона независимого советника. В B2B-сценарии встраивания FINPILOT в банк именно этот расчёт — законная функция банка.
+5. **Art. 43(1):** директива не применяется к договорам, существующим до 21.03.2016 — старые ипотеки вне её режима (национальное право могло распространить).
+
+
+### Г2.1 — транспозиция MCD: Германия и Ирландия (дословно)
+
+**Германия — § 34i GewO (Gewerbeordnung).** https://www.gesetze-im-internet.de/gewo/__34i.html — прямой `curl` дал код 000 (таймаут соединения, 0 байт); через `r.jina.ai` — HTTP 200, 6 642 байта, текст нормы полностью.
+
+> (1) Wer gewerbsmäßig den Abschluss von Immobiliar-Verbraucherdarlehensverträgen im Sinne des § 491 Absatz 3 des Bürgerlichen Gesetzbuchs … vermitteln will **oder Dritte zu solchen Verträgen beraten will** (Immobiliardarlehensvermittler), **bedarf der Erlaubnis der zuständigen Behörde.** …
+>
+> (2) Die Erlaubnis ist zu versagen, wenn … 3. der Antragsteller den Nachweis einer Berufshaftpflichtversicherung … nicht erbringen kann, 4. der Antragsteller nicht durch eine vor der Industrie- und Handelskammer erfolgreich abgelegte Prüfung nachweist, dass er die Sachkunde … besitzt …, oder 🔴 **5. der Antragsteller seine Hauptniederlassung oder seinen Hauptsitz nicht im Inland hat oder seine Tätigkeit als Immobiliardarlehensvermittler nicht im Inland ausübt.**
+>
+> (3) Keiner Erlaubnis … bedürfen Kreditinstitute, für die eine Erlaubnis nach § 32 Absatz 1 des Kreditwesengesetzes erteilt wurde, …
+>
+> (4) Keiner Erlaubnis … bedarf ein Immobiliardarlehensvermittler, der … im Umfang seiner Erlaubnis handelt, die nach Artikel 29 der Richtlinie 2014/17/EU … durch einen anderen Mitgliedstaat … erteilt worden ist. …
+>
+> (5) Gewerbetreibende nach den Absätzen 1 und 4, die eine unabhängige Beratung anbieten oder als unabhängiger Berater auftreten (**Honorar-Immobiliardarlehensberater**), 1. müssen für ihre Empfehlung **für oder gegen einen Immobiliar-Verbraucherdarlehensvertrag** … eine hinreichende Anzahl von entsprechenden auf dem Markt angebotenen Verträgen heranziehen und 2. dürfen vom Darlehensgeber keine Zuwendungen annehmen und von ihm in keiner Weise abhängig sein. Honorar-Immobiliardarlehensberater dürfen keine Tätigkeit als Immobiliardarlehensvermittler und Immobiliardarlehensvermittler dürfen keine Tätigkeit als Honorar-Immobiliardarlehensberater ausüben.
+>
+> (8) … sich unverzüglich nach Aufnahme ihrer Tätigkeit in das Register nach § 11a Absatz 1 eintragen zu lassen …
+
+**Германия — § 511 BGB «Beratungsleistungen bei Immobiliar-Verbraucherdarlehensverträgen».** https://www.gesetze-im-internet.de/bgb/__511.html — `curl`, HTTP 200, 4 916 байт.
+
+> (1) Bevor der Darlehensgeber dem Darlehensnehmer **individuelle Empfehlungen zu einem oder mehreren Geschäften erteilt, die im Zusammenhang mit einem Immobiliar-Verbraucherdarlehensvertrag stehen (Beratungsleistungen)**, hat er den Darlehensnehmer über die sich aus Artikel 247 § 18 des Einführungsgesetzes zum Bürgerlichen Gesetzbuche ergebenden Einzelheiten … zu informieren.
+> (2) … hat der Darlehensgeber eine ausreichende Zahl an Darlehensverträgen zumindest aus seiner Produktpalette auf ihre Geeignetheit zu prüfen.
+> (3) Der Darlehensgeber hat dem Darlehensnehmer … ein geeignetes oder mehrere geeignete Produkte zu empfehlen **oder ihn darauf hinzuweisen, dass er kein Produkt empfehlen kann.** …
+
+§ 655a(3) BGB (https://www.gesetze-im-internet.de/bgb/__655a.html, `curl`, HTTP 200, 6 028 байт): для Darlehensvermittler, оказывающего Beratungsleistungen, «so gilt § 511 entsprechend … mit der Maßgabe, dass der Darlehensvermittler eine ausreichende Zahl von am Markt verfügbaren Darlehensverträgen zu prüfen hat».
+
+**Разбор Германии.** (1) Германия воспользовалась дерогацией Art. 22(6)(c) MCD: независимый советник по ипотеке **допустим, но только с Erlaubnis** по § 34i(1) и под именем Honorar-Immobiliardarlehensberater (§ 34i(5)). (2) Предмет немецкой нормы сформулирован **уже**, чем в директиве: «Dritte **zu solchen Verträgen** beraten» и «Empfehlung **für oder gegen einen** Immobiliar-Verbraucherdarlehensvertrag» — речь о заключении/выборе договора. Совет о досрочном погашении существующего договора текстом § 34i прямо не назван; § 511(1) BGB шире («Geschäften … im Zusammenhang mit» договором), но адресован Darlehensgeber, то есть банку. Толкование BaFin/IHK на вопрос «покрывает ли досрочное погашение» — не найдено. (3) 🔴 **§ 34i(2) Nr. 5: разрешение не выдаётся, если головной офис не в Германии** — для FINPILOT, оказывающего услугу из-за пределов ЕС, немецкая лицензия недоступна в принципе (кроме пути § 34i(4) — паспорт другого государства-члена ЕС/ЕЭЗ по Art. 29 MCD, но у советника по дерогации Art. 22(6) паспорта нет, см. последний абзац Art. 22(6)).
+
+**Ирландия — S.I. No. 142 of 2016, European Union (Consumer Mortgage Credit Agreements) Regulations 2016.** https://www.irishstatutebook.ie/eli/2016/si/142/made/en/print — `curl`, HTTP 200, 320 389 байт. Редакция — as made (поправки не сверялись).
+
+> Reg. 3(1): “advisory services” means the provision of personal recommendations to a consumer in respect of one or more transactions relating to credit agreements and constitutes a separate activity from the granting of a credit and from credit intermediation activities;
+>
+> Reg. 23(7): **Advisory services shall only be provided by**— (a) a creditor; (b) a mortgage credit intermediary; (c) a barrister, solicitor or accountant providing advisory services if— (i) he or she is subject to regulation by a professional body, and (ii) those services are provided in an incidental manner in the course of a professional activity; (d) any of the following (**but only in the context of managing existing debt**)— (i) an approved intermediary authorised under section 47 of the Personal Insolvency Act 2012 … or a personal insolvency practitioner …; (ii) **a debt management firm authorised by the Central Bank**; (iii) a charitable organisation within the meaning of section 2(1) of the Charities Act 2009 …; (iv) **the Money Advice and Budgeting Service**; (v) a person who is a party to the “Protocol for Independent Advice to Borrowers Availing of Long Term Mortgage Forbearance” made on 2 August 2012 … .
+>
+> Reg. 23(10): A creditor or mortgage credit intermediary **or other person who contravenes a provision of this Regulation commits an offence.**
+
+**Разбор Ирландии.** (1) Ирландия, в отличие от Германии, дерогацию (c) — «любое допущенное лицо» — **не открыла**: список закрытый. Коммерческий независимый советник по ипотеке может работать только как mortgage credit intermediary либо — «only in the context of managing existing debt» — как **debt management firm authorised by the Central Bank**. (2) 🔴 Ирландский законодатель прямо выделил категорию «советы в контексте управления существующим долгом» внутри режима advisory services и допустил туда лицензированные debt management firms — **это прямое подтверждение, что национальный законодатель читает «advisory services» MCD как включающие советы по уже существующему ипотечному долгу**, иначе категория (d) была бы лишней. (3) Нарушение Reg. 23 — уголовное правонарушение (offence) для «other person» (Reg. 23(10)), то есть норма адресована и нелицензированным третьим лицам.
+
+
+## ДОБОР Г2 — Г2.4 SEC Release No. 33-11377 (дословно)
+
+Добыто 11.09.2026. https://www.sec.gov/files/rules/final/2025/33-11377.pdf — `curl -sk --http1.1` с UA, содержащим контакт, HTTP 200, 182 621 байт PDF; `pdftotext` — 14 955 байт текста. (Браузерный UA на sec.gov ранее давал 403 — подтверждено правило вахты: нужен UA с контактом.) Страница Federal Register https://www.federalregister.gov/documents/2025/06/17/2025-11110/withdrawal-of-proposed-regulatory-actions — HTTP 200, 92 260 байт (не разбиралась, PDF — первоисточник).
+
+Реквизиты: «[Release Nos. **33-11377; 34-103247; IA-6885; IC-35635**; File Nos. S7-20-22; **S7-12-23**; …] RINs … **3235-AN14** … **Withdrawal of Proposed Regulatory Actions** … ACTION: Notice of withdrawal of proposed rules.» Подписано: «By the Commission. **Dated: June 12, 2025.** Sherry R. Haywood». В силе «as of June 17, 2025».
+
+> SUMMARY: The Securities and Exchange Commission (“Commission”) is formally withdrawing certain notices of proposed rulemaking issued between March 2022 and November 2023. **The Commission does not intend to issue final rules with respect to these proposals.** If the Commission decides to pursue future regulatory action in any of these areas, it will issue a new proposed rule.
+
+Что отозвано по нашей теме:
+
+> Conflicts of Interest Associated with the Use of Predictive Data Analytics by Broker-Dealers and Investment Advisers
+> On August 9, 2023, the Commission published proposed new rules under the Securities Exchange Act of 1934 (“Exchange Act”) and the Investment Advisers Act of 1940 (“Advisers Act”) to, among other things, address certain interactions between broker-dealers or investment advisers and investors through these firms’ use of predictive data analytics. [сноска: 88 FR 53960 (August 9, 2023)]
+
+Почему — единственная мотивировка в тексте:
+
+> Withdrawal of Proposed Rules
+> **We are withdrawing these proposals because, as noted above, we no longer intend to issue final rules with respect to these proposals.** If the Commission decides to pursue future regulatory action in any of these areas, it will do so by publishing a new proposed rule or other issuance consistent with the requirements of the Administrative Procedure Act, as applicable.
+
+**Разбор.** (1) Прежняя запись файла (§5-бис) подтверждена дословно. (2) Содержательной мотивировки («правило ошибочно», «рынок сам») в релизе **нет** — только «no longer intend». Утверждать, что SEC «сочла регулирование ИИ ненужным», по этому тексту нельзя. (3) Отзыв пакетный: 14 предложений 2020–2023 гг. одним актом, среди них также safeguarding (custody) и cybersecurity для advisers — это смена повестки Комиссии, а не решение по PDA по существу. (4) Для FINPILOT вывод прежний: специального федерального режима «алгоритм в совете» нет, и отозванное правило в любом случае адресовалось BD/IA.
+
+
+## ДОБОР Г2 — Г2.3 art. 72A RAO и PERG 2.9.18G (UK, исключение для information society services)
+
+Добыто 11.09.2026.
+
+**(1) art. 72A RAO — текущее состояние.** https://www.legislation.gov.uk/uksi/2001/544/article/72A — `curl`, HTTP 200, 41 878 байт. Страница «up to date with all changes known to be in force on or before 11 September 2026». Текст статьи на сайте — дословно:
+
+> Information society services
+> F1 72A. . . . . . . . . . . . . . . . . . . . . . . . . .
+> Textual Amendments
+> F1 **Art. 72A omitted (31.12.2020)** by virtue of The Electronic Commerce and Solvency 2 (Amendment etc.) (EU Exit) Regulations 2019 (**S.I. 2019/1361**), regs. 1(2), 5(2) (with regs. 11-28) (as amended by S.I. 2019/1390, regs. 1(2), 6); 2020 c. 1, Sch. 5 para. 1(1)
+
+История версий на той же странице: 21/08/2002 · 11/01/2005 · 24/03/2015 · 01/01/2016 · 29/11/2018 · 01/04/2019 · **31/12/2020**. Отметки outstanding: «Order revoked by 2023 c. 29 Sch. 1 Pt. 5» (Financial Services and Markets Act 2023 — отмена RAO целиком ещё не введена в силу; RAO пока действует).
+
+**(2) PERG 2.9.18G — редакция до Brexit.** Текущий handbook.fca.org.uk отдаёт 301 на себя же (`curl`, 167 байт), `r.jina.ai` возвращает страницу PERG 2.10 (26 766 байт, 2.9.18 не найдено). Добыто через Wayback: CDX API вернул 26 снимков 2015–2025; снимок `https://web.archive.org/web/20190718233738id_/https://www.handbook.fca.org.uk/handbook/PERG/2/9.html` — HTTP 200, 145 155 байт. Дословно:
+
+> Incoming ECA providers
+> **PERG 2.9.18 G** 01/01/2016
+> (1) In accordance with article 3(2) of the E-Commerce Directive, all requirements on persons providing electronic commerce activities into the United Kingdom **from the EEA** are lifted, where these fall within the co-ordinated field and would restrict the freedom of such a firm to provide services. The coordinated field includes any requirement of a general or specific nature concerning the taking up or pursuit of electronic commerce activities. Authorisation requirements fall within the coordinated field. The services affected are generally those provided electronically, for example through the Internet or solicited e-mail.
+> (2) The Regulated Activities Order was amended by the Financial Services and Markets Act 2000 (Regulated Activities) (Amendment) (Electronic Commerce Directive) Order 2002 (SI 2002/2157). This Order creates a general exclusion from regulated activities (except for the regulated activities of effecting or carrying out contracts of insurance). Where activities consist of electronic commerce activities, **an incoming ECA provider will not require authorisation for such activities in the United Kingdom**. … However, services provided off-line in the United Kingdom … by such a firm which amount to regulated activities still require authorisation.
+> (3) Incoming ECA providers should note that notification requirements under the Single Market Directives still apply (see SUP 13A).
+
+И в той же главе (PERG 2.9.1G(2) того же снимка): «The exclusion described in PERG 2.9.18 G relates to electronic commerce activities provided by an **incoming ECA provider**. This exclusion applies to all regulated activities except effecting or carrying out contracts of insurance.»
+
+**(3) PERG 2.9 — текущая редакция.** Снимок `…/web/20251207183722id_/…/PERG/2/9.html` — HTTP 200, 35 753 байта; строк «2.9.18» и «Information society» в нём **нет** (0 совпадений) — раздел удалён вместе с art. 72A.
+
+### Разбор Г2.3
+
+🔴 **Гипотеза файла (строка «art. 72A … вывод о неприменимости к третьим странам после Brexit помечен как гипотеза») — подтверждена в сильной форме: исключения больше не существует вовсе, а не только для третьих стран.** С 31.12.2020 art. 72A исключена из RAO (S.I. 2019/1361), PERG 2.9.18G из Perimeter Guidance удалён. Даже в период действия исключение работало только для **incoming ECA provider** — поставщика, учреждённого **в ЕЭЗ** (механизм article 3(2) E-Commerce Directive, «country of origin»). Российский или любой иной не-ЕЭЗ поставщик под него не подпадал никогда. **Вывод: путь «оказываем онлайн из-за рубежа — значит вне британского debt counselling» закрыт; остаётся только общий вопрос территориальности («by way of business in the UK», s. 19 и s. 418 FSMA) и исключение для overseas persons (art. 72 RAO), которое для debt counselling не проверялось в этом доборе.**
+
+
+## ДОБОР Г2 — Г2.5 UDMSA — официальный текст (дословно)
+
+Добыто 11.09.2026. «UNIFORM DEBT-MANAGEMENT SERVICES ACT (Last Revised or Amended in 2008)», National Conference of Commissioners on Uniform State Laws — https://www.ftc.gov/sites/default/files/documents/public_events/consumer-protection-and-debt-settlement-industry/udmsafinal.pdf (копия официального текста NCCUSL в материалах FTC; ссылка найдена через WebSearch; сайт uniformlaws.org PDF в выдаче не дал — библиотека сообщества за входом). `curl` — HTTP 200, 422 105 байт, PDF 44 страницы; `pdftotext` — 271 935 байт.
+
+**Section 2 — определения:**
+
+> (7) “Concessions” means assent to repayment of a debt on terms more favorable to an individual than the terms of the contract between the individual and a creditor.
+>
+> (9) **“Debt-management services” means services as an intermediary between an individual and one or more creditors of the individual for the purpose of obtaining concessions**, but does not include:
+> (A) legal services provided in an attorney-client relationship by an attorney licensed …;
+> (B) accounting services provided in an accountant-client relationship by a certified public accountant …; or
+> (C) **financial-planning services provided in a financial planner-client relationship by a member of a financial-planning profession** whose members the administrator, by rule, determines are (i) licensed by this state; (ii) subject to a disciplinary mechanism; (iii) subject to a code of professional responsibility; and (iv) subject to a continuing-education requirement.
+>
+> (13) “Plan” means a program or strategy in which a provider furnishes debt-management services to an individual and which includes a schedule of payments to be made by or on behalf of the individual and used to pay debts owed by the individual.
+>
+> (15) “Provider” means a person that provides, offers to provide, or agrees to provide debt-management services directly or through others.
+
+**Section 3 — изъятия (выборка):**
+
+> (a) This [act] does not apply to an agreement with an individual who the provider has no reason to know resides in this state at the time of the agreement.
+> (b) This [act] does not apply to a provider to the extent that the provider: (1) provides or agrees to provide debt-management, educational, or counseling services to an individual who the provider has no reason to know resides in this state …; or (2) **receives no compensation for debt-management services** from or on behalf of the individuals … or from their creditors.
+> (c) … (2) a bank; (3) an affiliate … of a bank if the affiliate is regulated by a federal or state banking regulatory authority; or (4) a title insurer, escrow company, or other person that provides bill-paying services if the provision of debt-management services is incidental to the bill-paying services.
+
+Официальный Comment к Section 3, п. 1: «Under section 2(15) a person may be a provider **even if the person has no physical presence in this state.**» П. 5: «A provider whose ads reach, or whose website is accessible to, individuals who reside in this state but who does not enter agreements with or provide services to those individuals is not offering to provide debt-management services to residents of this state.»
+
+**Section 4(a):** «a provider may not provide debt-management services to an individual who it reasonably should know resides in this state at the time it agrees to provide the services, **unless the provider is registered** under this [act].» Section 4(d) [в скобках, опция штата] — регистрация только not-for-profit 501(c); Legislative Note: «This section implements the state’s decision concerning whether for-profit entities are permitted to provide debt-management services.»
+
+**Какие штаты приняли** — сниппет выдачи WebSearch 11.09.2026 (первоисточник — карта принятий uniformlaws.org — не открыт): «adopted in Colorado, Delaware, Missouri, Nevada, Rhode Island, Tennessee, and Utah … the Virgin Islands have also adopted the UDMSA with modifications»; Utah — первый штат, 2006. Косвенные подтверждения по выдаче: Nevada NRS Chapter 676A (https://www.leg.state.nv.us/nrs/nrs-676a.html), Delaware AG «Debt Management Services Act» (https://attorneygeneral.delaware.gov/fraud/cpu/debtmanadvisory/), Utah Code Title 13 Ch. 42 (добыт ранее). Wikipedia (API, HTTP 200, 7 979 байт) пишет лишь «more than 20 states are executed to introduce the act in 2009» — число принявших не называет.
+
+### Разбор Г2.5
+
+1. **Прежний вывод файла по UDMSA подтверждён по официальному тексту модели, а не только по кодификации Юты:** триггер — «intermediary between an individual and … creditors **for the purpose of obtaining concessions**». Совет без контакта с кредиторами и без переговоров об уступках (FINPILOT: гасить досрочно по договору, без изменения условий) под определение не подпадает; план с графиком платежей (2(13)) — производное понятие, «in which a provider furnishes debt-management services», то есть без посредничества планом в смысле акта не является.
+2. Отдельно: даже планировщик внутри определения мог бы быть изъят по 2(9)(C), но только если он член **лицензируемой штатом** профессии планировщиков — такой профессии в большинстве штатов нет, так что для нас это изъятие мёртвое и не нужно.
+3. **Экстерриториальность:** отсутствие физического присутствия в штате не спасает (Comment 1). Для нас это безразлично, пока мы вне определения.
+4. 🔴 **UDMSA — лишь 7 штатов + Виргинские острова (по сниппету).** Остальные штаты держат собственные законы о debt adjusting / credit counseling, и часть из них построена широко, как вашингтонский RCW 18.28.010 («managing, counseling … prorating … of the indebtedness») — ранее найденный риск это не снимает, а подтверждает: безопасная UDMSA-модель — меньшинство.
+
+
+## ДОБОР Г2 — Г2.2 CCD II (Directive (EU) 2023/2225): досрочное погашение и debt advisory services
+
+Добыто 11.09.2026. Текст — CELEX 32023L2225 через `r.jina.ai`, HTTP 200, 207 412 байт (тот же размер, что при добыче 09.09.2026 — текст не менялся). Art. 3(17), 3(22), 16(3), 16(6), 36, 48 уже процитированы в §5.8; ниже — только новое.
+
+**Art. 3(21) — определение досрочного погашения:**
+> (21) ‘early repayment’ means the full or partial discharge of the consumer’s obligations under a credit agreement, before the date agreed in the credit agreement;
+
+**Art. 16(6)(b) и (c) — полные формулировки дерогаций (в §5.8 были сокращены):**
+> (b) the advisory services are provided **in the context of management of existing debt** by insolvency practitioners and where that management activity is regulated by legal or regulatory provisions;
+> (c) the advisory services are provided **in the context of management of existing debt** by public or voluntary providers of debt advisory services as referred to in Article 36 which do not operate on a commercial basis;
+
+**Art. 2(2)(l) — сфера, переходное:**
+> 2. This Directive does not apply to the following: … (l) **credit agreements existing on 20 November 2026**; however, Articles 23 and 24, Article 25(1), second sentence, Article 25(2) and Articles 28 and 39 shall apply to all open-end credit agreements existing on 20 November 2026.
+
+Art. 47, второй абзац: «Notwithstanding the first paragraph, Directive 2008/48/EC shall continue to apply to credit agreements existing on 20 November 2026 until their termination.»
+
+**Art. 2(2)(a) — ипотека вне CCD II:** «credit agreements which are secured either by a mortgage, or by another comparable security … on immovable property …» — то есть ипотечный кредит FINPILOT-пользователя в ЕС — это MCD (Г2.1), потребкредит и карты — CCD II.
+
+**Art. 29(1)–(2) — право на досрочное погашение**: «the consumer is at any time entitled to early repayment …»; компенсация кредитору только в период фиксированной ставки, потолок **1 %** (при сроке до окончания больше года) и **0,5 %** (до года) от досрочно погашаемой суммы; Art. 29(4)(a) — государство может установить порог, не выше **EUR 10 000** за 12 месяцев, ниже которого компенсации нет.
+
+**Recital (63)** — кредитор при регулярном овердрафте «should offer the consumer advisory services, where available, to help the consumer identify less expensive alternatives, and redirect the consumer towards debt advisory services». (Норма — Art. 25(2)-подобное положение: «in the case of regular overrunning, the creditor shall offer the consumer advisory services, where available, and redirect the consumer at no cost towards debt advisory services».)
+
+**Recital (81) — debt advisory services, дословно ключевые части:**
+> … Financial difficulties cover a wide variety of situations, for example among many others, having delayed the repayment of debt for more than 90 days. The objective of debt advisory services is to help consumers facing financial difficulties and guide them to repay, as far as possible, their outstanding debts, while maintaining a decent level of life and preserving their dignity. That personalised and independent assistance may include legal counselling, **money and debt management** as well as social and psychological assistance. The assistance should be provided by professional operators which are **not creditors, credit intermediaries, providers of crowdfunding credit services, credit purchasers or credit servicers, and are independent from them.** Member States should ensure that debt advisory services provided by independent professional operators are made available, directly or indirectly and **with only limited charges**, to consumers. **Those charges should in principle only cover operating expenses** … **Member States remain free to maintain or introduce specific requirements for debt advisory services.** …
+
+Art. 36(4): «Member States shall, by 20 November 2026, and every year thereafter, report to the Commission on available debt advisory services»; Комиссия — обзор к 20.11.2028.
+
+**Толкования по вопросу «досрочное погашение = advisory services?»** — поиск WebSearch (запрос «CCD2 "advisory services" early repayment existing credit agreement interpretation», 11.09.2026): **официальных разъяснений Комиссии или EBA не найдено**. Найдено:
+
+(а) **Ирландия, CCPC — Submission to the Department of Finance CCD 2 Consultation (2024).** https://www.ccpc.ie/business/wp-content/uploads/sites/3/2024/10/Consumer-Credit-Directive-CCD-2.pdf → 301 → https://assets.ccpc.ie/data/docs/default-source/about-us/submissions/submissions-2024/submission-to-consumer-credit-directive-cc2.pdf, `curl -L`, HTTP 200, 485 146 байт, `pdftotext` 33 944 байта. Дословно:
+> Question 10 – **Should Ireland continue to allow persons to provide advisory services** on condition that they are provided under a regulated professional framework; provided by regulated insolvency practitioners; provided by non-commercial public or voluntary debt advisory services or provided by persons authorised and supervised by the competent authority?
+> **Yes.** Independent advice by regulated, recognised and authorised services will ensure that consumers continue to avail of protections and impartial assistance, if required, with credit agreements. It is important that any advice received is holistically in the best interest of the consumer and considers their overall financial wellbeing. … A regulated independent professional will impartially review the overall financial health of the consumer and offer comprehensive support.
+
+Это позиция ирландского регулятора по защите потребителей в консультации Минфина (не норма). Итоговый ирландский акт транспозиции CCD II в этом доборе не искался.
+
+(б) **Италия — транспозиция** по Legal500 «Navigating the New Consumer Credit Landscape with CCD II» (https://www.legal500.com/guides/hot-topic/navigating-the-new-consumer-credit-landscape-with-ccd-ii/, `r.jina.ai`, HTTP 200, 16 100 байт; вторичный источник, первоисточник — Decreto legislativo — не открыт): «Italy implemented CCD II through **Legislative Decree No. 212 of December 31, 2025** … Introducing a formal definition of “advisory services” (Article 121 TUB); Regulating advisory activity by lenders and intermediaries (Article 124.2 TUB); **Clarifying that only specific registered intermediaries may provide independent advice**; Distinguishing this from debt counseling services under Article 125-terdecies TUB.»
+
+### Разбор Г2.2
+
+1. 🔴 **Дерогации (b)–(c) Art. 16(6) прямо говорят о «advisory services … in the context of management of existing debt».** Та же логика, что в MCD (Г2.1, п. 2): законодатель ЕС в обоих актах исходит из того, что советы по управлению **уже существующим** долгом **входят** в понятие advisory services — иначе их не нужно было бы изымать из резервирования. Это текстуальный аргумент, а не разъяснение; но он **ослабляет** прежнюю оговорку §8.3 («Art. 16(3)(c) склоняет к прочтению "советы о выборе кредита"»). Корректнее: стандарты Art. 16(3) написаны под выбор кредита, но **периметр** Art. 3(17) + резервирование Art. 16(6) по систематике охватывает и управление существующим долгом.
+2. 🟢 **Смягчающее — Art. 2(2)(l):** CCD II не применяется к кредитным договорам, существующим на 20.11.2026; к ним продолжает применяться CCD 2008/48/EC до их прекращения (Art. 47). В CCD 2008/48/EC режима advisory services и резервирования **нет** (в тексте 2008/48 определения advisory services нет — это новелла CCD II; сверено косвенно: в §5.8 указано, что CCD II «новый и ужесточающий»; первоисточник 2008/48 в этом доборе не открывался — 🟡). Следствие: на переходный период совет по уже существующим на 20.11.2026 кредитам, по буквальному тексту, в периметр Art. 16(6) CCD II не попадает; по кредитам, заключённым после 20.11.2026, — попадает, если это «personal recommendation in respect of … transactions relating to credit agreements». Для продукта с горизонтом в годы это временная, а не структурная ниша.
+3. **Легальная ниша debt advisory services (Art. 36) для FINPILOT как коммерческого продукта — узкая.** Recital (81): операторы должны быть **независимы** от кредиторов, плата — «only limited charges», «in principle only cover operating expenses». Дерогация (c) Art. 16(6) — только для «public or voluntary providers … which do not operate on a commercial basis». То есть подписочная модель FINPILOT под Art. 36 не встаёт. Реалистичные роли: (а) **поставщик ПО для** независимых debt advisory services (некоммерческих организаций, которых государства обязаны обеспечить к 20.11.2026) — B2B2C, где советует оператор, а не мы; (б) **поставщик ПО для кредитора** в рамках Art. 36(2) — «processes and policies in place for the early detection of consumers experiencing financial difficulties» и направление к debt advice. Оба варианта — не норма, а вывод исследователя из текста.
+4. **B2B со встраиванием в банк:** кредитор входит в список тех, кому advisory services **разрешены** по умолчанию (Art. 16(6) первый абзац), но несёт стандарты Art. 16(2)–(5): раскрыть, на какой линейке основан совет; собрать информацию о финансовом положении; best interests; **record of the recommendation on a durable medium**. FINPILOT, встроенный в банк, должен уметь выдавать эту запись — продуктовое требование, а не лицензионное.
+
+
+## ДОБОР Г2 — Г2.4 SEC: staff guidance по финансовому планированию (IA-1092) и практика юрфирм
+
+**SEC Release No. IA-1092 (October 8, 1987), «Applicability of the Investment Advisers Act to Financial Planners, Pension Consultants, and Other Persons Who Provide Investment Advisory Services as a Component of Other Financial Services»** — позиция staff Division of Investment Management, выпущенная совместно с NASAA; заменила IA-770. Адрес `https://www.sec.gov/rules/interp/ia-1092.pdf` → 301 → `/files/rules/interp/ia-1092.pdf` → **HTTP 404** (53 435 байт HTML-заглушки). Правильный адрес найден WebSearch: https://www.sec.gov/files/rules/interp/1987/ia-1092.pdf — `curl` с UA-контактом, HTTP 200, 1 167 175 байт, PDF-скан; `pdftotext` — 41 800 байт, **OCR местами искажён**.
+
+Дословно (читаемые места скана):
+
+> Financial planning typically involves providing a variety of services, principally advisory in nature, to individuals or families regarding the management of their financial resources based upon an analysis of individual client needs. … This information normally would cover present and anticipated **assets and liabilities**, including insurance, savings, investments … The program developed for the client usually includes general recommendations for a course of activity or specific actions, to be taken by the client. For example, recommendations may be made that the client obtain insurance or revise existing coverage, establish an individual retirement account, **increase or decrease funds held in savings accounts, or invest funds in securities**.
+
+> Whether a person providing financially related services of the type discussed in this release is an investment adviser within the meaning of the Advisers Act **depends upon all the relevant facts and circumstances.** … A determination … will depend upon whether such person: (1) provides advice, or issues reports or analyses, **regarding securities**; (2) is in the business of providing such services; and (3) provides such services for compensation.
+
+> … if a financial planner structures his planning so as to give only generic, non-specific investment advice as a financial planner, but then gives specific securities advice in his capacity as a registered representative of a dealer or as agent of an insurance company, the person would not be able to assert that he was not "in the business" of giving investment advice.
+
+🔴 **Ключевой абзац о «securities» — в скане не читается** (OCR выдал мусор в районе стр. 6–7). Приводится по дословной цитате в Kitces.com (гостевой пост Chris Stanley, Beach Street Legal, «When Does A Financial Coach Need To Register As An Investment Adviser? The “ABCS” Test», https://www.kitces.com/blog/abcs-financial-coach-register-investment-adviser-status-sec-series-65-66-nasaa/ — прямой канал kitces.com отдаёт 403 по прежним замерам; через `r.jina.ai` HTTP 200, 36 858 байт). **Вторичная цитата первоисточника, со скана не сверена:**
+
+> The staff believes that a person who provides advice, or issues or promulgates reports or analyses, which concern securities, but which do not relate to specific securities, generally is an investment adviser … **The staff has interpreted the definition of investment adviser to include persons who advise clients concerning the relative advantages and disadvantages of investing in securities in general as compared to other investments. A person who, in the course of developing a financial program for a client, advises a client as to the desirability of investing in, purchasing or selling securities, as opposed to, or in relation to, any non-securities investment or financial vehicle would also be "advising" others within the meaning of Section 202(a)(11).**
+
+Та же статья, позиция юриста (не SEC) — список областей, которые «would also not be captured by the "securities" hook»: «Goal setting · **Debt reduction** · **Budgeting** · **Establishing appropriate savings** · College aid strategies · Property & casualty insurance needs analysis · Optimization of credit card benefits · Employer salary negotiation · Vehicle lease versus buy decisions · Rent versus own decisions · **Mortgage refinancing**». И: «Thus, even the mere comparison of investing in securities in general as opposed to real estate, for example, is enough to trigger the securities element of the ABCS test.» Автор отдельно указывает, что «business» по IA-1092 требует «specific investment advice» о «specific securities or specific categories of securities»: «a general recommendation to allocate assets to securities is not enough … A recommendation to allocate assets to stocks, bonds, mutual funds, or exchange-traded funds … would seem to be specific enough».
+
+**Рынок — пример того, что делают конкуренты в США:** Origin (useorigin.com, `r.jina.ai`, HTTP 200, 10 039 байт) называет свой ИИ-продукт «The first full-spectrum AI financial advisor **regulated by the SEC**» — то есть при переходе к инвестиционным советам американский игрок пошёл в регистрацию RIA, а не в обход. Маркетинговый текст, факт регистрации по Form ADV в этом доборе не проверялся.
+
+**Не найдено:** SEC no-action letters конкретно про budgeting / financial-wellness приложения; публикации Morrison Foerster, Ropes & Gray, Davis Polk, Skadden, Sidley по вопросу «is a financial planning tool an investment adviser». Два WebSearch-запроса («budgeting app "investment adviser" SEC financial planning tool law firm», «financial wellness app Investment Advisers Act registration law firm analysis») вернули маркетинг приложений, NASAA, Cornell LII и Kitces/Beach Street Legal; страниц названных пяти фирм в выдаче не было. Отрицательный результат, а не исчерпание канала.
+
+### Разбор Г2.4
+
+1. 🟢 **Совет о долгах и резерве без ценных бумаг — вне Advisers Act.** Подтверждено по IA-1092 (трёхэлементный тест, элемент (1) «regarding securities») и по практике юриста-специалиста: debt reduction, budgeting, establishing savings, mortgage refinancing — вне «securities hook».
+2. 🔴 **Уточнение прежнего вывода §7 «Advisers Act — мимо, потому что мы бумаг не называем»: этого условия НЕДОСТАТОЧНО.** По позиции staff в IA-1092 (во вторичной цитате) советником является и тот, кто советует о «relative advantages and disadvantages of investing in securities **in general** as compared to other investments» и о желательности инвестиций в ценные бумаги «as opposed to, or in relation to, **any non-securities investment or financial vehicle**». Если в распределении свободного потока FINPILOT есть направление «инвестировать» (в любой форме: «цель — инвестиции», «вложить в фондовый рынок») и модель рекомендует долю между ним и досрочным погашением/резервом, это ложится на формулировку staff **без называния конкретной бумаги**. Защищённая конструкция для США — направления «погашение долга / резерв (депозит, накопительный счёт) / цель-покупка», без направления «инвестиции в ценные бумаги». Проверить, есть ли такое направление в каноне модели, — задача не этого добора (канон не правится).
+3. Отзыв PDA (33-11377) на этот вывод не влияет: IA-1092 — действующая staff-позиция 1987 года, её отзыв в этом доборе не встречен.
+
+## ДОБОР Г2 — Г2.6 Бесплатный долговой совет в UK: авторизация, финансирование, цены
+
+**StepChange.** https://www.stepchange.org/about-us/governance/regulatory-information.aspx — `curl`, HTTP 200, 57 534 байта. Дословно: «Foundation for Credit Counselling, 123 Albion Street, Leeds, LS2 8ER trading as StepChange Debt Charity and StepChange Debt Charity Scotland. A registered charity no.1016630 and SC046263. It is a limited company registered in England and Wales (company no:2757055). **Authorised and regulated by the Financial Conduct Authority (Firm Registration Number 729047)**».
+
+**National Debtline (Money Advice Trust).** https://moneyadvicetrust.org/advice-services/makingsureitsus/ — `r.jina.ai`, HTTP 200, 12 089 байт. Дословно: «**Authorised and regulated by the Financial Conduct Authority - 618928**».
+
+**Citizens Advice.** Единого FRN нет: в FCA Register **каждое местное бюро — отдельная авторизованная фирма** (выдача WebSearch 11.09.2026: Birmingham, Basingstoke, Wiltshire, New Forest, Liverpool, Braintree & South Essex, St Helens, Arun and Chichester, Blackpool, Bath & District — все на register.fca.org.uk; в сниппете — «authorised by the FCA since 01/04/2014»). Страницы реестра (Salesforce, JS-рендер) не открывались — **сниппет, первоисточник не открыт**. Дата 01.04.2014 совпадает с переходом потребкредита от OFT к FCA и вступлением art. 39E (§5.1).
+
+**Финансирование.** Money Advice Trust, «Our funding» (https://moneyadvicetrust.org/partnerships/our-funding/, `r.jina.ai`, HTTP 200, 3 135 байт), дословно: «**Commissioned services** – Specific funding to help support the provision of **free-to-client debt advice** via our front-line services, **largely from the debt advice levy administered by the Money and Pensions Service**». Сниппеты выдачи (первоисточники не открыты): «The Financial Conduct Authority imposes a levy on all regulated financial services companies to pay for such support, and that includes funding the Money and Pensions Service» (Hansard, Commons, Debt Advice Services, 09.01.2025, https://hansard.parliament.uk/commons/2025-01-09/debates/6D09A5E2-5CE7-46E7-B272-03328ED1C36F/DebtAdviceServices); у MaPS есть грантовые программы Debt Advice Modernisation Fund 2025/26 и Debt Advice Modernisation and Transformation Fund 2026/27 для «not-for-profit organisations» (find-government-grants.service.gov.uk). Сумма levy на 2025/26 не добыта.
+
+**MoneyHelper — цена платной консультации.** Страница «Financial adviser fees» https://www.moneyhelper.org.uk/en/getting-help-and-advice/financial-advisers/guide-to-financial-adviser-fees — прямой `curl` к moneyhelper.org.uk отдаёт **403** (5 909 байт), `r.jina.ai` — HTTP 200, но **561 байт заглушки**. Добыто через Wayback: CDX — снимки 2025-03…2025-11; `https://web.archive.org/web/20251119023745id_/…` — HTTP 200, 27 441 байт gzip, после распаковки 24 657 байт текста. Дословно:
+
+> An hourly rate — this will vary from **£75 an hour to £350**, although the UK average rate is about **£150 an hour**. A set fee for a piece of work — this might be several hundred or several thousand pounds. … (i.e. a pension transfer will cost more in advice fees than simply arranging an ISA). A monthly fee …
+
+🔴 **Поправка к прежней записи файла (§5.7 и строка «4» в «Что не добыто»):** числа £75–£350/час подтверждены, но это цена **регулируемого финансового (инвестиционного, пенсионного) советника**, а не консультации по долгам — страница лежит в разделе «financial-advisers» и в примерах — pension transfer и ISA. Использовать эти числа как «цену долгового совета» нельзя. Долговой совет в UK для потребителя в массе **бесплатен** (StepChange, National Debtline, Citizens Advice — все авторизованы по debt counselling и финансируются через levy MaPS); платный сектор — debt management plans с комиссиями (страница MoneyHelper о DMP через `r.jina.ai` дала заглушку 550 байт, прямой `curl` — 403; сниппет выдачи: «if you choose a fee-paying provider, all DMP providers must be authorised by the Financial Conduct Authority» — первоисточник не открыт).
+
+### Разбор Г2.6
+
+Бесплатный сектор UK занимает именно ту нишу, где FINPILOT попал бы под art. 39E: персонализированный совет по долгам. Он **авторизован** (не вне периметра, а внутри, с FRN), финансируется **принудительным сбором с отрасли** через MaPS и нацелен на людей в трудностях. Места для платного продукта с тем же содержанием нет по двум причинам сразу: нужна та же авторизация, и потребитель получает аналог бесплатно. Место остаётся у (а) нейтрального планировщика без выбора (пример (15) PERG 17.7, Д14), (б) людей **без** финансовых трудностей, которым бесплатный сектор не адресован (оптимизация досрочного погашения при нормальной платёжеспособности) — но art. 39E охватывает и их (Q3.1–3.2), так что авторизация нужна и тут; (в) B2B — поставщик ПО для авторизованных фирм и благотворительных организаций (конкурентное поле — у MaPS есть гранты на digital transformation для not-for-profit).
+
+
+**Сверка к Г2.2, п. 2 (снимает 🟡):** Directive 2008/48/EC, CELEX 32008L0048, `r.jina.ai`, HTTP 200, 91 415 байт — строка «advis» в тексте встречается **0 раз**. Режима advisory services и резервирования деятельности в CCD 2008 нет; это новелла CCD II. Переходная ниша по договорам, существующим на 20.11.2026, подтверждена по тексту обеих директив.
+
+---
+
+## ИТОГ ДОБОРА Г2 (11.09.2026)
+
+### По пунктам
+
+| Пункт | Статус | Что добыто / причина недобора |
+|---|---|---|
+| Г2.1 MCD 2014/17/EU | ✅ добыт | Art. 4(21), 22 (вкл. 22(6)–(7)), 29, 7, 25, 43 — дословно; транспозиция: Германия (§ 34i GewO, § 511, § 655a BGB), Ирландия (S.I. 142/2016, Reg. 3, 23). Толкование Комиссии/EBA/BaFin по досрочному погашению **не найдено**. |
+| Г2.2 CCD II 2023/2225 | ✅ добыт (кроме толкований) | Art. 3(21), 16(6)(b)–(c) полностью, 2(2)(l), 29, 36(4), 47, recitals 63, 81; позиция CCPC (Ирландия); транспозиция Италии — по вторичному (Legal500). **Официальных толкований Комиссии/EBA о досрочном погашении не найдено.** Итоговые акты транспозиции Германии и Ирландии не искались. |
+| Г2.3 art. 72A RAO / PERG 2.9.18G | ✅ добыт | Статья исключена с 31.12.2020 (S.I. 2019/1361); PERG 2.9.18G — дословно по Wayback 2019; в снимке 2025 раздела нет. Overseas persons exclusion (art. 72 RAO) для debt counselling **не проверялся**. |
+| Г2.4 SEC | 🟡 частично | 33-11377 — дословно; IA-1092 — первоисточник добыт, ключевой абзац о «securities in general» — **только по вторичной цитате** (OCR скана нечитаем). **No-action letters по budgeting/wellness-приложениям и публикации пяти названных юрфирм не найдены** (два запроса, в выдаче их нет). |
+| Г2.5 UDMSA | ✅ добыт | Официальный текст 2008 (копия на ftc.gov): §§ 2(7), 2(9), 2(13), 2(15), 3, 4 + Comment. Список принявших штатов — **по сниппету** (7 + Виргинские о-ва), карта uniformlaws.org не открыта. |
+| Г2.6 UK бесплатный сектор + MoneyHelper | ✅ добыт (кроме суммы levy) | FRN StepChange 729047, Money Advice Trust (National Debtline) 618928 — первоисточники; Citizens Advice — по бюро, по сниппету; финансирование через levy MaPS — первоисточник MAT; MoneyHelper £75–£350/час, среднее £150 — первоисточник через Wayback. Сумма levy 2025/26 **не добыта**. |
+
+### Опровержения и уточнения прежних выводов файла
+
+- 🔴 **§8.3 / §5.8 («Art. 16(3)(c) склоняет к прочтению "советы о выборе кредита"»)** — ослаблено. И MCD (Art. 22(6)(b)), и CCD II (Art. 16(6)(b)–(c)) изымают из резервирования «advisory services **in the context of managing existing debt**»; Ирландия в Reg. 23(7)(d) S.I. 142/2016 выделила ту же категорию и допустила туда «debt management firm authorised by the Central Bank». Систематическое толкование — советы по существующему долгу **внутри** периметра advisory services.
+- 🔴 **§«Что не добыто», строка про art. 72A («гипотеза о неприменимости к третьим странам»)** — подтверждено сильнее гипотезы: исключения **нет вовсе** с 31.12.2020, а для не-ЕЭЗ поставщиков его не было никогда.
+- 🔴 **§7 / «Итоговая рамка США», п. 1 («Advisers Act — мимо, потому что бумаг не называем»)** — условие недостаточно: по staff-позиции IA-1092 (во вторичной цитате) совет о «securities in general as compared to other investments» уже триггер. Мимо — только если среди направлений распределения нет инвестиций в ценные бумаги.
+- 🔴 **§5.7 / «Что не добыто» п. 4 (MoneyHelper £75–£350+/час как цена консультации)** — числа верны, но это цена **финансового советника** (пенсии, ISA), а не долгового совета. Долговой совет в UK массово бесплатен.
+- 🟢 **Новое смягчение по ЕС:** CCD II не применяется к договорам, существующим на 20.11.2026 (Art. 2(2)(l)), а в CCD 2008 режима advisory services нет. MCD не применяется к ипотекам до 21.03.2016 (Art. 43(1)).
+- 🟢 **Новая нейтральная зона по ЕС:** MCD Art. 22(7) и Irish Reg. 23(9) — услуги, помогающие потребителю «understand their financial needs and **which types of products** are likely to meet those needs», прямо выведены из-под резервирования.
+
+### Сводная таблица (материал исследователя, не юридическое заключение)
+
+| Юрисдикция | Норма | Ловит FINPILOT в B2C? | Ловит в B2B со встраиванием в банк? | Что нужно, чтобы работать легально |
+|---|---|---|---|---|
+| **ЕС — ипотека** | MCD Art. 4(21), 22(6), 29; DE § 34i GewO; IE Reg. 23(7) S.I. 142/2016 | 🔴 Вероятно да, по ипотекам после 21.03.2016: персональный совет «гасить ипотеку досрочно» — advisory services по систематике Art. 22(6)(b). Коммерческая дерогация есть не везде: DE — Erlaubnis по § 34i, **только с головным офисом в Германии** (§ 34i(2) Nr. 5); IE — закрытый список, коммерческому советнику только через статус intermediary или debt management firm. | 🟢 Банк-кредитор вправе оказывать advisory services (Art. 22(6), первый абзац), но несёт стандарты Art. 22(1)–(3): раскрыть охват линейки, собрать данные, best interests, **record on durable medium**. Расчёт последствий досрочного погашения — обязанность кредитора (Art. 25(4)). | B2C: допуск как credit intermediary / Honorar-Immobiliardarlehensberater в конкретной стране с местным учреждением, без паспорта ЕС; либо нейтральный инструмент «какие **типы** решений подходят» (Art. 22(7)) без выбора за пользователя. B2B: FINPILOT — ПО банка, советует банк. |
+| **ЕС — потребкредит** | CCD II Art. 3(17), 16(6), 36; применяется с 20.11.2026 | 🔴 Вероятно да, по договорам после 20.11.2026 (Art. 16(6) — резервирование; коммерческий путь только через (d) «authorised and supervised»). 🟢 По договорам, существующим на 20.11.2026, — вне CCD II (Art. 2(2)(l)), а в CCD 2008 режима нет. Ниша Art. 36 — только некоммерческая и с «limited charges». | 🟢 Кредитор — разрешённый субъект; стандарты Art. 16(2)–(5), обязанности Art. 36(2)–(3) (раннее выявление трудностей, направление к debt advice) — функция, которую FINPILOT может закрывать как ПО. | B2C: авторизация по национальному акту транспозиции (Италия — только зарегистрированные посредники); B2B: ПО банка или ПО для некоммерческих debt advisory services. |
+| **UK** | art. 39E RAO, PERG 17; art. 72A **исключена** 31.12.2020 | 🔴 Да (Д14, подтверждено): debt counselling. Онлайн из-за рубежа не спасает — исключения для information society services больше нет. Бесплатный авторизованный сектор (StepChange 729047, MAT 618928, бюро Citizens Advice) занимает эту нишу за счёт levy MaPS. | 🟡 Банк, авторизованный на debt counselling, может давать совет сам; FINPILOT как его ПО — вне периметра, если совет даёт банк (не проверялось отдельно — PERG об аутсорсинге не открывался). | B2C: авторизация FCA на debt counselling либо нейтральный планировщик (пример (15) PERG 17.7). B2B: ПО для авторизованных фирм и благотворительных организаций. |
+| **США — федеральный** | Advisers Act § 202(a)(11); IA-1092; 33-11377 | 🟢 Нет, если совет только о долгах, бюджете, резерве, рефинансировании ипотеки. 🔴 Да, если модель сравнивает инвестиции в ценные бумаги **в целом** с другими направлениями (IA-1092, вторичная цитата). Спецрежима ИИ нет (PDA отозвано). | 🟢 Банк исключён из определения; FINPILOT как ПО банка — вне. | Не иметь направления «инвестиции в ценные бумаги» в распределении для американской сборки; иначе регистрация RIA (так сделал Origin). |
+| **США — штаты** | UDMSA (7 штатов + Виргинские о-ва, по сниппету); широкие законы типа RCW 18.28.010 (WA) | 🟢 В UDMSA-штатах — нет (нужны посредничество с кредитором и concessions). 🔴 В штатах с широкими законами — вероятно да («counseling … prorating … of the indebtedness … for compensation»). Отсутствие присутствия в штате не спасает (Comment 1 к § 3 UDMSA). | 🟢 Банки изъяты и в UDMSA (§ 3(c)(2)–(3)), и в WA (RCW 18.28.010(1)(b)). | Поштатный обзор; вне UDMSA-штатов — лицензия debt adjuster/credit counselor (часть штатов допускает только nonprofit) или B2B через банк. |
+
+**Общий вывод добора (материал, не заключение).** Во всех трёх западных юрисдикциях ядро FINPILOT — персональная рекомендация по существующему долгу — **внутри** регулируемого периметра, кроме UDMSA-штатов США и переходной ниши ЕС по старым договорам. Единственный сценарий, где продукт работает без собственной лицензии во всех юрисдикциях таблицы, — **B2B-встраивание в банк**: кредитор везде разрешённый субъект (ЕС), изъят из определения (США) или может авторизоваться сам (UK). Цена — стандарты банка ложатся на продукт: раскрытие охвата, best interests, запись рекомендации на durable medium.
+
+**Процесс.** Тип — breadth-first (шесть независимых пунктов по четырём юрисдикциям). Подагентов — **0** (потолок два; пункты закрывались дешевле напрямую через `curl`/`r.jina.ai`). Вызовов `WebSearch` — 13, отказа бюджета не было. Каналы: прямой `curl` (EUR-Lex MCD, gesetze-im-internet § 511/§ 655a, irishstatutebook, legislation.gov.uk, sec.gov с UA-контактом, ftc.gov, stepchange.org, ccpc.ie с `-L`); `r.jina.ai` (EUR-Lex CCD II/CCD 2008, § 34i GewO после таймаута прямого, Money Advice Trust, Legal500, Kitces, Origin); Wayback `id_` + CDX (PERG 2.9 в редакциях 2019 и 2025, MoneyHelper — gzip). Заглушки, отсеянные по размеру: handbook.fca.org.uk 301/167 байт, moneyhelper через jina 561 и 550 байт, sec.gov старый адрес IA-1092 404/53 435 байт.
+
+---
+
+## ДОБОР Г16 — П. Режимы для советующих финсервисов: Казахстан, Армения, Сербия, ОАЭ, Грузия
+
+Добор 12.09.2026, исполнитель без подагентов. Метод: нормы дословно на языке оригинала; у каждого источника URL, канал, HTTP-код, размер. Заключений юриста нет — только буквальное содержание норм.
+
+### П.Казахстан
+
+#### П.КЗ-1. Республиканский режим (АРРФР) — Закон РК «О рынке ценных бумаг» от 02.07.2003 № 461-II
+
+**Источник.** `https://old.adilet.zan.kz/rus/docs/Z030000461_` — канал `curl -sk --http1.1` с браузерным UA, **HTTP 200, 1 029 829 байт**. Перечень изменений в тексте доведён до **Закона РК от 16.01.2026 № 259-VIII**.
+Отрицательный канал, для протокола: новый `https://adilet.zan.kz/rus/docs/Z030000461_` — HTTP 200, **2 191 байт** (SPA-заглушка, в разметке комментарий «ИИ-краулеры … видят только эту разметку»); через `r.jina.ai` — HTTP 200, 2 281 байт (только шапка). Старая версия ИПС отдаёт полный текст.
+
+Дословно, **статья 53-2 «Особенности предоставления услуг по инвестиционному консультированию»**:
+
+> «1. Под инвестиционным консультированием понимаются услуги по предоставлению индивидуальным инвесторам инвестиционных рекомендаций по заключению сделок с ценными бумагами и иными финансовыми инструментами (далее – инвестиционная рекомендация).
+> Оказывать услуги по инвестиционному консультированию вправе организации, осуществляющие брокерскую и (или) дилерскую деятельность на рынке ценных бумаг и (или) деятельность по управлению инвестиционным портфелем.
+> 2. Инвестиционная рекомендация предоставляется индивидуальному инвестору в порядке, определенном нормативным правовым актом уполномоченного органа.
+> 3. Инвестиционную рекомендацию вправе предоставлять только [работник лицензиата, осуществляющего] брокерскую и (или) дилерскую деятельность на рынке ценных бумаг и (или) деятельность по управлению инвестиционным портфелем, соответствующий квалификационным требованиям, установленным нормативным правовым актом уполномоченного органа и внутренними документами лицензиата.
+> 4. При оказании услуг по инвестиционному консультированию брокер и (или) дилер, управляющий инвестиционным портфелем и их работники обязаны действовать добросовестно с должной осмотрительностью и исключительно в интересах клиента. …»
+
+(Квадратные скобки в п. 3 — фрагмент, выпавший на границе выдержки при извлечении; смысл восстановлен по соседнему окну того же текста, дословная середина фразы не сверена.)
+
+Там же, статья о запрете непрофильной деятельности лицензиата (номер статьи в выдержке не захвачен): «Лицензиат не вправе осуществлять предпринимательскую деятельность, не относящуюся к деятельности на финансовом рынке, за исключением следующих случаев: … 2) предоставления консультационных и информационных услуг по вопросам, связанным с деятельностью на рынке ценных бумаг, с учетом особенностей, установленных статьей 53-2 настоящего Закона; … 4) организации обучения в области деятельности на рынке ценных бумаг».
+
+**Что норма покрывает / не покрывает (буквально).** Предмет ст. 53-2 — рекомендации «по заключению сделок с ценными бумагами и иными финансовыми инструментами». Совет по погашению займа, резерву, бюджету под этот предмет буквально не подпадает (вывод по тексту, не толкование юриста). Отдельного лицензируемого вида «финансовый консультант физлиц / долговой консультант» в выдержках не найдено.
+
+#### П.КЗ-2. Закон РК «О банках и банковской деятельности» от 31.08.1995 № 2444
+
+**Источник.** `https://old.adilet.zan.kz/rus/docs/Z950002444_` — `curl`, **HTTP 200, 1 688 936 байт**.
+Дословно (перечень разрешённой банкам неосновной деятельности, подпункт 8): «8) предоставлением консультационных услуг по вопросам, связанным с финансовой деятельностью». То же для банковских холдингов (п. 10 той же статьи): «2) предоставлением консультационных услуг по вопросам, связанным с финансовой деятельностью».
+**Буквальное значение:** норма РАЗРЕШАЕТ такие услуги банкам (снимает с них запрет непрофильной деятельности), но не делает их лицензируемой банковской операцией и не резервирует за банками. Нормы, запрещающей нелицензиатам консультировать физлиц по долгам, в законе не найдено (поиск по «консультацион» — 3 вхождения, все приведены или касаются омбудсмана).
+
+#### П.КЗ-3. МФЦА / AIFC — AFSA (отдельный режим, для деятельности «в или из» МФЦА)
+
+**Источник 1.** AIFC General Rules (GEN), Schedule 1 — `https://orderly.myafsa.com/entiresection/a0001000200020007/general-rules` через `r.jina.ai`, **HTTP 200, 126 799 байт** (прямой `curl` на orderly.myafsa.com — **403, 5 878 байт**, антибот). Дата редакции в выдержке не видна.
+
+GEN 1.1.1 (фрагмент): «… a Regulated Activity that may be carried on by an Authorised Firm, subject to the terms of its Licence, if that activity: (a) is specified in the list of activities in Schedule 1; and (b) is carried on by way of business as described in GEN 1.1.9; and (c) is not otherwise excluded in accordance with any other provision in GEN 1.1.»
+
+GEN 1.1.9: «A Person carries on an activity by way of business for the purposes of GEN 1.1.1 if that Person: (a) engages in the activity in a manner which in itself constitutes the carrying on of a business; (b) holds himself out as willing and able to engage in that activity; or (c) regularly solicits other Persons to engage with him in transactions constituting that activity.»
+
+Schedule 1, п. 10: «**10. Advising on Investments** (1) Advising on Investments means giving advice to a Person in his capacity as an investor or potential investor, or in his capacity as agent for an investor or a potential investor, on the merits of his buying, selling, holding, subscribing for or underwriting a particular Investment (whether as principal or agent). (2) In sub‐paragraph (1), "advice" includes a statement, opinion or report: (a) where the intention is to influence a Person, in making a decision, to select a particular Investment or an interest in a particular Investment; or (b) which could reasonably be regarded as being intended to have such an influence.»
+
+Schedule 1, п. 19: «**19. Advising on a Credit Facility** (1) Advising on a Credit Facility means giving advice to a Person in his capacity as a borrower or a potential borrower, or as an agent for a borrower or a potential borrower, on the merits of his entering into a particular Credit Facility. (2) In sub‐paragraph (1), "advice" includes a statement, opinion or report: (a) where the intention is to influence a Person, in making a decision, to enter into a particular Credit Facility; or (b) which could reasonably be regarded as being intended to have such an influence.»
+
+Schedule 1, п. 20 (для контраста): «(1) Arranging a Credit Facility means making arrangements for the provision of a Credit Facility by one or more Persons. (2) A Person does not carry on the Regulated Activity of Arranging a Credit Facility if (a) he is to be a party to the Provision of Credit Facilities in question; or (b) he merely provides the means by which a Person providing a Credit Facility communicates with the Person to whom the Credit Facility is or is to be provided. …»
+
+**Буквально:** п. 19 привязан к «entering into a particular Credit Facility» — к ВСТУПЛЕНИЮ в конкретный кредит. Совет по порядку погашения УЖЕ существующих долгов в формулировку «entering into» буквально не входит (вывод по тексту). Исключения для «generic advice / publications / software» в выданном тексте GEN не найдено: поиск по «newspaper», «Advice given in» — 0 вхождений.
+
+**Источник 2.** AFSA, страницы видов деятельности: `https://afsa.aifc.kz/regulated-activities/advising-on-investments/` (`curl`, **200, 80 096 байт**) и `https://afsa.aifc.kz/regulated-activities/advising-on-a-credit-facility/` (`curl`, **200, 79 320 байт**). Определения совпадают с GEN дословно. Цифры с официальной страницы (Advising on Investments): «Authorisation Fee (paid once) 7 000 USD»; «Registration fee is 500 USD (paid once) if you apply via the self-service portal»; «Supervision Fee (annually) 1 400 USD»; «The Minimum Capital Requirement of Advising on Investments Firms is equal to its Base Capital Requirement (10 000 USD)»; «Liquid Assets whose value is at least equal to 25% of the firm's Annual Operating Expenditure». По Advising on a Credit Facility — «Authorisation Fee (paid once) 7 000 USD».
+
+**Не добыто по КЗ.** (1) Акт АРРФР о «порядке» предоставления инвестиционной рекомендации (п. 2 ст. 53-2) — не искался, бюджет. (2) Прямой нормы о роботизированном совете в РК не найдено ни в законе о РЦБ, ни в законе о банках — отрицательный результат по двум текстам. (3) Номер статьи о запрете непрофильной деятельности лицензиата РЦБ не зафиксирован. (4) AIFC: исключения для генерической/программной рекомендации в GEN не найдены; Guidance AFSA по «advice» vs «information» — не искалась.
+
+### П.Армения
+
+Регулятор — **Центральный банк Республики Армения (ЦБА)**, мегарегулятор (банки, кредитные организации, рынок ценных бумаг).
+
+#### П.АМ-1. Закон РА «О рынке ценных бумаг» от 11.10.2007 HO-195-N
+
+**Источник.** `https://www.arlis.am/hy/acts/182318` — `curl`, **HTTP 200, 546 630 байт**. Официальный перевод на английский («Text of the Official Translation»), шапка: «With changes and additions as of 09.06.2022»; перевод опубликован «on a joint site 12 september 2023».
+
+Дословно, **Article 25. Investment services**: «1. Within the meaning of this Law, the investment services shall mean services where the person: (1) receives and communicates assignments regarding securities transactions from clients; (2) executes securities transactions on its behalf or on behalf of the client and at the expense of the client; (3) **provides consultation to clients regarding the investments in securities**; (4) executes securities transaction at its expense and on its behalf; (5) manages the pool of securities; (6) carries out guaranteed or non-guaranteed placement of securities. …»
+
+**Article 26. Non-basic services**: «Within the meaning of this Law non-basic services shall mean: … (4) provision of consultations to companies on structure of capital, corporate strategy issues … (7) **development and dissemination of researches, financial analyses and other general investment proposals related to securities transactions.** (Article 26 … edited by HO-183-N of 25 March 2020)»
+
+**Article 27. Persons providing investment services**: «2. Investment services and non-basic service specified in point 1 of Article 26 of this Law may be provided only by: (1) the persons providing investment services; (2) persons and bodies specified in Articles 30 and 31 of this Law. 3. **Non-basic services prescribed by points (3), (4) and (7) of Article 26 of this Law may be provided by other persons as well.** …»
+
+**Article 28** (фрагмент): «1. The investment company shall mean a joint-stock or limited liability company that has been issued a licence for providing investment services …»
+
+**Буквально:** граница «регулируемый совет / общая информация» проведена самим законом: консультация клиента по инвестициям в ценные бумаги — инвестиционная услуга (ст. 25(1)(3)), только для лицензиатов (ст. 27(2)); «general investment proposals», исследования и финансовый анализ (ст. 26(7)) — разрешены любым лицам (ст. 27(3)). Долги, бюджет, резерв в предмет закона (ценные бумаги) не входят.
+
+#### П.АМ-2. Официальное разъяснение ЦБА от 22.02.2022 № 1 (иностранный провайдер)
+
+**Источник.** `https://old.cba.am/EN/laregulations/clarification_22022022_eng.pdf` — `curl`, **HTTP 200, 37 276 байт**, `pdftotext` → 6 172 байта. (В тексте разъяснения закон ошибочно датирован «October 11, 2017» в первом абзаце и «October 11, 2007» в резолютивной части.)
+
+Дословно, резолютивная часть: «1. Investment services provided by a foreign financial institution to RA-resident individuals or legal entities are not subject to the provisions of the October 11, 2007 HO-195-N Law on the Securities Market, if the services are carried out in compliance with the following conditions: 1) The offer of investment services by the foreign financial institution is not presented in the form of a public offer (including through advertising carried out via various information and telecommunication platforms, such as on television, radio, the internet, or other mass media, as well as in any other way), the content of which makes it clear that the offer is targeted toward RA residents. 2) The individual offer … does not indicate that the institution intends to gradually disseminate information about its services to a wide audience of RA residents and to regularly provide such services to many RA residents. 2. The provisions of the Law on the Securities Market additionally do not apply to investment services provided by foreign financial institutions to RA-resident individuals or legal entities when the offer of investment services is made or the services are provided at the initiative of the RA resident, regardless of the type or frequency of services provided thereafter.»
+Подписано: «Governor of the Central Bank of Armenia Martin Galstyan, February 25, 2022».
+
+#### П.АМ-3. Закон РА «О кредитных организациях» от 29.05.2002 HO-176-N
+
+**Источник.** `https://www.arlis.am/hy/acts/182327` — `curl`, **HTTP 200, 122 056 байт**, официальный перевод, «With changes and additions as of 09.06.2022».
+Дословно (перечень того, что вправе делать кредитная организация; номер статьи в выдержке не захвачен): «… (h) provide leasing; (i) accept in deposit precious metals … (j) **provide financial consultation**; (k) establish and maintain customer creditworthiness database, carry out the activities of collection of debts; …»
+**Буквально:** финансовая консультация — разрешённая кредитной организации деятельность, а не операция, зарезервированная за лицензиатами.
+
+#### П.АМ-4. Закон РА «О потребительском кредитовании» от 17.06.2008 HO-141-N
+
+**Источник.** `https://www.arlis.am/hy/acts/182395` — `curl`, **HTTP 200, 86 282 байт**, официальный перевод, «With changes and additions as of 24.03.2021».
+Дословно, Article 1(1): «This Law shall regulate the relations arising from contracts on crediting, the peculiarities of and mandatory conditions for the types thereof, the procedure and the conditions for calculation of Annual Percentage Rate under contracts on crediting, the liability of the creditor, the rights of consumers under contracts on crediting and other relations pertaining to these contracts.» Article 2(1)(2): «creditor — a bank, branch of foreign bank, credit organisation or pawn shop providing credit».
+**Отрицательный результат:** поиск по «ntermediar», «advice», «consult» в тексте закона — **0 вхождений**. Режима кредитного посредника/консультанта по долгам в этом законе нет (в редакции перевода на 24.03.2021).
+
+**Не добыто по Армении.** (1) Нормативные акты ЦБА о правилах оказания инвестиционных услуг (ст. 27(4)) — не искались. (2) Новейшие поправки после 09.06.2022 к закону о РЦБ (включая возможную гармонизацию с MiFID) — английский перевод на arlis их не содержит; армянский текст не сверялся. (3) Отдельной нормы о роботизированном совете — не найдено.
+
+### П.Сербия
+
+Регуляторы — **Komisija za hartije od vrednosti** (рынок капитала, инвестиционные услуги) и **Narodna banka Srbije** (банковские и кредитные услуги, защита пользователей финуслуг).
+
+#### П.RS-1. Zakon o tržištu kapitala («Sl. glasnik RS», br. 129/2021 i 109/2025)
+
+**Источник.** `https://www.paragraf.rs/propisi/zakon_o_trzistu_kapitala.html` — `curl`, **HTTP 200, 905 580 байт**; редакция по шапке: «Sl. glasnik RS", br. 129/2021 i 109/2025». Paragraf.rs — частная правовая база (консолидированный текст), не официальный вестник; официальный ПИС (pravno-informacioni-sistem.rs) не сверялся.
+
+Дословно, **Član 2, stav 1, tačka 2)**: «investicione usluge i aktivnosti koje se odnose na finansijske instrumente iz tačke 19) ovog stava su: (1) prijem i prenos naloga koji se odnose na jedan ili više finansijskih instrumenata; (2) izvršenje naloga za račun klijenata; (3) trgovanje za sopstveni račun; (4) upravljanje portfoliom; (5) **investiciono savetovanje**; …»
+
+**Član 2, tačka 7)**: «**investicioni savet je pružanje lične preporuke klijentu, bilo na zahtev klijenta ili na inicijativu investicionog društva, u pogledu jedne ili više transakcija u vezi sa finansijskim instrumentima**».
+
+**Član 2, tačka 1)**: «investiciono društvo je pravno lice u čije redovne aktivnosti ili poslovanje spada pružanje jedne ili više investicionih usluga trećim licima, odnosno profesionalno obavljanje jedne ili više investicionih aktivnosti».
+
+**Član 3 (Izuzeci)**: «Odredbe Glave VI i Glave VIII ovog zakona ne primenjuju se na: … 3) lica koja pružaju investicione usluge kada se ta usluga pruža povremeno u okviru obavljanja njihove pretežne profesionalne delatnosti, a sama delatnost je uređena zakonskim ili podzakonskim odredbama ili pravilima poslovne etike koji uređuje samu profesiju i kojima se ne zabranjuje pružanje te usluge; … 10) **lica koja pružaju investicione savete u okviru obavljanja druge delatnosti, na koju se ne primenjuju odredbe ovog zakona, pod uslovom da se za pružanje takvih saveta ne naplaćuje posebna naknada.**»
+
+Граница «общая рекомендация» — отдельный режим «investiciona preporuka» (Glava о злоупотреблениях рынком, чл. 291–294): «… preporučuje ili predlaže strategija ulaganja u pogledu jednog ili više finansijskih instrumenata … namenjenih distribucionom kanalu ili javnosti. … Distribucioni kanal je kanal putem kojeg informacija postaje javno dostupna ili će pristup informaciji imati veliki broj lica.» Для таких рекомендаций — требования к содержанию и раскрытию (чл. 292–294), а не лицензия («Davalac investicione preporuke dužan je da u preporuci osigura: 1) da se činjenice jasno razlikuju od tumačenja, procena, mišljenja …», чл. 293).
+
+Лицензирование: «Zahtev za davanje dozvole za obavljanje delatnosti investicionog društva Član 150 …»; «Član 151 Komisija odlučuje o zahtevu … u roku od šest meseci od dana prijema urednog zahteva.»
+
+**Буквально:** лицензируемо — «lična preporuka» по «transakcijama u vezi sa finansijskim instrumentima». Совет по долгам/бюджету в предмет не входит (кредит — не финансовый инструмент по тексту закона; вывод по тексту, не толкование). Исключение чл. 3(10) снимает режим с попутного бесплатного инвест-совета; у FINPILOT совет — основная платная деятельность (подписка), под буквальный текст исключения не подходит.
+
+#### П.RS-2. Zakon o zaštiti korisnika finansijskih usluga («Sl. glasnik RS», br. 19/2025)
+
+**Источник.** `https://www.paragraf.rs/propisi/zakon_o_zastiti_korisnika_finansijskih_usluga.html` — `curl`, **HTTP 200, 198 206 байт**; шапка: «Sl. glasnik RS", br. 19/2025» (новый закон 2025 г.).
+
+Дословно, **Član 2, tačka 41)**: «**savetodavne usluge označavaju lične preporuke u pogledu jedne ili više bankarskih usluga koje korisnik koji se obratio banci zahteva, a koje predstavljaju odvojenu aktivnost u odnosu na bankarske usluge.**»
+Član 2, tač. 1), 2), 4): «1) kreditne usluge su usluge koje banka, platna institucija i institucija elektronskog novca pružaju korisnicima ovih usluga po osnovu ugovora o kreditu … 2) bankarske usluge su kreditne usluge i usluge koje pruža banka po osnovu ugovora o depozitu; … 4) finansijske usluge su bankarske usluge, kreditne usluge i usluge finansijskog lizinga».
+Член о квалификации (чл. 15): «Zaposleni koji su angažovani na poslovima prodaje finansijskih usluga, odnosno sporednih usluga ili pružanju savetodavnih usluga dužni su da poseduju odgovarajuće kvalifikacije, znanje i iskustvo …»
+Там же, об обязанности учитывать положение клиента: «Pri zaključivanju ugovora o finansijskim uslugama i pružanju savetodavnih usluga, davalac usluga dužan je da uzme u obzir sve informacije o okolnostima u kojima se korisnik nalazi …»
+Član 3, tač. 1): «Odredbe ovog zakona ne primenjuju se na: 1) ugovore o finansijskim uslugama koji imaju za cilj investiranje u finansijske instrumente, izuzev ugovora o depozitu; …»
+
+**Буквально:** «savetodavne usluge» определены как услуга, которую клиент запрашивает **у банка**; обязанности адресованы «davalac usluga» (банк, платёжная институция и т. п.). Лицензионного режима для небанковского независимого консультанта по кредитам в выдержках не найдено; отдельного вида «kreditni posrednik» в тексте нет (поиск по «posrednik» дал только посредничество НБС в спорах).
+
+**Не добыто по Сербии.** (1) Официальный текст на pravno-informacioni-sistem.rs не сверялся — использован консолидированный текст paragraf.rs. (2) Акты Комиссии о «povremeno» (чл. 3 ст. 1 т. 3) — не искались. (3) Норма о роботизированном совете — не найдена.
+
+### П.ОАЭ
+
+Четыре раздельных периметра: onshore — **ЦБ ОАЭ (CBUAE)** по банковским и кредитным услугам и **SCA** по ценным бумагам (по выдаче поиска SCA переименована в **Capital Market Authority**, домен `uaecma.gov.ae`; в этом добое не проверялось); свободные финансовые зоны — **DIFC/DFSA** и **ADGM/FSRA**. VARA (виртуальные активы, Дубай) к продукту без криптоактивов не относится и не исследовалась.
+
+#### П.AE-DIFC. DFSA Rulebook, General Module (GEN)
+
+Все тексты взяты с `dfsaen.thomsonreuters.com` (официальный хостинг Rulebook DFSA) через `r.jina.ai`.
+
+**GEN 2.11.1 Advising on Financial Products** — `https://dfsaen.thomsonreuters.com/rulebook/gen-2111`, jina **200, 40 409 байт**; действующая редакция «Nov 01 2022», последняя поправка «DFSA RMI328/2022 (Made 29th June 2022). [VER56/11-22]». Дословно:
+«(1) In GEN Rule 2.2.2, Advising on Financial Products means giving advice to a Person in his capacity as an investor or potential investor, or in his capacity as agent for an investor or a potential investor, on the merits of his buying, selling, holding, subscribing for or underwriting a particular financial product (whether as principal or agent). (2) Advice in (1) includes a statement, opinion or report: (a) where the intention is to influence a Person, in making a decision, to select a particular financial product or an interest in a particular financial product; or (b) which could reasonably be regarded as being intended to have such an influence. (3) Giving advice to a Person under (1) includes operating an Insurance Aggregation Site relating to contracts of Long-Term Insurance, other than contracts of reinsurance. (4) For the purposes of this Rule and GEN Rule 2.11.2, a "financial product" is: (a) an Investment; (b) a Deposit; (c) a Profit Sharing Investment Account; (d) a right under a contract of Long-Term Insurance, that is not a contract of reinsurance; (e) a right under an Employee Money Purchase Scheme; (f) a right or interest in a pension, superannuation, retirement or gratuity scheme or arrangement, or a broadly similar scheme or arrangement; or (g) a Crypto Token.»
+
+**GEN 2.11.2 (исключение для публикаций)** — `https://dfsaen.thomsonreuters.com/rulebook/gen-2112`, jina **200, 37 558 байт**; редакция «Feb 01 2017». Дословно:
+«A Person does not Advise on Financial Products by giving advice in any newspaper, journal, magazine, broadcast service or similar service in any medium if the principal purpose of the publication or service, taken as a whole, is neither: (a) that of giving advice of the kind mentioned in GEN Rule 2.11.1; nor (b) that of leading or enabling Persons to buy, sell, subscribe for or underwrite a particular financial product of the kind in GEN Rule 2.11.1(4).»
+
+**GEN 2.28.1 Arranging Credit and Advising on Credit** — `https://dfsaen.thomsonreuters.com/rulebook/gen-2281`, jina **200, 38 127 байт**; редакция «Feb 01 2017», «[Added] DFSA RM131/2014 … [Amended] DFSA RM184/2016». Дословно:
+«(1) In GEN Rule 2.2.2, Arranging Credit and Advising on Credit means: (a) making arrangements for another Person, whether as principal or agent, to borrow money by way of a Credit Facility; or (b) giving advice to a Person in his capacity as a borrower or potential borrower or as agent for a borrower or potential borrower on the merits of his entering into a particular Credit Facility. (2) Advice in (1)(b) includes a statement, opinion or report: (a) where the intention is to influence a Person, in making a decision, to enter into a particular Credit Facility; or (b) which could reasonably be regarded as being intended to have such an influence.»
+
+**GEN 2.28.2** — `https://dfsaen.thomsonreuters.com/rulebook/gen-2282`, jina **200, 37 863 байт**. Дословно: «A Person does not carry on the activity of Arranging Credit under GEN Rule 2.28.1(1)(a) if that Person enters, or is to enter, into the transaction to Provide Credit. …» (исключения GEN 2.28.3–2.28.8 существуют по оглавлению, тексты не добыты).
+
+**Буквально (DIFC):** «financial product» по GEN 2.11.1(4) — инвестиции, депозиты, долгосрочное страхование, пенсии, крипто-токены; кредит в список не входит. Совет по кредиту — отдельная деятельность GEN 2.28.1(1)(b), привязанная к «entering into a particular Credit Facility». Порядок погашения существующих долгов в эту формулировку буквально не входит; совет «положить в депозит / резерв в конкретном продукте» — входит в GEN 2.11.1, если продукт конкретный («a particular financial product»). Исключение GEN 2.11.2 касается изданий, чья основная цель — НЕ совет; сервис, чья основная цель — совет, под него буквально не подпадает.
+
+#### П.AE-ADGM. Financial Services and Markets Regulations 2015 (FSMR), Schedule 1
+
+**Источник.** `https://en.adgm.thomsonreuters.com/node/12877` (официальный хостинг ADGM Rulebook) через `r.jina.ai`, **200, 22 304 байт**; действующая редакция «Dec 18 2023», пометка «Amended on (04 May, 2023)». Глоссарий: `https://en.adgm.thomsonreuters.com/entiresection/11100`, jina **200, 50 768 байт** — «Advising on Investments or Credit Means the Regulated Activity specified in paragraph 28 of Schedule 1 of the FSMR».
+
+Дословно, **Schedule 1, paragraph 28. Advising on Investments or Credit**:
+«(1) Advising a person is a specified kind of activity if the advice is — (a) advice on the merits of his doing any of the following (whether as principal or agent) — (i) Buying or Selling a Specified Investment (other than a Credit Facility), a Virtual Asset or a Spot Commodity or subscribing for or underwriting a particular investment which is a Specified Investment (other than a Credit Facility) or a Profit Sharing Investment Account; (ii) exercising any right conferred by such an investment to Buy, Sell, subscribe for or underwrite such an investment; or (iii) **entering into a Credit Facility**; and (b) given to the person in his capacity as (i) an investor or potential investor; (ii) agent for an investor or a potential investor; (iii) Borrower or potential Borrower; or (iv) agent for a Borrower or potential Borrower. (2) In sub-paragraph (1), "advice" includes a statement, opinion or report — (a) where the intention is to influence a person, in making a decision, to select a particular financial product or an interest in a particular investment; or (b) which could reasonably be regarded as being intended to have such an influence.»
+
+Оглавление раздела исключений (`https://en.adgm.thomsonreuters.com/node/12878`, jina **200, 21 200 байт**): «29. Advice given in newspapers etc.»; «30. Other exclusions» — тексты добираются ниже.
+
+**Робо-совет в ADGM (только заголовок и сниппет поиска, документ не открывался):** FSRA «Supplementary Guidance – Digital Investment Management (VER02.061125)», `https://assets.adgm.com/download/assets/supplementary-guidance-authorisation-of-digital-investment-management-robo-advisory-activities.pdf/…`. По сниппету выдачи (пересказ, не норма): Advising on Investments or Credit включает «recommending that a client invest in a portfolio of Financial Instruments», а Digital Investment Manager с разрешением на Managing Assets «will not require separate permissions for Advising on Investments or Credit if it undertakes those Regulated Activities incidentally».
+
+ADGM FSMR Schedule 1, **paragraph 29. Advice given in newspapers etc.** — `https://en.adgm.thomsonreuters.com/node/12879`, jina **200, 22 536 байт**, редакция «Oct 20 2015». Дословно:
+«(1) There is excluded from paragraph 28 the giving of advice in writing or other legible form if the advice is contained in a newspaper, journal, magazine, or other periodical Publication, or is given by way of a service comprising regularly updated news or information, if the principal purpose of the Publication or service, taken as a whole and including any advertisements or other promotional material contained in it, is neither — (a) that of giving advice of a kind mentioned in paragraph 28; nor (b) that of leading or enabling persons to Buy, Sell, subscribe for or underwrite Specified Investments. (2) There is also excluded from paragraph 28 the giving of advice in any service consisting of the broadcast or transmission of television or radio programmes, if the principal purpose of the service … is neither of those mentioned in sub-paragraph (1)(a) and (b). (3) The Regulator may, on the application of the proprietor of any such Publication or service as is mentioned in sub-paragraph (1) or (2), certify that it is of the nature described in that paragraph, and may revoke any such certificate if it considers that it is no longer justified. (4) A certificate given under sub-paragraph (3) and not revoked is conclusive evidence of the matters certified.»
+Paragraph 30 «Other exclusions» — не добыт.
+
+**Буквально (ADGM):** п. 28(1)(a)(iii) — «entering into a Credit Facility»: как в DIFC и AIFC, привязка к вступлению в кредит. Исключение п. 29 — для периодических изданий и новостных сервисов, чья основная цель не совет; сервис, чья основная цель — совет, буквально под него не подпадает.
+
+#### П.AE-onshore-SCA. Правила SCA о лицензировании финансовой деятельности (Rulebook of Financial Activities, Section 2)
+
+**Источник.** `https://www.sca.gov.ae/assets/7949008c/en-licensing-of-the-financial-activities-and-jobs-approval.aspx` — `curl` без `-L`: **301, 228 байт**; с `-L`: **200, 728 961 байт**, конечный адрес `https://www.uaecma.gov.ae/assets/7949008c/…` (переадресация SCA → CMA подтверждена на уровне HTTP), PDF 1.7, 64 страницы. Документ — «Section (2): The financial activities and jobs approval»; в тексте поправки до «Resolution No. (35/Chairman) of 2023 issued on 3/8/2023 enforced on 16/8/2023».
+
+Дословно, Chapter 1, **Article (2): Scope of application**: «1- The provisions of this section shall apply to any person who practices any of the financial activities or professional jobs specified in this section inside the state. … 2- **No financial activity may be practiced unless after obtaining a license and /or approval on practicing the financial activity from the Authority.** Furthermore, no approved job shall be practiced unless after obtaining an approval from it.»
+
+Перечень финансовой деятельности (Article (1), фрагмент): «1- Trading broker. … 5- Financial Products dealer *. **6- Financial Consultations.** 7- Financial advisor (issuance manager). 8- Listing advisor. 9- Promotion. 10- Introducing. … 12- Portfolios management* …»
+Категории лицензий (Chapter 2, Article (2)): «… Fifth category: Arrangement and advice. …»
+Среди признаваемых квалификаций сотрудников — «Registered Financial Planner», «Chartered Financial Consultant (ChFC)» (с. 51).
+
+**Чего в этом документе нет:** определения «Financial Consultations» (поиск по «Consultation» — 1 вхождение, только перечень; «Definitions» — 0). Предмет категории по сниппету поиска (Mondaq/Lexology, **пересказ, не норма**): «providing financial consultation and financial analysis on securities for a fee as a regular business». По тексту документа предмет — финансовая деятельность в отношении ценных бумаг; долгов и бюджета он не касается.
+
+#### П.AE-onshore-CBUAE — не исследовано
+
+Режим ЦБ ОАЭ для консультаций по кредитам и личным финансам (Consumer Protection Regulation, Finance Companies Regulation) в этом добое **не открывался** — бюджет вызовов исчерпан на SCA/DFSA/ADGM. Отрицательного результата нет: вопрос остаётся открытым.
+
+**Не добыто по ОАЭ.** (1) CBUAE — целиком, см. выше. (2) Определение «Financial Consultations» из Decision No. 13/RM/2021 (Rulebook, Section 1 «Definitions») — не найдено в скачанной Section 2. (3) DFSA GEN 2.28.3–2.28.8 и ADGM Schedule 1 п. 30 — не открывались. (4) FSRA Supplementary Guidance по робо-совету — известен только сниппет.
+
+### П.Грузия
+
+Регулятор — **Национальный банк Грузии (НБГ)**.
+
+**Источник 1 (актуальный).** `https://matsne.gov.ge/en/document/view/18196` через `r.jina.ai`, **200, 204 947 байт** — английский перевод Закона Грузии «О рынке ценных бумаг» от 24.12.1998 № 1745-IIს; последние поправки в выдержках — «Law of Georgia No 3714 of 16 November 2023 – website, 7.12.2023»; есть вставки с пометкой «Shall become effective from 1 January 2027».
+**Источник 2 (устаревший, для протокола).** `https://www.matsne.gov.ge/en/document/download/18196/22/en/pdf` — `curl`, **200, 224 870 байт**, PDF 30 страниц; это публикация № 22 с поправками до 2015 г. Использован только для сверки, нормы процитированы из источника 1.
+
+Дословно, **Article 23 – Activities of a brokerage company**: «A brokerage licence authorises a brokerage company to engage in operations and services related to equity share, shares, bonds, certificates, bills of exchange, cheques and other securities, and as such a brokerage company may: a) **direct consultations to investors on investments, including the price of securities, investment in securities, trading in securities and related foreign exchange transactions**; b) conduct research related to financial instruments and their issuers and ensure the dissemination of the research results and/or recommendations on investments strategies; c) provide consultations to issuers on the issuance of securities and the attractiveness of investments; … f) manage clients' investment portfolios …»
+
+Лицензионная оговорка (номер статьи и её п. 1 с перечнем деятельности в выдержку не попали): «2. An appropriate activity may not be carried out without a licence specified in paragraph 1 of this article and issued by the National Bank of Georgia, except as otherwise provided for by the legislation of Georgia.»
+
+Article 23¹(4) (фрагмент): «Brokerage companies shall not be engaged in activities that are not stipulated by Article 23 of this Law, except …»
+Об обязанностях при рекомендациях (статья не зафиксирована): «4. A broker shall be prohibited from giving knowingly misleading recommendations and information to clients on behalf of the brokerage company. A brokerage company shall provide information on the suitability of investments …»
+
+**Отрицательный результат.** В актуальном английском тексте закона поиск по «adviser», «advisor», «investment advice» — **0 вхождений**; отдельного лицензируемого вида «инвестиционный советник» в законе нет. Консультирование инвесторов — вид деятельности в рамках брокерской лицензии (ст. 23(a)); из выдержек не видно, распространяется ли лицензионная оговорка на консультации, которые отдельно от брокерских операций оказывает нелицензиат.
+**Пересказ, не норма:** `https://legal.ge/en/service/licensing-and-regulatory-permits-en/investment-advisor-license-georgia` (юрфирма, по сниппету поиска) — «Investment advisor licensing in Georgia is regulated by the National Bank of Georgia … mandatory … for individuals planning to provide individual recommendations on securities»; основание — «the Order of the President of the National Bank "On Approval of the Rule for Licensing Brokerage Companies and Recognizing Investment Advisors"». Сам приказ НБГ не открывался.
+
+**Не добыто по Грузии.** (1) Приказ президента НБГ о лицензировании брокерских компаний и признании инвестиционных советников — не открывался, бюджет. (2) Номер статьи с оговоркой «may not be carried out without a licence» и её п. 1. (3) Нормы о консультациях по потребительскому кредиту и долгам (Органический закон о НБГ, акты НБГ о защите прав потребителей) — не искались. (4) Грузинский оригинал не сверялся, только официальный английский перевод matsne.
+
+### П — итог по странам
+
+Обозначения: (а) персональный совет по долгам и личным финансам без продажи продуктов; (б) то же, выдаётся программой; (в) инвестиционный совет. «Нормы не найдено» — в прочитанных актах нет нормы, требующей лицензии; это не значит, что её нет во всей правовой системе. Выводы в колонках — буквальное содержание прочитанных норм, не юридическое заключение.
+
+| Юрисдикция | Регулятор | (а) | (б) | (в) | Норма-основание | Уверенность | Что не добыто и почему |
+|---|---|---|---|---|---|---|---|
+| Казахстан (республиканский режим) | АРРФР | нормы не найдено | нормы не найдено (о робо-совете ничего нет) | **да** — только брокер/дилер/управляющий портфелем | Закон о РЦБ № 461-II, ст. 53-2 п. 1 (ред. до 16.01.2026 № 259-VIII); Закон о банках, ст. 8 пп. 8) — разрешение банкам, не резерв | ст. 53-2 прочитана дословно (в п. 3 разрыв на границе выдержки) | акт АРРФР о порядке рекомендации; номер статьи о непрофильной деятельности — не хватило бюджета |
+| Казахстан — МФЦА | AFSA | совет по порядку погашения существующих долгов — буквально вне п. 19; совет о вступлении в конкретный кредит — **да** | то же; исключения для ПО не найдено | **да** | AIFC GEN Sch. 1 п. 10, п. 19; GEN 1.1.1, 1.1.9 | прочитано дословно (jina), дата редакции не видна | Guidance AFSA по advice/information — не искалась |
+| Армения | ЦБА | нормы не найдено | нормы не найдено | **да** (консультация по инвестициям в ЦБ — инвестиционная услуга); «general investment proposals» — свободны | Закон о РЦБ HO-195-N ст. 25(1)(3), 26(7), 27(2)–(3) (ред. 09.06.2022); Закон о потребкредите — посредников нет; Закон о кредитных организациях — «provide financial consultation» разрешена, не зарезервирована | прочитано дословно (официальный английский перевод) | акты ЦБА по ст. 27(4); поправки после 06.2022 не сверены |
+| Сербия | Komisija za HoV; НБС | для небанковского консультанта нормы не найдено; «savetodavne usluge» определены как услуги банка | нормы не найдено | **да** («lična preporuka» по финансовым инструментам); исключение ч. 3 т. 10 — только для попутного бесплатного совета | ZTK (СГ 129/2021, 109/2025) чл. 2 т. 2)(5), т. 7), чл. 3 т. 10; ZZKFU (СГ 19/2025) чл. 2 т. 41 | дословно, но по консолидированному тексту paragraf.rs, не по официальному ПИС | официальный текст ПИС; акты Комиссии о «povremeno» |
+| ОАЭ onshore — SCA/CMA | SCA (CMA) | не относится (предмет — ценные бумаги) | не относится | **да** — категория «Financial Consultations», без лицензии деятельность запрещена | Rulebook Section 2, Article (2) Scope, п. 2; перечень, п. 6 | прочитано дословно; определения категории в документе нет — по пересказу юрфирмы | определение «Financial Consultations» (Section 1 Rulebook) |
+| ОАЭ onshore — CBUAE | CBUAE | **неясно** | **неясно** | — | — | не исследовано | весь режим CBUAE — бюджет вызовов кончился |
+| ОАЭ — DIFC | DFSA | совет о вступлении в конкретный кредит — **да** (GEN 2.28.1(1)(b)); порядок погашения существующих долгов — буквально вне; совет по конкретному депозиту — **да** (GEN 2.11.1(4)(b)) | то же; исключение GEN 2.11.2 — только для изданий, чья основная цель не совет | **да** | GEN 2.11.1 (ред. 01.11.2022), 2.11.2, 2.28.1 (ред. 01.02.2017) | прочитано дословно | GEN 2.28.3–2.28.8 не открывались |
+| ОАЭ — ADGM | FSRA | вступление в кредит — **да**; существующий долг — буквально вне | то же; исключение п. 29 — для периодики и новостей, чья основная цель не совет | **да** | FSMR 2015 Sch. 1 п. 28 (ред. 18.12.2023), п. 29 | прочитано дословно | п. 30 Other exclusions; Guidance по робо-совету — только сниппет |
+| Грузия | НБГ | нормы не найдено | нормы не найдено | **да** — в рамках брокерской лицензии (ст. 23(a)); отдельного «советника» в законе нет; по пересказу юрфирмы есть приказ НБГ о «признании инвестиционных советников» | Закон о РЦБ № 1745-IIს ст. 23(a), 23¹(4), оговорка «may not be carried out without a licence» (статья не зафиксирована); ред. до 16.11.2023 | закон — дословно (английский перевод); приказ НБГ — пересказ | приказ НБГ; номер статьи лицензионной оговорки; режим для консультаций по потребкредиту |
+
+**Процесс.** Подагентов — 0. Вызовов `WebSearch` — 10, отказа бюджета не было. Всего вызовов инструментов — около 40 (потолок задания). Каналы: прямой `curl` (old.adilet.zan.kz, afsa.aifc.kz, arlis.am, old.cba.am PDF, paragraf.rs, matsne PDF, sca.gov.ae → uaecma.gov.ae с `-L`); `r.jina.ai` (orderly.myafsa.com после 403 прямого, dfsaen.thomsonreuters.com, en.adgm.thomsonreuters.com, matsne view). Отсеянные заглушки: новый adilet.zan.kz — 200/2 191 байт (SPA), тот же через jina — 200/2 281; orderly.myafsa.com прямой — 403/5 878; sca.gov.ae без `-L` — 301/228. Exa и Wayback не понадобились.
+
+
+
+## ДОБОР Г16 — О. UK RAO (SI 2001/544) art. 72 «Overseas persons» и art. 39E «Debt-counselling» (дословно)
+
+- Источник: https://www.legislation.gov.uk/uksi/2001/544/article/72 (latest available revised version) — curl, HTTP 200, 137 910 байт; https://www.legislation.gov.uk/uksi/2001/544/article/39E — curl, HTTP 200, 41 259 байт; снято 12.09.2026 ~22:05 МСК.
+- Буквальное содержание, без толкования: пункт (5) art. 72 исключает для overseas person по legitimate approach только activities по articles 53 и 55A («giving of advice or the provision of targeted support»). Строки «39E» в тексте art. 72 НЕТ (проверено поиском по снятому тексту: `'39E' in text` → False). Единственное совпадение по шаблону «39[A-Z]» — «39A» в п. (6), который исключает из article 64 соглашения по legitimate approach; к debt-counselling (39E) не относится.
+- Пп. (1)–(5F) art. 72 — полностью; хвост (6)–(14) — в полном тексте, снятом в /private/tmp/g16/rao72.txt, тоже переносится ниже.
+
+```text
+Overseas persons U.K. 72. —(1) An overseas person does not carry on an activity of the kind specified by article 14 [ F1 , 25D or 25DA ] by— (a) entering into a transaction as principal with or though an authorised person, or an exempt person acting in the course of a business comprising a regulated activity in relation to which he is exempt; or (b) entering into a transaction as principal with a person in the United Kingdom, if the transaction is the result of a legitimate approach. (2) An overseas person does not carry on an activity of the kind specified by article 21 [ F2 , 25D or 25DA ] by— (a) entering into a transaction as agent for any person with or through an authorised person or an exempt person acting in the course of a business comprising a regulated activity in relation to which he is exempt; or (b) entering into a transaction with another party (“X") as agent for any person (“Y"), other than with or through an authorised person or such an exempt person, unless— (i) either X or Y is in the United Kingdom; and (ii) the transaction is the result of an approach (other than a legitimate approach) made by or on behalf of, or to, whichever of X or Y is in the United Kingdom. (3) There are excluded from article 25(1) [ F3 , 25D or 25DA ] arrangements made by an overseas person with an authorised person, or an exempt person acting in the course of a business comprising a regulated activity in relation to which he is exempt. (4) There are excluded from article 25(2) [ F4 , 25D or 25DA ] arrangements made by an overseas person with a view to transactions which are, as respects transactions in the United Kingdom, confined to— (a) transactions entered into by authorised persons as principal or agent; and (b) transactions entered into by exempt persons, as principal or agent, in the course of business comprising regulated activities in relation to which they are exempt. (5) [ F5 There is excluded from articles 53 and 55A the giving of advice or the provision of targeted support by an overseas person ] as a result of a legitimate approach. [ F6 (5A) An overseas person does not carry on an activity of the kind specified by article 25A(1)(a), [ F7 25A(2A), ] 25B(1)(a) [ F8 , 25C(1)(a) or 25E(1)(a) ] if each person who may be contemplating entering into the relevant type of agreement in the relevant capacity is non-resident. (5B) There are excluded from articles 25A(1)(b), 25B(1)(b) [ F9 , 25C(1)(b) and 25E(1)(b) ] arrangements made by an overseas person to vary the terms of a qualifying agreement. (5C) There are excluded from articles 25A(2), 25B(2) [ F10 , 25C(2) and 25E(2) ] , arrangements made by an overseas person which are made solely with a view to non-resident persons who participate in those arrangements entering, in the relevant capacity, into the relevant type of agreement. (5D) An overseas person does not carry on an activity of the kind specified in article 61(1), 63B(1) [ F11 , 63F(1) or 63J(1) ] by entering into a qualifying agreement. (5E) An overseas person does not carry on an activity of the kind specified in article 61(2), 63B(2) [ F12 , 63F(2) or 63J(2) ] where he administers a qualifying agreement. (5F) In paragraphs (5A) to (5E)— (a) “ non-resident ” means not normally resident in the United Kingdom; (b) “ qualifying agreement ” means— (i) in relation to articles 25A and 61, a regulated mortgage contract where the borrower (or each borrower) is non-resident when he enters into it; (ii) in relation to articles 25B and 63B, a regulated home reversion plan where the reversion seller (or each reversion seller) is non-resident when he enters into it; (iii) in relation to articles 25C and 63F, a regulated home purchase plan where the home purchaser (or each home purchaser) is non-resident when he enters into it; [ F13 (iv) in relation to articles 25E and 63J, a regulated sale and rent back agreement where the agreement seller (or each agreement seller) is non-resident when the agreement seller enters into it; ] (c) “ the relevant capacity ” means— (i) in the case of a regulated mortgage contract, as borrower; (ii) in the case of a regulated home reversion plan, as reversion seller or plan provider; (iii) in the case of a regulated home purchase plan, as home purchaser; [ F14 (iv) in the case of a regulated sale and rent back agreement, as agreement seller or agreement provider; ] (d) “ the relevant type of agreement ” means— (i) in relation to article 25A, a regulated mortgage contract; (ii) in relation to article 25B, a regulated home reversion plan; (iii) in relation to article 25C, a regulated home purchase plan [ F15 ; (iv) in relation to article 25E, a regulated sale and rent back agreement ] . ] [ F16 (5G) An overseas person (“ P ”) does not carry on the activity specified by article 63U by providing an ESG rating to a person who is located in the United Kingdom (“ Q ”) where P receives no remuneration in respect of the ESG rating from any person. (5H) In paragraph (5G)— (a) “ ESG rating ” and “ located in the United Kingdom ” have the meanings given in article 63Z7; (b) the reference to P making the rating available is to be interpreted in accordance with the definition of “making available” in article 63Z7; (c) “ remuneration ” means any commission, fee, charge or other payment, including an economic benefit of any kind or any other financial or non-financial advantage or incentive offered or given. ] (6) There is excluded from article 64 any agreement made by an overseas person to carry on an activity of the kind specified by article 25(1) or (2), 37 [ F17 , 39A ] , 40 or 45 if the agreement is the result of a legitimate approach. (7) In this article, “ legitimate approach " means— (a) an approach made to the overseas person which has not been solicited by him in any way, or has been solicited by him in a way which does not contravene section 21 of the Act; or (b) an approach made by or on behalf of the overseas person in a way which does not contravene that section. [ F18 (8) Paragraphs (1) to (5) do not apply where the overseas person is an investment firm or [ F19 qualifying credit institution ] — (a) who is providing or performing investment services and activities on a professional basis; and (b) whose home F20 ... State is the United Kingdom. ] [ F21 (9) Paragraphs (1) to (5) do not apply where the overseas person is providing clearing services as a central counterparty (within the meaning of section 313(1) of the Act). ] [ F22 (9A) Paragraphs (1) to (5) do not apply— (a) where the overseas person is a central securities depository which provides the services referred to in Article F23 ... 25(2) of the CSD regulation in the United Kingdom (including through a branch in the United Kingdom); F24 ... F24 (b) . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . ] [ F25 (10) Paragraphs (5A) and (5C) do not apply where the overseas person is a mortgage intermediary whose home F26 ... State is the United Kingdom. ] [ F27 (10A) This article does not apply in the following two cases. ] [ F28 (11) [ F29 The first case is ] where the overseas person is— (a) a third-country firm, as defined by Article 4.1.57 (“definitions”) of the markets in financial instruments directive (“third country firm”); (b) established in a country subject to an equivalence decision; and (c) carrying on an activity a third country firm established in that third country may carry on by virtue of the equivalence decision under— (i) Article 46.1 of the markets in financial instruments regulation (general provisions) if it is registered by ESMA in the register of third country firms established in accordance with Article 48 of that Regulation (register); (ii) Article 47.3 of the markets in financial instruments regulation (equivalence decision) if it has a branch in an EEA State other than the United Kingdom and is authorised in that State in accordance with Article 39 of the markets in financial instruments directive (establishment of a branch); or (iii) Article 46.5 of the markets in financial instruments regulation. [ F30 (11A) The second case is where the overseas person is— (a) a third-country firm, as defined by Article 2.1.42 of the markets in financial instruments regulation; (b) established in a county that is the subject of an equivalence determination; and (c) carrying on an activity a third country firm established in that third country may carry on, by virtue of the equivalence determination, under— (i) Article 46.1 of the markets in financial instruments regulation, if it is registered by the FCA in the register of third country firms established in accordance with Article 48 of that regulation, or (ii) Article 46.5 of that regulation. ] (12) For the purposes of [ F31 paragraphs (11) and (11A) ] — (a) “ equivalence decision ” means a decision adopted by the Commission [ F32 before IP completion day ] in relation to a country under Article 47.1 of the markets in financial instruments regulation which has not been withdrawn by a subsequent decision adopted by the Commission [ F32 before IP completion day ] under that Article; F33 ... (b) a country is subject to an equivalence decision if a period of more than three years has elapsed since the adoption of the decision by the Commission, beginning on the day after the date of the adoption of the decision. ] [ F34 (c) “ equivalence determination ” means a determination made by the Treasury— (i) in regulations under Article 47.1 of the markets in financial instruments regulation and not revoked; or (ii) by direction under regulation 2 of the Equivalence Determinations for Financial Services and Miscellaneous Provisions (Amendment etc) (EU Exit) Regulations 2019 and not revoked; (d) a country is the subject of an equivalence determination if a period of more than three years has elapsed since— (i) the date on which the equivalence determination came into force, or (ii) where two or more equivalence determinations have been made in succession in relation to the country concerned, the date on which the first equivalence determination came into force; (e) for the purposes of sub-paragraph (d), an equivalence determination is not made in succession to an earlier determination if the earlier determination ceased to have effect before the later determination came into force. ] [ F35 (13) This article does not apply to the carrying on of an activity of any of the kinds specified in this article (“the RAO activity”) by an overseas person where— (a) the overseas person is registered in the register in respect of a description of— (i) relevant services, (ii) a category of relevant clients, and (iii) one or more relevant financial instruments, and (b) the activity which the overseas person may carry on by virtue of their registration in the register is in substance the same as the RAO activity, taking account of the financial instruments in relation to which, and the clients in relation to whom, the RAO activity may be carried out. (14) In paragraph (13)— “ register ” is the register maintained by the FCA in accordance with regulation 8 of the Financial Services and Markets Act 2023 (Mutual Recognition Agreement) (Switzerland) Regulations 2025 (the “ Switzerland Regulations ”); “ relevant client ” has the same meaning as in Part 4 of the Switzerland Regulations; “ relevant financial instrument ” has the same meaning as in Part 4 of the Switzerland Regulations; “ relevant service ” has the same meaning as in Part 4 of the Switzerland Regulations. ]
+```
+
+Поправки к art. 72 (первые записи блока Textual Amendments; F5 — S.I. 2026/74 о targeted support, в силе 06.04.2026):
+
+```text
+Textual Amendments F1 Words in art. 72(1) substituted (1.4.2017 for specified purposes, 3.1.2018 in so far as not already in force) by The Financial Services and Markets Act 2000 (Regulated Activities) (Amendment) Order 2017 (S.I. 2017/488) , arts. 1(2) , 5(2) F2 Words in art. 72(2) substituted (1.4.2017 for specified purposes, 3.1.2018 in so far as not already in force) by The Financial Services and Markets Act 2000 (Regulated Activities) (Amendment) Order 2017 (S.I. 2017/488) , arts. 1(2) , 5(2) F3 Words in art. 72(3) substituted (1.4.2017 for specified purposes, 3.1.2018 in so far as not already in force) by The Financial Services and Markets Act 2000 (Regulated Activities) (Amendment) Order 2017 (S.I. 2017/488) , arts. 1(2) , 5(2) F4 Words in art. 72(4) substituted (1.4.2017 for specified purposes, 3.1.2018 in so far as not already in force) by The Financial Services and Markets Act 2000 (Regulated Activities) (Amendment) Order 2017 (S.I. 2017/488) , arts. 1(2) , 5(2) F5 Words in art. 72(5) substituted (23.2.2026 for specified purposes, 6.4.2026 in so far as not already in force) by The Financial Services and Markets Act 2000 (Regulated Activities) (Providing Targeted Support) (Amendment) Order 2026 (S.I. 2026/74) , art. 1(2) (3) , Sch. para. 1(10) F6 Art. 72(5A)-(5F) substituted (6.11.2006 for specified purposes, 6.4.2007 in so far as not already in force) by The Financial Services and Markets Act 2000 (Regulated Activities) (Amendment) (No.2) Order 2006 (S.I. 2006/2383) , arts. 1(2) , 21 F7 Word in art. 72(5A) inserted (20.4.2015 for specified purposes, 21.12.2015 for specified purposes, 21.3.2016 in so far as not already in force) by The Mortgage Credit Directive Order 2015 (S.I. 2015/910) , art. 1(5) , Sch. 1 para. 4(26)(a) (with Pt. 4 ) F8 Words in art. 72(5A) substituted (1.7.2009 for specified purposes, 30.6.2010 in so far as not already in force) by The Financial Services and Markets Act 2000 (Regulated Activities) (Amendment) Order 2009 (S.I. 2009/1342) , arts. 1(2) , 20(a) F9 Words in art. 72(5B) substituted (1.7.2009 for specified purposes, 30.6.2010 in so far as not already in force) by The Financial Services and Markets Act 2000 (Regulated Activities) (Amendment) Order 2009 (S.I. 2009/1342) , arts. 1(2) , 20(b) F10 Words in art. 72(5C) substituted (1.7.2009 for specified purposes, 30.6.2010 in so far as not already in force) by The Financial Services and Markets Act 2000 (Regulated Activities) (Amendment) Order 2009 (S.I. 2009/1342) , arts. 1(2) , 20(c) F11 Words in art. 72(5D) substituted (1.7.2009 for specified purposes, 30.6.2010 in so far as not already in force) by The Financial Services and Markets Act 2000 (Regulated Activities) (Amendment) Order 2009 (S.I. 2009/1342) , arts. 1(2) , 20(d) F12 Words in art. 72(5E) substituted (1.7.2009 for specified purposes, 30.6.2010 in so far as not already in force) by The Financial Services and Markets Act 2000 (Regulated Activities) (Amendment) Order 2009 (S.I. 2009/1342) , arts. 1(2) , 20(e) F13 Art. 72(5F)(b)(iv) inserted (1.7.2009 for specified purposes, 30.6.2010 in so far as not already in force) by The Financial Services and Markets Act 2000 (Regulated Activities) (Amendment) Order 2009 (S.I. 2009/1342) , arts. 1(2) , 20(f) F14 Art. 72(5F)(c)(iv) inserted (1.7.2009 for specified purposes, 30.6.2010 in so far as not already in force) by The Financial Services and Markets Act 2000 (Regulated Activities) (Amendment) Order 2009 (S.I. 2009/1342) , arts. 1(2) , 20(g) F15 Art. 72(5F)(d)(iv) and semi-colon inserted (1.7.2009 for specified purposes, 30.6.2010 in so far as not already in force) by The Financial Services and Markets Act 2000 (Regulated Activities) (Amendment) Order 2009 (S.I. 2009/1342) , arts. 1(2) , 20(h) F16 Art. 72(5G)(5H) inserted (16.12.2025 for specified purposes) by The Financial Services and Markets Act 2000 (Regulated Activities) (ESG Ratings) Order 2025 (S.I. 2025/1349) , arts. 2 , 7 (with arts. 8-22 ) F17 Word in art. 72(6) inserted (31.10.2004 for specified purposes, 14.1.2005 in so far as not already in force) by The Financial Services and Markets Act 2000 (Regulated Activities) (Amendment) (No. 2) Order 2003 (S.I. 2003/1476) , arts. 1(3) , 10(6) F18 Art. 72(8) inserted (1.4.2007 for specified purposes, 1.11.2007 in so far as not already in force) by The Financial Services and Markets Act 2000 (Regulated Activities) (Amendment No. 3) Order 2006 (S.I. 2006/3384) , arts. 1(2) , 24(e) F19 Words in art. 72(8) substituted (31.12.2020) by The Financial Services and Markets Act 2000 (Amendment) (EU Exit) Regulations 2019 (S.I. 2019/632) , regs. 1(3) , 147(2) (with savings in S.I. 2019/680 , reg. 11 (as amended by S.I. 2019/1212 , regs. 1(3) , 22(3) ); 2020 c. 1 , Sch. 5 para. 1(1) F20 Word in art. 72(8)(b) omitted (31.12.2020) by virtue of The Financial Services and Markets Act 2000 (Amendment) (EU Exit) Regulations 2019 (S.I. 2019/632) , regs. 1(3) , 147(3) (with savings in S.I. 2019/680 , reg. 11 (as amended by S.I. 2019/1212 , regs. 1(3) , 22(3) ); 2020 c. 1 , Sch. 5 para. 1(1) F21 Art. 72(9) inserted (1.4.2013) by The Financial Services and Markets Act 2000 (Over the Counter Derivatives, Central Counterparties and Trade Repositories) Regulations 2013 (S.I. 2013/504) , regs. 1(2) , 33(5) (with regs. 52-58 ) F22 Art. 72(9A) inserted (28.11.2017) by The Central Securities Depositories Regulations 2017 (S.I. 2017/1064) , reg. 1 , Sch. para. 23(3) (with regs. 7(4) , 8(4) , 9(1) ) F23 Words in art. 72(9A)(a) omitted (31.12.2020) by virtue of The Financial Services and Markets Act 2000 (Amendment) (EU Exit) Regulations 2019 (S.I. 2019/632) , regs. 1(3) , 147(4)(a) (with savings in S.I. 2019/680 , reg. 11 (as amended by S.I. 2019/1212 , regs. 1(3) , 22(3) ); 2020 c. 1 , Sch. 5 para. 1(1) F24 Art. 72(9A)(b) and word omitted (31.12.2020) by virtue of The Financial Services and Markets Act 2000 (Amendment) (EU Exit) Regulations 2019 (S.I. 2019/632) , regs. 1(3) , 147(4)(b) (with savings in S.I. 2019/680 , reg. 11
+```
+
+art. 39E:
+
+```text
+[ F1 Debt-counselling U.K. 39E. — (1) Giving advice to a borrower about the liquidation of a debt due under a credit agreement is a specified kind of activity. (2) Giving advice to a hirer about the liquidation of a debt due under a consumer hire agreement is a specified kind of activity. ] Textual Amendments F1 Pt. II Ch. 7B inserted (26.7.2013 for specified purposes, 1.4.2014 in so far as not already in force) by The Financial Services and Markets Act 2000 (Regulated Activities) (Amendment) (No.2) Order 2013 (S.I. 2013/1881) , art. 1(2) (6) , 5
+```
+
+
+## ДОБОР Г16 — Н. Транспозиция CCD II (Directive (EU) 2023/2225): Германия и Ирландия
+
+### Германия — итоговый акт принят и опубликован
+
+- Акт: «Gesetz zur Umsetzung der Richtlinie (EU) 2023/2225 über Verbraucherkreditverträge und zur Regelung der Förderung klimaneutraler Mobilität» vom 12. Mai 2026, BGBl. 2026 I Nr. 139 vom 18.05.2026; ELI https://www.recht.bund.de/eli/bund/bgbl-1/2026/139
+- Источники: карточка https://www.recht.bund.de/bgbl/1/2026/139/VO.html (curl, HTTP 200, 37 948 байт); официальный PDF https://www.recht.bund.de/bgbl/1/2026/139/regelungstext.pdf?__blob=publicationFile&v=1 (curl, HTTP 200, 921 242 байт; pdftotext 193 391 знак). Снято 12.09.2026 ~22:15 МСК.
+- Структура (заголовки статей из PDF): Art. 1 BGB; Art. 2 EGBGB (Art. 247 — информация); Art. 3 BDSG; Art. 4 UKlaG; Art. 5 EU-VSchDG; Art. 6 UWG; Art. 7 GewO; Art. 8 PAngV; Art. 9 KWG; Art. 10 InstitutsVergV; Art. 11 FinDAG; Art. 12 FinDAGebV; Art. 13 VVG; Art. 14 новый Absatzfinanzierungsaufsichtsgesetz (AbsFinAG); Art. 15 KliNeMFöG; Art. 16 Inkrafttreten.
+- В тексте есть отсылка к отдельному закону «Gesetz über den Zugang zu Schuldnerberatungsdiensten für Verbraucher» (обязанность кредитора направлять заёмщика в трудностях к службам долгового консультирования, ст. 36 CCD II) — сам этот закон в Nr. 139 не содержится; его реквизиты не добыты.
+
+Art. 16 Inkrafttreten — дословно:
+
+```text
+Artikel 16
+Inkrafttreten
+(1) Dieses Gesetz tritt vorbehaltlich des Absatzes 2 am 20. November 2026 in Kraft.
+(2) Am Tag nach der Verkündung treten in Kraft:
+1. Artikel 1 Nummer 6 Buchstabe c und Nummer 19,
+2. in Artikel 7 Nummer 6 § 34l der Gewerbeordnung sowie
+3. Artikel 15.
+
+Die verfassungsmäßigen Rechte des Bundesrates sind gewahrt.
+Das vorstehende Gesetz wird hiermit ausgefertigt. Es ist im Bundesgesetzblatt zu verkünden.
+
+Berlin, den 12. Mai 2026
+Der Bundespräsident
+Steinmeier
+Der Bundeskanzler
+Merz
+Die Bundesministerin
+d e r J u s t i z u n d f ü r Ve r b r a u c h e r s c h u t z
+Stefanie Hubig
+
+Seite 37 von 51
+
+Bundesgesetzblatt Jahrgang 2026 Teil I Nr. 139, ausgegeben zu Bonn am 18. Mai 2026
+
+Seite 38 von 51
+
+EU-Rechtsakte:
+1. Richtlinie 93/13/EWG des Rates vom 5. April 1993 über missbräuchliche Klauseln in Verbraucherverträgen
+(ABl. L 95 vom 21.4.1993, S. 29), die zuletzt durch die Richtlinie (EU) 2019/2161 vom 27. November 2019
+(ABl. L 328 vom 18.12.2019, S. 7) geändert worden ist
+2. Empfehlung 2003/361/EG der Kommission vom 6. Mai 2003 betreffend die Definition der Kleinstunternehmen
+sowie der kleinen und mittleren Unternehmen (ABl. L 124 vom 20.5.2003, S. 36)
+3. Richtlinie 2005/36/EG des Europäischen Parlaments und des Rates vom 7. September 2005 über die
+Anerkennung von Berufsqualifikationen (ABl. L 255 vom 30.9.2005, S. 22; L 271 vom 16.10.2007, S. 18; L 93
+vom 4.4.2008, S. 28; L 33 vom 3.2.2009, S. 49; L 305 vom 24.10.2014, S. 115), die zuletzt durch die Delegierte
+Richtlinie (EU) 2024/782 vom 4. März 2024 (ABl. L, 2024/782, 31.5.2024) geändert worden ist
+4. Verordnung (EU) Nr. 260/2012 des Europäischen Parlaments und des Rates vom 14. März 2012 zur Festlegung
+der technischen Vorschriften und der Geschäftsanforderungen für Überweisungen und Lastschriften in Euro und
+zur Änderung der Verordnung (EG) Nr. 924/2009 (ABl. L 94 vom 30.3.2012, S. 22), die zuletzt durch die
+Verordnung (EU) 2024/886 vom 13. März 2024 (ABl. L, 2024/886, 19.3.2024) geändert worden ist
+5. Verordnung (EU) 2015/751 des Europäischen Parlaments und des Rates vom 29. April 2015 über
+Interbankenentgelte für kartengebundene Zahlungsvorgänge (ABl. L 123 vom 19.5.2015, S. 1), die durch die
+Delegierte Verordnung (EU) 2018/72 vom 4. Oktober 2017 (ABl. L 13 vom 18.1.2018, S. 1) geändert worden ist
+6. Richtlinie (EU) 2015/1535 des Europäischen Parlaments und des Rates vom 9. September 2015 über ein
+Informationsverfahren auf dem Gebiet der technischen Vorschriften und der Vorschriften für die Dienste der
+Informationsgesellschaft (ABl. L 241 vom 17.9.2015, S. 1)
+```
+
+Отсылка к Schuldnerberatungsdienste (Art. 1, изменения BGB) — дословно, строки PDF:
+
+```text
+Abschnitten 3, 4 und 13 des in Artikel 247 § 1 Absatz 2 Satz 2 des Einführungsgesetzes zum Bürgerlichen
+Gesetzbuche genannten Musters und entsprechend Artikel 246b § 1 Absatz 1 Nummer 16 des Einführungs­
+gesetzes zum Bürgerlichen Gesetzbuche unterrichtet hat.“
+16. In § 496 Absatz 2 Satz 1 wird nach der Angabe „unverzüglich“ die Angabe „vom bisherigen Darlehensgeber“
+eingefügt.
+17. Nach § 497 wird der folgende § 497a eingefügt:
+„§ 497a
+Zahlungsrückstände und Nachsichtsmaßnahmen bei Allgemein-Verbraucherdarlehen
+(1) Der Darlehensgeber ist verpflichtet, den Darlehensnehmer eines Allgemein-Verbraucherdarlehens­
+vertrags, der Schwierigkeiten bei der Erfüllung seiner finanziellen Verpflichtungen hat, an Schuldnerberatungs­
+dienste nach dem Gesetz über den Zugang zu Schuldnerberatungsdiensten für Verbraucher zu verweisen, die
+für den Darlehensnehmer leicht zugänglich sind.
+(2) Der Darlehensgeber muss, sofern angebracht, angemessene Nachsicht walten lassen, bevor er ein
+Zwangsvollstreckungsverfahren zur Durchsetzung seiner Ansprüche im Zusammenhang mit einem AllgemeinVerbraucherdarlehensvertrag einleitet. Die gegebenenfalls zu ergreifenden Maßnahmen der Nachsicht müssen
+unter anderem den individuellen Umständen des jeweiligen Darlehensnehmers Rechnung tragen. Sie können
+unter anderem aus einer vollständigen oder anteiligen Umschuldung des Darlehens bestehen und umfassen
+eine Änderung der Bedingungen des Darlehensvertrags, die unter anderem Folgendes umfassen kann:
+1. eine Verlängerung der Laufzeit des Darlehensvertrags,
+2. eine Änderung der Art des Darlehensvertrags,
+3. einen Zahlungsaufschub für alle oder einen Teil der Rückzahlungsraten in einem bestimmten Zeitraum,
+
+Bundesgesetzblatt Jahrgang 2026 Teil I Nr. 139, ausgegeben zu Bonn am 18. Mai 2026
+```
+
+Новый § 511 BGB «Beratungsleistungen» (Art. 1 Nr. 32) — дословно:
+
+```text
+Beratungsleistungen bei Verbraucherdarlehensverträgen“.
+32. § 511 wird wie folgt geändert:
+a) Die Überschrift wird durch die folgende Überschrift ersetzt:
+„§ 511
+Beratungsleistungen bei Verbraucherdarlehensverträgen“.
+
+Bundesgesetzblatt Jahrgang 2026 Teil I Nr. 139, ausgegeben zu Bonn am 18. Mai 2026
+
+Seite 9 von 51
+
+b) Absatz 1 wird durch den folgenden Absatz 1 ersetzt:
+„(1) Der Darlehensgeber hat den Darlehensnehmer zu informieren, ob für ihn individuelle Empfehlungen
+zu einem oder mehreren Geschäften, die im Zusammenhang mit einem Verbraucherdarlehensvertrag stehen
+(Beratungsleistungen), erbracht werden oder erbracht werden können. Bevor der Darlehensgeber für den
+Darlehensnehmer solche Beratungsleistungen erbringt, hat er den Darlehensnehmer über die sich aus
+Artikel 247 § 18 des Einführungsgesetzes zum Bürgerlichen Gesetzbuche ergebenden Einzelheiten in der
+dort vorgesehenen Form zu informieren.“
+c) Absatz 3 wird durch die folgenden Absätze 3 und 4 ersetzt:
+„(3) Der Darlehensgeber hat dem Darlehensnehmer auf Grund der Prüfung gemäß Absatz 2 in dessen
+bestem Interesse ein geeignetes oder mehrere geeignete Produkte zu empfehlen oder ihn darauf
+hinzuweisen, dass er kein Produkt empfehlen kann. Die Empfehlung oder der Hinweis ist dem
+Darlehensnehmer bei einem Immobiliar-Verbraucherdarlehensvertrag auf einem dauerhaften Datenträger
+und bei einem Allgemein-Verbraucherdarlehensvertrag auf Papier oder auf einem anderen im Vertrag über
+die Erbringung der Beratungsleistung benannten dauerhaften Datenträger nach Wahl des Darlehensnehmers
+zur Verfügung zu stellen.
+(4) Der Darlehensgeber ist verpflichtet, den Darlehensnehmer zu warnen, wenn ein Verbraucher­
+darlehensvertrag unter Berücksichtigung der finanziellen Situation des Darlehensnehmers möglicherweise
+ein spezifisches Risiko für ihn birgt.“
+33. § 512 Satz 1 wird durch den folgenden Satz ersetzt:
+„Von den Vorschriften der §§ 491 bis 511 darf, soweit nicht etwas anderes bestimmt ist, nicht zum Nachteil des
+Verbrauchers abgewichen werden.“
+34. Buch 2 Abschnitt 8 Titel 3 Untertitel 6 wird gestrichen.
+35. Die Überschrift des Buchs 2 Abschnitt 8 Titel 10 Untertitel 2 wird durch die folgende Überschrift ersetzt:
+„Untertitel 2
+Vermittlung von Verbraucherdarlehensverträgen und Finanzierungshilfen“.
+36. § 655a wird wie folgt geändert:
+a) Absatz 1 wird wie folgt geändert:
+aa) In Satz 1 Nummer 1 wird die Angabe „entgeltliche Finanzierungshilfe“ durch die Angabe „Finanzierungs­
+hilfe nach § 506“ ersetzt.
+bb) Satz 2 wird durch den folgenden Satz ersetzt:
+„Bei Finanzierungshilfen nach § 506, die den Ausnahmen des § 491 Absatz 2 Satz 2 Nummer 1 bis 3 und
+Absatz 3 Satz 2 entsprechen, gelten die Vorschriften dieses Untertitels nicht.“
+b) Absatz 2 wird durch den folgenden Absatz 2 ersetzt:
+„(2) Der Darlehensvermittler ist verpflichtet, den Verbraucher nach Maßgabe des Artikels 247 § 13
+Absatz 2 und § 13b Absatz 1 und des Artikels 247a § 2 des Einführungsgesetzes zum Bürgerlichen
+Gesetzbuche zu informieren. Der Darlehensvermittler ist gegenüber dem Verbraucher zusätzlich wie ein
+Darlehensgeber gemäß § 491a verpflichtet. Satz 2 gilt hinsichtlich § 491a Absatz 1 und 2 nicht für
+Warenlieferanten oder Dienstleistungserbringer, die in lediglich untergeordneter Funktion als Darlehens­
+vermittler von Allgemein-Verbraucherdarlehen oder von entsprechenden Finanzierungshilfen tätig werden,
+etwa indem sie als Nebenleistung den Abschluss eines verbundenen Verbraucherdarlehensvertrags
+vermitteln.“
+c) Absatz 3 Satz 1 und 2 wird durch die folgenden Sätze ersetzt:
+„Bietet der Darlehensvermittler im Zusammenhang mit der Vermittlung eines Verbraucherdarlehensvertrags
+oder einer entsprechenden Finanzierungshilfe nach § 506 Beratungsleistungen gemäß § 511 Absatz 1 an, so
+gilt § 511 entsprechend. § 511 Absatz 2 Satz 2 gilt bei der Vermittlung eines Immobiliar-Verbraucher­
+darlehensvertrages oder einer entsprechenden Finanzierungshilfe entsprechend mit der Maßgabe, dass
+der Darlehensvermittler eine ausreichende Zahl von am Markt verfügbaren Darlehensverträgen zu prüfen
+hat.“
+37. § 655b wird durch den folgenden § 655b ersetzt:
+„§ 655b
+Textform bei einem Vertrag mit einem Verbraucher
+(1) Der Darlehensvermittlungsvertrag mit einem Verbraucher bedarf der Textform. Der Vertrag darf nicht mit
+dem Antrag auf Hingabe des Darlehens oder der Finanzierungshilfe gemäß § 506 verbunden werden. § 492
+Absatz 1a gilt entsprechend. Der Darlehensvermittler hat dem Verbraucher den Vertragsinhalt in Textform
+mitzuteilen.
+(2) Ein Darlehensvermittlungsvertrag mit einem Verbraucher, der den Anforderungen des Absatzes 1 Satz 1
+und 2 nicht genügt oder vor dessen Abschluss die Pflichten aus Artikel 247 § 13 Absatz 2, § 13b Absatz 1 sowie
+§ 18 des Einführungsgesetzes zum Bürgerlichen Gesetzbuche nicht erfüllt worden sind, ist nichtig.“
+
+Bundesgesetzblatt Jahrgang 2026 Teil I Nr. 139, ausgegeben zu Bonn am 18. Mai 2026
+
+```
+
+### Ирландия — итоговый акт НЕ найден
+
+- Три поиска 12.09.2026 (WebSearch: «Ireland transposition … S.I. 2025», «"European Union (Consumer Credit" Regulations 2026 Ireland», «Ireland Consumer Credit Bill 2026 general scheme») не нашли ни S.I., ни законопроекта о транспозиции. Юрфирмы (A&L Goodbody https://www.algoodbody.com/insights-publications/consumer-credit-directive-2-ccd2-what-consumer-lenders-in-ireland-need-to-know ; Mason Hayes Curran https://www.mhc.ie/latest/insights/new-rules-on-consumer-credit-and-distance-marketing) по пересказу выдачи пишут: транспонирующий акт не опубликован, несмотря на срок 20.11.2025; применение CCD II — с 20.11.2026. Консультация Минфина по 23 национальным дискрециям закрылась 16.10.2024: https://www.gov.ie/en/department-of-finance/consultations/public-consultation-on-the-implementation-of-the-consumer-credit-directive-2/
+- В irishstatutebook найден «Credit Review Act 2026» (Number 1 of 2026) — по названию это закон о Credit Review Office, к транспозиции CCD II по выдаче не относится; не открывался.
+- Статус: неизвестно, принят ли акт между июлем и сентябрём 2026 — первоисточник (irishstatutebook.ie, перечень S.I. 2026) целиком не просматривался.
+
+## ДОБОР Г16 — Р (часть 1). Stripe: условия о запрещённых бизнесах и санкциях
+
+- Источник: https://stripe.com/legal/restricted-businesses — curl HTTP 200, 214 495 байт (текст в JS); через r.jina.ai HTTP 200, 28 425 байт. Снято 12.09.2026 ~22:15 МСК.
+- Выдержки дословно (строки markdown прокси; пропуски [...]):
+
+```text
+
+## High-Risk Jurisdictions and Persons
+
+Use of Stripe's services for any dealings, engagement, or sale of goods or services either directly or indirectly with the following are prohibited:
+
+#### High-risk jurisdictions
+
+Persons located in, resident in, or a citizen of, or products or services originating from jurisdictions that Stripe has determined for various reasons, including legal, contractual, and commercial reasons, to be prohibited, including, Cuba, Iran, North Korea, and Syria, and the Crimea, Donetsk, and Luhansk regions.
+
+#### High-risk persons
+
+Persons Stripe has determined for various reasons, including legal, contractual, and commercial reasons, to be prohibited, such as those individuals or entities named to a restricted person or party list of, or otherwise restricted by, the United States, United Kingdom, European Union, or United Nations, including the sanctions maintained by the US Office of Foreign Assets Control or the Denied Persons List or Entity List maintained by the US Department of Commerce.
+
+Additionally, it's prohibited to use Stripe's products and services to directly or indirectly:
+
+#### Prohibited services
+
+Export, re-export, sell, or supply accounting services; trust and corporate formation services; management consulting services; architecture services; engineering services; quantum computing services; information technology (IT) consultancy and design services; and IT-support services and cloud-based services for enterprise management software and design and manufacturing software to any person located in Russia. In the European Union and the United Kingdom, it is prohibited to use Stripe's products and services, directly or indirectly, to provide credit-rating services, market research and public relations services, advertising services, auditing services, or legal advisory services to any person located in Russia.
+
+#### Prohibited goods
+
+Deal in any goods prohibited by law for export to or import from Russia (for example, luxury goods, sensitive goods included in the Common High Priority Items List, enterprise management software and design software).
+
+You must not use Stripe's services for any illegal activities or for the businesses or product types listed below. The types of businesses listed here are representative of prohibited categories, but this is not an exhaustive list.
+
+#### Any illegal products and services
+[...]
+
+*    Any artificial-intelligence generated content that meets the above criteria
+
+#### Debt relief companies
+
+*    Debt settlement, debt negotiation, and debt consolidation
+
+#### The following financial products and services
+
+*    ATMs
+
+*    Check cashing
+
+*    Debt collection agencies
+
+*    Funded prop trading
+
+*    Money orders and traveler's checks
+
+*    Payable-through accounts
+[...]
+
+#### Lending and credit
+
+*    Loan repayments with credit cards
+
+*    Credit monitoring, credit repair, and counseling services
+
+#### Marijuana(see the[FAQ](https://support.stripe.com/questions/prohibited-and-restricted-businesses-list-faqs)s for additional details)
+
+*    Cannabis products
+```
+
+- https://support.stripe.com/questions/uae-account-activation-requirements — curl и r.jina.ai отдали пустую страницу (174–209 байт), текста нет. Пересказ поисковой выдачи (не Stripe): для счёта Stripe UAE нужна торговая лицензия ОАЭ (mainland или free zone); для представителей и владельцев ≥25 % — паспорт, Emirates ID и резидентская виза, если они не граждане ОАЭ/GCC и живут в ОАЭ.
+- https://stripe.com/legal/ssa (HTTP 200, 289 353 байт): ОАЭ и Кипр обслуживает контрагент «Stripe Payments Europe, Limited» (таблица Stripe Contracting Entity, дословно: «United Arab Emirates Stripe Payments Europe, Limited»; Кипр — в списке стран ЕЭЗ того же контрагента). Слово «sanction» в тексте SSA, снятом curl, не найдено — вероятно, санкционный пункт в подгружаемой части; не проверено.
+- https://support.stripe.com/questions/stripe-and-sanctions — HTTP 404.
+
+
+### Германия — отдельный закон о службах долгового консультирования (SchuBerDG): НЕ вступил, в согласительной процедуре
+
+- Акт: «Gesetz über den Zugang zu Schuldnerberatungsdiensten für Verbraucher (Schuldnerberatungsdienstegesetz – SchuBerDG)», Drucksache Bundestag 21/1847, Bundesrat 701/25; реализует ст. 36 CCD II (доступ к независимым службам долгового консультирования).
+- Карточка Бундесрата https://www.bundesrat.de/SharedDocs/beratungsvorgaenge/2025/0701-0800/0701-25.html (r.jina.ai HTTP 200, 16 812 байт) — дословно ход дела:
+
+```text
+    *   [Reden](https://www.bundesrat.de/DE/service/archiv/reden-archiv/reden-archiv-node.html)
+    *   [Themenarchiv](https://www.bundesrat.de/DE/service/archiv/themenarchiv/themenarchiv-node.html)
+    *   [Fotos](https://www.bundesrat.de/DE/service/archiv/fotoarchiv/fotoarchiv-node.html)
+*   [Mediathek Videoarchiv zu Plenarsitzungen und Veranstaltungen](https://www.bundesrat.de/DE/service/mediathek/mediathek-node.html)
+*   [Livestream Streamingangebote des Bundesrates während der Plenarsitzungen](https://www.bundesrat.de/DE/service/livestream/livestream-node.html)
+*   [App des Bundesrates Alles Wesentliche zum Bundesrat - zu jeder Zeit, an jedem Ort](https://www.bundesrat.de/DE/service/app/app-node.html)
+*   [Social Media Der Bundesrat in den sozialen Netzwerken](https://www.bundesrat.de/DE/service/socialmedia/socialmedia-node.html)
+*   [Stellenangebote Stellenausschreibungen des Sekretariats des Bundesrates](https://www.bundesrat.de/DE/service/stellen/stellen-node.html)
+*   [Öffentliche Ausschreibungen Lieferleistungen und Dienstleistungen](https://www.bundesrat.de/DE/service/ausschreibungen/ausschreibungen-node.html)
+*   [Glossar](https://www.bundesrat.de/DE/service/glossar/glossar_node.html)
+*   [Abkürzungen](https://www.bundesrat.de/DE/service/abkuerzungen/abkuerzungen-node.html)
+# Sie sind hier:
+1.   [Startseite](https://www.bundesrat.de/DE/homepage/homepage-node.html)
+2.   [Service](https://www.bundesrat.de/DE/service/service-node.html)
+3.   [Archiv](https://www.bundesrat.de/DE/service/archiv/archiv-node.html)
+4.   [Drucksachen](https://www.bundesrat.de/DE/service/archiv/bv-archiv/bv-archiv-node.html)
+5.   **Gesetz über den Zugang zu Schuldnerberatungsdiensten für Verbraucher (Schuldnerberatungsdienstegesetz - SchuBerDG)**
+[](https://www.bundesrat.de/)
+## 701/25
+## [Gesetz über den Zugang zu Schuldnerberatungsdiensten für Verbraucher (Schuldnerberatungsdienstegesetz - SchuBerDG)](https://www.bundesrat.de/SharedDocs/beratungsvorgaenge/2025/0701-0800/0701-25.html?topNr=701%2F25#top-701/25)
+28.11.2025
+```
+
+- Бундестаг, текстовый архив 2026 kw20 «Gesetz zu Schuldnerberatungsdiensten im Vermittlungsausschuss» https://www.bundestag.de/dokumente/textarchiv/2026/kw20-vermittlungsausschuss-1178424 (curl HTTP 200, 721 233 байт) — дословно фрагмент:
+
+```text
+) zu dem Gesetzentwurf. Neben den Grünen stimmte nur Die Linke dafür, Union, AfD und SPD lehnten ihn ab.
+Mit den Stimmen von CDU/CSU, SPD und Bündnis 90/Die Grünen beschloss das Parlament eine Entschließung zu dem Gesetz. Dagegen stimmten die AfD und Die Linke.
+Der Bundesrat hat am 
+Freitag, 8. Mai 2026
+, beschlossen dem Gesetz nicht zuzustimmen (
+21/5883
+(Dokument, öffnet ein neues Fenster)
+).
+Gesetzentwurf der Bundesregierung
+Mit dem Gesetz über den Zugang zu Schuldnerberatungsdiensten für Verbraucher (
+21/1847
+(Dokument, öffnet ein neues Fenster)
+) werden Vorgaben der EU-Verbraucherkreditrichtlinie 2023 / 2225 in deutsches Recht umgesetzt. Danach haben die Mitgliedstaaten sicherzustellen, dass Verbraucherinnen und Verbraucher, die Schwierigkeiten bei der Erfüllung ihrer finanziellen Verpflichtungen haben oder haben könnten, Zugang zu unabhängigen Schuldnerberatungsdiensten erhalten, für die nur begrenzte Entgelte zu entrichten sind. Die Richtlinie verpflichtet die Mitgliedstaaten, die entsprechenden Rechts- und Verwaltungsvorschriften bis spätestens 20. November 2025 umzusetzen.
+Vorgesehen ist, dass die Länder die Verfügbarkeit unabhängiger Schuldnerberatungsdienste sicherstellen. Diese Dienste sollen für Verbraucherinnen und Verbraucher „grundsätzlich kostenlos“ sein. Die Erhebung eines begrenzten Entgelts ist demnach möglich, sofern es höchstens die Betriebskosten deckt und keine unangemessene Belastung für die Verbraucher darstellt. Vorgesehen sind zudem jährliche Berichtspflichten der Länder an das Bundesministerium der Justiz sowie des Ministeriums an die Europäische Kommission über die Zahl der vorhandenen Beratungsstellen.
+In Deutschland gibt es laut Bundesregierung rund 1.380 Schuldnerberatungsstellen. Verlässliche Daten zu deren geografischer Verteilung, Ausstattung oder Wartezeiten lägen jedoch nicht vor, „auf deren Grundlage sich die Notwendigkeit oder der Umfang eines Ausbaus der Beratungskapazitäten prognostizieren ließe“. Daher lasse sich der finanzielle Mehraufwand auf Seiten der Länder nicht im Vorhinein quantifizieren.
+Änderungen im Rechtsausschuss
+Der Rechtsausschuss hatte am 12. November auf Änderungsantrag der Koalitionsfraktionen CDU/CSU und SPD noch zwei Änderungen am Regierungsentwurf vorgenommen. Zum einen wird im Schuldnerberatungsdienstegesetz festgeschrieben, dass die Dienste für Verbraucher „kostenlos angeboten werden“. Ein „begrenztes“ Entgelt ist demnach nur in „besonders begründeten Ausnahmefällen“ zulässig. 
+Ursprünglich hatte der Entwurf vorgesehen, dass die Beratung „grundsätzlich kostenlos“ anzubieten ist und die Möglichkeit für ein „begrenztes Entgelt“ eingeräumt. Dies war in den parlamentarischen Beratungen zu dem Gesetzentwurf sowohl von Abgeordneten als auch von Sachverständigen kritisiert worden.
+Zum anderen wird durch die Änderungen nun ausführlicher im Normtext dargelegt, wer Schuldnerberatungsdienste im Sinne des Gesetzes erbringen darf. Dazu wird definiert, was unter einem unabhängigen professionellen Anbieter zu verstehen ist. Auch diese Forderung war im parlamentarischen Verfahren erhoben worden.
+Entschließung verabschiedet
+Die Bundesregierung wird in der verabschiedeten Entschließung aufgefordert, gemeinsam mit den Ländern einen Vorschlag zu entwickeln, der dazu führt, eine auskömmliche Finanzierung und damit die Zukunftsfähigkeit der Schuldnerberatung in Deutschland – auch im Hinblick auf die Kostenfreiheit – zu sichern. Die Entwicklung dieses Vorschlags soll eine Prüfung der verpflichtenden Beteiligung privater Gläubiger an der Finanzierung der Schuldnerberatung einschließen.
+Die Prüfung soll auch umfassen, wie es durch Verfahrensverschlankungen, Änderungen im Verbraucherinsolvenzrecht und die Digitalisierung von Schuldnerberatungsprozessen und Verbraucherinsolvenzverfahren zu besseren und schnelleren Ergebnissen und gleichzeitig zu Kosteneinsparungen kommen kann. Dies soll ermöglichen, dass die Länder dadurch frei werdende Mittel der Schuldnerberatung zur Verfügung stellen können. Der Rechtsausschuss des Bundestages erwartet zu den Forderungen der Entschließung einen Bericht bis zum 31. Januar 2027.
+Änderungs- und Entschließungsantrag
+Die Linke hatte in ihrem Änderungsantrag (
+21/2788
+(Dokument, öffnet ein neues Fenster)
+```
+
+- По пересказу выдачи (bundestag kw46/2025): службы должны быть «grundsätzlich kostenfrei» для потребителя, обязанность обеспечить их — на землях. Режима лицензирования коммерческих советующих сервисов в этом законе по пересказу нет; текст закона не добыт (PDF Бундесрата 1060/erl/21.pdf — curl вернул 000/0 байт).
+
+## ДОБОР Г16 — Р (часть 2). Публичные свидетельства по Stripe и гражданам РФ
+
+- Privatily helpdesk (сервис регистрации компаний; вторичный источник, не Stripe) https://helpdesk.privatily.com/?article=which-nationalities-are-fully-blacklisted-by-stripe — r.jina.ai HTTP 200, 5 152 байт; дословно:
+
+```text
+
+```
+
+- vc.ru, 16.05.2024 (коммерческий блог посредника, маркетинговый тон) https://vc.ru/money/1177254-platezhnye-sistemy-paypal-i-stripe-nedostupny-grazhdanam-rossii-pochemu-eto-mif — r.jina.ai HTTP 200, 19 375 байт; дословно: «известные платежные системы Stripe и PayPal или не позволяли создать аккаунт в принципе, поскольку в списке выпадающих стран не было России, или уже после успешной регистрации учетной записи из РФ первые транзакции могли привести к мгновенной блокировке». Рецепт статьи — зарубежное юрлицо; конкретных кейсов с датами нет.
+- Поиск по «Stripe ОАЭ гражданин РФ … отказ» и «Stripe Кипр … россиянин блокировка» (12.09.2026): задокументированных кейсов отказа/успеха в 2025–2026 с проверяемыми деталями не найдено; выдача — посредники (pikabu, awx.pro, relocation2armenia), утверждающие, что при зарубежной компании «можно», и что «российский паспорт может потребовать дополнительных документов» при KYC. Пересказ, не свидетельство.
+- Контекст по Кипру (пересказ выдачи, mind.ua; residentpravo.com): массовые закрытия счетов россиян в кипрских банках; с конца октября 2025 EMI (Revolut) замораживали счета граждан РФ со ссылкой на 19-й пакет санкций ЕС; 13.03.2026 Еврокомиссия опубликовала разъяснение, что гражданство РФ само по себе не основание для закрытия счёта. Первоисточник разъяснения ЕК не открывался.
+- Exa (`web_search_exa`, `web_fetch_exa`) в наборе инструментов этого агента отсутствует: вызов вернул «No such tool available». Канал не использован.
+
+- Итог по SchuBerDG на 12.09.2026 (пересказ выдачи: hib-Kurzmeldung Бундестага https://www.bundestag.de/presse/hib/kurzmeldungen-1178472 ; gegen-hartz.de): Бундесрат отказал в согласии 08.05.2026, правительство созвало Vermittlungsausschuss 13.05.2026; сведений о договорённости в выдаче нет; действуют прежние земельные службы. Первоисточник о результате (vermittlungsausschuss.de) не открывался.
+
+
+## ИТОГ ДОБОРА Г16 (regulation_world_advice_boundary) — 12.09.2026
+
+| Пункт | Статус | Что именно |
+|---|---|---|
+| Н. CCD II — Германия | добыт | итоговый акт BGBl. 2026 I Nr. 139 от 18.05.2026 (официальный PDF), Art. 16 — вступление в силу 20.11.2026; новый § 511 BGB. Отдельный SchuBerDG (службы долгового консультирования) не вступил: Бундесрат отказал в согласии 08.05.2026, правительство 13.05.2026 созвало Vermittlungsausschuss, об исходе известно только по пересказу |
+| Н. CCD II — Ирландия | НЕ добыт | транспонирующий акт не найден тремя поисками; юрфирмы по пересказу пишут, что он не опубликован; irishstatutebook сплошь не просматривался |
+| О. UK RAO art. 72 | добыт | art. 72 целиком (latest revised, с поправкой S.I. 2026/74) + art. 39E |
+| П. KZ / AM / RS / UAE / GE | добыт в основном (подагент, 1 запуск) | см. «П — итог по странам» выше; ОАЭ onshore CBUAE — не исследован, кончился бюджет вызовов |
+| Р. Stripe | добыт частично | restricted-businesses дословно, SSA (контрагент для ОАЭ и Кипра); страница требований Stripe UAE — пустая (174–209 байт), sanctions FAQ — 404; проверяемых кейсов отказа или открытия в 2025–2026 не найдено. Exa в инструментах агента отсутствует |
+
+Буквальное содержание:
+- RAO art. 72(5): «There is excluded from articles 53 and 55A the giving of advice or the provision of targeted support by an overseas person … as a result of a legitimate approach». Строки «39E» в art. 72 нет вовсе (проверено по снятому тексту).
+- Stripe, список запрещённых (блок перед заголовком «Restricted Businesses»): «Debt relief companies — Debt settlement, debt negotiation, and debt consolidation»; «Lending and credit — … Credit monitoring, credit repair, and counseling services». В разметке прокси заголовка «Prohibited businesses» над блоком не видно, принадлежность разделу определена по оглавлению страницы — сверить глазами.
+- Stripe, «High-risk jurisdictions»: запрещены лица, «located in, resident in, or a citizen of» Кубы, Ирана, КНДР, Сирии, Крыма, Донецкой и Луганской областей. Россия в этом перечне по гражданству НЕ названа. «Prohibited services» по России перечисляют бухгалтерию, trust/corporate formation, консалтинг, IT-консалтинг и IT-поддержку, облачные сервисы для корпоративного ПО; в ЕС и UK — ещё рекламу, маркетинговые исследования, юридические услуги «to any person located in Russia».
+- SSA: контрагент для ОАЭ и для Кипра (ЕЭЗ) — «Stripe Payments Europe, Limited».
+
+Противоречие между источниками (не сглаживаю): Privatily (посредник) пишет «Stripe fully restricts accounts from … Russia», а собственная страница Stripe среди запрещённых по гражданству Россию не называет. Первичным считаю текст Stripe. Что Stripe делает на практике при KYC бенефициара с паспортом РФ — неизвестно.
+
+🔴 Что меняет выводы `legal_final.md`:
+1. 🔴 **§2.1 (UK) усиливается: у иностранного поставщика нет выхода через overseas persons exclusion.** Art. 72(5) снимает с overseas person только articles 53 и 55A (инвестиционный совет, targeted support), а debt-counselling (39E) в art. 72 не упоминается. То есть британский режим debt counselling через art. 72 с иностранного поставщика не снимается. Оговорка: территориальный вопрос — «carrying on in the UK», s. 418 FSMA — не исследовался.
+2. 🔴 **Stripe может отказать нам по ПРЕДМЕТУ, а не из-за основателя.** В списке запрещённых стоят «credit … counseling services» и «debt relief companies». Советующий по долгам сервис рискует попасть в категорию «credit counseling» при любой юрисдикции компании — в ОАЭ, на Кипре, в США. В L9 это надо поставить рядом с UK: платёжный провайдер — отдельный барьер для выхода за рубеж. Что Stripe сделает с FINPILOT на практике, не проверялось.
+3. 🔴 **Для L9 появилась карта «мягких» юрисдикций.** В МФЦА, DIFC и ADGM регулируется совет о ВСТУПЛЕНИИ в конкретный кредит, а совет о порядке погашения существующих долгов под буквальные определения не подпадает (AIFC GEN Sch. 1 п. 19; DFSA GEN 2.28.1(1)(b); ADGM FSMR Sch. 1 п. 28). В прочитанных актах республиканского Казахстана, Армении, Сербии и Грузии нормы о лицензии на (а) и (б) не найдено. Это полярно UK (PERG 17 покрывает и не просроченный долг). Оговорка подагента: «нормы не найдено» ≠ «нормы нет», а ОАЭ onshore (CBUAE) не исследован.
+4. §2.2 (ЕС): для DE транспозиция CCD II теперь реквизирована (BGBl. 2026 I Nr. 139, с 20.11.2026). Новый § 511 BGB («Beratungsleistungen») адресован кредиторам и посредникам, к нам как к несоветующему-по-продукту сервису его адресность не проверялась.

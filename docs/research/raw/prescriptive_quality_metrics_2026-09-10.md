@@ -928,3 +928,631 @@ better than the unaided user»; Rockafellar & Uryasev 2000.
 что операционные прокси принятия рекомендаций не являются метрикой качества.
 Обнаружен один удар по нашему методу (Grove et al. — экспертное согласие не есть
 точность), он вынесен в участок 2.3 и в ИТОГ 2 п.2, не сглажен.
+
+---
+
+# ДОБОР Г4 (11.09.2026) — первоисточники метрик качества прескриптивных рекомендаций
+
+Метод: только полные тексты. У каждого источника указан канал, HTTP-код и размер ответа.
+Цитаты дословные, страница — по колонтитулу самого PDF.
+
+## ДОБОР Г4 — Landis J.R., Koch G.G. (1977): 🔴 ШКАЛА КАППЫ ДОБЫТА ДОСЛОВНО, ГРАНИЦЫ РАСХОДЯТСЯ С ХОДЯЧЕЙ ВЕРСИЕЙ
+
+**Реквизиты (с титульной страницы JSTOR-скана, дословно):** «The Measurement of Observer
+Agreement for Categorical Data. Author(s): **J. Richard Landis and Gary G. Koch.** Source:
+**Biometrics, Vol. 33, No. 1 (Mar., 1977), pp. 159–174.** Published by: International Biometric
+Society. Stable URL: http://www.jstor.org/stable/2529310». DOI по Crossref: **10.2307/2529310**,
+`published: [1977, 3]`, `page: "159"`. PMID 843571.
+
+**Канал добычи — цепочка из пяти шагов, четыре первых провалились:**
+1. `WebSearch` — прямого PDF не дал.
+2. Unpaywall `10.2307/2529310` — HTTP 200, **`is_oa: False`, `oa_status: "closed"`,
+   `best_oa_location: None`**. Легальной открытой копии нет.
+3. `curl -sk --http1.1` с браузерным UA на `www.dentalage.co.uk/wp-content/uploads/2014/09/
+   landis_jr__koch_gg_1977_kappa_and_observer_agreement.pdf` — **HTTP 403, 4 551 байт**
+   (Cloudflare). `www.cs.cmu.edu/.../kappa.pdf` — HTTP 200, но `text/html` 40 903 байта,
+   не тот файл. CiteSeerX — HTTP 404.
+4. Текстовый прокси `r.jina.ai` на тот же dentalage-URL — **HTTP 200, 862 байта**, тело:
+   «Attention Required! | Cloudflare / Warning: Target URL returned error 403: Forbidden».
+   🔴 **Ещё один замер: `r.jina.ai` НЕ пробивает Cloudflare** (ранее то же на ACM DL).
+5. ✅ **Wayback.** CDX по точному URL — HTTP 200, JSON со снимками; взят снимок
+   **20170829141229**, `application/pdf`, `length 1178884`. Запрос
+   `https://web.archive.org/web/20170829141229id_/http://www.dentalage.co.uk/wp-content/
+   uploads/2014/09/landis_jr__koch_gg_1977_kappa_and_observer_agreement.pdf` —
+   **HTTP 200, 1 181 952 байта, `application/pdf`**; `pdftotext -layout` → 61 382 байта.
+   Это шестой за сессию случай, когда `id_`-снимок Wayback отдал текст, закрытый на живом сайте.
+
+### 🔴 ТАБЛИЦА ДОСЛОВНО, страница 165 (колонтитул «AGREEMENT MEASURES FOR CATEGORICAL DATA 165»)
+
+Вводная фраза автора перед таблицей (с. 164–165, дословно):
+> «In order to maintain consistent nomenclature when describing the relative strength of
+> agreement associated with kappa statistics, the following labels will be assigned to the
+> corresponding ranges of kappa:»
+
+| Kappa Statistic | Strength of Agreement |
+|---|---|
+| **< 0.00** | **Poor** |
+| **0.00–0.20** | **Slight** |
+| **0.21–0.40** | **Fair** |
+| **0.41–0.60** | **Moderate** |
+| **0.61–0.80** | **Substantial** |
+| **0.81–1.00** | **Almost Perfect** |
+
+(в OCR-скане «Moderate» распознано как «1\Ioderate», «AlmostPerfect» слитно — это артефакт
+распознавания, не текст статьи.)
+
+🔴 **РАСХОЖДЕНИЕ С ХОДЯЧЕЙ ВЕРСИЕЙ, которое надо зафиксировать.** Повсеместно (в том числе
+в сводке поисковой выдачи, полученной в этом же доборе) шкалу цитируют как
+«**≤ 0 = poor, 0.01–0.20 = slight**, 0.21–0.40 = fair…». **В первоисточнике границы иные:
+«< 0.00 — Poor» и «0.00–0.20 — Slight».** То есть κ = 0,00 ровно у Landis & Koch попадает
+в «Slight», а не в «Poor»; и нижняя граница «Slight» — 0.00, а не 0.01. Разница
+микроскопическая численно, но это ровно тот класс искажения, который эта сессия ловит
+пятый раз: пересказ подправил первоисточник и разошёлся тиражом.
+
+🔴 **ГЛАВНАЯ ОГОВОРКА САМИХ АВТОРОВ, которую пересказы опускают почти всегда (с. 165,
+сразу под таблицей, дословно):**
+> «**Although these divisions are clearly arbitrary, they do provide useful "benchmarks" for
+> the discussion of the specific example in Table 1.**»
+
+То есть авторы (а) называют границы **произвольными** собственными словами и (б) вводят их
+**для обсуждения одного конкретного примера в Таблице 1 своей статьи**, а не как универсальный
+норматив приёмки. **Любая наша формулировка вида «согласие экспертов существенное по шкале
+Landis & Koch» обязана нести эту оговорку**, иначе мы приписываем первоисточнику
+нормативность, которой он за собой не признаёт. Для калибровки весов это означает: порог
+«κ ≥ 0,61» — наше собственное проектное решение, обоснованное удобством, а не заимствованный
+из литературы стандарт; так его и надо называть в документах.
+
+**Контекст статьи в целом (аннотация, с. 159):** работа посвящена общей статистической
+методологии анализа многомерных категориальных данных из исследований надёжности
+наблюдателей — построению функций наблюдённых долей для измерения согласия наблюдателей и
+критериям межнаблюдательного смещения, выраженным через однородность маргиналов и
+**обобщённые каппа-подобные статистики** (generalized kappa-type statistics). Оценивание и
+проверка гипотез (§3.3, с. 165) опираются на подход Grizzle, Starmer & Koch [1969] (GSK).
+
+## ДОБОР Г4 — Feinstein & Cicchetti (1990), два парадокса каппы: АННОТАЦИЯ ИЗДАТЕЛЯ ДОБЫТА ДОСЛОВНО, ПОЛНЫЙ ТЕКСТ НЕ ДОБЫТ
+
+**Реквизиты (Crossref, HTTP 200):** Feinstein A.R., Cicchetti D.V. «High agreement but low
+Kappa: I. the problems of two paradoxes». **Journal of Clinical Epidemiology, том 43,
+выпуск 6, страницы 543–549, 1990.** DOI **10.1016/0895-4356(90)90158-L**. PMID **2348207**.
+🔴 В очереди пробелов записано «J Clin Epidemiol 43:543–549» без номера выпуска — **выпуск 6**,
+подтверждено Crossref и списком литературы BMC.
+
+**Парная статья (её реквизиты нужны, потому что решение парадоксов — именно в ней):**
+Cicchetti D.V., Feinstein A.R. «High agreement but low kappa: II. Resolving the paradoxes».
+J Clin Epidemiol, **43(6):551–558**, 1990, DOI 10.1016/0895-4356(90)90159-M, PMID 2189948.
+🔴 Порядок авторов во второй статье **обратный** (Cicchetti первый) — частая ошибка цитирования.
+
+**Каналы:**
+- Unpaywall `10.1016/0895-4356(90)90158-l` — HTTP 200: **`is_oa: False`, `oa_status: "closed"`,
+  `best_oa_location: None`**. Открытой копии нет.
+- ScienceDirect `…/pii/089543569090158L/pdf` — **HTTP 403 при теле 832 805 байт**. Это тот самый
+  замер, который уже фиксировался в сессии: большой размер ответа у ScienceDirect НЕ означает,
+  что текст получен, это страница-заглушка.
+- EuropePMC `fulltextRepo` — HTTP 500.
+- ✅ Текстовый прокси `curl -s "https://r.jina.ai/https://www.jclinepi.com/article/
+  0895-4356(90)90158-L/abstract"` — **HTTP 200, 16 299 байт**. Получена официальная аннотация
+  издателя целиком. Сама страница честно сообщает: «This paper is only available as a PDF»,
+  и PDF за пейволлом Elsevier.
+
+### 🔴 ДВА ПАРАДОКСА — ДОСЛОВНО, из авторской аннотации (первичный текст издателя, не пересказ)
+
+> «In a fourfold table showing binary agreement of two observers, the observed proportion of
+> agreement, *P₀*, can be paradoxically altered by the chance-corrected ratio that creates κ as
+> an index of concordance. **In one paradox, a high value of *P₀* can be drastically lowered by
+> a substantial imbalance in the table's marginal totals either vertically or horizontally. In
+> the second paradox, κ will be higher with an asymmetrical rather than symmetrical imbalance
+> in marginal totals, and with imperfect rather than perfect symmetry in the imbalance.** An
+> adjustment that substitutes *K*max for κ does not repair either problem, and seems to make
+> the second one worse.»
+
+(В оригинале страницы опечатка «pardox» во втором предложении; ключевые слова статьи: Kappa,
+Concordance, Agreement, Paradox.)
+
+**Дисклеймер честности:** это **аннотация**, а не полный текст. Числовых таблиц-примеров
+самой статьи мы не видели; ссылаться на конкретные значения κ «из Feinstein & Cicchetti»
+нельзя — только на формулировку парадоксов выше.
+
+### Подтверждающее и уточняющее переизложение из ОТКРЫТОГО рецензируемого источника
+
+Канал: `r.jina.ai` → `https://bmcmedresmethodol.biomedcentral.com/articles/10.1186/1471-2288-14-100`
+— **HTTP 200, 47 640 байт**. Это «Observer agreement paradoxes in 2×2 tables: comparison of
+agreement measures», BMC Medical Research Methodology 14:100 (2014), открытый доступ.
+
+Определения баланса и симметрии, которых в аннотации нет (дословно):
+> «In the generic 2×2 table, **balance** refers to whether the ratio of column marginals
+> (f1/f2) and the ratio of row marginal (g1/g2) are close to 1, while **symmetry** refers to
+> whether the difference in column marginal (f1−f2) has the same sign as the difference in row
+> marginal (g1−g2). The first paradox noted by Feinstein and Cicchetti was that **one gets
+> lower kappa values despite high observed agreement [P₀ = (x11 + x22)/N] when the marginals
+> are imbalanced.** The second paradox is that **one has higher kappa values for asymmetrical
+> than for symmetrical imbalanced marginal totals and for imperfect versus perfect symmetry in
+> the imbalance.**»
+
+Что предложили сами авторы во второй статье (дословно из BMC):
+> «Cicchetti and Feinstein suggested resolving the paradoxes by using **two separate indexes
+> (p_pos and p_neg)** to quantify agreement in the positive and negative decisions; these are
+> analogous to sensitivity and specificity from a diagnostic testing perspective.»
+
+Другие штатные ответы на парадоксы (дословно из BMC):
+> «Byrt et al. discussed the effect of bias and prevalence on kappa and proposed a **prevalence
+> and bias adjusted kappa, PABAK**. They also suggested that when reporting kappa, one should
+> also report bias and prevalence indices.» (Byrt, Bishop, Carlin, J Clin Epidemiol 46(5):
+> 423–429, 1993, DOI 10.1016/0895-4356(93)90018-V)
+> «Lantz and Nebenzahl proposed that one should report supporting indicators along with kappa —
+> P₀, a symmetry indicator, and p_pos. **Unfortunately, reporting of multiple indices is often
+> not done.**» (J Clin Epidemiol 49(4):431–434, 1996, DOI 10.1016/0895-4356(95)00571-4)
+
+Вывод обзора 2014 года (дословно): «While all statistics examined are affected by lack of
+symmetry and by imbalances in the marginal totals, **the B-statistic comes closest to resolving
+the paradoxes** identified by Feinstein and Cicchetti and Byrt et al. … we **recommend use of
+the B-statistic when assessing agreement in 2×2 tables** … and we recommend additionally
+providing the corresponding agreement chart». Про саму каппу там же: «Kappa and alpha behave
+similarly and are affected by the marginal distributions more so than the B-statistic,
+AC1-index and delta measures.» И: «PABAK does not change with changes in prevalence or bias
+since it is a simple function of P₀.»
+
+### 🔴 Что это значит для нашей калибровки весов — прямое следствие
+
+Мы меряем каппой согласие экспертов при калибровке весов SAW. Оба парадокса бьют ровно в наш
+сценарий: **экспертные оценки альтернатив почти наверняка имеют перекошенные маргиналы**
+(эксперты редко раскладывают варианты равномерно по категориям — большинство «приемлемо»,
+меньшинство «плохо»). Следствия:
+1. Низкая κ при высоком наблюдаемом согласии **не доказывает** расхождения экспертов — это
+   может быть парадокс 1. Поэтому **κ нельзя публиковать в одиночку**: вместе с ней обязаны
+   идти P₀, индекс смещения (BI) и индекс распространённости (PI) — это буквально
+   рекомендация Byrt et al. и Lantz & Nebenzahl, дословно процитированная выше.
+2. Рост κ между раундами калибровки **не обязательно означает рост согласия** — парадокс 2:
+   κ растёт при АСИММЕТРИЧНОМ перекосе маргиналов. Если между раундами изменилось
+   распределение оценок, сравнивать κ раунда 4 и раунда 5 напрямую некорректно.
+3. Порог из шкалы Landis & Koch (см. предыдущий раздел) наложен на статистику, которая при
+   перекошенных маргиналах систематически занижена — то есть два источника произвола
+   складываются. Формулировать в документах так: «κ = X при P₀ = Y, BI = Z, PI = W»,
+   а не «согласие существенное».
+
+## ДОБОР Г4 — метаморфическое тестирование: 🔴 АТРИБУЦИЯ В ОЧЕРЕДИ ПРОБЕЛОВ ОШИБОЧНА
+
+### Первое и главное: doi 10.1145/3143561 — это НЕ Segura et al.
+
+В очереди пробелов пункт записан как «**Segura et al., ACM Computing Surveys 51(1),
+doi 10.1145/3143561** — обзор метаморфического тестирования». Проверка по Crossref
+(`https://api.crossref.org/works/10.1145/3143561`, HTTP 200) даёт другое:
+
+> title: **«Metamorphic Testing»** [полное название — «Metamorphic Testing: A Review of
+> Challenges and Opportunities»]; authors: **Chen, Kuo, Liu, Poon, Towey, Tse, Zhou**;
+> container-title: **ACM Computing Surveys**, volume **51**, issue **1**, page **1-27**,
+> published **2018-01-04**.
+
+**Segura'ы там нет вообще.** Обзор Segura с соавторами — это отдельная работа:
+
+> **Segura S., Fraser G., Sanchez A.B., Ruiz-Cortes A. «A Survey on Metamorphic Testing».
+> IEEE Transactions on Software Engineering, том 42, выпуск 9, страницы 805–824,
+> сентябрь 2016. DOI 10.1109/TSE.2016.2532875.** (Crossref, HTTP 200.)
+
+🔴 **Итог: в наших текстах ссылку «Segura et al., ACM Comput. Surv. 51(1)» надо разделить на
+две — либо Chen et al. (CSUR 2018), либо Segura et al. (IEEE TSE 2016). Существующая запись
+склеивает авторов одной работы с выходными данными другой.** Это шестой случай искажения
+первоисточника вторичным пересказом за сессию.
+
+### Что добыто полным текстом: препринт-версия обзора Segura et al.
+
+**Канал:** Unpaywall `10.1109/tse.2016.2532875` — HTTP 200, **`is_oa: True`,
+`oa_status: "green"`**, репозиторий `https://idus.us.es/handle/11441/38271` (Universidad de
+Sevilla). Страница handle — HTTP 200, 418 149 байт; из неё извлечены ссылки на битстримы;
+`https://idus.us.es/bitstreams/2ca59b51-6fdd-4ea5-82d8-1189a775ac85/download` —
+**HTTP 200, 1 970 284 байта, `application/pdf`**; `pdftotext -layout` → 554 479 байт текста.
+(Второй битстрим `d8fffc33-…` — HTTP 200, 1 935 268 байт, но `pdftotext` видит «0 pages»,
+битый/иначе закодированный файл; брать первый.)
+
+🔴 **Дисклеймер по версии:** добытый PDF — это **Technical Report ISA-16-TR-02, «Metamorphic
+Testing: A Literature Review», Version 1.3, February 9, 2016**, Applied Software Engineering
+Research Group, University of Seville. Это авторская версия того же исследования, а **не
+журнальная вёрстка TSE 42(9):805–824**; название отличается («A Literature Review» против
+«A Survey»), нумерация страниц своя. Цитировать как журнальную статью со страницами нельзя —
+либо технический отчёт с его реквизитами, либо журнал без постраничных ссылок.
+История версий отчёта дословно: v1.0 — May 25, 2015 «First release»; v1.1 — July 10, 2015
+«Eight new papers added… New author added»; v1.2 — January 11, 2016 «Search time span extended
+to November 2015. Seventeen new papers reviewed»; v1.3 — February 9, 2016 «New paper added.
+Typo fixed.» Охват: «an exhaustive literature review on metamorphic testing, covering
+**119 papers published between 1998 and 2015**» (с. 1); сноска 1 на с. 1: «Note that **86 out
+of the 119 papers** reviewed in our literature review were published in 2009 or later.»
+
+### 🔴 ОПРЕДЕЛЕНИЯ ДОСЛОВНО
+
+**Проблема оракула и назначение техники (с. 1–2, дословно):**
+> «…this problem is referred to as the **oracle problem** and it is recognised as one of the
+> fundamental challenges of software testing. **Metamorphic testing is a technique conceived
+> to alleviate the oracle problem. It is based on the idea that often it is simpler to reason
+> about relations between outputs of a program, than it is to fully understand or formalise
+> its input-output behaviour.**»
+
+**Ведущий пример (с. 1, дословно):** «The prototypical example is that of a program that
+computes the sine function: What is the exact value of sin(12)? Is an observed output of
+−0.5365 correct? A mathematical property of the sine function states that sin(x) = sin(π − x),
+and we can use this to test whether sin(12) = sin(π − 12) **without knowing the concrete values
+of either sine calculation**.»
+
+🔴 **ОПРЕДЕЛЕНИЕ МЕТАМОРФИЧЕСКОГО ОТНОШЕНИЯ, дословно (с. 1):**
+> «This is an example of a **metamorphic relation: an input transformation that can be used to
+> generate new test cases from existing test data, and an output relation, that compares the
+> outputs produced by a pair of test cases.** Metamorphic testing does not only alleviate the
+> oracle problem, but it can also be highly automated.»
+
+**Формальная запись, дословно (с. 2):**
+> «In general, a **metamorphic relation for a function f is expressed as a relation among a
+> series of function inputs x1, x2, …, xn (with n > 1), and their corresponding output values
+> f(x1), f(x2), …, f(xn)**. For instance, for the sine example from the introduction the
+> relation between x1 and x2 would be π − x1 = x2, and the relation between f(x1) and f(x2)
+> would be equality, i.e.:
+> **R = {(x1, x2, sin x1, sin x2) | π − x1 = x2 → sin x1 = sin x2}**»
+
+**Происхождение и обобщение (с. 2, дословно):** «The concept of metamorphic testing,
+**introduced by Chen [5] in 1998**, generalises these ideas **from identity relations to any
+type of relation, such as equalities, inequalities, periodicity properties, convergence
+constraints, subsumption relationships and many others.**»
+
+🔴 **Отличие от инварианта — ключевое для нас (с. 2, дословно):**
+> «This resembles the traditional concept of **program invariants**, which are properties (for
+> example expressed as assert statements) that hold at certain points in programs. **However,
+> the key difference is that an invariant has to hold for every possible program execution,
+> whereas a metamorphic relation is a relation between different executions.**»
+
+**Терминология source / follow-up (с. 2, дословно):** «A relation between two executions
+implicitly defines how, given an existing **source test case** (x1), one has to transform this
+into a **follow-up test case** (x2)… If the relation R does not hold on a pair of source and
+follow-up test cases x1 and x2, then a fault has been detected. In this article, we use the
+term **metamorphic test case** to refer to a pair of a source test case and its follow-up
+test case.»
+
+### Базовый процесс применения — три шага, ДОСЛОВНО (с. 2)
+
+> «1) **Construction of metamorphic relations.** Identify necessary properties of the program
+> under test and represent them as metamorphic relations among multiple test case inputs and
+> their expected outputs, together with some method to generate a follow-up test case based on
+> a source test case. **Note that metamorphic relations may be associated with preconditions
+> that restrict the source test cases to which they can be applied.**
+> 2) **Generation of source test cases.** Generate or select a set of source test cases for the
+> program under test using any traditional testing technique (e.g., random testing).
+> 3) **Execution of metamorphic test cases.** Use the metamorphic relations to generate
+> follow-up test cases, execute source and follow-up test cases, and check the relations. If
+> the outputs of a source test case and its follow-up test case violate the metamorphic
+> relation, the metamorphic test case is said to have failed, indicating that the program under
+> test contains a bug.»
+
+### Примеры метаморфических отношений из статьи (дословно) — образцы формы
+
+**Кратчайший путь (с. 2):** «consider a program that computes the shortest path between a
+source vertex s and destination vertex d in a graph G, SP(G, s, d). A metamorphic relation of
+the program is that **if the source and destination vertices are swapped, the length of the
+shortest path should be equal: |SP(G, s, d)| = |SP(G, d, s)|**.»
+
+**Поисковая система (с. 2):** «Let Count(q) be the number of results returned for a search
+query q. Intuitively, the number of returned results for q should be greater or equal than that
+obtained when refining the search with another keyword k. This can be expressed as the
+following metamorphic relation: **Count(q) ≥ Count(q + k)**, where + denotes the concatenation
+of two keywords.» С конкретными числами (с. 2): «a search for the keyword "metamorphic",
+resulting in "About" **4.2M results** … searching for the keywords "metamorphic testing": This
+leads to **8,380 results** which is less than the result for "metamorphic", and thus satisfies
+the relation.»
+
+**Ранние предшественники (с. 2, дословно):** «Blum et al. checked whether numerical programs
+satisfy identity relations such as P(x) = P(x1) + P(x2) for random values of x1 and x2. In the
+context of fault tolerance, the technique of **data diversity** runs the program on
+re-expressed forms of the original input; e.g., sin(x) = sin(a) × sin(π/2 − b) +
+sin(π/2 − a) × sin(b) where a + b = x.»
+
+**Автоматизация (с. 2, дословно):** «If source test cases are generated automatically, then
+metamorphic testing enables **full test automation**, i.e., input generation and output
+checking.»
+
+**Открытая проблема, названная авторами (с. 2, дословно):** «there are **open questions on how
+to derive effective metamorphic relations**, as well as how to reduce the costs of testing with
+them.» — то есть построение MR остаётся ручной инженерной работой; ждать от техники
+автоматического вывода отношений нельзя.
+
+### Прямое применение к FINPILOT — почему техника нам подходит
+
+У нас ровно проблема оракула: **для расчёта SES + Монте-Карло и для ранжирования SAW нет
+эталонного «правильного ответа»**, с которым можно сравнить выход. Метаморфические отношения
+строятся без эталона, и их форма для нашей модели выводится из самих определений выше.
+Кандидаты, формулируемые по шаблону «преобразование входа → отношение выходов» (наша
+формулировка, построенная на определении со с. 1–2, не цитата):
+- масштабирование: умножение всего свободного денежного потока и всех долгов на λ > 0 не
+  должно менять ДОЛЕВОЕ распределение в оптимальной альтернативе (66 вариантов — доли);
+- монотонность по ставке: повышение ставки одного долга при прочих равных не должно снижать
+  долю, направляемую на его погашение (Avalanche);
+- перестановка: перенумерация долгов с одинаковыми параметрами не должна менять результат;
+- сужение допустимого множества: ужесточение порога ПДН не может РАСШИРИТЬ множество
+  допустимых альтернатив (аналог `Count(q) ≥ Count(q + k)` дословно из статьи);
+- идемпотентность горизонта: прогноз на T шагов, перезапущенный с промежуточного состояния,
+  должен совпасть с хвостом исходного прогноза.
+Все пять — **отношения между РАЗНЫМИ прогонами**, а не инварианты внутри одного прогона;
+именно это отличие авторы называют ключевым (цитата выше, с. 2). Наши Rt ≥ 0 и ПДН ≤ 0,40 —
+это **инварианты**, не MR, и одно другого не заменяет.
+
+**Не добыто:** журнальная вёрстка TSE 42(9):805–824 (постраничные ссылки) и обзор Chen et al.
+CSUR 51(1) doi 10.1145/3143561 — по последнему Unpaywall даёт `is_oa: True, oa_status: "green"`
+с единственным репозиторием `https://nottingham-repository.worktribe.com/output/925152`,
+который отдаёт **HTTP 403 на `curl` с браузерным UA** и **HTTP 200/549 байт «Just a moment…
+Performing security verification» на `r.jina.ai`** (Cloudflare). Оставлено на следующий добор.
+
+## ДОБОР Г4 — Bengen W.P. (1994), правило 4 %: ПОЛНЫЙ ТЕКСТ ДОБЫТ, МЕТОДОЛОГИЯ ДОСЛОВНО
+
+**Реквизиты:** William P. Bengen, CFP®. «Determining Withdrawal Rates Using Historical Data».
+**Journal of Financial Planning, октябрь 1994.** (Во вторичных источниках встречается
+«vol. 7, iss. 4, pp. 171–180»; постранично подтвердить не удалось — добытый файл есть
+**перепечатка 2004 года** без исходной пагинации, см. дисклеймер ниже.)
+
+**Канал:** `WebSearch` → прямой URL на сайте FPA. 🔴 **Путь в записи файла был устаревшим:**
+`…/sites/default/files/**2020-12**/MAR04%20Determining…pdf` — **HTTP 404, 58 596 байт HTML**.
+Рабочий путь — с каталогом **`2021-04`**:
+`https://www.financialplanningassociation.org/sites/default/files/2021-04/MAR04%20Determining%20Withdrawal%20Rates%20Using%20Historical%20Data.pdf`
+— **HTTP 200, 347 755 байт, `application/pdf`**; `pdftotext -layout` → 37 864 байта.
+Не сработало: `https://www.retailinvestor.org/pdf/Bengen1.pdf` — HTTP 200, но `text/html`
+1 324 байта (заглушка, не PDF).
+
+🔴 **Дисклеймер по изданию, обязателен при цитировании.** Добытый PDF — это **перепечатка
+в рубрике «FPA Journal — The Best of 25 Years»**, март 2004 (внутренний колонтитул
+`2004_Issues/jfp0304 (N of 13)`). Примечание редактора дословно: «In honor of the Journal of
+Financial Planning's 25th anniversary, during 2004 we will reprint what we consider some of the
+best content of the Journal. This month, we present William Bengen's research on calculating
+"safe" withdrawal rates and asset allocations based on historical data, **which was published
+in the October 1994 issue of the Journal**.» То есть текст авторский и полный, но **номера
+страниц 171–180 в нём отсутствуют**; ссылаться постранично на оригинал 1994 года по этому
+файлу нельзя.
+
+### Источник данных (дословно)
+
+> «In all cases I will rely on actual historical performance of investments and inflation, as
+> presented in **Ibbotson Associates' Stocks, Bonds, Bills and Inflation: 1992 Yearbook**.»
+
+Средние из Ibbotson, которыми Бенген иллюстрирует ошибочный подход (дословно): «common stocks
+had returned **10.3 percent** compounded over the years, and intermediate-term Treasuries had
+returned **5.1 percent**. Inflation averaged **3 percent** over the same period. Therefore, a
+client with a portfolio consisting of 60-percent stocks and 40-percent bonds could expect an
+average compounded return of **8.2 percent**, assuming continual rebalancing. The "real"
+return, adjusted for inflation, would be almost **5.1 percent**.»
+
+🔴 **Формулировка ошибки, ради опровержения которой написана статья (дословно):**
+> «**The logical fallacy that got our hypothetical planner into trouble was assuming that
+> average returns and average inflation rates are a sound basis for computing how much a client
+> can safely withdraw from a retirement fund over a long time.**»
+
+Предшественник, на которого Бенген прямо опирается (дословно): «As **Larry Bierwirth** pointed
+out in his excellent article in the **January 1994** issue of this publication ("Investing for
+Retirement: Using the Past to Model the Future"), **it pays to look not just at averages, but
+at what actually has happened, year-by-year**, to investment returns and inflation in the past.»
+
+### 🔴 МЕТОДОЛОГИЯ СКОЛЬЗЯЩИХ КОГОРТ — ДОСЛОВНО
+
+**Мера результата:**
+> «I have quantified portfolio performance in terms of "**portfolio longevity**": **how long the
+> portfolio will last before all its investments have been exhausted by withdrawals.** This is
+> an intuitive approach that is easy to explain to my clients, whose primary goal is making it
+> through retirement without exhausting their funds, and whose secondary goal is accumulating
+> wealth for their heirs.»
+
+**Устройство когорт (это и есть искомая «методология скользящих когорт», дословно):**
+> «In Figure 1(A), **the first vertical bar on the left represents the portfolio of a client who
+> began retirement on Jan. 1, 1926. He made a withdrawal of 3 percent of the portfolio the first
+> year, followed by inflation-adjusted withdrawals each succeeding year. The next bar represents
+> the portfolio of a client who began retirement on Jan. 1, 1927, and so on.**»
+
+То есть: **один сценарий = один год старта**, ряд стартов идёт подряд с 1926 года, каждая
+когорта проживает СВОЮ фактическую историю доходностей и инфляции год за годом. Никакой
+случайной генерации, никакого Монте-Карло — только исторические последовательности.
+Число когорт названо в тексте позже: «Twenty-four of the **51 scenario years**…» — то есть
+51 сценарный год.
+
+🔴 **Горизонт 50 лет — ПРОИЗВОЛЬНАЯ ОТСЕЧКА, а не результат (дословно):**
+> «As you can see from the graph, the 1926 client was able to make withdrawals from his
+> portfolio in this manner for 50 years. **Actually, the portfolio would have lasted much longer
+> than this. I have chosen 50 years arbitrarily as the longest period to show on the charts**,
+> as few clients enjoy more than 50 years of retirement.»
+Это значит, что столбцы «50 лет» на графиках — **цензурированные наблюдения** (right-censored),
+и любая статистика по ним занижает истинную живучесть. Пересказы этого не сообщают почти
+никогда.
+
+**Базовое распределение активов — тоже произвольное (дословно):** «a series of graphs
+illustrates the historical performance of portfolios consisting of 50-percent intermediate-term
+Treasury notes and 50-percent common stocks (**an arbitrary asset allocation chosen for
+purposes of illustration**)». И далее: «my conclusions above were based on the assumption that
+the client **continually rebalanced** a portfolio of 50-percent common stocks and 50-percent
+intermediate-term Treasuries.»
+
+### 🔴 ГЛАВНЫЕ ЧИСЛА — ДОСЛОВНО, с расхождением внутри самой статьи
+
+**3 %:** «Figure 1(A) (three-percent withdrawal rate) is as exciting as a crewcut. It shows that
+**all clients, regardless of the year they began their retirement, were able to enjoy at least
+50 years of inflation-adjusted withdrawals** from their portfolios.» И: «an "absolutely safe"
+(to the extent history is a guide) initial withdrawal level is **3 percent**, in that it ensures
+that portfolio longevity is never less than 50 years. (**This is also true for withdrawal rates
+as high as approximately 3.5 percent.**) However, most clients would find such a low level of
+withdrawals unacceptable.»
+
+**4 % — ключевая формулировка (дословно):**
+> «**Assuming a minimum requirement of 30 years of portfolio longevity, a first-year withdrawal
+> of 4 percent, followed by inflation-adjusted withdrawals in subsequent years, should be safe.
+> In no past case has it caused a portfolio to be exhausted before 33 years, and in most cases
+> it will lead to portfolio lives of 50 years or longer. By comparison, a 4.25-percent
+> first-year withdrawal could exhaust a portfolio in as little as 28 years, were past conditions
+> to repeat themselves.**»
+
+🔴 **Внутреннее расхождение первоисточника, которое надо знать.** Ранее, описывая ту же
+Figure 1(B), Бенген пишет: «no client enjoys less than **about 35 years** before his retirement
+money is used up». А в разделе выводов — «**before 33 years**». Оба числа — из одной статьи,
+про один и тот же график. При цитировании безопасно брать **33 года** (это число стоит в
+нормативном выводе) и указывать, что в описании графика автор говорит «около 35».
+
+🔴 **Проверка ходячего пересказа.** Сводка поисковой выдачи в этом же доборе утверждает:
+«Bengen tested the withdrawal rates using actual returns over **50-year periods beginning in
+1926**. A 3% withdrawal rate lasted 50 years in all test cases. **A 4% withdrawal rate lasted
+50 years in 41 of the 50 test cases** and lasted at least 35 years in all cases.» Из добытого
+полного текста прямо подтверждается: «all clients… at least 50 years» для 3 %; «no past case…
+exhausted before 33 years» и «in most cases… 50 years or longer» для 4 %. Про «41 из 50» —
+🔴 **в тексте статьи такой фразы НЕТ.** Ближайшее, что есть: «Fully **47 scenario years** result
+in portfolio longevities of the maximum of 50 years, while **only 40 scenario years** attained
+that pinnacle in the earlier chart» — и это сравнение **Figure 3(A) (75/25 при 4 %)** против
+**Figure 1(B) (50/50 при 4 %)**, то есть для 50/50 при 4 % полной 50-летней живучести достигают
+**40** сценарных лет, а не 41. **Цифру «41 из 50» цитировать нельзя**; правильная —
+«40 сценарных лет из 51» для 50/50.
+
+**Рекомендация автора клиентам (дословно):** «Therefore, I counsel my clients to withdraw at no
+more than a four-percent rate during the early years of retirement, especially if they retire
+early (age 60 or younger).»
+
+**6 % — оценка риска (дословно):** «If the client expects to live another 30 years, I point out
+that the chart shows **31 scenario years when he would outlive his assets, and only 20** which
+would have been adequate for his purposes … This means he has **less than a 40-percent chance**
+to successfully negotiate retirement — not very good odds.»
+
+### Выводы по распределению активов (дословно) — обычно опускаются, хотя это половина статьи
+
+Устройство сетки (дословно): «This chart was created by producing **40 graphs** … **Five
+possible asset allocations (0-, 25-, 50-, 75-, and 100-percent stocks)** were matched against
+**8 percentages of first-year withdrawals (1, 2, 3, 4, 5, 6, 7, and 8 percent)**. All
+permutations of these elements were computed as graphs, and **the shortest bar in each graph** —
+representing the shortest life of a portfolio for each combination of factors — was transferred
+to Figure 2. What is depicted in Figure 2, then, is a "**Worst Case Portfolio Life**" graph.»
+
+- «One pattern that leaps out from the figure is that **holding too few stocks does more harm
+  than holding too many stocks.**»
+- «the **50/50 stock/bond mix appears to be near-optimum** for generating the highest minimum
+  portfolio longevity for any withdrawal scheme.»
+- 🔴 Итоговый совет автора **не 50/50, а ближе к 75 % акций** (дословно): «**I think it is
+  appropriate to advise the client to accept a stock allocation as close to 75 percent as
+  possible, and in no cases less than 50 percent.** Stock allocations lower than 50 percent are
+  counterproductive… Somewhere between 50-percent and 75-percent stocks will be a client's
+  "comfort zone".» И: «**stock allocations of more than 75 percent are to be avoided at the
+  beginning of retirement**», потому что «the minimum longevity during the Little Dipper drops
+  below the minimum longevity established on the 50-percent chart».
+- «The average portfolio value increase from 35-percent stocks to 75-percent stocks is
+  **+123 percent**» (через 20 лет).
+
+### Что это даёт нам методологически
+
+Правило 4 % построено **ровно тем методом, который у нас в модели отсутствует**: прогон
+фиксированной политики по ВСЕМ историческим стартовым датам подряд и отчёт по ХУДШЕЙ когорте,
+а не по средней. У нас SES + Монте-Карло — синтетические траектории; Бенген бы назвал это
+«assuming average returns», ровно той ошибкой, против которой написана статья (цитата выше).
+🔴 Это не значит, что наш метод неверен, но означает, что **backtest по скользящим когортам
+на исторических рядах ключевой ставки и инфляции РФ — отдельная, не покрытая нами проверка**,
+и она дешевле Монте-Карло. Плюс два методологических урока прямо из текста: горизонт-отсечка
+создаёт цензурированные наблюдения (их нельзя усреднять как обычные), и отчётная величина —
+**минимум по когортам**, а не среднее.
+
+## ДОБОР Г4 — методология Delphi: пороги остановки, число раундов, критерий сходимости. ДВА ПЕРВОИСТОЧНИКА ДОБЫТЫ
+
+### Источник 1 — Linstone & Turoff (ред.), «The Delphi Method: Techniques and Applications» (1975), ПОЛНЫЙ ТЕКСТ
+
+**Канал:** авторская страница NJIT `https://web.njit.edu/~turoff/pubs/delphibook/delphibook.pdf`
+— **HTTP 404** (сайт переехал). Wayback CDX по этому URL — HTTP 200, найдены снимки;
+взят **20191128162519**. Запрос
+`https://web.archive.org/web/20191128162519id_/https://web.njit.edu/~turoff/pubs/delphibook/delphibook.pdf`
+— **HTTP 200, 11 700 935 байт, `application/pdf`**; `pdftotext -layout` → 1 499 260 байт.
+(Идентичный по digest `QY2HFJT7LPOGPZDYEMDO7WED7SRD4OR5` файл лежит в Wayback ещё с 2003 года
+по адресу `is.njit.edu/pubs/delphibook/delphibook.pdf` — то есть версия не менялась.)
+Это **седьмой** случай за сессию, когда `id_`-снимок Wayback отдал текст, недоступный на живом
+сайте.
+
+🔴 **ЧИСЛО РАУНДОВ — ДОСЛОВНО (раздел IV.A «Introduction», авторы Linstone и Turoff):**
+> «It was also observed in all early forecasting Delphis that **a point of diminishing returns
+> is reached after a few rounds. Most commonly, three rounds proved sufficient to attain
+> stability in the responses; further rounds tended to show very little change and excessive
+> repetition was unacceptable to participants.** (Obviously this tendency should not unduly
+> constrain the design of Policy Delphis or computerized conferencing which have objectives
+> other than forecasting.)»
+
+🔴 **КРИТЕРИЙ ОСТАНОВКИ — СТАБИЛЬНОСТЬ, А НЕ СХОДИМОСТЬ. Дословно (раздел «Evaluation:
+Introduction», с. 229 книги, пункт 4 в изложении результатов Dalkey, Brown & Cochran):**
+> «**(4) Stability of the distribution of the group's response along the interval scale over
+> successive rounds is a more significant measure for developing a stopping criterion than
+> degree of convergence.** The authors propose a specific stability measure.»
+
+(Первоисточник этого пункта, по сноске книги: **N. Dalkey, B. Brown, S. Cochran, «Use of
+Self-Ratings to Improve Group Estimates», Technological Forecasting 1, No. 3 (1970),
+pp. 283–291.**)
+
+**Это прямо противоречит интуитивному «останавливаемся, когда мнения сошлись».** Сходимость
+(сужение межквартильного размаха) — наблюдаемое свойство процесса, но останавливаться надо
+по СТАБИЛЬНОСТИ распределения между раундами: распределение перестало меняться — стоп,
+даже если разброс остался большим.
+
+**Что вообще известно про сходимость (тот же раздел, по Gordon–Helmer, Rand 1964, дословно):**
+> «The authors observed two trends: **(1) For most event statements the final-round
+> interquartile range is smaller than the initial-round range. In other words, convergence of
+> responses is more common than divergence over a number of rounds. (2) Uncertainty increases
+> as the median forecast date of the event moves further into the future.** Near-term forecasts
+> have a smaller interquartile range than distant forecasts.»
+
+**Мера сходимости, применявшаяся на практике (дословно):** «One indication of the effect of a
+Delphi experiment is the amount of convergence caused by the iteration process, where
+convergence is a measure of how much more … one measure of convergence was **the change in the
+spread between the** [квартилями]…» — то есть рабочая метрика сходимости — **изменение
+межквартильного размаха между раундами**.
+
+🔴 **Предупреждение о ложном консенсусе — дословно, из того же раздела:**
+> «**There clearly exists the possibility of an unnatural overconsensus. Conformists may
+> "capitulate" to group pressures temporarily, on paper.**»
+И эмпирика оттуда же: «Respondents are sensitive to feedback of the scores from the whole group
+and **tend to move (at least temporarily) toward the perceived consensus**»; «less confident
+members exhibit a somewhat larger movement in the second round»; а про догматиков —
+«Surprisingly, the **high-dogmatism group exhibits significantly more changes** than the
+low-dogmatism group… he views the median of the group response as a surrogate [for authority].»
+
+**Реальная практика раундов в кейсах книги (дословные строки):** «This study was originally
+scheduled to be completed in three rounds of interrogation. However, as it evolved, **only two
+rounds appeared necessary**»; «The Steel and Ferroalloy Delphi included **three rounds**»;
+«The Delphi ran for **three rounds**». Плюс общее замечание: «methods of successive refinement,
+like the Delphi, **strongly tend to induce convergence**» — то есть сходимость частично
+артефакт процедуры, а не свойство предмета.
+
+### Источник 2 — Diamond et al. (2014), систематический обзор: ЧИСЛА ПО ПОРОГАМ
+
+**Реквизиты (Crossref, HTTP 200):** Diamond, Grant, Feldman, Pencharz, Ling, Moore, Wales.
+«Defining consensus: A systematic review recommends methodologic criteria for reporting of
+Delphi studies». **Journal of Clinical Epidemiology, том 67, выпуск 4, страницы 401–409,
+апрель 2014.** DOI **10.1016/j.jclinepi.2013.12.002**. PMID 24581294.
+
+**Канал:** `r.jina.ai` → `https://www.jclinepi.com/article/S0895-4356(13)00507-6/abstract` —
+**HTTP 200, 23 026 байт**. Получена авторская аннотация целиком. Полный текст за пейволлом
+Elsevier (не добыт).
+
+🔴 **ЧИСЛА — ДОСЛОВНО ИЗ АННОТАЦИИ (выборка: 100 англоязычных Delphi-исследований из Web of
+Science и Scopus, 2000–2009):**
+> «About **98 of the Delphi studies purported to assess consensus**, although a definition for
+> consensus was only provided in **72** of the studies (**64 a priori**). **The most common
+> definition for consensus was percent agreement (25 studies), with 75% being the median
+> threshold to define consensus.** Although the authors concluded in **86** of the studies that
+> consensus was achieved, consensus was only specified a priori (with a threshold value) in
+> **42** of these studies. **Achievement of consensus was related to the decision to stop the
+> Delphi study in only 23 studies, with 70 studies terminating after a specified number of
+> rounds.**»
+
+Вывод авторов дословно: «Although consensus generally is felt to be of primary importance to
+the Delphi process, **definitions of consensus vary widely and are poorly reported.** Improved
+criteria for reporting of methods of Delphi studies are required.»
+
+### 🔴 Что из этого следует для НАШИХ пяти раундов калибровки весов
+
+1. **Пять раундов — больше нормы, и это не комплимент.** Linstone & Turoff: «three rounds
+   proved sufficient to attain stability… further rounds tended to show **very little change**
+   and **excessive repetition was unacceptable to participants**» (дословно выше). Раунды 4 и 5
+   у нас с высокой вероятностью не добавили информации, а добавили усталость и конформность.
+2. **Мы останавливались не по критерию.** По Diamond et al. это не аномалия (70 из 100
+   исследований останавливаются по числу раундов, а не по достижению консенсуса), но и не
+   методология: это ровно та практика, которую обзор называет плохо отчитанной.
+3. **Правильный критерий остановки — СТАБИЛЬНОСТЬ распределения между раундами, а не степень
+   сходимости** (дословная формулировка Dalkey/Brown/Cochran через Linstone & Turoff).
+   Проверяемо задним числом по нашим данным: если распределение оценок раунда 4 и раунда 5
+   статистически неразличимо — раунд 5 был лишним, и это надо записать честно.
+4. **Порог консенсуса обязан быть объявлен ДО начала**, с числом. Медиана по литературе —
+   **75 % согласия** (Diamond et al., дословно). Если мы не объявляли порог заранее — так и
+   писать: «порог a priori не задавался», а не подбирать его постфактум под полученный
+   результат.
+5. **Сдвиг к медиане группы — известный артефакт, а не признак правоты** («Respondents…
+   tend to move (at least temporarily) toward the perceived consensus», «unnatural
+   overconsensus», дословно выше). Совпадение экспертов после 5 раундов частично объясняется
+   самой процедурой. Это же смыкается с предыдущим разделом про каппу: согласие, полученное
+   итеративной процедурой с обратной связью, нельзя интерпретировать как независимое согласие
+   наблюдателей — а каппа считается именно для независимых оценок.
+
