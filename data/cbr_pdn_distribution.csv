@@ -1,0 +1,9 @@
+date,value,unit,region,breakdown
+2022-12-31,63,percent,RU,share_of_new_loans_pti_over_50|unsecured_total
+2025-12-31,18,percent,RU,share_of_new_loans_pti_over_50|unsecured_total
+2026-01-31,0.8,percent,RU,npl30_at_3mob|cash_loans
+2026-01-31,5.4,percent,RU,npl30_at_3mob|cash_loans_pti_over_80
+2026-01-31,2.7,percent,RU,npl30_at_3mob|credit_cards
+2026-03-31,14,percent,RU,share_of_new_loans_pti_over_50|cash_loans
+2026-03-31,20,percent,RU,share_of_new_loans_pti_over_50|credit_cards
+2026-04-01,35,percent,RU,share_of_portfolio_pti_over_50|unsecured_total

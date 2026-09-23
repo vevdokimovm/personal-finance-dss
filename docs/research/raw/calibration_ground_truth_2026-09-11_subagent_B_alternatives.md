@@ -191,3 +191,112 @@
 | `https://www.nbki.ru/company/news/` (сама лента) | HTTP 200, 251 227 б | HTML отдал только меню/навигацию; новости подгружаются скриптом |
 | Скоринг Бюро | **не запрашивалось** | бюджет действий исчерпан |
 | Содержание КОУЖ/ВНДН (долговой блок, цели сбережений) | — | вопросники доступны только внутри гигабайтных архивов tochno.st, качать было запрещено; на сайте Росстата — за JS |
+
+---
+
+## ДОБОР Г31.2 — прокси (16.09.2026)
+
+**Каналы на начало работы:** `r.jina.ai` **без UA** — 🟢 живой (контроль: `monarchmoney.com/pricing`
+**200, 5 509 байт**; тот же адрес с браузерным UA — **403, 5 743 б**, капча самого прокси).
+Exa — 🟢. Напоминаю условия исходной сессии этого файла: **`r.jina.ai` отдавал 401** («bad network
+reputation, AS9009»), **Exa — 404**, `WebSearch` исчерпан 400/400. То есть отказ по PSID был вынесен
+при трёх мёртвых каналах из четырёх.
+
+### Г31.2-14. 🔴 A3. PSID — ДОЛГОВОЙ БЛОК УСТАНОВЛЕН ПОЛНОСТЬЮ (был «не установлено» по всем колонкам)
+
+**Прежний статус:** «`psidonline.isr.umich.edu/Guide/Overview.aspx` — HTTP 403, 43 101 б,
+"Security Challenge. Enable JavaScript and cookies to continue"… Ничего о содержании долгового
+блока PSID не утверждаю — данных не добыл.»
+
+**Каналы 16.09.2026:**
+
+| Канал | Адрес | Код | Размер | Итог |
+|---|---|---|---|---|
+| `r.jina.ai` **без UA** | `psidonline.isr.umich.edu/Guide/Overview.aspx` | 200 у прокси | **413 б** | «Just a moment… We're reviewing the security of your connection» — 🔴 **и без UA антибот держит**; прежний отказ подтверждён как свойство сайта |
+| `r.jina.ai` **без UA** | `simba.isr.umich.edu/data/data.aspx` | **200** | **2 160 б** | 🟢 **открыто** — другой хост того же проекта антиботом не закрыт |
+| `mcp__exa__web_search_exa` | документация PSID | 200 | — | 🟢 **User Guide 2021 / Main Interview User Manual Release 2023 — с точными кодами переменных** |
+
+🔴 **Два вывода по каналу.** (1) Отказ по `psidonline` был **настоящим** — это не ошибка вызова
+прокси. (2) **Но он не означал недоступности данных**: соседний хост `simba.isr.umich.edu` открыт,
+а документация с полным перечнем долговых переменных лежит в PDF-руководствах, которые находит Exa.
+Это ровно класс «отказ инструмента записан как отсутствие источника».
+
+#### Первичный материал — ДОСЛОВНО, PSID User Guide for the 2021 Interviewing Year (ISR), §5.2.2 Wealth
+
+> «The wealth module was **first included in 1984**. This module was included again in **1989, 1994,
+> 1999, and every wave since then**. The question series includes **unfolding brackets**, and PSID
+> staff members use this and other information to create variables representing the total value of
+> wealth and its major subcomponents. Information from two sections — the housing section (A) and
+> the wealth section (W) — were used to construct the 2021 net worth measures. PSID asks about
+> **nine broad wealth categories, including short-term debt**:»
+> «3. **Value of debt aside from mortgage on the main home or vehicle loans**, divided into
+> sub-components: **credit card debt [W39A, ER80002]**, **student loan debt [W39B1, ER80012]**,
+> **medical bills [W39B2, ER80017]**, **legal bills [W39B3, ER80022]**, **loans from relatives
+> [W39B4, ER80027]**, and **unspecified other debt [W39B7, ER80033]**.»
+> «1. Equity in business (also includes farm), now split into **asset and debt components**
+> [W11A & W11B, ER79934 & ER79938].»
+> «4. Equity in real estate… now split into asset and debt components [W2A & W2B, ER79921 & ER79925].»
+> «9. Value of home equity (calculated as **home value minus remaining mortgage**; used in
+> calculation of WEALTH2) [ER81834].»
+
+**Обработка пропусков (дословно):**
+> «Processing of the data includes three steps: a) **imputation of the wealth components (1-8)**,
+> b) computation of home equity (9), and c) construction of estimates for the total family wealth
+> with and without housing equity… a **hot-deck imputation** technique was used for imputation of
+> the missing data in each wealth component (1-8)… For the **257 cases** missing at least one
+> component of home equity, the mean value imputed was **$149,117**» (волна 2021; в редакции 2023 —
+> «267 cases… $185,344»).
+
+**Сводные переменные (дословно, Cooper, Dynan & Rhodenhiser, Boston Fed WP 2019-06,
+DOI 10.29412/res.wp.2019.06):**
+> «The PSID is a longitudinal survey for which households were interviewed **annually through 1997
+> and since then have been interviewed biennially**… These variables are labeled **"WEALTH1" and
+> "WEALTH2"** in the PSID codebook. **WEALTH1 is imputed wealth excluding** the value of equity in
+> a household's primary residence, while **WEALTH2 equals WEALTH1 plus any such housing equity**.»
+> Состав неипотечного долга (волна 2017, коды): «…net of the sum of non-primary housing debt
+> (ER71431 [farm/business, W11B], ER71441 [other real estate, W2B], **ER71459 [credit card, W39A]**,
+> **ER71463 [student loan, W39B1]**, **ER71467 [medical, W39B2]**, **ER71471 [legal, W39B3]**,
+> **ER71475 [family loan, W39B4]**, ER71479 [other, W38B7]) plus the value of home equity (ER71481).
+> **All missing data were assigned.**»
+
+**Оговорка о сопоставимости (дословно, Boston Fed WP 2017-07 Data Appendix, Premo & Subramaniam):**
+> «Credit cards / charge cards — **PSID: All credit card debt, excluding debt from convenience use.**»
+> «Other loans — **PSID: Includes only loans from relatives.**»
+
+**Известная проблема измерения активов (дословно, User Guide):** в 2017 г. к вопросу W27 добавили
+W27a, и «**1,913 respondents** who had answered "No" to W27… went on to answer "**Yes**" to W27a…
+that is, **more than half (57%)** of those who reported that they did not hold money in any of
+[checking or savings accounts, money market funds, CDs, government bonds, treasury bills] did report
+that they owned a checking or savings account».
+
+#### Выжимка — что это даёт участку «альтернативные источники микроданных»
+
+1. 🟢 **Долговой блок PSID пригоден для нашей задачи по составу.** Неипотечный долг разложен ровно
+   на те компоненты, которыми оперирует наш долговой контур: карты, образовательный кредит,
+   медицинские счета, юридические счета, займы у родственников, прочее — каждый со своим кодом
+   переменной. Ипотека и автокредит вынесены отдельно (в раздел A и в equity in vehicle).
+2. 🟡 **Периодичность — раз в два года с 1999 г.** (до 1997 — ежегодно). Для калибровки помесячной
+   модели это означает: PSID даёт **структуру и уровни**, но не месячную динамику.
+3. 🔴 **Две ловушки, которые надо назвать, если берём PSID как основу портретов:**
+   (а) значения по компонентам **импутированы hot-deck**, и доля импутации ненулевая — сравнивать
+   наши синтетические распределения надо с учётом этого; (б) **credit card debt исключает
+   convenience use**, то есть это остаток, переносимый на следующий период, а не оборот по карте.
+   Смешать одно с другим — получить завышенную долговую нагрузку.
+4. 🔴 **Предупреждение по анкетным данным, совпадающее с нашим (ниворожкинским) выводом:** 57 %
+   ответивших «нет» на сложносоставной вопрос об активах отвечали «да» на простой вопрос о наличии
+   счёта. **Формулировка вопроса меняет ответ радикально** — прямое соображение для нашего
+   опросника и для любой калибровки на самоотчёте.
+5. ⚪ **Доступ к самим данным:** `simba.isr.umich.edu/data/data.aspx` (открыт), дословно:
+   «Before downloading data for the first time, users must **register** by completing a short
+   registration form which includes choosing a username and password that allows them to access
+   the **public use data archive**». То есть данные публичные, но за регистрацией — **действие
+   владельца**, не поисковая задача.
+
+## ИТОГ Г31.2 (в этом файле)
+
+- Закрыт **1 пункт** — A3 PSID, из состояния «не установлено по всем колонкам» в «долговой блок
+  установлен по официальной документации, с кодами переменных и оговорками».
+- 🔴 **Нашей ошибкой вызова прокси пункт НЕ был:** `psidonline` держит антибот и без UA. Но он был
+  **ошибкой «отказ инструмента = отсутствие источника»**: соседний хост открыт, а документация
+  находится поиском — просто в той сессии три канала из четырёх были мертвы, и добор не делался.
+- Канон, прогноз, новизну, юрблок — не меняет. Материал для выбора источника калибровки.

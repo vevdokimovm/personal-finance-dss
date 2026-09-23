@@ -1,0 +1,1426 @@
+date,value,unit,region,breakdown
+1926-01-01,92681,thousand_people,RU,total|all
+1939-01-01,108377,thousand_people,RU,total|all
+1959-01-01,117534,thousand_people,RU,total|all
+1970-01-01,129941,thousand_people,RU,total|all
+1979-01-01,137410,thousand_people,RU,total|all
+1989-01-01,147022,thousand_people,RU,total|all
+2002-01-01,145167,thousand_people,RU,total|all
+2004-01-01,144134,thousand_people,RU,total|all
+2005-01-01,143801,thousand_people,RU,total|all
+2006-01-01,143236,thousand_people,RU,total|all
+2007-01-01,142863,thousand_people,RU,total|all
+2008-01-01,142748,thousand_people,RU,total|all
+2009-01-01,142737,thousand_people,RU,total|all
+2010-01-01,142857,thousand_people,RU,total|all
+2011-01-01,142865,thousand_people,RU,total|all
+2012-01-01,143056,thousand_people,RU,total|all
+2013-01-01,143347,thousand_people,RU,total|all
+2014-01-01,143667,thousand_people,RU,total|all
+2015-01-01,146267,thousand_people,RU,total|all
+2016-01-01,146545,thousand_people,RU,total|all
+2017-01-01,146804,thousand_people,RU,total|all
+2018-01-01,146880,thousand_people,RU,total|all
+2019-01-01,146781,thousand_people,RU,total|all
+2020-01-01,146749,thousand_people,RU,total|all
+2021-01-01,146171,thousand_people,RU,total|all
+1926-01-01,14114,thousand_people,RU,total|0 – 4
+1939-01-01,13806,thousand_people,RU,total|0 – 4
+1959-01-01,13353,thousand_people,RU,total|0 – 4
+1970-01-01,9326,thousand_people,RU,total|0 – 4
+1979-01-01,10523,thousand_people,RU,total|0 – 4
+1989-01-01,12032,thousand_people,RU,total|0 – 4
+2002-01-01,6399,thousand_people,RU,total|0 – 4
+2004-01-01,6660,thousand_people,RU,total|0 – 4
+2005-01-01,6916,thousand_people,RU,total|0 – 4
+2006-01-01,7066,thousand_people,RU,total|0 – 4
+2007-01-01,7234,thousand_people,RU,total|0 – 4
+2008-01-01,7433,thousand_people,RU,total|0 – 4
+2009-01-01,7671,thousand_people,RU,total|0 – 4
+2010-01-01,7968,thousand_people,RU,total|0 – 4
+2011-01-01,8051,thousand_people,RU,total|0 – 4
+2012-01-01,8380,thousand_people,RU,total|0 – 4
+2013-01-01,8687,thousand_people,RU,total|0 – 4
+2014-01-01,8899,thousand_people,RU,total|0 – 4
+2015-01-01,9262,thousand_people,RU,total|0 – 4
+2016-01-01,9512,thousand_people,RU,total|0 – 4
+2017-01-01,9582,thousand_people,RU,total|0 – 4
+2018-01-01,9347,thousand_people,RU,total|0 – 4
+2019-01-01,9032,thousand_people,RU,total|0 – 4
+2020-01-01,8579,thousand_people,RU,total|0 – 4
+2021-01-01,8080,thousand_people,RU,total|0 – 4
+1926-01-01,9420,thousand_people,RU,total|5 – 9
+1939-01-01,11735,thousand_people,RU,total|5 – 9
+1959-01-01,12415,thousand_people,RU,total|5 – 9
+1970-01-01,11975,thousand_people,RU,total|5 – 9
+1979-01-01,9707,thousand_people,RU,total|5 – 9
+1989-01-01,11360,thousand_people,RU,total|5 – 9
+2002-01-01,6941,thousand_people,RU,total|5 – 9
+2004-01-01,6762,thousand_people,RU,total|5 – 9
+2005-01-01,6583,thousand_people,RU,total|5 – 9
+2006-01-01,6511,thousand_people,RU,total|5 – 9
+2007-01-01,6503,thousand_people,RU,total|5 – 9
+2008-01-01,6638,thousand_people,RU,total|5 – 9
+2009-01-01,6783,thousand_people,RU,total|5 – 9
+2010-01-01,7091,thousand_people,RU,total|5 – 9
+2011-01-01,7117,thousand_people,RU,total|5 – 9
+2012-01-01,7261,thousand_people,RU,total|5 – 9
+2013-01-01,7441,thousand_people,RU,total|5 – 9
+2014-01-01,7662,thousand_people,RU,total|5 – 9
+2015-01-01,8004,thousand_people,RU,total|5 – 9
+2016-01-01,8218,thousand_people,RU,total|5 – 9
+2017-01-01,8558,thousand_people,RU,total|5 – 9
+2018-01-01,8873,thousand_people,RU,total|5 – 9
+2019-01-01,9085,thousand_people,RU,total|5 – 9
+2020-01-01,9309,thousand_people,RU,total|5 – 9
+2021-01-01,9551,thousand_people,RU,total|5 – 9
+1926-01-01,10994,thousand_people,RU,total|10 – 14
+1939-01-01,14158,thousand_people,RU,total|10 – 14
+1959-01-01,8501,thousand_people,RU,total|10 – 14
+1970-01-01,13202,thousand_people,RU,total|10 – 14
+1979-01-01,9512,thousand_people,RU,total|10 – 14
+1989-01-01,10592,thousand_people,RU,total|10 – 14
+2002-01-01,10406,thousand_people,RU,total|10 – 14
+2004-01-01,9314,thousand_people,RU,total|10 – 14
+2005-01-01,8604,thousand_people,RU,total|10 – 14
+2006-01-01,7940,thousand_people,RU,total|10 – 14
+2007-01-01,7458,thousand_people,RU,total|10 – 14
+2008-01-01,7056,thousand_people,RU,total|10 – 14
+2009-01-01,6891,thousand_people,RU,total|10 – 14
+2010-01-01,6610,thousand_people,RU,total|10 – 14
+2011-01-01,6601,thousand_people,RU,total|10 – 14
+2012-01-01,6567,thousand_people,RU,total|10 – 14
+2013-01-01,6689,thousand_people,RU,total|10 – 14
+2014-01-01,6823,thousand_people,RU,total|10 – 14
+2015-01-01,7126,thousand_people,RU,total|10 – 14
+2016-01-01,7254,thousand_people,RU,total|10 – 14
+2017-01-01,7408,thousand_people,RU,total|10 – 14
+2018-01-01,7598,thousand_people,RU,total|10 – 14
+2019-01-01,7825,thousand_people,RU,total|10 – 14
+2020-01-01,8049,thousand_people,RU,total|10 – 14
+2021-01-01,8257,thousand_people,RU,total|10 – 14
+1926-01-01,10947,thousand_people,RU,total|15 – 19
+1939-01-01,9495,thousand_people,RU,total|15 – 19
+1959-01-01,8975,thousand_people,RU,total|15 – 19
+1970-01-01,12291,thousand_people,RU,total|15 – 19
+1979-01-01,12385,thousand_people,RU,total|15 – 19
+1989-01-01,9968,thousand_people,RU,total|15 – 19
+2002-01-01,12801,thousand_people,RU,total|15 – 19
+2004-01-01,12544,thousand_people,RU,total|15 – 19
+2005-01-01,12212,thousand_people,RU,total|15 – 19
+2006-01-01,11852,thousand_people,RU,total|15 – 19
+2007-01-01,11244,thousand_people,RU,total|15 – 19
+2008-01-01,10485,thousand_people,RU,total|15 – 19
+2009-01-01,9650,thousand_people,RU,total|15 – 19
+2010-01-01,8389,thousand_people,RU,total|15 – 19
+2011-01-01,8237,thousand_people,RU,total|15 – 19
+2012-01-01,7631,thousand_people,RU,total|15 – 19
+2013-01-01,7152,thousand_people,RU,total|15 – 19
+2014-01-01,6956,thousand_people,RU,total|15 – 19
+2015-01-01,6829,thousand_people,RU,total|15 – 19
+2016-01-01,6731,thousand_people,RU,total|15 – 19
+2017-01-01,6690,thousand_people,RU,total|15 – 19
+2018-01-01,6816,thousand_people,RU,total|15 – 19
+2019-01-01,6947,thousand_people,RU,total|15 – 19
+2020-01-01,7161,thousand_people,RU,total|15 – 19
+2021-01-01,7272,thousand_people,RU,total|15 – 19
+1926-01-01,8732,thousand_people,RU,total|20 – 24
+1939-01-01,8744,thousand_people,RU,total|20 – 24
+1959-01-01,11552,thousand_people,RU,total|20 – 24
+1970-01-01,9706,thousand_people,RU,total|20 – 24
+1979-01-01,12995,thousand_people,RU,total|20 – 24
+1989-01-01,9755,thousand_people,RU,total|20 – 24
+2002-01-01,11466,thousand_people,RU,total|20 – 24
+2004-01-01,11870,thousand_people,RU,total|20 – 24
+2005-01-01,12081,thousand_people,RU,total|20 – 24
+2006-01-01,12098,thousand_people,RU,total|20 – 24
+2007-01-01,12298,thousand_people,RU,total|20 – 24
+2008-01-01,12457,thousand_people,RU,total|20 – 24
+2009-01-01,12389,thousand_people,RU,total|20 – 24
+2010-01-01,12169,thousand_people,RU,total|20 – 24
+2011-01-01,12122,thousand_people,RU,total|20 – 24
+2012-01-01,11599,thousand_people,RU,total|20 – 24
+2013-01-01,10849,thousand_people,RU,total|20 – 24
+2014-01-01,9971,thousand_people,RU,total|20 – 24
+2015-01-01,9293,thousand_people,RU,total|20 – 24
+2016-01-01,8445,thousand_people,RU,total|20 – 24
+2017-01-01,7828,thousand_people,RU,total|20 – 24
+2018-01-01,7336,thousand_people,RU,total|20 – 24
+2019-01-01,7114,thousand_people,RU,total|20 – 24
+2020-01-01,6889,thousand_people,RU,total|20 – 24
+2021-01-01,6776,thousand_people,RU,total|20 – 24
+1926-01-01,7324,thousand_people,RU,total|25 – 29
+1939-01-01,10454,thousand_people,RU,total|25 – 29
+1959-01-01,10591,thousand_people,RU,total|25 – 29
+1970-01-01,7102,thousand_people,RU,total|25 – 29
+1979-01-01,11902,thousand_people,RU,total|25 – 29
+1989-01-01,12557,thousand_people,RU,total|25 – 29
+2002-01-01,10613,thousand_people,RU,total|25 – 29
+2004-01-01,10797,thousand_people,RU,total|25 – 29
+2005-01-01,10879,thousand_people,RU,total|25 – 29
+2006-01-01,11054,thousand_people,RU,total|25 – 29
+2007-01-01,11130,thousand_people,RU,total|25 – 29
+2008-01-01,11358,thousand_people,RU,total|25 – 29
+2009-01-01,11667,thousand_people,RU,total|25 – 29
+2010-01-01,11982,thousand_people,RU,total|25 – 29
+2011-01-01,12012,thousand_people,RU,total|25 – 29
+2012-01-01,12328,thousand_people,RU,total|25 – 29
+2013-01-01,12556,thousand_people,RU,total|25 – 29
+2014-01-01,12522,thousand_people,RU,total|25 – 29
+2015-01-01,12620,thousand_people,RU,total|25 – 29
+2016-01-01,12412,thousand_people,RU,total|25 – 29
+2017-01-01,11879,thousand_people,RU,total|25 – 29
+2018-01-01,11120,thousand_people,RU,total|25 – 29
+2019-01-01,10222,thousand_people,RU,total|25 – 29
+2020-01-01,9427,thousand_people,RU,total|25 – 29
+2021-01-01,8582,thousand_people,RU,total|25 – 29
+1926-01-01,5420,thousand_people,RU,total|30 – 34
+1939-01-01,8820,thousand_people,RU,total|30 – 34
+1959-01-01,11103,thousand_people,RU,total|30 – 34
+1970-01-01,11708,thousand_people,RU,total|30 – 34
+1979-01-01,8016,thousand_people,RU,total|30 – 34
+1989-01-01,12863,thousand_people,RU,total|30 – 34
+2002-01-01,9836,thousand_people,RU,total|30 – 34
+2004-01-01,10030,thousand_people,RU,total|30 – 34
+2005-01-01,10228,thousand_people,RU,total|30 – 34
+2006-01-01,10316,thousand_people,RU,total|30 – 34
+2007-01-01,10466,thousand_people,RU,total|30 – 34
+2008-01-01,10537,thousand_people,RU,total|30 – 34
+2009-01-01,10696,thousand_people,RU,total|30 – 34
+2010-01-01,10980,thousand_people,RU,total|30 – 34
+2011-01-01,11016,thousand_people,RU,total|30 – 34
+2012-01-01,11116,thousand_people,RU,total|30 – 34
+2013-01-01,11346,thousand_people,RU,total|30 – 34
+2014-01-01,11660,thousand_people,RU,total|30 – 34
+2015-01-01,12092,thousand_people,RU,total|30 – 34
+2016-01-01,12219,thousand_people,RU,total|30 – 34
+2017-01-01,12537,thousand_people,RU,total|30 – 34
+2018-01-01,12766,thousand_people,RU,total|30 – 34
+2019-01-01,12718,thousand_people,RU,total|30 – 34
+2020-01-01,12633,thousand_people,RU,total|30 – 34
+2021-01-01,12423,thousand_people,RU,total|30 – 34
+1926-01-01,5171,thousand_people,RU,total|35 – 39
+1939-01-01,7240,thousand_people,RU,total|35 – 39
+1959-01-01,6423,thousand_people,RU,total|35 – 39
+1970-01-01,9327,thousand_people,RU,total|35 – 39
+1979-01-01,8399,thousand_people,RU,total|35 – 39
+1989-01-01,11684,thousand_people,RU,total|35 – 39
+2002-01-01,10216,thousand_people,RU,total|35 – 39
+2004-01-01,9665,thousand_people,RU,total|35 – 39
+2005-01-01,9416,thousand_people,RU,total|35 – 39
+2006-01-01,9427,thousand_people,RU,total|35 – 39
+2007-01-01,9485,thousand_people,RU,total|35 – 39
+2008-01-01,9705,thousand_people,RU,total|35 – 39
+2009-01-01,9885,thousand_people,RU,total|35 – 39
+2010-01-01,10172,thousand_people,RU,total|35 – 39
+2011-01-01,10211,thousand_people,RU,total|35 – 39
+2012-01-01,10380,thousand_people,RU,total|35 – 39
+2013-01-01,10459,thousand_people,RU,total|35 – 39
+2014-01-01,10614,thousand_people,RU,total|35 – 39
+2015-01-01,10884,thousand_people,RU,total|35 – 39
+2016-01-01,11098,thousand_people,RU,total|35 – 39
+2017-01-01,11194,thousand_people,RU,total|35 – 39
+2018-01-01,11425,thousand_people,RU,total|35 – 39
+2019-01-01,11735,thousand_people,RU,total|35 – 39
+2020-01-01,12003,thousand_people,RU,total|35 – 39
+2021-01-01,12131,thousand_people,RU,total|35 – 39
+1926-01-01,4348,thousand_people,RU,total|40 – 44
+1939-01-01,5315,thousand_people,RU,total|40 – 44
+1959-01-01,6177,thousand_people,RU,total|40 – 44
+1970-01-01,10925,thousand_people,RU,total|40 – 44
+1979-01-01,10485,thousand_people,RU,total|40 – 44
+1989-01-01,7663,thousand_people,RU,total|40 – 44
+2002-01-01,12546,thousand_people,RU,total|40 – 44
+2004-01-01,12155,thousand_people,RU,total|40 – 44
+2005-01-01,11641,thousand_people,RU,total|40 – 44
+2006-01-01,10925,thousand_people,RU,total|40 – 44
+2007-01-01,10325,thousand_people,RU,total|40 – 44
+2008-01-01,9800,thousand_people,RU,total|40 – 44
+2009-01-01,9409,thousand_people,RU,total|40 – 44
+2010-01-01,9241,thousand_people,RU,total|40 – 44
+2011-01-01,9251,thousand_people,RU,total|40 – 44
+2012-01-01,9340,thousand_people,RU,total|40 – 44
+2013-01-01,9563,thousand_people,RU,total|40 – 44
+2014-01-01,9750,thousand_people,RU,total|40 – 44
+2015-01-01,10122,thousand_people,RU,total|40 – 44
+2016-01-01,10220,thousand_people,RU,total|40 – 44
+2017-01-01,10381,thousand_people,RU,total|40 – 44
+2018-01-01,10453,thousand_people,RU,total|40 – 44
+2019-01-01,10594,thousand_people,RU,total|40 – 44
+2020-01-01,10708,thousand_people,RU,total|40 – 44
+2021-01-01,10915,thousand_people,RU,total|40 – 44
+1926-01-01,3790,thousand_people,RU,total|45 – 49
+1939-01-01,4268,thousand_people,RU,total|45 – 49
+1959-01-01,7167,thousand_people,RU,total|45 – 49
+1970-01-01,6698,thousand_people,RU,total|45 – 49
+1979-01-01,9376,thousand_people,RU,total|45 – 49
+1989-01-01,7955,thousand_people,RU,total|45 – 49
+2002-01-01,11606,thousand_people,RU,total|45 – 49
+2004-01-01,11891,thousand_people,RU,total|45 – 49
+2005-01-01,11906,thousand_people,RU,total|45 – 49
+2006-01-01,12070,thousand_people,RU,total|45 – 49
+2007-01-01,12084,thousand_people,RU,total|45 – 49
+2008-01-01,11929,thousand_people,RU,total|45 – 49
+2009-01-01,11634,thousand_people,RU,total|45 – 49
+2010-01-01,10672,thousand_people,RU,total|45 – 49
+2011-01-01,10561,thousand_people,RU,total|45 – 49
+2012-01-01,10023,thousand_people,RU,total|45 – 49
+2013-01-01,9545,thousand_people,RU,total|45 – 49
+2014-01-01,9187,thousand_people,RU,total|45 – 49
+2015-01-01,9140,thousand_people,RU,total|45 – 49
+2016-01-01,9193,thousand_people,RU,total|45 – 49
+2017-01-01,9280,thousand_people,RU,total|45 – 49
+2018-01-01,9499,thousand_people,RU,total|45 – 49
+2019-01-01,9674,thousand_people,RU,total|45 – 49
+2020-01-01,9896,thousand_people,RU,total|45 – 49
+2021-01-01,9980,thousand_people,RU,total|45 – 49
+1926-01-01,3219,thousand_people,RU,total|50 – 54
+1939-01-01,3710,thousand_people,RU,total|50 – 54
+1959-01-01,5965,thousand_people,RU,total|50 – 54
+1970-01-01,5253,thousand_people,RU,total|50 – 54
+1979-01-01,9716,thousand_people,RU,total|50 – 54
+1989-01-01,9593,thousand_people,RU,total|50 – 54
+2002-01-01,10071,thousand_people,RU,total|50 – 54
+2004-01-01,10447,thousand_people,RU,total|50 – 54
+2005-01-01,10576,thousand_people,RU,total|50 – 54
+2006-01-01,10738,thousand_people,RU,total|50 – 54
+2007-01-01,10887,thousand_people,RU,total|50 – 54
+2008-01-01,11037,thousand_people,RU,total|50 – 54
+2009-01-01,11272,thousand_people,RU,total|50 – 54
+2010-01-01,11483,thousand_people,RU,total|50 – 54
+2011-01-01,11509,thousand_people,RU,total|50 – 54
+2012-01-01,11560,thousand_people,RU,total|50 – 54
+2013-01-01,11436,thousand_people,RU,total|50 – 54
+2014-01-01,11184,thousand_people,RU,total|50 – 54
+2015-01-01,10957,thousand_people,RU,total|50 – 54
+2016-01-01,10356,thousand_people,RU,total|50 – 54
+2017-01-01,9835,thousand_people,RU,total|50 – 54
+2018-01-01,9372,thousand_people,RU,total|50 – 54
+2019-01-01,9021,thousand_people,RU,total|50 – 54
+2020-01-01,8846,thousand_people,RU,total|50 – 54
+2021-01-01,8892,thousand_people,RU,total|50 – 54
+1926-01-01,2787,thousand_people,RU,total|55 – 59
+1939-01-01,3332,thousand_people,RU,total|55 – 59
+1959-01-01,4751,thousand_people,RU,total|55 – 59
+1970-01-01,6874,thousand_people,RU,total|55 – 59
+1979-01-01,5596,thousand_people,RU,total|55 – 59
+1989-01-01,8399,thousand_people,RU,total|55 – 59
+2002-01-01,5347,thousand_people,RU,total|55 – 59
+2004-01-01,6466,thousand_people,RU,total|55 – 59
+2005-01-01,7737,thousand_people,RU,total|55 – 59
+2006-01-01,8724,thousand_people,RU,total|55 – 59
+2007-01-01,9164,thousand_people,RU,total|55 – 59
+2008-01-01,9501,thousand_people,RU,total|55 – 59
+2009-01-01,9755,thousand_people,RU,total|55 – 59
+2010-01-01,10022,thousand_people,RU,total|55 – 59
+2011-01-01,10063,thousand_people,RU,total|55 – 59
+2012-01-01,10215,thousand_people,RU,total|55 – 59
+2013-01-01,10382,thousand_people,RU,total|55 – 59
+2014-01-01,10634,thousand_people,RU,total|55 – 59
+2015-01-01,10873,thousand_people,RU,total|55 – 59
+2016-01-01,11093,thousand_people,RU,total|55 – 59
+2017-01-01,11155,thousand_people,RU,total|55 – 59
+2018-01-01,11049,thousand_people,RU,total|55 – 59
+2019-01-01,10811,thousand_people,RU,total|55 – 59
+2020-01-01,10443,thousand_people,RU,total|55 – 59
+2021-01-01,9857,thousand_people,RU,total|55 – 59
+1926-01-01,2430,thousand_people,RU,total|60 – 64
+1939-01-01,2775,thousand_people,RU,total|60 – 64
+1959-01-01,3590,thousand_people,RU,total|60 – 64
+1970-01-01,5510,thousand_people,RU,total|60 – 64
+1979-01-01,5065,thousand_people,RU,total|60 – 64
+1989-01-01,8360,thousand_people,RU,total|60 – 64
+2002-01-01,7983,thousand_people,RU,total|60 – 64
+2004-01-01,6387,thousand_people,RU,total|60 – 64
+2005-01-01,5213,thousand_people,RU,total|60 – 64
+2006-01-01,4458,thousand_people,RU,total|60 – 64
+2007-01-01,4408,thousand_people,RU,total|60 – 64
+2008-01-01,5014,thousand_people,RU,total|60 – 64
+2009-01-01,5916,thousand_people,RU,total|60 – 64
+2010-01-01,7832,thousand_people,RU,total|60 – 64
+2011-01-01,7982,thousand_people,RU,total|60 – 64
+2012-01-01,8380,thousand_people,RU,total|60 – 64
+2013-01-01,8690,thousand_people,RU,total|60 – 64
+2014-01-01,8949,thousand_people,RU,total|60 – 64
+2015-01-01,9260,thousand_people,RU,total|60 – 64
+2016-01-01,9445,thousand_people,RU,total|60 – 64
+2017-01-01,9610,thousand_people,RU,total|60 – 64
+2018-01-01,9783,thousand_people,RU,total|60 – 64
+2019-01-01,10027,thousand_people,RU,total|60 – 64
+2020-01-01,10106,thousand_people,RU,total|60 – 64
+2021-01-01,10300,thousand_people,RU,total|60 – 64
+1926-01-01,1721,thousand_people,RU,total|65 – 69
+1939-01-01,2079,thousand_people,RU,total|65 – 69
+1959-01-01,2664,thousand_people,RU,total|65 – 69
+1970-01-01,4181,thousand_people,RU,total|65 – 69
+1979-01-01,5492,thousand_people,RU,total|65 – 69
+1989-01-01,4510,thousand_people,RU,total|65 – 69
+2002-01-01,6345,thousand_people,RU,total|65 – 69
+2004-01-01,7021,thousand_people,RU,total|65 – 69
+2005-01-01,7567,thousand_people,RU,total|65 – 69
+2006-01-01,7699,thousand_people,RU,total|65 – 69
+2007-01-01,7572,thousand_people,RU,total|65 – 69
+2008-01-01,6687,thousand_people,RU,total|65 – 69
+2009-01-01,5565,thousand_people,RU,total|65 – 69
+2010-01-01,4002,thousand_people,RU,total|65 – 69
+2011-01-01,3913,thousand_people,RU,total|65 – 69
+2012-01-01,3896,thousand_people,RU,total|65 – 69
+2013-01-01,4453,thousand_people,RU,total|65 – 69
+2014-01-01,5269,thousand_people,RU,total|65 – 69
+2015-01-01,6428,thousand_people,RU,total|65 – 69
+2016-01-01,7263,thousand_people,RU,total|65 – 69
+2017-01-01,7637,thousand_people,RU,total|65 – 69
+2018-01-01,7937,thousand_people,RU,total|65 – 69
+2019-01-01,8179,thousand_people,RU,total|65 – 69
+2020-01-01,8339,thousand_people,RU,total|65 – 69
+2021-01-01,8469,thousand_people,RU,total|65 – 69
+1926-01-01,2212,thousand_people,RU,total|70 и более
+1939-01-01,2426,thousand_people,RU,total|70 и более
+1959-01-01,4303,thousand_people,RU,total|70 и более
+1970-01-01,5806,thousand_people,RU,total|70 и более
+1979-01-01,8200,thousand_people,RU,total|70 и более
+1989-01-01,9646,thousand_people,RU,total|70 и более
+2002-01-01,12469,thousand_people,RU,total|70 и более
+2004-01-01,12325,thousand_people,RU,total|70 и более
+2005-01-01,12242,thousand_people,RU,total|70 и более
+2006-01-01,12358,thousand_people,RU,total|70 и более
+2007-01-01,12605,thousand_people,RU,total|70 и более
+2008-01-01,13111,thousand_people,RU,total|70 и более
+2009-01-01,13554,thousand_people,RU,total|70 и более
+2010-01-01,14210,thousand_people,RU,total|70 и более
+2011-01-01,14219,thousand_people,RU,total|70 и более
+2012-01-01,14380,thousand_people,RU,total|70 и более
+2013-01-01,14099,thousand_people,RU,total|70 и более
+2014-01-01,13587,thousand_people,RU,total|70 и более
+2015-01-01,13377,thousand_people,RU,total|70 и более
+2016-01-01,13086,thousand_people,RU,total|70 и более
+2017-01-01,13230,thousand_people,RU,total|70 и более
+2018-01-01,13506,thousand_people,RU,total|70 и более
+2019-01-01,13797,thousand_people,RU,total|70 и более
+2020-01-01,14361,thousand_people,RU,total|70 и более
+2021-01-01,14686,thousand_people,RU,total|70 и более
+1926-01-01,36854,thousand_people,RU,total|моложе трудоспособного
+1939-01-01,42072,thousand_people,RU,total|моложе трудоспособного
+1959-01-01,35094,thousand_people,RU,total|моложе трудоспособного
+1970-01-01,37145,thousand_people,RU,total|моложе трудоспособного
+1979-01-01,31974,thousand_people,RU,total|моложе трудоспособного
+1989-01-01,35995,thousand_people,RU,total|моложе трудоспособного
+2002-01-01,26327,thousand_people,RU,total|моложе трудоспособного
+2004-01-01,25136,thousand_people,RU,total|моложе трудоспособного
+2005-01-01,24349,thousand_people,RU,total|моложе трудоспособного
+2006-01-01,23671,thousand_people,RU,total|моложе трудоспособного
+2007-01-01,23073,thousand_people,RU,total|моложе трудоспособного
+2008-01-01,22842,thousand_people,RU,total|моложе трудоспособного
+2009-01-01,22854,thousand_people,RU,total|моложе трудоспособного
+2010-01-01,23126,thousand_people,RU,total|моложе трудоспособного
+2011-01-01,23209,thousand_people,RU,total|моложе трудоспособного
+2012-01-01,23568,thousand_people,RU,total|моложе трудоспособного
+2013-01-01,24110,thousand_people,RU,total|моложе трудоспособного
+2014-01-01,24717,thousand_people,RU,total|моложе трудоспособного
+2015-01-01,25689,thousand_people,RU,total|моложе трудоспособного
+2016-01-01,26360,thousand_people,RU,total|моложе трудоспособного
+2017-01-01,26895,thousand_people,RU,total|моложе трудоспособного
+2018-01-01,27254,thousand_people,RU,total|моложе трудоспособного
+2019-01-01,27430,thousand_people,RU,total|моложе трудоспособного
+2020-01-01,27442,thousand_people,RU,total|моложе трудоспособного
+2021-01-01,27387,thousand_people,RU,total|моложе трудоспособного
+1926-01-01,47830,thousand_people,RU,total|трудоспособном
+1939-01-01,56923,thousand_people,RU,total|трудоспособном
+1959-01-01,68609,thousand_people,RU,total|трудоспособном
+1970-01-01,72752,thousand_people,RU,total|трудоспособном
+1979-01-01,82959,thousand_people,RU,total|трудоспособном
+1989-01-01,83746,thousand_people,RU,total|трудоспособном
+2002-01-01,88942,thousand_people,RU,total|трудоспособном
+2004-01-01,89852,thousand_people,RU,total|трудоспособном
+2005-01-01,90099,thousand_people,RU,total|трудоспособном
+2006-01-01,90157,thousand_people,RU,total|трудоспособном
+2007-01-01,90058,thousand_people,RU,total|трудоспособном
+2008-01-01,89745,thousand_people,RU,total|трудоспособном
+2009-01-01,89342,thousand_people,RU,total|трудоспособном
+2010-01-01,87983,thousand_people,RU,total|трудоспособном
+2011-01-01,87847,thousand_people,RU,total|трудоспособном
+2012-01-01,87055,thousand_people,RU,total|трудоспособном
+2013-01-01,86137,thousand_people,RU,total|трудоспособном
+2014-01-01,85162,thousand_people,RU,total|трудоспособном
+2015-01-01,85415,thousand_people,RU,total|трудоспособном
+2016-01-01,84199,thousand_people,RU,total|трудоспособном
+2017-01-01,83224,thousand_people,RU,total|трудоспособном
+2018-01-01,82264,thousand_people,RU,total|трудоспособном
+2019-01-01,81362,thousand_people,RU,total|трудоспособном
+2020-01-01,82678,thousand_people,RU,total|трудоспособном
+2021-01-01,81881,thousand_people,RU,total|трудоспособном
+1926-01-01,7945,thousand_people,RU,total|старше трудоспособного
+1939-01-01,9362,thousand_people,RU,total|старше трудоспособного
+1959-01-01,13827,thousand_people,RU,total|старше трудоспособного
+1970-01-01,19987,thousand_people,RU,total|старше трудоспособного
+1979-01-01,22436,thousand_people,RU,total|старше трудоспособного
+1989-01-01,27196,thousand_people,RU,total|старше трудоспособного
+2002-01-01,29778,thousand_people,RU,total|старше трудоспособного
+2004-01-01,29346,thousand_people,RU,total|старше трудоспособного
+2005-01-01,29353,thousand_people,RU,total|старше трудоспособного
+2006-01-01,29408,thousand_people,RU,total|старше трудоспособного
+2007-01-01,29732,thousand_people,RU,total|старше трудоспособного
+2008-01-01,30161,thousand_people,RU,total|старше трудоспособного
+2009-01-01,30541,thousand_people,RU,total|старше трудоспособного
+2010-01-01,31714,thousand_people,RU,total|старше трудоспособного
+2011-01-01,31809,thousand_people,RU,total|старше трудоспособного
+2012-01-01,32433,thousand_people,RU,total|старше трудоспособного
+2013-01-01,33100,thousand_people,RU,total|старше трудоспособного
+2014-01-01,33788,thousand_people,RU,total|старше трудоспособного
+2015-01-01,35163,thousand_people,RU,total|старше трудоспособного
+2016-01-01,35986,thousand_people,RU,total|старше трудоспособного
+2017-01-01,36685,thousand_people,RU,total|старше трудоспособного
+2018-01-01,37362,thousand_people,RU,total|старше трудоспособного
+2019-01-01,37989,thousand_people,RU,total|старше трудоспособного
+2020-01-01,36629,thousand_people,RU,total|старше трудоспособного
+2021-01-01,36903,thousand_people,RU,total|старше трудоспособного
+1926-01-01,16452,thousand_people,RU,urban|all
+1939-01-01,36296,thousand_people,RU,urban|all
+1959-01-01,61611,thousand_people,RU,urban|all
+1970-01-01,80631,thousand_people,RU,urban|all
+1979-01-01,94942,thousand_people,RU,urban|all
+1989-01-01,107959,thousand_people,RU,urban|all
+2002-01-01,106429,thousand_people,RU,urban|all
+2004-01-01,106040,thousand_people,RU,urban|all
+2005-01-01,105182,thousand_people,RU,urban|all
+2006-01-01,104818,thousand_people,RU,urban|all
+2007-01-01,104732,thousand_people,RU,urban|all
+2008-01-01,104865,thousand_people,RU,urban|all
+2009-01-01,104915,thousand_people,RU,urban|all
+2010-01-01,105314,thousand_people,RU,urban|all
+2011-01-01,105421,thousand_people,RU,urban|all
+2012-01-01,105742,thousand_people,RU,urban|all
+2013-01-01,106118,thousand_people,RU,urban|all
+2014-01-01,106549,thousand_people,RU,urban|all
+2015-01-01,108282,thousand_people,RU,urban|all
+2016-01-01,108658,thousand_people,RU,urban|all
+2017-01-01,109032,thousand_people,RU,urban|all
+2018-01-01,109327,thousand_people,RU,urban|all
+2019-01-01,109454,thousand_people,RU,urban|all
+2020-01-01,109563,thousand_people,RU,urban|all
+2021-01-01,109252,thousand_people,RU,urban|all
+1926-01-01,1970,thousand_people,RU,urban|0 – 4
+1939-01-01,3913,thousand_people,RU,urban|0 – 4
+1959-01-01,6087,thousand_people,RU,urban|0 – 4
+1970-01-01,5310,thousand_people,RU,urban|0 – 4
+1979-01-01,7164,thousand_people,RU,urban|0 – 4
+1989-01-01,8498,thousand_people,RU,urban|0 – 4
+2002-01-01,4395,thousand_people,RU,urban|0 – 4
+2004-01-01,4649,thousand_people,RU,urban|0 – 4
+2005-01-01,4844,thousand_people,RU,urban|0 – 4
+2006-01-01,4972,thousand_people,RU,urban|0 – 4
+2007-01-01,5103,thousand_people,RU,urban|0 – 4
+2008-01-01,5239,thousand_people,RU,urban|0 – 4
+2009-01-01,5388,thousand_people,RU,urban|0 – 4
+2010-01-01,5591,thousand_people,RU,urban|0 – 4
+2011-01-01,5654,thousand_people,RU,urban|0 – 4
+2012-01-01,5890,thousand_people,RU,urban|0 – 4
+2013-01-01,6137,thousand_people,RU,urban|0 – 4
+2014-01-01,6326,thousand_people,RU,urban|0 – 4
+2015-01-01,6589,thousand_people,RU,urban|0 – 4
+2016-01-01,6855,thousand_people,RU,urban|0 – 4
+2017-01-01,7006,thousand_people,RU,urban|0 – 4
+2018-01-01,6919,thousand_people,RU,urban|0 – 4
+2019-01-01,6760,thousand_people,RU,urban|0 – 4
+2020-01-01,6487,thousand_people,RU,urban|0 – 4
+2021-01-01,6110,thousand_people,RU,urban|0 – 4
+1926-01-01,1238,thousand_people,RU,urban|5 – 9
+1939-01-01,2864,thousand_people,RU,urban|5 – 9
+1959-01-01,5871,thousand_people,RU,urban|5 – 9
+1970-01-01,6479,thousand_people,RU,urban|5 – 9
+1979-01-01,6508,thousand_people,RU,urban|5 – 9
+1989-01-01,8108,thousand_people,RU,urban|5 – 9
+2002-01-01,4683,thousand_people,RU,urban|5 – 9
+2004-01-01,4600,thousand_people,RU,urban|5 – 9
+2005-01-01,4467,thousand_people,RU,urban|5 – 9
+2006-01-01,4438,thousand_people,RU,urban|5 – 9
+2007-01-01,4468,thousand_people,RU,urban|5 – 9
+2008-01-01,4602,thousand_people,RU,urban|5 – 9
+2009-01-01,4732,thousand_people,RU,urban|5 – 9
+2010-01-01,4986,thousand_people,RU,urban|5 – 9
+2011-01-01,5011,thousand_people,RU,urban|5 – 9
+2012-01-01,5127,thousand_people,RU,urban|5 – 9
+2013-01-01,5253,thousand_people,RU,urban|5 – 9
+2014-01-01,5413,thousand_people,RU,urban|5 – 9
+2015-01-01,5656,thousand_people,RU,urban|5 – 9
+2016-01-01,5825,thousand_people,RU,urban|5 – 9
+2017-01-01,6081,thousand_people,RU,urban|5 – 9
+2018-01-01,6350,thousand_people,RU,urban|5 – 9
+2019-01-01,6546,thousand_people,RU,urban|5 – 9
+2020-01-01,6730,thousand_people,RU,urban|5 – 9
+2021-01-01,6982,thousand_people,RU,urban|5 – 9
+1926-01-01,1575,thousand_people,RU,urban|10 – 14
+1939-01-01,3839,thousand_people,RU,urban|10 – 14
+1959-01-01,4333,thousand_people,RU,urban|10 – 14
+1970-01-01,7048,thousand_people,RU,urban|10 – 14
+1979-01-01,5777,thousand_people,RU,urban|10 – 14
+1989-01-01,7599,thousand_people,RU,urban|10 – 14
+2002-01-01,7119,thousand_people,RU,urban|10 – 14
+2004-01-01,6401,thousand_people,RU,urban|10 – 14
+2005-01-01,5937,thousand_people,RU,urban|10 – 14
+2006-01-01,5511,thousand_people,RU,urban|10 – 14
+2007-01-01,5175,thousand_people,RU,urban|10 – 14
+2008-01-01,4859,thousand_people,RU,urban|10 – 14
+2009-01-01,4717,thousand_people,RU,urban|10 – 14
+2010-01-01,4523,thousand_people,RU,urban|10 – 14
+2011-01-01,4526,thousand_people,RU,urban|10 – 14
+2012-01-01,4526,thousand_people,RU,urban|10 – 14
+2013-01-01,4643,thousand_people,RU,urban|10 – 14
+2014-01-01,4770,thousand_people,RU,urban|10 – 14
+2015-01-01,4997,thousand_people,RU,urban|10 – 14
+2016-01-01,5115,thousand_people,RU,urban|10 – 14
+2017-01-01,5246,thousand_people,RU,urban|10 – 14
+2018-01-01,5392,thousand_people,RU,urban|10 – 14
+2019-01-01,5562,thousand_people,RU,urban|10 – 14
+2020-01-01,5739,thousand_people,RU,urban|10 – 14
+2021-01-01,5904,thousand_people,RU,urban|10 – 14
+1926-01-01,1810,thousand_people,RU,urban|15 – 19
+1939-01-01,3619,thousand_people,RU,urban|15 – 19
+1959-01-01,4876,thousand_people,RU,urban|15 – 19
+1970-01-01,8356,thousand_people,RU,urban|15 – 19
+1979-01-01,8782,thousand_people,RU,urban|15 – 19
+1989-01-01,7741,thousand_people,RU,urban|15 – 19
+2002-01-01,9658,thousand_people,RU,urban|15 – 19
+2004-01-01,9251,thousand_people,RU,urban|15 – 19
+2005-01-01,8832,thousand_people,RU,urban|15 – 19
+2006-01-01,8539,thousand_people,RU,urban|15 – 19
+2007-01-01,8163,thousand_people,RU,urban|15 – 19
+2008-01-01,7671,thousand_people,RU,urban|15 – 19
+2009-01-01,7090,thousand_people,RU,urban|15 – 19
+2010-01-01,6178,thousand_people,RU,urban|15 – 19
+2011-01-01,6064,thousand_people,RU,urban|15 – 19
+2012-01-01,5575,thousand_people,RU,urban|15 – 19
+2013-01-01,5163,thousand_people,RU,urban|15 – 19
+2014-01-01,5005,thousand_people,RU,urban|15 – 19
+2015-01-01,4886,thousand_people,RU,urban|15 – 19
+2016-01-01,4835,thousand_people,RU,urban|15 – 19
+2017-01-01,4824,thousand_people,RU,urban|15 – 19
+2018-01-01,4938,thousand_people,RU,urban|15 – 19
+2019-01-01,5056,thousand_people,RU,urban|15 – 19
+2020-01-01,5221,thousand_people,RU,urban|15 – 19
+2021-01-01,5300,thousand_people,RU,urban|15 – 19
+1926-01-01,2016,thousand_people,RU,urban|20 – 24
+1939-01-01,3604,thousand_people,RU,urban|20 – 24
+1959-01-01,6694,thousand_people,RU,urban|20 – 24
+1970-01-01,7256,thousand_people,RU,urban|20 – 24
+1979-01-01,9709,thousand_people,RU,urban|20 – 24
+1989-01-01,7385,thousand_people,RU,urban|20 – 24
+2002-01-01,8856,thousand_people,RU,urban|20 – 24
+2004-01-01,9207,thousand_people,RU,urban|20 – 24
+2005-01-01,9302,thousand_people,RU,urban|20 – 24
+2006-01-01,9227,thousand_people,RU,urban|20 – 24
+2007-01-01,9291,thousand_people,RU,urban|20 – 24
+2008-01-01,9363,thousand_people,RU,urban|20 – 24
+2009-01-01,9275,thousand_people,RU,urban|20 – 24
+2010-01-01,9176,thousand_people,RU,urban|20 – 24
+2011-01-01,9160,thousand_people,RU,urban|20 – 24
+2012-01-01,8871,thousand_people,RU,urban|20 – 24
+2013-01-01,8398,thousand_people,RU,urban|20 – 24
+2014-01-01,7760,thousand_people,RU,urban|20 – 24
+2015-01-01,7190,thousand_people,RU,urban|20 – 24
+2016-01-01,6443,thousand_people,RU,urban|20 – 24
+2017-01-01,5847,thousand_people,RU,urban|20 – 24
+2018-01-01,5363,thousand_people,RU,urban|20 – 24
+2019-01-01,5140,thousand_people,RU,urban|20 – 24
+2020-01-01,4942,thousand_people,RU,urban|20 – 24
+2021-01-01,4862,thousand_people,RU,urban|20 – 24
+1926-01-01,1716,thousand_people,RU,urban|25 – 29
+1939-01-01,4425,thousand_people,RU,urban|25 – 29
+1959-01-01,5977,thousand_people,RU,urban|25 – 29
+1970-01-01,5012,thousand_people,RU,urban|25 – 29
+1979-01-01,9060,thousand_people,RU,urban|25 – 29
+1989-01-01,9423,thousand_people,RU,urban|25 – 29
+2002-01-01,8150,thousand_people,RU,urban|25 – 29
+2004-01-01,8303,thousand_people,RU,urban|25 – 29
+2005-01-01,8323,thousand_people,RU,urban|25 – 29
+2006-01-01,8457,thousand_people,RU,urban|25 – 29
+2007-01-01,8520,thousand_people,RU,urban|25 – 29
+2008-01-01,8711,thousand_people,RU,urban|25 – 29
+2009-01-01,8953,thousand_people,RU,urban|25 – 29
+2010-01-01,9165,thousand_people,RU,urban|25 – 29
+2011-01-01,9193,thousand_people,RU,urban|25 – 29
+2012-01-01,9447,thousand_people,RU,urban|25 – 29
+2013-01-01,9635,thousand_people,RU,urban|25 – 29
+2014-01-01,9637,thousand_people,RU,urban|25 – 29
+2015-01-01,9722,thousand_people,RU,urban|25 – 29
+2016-01-01,9604,thousand_people,RU,urban|25 – 29
+2017-01-01,9262,thousand_people,RU,urban|25 – 29
+2018-01-01,8739,thousand_people,RU,urban|25 – 29
+2019-01-01,8035,thousand_people,RU,urban|25 – 29
+2020-01-01,7357,thousand_people,RU,urban|25 – 29
+2021-01-01,6588,thousand_people,RU,urban|25 – 29
+1926-01-01,1302,thousand_people,RU,urban|30 – 34
+1939-01-01,3521,thousand_people,RU,urban|30 – 34
+1959-01-01,6424,thousand_people,RU,urban|30 – 34
+1970-01-01,7987,thousand_people,RU,urban|30 – 34
+1979-01-01,6296,thousand_people,RU,urban|30 – 34
+1989-01-01,9812,thousand_people,RU,urban|30 – 34
+2002-01-01,7434,thousand_people,RU,urban|30 – 34
+2004-01-01,7644,thousand_people,RU,urban|30 – 34
+2005-01-01,7781,thousand_people,RU,urban|30 – 34
+2006-01-01,7854,thousand_people,RU,urban|30 – 34
+2007-01-01,7987,thousand_people,RU,urban|30 – 34
+2008-01-01,8058,thousand_people,RU,urban|30 – 34
+2009-01-01,8188,thousand_people,RU,urban|30 – 34
+2010-01-01,8438,thousand_people,RU,urban|30 – 34
+2011-01-01,8474,thousand_people,RU,urban|30 – 34
+2012-01-01,8574,thousand_people,RU,urban|30 – 34
+2013-01-01,8778,thousand_people,RU,urban|30 – 34
+2014-01-01,9056,thousand_people,RU,urban|30 – 34
+2015-01-01,9388,thousand_people,RU,urban|30 – 34
+2016-01-01,9494,thousand_people,RU,urban|30 – 34
+2017-01-01,9751,thousand_people,RU,urban|30 – 34
+2018-01-01,9943,thousand_people,RU,urban|30 – 34
+2019-01-01,9926,thousand_people,RU,urban|30 – 34
+2020-01-01,9893,thousand_people,RU,urban|30 – 34
+2021-01-01,9773,thousand_people,RU,urban|30 – 34
+1926-01-01,1164,thousand_people,RU,urban|35 – 39
+1939-01-01,2759,thousand_people,RU,urban|35 – 39
+1959-01-01,3691,thousand_people,RU,urban|35 – 39
+1970-01-01,5953,thousand_people,RU,urban|35 – 39
+1979-01-01,6153,thousand_people,RU,urban|35 – 39
+1989-01-01,9149,thousand_people,RU,urban|35 – 39
+2002-01-01,7505,thousand_people,RU,urban|35 – 39
+2004-01-01,7115,thousand_people,RU,urban|35 – 39
+2005-01-01,6917,thousand_people,RU,urban|35 – 39
+2006-01-01,6973,thousand_people,RU,urban|35 – 39
+2007-01-01,7071,thousand_people,RU,urban|35 – 39
+2008-01-01,7298,thousand_people,RU,urban|35 – 39
+2009-01-01,7479,thousand_people,RU,urban|35 – 39
+2010-01-01,7741,thousand_people,RU,urban|35 – 39
+2011-01-01,7777,thousand_people,RU,urban|35 – 39
+2012-01-01,7928,thousand_people,RU,urban|35 – 39
+2013-01-01,8005,thousand_people,RU,urban|35 – 39
+2014-01-01,8146,thousand_people,RU,urban|35 – 39
+2015-01-01,8355,thousand_people,RU,urban|35 – 39
+2016-01-01,8556,thousand_people,RU,urban|35 – 39
+2017-01-01,8657,thousand_people,RU,urban|35 – 39
+2018-01-01,8872,thousand_people,RU,urban|35 – 39
+2019-01-01,9148,thousand_people,RU,urban|35 – 39
+2020-01-01,9382,thousand_people,RU,urban|35 – 39
+2021-01-01,9497,thousand_people,RU,urban|35 – 39
+1926-01-01,922,thousand_people,RU,urban|40 – 44
+1939-01-01,2007,thousand_people,RU,urban|40 – 44
+1959-01-01,3486,thousand_people,RU,urban|40 – 44
+1970-01-01,7022,thousand_people,RU,urban|40 – 44
+1979-01-01,7446,thousand_people,RU,urban|40 – 44
+1989-01-01,6156,thousand_people,RU,urban|40 – 44
+2002-01-01,9247,thousand_people,RU,urban|40 – 44
+2004-01-01,8941,thousand_people,RU,urban|40 – 44
+2005-01-01,8501,thousand_people,RU,urban|40 – 44
+2006-01-01,7957,thousand_people,RU,urban|40 – 44
+2007-01-01,7515,thousand_people,RU,urban|40 – 44
+2008-01-01,7142,thousand_people,RU,urban|40 – 44
+2009-01-01,6869,thousand_people,RU,urban|40 – 44
+2010-01-01,6817,thousand_people,RU,urban|40 – 44
+2011-01-01,6840,thousand_people,RU,urban|40 – 44
+2012-01-01,6958,thousand_people,RU,urban|40 – 44
+2013-01-01,7178,thousand_people,RU,urban|40 – 44
+2014-01-01,7371,thousand_people,RU,urban|40 – 44
+2015-01-01,7663,thousand_people,RU,urban|40 – 44
+2016-01-01,7754,thousand_people,RU,urban|40 – 44
+2017-01-01,7902,thousand_people,RU,urban|40 – 44
+2018-01-01,7980,thousand_people,RU,urban|40 – 44
+2019-01-01,8111,thousand_people,RU,urban|40 – 44
+2020-01-01,8228,thousand_people,RU,urban|40 – 44
+2021-01-01,8432,thousand_people,RU,urban|40 – 44
+1926-01-01,767,thousand_people,RU,urban|45 – 49
+1939-01-01,1513,thousand_people,RU,urban|45 – 49
+1959-01-01,3924,thousand_people,RU,urban|45 – 49
+1970-01-01,4263,thousand_people,RU,urban|45 – 49
+1979-01-01,6258,thousand_people,RU,urban|45 – 49
+1989-01-01,5959,thousand_people,RU,urban|45 – 49
+2002-01-01,8693,thousand_people,RU,urban|45 – 49
+2004-01-01,8844,thousand_people,RU,urban|45 – 49
+2005-01-01,8744,thousand_people,RU,urban|45 – 49
+2006-01-01,8818,thousand_people,RU,urban|45 – 49
+2007-01-01,8801,thousand_people,RU,urban|45 – 49
+2008-01-01,8686,thousand_people,RU,urban|45 – 49
+2009-01-01,8454,thousand_people,RU,urban|45 – 49
+2010-01-01,7753,thousand_people,RU,urban|45 – 49
+2011-01-01,7676,thousand_people,RU,urban|45 – 49
+2012-01-01,7280,thousand_people,RU,urban|45 – 49
+2013-01-01,6937,thousand_people,RU,urban|45 – 49
+2014-01-01,6693,thousand_people,RU,urban|45 – 49
+2015-01-01,6665,thousand_people,RU,urban|45 – 49
+2016-01-01,6757,thousand_people,RU,urban|45 – 49
+2017-01-01,6875,thousand_people,RU,urban|45 – 49
+2018-01-01,7096,thousand_people,RU,urban|45 – 49
+2019-01-01,7280,thousand_people,RU,urban|45 – 49
+2020-01-01,7481,thousand_people,RU,urban|45 – 49
+2021-01-01,7568,thousand_people,RU,urban|45 – 49
+1926-01-01,600,thousand_people,RU,urban|50 – 54
+1939-01-01,1321,thousand_people,RU,urban|50 – 54
+1959-01-01,3181,thousand_people,RU,urban|50 – 54
+1970-01-01,3286,thousand_people,RU,urban|50 – 54
+1979-01-01,6523,thousand_people,RU,urban|50 – 54
+1989-01-01,6970,thousand_people,RU,urban|50 – 54
+2002-01-01,7710,thousand_people,RU,urban|50 – 54
+2004-01-01,7948,thousand_people,RU,urban|50 – 54
+2005-01-01,7947,thousand_people,RU,urban|50 – 54
+2006-01-01,8004,thousand_people,RU,urban|50 – 54
+2007-01-01,8067,thousand_people,RU,urban|50 – 54
+2008-01-01,8141,thousand_people,RU,urban|50 – 54
+2009-01-01,8268,thousand_people,RU,urban|50 – 54
+2010-01-01,8362,thousand_people,RU,urban|50 – 54
+2011-01-01,8381,thousand_people,RU,urban|50 – 54
+2012-01-01,8392,thousand_people,RU,urban|50 – 54
+2013-01-01,8286,thousand_people,RU,urban|50 – 54
+2014-01-01,8092,thousand_people,RU,urban|50 – 54
+2015-01-01,7905,thousand_people,RU,urban|50 – 54
+2016-01-01,7468,thousand_people,RU,urban|50 – 54
+2017-01-01,7092,thousand_people,RU,urban|50 – 54
+2018-01-01,6770,thousand_people,RU,urban|50 – 54
+2019-01-01,6536,thousand_people,RU,urban|50 – 54
+2020-01-01,6439,thousand_people,RU,urban|50 – 54
+2021-01-01,6531,thousand_people,RU,urban|50 – 54
+1926-01-01,469,thousand_people,RU,urban|55 – 59
+1939-01-01,1017,thousand_people,RU,urban|55 – 59
+1959-01-01,2406,thousand_people,RU,urban|55 – 59
+1970-01-01,4098,thousand_people,RU,urban|55 – 59
+1979-01-01,3700,thousand_people,RU,urban|55 – 59
+1989-01-01,5760,thousand_people,RU,urban|55 – 59
+2002-01-01,4152,thousand_people,RU,urban|55 – 59
+2004-01-01,5038,thousand_people,RU,urban|55 – 59
+2005-01-01,5957,thousand_people,RU,urban|55 – 59
+2006-01-01,6662,thousand_people,RU,urban|55 – 59
+2007-01-01,6952,thousand_people,RU,urban|55 – 59
+2008-01-01,7164,thousand_people,RU,urban|55 – 59
+2009-01-01,7313,thousand_people,RU,urban|55 – 59
+2010-01-01,7443,thousand_people,RU,urban|55 – 59
+2011-01-01,7470,thousand_people,RU,urban|55 – 59
+2012-01-01,7536,thousand_people,RU,urban|55 – 59
+2013-01-01,7611,thousand_people,RU,urban|55 – 59
+2014-01-01,7755,thousand_people,RU,urban|55 – 59
+2015-01-01,7864,thousand_people,RU,urban|55 – 59
+2016-01-01,8002,thousand_people,RU,urban|55 – 59
+2017-01-01,8031,thousand_people,RU,urban|55 – 59
+2018-01-01,7954,thousand_people,RU,urban|55 – 59
+2019-01-01,7778,thousand_people,RU,urban|55 – 59
+2020-01-01,7521,thousand_people,RU,urban|55 – 59
+2021-01-01,7104,thousand_people,RU,urban|55 – 59
+1926-01-01,352,thousand_people,RU,urban|60 – 64
+1939-01-01,770,thousand_people,RU,urban|60 – 64
+1959-01-01,1743,thousand_people,RU,urban|60 – 64
+1970-01-01,3187,thousand_people,RU,urban|60 – 64
+1979-01-01,3271,thousand_people,RU,urban|60 – 64
+1989-01-01,5803,thousand_people,RU,urban|60 – 64
+2002-01-01,5743,thousand_people,RU,urban|60 – 64
+2004-01-01,4628,thousand_people,RU,urban|60 – 64
+2005-01-01,3812,thousand_people,RU,urban|60 – 64
+2006-01-01,3331,thousand_people,RU,urban|60 – 64
+2007-01-01,3363,thousand_people,RU,urban|60 – 64
+2008-01-01,3872,thousand_people,RU,urban|60 – 64
+2009-01-01,4566,thousand_people,RU,urban|60 – 64
+2010-01-01,5973,thousand_people,RU,urban|60 – 64
+2011-01-01,6085,thousand_people,RU,urban|60 – 64
+2012-01-01,6338,thousand_people,RU,urban|60 – 64
+2013-01-01,6518,thousand_people,RU,urban|60 – 64
+2014-01-01,6672,thousand_people,RU,urban|60 – 64
+2015-01-01,6845,thousand_people,RU,urban|60 – 64
+2016-01-01,6944,thousand_people,RU,urban|60 – 64
+2017-01-01,7034,thousand_people,RU,urban|60 – 64
+2018-01-01,7130,thousand_people,RU,urban|60 – 64
+2019-01-01,7278,thousand_people,RU,urban|60 – 64
+2020-01-01,7305,thousand_people,RU,urban|60 – 64
+2021-01-01,7433,thousand_people,RU,urban|60 – 64
+1926-01-01,265,thousand_people,RU,urban|65 – 69
+1939-01-01,552,thousand_people,RU,urban|65 – 69
+1959-01-01,1196,thousand_people,RU,urban|65 – 69
+1970-01-01,2340,thousand_people,RU,urban|65 – 69
+1979-01-01,3409,thousand_people,RU,urban|65 – 69
+1989-01-01,3132,thousand_people,RU,urban|65 – 69
+2002-01-01,4417,thousand_people,RU,urban|65 – 69
+2004-01-01,4967,thousand_people,RU,urban|65 – 69
+2005-01-01,5371,thousand_people,RU,urban|65 – 69
+2006-01-01,5508,thousand_people,RU,urban|65 – 69
+2007-01-01,5467,thousand_people,RU,urban|65 – 69
+2008-01-01,4830,thousand_people,RU,urban|65 – 69
+2009-01-01,4037,thousand_people,RU,urban|65 – 69
+2010-01-01,2991,thousand_people,RU,urban|65 – 69
+2011-01-01,2939,thousand_people,RU,urban|65 – 69
+2012-01-01,2976,thousand_people,RU,urban|65 – 69
+2013-01-01,3433,thousand_people,RU,urban|65 – 69
+2014-01-01,4055,thousand_people,RU,urban|65 – 69
+2015-01-01,4896,thousand_people,RU,urban|65 – 69
+2016-01-01,5494,thousand_people,RU,urban|65 – 69
+2017-01-01,5742,thousand_people,RU,urban|65 – 69
+2018-01-01,5931,thousand_people,RU,urban|65 – 69
+2019-01-01,6086,thousand_people,RU,urban|65 – 69
+2020-01-01,6178,thousand_people,RU,urban|65 – 69
+2021-01-01,6244,thousand_people,RU,urban|65 – 69
+1926-01-01,275,thousand_people,RU,urban|70 и более
+1939-01-01,566,thousand_people,RU,urban|70 и более
+1959-01-01,1720,thousand_people,RU,urban|70 и более
+1970-01-01,3001,thousand_people,RU,urban|70 и более
+1979-01-01,4857,thousand_people,RU,urban|70 и более
+1989-01-01,6394,thousand_people,RU,urban|70 и более
+2002-01-01,8554,thousand_people,RU,urban|70 и более
+2004-01-01,8504,thousand_people,RU,urban|70 и более
+2005-01-01,8447,thousand_people,RU,urban|70 и более
+2006-01-01,8567,thousand_people,RU,urban|70 и более
+2007-01-01,8789,thousand_people,RU,urban|70 и более
+2008-01-01,9229,thousand_people,RU,urban|70 и более
+2009-01-01,9586,thousand_people,RU,urban|70 и более
+2010-01-01,10144,thousand_people,RU,urban|70 и более
+2011-01-01,10171,thousand_people,RU,urban|70 и более
+2012-01-01,10324,thousand_people,RU,urban|70 и более
+2013-01-01,10143,thousand_people,RU,urban|70 и более
+2014-01-01,9798,thousand_people,RU,urban|70 и более
+2015-01-01,9661,thousand_people,RU,urban|70 и более
+2016-01-01,9512,thousand_people,RU,urban|70 и более
+2017-01-01,9682,thousand_people,RU,urban|70 и более
+2018-01-01,9950,thousand_people,RU,urban|70 и более
+2019-01-01,10212,thousand_people,RU,urban|70 и более
+2020-01-01,10660,thousand_people,RU,urban|70 и более
+2021-01-01,10924,thousand_people,RU,urban|70 и более
+1926-01-01,5126,thousand_people,RU,urban|моложе трудоспособного
+1939-01-01,11379,thousand_people,RU,urban|моложе трудоспособного
+1959-01-01,16715,thousand_people,RU,urban|моложе трудоспособного
+1970-01-01,20399,thousand_people,RU,urban|моложе трудоспособного
+1979-01-01,20848,thousand_people,RU,urban|моложе трудоспособного
+1989-01-01,25693,thousand_people,RU,urban|моложе трудоспособного
+2002-01-01,18019,thousand_people,RU,urban|моложе трудоспособного
+2004-01-01,17326,thousand_people,RU,urban|моложе трудоспособного
+2005-01-01,16812,thousand_people,RU,urban|моложе трудоспособного
+2006-01-01,16442,thousand_people,RU,urban|моложе трудоспособного
+2007-01-01,16088,thousand_people,RU,urban|моложе трудоспособного
+2008-01-01,15934,thousand_people,RU,urban|моложе трудоспособного
+2009-01-01,15903,thousand_people,RU,urban|моложе трудоспособного
+2010-01-01,16108,thousand_people,RU,urban|моложе трудоспособного
+2011-01-01,16182,thousand_people,RU,urban|моложе трудоспособного
+2012-01-01,16472,thousand_people,RU,urban|моложе трудоспособного
+2013-01-01,16916,thousand_people,RU,urban|моложе трудоспособного
+2014-01-01,17425,thousand_people,RU,urban|моложе трудоспособного
+2015-01-01,18138,thousand_people,RU,urban|моложе трудоспособного
+2016-01-01,18758,thousand_people,RU,urban|моложе трудоспособного
+2017-01-01,19278,thousand_people,RU,urban|моложе трудоспособного
+2018-01-01,19677,thousand_people,RU,urban|моложе трудоспособного
+2019-01-01,19926,thousand_people,RU,urban|моложе трудоспособного
+2020-01-01,20028,thousand_people,RU,urban|моложе трудоспособного
+2021-01-01,20075,thousand_people,RU,urban|моложе трудоспособного
+1926-01-01,10155,thousand_people,RU,urban|трудоспособном
+1939-01-01,22425,thousand_people,RU,urban|трудоспособном
+1959-01-01,38629,thousand_people,RU,urban|трудоспособном
+1970-01-01,49080,thousand_people,RU,urban|трудоспособном
+1979-01-01,60107,thousand_people,RU,urban|трудоспособном
+1989-01-01,63618,thousand_people,RU,urban|трудоспособном
+2002-01-01,67249,thousand_people,RU,urban|трудоспособном
+2004-01-01,67768,thousand_people,RU,urban|трудоспособном
+2005-01-01,67357,thousand_people,RU,urban|трудоспособном
+2006-01-01,67172,thousand_people,RU,urban|трудоспособном
+2007-01-01,67050,thousand_people,RU,urban|трудоспособном
+2008-01-01,66891,thousand_people,RU,urban|трудоспособном
+2009-01-01,66613,thousand_people,RU,urban|трудоспособном
+2010-01-01,65764,thousand_people,RU,urban|трудоспособном
+2011-01-01,65725,thousand_people,RU,urban|трудоспособном
+2012-01-01,65275,thousand_people,RU,urban|трудоспособном
+2013-01-01,64713,thousand_people,RU,urban|трудоспособном
+2014-01-01,64131,thousand_people,RU,urban|трудоспособном
+2015-01-01,64223,thousand_people,RU,urban|трудоспособном
+2016-01-01,63373,thousand_people,RU,urban|трудоспособном
+2017-01-01,62717,thousand_people,RU,urban|трудоспособном
+2018-01-01,62115,thousand_people,RU,urban|трудоспособном
+2019-01-01,61544,thousand_people,RU,urban|трудоспособном
+2020-01-01,62536,thousand_people,RU,urban|трудоспособном
+2021-01-01,62006,thousand_people,RU,urban|трудоспособном
+1926-01-01,1160,thousand_people,RU,urban|старше трудоспособного
+1939-01-01,2486,thousand_people,RU,urban|старше трудоспособного
+1959-01-01,6265,thousand_people,RU,urban|старше трудоспособного
+1970-01-01,11119,thousand_people,RU,urban|старше трудоспособного
+1979-01-01,13958,thousand_people,RU,urban|старше трудоспособного
+1989-01-01,18578,thousand_people,RU,urban|старше трудоспособного
+2002-01-01,21049,thousand_people,RU,urban|старше трудоспособного
+2004-01-01,20946,thousand_people,RU,urban|старше трудоспособного
+2005-01-01,21013,thousand_people,RU,urban|старше трудоспособного
+2006-01-01,21204,thousand_people,RU,urban|старше трудоспособного
+2007-01-01,21594,thousand_people,RU,urban|старше трудоспособного
+2008-01-01,22040,thousand_people,RU,urban|старше трудоспособного
+2009-01-01,22399,thousand_people,RU,urban|старше трудоспособного
+2010-01-01,23408,thousand_people,RU,urban|старше трудоспособного
+2011-01-01,23514,thousand_people,RU,urban|старше трудоспособного
+2012-01-01,23995,thousand_people,RU,urban|старше трудоспособного
+2013-01-01,24489,thousand_people,RU,urban|старше трудоспособного
+2014-01-01,24993,thousand_people,RU,urban|старше трудоспособного
+2015-01-01,25921,thousand_people,RU,urban|старше трудоспособного
+2016-01-01,26527,thousand_people,RU,urban|старше трудоспособного
+2017-01-01,27037,thousand_people,RU,urban|старше трудоспособного
+2018-01-01,27535,thousand_people,RU,urban|старше трудоспособного
+2019-01-01,27984,thousand_people,RU,urban|старше трудоспособного
+2020-01-01,26999,thousand_people,RU,urban|старше трудоспособного
+2021-01-01,27171,thousand_people,RU,urban|старше трудоспособного
+1926-01-01,76229,thousand_people,RU,rural|all
+1939-01-01,72081,thousand_people,RU,rural|all
+1959-01-01,55923,thousand_people,RU,rural|all
+1970-01-01,49310,thousand_people,RU,rural|all
+1979-01-01,42468,thousand_people,RU,rural|all
+1989-01-01,39063,thousand_people,RU,rural|all
+2002-01-01,38738,thousand_people,RU,rural|all
+2004-01-01,38294,thousand_people,RU,rural|all
+2005-01-01,38619,thousand_people,RU,rural|all
+2006-01-01,38418,thousand_people,RU,rural|all
+2007-01-01,38131,thousand_people,RU,rural|all
+2008-01-01,37883,thousand_people,RU,rural|all
+2009-01-01,37822,thousand_people,RU,rural|all
+2010-01-01,37543,thousand_people,RU,rural|all
+2011-01-01,37444,thousand_people,RU,rural|all
+2012-01-01,37314,thousand_people,RU,rural|all
+2013-01-01,37229,thousand_people,RU,rural|all
+2014-01-01,37118,thousand_people,RU,rural|all
+2015-01-01,37985,thousand_people,RU,rural|all
+2016-01-01,37887,thousand_people,RU,rural|all
+2017-01-01,37772,thousand_people,RU,rural|all
+2018-01-01,37553,thousand_people,RU,rural|all
+2019-01-01,37327,thousand_people,RU,rural|all
+2020-01-01,37186,thousand_people,RU,rural|all
+2021-01-01,36919,thousand_people,RU,rural|all
+1926-01-01,12144,thousand_people,RU,rural|0 – 4
+1939-01-01,9893,thousand_people,RU,rural|0 – 4
+1959-01-01,7266,thousand_people,RU,rural|0 – 4
+1970-01-01,4016,thousand_people,RU,rural|0 – 4
+1979-01-01,3359,thousand_people,RU,rural|0 – 4
+1989-01-01,3534,thousand_people,RU,rural|0 – 4
+2002-01-01,2004,thousand_people,RU,rural|0 – 4
+2004-01-01,2011,thousand_people,RU,rural|0 – 4
+2005-01-01,2072,thousand_people,RU,rural|0 – 4
+2006-01-01,2094,thousand_people,RU,rural|0 – 4
+2007-01-01,2131,thousand_people,RU,rural|0 – 4
+2008-01-01,2194,thousand_people,RU,rural|0 – 4
+2009-01-01,2283,thousand_people,RU,rural|0 – 4
+2010-01-01,2377,thousand_people,RU,rural|0 – 4
+2011-01-01,2397,thousand_people,RU,rural|0 – 4
+2012-01-01,2490,thousand_people,RU,rural|0 – 4
+2013-01-01,2550,thousand_people,RU,rural|0 – 4
+2014-01-01,2573,thousand_people,RU,rural|0 – 4
+2015-01-01,2673,thousand_people,RU,rural|0 – 4
+2016-01-01,2657,thousand_people,RU,rural|0 – 4
+2017-01-01,2576,thousand_people,RU,rural|0 – 4
+2018-01-01,2428,thousand_people,RU,rural|0 – 4
+2019-01-01,2272,thousand_people,RU,rural|0 – 4
+2020-01-01,2092,thousand_people,RU,rural|0 – 4
+2021-01-01,1970,thousand_people,RU,rural|0 – 4
+1926-01-01,8182,thousand_people,RU,rural|5 – 9
+1939-01-01,8871,thousand_people,RU,rural|5 – 9
+1959-01-01,6544,thousand_people,RU,rural|5 – 9
+1970-01-01,5496,thousand_people,RU,rural|5 – 9
+1979-01-01,3199,thousand_people,RU,rural|5 – 9
+1989-01-01,3252,thousand_people,RU,rural|5 – 9
+2002-01-01,2258,thousand_people,RU,rural|5 – 9
+2004-01-01,2162,thousand_people,RU,rural|5 – 9
+2005-01-01,2116,thousand_people,RU,rural|5 – 9
+2006-01-01,2073,thousand_people,RU,rural|5 – 9
+2007-01-01,2035,thousand_people,RU,rural|5 – 9
+2008-01-01,2036,thousand_people,RU,rural|5 – 9
+2009-01-01,2051,thousand_people,RU,rural|5 – 9
+2010-01-01,2105,thousand_people,RU,rural|5 – 9
+2011-01-01,2106,thousand_people,RU,rural|5 – 9
+2012-01-01,2134,thousand_people,RU,rural|5 – 9
+2013-01-01,2188,thousand_people,RU,rural|5 – 9
+2014-01-01,2249,thousand_people,RU,rural|5 – 9
+2015-01-01,2348,thousand_people,RU,rural|5 – 9
+2016-01-01,2393,thousand_people,RU,rural|5 – 9
+2017-01-01,2477,thousand_people,RU,rural|5 – 9
+2018-01-01,2523,thousand_people,RU,rural|5 – 9
+2019-01-01,2539,thousand_people,RU,rural|5 – 9
+2020-01-01,2579,thousand_people,RU,rural|5 – 9
+2021-01-01,2569,thousand_people,RU,rural|5 – 9
+1926-01-01,9419,thousand_people,RU,rural|10 – 14
+1939-01-01,10319,thousand_people,RU,rural|10 – 14
+1959-01-01,4168,thousand_people,RU,rural|10 – 14
+1970-01-01,6154,thousand_people,RU,rural|10 – 14
+1979-01-01,3735,thousand_people,RU,rural|10 – 14
+1989-01-01,2993,thousand_people,RU,rural|10 – 14
+2002-01-01,3287,thousand_people,RU,rural|10 – 14
+2004-01-01,2913,thousand_people,RU,rural|10 – 14
+2005-01-01,2667,thousand_people,RU,rural|10 – 14
+2006-01-01,2429,thousand_people,RU,rural|10 – 14
+2007-01-01,2283,thousand_people,RU,rural|10 – 14
+2008-01-01,2197,thousand_people,RU,rural|10 – 14
+2009-01-01,2174,thousand_people,RU,rural|10 – 14
+2010-01-01,2087,thousand_people,RU,rural|10 – 14
+2011-01-01,2075,thousand_people,RU,rural|10 – 14
+2012-01-01,2041,thousand_people,RU,rural|10 – 14
+2013-01-01,2046,thousand_people,RU,rural|10 – 14
+2014-01-01,2053,thousand_people,RU,rural|10 – 14
+2015-01-01,2129,thousand_people,RU,rural|10 – 14
+2016-01-01,2139,thousand_people,RU,rural|10 – 14
+2017-01-01,2162,thousand_people,RU,rural|10 – 14
+2018-01-01,2206,thousand_people,RU,rural|10 – 14
+2019-01-01,2263,thousand_people,RU,rural|10 – 14
+2020-01-01,2310,thousand_people,RU,rural|10 – 14
+2021-01-01,2353,thousand_people,RU,rural|10 – 14
+1926-01-01,9137,thousand_people,RU,rural|15 – 19
+1939-01-01,5876,thousand_people,RU,rural|15 – 19
+1959-01-01,4099,thousand_people,RU,rural|15 – 19
+1970-01-01,3935,thousand_people,RU,rural|15 – 19
+1979-01-01,3603,thousand_people,RU,rural|15 – 19
+1989-01-01,2227,thousand_people,RU,rural|15 – 19
+2002-01-01,3142,thousand_people,RU,rural|15 – 19
+2004-01-01,3293,thousand_people,RU,rural|15 – 19
+2005-01-01,3380,thousand_people,RU,rural|15 – 19
+2006-01-01,3313,thousand_people,RU,rural|15 – 19
+2007-01-01,3081,thousand_people,RU,rural|15 – 19
+2008-01-01,2814,thousand_people,RU,rural|15 – 19
+2009-01-01,2560,thousand_people,RU,rural|15 – 19
+2010-01-01,2211,thousand_people,RU,rural|15 – 19
+2011-01-01,2173,thousand_people,RU,rural|15 – 19
+2012-01-01,2056,thousand_people,RU,rural|15 – 19
+2013-01-01,1989,thousand_people,RU,rural|15 – 19
+2014-01-01,1951,thousand_people,RU,rural|15 – 19
+2015-01-01,1943,thousand_people,RU,rural|15 – 19
+2016-01-01,1896,thousand_people,RU,rural|15 – 19
+2017-01-01,1866,thousand_people,RU,rural|15 – 19
+2018-01-01,1878,thousand_people,RU,rural|15 – 19
+2019-01-01,1891,thousand_people,RU,rural|15 – 19
+2020-01-01,1940,thousand_people,RU,rural|15 – 19
+2021-01-01,1972,thousand_people,RU,rural|15 – 19
+1926-01-01,6716,thousand_people,RU,rural|20 – 24
+1939-01-01,5140,thousand_people,RU,rural|20 – 24
+1959-01-01,4858,thousand_people,RU,rural|20 – 24
+1970-01-01,2450,thousand_people,RU,rural|20 – 24
+1979-01-01,3286,thousand_people,RU,rural|20 – 24
+1989-01-01,2370,thousand_people,RU,rural|20 – 24
+2002-01-01,2610,thousand_people,RU,rural|20 – 24
+2004-01-01,2663,thousand_people,RU,rural|20 – 24
+2005-01-01,2779,thousand_people,RU,rural|20 – 24
+2006-01-01,2871,thousand_people,RU,rural|20 – 24
+2007-01-01,3007,thousand_people,RU,rural|20 – 24
+2008-01-01,3094,thousand_people,RU,rural|20 – 24
+2009-01-01,3114,thousand_people,RU,rural|20 – 24
+2010-01-01,2993,thousand_people,RU,rural|20 – 24
+2011-01-01,2962,thousand_people,RU,rural|20 – 24
+2012-01-01,2728,thousand_people,RU,rural|20 – 24
+2013-01-01,2451,thousand_people,RU,rural|20 – 24
+2014-01-01,2211,thousand_people,RU,rural|20 – 24
+2015-01-01,2103,thousand_people,RU,rural|20 – 24
+2016-01-01,2002,thousand_people,RU,rural|20 – 24
+2017-01-01,1981,thousand_people,RU,rural|20 – 24
+2018-01-01,1973,thousand_people,RU,rural|20 – 24
+2019-01-01,1974,thousand_people,RU,rural|20 – 24
+2020-01-01,1947,thousand_people,RU,rural|20 – 24
+2021-01-01,1914,thousand_people,RU,rural|20 – 24
+1926-01-01,5608,thousand_people,RU,rural|25 – 29
+1939-01-01,6029,thousand_people,RU,rural|25 – 29
+1959-01-01,4614,thousand_people,RU,rural|25 – 29
+1970-01-01,2090,thousand_people,RU,rural|25 – 29
+1979-01-01,2842,thousand_people,RU,rural|25 – 29
+1989-01-01,3134,thousand_people,RU,rural|25 – 29
+2002-01-01,2463,thousand_people,RU,rural|25 – 29
+2004-01-01,2494,thousand_people,RU,rural|25 – 29
+2005-01-01,2556,thousand_people,RU,rural|25 – 29
+2006-01-01,2597,thousand_people,RU,rural|25 – 29
+2007-01-01,2610,thousand_people,RU,rural|25 – 29
+2008-01-01,2647,thousand_people,RU,rural|25 – 29
+2009-01-01,2714,thousand_people,RU,rural|25 – 29
+2010-01-01,2817,thousand_people,RU,rural|25 – 29
+2011-01-01,2819,thousand_people,RU,rural|25 – 29
+2012-01-01,2881,thousand_people,RU,rural|25 – 29
+2013-01-01,2921,thousand_people,RU,rural|25 – 29
+2014-01-01,2885,thousand_people,RU,rural|25 – 29
+2015-01-01,2898,thousand_people,RU,rural|25 – 29
+2016-01-01,2808,thousand_people,RU,rural|25 – 29
+2017-01-01,2617,thousand_people,RU,rural|25 – 29
+2018-01-01,2381,thousand_people,RU,rural|25 – 29
+2019-01-01,2187,thousand_people,RU,rural|25 – 29
+2020-01-01,2070,thousand_people,RU,rural|25 – 29
+2021-01-01,1994,thousand_people,RU,rural|25 – 29
+1926-01-01,4118,thousand_people,RU,rural|30 – 34
+1939-01-01,5299,thousand_people,RU,rural|30 – 34
+1959-01-01,4679,thousand_people,RU,rural|30 – 34
+1970-01-01,3721,thousand_people,RU,rural|30 – 34
+1979-01-01,1720,thousand_people,RU,rural|30 – 34
+1989-01-01,3051,thousand_people,RU,rural|30 – 34
+2002-01-01,2403,thousand_people,RU,rural|30 – 34
+2004-01-01,2386,thousand_people,RU,rural|30 – 34
+2005-01-01,2447,thousand_people,RU,rural|30 – 34
+2006-01-01,2462,thousand_people,RU,rural|30 – 34
+2007-01-01,2479,thousand_people,RU,rural|30 – 34
+2008-01-01,2479,thousand_people,RU,rural|30 – 34
+2009-01-01,2508,thousand_people,RU,rural|30 – 34
+2010-01-01,2542,thousand_people,RU,rural|30 – 34
+2011-01-01,2542,thousand_people,RU,rural|30 – 34
+2012-01-01,2542,thousand_people,RU,rural|30 – 34
+2013-01-01,2568,thousand_people,RU,rural|30 – 34
+2014-01-01,2604,thousand_people,RU,rural|30 – 34
+2015-01-01,2704,thousand_people,RU,rural|30 – 34
+2016-01-01,2725,thousand_people,RU,rural|30 – 34
+2017-01-01,2786,thousand_people,RU,rural|30 – 34
+2018-01-01,2823,thousand_people,RU,rural|30 – 34
+2019-01-01,2792,thousand_people,RU,rural|30 – 34
+2020-01-01,2740,thousand_people,RU,rural|30 – 34
+2021-01-01,2650,thousand_people,RU,rural|30 – 34
+1926-01-01,4007,thousand_people,RU,rural|35 – 39
+1939-01-01,4481,thousand_people,RU,rural|35 – 39
+1959-01-01,2732,thousand_people,RU,rural|35 – 39
+1970-01-01,3374,thousand_people,RU,rural|35 – 39
+1979-01-01,2246,thousand_people,RU,rural|35 – 39
+1989-01-01,2535,thousand_people,RU,rural|35 – 39
+2002-01-01,2711,thousand_people,RU,rural|35 – 39
+2004-01-01,2550,thousand_people,RU,rural|35 – 39
+2005-01-01,2499,thousand_people,RU,rural|35 – 39
+2006-01-01,2454,thousand_people,RU,rural|35 – 39
+2007-01-01,2414,thousand_people,RU,rural|35 – 39
+2008-01-01,2407,thousand_people,RU,rural|35 – 39
+2009-01-01,2406,thousand_people,RU,rural|35 – 39
+2010-01-01,2431,thousand_people,RU,rural|35 – 39
+2011-01-01,2434,thousand_people,RU,rural|35 – 39
+2012-01-01,2452,thousand_people,RU,rural|35 – 39
+2013-01-01,2454,thousand_people,RU,rural|35 – 39
+2014-01-01,2468,thousand_people,RU,rural|35 – 39
+2015-01-01,2529,thousand_people,RU,rural|35 – 39
+2016-01-01,2542,thousand_people,RU,rural|35 – 39
+2017-01-01,2537,thousand_people,RU,rural|35 – 39
+2018-01-01,2553,thousand_people,RU,rural|35 – 39
+2019-01-01,2587,thousand_people,RU,rural|35 – 39
+2020-01-01,2621,thousand_people,RU,rural|35 – 39
+2021-01-01,2634,thousand_people,RU,rural|35 – 39
+1926-01-01,3426,thousand_people,RU,rural|40 – 44
+1939-01-01,3308,thousand_people,RU,rural|40 – 44
+1959-01-01,2691,thousand_people,RU,rural|40 – 44
+1970-01-01,3903,thousand_people,RU,rural|40 – 44
+1979-01-01,3039,thousand_people,RU,rural|40 – 44
+1989-01-01,1507,thousand_people,RU,rural|40 – 44
+2002-01-01,3299,thousand_people,RU,rural|40 – 44
+2004-01-01,3214,thousand_people,RU,rural|40 – 44
+2005-01-01,3140,thousand_people,RU,rural|40 – 44
+2006-01-01,2968,thousand_people,RU,rural|40 – 44
+2007-01-01,2810,thousand_people,RU,rural|40 – 44
+2008-01-01,2658,thousand_people,RU,rural|40 – 44
+2009-01-01,2540,thousand_people,RU,rural|40 – 44
+2010-01-01,2424,thousand_people,RU,rural|40 – 44
+2011-01-01,2411,thousand_people,RU,rural|40 – 44
+2012-01-01,2382,thousand_people,RU,rural|40 – 44
+2013-01-01,2385,thousand_people,RU,rural|40 – 44
+2014-01-01,2379,thousand_people,RU,rural|40 – 44
+2015-01-01,2459,thousand_people,RU,rural|40 – 44
+2016-01-01,2466,thousand_people,RU,rural|40 – 44
+2017-01-01,2479,thousand_people,RU,rural|40 – 44
+2018-01-01,2473,thousand_people,RU,rural|40 – 44
+2019-01-01,2483,thousand_people,RU,rural|40 – 44
+2020-01-01,2480,thousand_people,RU,rural|40 – 44
+2021-01-01,2483,thousand_people,RU,rural|40 – 44
+1926-01-01,3023,thousand_people,RU,rural|45 – 49
+1939-01-01,2755,thousand_people,RU,rural|45 – 49
+1959-01-01,3243,thousand_people,RU,rural|45 – 49
+1970-01-01,2435,thousand_people,RU,rural|45 – 49
+1979-01-01,3118,thousand_people,RU,rural|45 – 49
+1989-01-01,1996,thousand_people,RU,rural|45 – 49
+2002-01-01,2913,thousand_people,RU,rural|45 – 49
+2004-01-01,3047,thousand_people,RU,rural|45 – 49
+2005-01-01,3162,thousand_people,RU,rural|45 – 49
+2006-01-01,3252,thousand_people,RU,rural|45 – 49
+2007-01-01,3283,thousand_people,RU,rural|45 – 49
+2008-01-01,3243,thousand_people,RU,rural|45 – 49
+2009-01-01,3180,thousand_people,RU,rural|45 – 49
+2010-01-01,2919,thousand_people,RU,rural|45 – 49
+2011-01-01,2885,thousand_people,RU,rural|45 – 49
+2012-01-01,2743,thousand_people,RU,rural|45 – 49
+2013-01-01,2608,thousand_people,RU,rural|45 – 49
+2014-01-01,2494,thousand_people,RU,rural|45 – 49
+2015-01-01,2475,thousand_people,RU,rural|45 – 49
+2016-01-01,2436,thousand_people,RU,rural|45 – 49
+2017-01-01,2405,thousand_people,RU,rural|45 – 49
+2018-01-01,2403,thousand_people,RU,rural|45 – 49
+2019-01-01,2394,thousand_people,RU,rural|45 – 49
+2020-01-01,2415,thousand_people,RU,rural|45 – 49
+2021-01-01,2412,thousand_people,RU,rural|45 – 49
+1926-01-01,2619,thousand_people,RU,rural|50 – 54
+1939-01-01,2389,thousand_people,RU,rural|50 – 54
+1959-01-01,2784,thousand_people,RU,rural|50 – 54
+1970-01-01,1967,thousand_people,RU,rural|50 – 54
+1979-01-01,3193,thousand_people,RU,rural|50 – 54
+1989-01-01,2623,thousand_people,RU,rural|50 – 54
+2002-01-01,2361,thousand_people,RU,rural|50 – 54
+2004-01-01,2499,thousand_people,RU,rural|50 – 54
+2005-01-01,2629,thousand_people,RU,rural|50 – 54
+2006-01-01,2734,thousand_people,RU,rural|50 – 54
+2007-01-01,2820,thousand_people,RU,rural|50 – 54
+2008-01-01,2896,thousand_people,RU,rural|50 – 54
+2009-01-01,3004,thousand_people,RU,rural|50 – 54
+2010-01-01,3121,thousand_people,RU,rural|50 – 54
+2011-01-01,3128,thousand_people,RU,rural|50 – 54
+2012-01-01,3168,thousand_people,RU,rural|50 – 54
+2013-01-01,3150,thousand_people,RU,rural|50 – 54
+2014-01-01,3092,thousand_people,RU,rural|50 – 54
+2015-01-01,3052,thousand_people,RU,rural|50 – 54
+2016-01-01,2888,thousand_people,RU,rural|50 – 54
+2017-01-01,2743,thousand_people,RU,rural|50 – 54
+2018-01-01,2602,thousand_people,RU,rural|50 – 54
+2019-01-01,2485,thousand_people,RU,rural|50 – 54
+2020-01-01,2407,thousand_people,RU,rural|50 – 54
+2021-01-01,2361,thousand_people,RU,rural|50 – 54
+1926-01-01,2318,thousand_people,RU,rural|55 – 59
+1939-01-01,2315,thousand_people,RU,rural|55 – 59
+1959-01-01,2345,thousand_people,RU,rural|55 – 59
+1970-01-01,2776,thousand_people,RU,rural|55 – 59
+1979-01-01,1896,thousand_people,RU,rural|55 – 59
+1989-01-01,2639,thousand_people,RU,rural|55 – 59
+2002-01-01,1195,thousand_people,RU,rural|55 – 59
+2004-01-01,1428,thousand_people,RU,rural|55 – 59
+2005-01-01,1780,thousand_people,RU,rural|55 – 59
+2006-01-01,2062,thousand_people,RU,rural|55 – 59
+2007-01-01,2212,thousand_people,RU,rural|55 – 59
+2008-01-01,2337,thousand_people,RU,rural|55 – 59
+2009-01-01,2442,thousand_people,RU,rural|55 – 59
+2010-01-01,2579,thousand_people,RU,rural|55 – 59
+2011-01-01,2593,thousand_people,RU,rural|55 – 59
+2012-01-01,2679,thousand_people,RU,rural|55 – 59
+2013-01-01,2771,thousand_people,RU,rural|55 – 59
+2014-01-01,2879,thousand_people,RU,rural|55 – 59
+2015-01-01,3009,thousand_people,RU,rural|55 – 59
+2016-01-01,3091,thousand_people,RU,rural|55 – 59
+2017-01-01,3124,thousand_people,RU,rural|55 – 59
+2018-01-01,3095,thousand_people,RU,rural|55 – 59
+2019-01-01,3033,thousand_people,RU,rural|55 – 59
+2020-01-01,2922,thousand_people,RU,rural|55 – 59
+2021-01-01,2753,thousand_people,RU,rural|55 – 59
+1926-01-01,2078,thousand_people,RU,rural|60 – 64
+1939-01-01,2005,thousand_people,RU,rural|60 – 64
+1959-01-01,1847,thousand_people,RU,rural|60 – 64
+1970-01-01,2323,thousand_people,RU,rural|60 – 64
+1979-01-01,1794,thousand_people,RU,rural|60 – 64
+1989-01-01,2557,thousand_people,RU,rural|60 – 64
+2002-01-01,2240,thousand_people,RU,rural|60 – 64
+2004-01-01,1759,thousand_people,RU,rural|60 – 64
+2005-01-01,1401,thousand_people,RU,rural|60 – 64
+2006-01-01,1127,thousand_people,RU,rural|60 – 64
+2007-01-01,1045,thousand_people,RU,rural|60 – 64
+2008-01-01,1142,thousand_people,RU,rural|60 – 64
+2009-01-01,1350,thousand_people,RU,rural|60 – 64
+2010-01-01,1859,thousand_people,RU,rural|60 – 64
+2011-01-01,1897,thousand_people,RU,rural|60 – 64
+2012-01-01,2042,thousand_people,RU,rural|60 – 64
+2013-01-01,2172,thousand_people,RU,rural|60 – 64
+2014-01-01,2277,thousand_people,RU,rural|60 – 64
+2015-01-01,2415,thousand_people,RU,rural|60 – 64
+2016-01-01,2501,thousand_people,RU,rural|60 – 64
+2017-01-01,2576,thousand_people,RU,rural|60 – 64
+2018-01-01,2653,thousand_people,RU,rural|60 – 64
+2019-01-01,2749,thousand_people,RU,rural|60 – 64
+2020-01-01,2801,thousand_people,RU,rural|60 – 64
+2021-01-01,2867,thousand_people,RU,rural|60 – 64
+1926-01-01,1456,thousand_people,RU,rural|65 – 69
+1939-01-01,1527,thousand_people,RU,rural|65 – 69
+1959-01-01,1468,thousand_people,RU,rural|65 – 69
+1970-01-01,1841,thousand_people,RU,rural|65 – 69
+1979-01-01,2083,thousand_people,RU,rural|65 – 69
+1989-01-01,1378,thousand_people,RU,rural|65 – 69
+2002-01-01,1928,thousand_people,RU,rural|65 – 69
+2004-01-01,2054,thousand_people,RU,rural|65 – 69
+2005-01-01,2196,thousand_people,RU,rural|65 – 69
+2006-01-01,2191,thousand_people,RU,rural|65 – 69
+2007-01-01,2105,thousand_people,RU,rural|65 – 69
+2008-01-01,1857,thousand_people,RU,rural|65 – 69
+2009-01-01,1528,thousand_people,RU,rural|65 – 69
+2010-01-01,1011,thousand_people,RU,rural|65 – 69
+2011-01-01,974,thousand_people,RU,rural|65 – 69
+2012-01-01,920,thousand_people,RU,rural|65 – 69
+2013-01-01,1020,thousand_people,RU,rural|65 – 69
+2014-01-01,1214,thousand_people,RU,rural|65 – 69
+2015-01-01,1532,thousand_people,RU,rural|65 – 69
+2016-01-01,1769,thousand_people,RU,rural|65 – 69
+2017-01-01,1895,thousand_people,RU,rural|65 – 69
+2018-01-01,2006,thousand_people,RU,rural|65 – 69
+2019-01-01,2093,thousand_people,RU,rural|65 – 69
+2020-01-01,2161,thousand_people,RU,rural|65 – 69
+2021-01-01,2225,thousand_people,RU,rural|65 – 69
+1926-01-01,1937,thousand_people,RU,rural|70 и более
+1939-01-01,1860,thousand_people,RU,rural|70 и более
+1959-01-01,2583,thousand_people,RU,rural|70 и более
+1970-01-01,2805,thousand_people,RU,rural|70 и более
+1979-01-01,3343,thousand_people,RU,rural|70 и более
+1989-01-01,3252,thousand_people,RU,rural|70 и более
+2002-01-01,3915,thousand_people,RU,rural|70 и более
+2004-01-01,3821,thousand_people,RU,rural|70 и более
+2005-01-01,3795,thousand_people,RU,rural|70 и более
+2006-01-01,3791,thousand_people,RU,rural|70 и более
+2007-01-01,3816,thousand_people,RU,rural|70 и более
+2008-01-01,3882,thousand_people,RU,rural|70 и более
+2009-01-01,3968,thousand_people,RU,rural|70 и более
+2010-01-01,4066,thousand_people,RU,rural|70 и более
+2011-01-01,4048,thousand_people,RU,rural|70 и более
+2012-01-01,4056,thousand_people,RU,rural|70 и более
+2013-01-01,3956,thousand_people,RU,rural|70 и более
+2014-01-01,3789,thousand_people,RU,rural|70 и более
+2015-01-01,3716,thousand_people,RU,rural|70 и более
+2016-01-01,3574,thousand_people,RU,rural|70 и более
+2017-01-01,3548,thousand_people,RU,rural|70 и более
+2018-01-01,3556,thousand_people,RU,rural|70 и более
+2019-01-01,3585,thousand_people,RU,rural|70 и более
+2020-01-01,3701,thousand_people,RU,rural|70 и более
+2021-01-01,3762,thousand_people,RU,rural|70 и более
+1926-01-01,31728,thousand_people,RU,rural|моложе трудоспособного
+1939-01-01,30693,thousand_people,RU,rural|моложе трудоспособного
+1959-01-01,18379,thousand_people,RU,rural|моложе трудоспособного
+1970-01-01,16746,thousand_people,RU,rural|моложе трудоспособного
+1979-01-01,11126,thousand_people,RU,rural|моложе трудоспособного
+1989-01-01,10302,thousand_people,RU,rural|моложе трудоспособного
+2002-01-01,8308,thousand_people,RU,rural|моложе трудоспособного
+2004-01-01,7810,thousand_people,RU,rural|моложе трудоспособного
+2005-01-01,7537,thousand_people,RU,rural|моложе трудоспособного
+2006-01-01,7229,thousand_people,RU,rural|моложе трудоспособного
+2007-01-01,6985,thousand_people,RU,rural|моложе трудоспособного
+2008-01-01,6908,thousand_people,RU,rural|моложе трудоспособного
+2009-01-01,6951,thousand_people,RU,rural|моложе трудоспособного
+2010-01-01,7018,thousand_people,RU,rural|моложе трудоспособного
+2011-01-01,7027,thousand_people,RU,rural|моложе трудоспособного
+2012-01-01,7096,thousand_people,RU,rural|моложе трудоспособного
+2013-01-01,7194,thousand_people,RU,rural|моложе трудоспособного
+2014-01-01,7292,thousand_people,RU,rural|моложе трудоспособного
+2015-01-01,7551,thousand_people,RU,rural|моложе трудоспособного
+2016-01-01,7602,thousand_people,RU,rural|моложе трудоспособного
+2017-01-01,7617,thousand_people,RU,rural|моложе трудоспособного
+2018-01-01,7577,thousand_people,RU,rural|моложе трудоспособного
+2019-01-01,7504,thousand_people,RU,rural|моложе трудоспособного
+2020-01-01,7414,thousand_people,RU,rural|моложе трудоспособного
+2021-01-01,7312,thousand_people,RU,rural|моложе трудоспособного
+1926-01-01,37675,thousand_people,RU,rural|трудоспособном
+1939-01-01,34498,thousand_people,RU,rural|трудоспособном
+1959-01-01,29980,thousand_people,RU,rural|трудоспособном
+1970-01-01,23672,thousand_people,RU,rural|трудоспособном
+1979-01-01,22852,thousand_people,RU,rural|трудоспособном
+1989-01-01,20128,thousand_people,RU,rural|трудоспособном
+2002-01-01,21692,thousand_people,RU,rural|трудоспособном
+2004-01-01,22084,thousand_people,RU,rural|трудоспособном
+2005-01-01,22742,thousand_people,RU,rural|трудоспособном
+2006-01-01,22985,thousand_people,RU,rural|трудоспособном
+2007-01-01,23008,thousand_people,RU,rural|трудоспособном
+2008-01-01,22854,thousand_people,RU,rural|трудоспособном
+2009-01-01,22729,thousand_people,RU,rural|трудоспособном
+2010-01-01,22218,thousand_people,RU,rural|трудоспособном
+2011-01-01,22122,thousand_people,RU,rural|трудоспособном
+2012-01-01,21780,thousand_people,RU,rural|трудоспособном
+2013-01-01,21424,thousand_people,RU,rural|трудоспособном
+2014-01-01,21031,thousand_people,RU,rural|трудоспособном
+2015-01-01,21192,thousand_people,RU,rural|трудоспособном
+2016-01-01,20826,thousand_people,RU,rural|трудоспособном
+2017-01-01,20507,thousand_people,RU,rural|трудоспособном
+2018-01-01,20149,thousand_people,RU,rural|трудоспособном
+2019-01-01,19818,thousand_people,RU,rural|трудоспособном
+2020-01-01,20142,thousand_people,RU,rural|трудоспособном
+2021-01-01,19875,thousand_people,RU,rural|трудоспособном
+1926-01-01,6785,thousand_people,RU,rural|старше трудоспособного
+1939-01-01,6876,thousand_people,RU,rural|старше трудоспособного
+1959-01-01,7562,thousand_people,RU,rural|старше трудоспособного
+1970-01-01,8868,thousand_people,RU,rural|старше трудоспособного
+1979-01-01,8478,thousand_people,RU,rural|старше трудоспособного
+1989-01-01,8618,thousand_people,RU,rural|старше трудоспособного
+2002-01-01,8729,thousand_people,RU,rural|старше трудоспособного
+2004-01-01,8400,thousand_people,RU,rural|старше трудоспособного
+2005-01-01,8340,thousand_people,RU,rural|старше трудоспособного
+2006-01-01,8204,thousand_people,RU,rural|старше трудоспособного
+2007-01-01,8138,thousand_people,RU,rural|старше трудоспособного
+2008-01-01,8121,thousand_people,RU,rural|старше трудоспособного
+2009-01-01,8142,thousand_people,RU,rural|старше трудоспособного
+2010-01-01,8306,thousand_people,RU,rural|старше трудоспособного
+2011-01-01,8295,thousand_people,RU,rural|старше трудоспособного
+2012-01-01,8438,thousand_people,RU,rural|старше трудоспособного
+2013-01-01,8611,thousand_people,RU,rural|старше трудоспособного
+2014-01-01,8795,thousand_people,RU,rural|старше трудоспособного
+2015-01-01,9242,thousand_people,RU,rural|старше трудоспособного
+2016-01-01,9459,thousand_people,RU,rural|старше трудоспособного
+2017-01-01,9648,thousand_people,RU,rural|старше трудоспособного
+2018-01-01,9827,thousand_people,RU,rural|старше трудоспособного
+2019-01-01,10005,thousand_people,RU,rural|старше трудоспособного
+2020-01-01,9630,thousand_people,RU,rural|старше трудоспособного
+2021-01-01,9732,thousand_people,RU,rural|старше трудоспособного

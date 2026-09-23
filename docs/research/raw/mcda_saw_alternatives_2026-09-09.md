@@ -583,3 +583,123 @@ Bash обойти нечем. Ниже — по реферату.
    про PROMETHEE, это классификационные фразы из выдачи. Угол закрыт как пустой.
 7. **Измеренная «плата за TOPSIS в объяснимости»** — эмпирических работ не найдено;
    наш аргумент выводится из структуры формул.
+
+---
+
+## ДОБОР Г31.5 — отказ адреса (17.09.2026)
+
+**Каналы на начало работы (замер 17.09.2026, коды дословно):** Unpaywall **200** (1 164 б) · Crossref **200** (16 033 б) · OpenAlex **200** (18 331 б) · EuropePMC **200** (17 910 б) · S2 `/paper/search/bulk` **200** (31 142 б) · S2 `/paper/DOI:` **404** на DOI, отсутствующем в S2 (не отказ канала) · `r.jina.ai` без UA **200** (321 б) · Wayback replay **302** (редирект на снимок, штатно). Сессия один раз упала на лимите АККАУНТА (HTTP 429 харнесса), аккаунт сменён — к каналам добычи отношения не имеет.
+
+Раздел «ЧТО ОСТАЛОСЬ НЕИЗВЕСТНЫМ» этого файла (последнее упоминание — строки 568–583, других доборов в файле нет) числит закрытыми четыре пункта по одному адресу каждый: MDPI 403, ScienceDirect 403, `peterdeeney.com` 403, `metrology-journal.org` 403. Все четыре — класс Г31.5.
+
+### Г31.5-M1. 🟢 Žižović et al. 2020, RAFSI — ПОЛНЫЙ ТЕКСТ ДОБЫТ, доказательство снято
+
+- Unpaywall `10.3390/math8061015` — **200**: `is_oa: true`, `oa_status: "gold"`, локации `mdpi.com/2227-7390/8/6/1015/pdf?version=1592731444` (publisher) и DOAJ.
+- Прямой `curl -sL` с UA по этому PDF — **403, 411 б** (тот самый отказ, записанный в файл).
+- 🟢 `r.jina.ai` **без UA** по странице `https://www.mdpi.com/2227-7390/8/6/1015` — **HTTP 200, 67 024 б**, полный текст статьи, «Published Time: 2020-06-21». sha256 снятого текста `d349e5604db27a59770505608a6b080343aeee77137d62baa007437fd94f960f`.
+
+**Нормировка и итоговая функция ДОСЛОВНО (разд. 2, шаги 4–5):**
+
+> «Step 4: Form normalized decision matrix … (a) for the criteria C j max type: ŝ_ij = s_ij / (2A) (7); (b) for the criteria C j min type: ŝ_ij = H / (2 s_ij) (8)»
+>
+> «For max type criteria … 0 < n_1/(2A) ≤ ŝ_ij ≤ n_2k/(2A) < 1 (10)» ; «for min type criteria … 0 < H/(2 n_2k) ≤ ŝ_ij ≤ H/(2 n_1) < 1 (11)»
+>
+> «Proof of (10): n_2k/(2A) = n_2k / (2·(n_1+n_2k)/2) = n_2k/(n_1+n_2k) < (n_2k+n_1)/(n_1+n_2k) = 1»
+>
+> «Additionally, for the boundary values of criteria intervals n_1 and n_2k, we have the following equality (12) and (13): n_1/(2A) = H/(2 n_2k) (12); n_2k/(2A) = H/(2 n_1) (13)»
+>
+> «Step 5: Calculate criteria functions of the alternatives V(A_i) … V(A_i) = w_1 ŝ_i1 + w_2 ŝ_i2 + … + w_n ŝ_in (14)»
+
+Здесь A и H — арифметическое и гармоническое среднее границ n_1 и n_2k ЕДИНОГО интервала, в который отображаются заданные ЛПР идеальная и анти-идеальная точки (шаги 1–3). Ни одна величина нормировки не зависит от состава множества альтернатив.
+
+🔴 **Главное, что даёт первоисточник и чего не было в файле: «теоремы о rank reversal» в статье НЕТ.** Доказываются только (10)–(13) — что нормированные значения лежат в (0;1) и что границы для max- и min-критериев совпадают. Устойчивость к RR показана **экспериментально** (разд. 4.2), не доказана. Запись «Доказательство теоремы RAFSI о rank reversal — не добыто» (п. 1 «ЧТО ОСТАЛОСЬ НЕИЗВЕСТНЫМ») описывала несуществующий объект.
+
+**Эксперименты разд. 4.2 ДОСЛОВНО:**
+
+> «The first experiment: … in each subsequent scenario, the worst-ranked researcher from the set is eliminated. … In all these scenarios, the criteria functions of the alternatives remained unchanged. TOPSIS, VIKOR, and COPRAS methods are used in the same condition. All these methods also showed stability and resistance to rank reversal. However, changes in criteria function values are observed in these methods.»
+>
+> «The second experiment: … another candidate (A7) is added … (4) RAFSI method: This method showed stability in both sets of alternatives. All the alternatives kept the same f(Ai) values in both sets.» — при этом у TOPSIS «alternative A2 was third in the old set, while, in the new set, it is in the fifth position instead of the fourth», у VIKOR «alternative A3 was in the fifth rank in the old set, but, in the new set, it is ranked last».
+
+И побочный результат разд. 4.1, прямо про нормировку: «data normalization, as suggested in RAFSI method, was also used for TOPSIS, VIKOR, and COPRAS methods. After using the new normalization technique, **identical rankings were obtained by all the methods**.»
+
+**Выжимка.** (14) — это ровно взвешенная сумма, то есть SAW. Всё отличие RAFSI от SAW — в нормировке к фиксированным ЛПР-опорным точкам вместо min/max по текущей выборке. Первоисточник, таким образом, прямо подтверждает тезис §1–2 файла («причина rank reversal — нормировка, а не аддитивная свёртка»), но как **конструктивный довод и численный пример на 6–7 альтернативах**, а не как теорема. Для обоснования нашей нормативной нормировки ссылаться на RAFSI можно в форме «та же конструкция описана и проверена экспериментом», но не «доказана устойчивость».
+
+### Г31.5-M2. 🟢 O'Shea et al., WSM weight stability intervals — ПОЛНЫЙ ТЕКСТ ДОБЫТ по тому же адресу
+
+- Прямой `curl -sL` с браузерным UA по `https://peterdeeney.com/wp-content/uploads/2025/07/OShea-et-al-2025-MCDA-L1.pdf` — **HTTP 200, 1 078 100 б**, PDF 1.7, **14 страниц** (`pdfinfo`), `pdftotext -layout` → 1 072 строки. sha256 `8c713da1d7b2f7ecc61b4e714236f0cdfca431eab3386b1afd66adb54037142e`.
+- 🔴 Запись файла «403 (вопреки ожиданию задания)» — отказ ОДНОГО ЗАХОДА: тот же адрес сегодня отдаёт файл целиком. Адрес не менялся, менялся заход.
+- Реквизиты из самого файла: O'Shea R., Deeney P., Triantaphyllou E., Diaz-Balteiro L., Tarim S. A. «Weight stability intervals for multi-criteria decision analysis using the weighted sum model». *Expert Systems With Applications* **296 (2026) 128460**. (Файл писал «2025»/«2026» вперемешку — год тома 2026.)
+
+**Абстракт ДОСЛОВНО (с. 1):**
+
+> «A key consideration in any MCDA is the sensitivity of the results obtained to alterations of the criteria weights used. Prior methods to determine the weight stability interval (WSI, the range of values for individual weights for which the ranking of alternatives will not change) include the manual alteration of criteria weights, the use of different sets of criteria weights in a form of scenario analysis, or the process of iteratively searching for the maximum and minimum allowable alterations to individual criteria weights to determine the weight stability interval. The first contribution of this paper is the development of a novel method for determining precise weight stability intervals which does not rely on enumeration or simulation for use with the weighted sum model (WSM, based on the L1 Minkowski norm), one of the most widely used aggregation methods within MCDA. The second contribution of this work is the use of these WSIs to identify the most sensitive weight(s) based on a Pareto dominance approach whilst considering both the allowable increase and decrease in criteria weights.»
+
+**Формулы ДОСЛОВНО (с. 4–5; сверено чтением отрисованных страниц 4–5 PDF, не только `pdftotext` — двухколоночная вёрстка ломает дроби):**
+
+> «Utopia_j = max(p_1j,…,p_nj) if c_j is a benefit criterion … min(p_1j,…,p_nj) if cost; Nadir_j = min(…) if benefit … max(…) if cost» ;
+> «x_ij^Nadir = |Nadir_j − p_ij| / |Nadir_j − Utopia_j| (1)» ; «d_i = L1(A_i) = Σ_j w_j x_ij (4). Equation (4) is equivalent to the simple additive weighting (SAW), or weighted sum model (WSM)»
+>
+> «Theorem 1. If two alternatives A_K and A_L are ranked as A_K > A_L under the WSM method when the Nadir alternative is used for reference, then these two alternatives will be ranked in exactly the same way when the Utopia alternative is considered, and vice-versa.» (доказательство — через D_12^Nadir = −D_12^Utopia, (10)–(11))
+>
+> «w*_j = (1 + α_j) w_j (12), where, for w*_j to remain non-negative, α_j ≥ −1. In order for the relative weight ratios of the remaining weights to remain unchanged … β_j = (1 − (1 + α_j) w_j) / (1 − w_j) (13); w*_i = β_j w_i (14), where, for w*_i to remain positive α_j < (1 − w_j)/w_j.»
+>
+> «d_E^Nadir* = ((1 + α_j)(1 − w_j) w_j x_Ej + (1 − w_j + α_j w_j)(d_E^Nadir − w_j x_Ej)) / (1 − w_j) (15)» ;
+> «α_j = (1 − w_j)(d_F^Nadir − d_E^Nadir) / ( w_j (x_Ej − x_Fj − d_E^Nadir + d_F^Nadir) ) (16)»
+>
+> «α_j^− = max(−1, α_j) if α_j ≤ 0; −1 if α_j > 0 (17)» ; «α_j^+ = min((1 − w_j)/w_j, α_j) if α_j ≥ 0; (1 − w_j)/w_j if α_j < 0 (18)» ;
+> «This process provides the normalised weight stability interval (wsi) for the normalised weight w_j of criterion c_j, namely wsi_j = [w_j(1 + α_j^−), w_j(1 + α_j^+)] = [w_jL, w_jU]. This ensures that alternative A_E performs better than alternative A_F for an alteration to a single criterion weight, w_j, within [w_jL, w_jU].»
+
+**Выжимка.** (16)–(18) дают интервал устойчивости веса **в замкнутой форме, без перебора и Монте-Карло**, для пары альтернатив при пропорциональной перенормировке остальных весов — ровно та схема весов, что у нас (сумма = 1). Для 66 альтернатив это O(66 · k) вычислений на критерий против лидера. 🔴 Оговорка применимости: Utopia/Nadir у авторов — min/max **по текущей выборке**, т. е. их нормировка зависит от состава альтернатив (класс, подверженный RR по M1); сами формулы (12)–(18) от этого не зависят и переносятся на нормировку к фиксированным опорным точкам без изменений, поскольку используют только x_Ej, x_Fj и d^Nadir.
+
+### Г31.5-M3. 🟢 Vafaei et al. 2022, Procedia CS — ПОЛНЫЙ ТЕКСТ ДОБЫТ через репозиторий, который Unpaywall называл прямо
+
+- Файл записывал: ScienceDirect страница **403**, прямой PDF **403** → «не открыто», «ScienceDirect и Springer закрыты».
+- Unpaywall `10.1016/j.procs.2022.01.156` — **200**: `is_oa: True`, `oa_status: "gold"`, вторая локация **`run.unl.pt/bitstreams/48b7fbce-477f-45f7-ac0c-8fa244d26cba/download`** (repository, помечена `submittedVersion`).
+- `curl -skL` с UA по этому адресу — **HTTP 200, 662 030 б, `application/pdf`**, 8 страниц, sha256 `4539fd0964ab9f2a4f1d66797708418bda8a38704fdb89672e3c1f1440185cbf`. 🔴 Метка `submittedVersion` **неверна**: в файле журнальная вёрстка с колонтитулом «Nazanin Vafaei et al. / Procedia Computer Science 199 (2022) 1229–1236».
+- Попутно: `r.jina.ai` без UA по странице ScienceDirect — **200, 11 827 б**, только абстракт и метка «Open access / Under a Creative Commons license». Статья — gold OA, закрыт был бот-канал, не доступ.
+
+**Абстракт ДОСЛОВНО:** «Using different normalization techniques may result in different rankings of alternatives. … we assess different normalization techniques with the Simple Additive Weighting (SAW) method using metrics from the proposed assessment framework and select the most adequate technique for a small case study that is borrowed from literature.»
+
+**Результат ДОСЛОВНО (Table 4, SAW, кейс Chakraborty & Yeh: 6 альтернатив, 5 критериев):**
+
+| | Max | Max-Min | Sum | Vector |
+|---|---|---|---|---|
+| Euclidean↑ | 0.2172 | 0.5912 | 0.1790 | 0.1850 |
+| STD↑ | 0.0397 | 0.1079 | 0.0327 | 0.0338 |
+| RCI↑ | 3 | 2.6667 | 4 | 3.6667 |
+| MSE↓ | 1.7778 | 4.7778 | 2.4444 | 2.7778 |
+| Mean ks↑ | 0.4640 | 0.1500 | 0.3210 | 0.393 |
+| PV (Table 5) | 2 | 2 | 1 | 0 |
+
+> «By implementing PV, we conclude that our framework selects the Max and Max-Min normalization as the best techniques for this case because it has the highest PV, while the approach by Chakraborty and Yeh [11], recommended the Max normalization technique.»
+
+**Выжимка.** Работа про выбор нормировки для SAW по согласованности рангов на ОДНОМ кейсе из 6 альтернатив; rank reversal при добавлении/удалении альтернатив **не тестируется**, фиксированных опорных точек среди кандидатов нет. Для нас это слабый источник: подтверждает лишь, что «разные нормировки — разные ранги» у SAW (тезис §1 файла), и что голосование по метрикам даёт ничью. Числа кейса на наш выбор не переносятся.
+
+### Г31.5-M4. 🟢 Duc Trung et al. 2022, «Comparison of the RAFSI and PIV method» — ПОЛНЫЙ ТЕКСТ ДОБЫТ
+
+- Файл записывал: `metrology-journal.org/…/ijmqe220020.html` — **403** → «не открыто».
+- `r.jina.ai` без UA по тому же адресу — **HTTP 200, 52 286 б**, полный текст. Реквизиты: *Int. J. Metrol. Qual. Eng.* **13**, 14 (2022), EDP Sciences, **CC BY 4.0**, Hanoi University of Industry.
+
+**Абстракт ДОСЛОВНО:** «However, rank reversal after adding or removing an alternative can occur in using some of the methods. In this study, two methods RAFSI and PIV were compared for application of making multi-criteria decisions. They are known to be capable of avoiding rank reversal problems. Sixteen 9XC steel turning tests were performed … Four methods including MEREC, ROC, RS and EQUAL were used for determining weights of the criteria. The blend of two multi-criteria decision making methods (RAFSI and PIV) with four weight-determining methods resulted in eight ranking options. … all eight ranking options identified the same best test.»
+
+**Вывод ДОСЛОВНО (разд. 6):** «Under the RAFSI method, the best and worst alternatives do not depend on the weighting methods. The ranking results of the alternatives are the same as the MEREC and EQUAL methods are applied. The ranking order of the alternatives overlaps fourteen out of sixteen as the weights of the criteria are identified by the two methods ROC and RS. … the similarity in ranking order of the alternatives using the PIV method is less than the RAFSI method.»
+
+**Выжимка.** 🔴 Несмотря на заголовок и абстракт, **rank reversal при добавлении/удалении альтернатив в работе не проверяется** — сравнивается устойчивость рангов к смене метода ВЕСОВ. Для вопроса «устойчив ли RAFSI/нормативная нормировка к RR» источник пуст; для вопроса «чувствителен ли ранг к схеме весов» — 14 из 16 совпадений позиций при ROC/RS против MEREC/EQUAL, один кейс. Ценность малая, запись «не открыто» снимается.
+
+## ИТОГ Г31.5 — mcda_saw_alternatives
+
+**4 кандидата класса, 4 закрыты полным текстом.**
+
+| Пункт | Записанный отказ (один адрес) | Чем закрыт |
+|---|---|---|
+| Žižović 2020 RAFSI (MDPI) | `mdpi.com` 403 | **`r.jina.ai` без UA** по странице (200, 67 024 б) |
+| O'Shea et al. 2026 ESWA | `peterdeeney.com` PDF 403 | **прямой `curl -sL` с UA по тому же адресу** (200, 1 078 100 б) — отказ одного захода |
+| Vafaei 2022 Procedia CS | ScienceDirect 403 (страница и PDF) | **Unpaywall → репозиторий `run.unl.pt`** (200, 662 030 б) |
+| Duc Trung 2022 IJMQE | `metrology-journal.org` 403 | **`r.jina.ai` без UA** (200, 52 286 б) |
+
+🔴 **Что меняет обоснование (канон не трогается):**
+1. **«Теоремы RAFSI о rank reversal» не существует** — устойчивость показана экспериментом на 6–7 альтернативах, доказаны лишь границы нормировки (10)–(13). Итоговая функция RAFSI (14) — это SAW. Ссылаться: «конструкция нормировки к фиксированным опорным точкам описана и экспериментально проверена», не «доказана». Пункт 1 «ЧТО ОСТАЛОСЬ НЕИЗВЕСТНЫМ» снимается как описывавший несуществующий объект.
+2. **Интервалы устойчивости весов SAW в замкнутой форме** (O'Shea (16)–(18)) — готовый метод для анализа чувствительности пяти риск-профилей без Монте-Карло; прямо смыкается с §6 файла и с Г30.2-К. Заведение проверки — решение владельца.
+3. Vafaei 2022 и Duc Trung 2022 **RR при смене состава альтернатив не тестируют** — если где-то в базе на них сослались как на подтверждение устойчивости к RR, ссылка неверна.
+
+Остаётся по файлу: п. 3 Vafaei 2018/2020 (Springer) — в этот заход не брались, см. сводный итог (ЗАДОЛЖЕННОСТЬ); п. 6 PROMETHEE — угол закрыт как пустой содержательно, не отказом адреса, класс Г31.5 к нему неприменим; Li 2026 Wiley `10.1002/mcda.70027` — см. ЗАДОЛЖЕННОСТЬ.

@@ -1988,15 +1988,15 @@ Informationsgesellschaft (ABl. L 241 vom 17.9.2015, S. 1)
 
 ```text
 Abschnitten 3, 4 und 13 des in Artikel 247 § 1 Absatz 2 Satz 2 des Einführungsgesetzes zum Bürgerlichen
-Gesetzbuche genannten Musters und entsprechend Artikel 246b § 1 Absatz 1 Nummer 16 des Einführungs­
+Gesetzbuche genannten Musters und entsprechend Artikel 246b § 1 Absatz 1 Nummer 16 des Einführungs
 gesetzes zum Bürgerlichen Gesetzbuche unterrichtet hat.“
 16. In § 496 Absatz 2 Satz 1 wird nach der Angabe „unverzüglich“ die Angabe „vom bisherigen Darlehensgeber“
 eingefügt.
 17. Nach § 497 wird der folgende § 497a eingefügt:
 „§ 497a
 Zahlungsrückstände und Nachsichtsmaßnahmen bei Allgemein-Verbraucherdarlehen
-(1) Der Darlehensgeber ist verpflichtet, den Darlehensnehmer eines Allgemein-Verbraucherdarlehens­
-vertrags, der Schwierigkeiten bei der Erfüllung seiner finanziellen Verpflichtungen hat, an Schuldnerberatungs­
+(1) Der Darlehensgeber ist verpflichtet, den Darlehensnehmer eines Allgemein-Verbraucherdarlehens
+vertrags, der Schwierigkeiten bei der Erfüllung seiner finanziellen Verpflichtungen hat, an Schuldnerberatungs
 dienste nach dem Gesetz über den Zugang zu Schuldnerberatungsdiensten für Verbraucher zu verweisen, die
 für den Darlehensnehmer leicht zugänglich sind.
 (2) Der Darlehensgeber muss, sofern angebracht, angemessene Nachsicht walten lassen, bevor er ein
@@ -2039,7 +2039,7 @@ Darlehensnehmer bei einem Immobiliar-Verbraucherdarlehensvertrag auf einem dauer
 und bei einem Allgemein-Verbraucherdarlehensvertrag auf Papier oder auf einem anderen im Vertrag über
 die Erbringung der Beratungsleistung benannten dauerhaften Datenträger nach Wahl des Darlehensnehmers
 zur Verfügung zu stellen.
-(4) Der Darlehensgeber ist verpflichtet, den Darlehensnehmer zu warnen, wenn ein Verbraucher­
+(4) Der Darlehensgeber ist verpflichtet, den Darlehensnehmer zu warnen, wenn ein Verbraucher
 darlehensvertrag unter Berücksichtigung der finanziellen Situation des Darlehensnehmers möglicherweise
 ein spezifisches Risiko für ihn birgt.“
 33. § 512 Satz 1 wird durch den folgenden Satz ersetzt:
@@ -2051,7 +2051,7 @@ Verbrauchers abgewichen werden.“
 Vermittlung von Verbraucherdarlehensverträgen und Finanzierungshilfen“.
 36. § 655a wird wie folgt geändert:
 a) Absatz 1 wird wie folgt geändert:
-aa) In Satz 1 Nummer 1 wird die Angabe „entgeltliche Finanzierungshilfe“ durch die Angabe „Finanzierungs­
+aa) In Satz 1 Nummer 1 wird die Angabe „entgeltliche Finanzierungshilfe“ durch die Angabe „Finanzierungs
 hilfe nach § 506“ ersetzt.
 bb) Satz 2 wird durch den folgenden Satz ersetzt:
 „Bei Finanzierungshilfen nach § 506, die den Ausnahmen des § 491 Absatz 2 Satz 2 Nummer 1 bis 3 und
@@ -2061,14 +2061,14 @@ b) Absatz 2 wird durch den folgenden Absatz 2 ersetzt:
 Absatz 2 und § 13b Absatz 1 und des Artikels 247a § 2 des Einführungsgesetzes zum Bürgerlichen
 Gesetzbuche zu informieren. Der Darlehensvermittler ist gegenüber dem Verbraucher zusätzlich wie ein
 Darlehensgeber gemäß § 491a verpflichtet. Satz 2 gilt hinsichtlich § 491a Absatz 1 und 2 nicht für
-Warenlieferanten oder Dienstleistungserbringer, die in lediglich untergeordneter Funktion als Darlehens­
+Warenlieferanten oder Dienstleistungserbringer, die in lediglich untergeordneter Funktion als Darlehens
 vermittler von Allgemein-Verbraucherdarlehen oder von entsprechenden Finanzierungshilfen tätig werden,
 etwa indem sie als Nebenleistung den Abschluss eines verbundenen Verbraucherdarlehensvertrags
 vermitteln.“
 c) Absatz 3 Satz 1 und 2 wird durch die folgenden Sätze ersetzt:
 „Bietet der Darlehensvermittler im Zusammenhang mit der Vermittlung eines Verbraucherdarlehensvertrags
 oder einer entsprechenden Finanzierungshilfe nach § 506 Beratungsleistungen gemäß § 511 Absatz 1 an, so
-gilt § 511 entsprechend. § 511 Absatz 2 Satz 2 gilt bei der Vermittlung eines Immobiliar-Verbraucher­
+gilt § 511 entsprechend. § 511 Absatz 2 Satz 2 gilt bei der Vermittlung eines Immobiliar-Verbraucher
 darlehensvertrages oder einer entsprechenden Finanzierungshilfe entsprechend mit der Maßgabe, dass
 der Darlehensvermittler eine ausreichende Zahl von am Markt verfügbaren Darlehensverträgen zu prüfen
 hat.“
@@ -2265,3 +2265,3286 @@ Die Linke hatte in ihrem Änderungsantrag (
 2. 🔴 **Stripe может отказать нам по ПРЕДМЕТУ, а не из-за основателя.** В списке запрещённых стоят «credit … counseling services» и «debt relief companies». Советующий по долгам сервис рискует попасть в категорию «credit counseling» при любой юрисдикции компании — в ОАЭ, на Кипре, в США. В L9 это надо поставить рядом с UK: платёжный провайдер — отдельный барьер для выхода за рубеж. Что Stripe сделает с FINPILOT на практике, не проверялось.
 3. 🔴 **Для L9 появилась карта «мягких» юрисдикций.** В МФЦА, DIFC и ADGM регулируется совет о ВСТУПЛЕНИИ в конкретный кредит, а совет о порядке погашения существующих долгов под буквальные определения не подпадает (AIFC GEN Sch. 1 п. 19; DFSA GEN 2.28.1(1)(b); ADGM FSMR Sch. 1 п. 28). В прочитанных актах республиканского Казахстана, Армении, Сербии и Грузии нормы о лицензии на (а) и (б) не найдено. Это полярно UK (PERG 17 покрывает и не просроченный долг). Оговорка подагента: «нормы не найдено» ≠ «нормы нет», а ОАЭ onshore (CBUAE) не исследован.
 4. §2.2 (ЕС): для DE транспозиция CCD II теперь реквизирована (BGBl. 2026 I Nr. 139, с 20.11.2026). Новый § 511 BGB («Beratungsleistungen») адресован кредиторам и посредникам, к нам как к несоветующему-по-продукту сервису его адресность не проверялась.
+
+---
+
+## ДОБОР Г21 (16.09.2026)
+
+Батч закрывает правовые лакуны, оставшиеся после Г2 и Г16. Состав и обоснование —
+`docs/research/queue/COVERAGE_AUDIT_3.md`, раздел «→ Г21».
+
+**Проверка класса 4 (сервисы, лежавшие 16.09.2026), один запрос в начале работы:**
+Wayback/Internet Archive **ПОДНЯЛСЯ**. Замер 16.09.2026:
+`https://web.archive.org/web/2024id_/https://www.sec.gov/rules/final.htm` →
+редирект на `https://web.archive.org/web/20250117225351id_/https://www.sec.gov/rules-regulations/rulemaking-activity`,
+**HTTP 200, 261 986 байт**. Канал доступен и использовался в этом батче как резервный.
+
+### Классификация запроса и процесс
+
+**Тип: breadth-first** — семь независимых правовых под-вопросов по четырём юрисдикциям,
+пересечений между ними почти нет. Не depth-first: это не «один вопрос многими ракурсами»,
+а список раздельных норм, каждая проверяется своим первоисточником.
+
+**Основной метод — прямое снятие первоисточника вахтой**, а не делегирование.
+Отвергнутые способы: (1) веер подагентов по юрисдикциям — запрещён правилом 11 CLAUDE.md
+и уже стоил трёх лимитов; (2) опора на обзоры юрфирм как на основной источник —
+они пересказывают, а батч требует дословных цитат с номерами статей.
+Подагенты (не более двух, последовательно) — только на пункты, где нужен широкий
+перебор источников, а не одна известная норма.
+
+---
+
+### Пункт 2. Directive 2014/17/EU (MCD), Art. 4(21) и Art. 22 — ДОБЫТО ДОСЛОВНО
+
+**Источник.** EUR-Lex, CELEX 32014L0017, консолидированный английский текст.
+Прямой `curl -sk --http1.1` с браузерным UA по
+`https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32014L0017` →
+**HTTP 202, 0 байт** (предсказанное батчем поведение EUR-Lex).
+Обход текстовым прокси:
+`https://r.jina.ai/https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX%3A32014L0017`
+→ **HTTP 200, 271 929 байт**, снято 16.09.2026.
+
+**Art. 4(21), дословно:**
+
+> (21) 'Advisory services' means the provision of personal recommendations to a consumer
+> in respect of one or more transactions relating to credit agreements and constitutes
+> a separate activity from the granting of a credit and from the credit intermediation
+> activities set out in point 5.
+
+**Art. 22(6), дословно (полный текст пункта):**
+
+> 6. Member States shall ensure that advisory services are only provided by creditors,
+> credit intermediaries or appointed representatives.
+>
+> Member States may decide not to apply the first subparagraph to persons:
+>
+> (a) carrying out the credit intermediation activities set out in point 5 of Article 4
+> or providing advisory services where those activities are carried out or services are
+> provided in an incidental manner in the course of a professional activity and that
+> activity is regulated by legal or regulatory provisions or a code of ethics governing
+> the profession which do not exclude carrying out of those activities or the provision
+> of those services;
+>
+> (b) providing advisory services **in the context of managing existing debt** which are
+> insolvency practitioners where that activity is regulated by legal or regulatory
+> provisions or public or voluntary debt advisory services which **do not operate on a
+> commercial basis**; or
+>
+> (c) providing advisory services who are not creditors, credit intermediaries or
+> appointed representatives where such persons are **admitted and supervised by competent
+> authorities** in accordance with the requirements for credit intermediaries under this
+> Directive.
+>
+> Persons benefiting from the waiver in the second subparagraph shall not benefit from
+> the right referred to in Article 32(1) to provide services for the entire territory
+> of the Union.
+
+**Art. 22(1) и (3)(a), дословно (обязанности при оказании advisory services):**
+
+> 1. Member States shall ensure that the creditor, credit intermediary or appointed
+> representative explicitly informs the consumer, in the context of a given transaction,
+> whether advisory services are being or can be provided to the consumer.
+
+Формулировка-разграничитель из Приложения II MCD (ESIS, Part A), дословно — она же
+и есть образец «мы не советуем, вы решаете сами»:
+
+> We are not recommending a particular mortgage for you. However, based on your answers
+> to some questions, we are giving you information about this mortgage so that you can
+> make your own choice.
+
+**Выжимка по пункту 2.** Гипотеза батча подтвердилась: конструкция MCD **аналогична
+CCD II**, причём почти дословно. Определение Art. 4(21) MCD и Art. 3(17) CCD II
+различаются только порядком слов. Монополия на advisory services (Art. 22(6) MCD =
+Art. 16(6) CCD II) и набор изъятий — те же, включая изъятие «managing existing debt»
+для insolvency practitioners и некоммерческих служб.
+🔴 **Следствие для нас:** ипотечный контур не мягче потребительского. Если мы
+советуем по порядку погашения, и в наборе обязательств пользователя есть ипотека,
+то под MCD применима та же логика, что под CCD II, и то же изъятие нам недоступно
+по признаку коммерческой основы.
+Формулировка ESIS — прямое текстовое подтверждение уже принятого нами разграничителя
+(«assisting the person to make their own choice»): европейский законодатель сам
+использует «so that you can make your own choice» как маркер НЕ-совета.
+
+---
+
+### Пункт 3. CCD II Art. 3(17): покрывает ли «advisory services» совет о ДОСРОЧНОМ ПОГАШЕНИИ — ОТВЕТ ПОЛУЧЕН ИЗ САМОЙ НОРМЫ
+
+**Источник.** EUR-Lex, CELEX 32023L2225 (Directive (EU) 2023/2225, CCD II).
+`https://r.jina.ai/https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX%3A32023L2225`
+→ **HTTP 200, 207 127 байт**, снято 16.09.2026.
+
+**Art. 3(17), дословно:**
+
+> (17) 'advisory services' means personal recommendations to a consumer in respect of
+> one or more transactions relating to credit agreements and that constitute a separate
+> activity from the granting of a credit and from the credit intermediation activities
+> as set out in point (12);
+
+**Art. 3(22), дословно (отдельное понятие — не путать с (17)):**
+
+> (22) 'debt advisory services' means personalised assistance of a technical, legal or
+> psychological nature provided by independent professional operators which are not,
+> in particular, creditors or credit intermediaries as defined in this Directive, or
+> credit purchasers or credit servicers as defined in Article 3, points (6) and (8),
+> of Directive (EU) 2021/2167 ... in favour of consumers who experience or might
+> experience difficulties in meeting their financial commitments.
+
+**Art. 16(6), дословно (полный текст):**
+
+> 6. Member States shall ensure that advisory services may only be provided by creditors
+> and, where applicable, credit intermediaries.
+>
+> Member States may, by way of derogation from the first subparagraph, allow other persons
+> than those referred to in the first subparagraph to provide advisory services where one
+> of the following conditions is fulfilled:
+>
+> (a) the advisory services are provided in an incidental manner in the course of a
+> professional activity that is regulated by legal or regulatory provisions or a code of
+> ethics which do not exclude the provision of those services;
+>
+> (b) the advisory services are provided **in the context of management of existing debt**
+> by insolvency practitioners and where that management activity is regulated by legal
+> or regulatory provisions;
+>
+> (c) the advisory services are provided **in the context of management of existing debt**
+> by public or voluntary providers of debt advisory services as referred to in Article 36
+> which **do not operate on a commercial basis**;
+>
+> (d) the advisory services are provided by persons that are **authorised and supervised
+> by competent authorities**.
+
+🔴 **Это и есть ответ на пункт 3, и он выводится из структуры самой директивы,
+а не из чьего-либо толкования.** Аргумент:
+
+1. Art. 16(6) устанавливает **монополию**: advisory services вправе оказывать только
+   кредиторы и кредитные посредники.
+2. Изъятия (b) и (c) написаны специально для случая «advisory services **in the context
+   of management of existing debt**».
+3. Изъятие из запрета требуется только для того, что запретом **охвачено**. Если бы
+   совет об управлении существующим долгом не подпадал под Art. 3(17), подпункты (b)
+   и (c) были бы лишены предмета.
+4. Следовательно, **законодатель ЕС сам исходит из того, что совет об управлении
+   существующим долгом ОХВАТЫВАЕТСЯ определением «advisory services» Art. 3(17)**.
+
+Досрочное погашение — прямо поименованная в директиве транзакция по кредитному договору
+(Art. 29 CCD II, right of early repayment), то есть «transaction relating to a credit
+agreement» в смысле Art. 3(17). Совет о том, какой из существующих кредитов гасить
+досрочно первым, — персональная рекомендация в отношении такой транзакции.
+
+🔴 **Ни одно из четырёх изъятий нам не подходит:**
+- (a) — мы не оказываем совет «incidental» в рамках иной регулируемой профессии;
+- (b) — мы не insolvency practitioners;
+- (c) — 🔴 отсекает нас **прямо по признаку**: «do not operate on a commercial basis».
+  Мы коммерческий сервис. Это главный отсекающий признак по ЕС;
+- (d) — доступно, но это и есть «получить авторизацию», то есть попасть под регулирование.
+
+**Соотношение с Art. 3(22) «debt advisory services».** Понятия (17) и (22) различны:
+(22) — специальный институт социальной помощи людям в затруднении (Art. 36 требует от
+государств обеспечить его доступность с ограниченной платой), и он тоже требует
+независимости и фактически некоммерческой основы. Ни одно из двух понятий не даёт нам
+безопасной гавани: (17) — монополизировано Art. 16(6), (22) — адресовано independent
+professional operators для потребителей в затруднении.
+
+**Что по этому пункту НЕ добыто.** Толкований Еврокомиссии (Q&A/guidance) именно по
+Art. 3(17) и именно про досрочное погашение в этом заходе не найдено; позиции BaFin,
+AMF, Banca d'Italia, Central Bank of Ireland по этому вопросу не снимались — см.
+раздел о недобытом ниже. Однако **вывод от них не зависит**: он получен из текста
+Art. 16(6) директивы напрямую и толкованием лишь подтверждался бы.
+
+---
+
+### Пункт 4. UK: art. 72A RAO — ГИПОТЕЗА СНЯТА НОРМОЙ. Статьи БОЛЬШЕ НЕ СУЩЕСТВУЕТ
+
+**Источник.** `https://www.legislation.gov.uk/uksi/2001/544/article/72A`,
+`curl -sk --http1.1` с браузерным UA → **HTTP 200, 41 878 байт**, снято 16.09.2026.
+
+**Дословно, текущая редакция (latest revised):**
+
+> Information society services U.K.
+> F1 72A. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+>
+> **Textual Amendments**
+> F1 Art. 72A **omitted (31.12.2020)** by virtue of The Electronic Commerce and Solvency 2
+> (Amendment etc.) (EU Exit) Regulations 2019 (**S.I. 2019/1361**), regs. 1(2), **5(2)**
+> (with regs. 11-28) (as amended by S.I. 2019/1390, regs. 1(2), 6); 2020 c. 1, Sch. 5 para. 1(1)
+
+Та же страница фиксирует ещё не применённые изменения ко всему инструменту:
+«Order revoked by 2023 c. 29 Sch. 1 Pt. 5» (Financial Services and Markets Act 2023) —
+отзыв RAO как ретейненного права ещё не введён в действие, то есть **RAO продолжает
+действовать**, и опираться на его будущий отзыв нельзя.
+
+🔴 **Прежний вывод Г2 был помечен как гипотеза («art. 72A неприменим к третьим странам
+после Brexit») — теперь он ЗАМЕНЁН нормой, и основание оказалось другим и более
+сильным.** Дело не в том, что статья не распространяется на третьи страны:
+**статья изъята из RAO целиком с 31.12.2020**. Исключение для information society
+services в британском праве **отсутствует как таковое** — ни для кого, включая
+поставщиков из третьих стран. Ссылаться на art. 72A RAO в юрблоке нельзя вовсе.
+Причина изъятия системная: art. 72A имплементировал «country of origin» принцип
+Директивы об электронной коммерции 2000/31/EC, а взаимность внутреннего рынка
+после выхода из ЕС прекратилась.
+
+**PERG 2.9.18G.** `https://r.jina.ai/https://www.handbook.fca.org.uk/handbook/PERG/2/9.html`
+→ **HTTP 200, 27 552 байта**, снято 16.09.2026. Раздел PERG 2.9 «Regulated activities:
+exclusions applying to more than one regulated activity» в снятой версии Handbook
+нормы 2.9.18G про information society services в прежнем виде не содержит —
+что согласуется с изъятием art. 72A: руководство следует за отменённой нормой.
+Точная нумерация в действующем Handbook по этому подразделу отдельно не сверялась,
+потому что вопрос закрыт на уровне самой нормы RAO.
+
+**Art. 72 RAO (overseas persons) применительно к debt counselling.**
+`https://www.legislation.gov.uk/uksi/2001/544/article/72` → **HTTP 200, 137 910 байт**,
+снято 16.09.2026. Подтверждён уже зафиксированный в этом файле результат Г16:
+art. 72(5) снимает с overseas person только articles 53 и 55A; **упоминания art. 39E
+(debt counselling) в art. 72 нет**. Для иностранного поставщика выхода через
+overseas persons exclusion по долговому контуру НЕТ.
+
+🔴 **Сводно по UK: обе двери, на которые была надежда, закрыты нормой.**
+Art. 72A — изъят целиком с 31.12.2020; art. 72 — не покрывает 39E. Британский
+долговой контур с нас не снимается ни территориально, ни по каналу оказания услуги.
+Оговорка прежнего захода сохраняется: территориальный вопрос «carrying on in the UK»
+(s. 418 FSMA) отдельно не исследовался — это единственная оставшаяся линия защиты
+по UK, и она не про исключения, а про то, ведётся ли деятельность в UK вообще.
+
+---
+
+### Пункт 7. Добивка до дословных цитат — ДОБЫТО (3 из 4)
+
+#### 7.1. SEC Release No. 33-11377 — дословно, ДОБЫТО
+
+`curl` по `https://www.sec.gov/files/rules/final/2025/33-11377.pdf` — 403
+(подтверждён замер батча: `sec.gov` отбивает и `curl`+UA, и `WebFetch`).
+Обход: `https://r.jina.ai/https://www.sec.gov/files/rules/final/2025/33-11377.pdf`
+→ **HTTP 200, 14 017 байт**, 7 страниц, Published Time: Tue, 17 Jun 2025 12:15:48 GMT.
+Снято 16.09.2026.
+
+Полные реквизиты (дословно с титула):
+
+> SECURITIES AND EXCHANGE COMMISSION
+> 17 CFR Parts 200, 230, 232, 239, 240, 242, 249, 270, 274, 275, and 279
+> [Release Nos. **33-11377**; 34-103247; **IA-6885**; IC-35635; File Nos. S7-20-22; S7-12-23;
+> S7-04-23; S7-04-22; S7-17-22; S7-25-22; S7-32-10; S7-18-23; S7-32-22; S7-31-22; S7-07-23;
+> S7-06-23; S7-02-22; S7-10-20]
+>
+> **Withdrawal of Proposed Regulatory Actions**
+> ACTION: Notice of withdrawal of proposed rules.
+>
+> SUMMARY: The Securities and Exchange Commission ("Commission") is formally withdrawing
+> certain notices of proposed rulemaking issued between March 2022 and November 2023.
+> **The Commission does not intend to issue final rules with respect to these proposals.**
+> If the Commission decides to pursue future regulatory action in any of these areas,
+> it will issue a new proposed rule.
+
+Про сам PDA-проект, дословно (раздел Background):
+
+> **Conflicts of Interest Associated with the Use of Predictive Data Analytics by
+> Broker-Dealers and Investment Advisers**
+> On August 9, 2023, the Commission published proposed new rules under the Securities
+> Exchange Act of 1934 ("Exchange Act") and the Investment Advisers Act of 1940
+> ("Advisers Act") to, among other things, address certain interactions between
+> broker-dealers or investment advisers and investors through these firms' use of
+> predictive data analytics.
+
+Дата отзыва — **17.06.2025** (DATES: «...as of June 17, 2025»), исходная публикация
+проекта PDA — 88 FR 53960 (August 9, 2023). Подтверждающая публикация в Federal Register:
+`https://r.jina.ai/https://www.federalregister.gov/documents/2025/06/23/2025-11333/...`
+→ **HTTP 200, 17 242 байта**.
+
+**Что это значит для нас.** Проект PDA был единственной инициативой SEC, которая
+прямо целилась в алгоритмические/предиктивные рекомендательные механики и могла бы
+задеть сервис нашего класса по признаку «технология», а не «предмет». Он **отозван
+окончательно**, с прямой формулировкой «does not intend to issue final rules».
+Регуляторного крючка «вы алгоритм — значит под Advisers Act» в США сейчас нет.
+Оговорка: отзыв проекта не создаёт безопасной гавани, он лишь убирает
+несостоявшееся расширение; действующее определение Advisers Act не менялось.
+
+#### 7.2. Lowe v. SEC, 472 U.S. 181 (1985) — «person-to-person», ДОБЫТО ДОСЛОВНО
+
+`justia` → **HTTP 200, но 288 байт** (пустое тело, антибот).
+Обход: `https://r.jina.ai/https://www.law.cornell.edu/supremecourt/text/472/181`
+→ **HTTP 200, 145 529 байт** (Cornell LII, полный текст с особыми мнениями).
+Снято 16.09.2026.
+
+Ключевой абзац большинства (Stevens, J.), дословно:
+
+> The Act was designed to apply to those persons engaged in the investment-advisory
+> profession — **those who provide personalized advice attuned to a client's concerns**,
+> whether by written or verbal communication. The mere fact that a publication contains
+> advice and comment about specific securities does not give it the personalized character
+> that identifies a professional investment adviser. Thus, petitioners' publications do not
+> fit within the central purpose of the Act because **they do not offer individualized
+> advice attuned to any specific portfolio or to any client's particular needs**.
+
+И собственно формула «person-to-person», дословно:
+
+> As long as the communications between petitioners and their subscribers remain
+> **entirely impersonal and do not develop into the kind of fiduciary, person-to-person
+> relationships** that were discussed at length in the legislative history of the Act and
+> that are characteristic of investment adviser-client relationships, we believe the
+> publications are, at least presumptively, within the exclusion and thus not subject
+> to registration under the Act.
+
+Из истории дела (важно, что это позиция НИЖЕСТОЯЩЕГО суда, а не ratio ВС), дословно:
+
+> The majority first held that petitioners were engaged in business as "investment
+> advisers" within the meaning of the Act. It concluded that **the Act does not distinguish
+> between person-to-person advice and impersonal advice given in printed publications.**
+
+🔴 **Осторожно с использованием Lowe в нашу пользу — и это правка к прежнему заходу.**
+Lowe строит защиту на **безличности и публичности** коммуникации («entirely impersonal»,
+«circulate for sale to the public at large in a free, open market»). Наш продукт —
+ровно противоположное: персональная рекомендация, рассчитанная по данным конкретного
+пользователя, «attuned to a client's particular needs». По критерию Lowe мы на
+**«плохой» стороне линии**: мы персонализированы. Lowe защищает нас **только потому,
+что мы не говорим о ценных бумагах вообще** — то есть работает предметный
+разграничитель, уже зафиксированный в этом файле, а не критерий персональности.
+Формулировка «person-to-person» **не является** для нас щитом и не должна цитироваться
+в юрблоке как таковой.
+
+#### 7.3. Третий штат с нормой о debt adjusting: ГРУЗИЯ (Georgia) — ДОБЫТО ДОСЛОВНО
+
+Источники (снято 16.09.2026, все через `r.jina.ai`, прямой `justia` отдаёт пустое тело):
+- перечень главы: `https://r.jina.ai/https://law.justia.com/codes/georgia/title-18/chapter-5/`
+  → **HTTP 200, 13 845 байт**;
+- `https://r.jina.ai/https://law.justia.com/codes/georgia/title-18/chapter-5/section-18-5-1/`
+  → **HTTP 200, 14 926 байт**;
+- `https://r.jina.ai/https://law.justia.com/codes/georgia/title-18/chapter-5/section-18-5-3/`
+  → **HTTP 200, 14 463 байта**.
+
+**O.C.G.A. § 18-5-1 (2025), дословно и целиком:**
+
+> As used in this chapter, the term:
+> (1) **"Debt adjusting"** means doing business in debt adjustments, **budget counseling**,
+> debt management, or debt pooling service or holding oneself out, by words of similar
+> import, as providing services to debtors in the management of their debts **and
+> contracting with a debtor for a fee to**:
+> (A) Effect the adjustment, compromise, or discharge of any account, note, or other
+> indebtedness of the debtor; or
+> (B) Receive from the debtor and disburse to his or her creditors any money or other
+> thing of value.
+> (2) "Person" means an individual, corporation, partnership, trust, association, or other
+> legal entity.
+> (3) "Resides" means to live in a particular place, whether on a temporary or permanent basis.
+
+История нормы: Ga. L. 1956, p. 797, § 1; Ga. L. 2003, p. 392, § 1; Ga. L. 2015, p. 1088,
+§ 18/SB 148. Наказание за ведение бизнеса debt adjusting с нарушением главы — § 18-5-4.
+
+**O.C.G.A. § 18-5-3 (изъятия), дословно:**
+
+> Nothing in this chapter shall apply to those situations involving debt adjusting incurred
+> in the practice of law in this state. Nothing in this chapter shall apply to those persons
+> or entities who incidentally engage in debt adjustment to adjust the indebtedness owed to
+> said person or entity. Nothing in this chapter shall apply to the following entities or
+> their subsidiaries: the Federal National Mortgage Association; the Federal Home Loan
+> Mortgage Corporation; a bank, bank holding company, trust company, savings and loan
+> association, credit union, credit card bank, or savings bank that is regulated and
+> supervised by the Office of the Comptroller of the Currency, the Federal Reserve, the
+> Federal Deposit Insurance Corporation, the National Credit Union Administration, or the
+> Georgia Department of Banking and Finance; or persons as defined in Code Section 7-3-3
+> operating under Chapter 3 of Title 7, the "Georgia Installment Loan Act."
+
+🔴 **Разбор — и это главный содержательный результат по штатам.**
+Определение Джорджии **называет «budget counseling» прямо** — это самый тревожный для нас
+текст из трёх штатов (Utah UDMSA, RCW 18.28.010 Washington, теперь Georgia).
+Но **структура определения конъюнктивная**: требуется И (а) вести бизнес в
+debt adjustments / budget counseling / debt management / debt pooling либо выдавать себя
+за такового, И (б) «contracting with a debtor **for a fee** to» совершить одно из двух
+действий — (A) добиться adjustment, compromise или discharge задолженности, либо
+(B) принимать деньги от должника и распределять их кредиторам.
+
+Мы **не делаем ни (A), ни (B)**: мы не ведём переговоров с кредиторами, ничего не
+«compromise» и не «discharge», и через нас не проходят деньги пользователя.
+Поэтому по букве § 18-5-1 Джорджия нас **не ловит**, несмотря на слово
+«budget counseling» в первой половине определения.
+
+🔴 **Отличие от UK — и оно принципиально.** Джорджия строит состав вокруг
+**действия с долгом и денежного потока**; UK (art. 39E RAO + PERG 17) строит его
+вокруг **самого совета**. Поэтому американская модель штатов для нас мягче
+британской: там, где PERG 17 ловит за рекомендацию приоритета погашения,
+Джорджия требует ещё и договор на совершение действия с задолженностью.
+Оговорка: конъюнктивное прочтение «and contracting with a debtor for a fee» —
+прочтение по букве; судебной практики именно по разграничению «совет без действия»
+в этом заходе не снималось. Единственное найденное на странице судебное решение
+(Moon v. CSA—Credit Solutions of Am., Inc., 304 Ga. App. 555 (2010)) о составе
+не высказывается — оно о недействительности оговорки о подсудности.
+
+#### 7.4. Delaware / Rhode Island / Colorado — НЕ ДОБЫТО в этом заходе
+
+Пройдено: `https://r.jina.ai/https://delcode.delaware.gov/title6/c024a/index.html`
+→ **HTTP 200, 85 587 байт**, но термина «debt adjusting» в главе нет;
+`.../title6/c023a/index.html` → **HTTP 200, 342 байта** (пустая заглушка, главы нет).
+Rhode Island и Colorado не запрашивались — задача пункта («третий штат с дословной
+нормой») закрыта Джорджией, дальнейший перебор штатов не был строго необходим
+для ответа на вопрос батча. Это осознанный отказ от шага по критерию
+«строго ли необходим», а не недобор.
+
+---
+
+### Пункт 5. Ирландия: транспозиция CCD II — ДОБЫТ ДОКАЗАННЫЙ ОТРИЦАТЕЛЬНЫЙ РЕЗУЛЬТАТ
+
+Прежний статус (Г16): «акт не найден тремя поисками, `irishstatutebook.ie` сплошь
+не просматривался». Теперь перечень просмотрен сплошь.
+
+**Найден рабочий адрес перечня** (прежние заходы били по неверным шаблонам URL,
+отсюда и «не найден»). Замеры 16.09.2026, `curl -sk --http1.1` с браузерным UA:
+
+| URL | HTTP | Байт |
+|---|---|---|
+| `https://www.irishstatutebook.ie/eli/2026/en/si/` | **404** | 196 |
+| `https://www.irishstatutebook.ie/eli/isbc/si/2026.html` | **404** | 196 |
+| `https://www.irishstatutebook.ie/eli/ISBCSI/2026.html` | **404** | 196 |
+| `https://www.irishstatutebook.ie/eli/isbc/2026.html` | 200 | 24 839 (это перечень ЗАКОНОВ, не S.I.) |
+| 🟢 `https://www.irishstatutebook.ie/eli/2026/si` | **200** | **279 434** — рабочий перечень S.I. за 2026 |
+| `https://www.irishstatutebook.ie/eli/2026/si/1/made/en/print` | 200 | 64 706 (подтверждает шаблон адреса отдельного S.I.) |
+
+**Сплошной проход перечня S.I. за 2026 год (279 434 байта) по словам «credit»
+и «consumer» дал полный список совпадений:**
+
+- Credit Review Act 2026 (Commencement) Order 2026
+- Credit Review Act 2026 (Establishment Day) Order 2026
+- Credit Review Act 2026 (Prescribed Amounts and Fee) Regulations 2026
+- Credit Review Act 2026 (Credit Review Levy) Regulations 2026
+- Film (Enhanced Credit Amount for Visual Effects) (Amendment) Regulations 2026
+- Statistics (Consumer Price Survey) (Amendment) Order 2026
+- Central Bank (Supervision and Enforcement) Act 2013 (Section 48) (Consumer Protection) (Amendment) Regulations 2026
+- European Union (Empowering Consumers for the Green Transition) Regulations 2026
+- Consumer Insurance Contracts Act 2019 (Commencement) Order 2026
+
+🔴 **Ни один из них не транспонирует Directive (EU) 2023/2225.** Credit Review Act 2026 —
+про апелляции МСП на отказ в кредите, а не про CCD II.
+
+**Подтверждение вторым, независимым источником.** A&L Goodbody, «Consumer Credit
+Directive 2 (CCD2) – What consumer lenders in Ireland need to know»,
+`https://r.jina.ai/https://www.algoodbody.com/insights-publications/consumer-credit-directive-2-ccd2-what-consumer-lenders-in-ireland-need-to-know`
+→ **HTTP 200, 20 752 байта**, дата публикации **7 мая 2026**. Дословно:
+
+> To date, Ireland has not published transposing legislation despite the transposition
+> deadline of 20 November 2025, but we expect the transposing legislation to closely
+> mirror the wording of the CCD2 text and there to be **no gold-plating**.
+
+Найденный смежный акт (не CCD II, но по соседнему досье): **S.I. No. 309/2026 —
+European Union (Distance Contracts for Financial Services) Regulations 2026**
+(`https://www.irishstatutebook.ie/eli/2026/si/309/made/en/print`), транспозиция DMD II.
+
+**Вывод по пункту 5.** Ирландия **просрочила** транспозицию CCD II (дедлайн 20.11.2025)
+и по состоянию на 16.09.2026 транспонирующего акта не опубликовала. Это уже не
+«не нашли», а проверенный отрицательный результат: перечень S.I. за 2026 пройден целиком.
+Практическое следствие: **по Ирландии ориентироваться следует на текст самой директивы** —
+и ожидание рынка (ALG) состоит в том, что ирландский акт повторит формулировки CCD II
+без ужесточения. То есть разбор Art. 3(17) и Art. 16(6) выше применим к Ирландии
+напрямую, когда акт выйдет. Отдельная оговорка: сама директива применяется с 20.11.2026,
+и отсутствие национального акта не отменяет прямого действия за государством
+в части, где нормы безусловны.
+
+---
+
+### Пункт 6. ОАЭ onshore (CBUAE) — ДОБЫТО. Перечень лицензируемой деятельности ИСЧЕРПЫВАЮЩИЙ, совета в нём нет
+
+Прежний статус (Г16): «весь режим не исследован, кончился бюджет вызовов».
+
+**Источник.** CBUAE Rulebook, консолидированный текст
+«Central Bank & Organization of Financial Institutions and Activities Law»
+(Decretal Federal Law No. (14) of 2018 в редакции Decretal Federal Law No. (9) of 2021).
+`https://r.jina.ai/https://rulebook.centralbank.ae/en/rulebook/central-bank-organization-financial-institutions-and-activities-law`
+→ **HTTP 200, 259 329 байт**, снято 16.09.2026.
+
+Пройденные и отвергнутые каналы (замеры того же дня):
+- `https://r.jina.ai/https://www.centralbank.ae/media/mnbhnyhq/decretal-federal-law-no-14-of-2018-on-the-central-bank-en.pdf` → **HTTP 422, 379 байт**;
+- `https://r.jina.ai/https://rulebook.centralbank.ae/en/rulebook/article-65-licensed-financial-activities` → **HTTP 404, 3 840 байт** (неверный slug);
+- `https://r.jina.ai/https://rulebook.centralbank.ae/en/rulebook/article-65-financial-activities` → **HTTP 200, 17 938 байт**, но страница помечена **«Status: Repealed»** (первоначальная редакция DFL 14/2018). 🔴 Брать её как действующую норму нельзя — взята консолидированная.
+
+**Article (65): Financial Activities — дословно, действующая консолидированная редакция:**
+
+> 1) The following activities shall be considered financial activities subject to Central
+> Bank licensing and supervision in accordance with the provisions of this Decretal Law:
+>
+> a. Taking deposits of all types, including Shari'ah-compliant deposits.
+> b. Providing credit facilities of all types.
+> c. Providing funding facilities of all types, including Shari'ah-compliant funding facilities.
+> d. Providing currency exchange and money transfer services.
+> e. Providing monetary intermediating services.
+> f. Providing stored values services, electronic retail payments and digital money services.
+> g. Providing virtual banking services.
+> h. Arranging and/or marketing for Licensed Financial Activities.
+> i. Acting as a principal in financial products that affect the financial position of the
+> Licensed Financial Institution, including but not limited to foreign exchange, financial
+> derivatives, bonds and sukuk, equities, commodities, and any other financial products
+> approved by the Central Bank.
+>
+> 2) The Board of Directors shall:
+> a. Classify and define Licensed Financial Activities and the practices relating thereto.
+> b. **Add activities or practices to the list** of Licensed Financial Activities mentioned
+> in item (1) of this article, or delete activities or practices from the list, or amend them,
+> following coordination and agreement with the Regulatory Authorities in the State, through
+> the Financial Activities Committee referred to in Article (66) of this Decretal Law.
+
+Определение из Article (1), дословно:
+
+> **Licensed Financial Activities:** The financial activities subject to Central Bank
+> licensing and supervision, which are specified in Article (65) of this Decretal Law.
+
+Санкция за безлицензионную деятельность — Article (?) о проверках, дословно:
+
+> 3) The Central Bank may, in coordination with the concerned agencies in the State, inspect
+> premises of any Person **suspected of carrying on any of the financial activities referred
+> to in Article (65) of this Decretal Law, without a license**.
+
+🔴 **Вывод по ОАЭ onshore.** Перечень Art. 65(1) — **закрытый и исчерпывающий**
+(«The following activities shall be considered financial activities subject to Central Bank
+licensing»), и расширяется только решением Совета директоров через Financial Activities
+Committee (Art. 65(2)(b), Art. 66). В перечне **нет ни «financial advice», ни «financial
+consultancy», ни «debt counselling», ни «credit counselling»** — ни в одной из девяти позиций.
+
+Наш сервис не принимает депозитов (a), не предоставляет кредитных или финансирующих
+средств (b, c), не занимается обменом и переводом (d), не выступает monetary intermediary
+(e), не эмитирует stored value и не проводит платежи (f), не оказывает virtual banking (g),
+не действует как принципал в финансовых продуктах (i).
+
+Единственная позиция, требующая осторожности, — **(h) «Arranging and/or marketing for
+Licensed Financial Activities»**. Она ловит не совет как таковой, а организацию и
+маркетинг чужой лицензируемой деятельности. Пока мы не называем конкретных продуктов
+и не направляем пользователя к конкретному кредитору или банку, под (h) мы не попадаем;
+🔴 **но появление в продукте любой партнёрской выдачи («вот банк, где рефинансировать»)
+переводит нас под (h) и, следовательно, под лицензирование CBUAE.** Это тот же предметный
+разграничитель, что и в остальных юрисдикциях, только выраженный через «arranging/marketing».
+
+**Сопоставление с уже добытыми зонами ОАЭ.** Картина сходится: DIFC (DFSA GEN 2.28.1,
+2.11.1) и ADGM (FSMR Sch. 1 п. 28) регулируют совет о ВСТУПЛЕНИИ в конкретный продукт;
+CBUAE onshore вообще не относит совет к лицензируемой деятельности. То есть
+**в ОАЭ — во всех трёх контурах — совет о порядке погашения существующих долгов
+под лицензирование не подпадает.** Это полярно UK.
+
+**Оговорки, честно.** (1) «Нормы в перечне нет» — вывод по исчерпывающему перечню
+первичного закона, и в этом он сильнее, чем обычное «не нашли»; но подзаконные
+регламенты Совета директоров (Art. 65(2)(a) «classify and define... and the practices
+relating thereto») отдельно не просматривались, а именно они детализируют практики.
+(2) Инвестиционный совет onshore ОАЭ относится к компетенции **SCA** (Securities and
+Commodities Authority), а не CBUAE; режим SCA в этом заходе не снимался, но он
+по предмету привязан к ценным бумагам, то есть к тому, чего мы не касаемся.
+
+---
+
+### Пункт 1. 🔴 США: Investment Advisers Act и сервис, советующий по долгам и накоплениям — ДОБЫТО
+
+Исполнено подагентом (один запуск, `base-kit:researcher`, бюджет 14 действий, израсходовано 13,
+своих подагентов не запускал). Ниже — материал подагента, сверенный вахтой, и отдельно
+несколько мест, где вахта с ним расходится или уточняет.
+
+#### 1.1. Норма: 15 U.S.C. § 80b-2(a)(11), дословно
+
+Источник: `https://r.jina.ai/https://www.govinfo.gov/content/pkg/USCODE-2023-title15/html/USCODE-2023-title15-chap2D-subchapII-sec80b-2.htm`
+→ **HTTP 200, 32 809 байт**, снято 16.09.2026.
+
+> **(11) "Investment adviser" means any person who, for compensation, engages in the business
+> of advising others, either directly or through publications or writings, as to the value of
+> securities or as to the advisability of investing in, purchasing, or selling securities,
+> or who, for compensation and as part of a regular business, issues or promulgates analyses
+> or reports concerning securities;** but does not include (A) a bank… (B) any lawyer,
+> accountant, engineer, or teacher whose performance of such services is solely incidental
+> to the practice of his profession; (C) any broker or dealer… (D) the publisher of any
+> bona fide newspaper, news magazine or business or financial publication of general and
+> regular circulation; (E) any person whose advice, analyses or reports relate to no
+> securities other than securities which are direct obligations of… the United States…;
+> (F) any nationally recognized statistical rating organization…; (G) any family office…;
+> or (H) such other persons not within the intent of this paragraph, as the Commission may
+> designate by rules and regulations or order.
+
+🔴 **Ключевое наблюдение, и оно — самое сильное в нашу пользу по США:** слово «securities»
+стоит в **каждой** из двух альтернативных ветвей определения. Совет, не касающийся ценных
+бумаг, не попадает ни в первую ветвь, ни во вторую. Мы **не входим в само определение**,
+а не выводимся из него изъятием (A)–(H). Юридически это сильнее: изъятие можно потерять,
+непопадание в дефиницию — нет.
+
+**Замечание по каналу (расхождение с замером батча).** Cornell LII по
+`https://r.jina.ai/https://www.law.cornell.edu/uscode/text/15/80b-2` → HTTP 200, 30 287 байт,
+**но статутный текст (a)(11) на странице не отрендерен** — только примечания и история
+поправок. То есть «Cornell работает» верно по коду и неверно по содержанию для страниц USC.
+Для текста дела (472 U.S. 181) Cornell при этом отработал полностью (145 529 байт, см. п. 7.2).
+Вывод для будущих батчей: **USC брать с `govinfo.gov`, судебные решения — с Cornell.**
+
+#### 1.2. SEC Release IA-1092 (8 октября 1987) — добыт целиком
+
+Источник: `https://r.jina.ai/https://www.sec.gov/rules/interp/1987/ia-1092.pdf`
+→ **HTTP 200, 36 156 байт, 20 страниц**, снято 16.09.2026.
+Старый адрес `https://www.sec.gov/divisions/investment/noaction/ia-1092.htm` — **404**
+(страница удалена SEC; это мёртвый адрес, а не недобытый источник).
+
+🔴 **Статус документа — и это поправка к постановке задачи батча.** Шапка релиза, дословно:
+
+> **ACTION: Statement of staff interpretive position.** SUMMARY: The Commission is publishing
+> the views of **the staff of the Division of Investment Management** on the applicability of
+> the Investment Advisers Act of 1940 to financial planners… The views expressed in this
+> statement were developed jointly by Division staff and the **North American Securities
+> Administrators Association, Inc. ("NASAA")** to update Investment Advisers Act Release No. 770…
+
+То есть IA-1092 — **позиция штата (сотрудников Отдела), а не Комиссии, и не норма права**.
+Он не связывает ни суд, ни саму SEC. Писать в юрблоке «SEC постановила» — ошибка.
+
+**Трёхчастный тест, дословно:**
+
+> A determination as to whether a person providing financial planning, pension consulting,
+> or other integrated advisory services is an investment adviser will depend upon whether
+> such person: **(1) provides advice, or issues reports or analyses, regarding securities;
+> (2) is in the business of providing such services; and (3) provides such services for
+> compensation.**
+
+Элементы **конъюнктивны** — подтверждено вторым документом SEC (Plaze, см. 1.3):
+«A person must satisfy **all three** elements to fall within the definition».
+
+**Что НЕ является specific investment advice — дословно:**
+
+> For the purposes of (iii) above, "specific investment advice" includes a recommendation,
+> analysis or report about specific securities or specific categories of securities
+> (e.g., industrial development bonds, mutual funds, or medical technology stocks).
+> **It includes a recommendation that a client allocate certain percentages of his assets
+> to life insurance, high yielding bonds, and mutual funds or particular types of mutual
+> funds such as growth stock funds or money market funds. However, specific investment
+> advice does not include advice limited to a general recommendation to allocate assets
+> in securities, life insurance, and tangible assets.**
+
+🔴 **Оговорка подагента, которую вахта принимает и подчёркивает:** этот абзац относится
+к элементу **«business»**, а НЕ к элементу «advice regarding securities». Он отвечает
+на вопрос «достаточно ли регулярно и конкретно ты советуешь, чтобы быть *в бизнесе*»,
+а не «касается ли твой совет бумаг». Вторичные источники этим злоупотребляют. Для нас
+элемент (1) отпадает по более простой причине — бумаг в выдаче нет вовсе.
+
+**🔴 Самая опасная для нас фраза IA-1092, дословно:**
+
+> A person who, in the course of developing a financial program for a client, advises a client
+> as to **the desirability of investing in, purchasing or selling securities, as opposed to,
+> or in relation to, any non-securities investment or financial vehicle** would also be
+> "advising" others within the meaning of Section 202(a)(11).
+
+🔴 **Перевод на наш продукт.** Ловушка не в том, чтобы назвать бумагу, а в том, чтобы
+**сопоставить вложение в бумаги с не-бумагами**. Фраза «гасить долг под 22 % выгоднее,
+чем инвестировать» — классический аргумент продукта нашего класса — **прямо накрыта**
+этой формулировкой и сама по себе выполняет элемент (1), хотя ни один инструмент не назван.
+Это новое ограничение, которого в файле до сих пор не было.
+
+**Антиобход — § 208(d), дословно:**
+
+> …if a financial planner structures his planning so as to give only generic, non-specific
+> investment advice as a financial planner, **but then gives specific securities advice in his
+> capacity as a registered representative of a dealer**… the person would not be able to assert
+> that he was not "in the business" of giving investment advice. … **Section 208(d) of the
+> Advisers Act makes it illegal for someone to do indirectly under the Advisers Act what
+> cannot be done directly.**
+
+То есть «чистый» расчётный модуль не спасает, если в той же экономической связке есть
+брокерская витрина или партнёрские выплаты за открытие счёта.
+
+#### 1.3. «Regulation of Investment Advisers», SEC Division of Investment Management (Robert E. Plaze, апрель 2012)
+
+Источник: `https://r.jina.ai/https://www.sec.gov/about/offices/oia/oia_investman/rplaze-042012.pdf`
+→ **HTTP 200, 191 161 байт**, снято 16.09.2026. Документ на домене sec.gov за авторством
+заместителя директора Division of Investment Management; даёт то, чего нет в IA-1092, —
+поимённые no-action letters.
+
+**Главная цитата по нашему вопросу, дословно:**
+
+> **a. Advice about Securities.** A person clearly meets the third element of the statutory
+> test if he provides advice to others about specific securities… **The SEC staff has stated
+> that advice about real estate, coins, precious metals, or commodities is not advice about
+> securities.**⁷ The more difficult questions arise with less specific advice… The SEC staff
+> has stated in this regard: (i) advice about market trends is advice about securities;⁸
+> (ii) advice about the selection and retention of other advisers is advice about securities;⁹
+> (iii) advice about the advantages of investing in securities versus other types of investments
+> (e.g., coins or real estate) is advice about securities;¹⁰ (iv) providing a selective list
+> of securities is advice about securities even if no advice is provided as to any one
+> security;¹¹ and **(v) asset allocation advice is advice about securities.**¹²
+
+Сноски (дословно, сокращённо): ⁷ **Robert R. Champion**, SEC Staff No-Action Letter
+(Sept. 22, 1986); ⁸ **Dow Theory Forecasts** (Feb. 2, 1978), **Maratta Advisory, Inc.**
+(July 16, 1981); ⁹ Release 1092, **FPC Securities Corp.** (Dec. 1, 1974), см. также
+**SEC v. Washington Investment Network, 475 F.3d 392 (D.C. Cir. 2007)**;
+¹¹ **RDM Infodustries, Inc.** (Mar. 25, 1996); ¹² **Maratta Advisory, Inc.**
+
+🔴 **Пункт (v) — самое опасное место во всём материале по США: «asset allocation advice
+IS advice about securities».** Это позиция штата SEC, не чужая интерпретация. Формально
+она опирается на Maratta Advisory (market timing) и SEC v. Bolla — оба про распределение
+**инвестиционных активов**, то есть контекст узкий. Но строить защиту на узком прочтении
+чужой сноски — слабая позиция в споре с регулятором.
+🔴 **Терминологическое следствие, практическое:** слово «allocation» / «распределение
+активов» в англоязычных публичных материалах продукта лучше не использовать;
+**«cash flow prioritization»** или **«payment prioritization»** описывают ровно то же
+самое и не тянут за собой сноску ¹².
+
+**Компенсация, дословно:**
+
+> The term "compensation" has been broadly construed. Generally, the receipt of **any
+> economic benefit**… satisfies this element. The person receiving the advice **or another
+> person** may pay the compensation.
+
+🔴 «**or another person may pay**» закрывает лазейку «для пользователя бесплатно,
+платит работодатель или банк-партнёр». Элемент (3) у нас выполнен всегда.
+
+#### 1.4. Публикации юрфирм — добыты частично, вес низкий
+
+- **Mayer Brown, «Advisers Act Outline»** (IMU 2026, черновик 21.04.2026, Adam Kanter).
+  🔴 Прямым фетчем **не открывался**, текст получен через Exa highlights; HTTP-код и размер
+  **не замерены**. Ключевая фраза, дословно:
+  «**SEC Releases 770 and 1092 identify most financial planners as investment advisers under
+  the Act who must comply with it unless they can rely on a statutory exception or exemption.**»
+  🔴 **Это против нас, и замалчивать нельзя:** умолчание штата SEC — financial planner
+  = investment adviser. Продукт, **называющий себя** «financial planner», стартует из
+  презумпции «подпадает» и вынужден доказывать обратное. Продукт, называющий себя
+  «debt payoff planner» / «cash flow tool», такой презумпции против себя не создаёт.
+  Это вопрос позиционирования с прямой юридической ценой.
+- **Wilson Sonsini, «Five Issues for Wealthtech Companies…»** (через JD Supra).
+  🔴 Прямым фетчем не открывался, дата в выдаче отсутствует, по внутренней отсылке
+  материал ~2023–2024. 🔴 **Помечаю как спекуляцию:** весь фрагмент построен на «may»,
+  «can», «it is very possible», «more likely», без единой ссылки на конкретное письмо
+  или дело. Существенно: текст относится к продуктам, которые «help investors allocate
+  **investments**» и «provide trading signals» — там элемент «securities» и так выполнен.
+  К продукту, не касающемуся инвестиций, он по предмету не относится.
+- Morrison Foerster, Ropes & Gray, Davis Polk, Skadden, Sidley — **публикаций по этому
+  вопросу не найдено**. В выдаче доминировал SEO-контент compliance-вендоров
+  (`skills.cat`, `complycode.app`, `terms.law`), который как основание не используется.
+
+🔴 **Непроверенное, которое НЕ переносим в выводы.** В SEO-источнике фигурировало
+no-action letter под аббревиатурой «FPL» про софт для финансового планирования —
+ни полного названия, ни даты, ни подтверждения существования не найдено. Не использовать,
+пока не идентифицировано.
+
+#### 1.5. Вывод по США
+
+**Федеральный уровень: НЕ подпадаем под Advisers Act** — при условии абсолютной чистоты
+по ценным бумагам. Логика: элементы (2) business и (3) compensation у подписного веб-сервиса
+выполнены практически автоматически; элемент (1) — единственная линия обороны, и он
+**не выполнен**, потому что «securities» стоит в обеих ветвях определения, а штат SEC
+прямо признаёт классы советов вне периметра («advice about real estate, coins, precious
+metals, or commodities **is not** advice about securities»). Долг, резерв и бюджет —
+такой же не-security, как недвижимость. Три элемента конъюнктивны, невыполнение одного
+закрывает вопрос.
+
+🔴 **Шесть условий, при которых вывод рушится** (по убыванию риска, каждое — с нормой):
+
+| № | Что рушит | Основание |
+|---|---|---|
+| 1 | Сравнение «гасить долг ИЛИ инвестировать» — даже без названия бумаг | IA-1092: «as opposed to, or in relation to, any non-securities investment or financial vehicle» |
+| 2 | Конкретизация резерва: «money market fund», «short-term bond fund», брокерский счёт | IA-1092: specific investment advice **includes** рекомендацию про money market funds |
+| 3 | Аффилированная монетизация через брокера/фонды/реферальные ссылки | § 208(d): «illegal… to do indirectly… what cannot be done directly» |
+| 4 | Самоназвание «financial planner» | Mayer Brown по Releases 770/1092: «most financial planners are investment advisers» |
+| 5 | Термин «asset allocation» в описании функции | Plaze (v): «asset allocation advice **is** advice about securities» |
+| 6 | Регистрация в ШТАТАХ независимо от федерального вывода | не проверено, см. ниже |
+
+🔴 **Главное по США одной строкой: защита — не в дисклеймере, а в СЛОВАРЕ.**
+Тест функциональный, по существу, а не по ярлыку; дисклеймер «not investment advice»
+не защищает никого (это третье независимое подтверждение уже зафиксированного в файле
+принципа «дисклеймер не защищает»). Защищает отсутствие в выдаче: названий инструментов,
+сравнений с инвестированием, слова «allocation», самоназвания «financial planner», —
+и отсутствие инвестиционных партнёров в бизнес-модели.
+
+#### 1.6. Что по США осталось неизвестным — честно
+
+1. 🔴 **Ни одного no-action letter прямо по budgeting / debt-payoff / financial-wellness
+   приложению не найдено.** Пройдены: Exa (2 целевых запроса), выдача sec.gov через прокси,
+   весь реферативный аппарат § II у Plaze. Все идентифицированные письма — про смежное
+   (Champion, RDM Infodustries, Maratta, FPC Securities, Dow Theory Forecasts, Kenisa Oil).
+   Предположение подагента о причине («за таким письмом никто не обращался, ответ очевиден
+   из статута») — правдоподобно, но это **догадка, а не установленный факт**.
+2. 🔴 **Тексты самих no-action letters не добыты — ни одного**, только изложение у Plaze.
+   В том числе ключевой **Robert R. Champion (22.09.1986)** — единственный источник тезиса
+   «real estate, coins… is not advice about securities». Письма 1970–80-х на sec.gov
+   в открытом доступе, как правило, отсутствуют.
+3. 🔴 **Letter to Olena Berg (DOL), 22.02.1996** — не добыт, только изложение у Plaze.
+   Ближайший к теме financial wellness документ (снимает элемент «business» с работодателя,
+   но **не с вендора**, продающего софт работодателю).
+4. 🔴 **Регистрация в ШТАТАХ не исследована вообще, и это самый вероятный реальный риск.**
+   Есть непроверенное утверждение, что ряд штатов требует регистрации от тех, кто
+   **holds himself out** как financial planner, даже без советов по бумагам. Если верно —
+   это обходит всю федеральную защиту по элементу (1). Согласуется с тем, что IA-1092
+   разрабатывался **совместно с NASAA**. 🔴 **Помечено как ГИПОТЕЗА**, требует отдельной
+   темы: NASAA Model Rules + законы целевых штатов. В юрблок в таком виде не переносить.
+5. IA-1092 добыт как OCR старого скана; два абзаца (компенсация, стр. 10; вводная часть
+   стр. 6–7) в оригинале нечитаемы, восстановлены перекрёстной сверкой по Plaze
+   и совпадающим фрагментам. Чистого машинного текста релиза от SEC нет.
+6. Mayer Brown и Wilson Sonsini прямым фетчем не открывались (только Exa highlights),
+   HTTP-коды и размеры не замерены.
+
+---
+
+### Пункт 7.5. Статус CFP Board — ДОБЫТО. Это ЧАСТНАЯ сертификация, а не регулятор
+
+**Источник.** `https://r.jina.ai/https://www.cfp.net/about-cfp-board/mission-and-priorities`
+→ **HTTP 200, 21 238 байт**, снято 16.09.2026. (Страница `/about-cfp-board/our-mission`
+→ HTTP 200, 17 342 байта, но тело — **404 Not Found**; рабочий адрес — `/mission-and-priorities`.)
+
+Дословно:
+
+> CFP Board consists of two affiliated **nonprofit** organizations, both focused on achieving
+> our Strategic Priorities.
+>
+> The mission of **CFP Board of Standards, a 501(c)(6) nonprofit organization**, is to
+> credential competent and ethical financial planners, uphold CFP® certification as the
+> recognized standard and advance the financial planning profession.
+>
+> The mission of **CFP Board Center for Financial Planning, a 501(c)(3) nonprofit
+> organization**, is to advance competent and ethical financial planning and expand
+> CFP® professional diversity for the benefit of the public.
+
+Адрес: 1425 K Street NW #800, Washington, DC 20005. Основана в 1985 году.
+
+🔴 **Вывод.** CFP Board — **частная некоммерческая сертифицирующая организация,
+а НЕ государственный регулятор**. Её стандарты (в том числе фидуциарный стандарт для
+владельцев марки CFP®) обязательны **только для тех, кто добровольно получил марку CFP®**,
+и обеспечиваются договорным и товарно-знаковым правом, а не публичным принуждением.
+Санкция за нарушение — отзыв права пользоваться маркой, а не административное наказание.
+
+**Что это значит для нас.** CFP Board **не создаёт для нашего продукта никаких обязанностей**:
+мы не претендуем на марку CFP® и не нанимаем CFP®-специалистов для оказания услуги.
+🔴 Ссылаться на стандарты CFP Board в юрблоке как на регуляторное требование — ошибка;
+их место — в разделе о добровольных отраслевых практиках, не в разделе о применимом праве.
+Единственный практический риск — репутационно-маркетинговый: использование марки CFP®
+или производных обозначений без права на них нарушало бы права на товарный знак.
+
+---
+
+## ИТОГ Г21
+
+### Таблица по пунктам батча
+
+| № | Пункт | Статус | Норма-основание (точная ссылка) | Что это меняет для красной линии |
+|---|---|---|---|---|
+| 1 | США: Advisers Act и сервис по долгам/накоплениям | **добыто** | 15 U.S.C. § 80b-2(a)(11) (govinfo, 200/32 809 б); SEC Release IA-1092, 08.10.1987 (sec.gov через прокси, 200/36 156 б, 20 стр.); Plaze, «Regulation of Investment Advisers», SEC DIM, апрель 2012 (200/191 161 б) | 🟢 **Федерально НЕ подпадаем**: «securities» стоит в обеих ветвях определения, мы не входим в дефиницию (а не выводимся изъятием). 🔴 Но добавились ДВА новых запрета в словаре продукта: нельзя сравнивать «гасить долг vs инвестировать» (IA-1092) и нельзя называть функцию «asset allocation» (Plaze, п. v) |
+| 2 | MCD Art. 4(21) и Art. 22 | **добыто дословно** | Directive 2014/17/EU, Art. 4(21), Art. 22(1), 22(6)(a)-(c), Приложение II ESIS Part A (EUR-Lex через прокси, 200/271 929 б) | Ипотечный контур **не мягче** потребительского: определение и монополия почти дословно совпадают с CCD II. Формулировка ESIS «so that you can make your own choice» — текстовое подтверждение нашего разграничителя |
+| 3 | CCD II Art. 3(17) и досрочное погашение | **добыто, ответ ПОЛОЖИТЕЛЬНЫЙ (против нас)** | Directive (EU) 2023/2225, Art. 3(17), Art. 3(22), **Art. 16(6)(b) и (c)** (EUR-Lex через прокси, 200/207 127 б) | 🔴 **Ключевой результат батча.** Изъятия 16(6)(b) и (c) написаны для «advisory services **in the context of management of existing debt**» — изъятие нужно только для охваченного, значит совет об управлении существующим долгом **входит** в Art. 3(17). Ни одно из четырёх изъятий нам не подходит; (c) отсекает прямо словами «do not operate on a commercial basis» |
+| 4 | UK art. 72A RAO и PERG 2.9.18G; art. 72 | **добыто, гипотеза СНЯТА** | RAO 2001/544 art. 72A — **omitted (31.12.2020)** by S.I. 2019/1361 reg. 5(2) (legislation.gov.uk, 200/41 878 б); art. 72 (200/137 910 б) | 🔴 Прежняя гипотеза заменена нормой, и основание **сильнее и хуже для нас**: исключение для information society services в праве UK **отсутствует как таковое**, а не «не распространяется на третьи страны». Ссылаться на art. 72A нельзя вовсе |
+| 5 | Ирландия: транспозиция CCD II | **добыт доказанный отрицательный результат** | Сплошной проход перечня S.I. за 2026 (`irishstatutebook.ie/eli/2026/si`, 200/279 434 б) + A&L Goodbody, 07.05.2026 (200/20 752 б) | Транспонирующего акта нет, дедлайн 20.11.2025 просрочен. По Ирландии ориентируемся на текст самой директивы; ожидание рынка — «no gold-plating» |
+| 6 | ОАЭ onshore (CBUAE) | **добыто** | DFL 14/2018 в ред. DFL 9/2021, **Art. 65(1)(a)-(i)**, консолидированный текст CBUAE Rulebook (200/259 329 б) | 🟢 Перечень лицензируемой деятельности **исчерпывающий**, совета в нём нет вовсе. В ОАЭ во всех трёх контурах (CBUAE, DIFC, ADGM) мы вне лицензирования. 🔴 Осторожно с Art. 65(1)(h) «arranging and/or marketing» — партнёрская выдача переводит нас под лицензию |
+| 7 | Добивка до дословных цитат | **добыто 4 из 5** | Release 33-11377 (200/14 017 б); Lowe v. SEC, 472 U.S. 181 (Cornell, 200/145 529 б); O.C.G.A. § 18-5-1 и § 18-5-3 (200/14 926 и 14 463 б); CFP Board (200/21 238 б) | Georgia — третий штат, добыт дословно. 🔴 **Lowe нас НЕ защищает** (мы персонализированы — по критерию Lowe это «плохая» сторона). CFP Board — частная сертификация, в юрблок как право не идёт. Delaware/RI/Colorado не добирались осознанно |
+
+### 🔴 Изменилась ли граница «где мы вне регулирования» — ДА, в трёх местах
+
+**1. ЕС: граница сдвинулась ПРОТИВ нас, и это главный результат батча.**
+До Г21 статус «покрывает ли CCD II совет о досрочном погашении» был записан как
+«ключевая открытая неопределённость». Теперь неопределённости нет: **Art. 16(6)(b) и (c)
+CCD II доказывают охват от противного** — законодатель ЕС не стал бы писать изъятие для
+«advisory services in the context of management of existing debt», если бы такой совет
+не подпадал под Art. 3(17). Наш Avalanche (совет, какой из существующих кредитов гасить
+первым) с 20.11.2026 в ЕС — **advisory services**, и коммерческий характер сервиса прямо
+отсекает единственное подходящее по предмету изъятие (c). То же самое по ипотеке через
+MCD Art. 22(6)(b). **Вывод: ЕС переходит из «вероятно вне» в «внутри, изъятия недоступны».**
+Это ставит ЕС в один ряд с UK, а не с ОАЭ.
+
+**2. UK: граница не сдвинулась, но исчезла последняя надежда на выход.**
+Art. 72A изъят из RAO целиком 31.12.2020 — не «неприменим к нам», а не существует.
+Вместе с подтверждённым отсутствием 39E в art. 72 (overseas persons) это значит:
+**по долговому контуру UK у иностранного поставщика нет ни одного исключения.**
+Единственная оставшаяся линия защиты — территориальная («carrying on in the UK»,
+s. 418 FSMA), и она **не исследована**. Это теперь самая важная открытая правовая
+тема по UK.
+
+**3. США и ОАЭ: граница подтверждена в нашу пользу, но появились новые запреты в СЛОВАРЕ.**
+Федерально в США мы вне Advisers Act, в ОАЭ вне лицензирования CBUAE — оба вывода
+получены из первоисточника, а не из обзоров. 🔴 Но США добавили два ограничения,
+которых в файле раньше не было и которые касаются **формулировок продукта**, а не
+его архитектуры: (а) нельзя сравнивать досрочное погашение с инвестированием —
+это само по себе делает нас «advising… as to the desirability of investing in securities»
+(IA-1092); (б) нельзя называть функцию «asset allocation» — позиция штата SEC прямо
+говорит «asset allocation advice **is** advice about securities» (Plaze, п. v).
+Безопасные термины: **«cash flow prioritization»**, **«payment prioritization»**.
+
+**4. Разграничитель подтверждён четвёртый раз, уже из нового источника.**
+Приложение II MCD (ESIS, Part A) предписывает кредитору формулу
+«**We are not recommending a particular mortgage for you… so that you can make your own
+choice**». Это буквально тот разграничитель «assisting the person to make their own choice»,
+который уже зафиксирован в этом файле, — теперь он подтверждён текстом европейского
+законодателя, а не только руководством FCA.
+
+**5. Принцип «дисклеймер не защищает» подтверждён независимо в третий раз** — теперь
+американским материалом: тест по Advisers Act функциональный, по существу деятельности,
+а ярлык на продукте его не меняет; § 208(d) прямо запрещает делать косвенно то,
+что нельзя прямо.
+
+### Общая карта на конец Г21 (по жёсткости для нас)
+
+| Юрисдикция | Инвестиционный контур | Долговой контур |
+|---|---|---|
+| США (федерально) | вне (нет securities) | вне федерально; 🔴 **штаты не проверены**; Georgia не ловит (нужны действия с долгом, а не совет) |
+| ЕС | вне (ESMA35-43-3861 §58) | 🔴 **ВНУТРИ с 20.11.2026** (CCD II Art. 3(17) + 16(6)); ипотека — то же через MCD |
+| UK | вне (PERG 8.26.2G(1)) | 🔴 **ВНУТРИ** (art. 39E RAO + PERG 17); исключений нет — 72A изъят, 72 не покрывает 39E |
+| ОАЭ (CBUAE / DIFC / ADGM) | вне | 🟢 **вне во всех трёх контурах** |
+| РФ | вне | вне (по ранее зафиксированному в этом файле) |
+
+### Что осталось неизвестным после Г21
+
+1. 🔴 **Регистрация инвестиционных советников в ШТАТАХ США** — не исследовалась вовсе.
+   Есть непроверенная гипотеза, что ряд штатов требует регистрации от тех, кто
+   *holds himself out* как financial planner, даже без советов по бумагам. Если верно —
+   обходит всю федеральную защиту. **Кандидат №1 в следующий правовой батч.**
+2. 🔴 **Территориальность UK: s. 418 FSMA «carrying on in the UK»** — единственная
+   оставшаяся линия защиты по британскому долговому контуру, не исследована.
+3. Толкования Еврокомиссии и позиции нацрегуляторов (BaFin, AMF, Banca d'Italia, CBI)
+   по Art. 3(17) CCD II — не найдены. Вывод по п. 3 от них **не зависит** (получен
+   из текста Art. 16(6)), но подтверждение усилило бы позицию.
+4. Тексты SEC no-action letters — ни одного в оригинале (только изложение у Plaze);
+   ключевой Robert R. Champion (22.09.1986) не прочитан.
+5. Подзаконные регламенты Совета директоров CBUAE (Art. 65(2)(a)) и режим SCA
+   в ОАЭ onshore — не просматривались.
+6. Delaware, Rhode Island, Colorado по debt adjusting — осознанно не добирались
+   (задача «третий штат» закрыта Джорджией).
+
+### Процесс — прозрачно
+
+Тип запроса: **breadth-first**, 7 независимых под-вопросов. Субагентов: **ОДИН**
+(`base-kit:researcher`, по пункту 1 — США; 13 действий из 14, своих подагентов не запускал),
+остальные шесть пунктов вахта сняла сама прямыми запросами. Правило «по одному агенту
+за раз» соблюдено: в одном ходе ни разу не было больше одного вызова `Agent`.
+Собственных `WebSearch` — 4. Запись в файл велась **по ходу**, шестью отдельными
+дописываниями, до формирования итогового ответа.
+
+**Канал, решивший батч:** текстовый прокси `r.jina.ai`. Через него взято 11 из 14
+источников, включая все, что отдавали 202/403/пустое тело напрямую (EUR-Lex, sec.gov,
+justia, cfp.net, rulebook.centralbank.ae). Прямой `curl -sk --http1.1` с браузерным UA
+сработал только на `legislation.gov.uk` и `irishstatutebook.ie`.
+
+**Новые замеры каналов, зафиксировать для следующих батчей:**
+- 🟢 **Wayback поднялся** (200, 261 986 б) — канал, лежавший 16.09 в прошлых батчах, снова жив.
+- 🔴 **Cornell LII через прокси: код 200, но страницы USC отдаются БЕЗ статутного текста**
+  (только примечания). Судебные решения отдаются полностью. Правило: **USC брать
+  с `govinfo.gov`, судебные решения — с Cornell.**
+- 🔴 **CBUAE Rulebook отдаёт отменённые редакции по «красивым» slug-адресам**
+  (`article-65-financial-activities` → «Status: Repealed»). Брать только консолидированный
+  текст закона целиком.
+- 🔴 **`irishstatutebook.ie`: рабочий перечень S.I. — `/eli/<год>/si`** (без `/en/`,
+  без `.html`). Три «естественных» варианта адреса дают 404 — именно на этом
+  спотыкались прошлые заходы.
+
+---
+
+## ДОБОР Г26 (16.09.2026)
+
+Второй правовой заход после Г21. Состав — `docs/research/queue/COVERAGE_AUDIT_3.md`, «→ Г26».
+Пункты: (1) штаты США и financial planners; (2) s. 418 FSMA и PERG 2.4; (3) толкования CCD II
+Art. 3(17); (4) SEC no-action letters в оригинале. Запись ведётся по ходу, после каждого источника.
+
+### Г26.2 UK — s. 418 FSMA и PERG 2.4 (дословно)
+
+**Источник 1.** FSMA 2000 s. 418, legislation.gov.uk/ukpga/2000/8/section/418 — прямой `curl -sk --http1.1`
+с браузерным UA, **HTTP 200, 83 231 б** (XML-версия `/data.xml` — 200, 133 227 б), снято 16.09.2026.
+Норма закона (актуальная редакция, с крипто-кейсами 6B–6F).
+
+> **418 Carrying on regulated activities in the United Kingdom.**
+> (1) [In the cases] described in this section, a person who—
+> (a) is carrying on a regulated activity, but
+> (b) would not otherwise be regarded as carrying it on in the United Kingdom,
+> is, for the purposes of this Act, to be regarded as carrying it on in the United Kingdom.
+> (2) . . . [omitted] (3) . . . [omitted]
+> (4) The third case is where— (a) his registered office (or if he does not have a registered office
+> his head office) is in the United Kingdom; (b) the day-to-day management of the carrying on of the
+> regulated activity is the responsibility of— (i) his registered office (or head office); or
+> (ii) another establishment maintained by him in the United Kingdom.
+> (5) The fourth case is where— (a) his head office is not in the United Kingdom; but (b) the activity
+> is carried on from an establishment maintained by him in the United Kingdom.
+> (5A) . . . [omitted]
+> (5AA) The sixth case … [managing an AIF] …
+> **(6) [For the purposes of the preceding subsections] it is irrelevant where the person with whom the
+> activity is carried on is situated.**
+> (6B)–(6F) [ninth–eleventh cases: qualifying stablecoin, cryptoasset activities; «consumer» = an
+> individual in the United Kingdom …]
+> (7) . . . [omitted] (8) [AIF «marketed»]
+> Textual Amendments: F1 Words in s. 418(1) substituted (31.12.2020) by S.I. 2019/632, regs. 1(3), 86(2).
+
+**Источник 2.** FCA Handbook, PERG 2.4 «Link between activities and the United Kingdom»,
+`r.jina.ai/https://www.handbook.fca.org.uk/handbook/PERG/2/4.html` — **HTTP 200, 16 793 б**,
+снято 16.09.2026, раздел обновлён 29.07.2022. Это **guidance (G) регулятора**, не норма закона.
+
+> **PERG 2.4.1 G** Section 19 of the Act (The general prohibition) provides that the requirement to be
+> authorised under the Act only applies in relation to activities that are carried on 'in the United
+> Kingdom'. … when there is a cross-border element, for example because a client is outside the United
+> Kingdom or because some other element of the activity happens outside the United Kingdom, the question
+> may arise as to where the activity is carried on.
+>
+> **PERG 2.4.3 G** Section 418 of the Act … takes this one step further. **It extends the meaning that
+> 'in the United Kingdom' would ordinarily have by setting out additional cases.** …
+> (3) The case is where a regulated activity is carried on by a UK-based person and the day-to-day
+> management of the activity is the responsibility of an establishment in the United Kingdom.
+> (4) The case is where a regulated activity is carried on by a person who is not based in the United
+> Kingdom but is carried on from an establishment in the United Kingdom. …
+> ((1), (2), (5) — [deleted])
+>
+> **PERG 2.4.5 G** A person who is based outside the United Kingdom but who sets up an establishment in
+> the United Kingdom must therefore consider … Third, such a person will need to ensure that he does not
+> contravene other provisions of the Act that apply to persons who are not authorised. These include the
+> controls on financial promotion (section 21 …), and on giving the impression that a person is
+> authorised (section 24).
+>
+> 🔴 **PERG 2.4.6 G** A person based outside the United Kingdom **may also be carrying on activities in
+> the United Kingdom even if he does not have a place of business maintained by him in the United Kingdom
+> (for example, by means of the internet or other telecommunications system or by occasional visits).**
+> In that case, it will be relevant to consider whether what he is doing satisfies the business test as
+> it applies in relation to the activities in question. In addition, he may be able to rely on the
+> exclusions from certain regulated activities that apply in relation to overseas persons (see
+> PERG 2.9.15 G).
+
+**Выжимка.** s. 418 — норма **расширяющая**, а не ограничивающая: она добавляет случаи, когда
+деятельность *считается* осуществляемой в UK, и ни одного случая, когда она *не считается*. Поэтому
+«s. 418 нас защищает» — неверная постановка: защитить может только **общее значение** слов
+«in the United Kingdom» в s. 19, а s. 418 для нас нейтральна (у нас нет ни UK-офиса, ни UK-заведения —
+третий и четвёртый случаи не срабатывают). Общее значение FCA толкует **против** нас прямо: PERG 2.4.6G
+называет интернет примером того, как иностранец без места деятельности в UK всё-таки осуществляет
+деятельность в UK, и отсылает к двум фильтрам — business test и исключениям для overseas persons.
+Второй фильтр для нас закрыт (Г16/Г21: art. 72 RAO не содержит 39E). Остаётся только business test —
+см. следующий источник.
+
+**Источник 3.** FCA Handbook, PERG 2.3 «The business element»,
+`r.jina.ai/https://www.handbook.fca.org.uk/handbook/PERG/2/3.html` — **HTTP 200, 23 009 б**, 16.09.2026. Guidance.
+
+> **PERG 2.3.2 G (3B)** If a not-for-profit body is carrying on debt adjusting, debt counselling or
+> providing credit information services … it is to be regarded as doing so by way of business. …
+> This change to the business element does not apply, however, if the not-for-profit body carries on that
+> activity only on an occasional basis.
+> **(4)** The business element for all other regulated activities is that the activities are carried on
+> by way of business. This applies to … credit-related regulated activities …
+>
+> **PERG 2.3.3 G** Whether or not an activity is carried on by way of business is ultimately a question of
+> judgement that takes account of several factors (none of which is likely to be conclusive). These include
+> **the degree of continuity, the existence of a commercial element, the scale of the activity** and the
+> proportion which the activity bears to other activities carried on by the same person but which are not
+> regulated.
+
+**Источник 4.** FCA Handbook, PERG 2.9 «Regulated activities: exclusions applicable in certain circumstances»,
+`r.jina.ai/https://www.handbook.fca.org.uk/handbook/perg2/perg2s9` — **HTTP 200, 83 633 б**, 16.09.2026.
+(Адрес `/handbook/PERG/2/9.html` через прокси отдал ЧУЖОЙ раздел — PERG 2.10, 26 766 б; `/PERG/2/9A.html` —
+2 299 б пустышка. Правильный адрес — старая схема `perg2/perg2s9`.) Guidance.
+
+> **PERG 2.9.15 G** This group of exclusions applies, in specified circumstances, to the regulated
+> activities of: (1) dealing in investments as principal; (2) dealing in investments as agent;
+> (3) arranging (bringing about) deals in investments and making arrangements with a view to transactions
+> in investments; (3A) arranging a home finance transaction; (3B) operating a multilateral trading facility;
+> (3C) operating an organised trading facility; (4) advising on investments; (5) entering into a home finance
+> transaction; (6) administering a home finance transaction; and (7) agreeing to carry on [перечень] …
+>
+> **PERG 2.9.16 G** An overseas person is defined as a person who carries on what would be regulated
+> activities … but who does not do so, or offer to do so, from a permanent place of business maintained by
+> him in the United Kingdom. **Where a person does not have a permanent place of business in the United
+> Kingdom, he will not, in any event, need to rely on these exclusions unless what he does is regarded as
+> carried on in the United Kingdom (see PERG 2.4).** …
+>
+> **PERG 2.9.17 G** … (2) The second case is where a particular regulated activity is carried on as a
+> result of what is termed a 'legitimate approach'. An approach to an overseas person that has not been
+> solicited by him in any way, or has been solicited in a way that does not contravene the restrictions on
+> financial promotion in section 21 of the Act, is a legitimate approach. … In such circumstances, the
+> overseas person can, without requiring authorisation, … give advice in the United Kingdom …
+
+**Выжимка по UK (Г26.2).**
+1. Перечень PERG 2.9.15G подтверждает Г21 третьим независимым путём: **debt counselling (art. 39E) в
+   исключениях для overseas persons нет**. Механизм «legitimate approach» (PERG 2.9.17G(2)) — тот самый,
+   который спасал бы нас при обращении UK-пользователя по своей инициативе, — для долгового контура
+   **недоступен**.
+2. **Business test нас не спасает:** непрерывность, коммерческий элемент, масштаб (PERG 2.3.3G) — это
+   ровно описание SaaS-подписки. Для credit-related activities тест «by way of business» (PERG 2.3.2G(4));
+   даже некоммерческий поставщик debt counselling считается действующим by way of business (3B).
+3. **Прямой ответ: s. 418 нас НЕ защищает — она вообще не про защиту.** Это норма-расширитель. Вопрос
+   решается общим значением «in the United Kingdom» в s. 19, и регулятор (guidance, не закон, не суд)
+   прямо называет интернет примером деятельности в UK без места деятельности в UK (PERG 2.4.6G).
+   Судебного толкования этого места в заходе не добыто (см. ниже, поиск). Единственная инженерная
+   защита, которая остаётся, — **не вести деятельность в UK фактически**: не принимать UK-пользователей
+   для долгового модуля (геоблок/проверка резидентства при регистрации), не таргетировать UK
+   (фунты, UK-кредиторы, реклама на UK). Это вывод из совокупности норм, а не цитата.
+4. Независимо от авторизации, s. 21 FSMA (financial promotion) применяется к сообщениям, «capable of
+   having an effect in the United Kingdom» — упомянут в PERG 2.4.5G; текст s. 21(3) в этом заходе не
+   снимался.
+
+**Источник 5.** FSMA 2000 s. 21, legislation.gov.uk/ukpga/2000/8/section/21 — прямой `curl`, **HTTP 200,
+89 522 б**, 16.09.2026. Норма закона.
+
+> **21 Restrictions on financial promotion.** (1) A person ("A") must not, in the course of business,
+> communicate an invitation or inducement to (a) engage in investment activity, or (b) to engage in claims
+> management activity.
+> (2) But subsection (1) does not apply if— (a) A is an authorised person; or (b) the content of the
+> communication is approved for the purposes of this section by an authorised person. …
+> **(3) In the case of a communication originating outside the United Kingdom, subsection (1) applies only
+> if the communication is capable of having an effect in the United Kingdom.**
+
+**Источник 6.** Financial Promotion Order 2005 (SI 2005/1529), Schedule 1, legislation.gov.uk/uksi/2005/1529/schedule/1
+— прямой `curl`, **HTTP 200, 498 204 б**, 16.09.2026 (адрес `/schedule/1/part/1` — 404). Норма (подзаконный акт).
+
+> **Debt-counselling. 5B.** — (1) Advising a borrower about the liquidation of a debt due under a relevant
+> credit agreement is a controlled activity. (2) Advising a hirer about the liquidation of a debt due under a
+> consumer hire agreement is a controlled activity.
+> [Textual Amendments F45: Sch. 1 paras. 5A, 5B inserted (26.7.2013 …, 1.4.2014 …) by S.I. 2013/1881,
+> arts. 1(2)(6), 17(6)(b)]
+
+**Выжимка.** Для UK у нас ДВА независимых территориальных крючка, и второй мягче первого не бывает:
+(а) s. 19 — «carrying on in the UK» (оценочно, PERG 2.4.6G прямо против нас); (б) **s. 21(3) —
+«capable of having an effect in the UK»**, и debt counselling — **controlled activity** по FPO Sch. 1
+para. 5B, то есть реклама долгового модуля, доступная UK-аудитории, сама по себе — financial promotion,
+даже если s. 19 бы не сработал. Baker McKenzie Resource Hub (UK, «main sources of regulatory laws»,
+через `r.jina.ai`, HTTP 200, 4 699 б, 16.09.2026 — комментарий юрфирмы) формулирует то же:
+«These restrictions apply separately to one another: it is possible that a particular activity is not
+considered to be carrying on a regulated activity in the UK …, but sending communications to customers in
+relation to that activity may still be a breach of the financial promotion restriction. A breach of either
+of these restrictions is a criminal offense and may result in certain agreements being unenforceable.»
+Судебной практики по интернет-случаю s. 19 не добыто: `WebSearch` (1 запрос) дал только LexisNexis
+Practice Note «Territorial scope of the general prohibition» (платный, не открывался) и страницы FCA.
+
+### Г26.1 Штаты США — financial planners без ценных бумаг
+
+**Источник 7.** Nevada Revised Statutes, Chapter 628A «Financial Planners»,
+`r.jina.ai/https://www.leg.state.nv.us/nrs/nrs-628a.html` — **HTTP 200, 5 736 б**, 16.09.2026
+(ревизия на странице: «Rev. 4/15/2026 … 2025»). Норма закона штата, полный текст главы (4 секции).
+
+> **NRS 628A.010 Definitions.** As used in this chapter, unless the context otherwise requires:
+> 1. "Client" means a person who receives advice from a financial planner.
+> 2. "Compensation" means a fee for services provided by a financial planner to a client or a commission or
+> other remuneration derived by a financial planner from a person other than the client as the result of the
+> purchase of a good or service by the client.
+> 3. **"Financial planner" means a person who for compensation advises others upon the investment of money or
+> upon provision for income to be needed in the future, or who holds himself or herself out as qualified to
+> perform either of these functions**, but does not include: (a) An attorney …; (b) A certified public
+> accountant …; or (c) A producer of insurance … or an insurance consultant …, whose advice upon investment
+> or provision of future income is incidental to the practice of his or her profession or business.
+> (Added 1993, 1372; A 1995, 1453, 1635; 1997, 530; 2001, 2256; 2017, 1796, 3476)
+>
+> **NRS 628A.020 Duties of financial planner.** A financial planner has the duty of a fiduciary toward a
+> client. A financial planner shall disclose to a client, at the time advice is given, any gain the financial
+> planner may receive, such as profit or commission, if the advice is followed. **A financial planner shall
+> make diligent inquiry of each client to ascertain initially, and keep currently informed concerning, the
+> client's financial circumstances and obligations and the client's present and anticipated obligations to
+> and goals for his or her family.**
+>
+> **NRS 628A.030 Liability of financial planner.** 1. If loss results from following a financial planner's
+> advice under any of the circumstances listed in subsection 2, the client may recover from the financial
+> planner in a civil action the amount of the economic loss and all costs of litigation and attorney's fees.
+> 2. … the financial planner: (a) Violated any element of his or her fiduciary duty; (b) **Was grossly
+> negligent in selecting the course of action advised, in the light of all the client's circumstances known
+> to the financial planner**; or (c) Violated any law of this State in recommending the investment or service.
+>
+> **NRS 628A.040** 1. Except as otherwise provided in subsection 2, **a financial planner shall maintain
+> insurance covering liability for errors or omissions, or a surety bond to compensate clients for losses
+> actionable pursuant to this chapter, in an amount of $1,000,000 or more.** 2. The provisions of
+> subsection 1 do not apply to: (a) A broker-dealer or sales representative licensed pursuant to NRS 90.310
+> or exempt under NRS 90.320; or (b) An investment adviser licensed pursuant to NRS 90.330 or exempt under
+> NRS 90.340 or 90.345. (A 2017, 1796; 2021, 249)
+
+**Выжимка (Невада).** 🔴 **Главная находка пункта.** Регистрации NRS 628A **не требует** — но определение
+не привязано к ценным бумагам: «investment of money» (не «securities») **или** «provision for income to be
+needed in the future», плюс ветка holding out. Цель накоплений / резерв / пенсионная цель FINPILOT — прямо
+«provision for income to be needed in the future». Последствия при попадании: (1) фидуциарная обязанность;
+(2) гражданская ответственность за убытки с судебными расходами и гонорарами адвокатов, в т.ч. за **gross
+negligence в выборе рекомендованного курса**; (3) **обязательная страховка E&O или surety bond от
+$1 000 000**, от которой освобождены только зарегистрированные брокеры и инвестсоветники — то есть
+в Неваде «быть вне Advisers Act» делает положение **хуже**, а не лучше. Вопрос, является ли автоматический
+сервис «person who advises», и применяется ли глава к иностранному поставщику без присутствия в Неваде,
+текстом не решён; толкований/практики в заходе не добыто. Порядок величин: это не лицензия, а
+частноправовой и страховой режим; нарушение 628A.040 глава санкцией не снабжает (санкций в тексте нет).
+
+**Источник 8.** Uniform Securities Act (2002), NCCUSL, «without prefatory note or comments»,
+uniformlaws.org/HigherLogic/System/DownloadDocumentFile.ashx?DocumentFileKey=af36852d-457e-db56-3fc2-b2485cdc47e9 —
+прямой `curl`, **HTTP 200, 648 853 б, PDF 101 стр.**, `pdftotext`, 16.09.2026. (Копия на nasaa.org —
+`curl` 403, 2 335 б.) Это **модельный закон**, силу имеет только в редакции, принятой штатом.
+
+> **SECTION 102 (15)** "Investment adviser" means a person that, for compensation, engages in the business of
+> advising others, either directly or through publications or writings, **as to the value of securities or the
+> advisability of investing in, purchasing, or selling securities** or that, for compensation and as a part of
+> a regular business, issues or promulgates analyses or reports **concerning securities**. **The term includes a
+> financial planner or other person that, as an integral component of other financially related services,
+> provides investment advice to others for compensation as part of a business or that holds itself out as
+> providing investment advice to others for compensation.** The term does not include: (A) an investment adviser
+> representative; (B) a lawyer, accountant, engineer, or teacher whose performance of investment advice is solely
+> incidental …; (C) a broker-dealer …; (D) a publisher of a bona fide newspaper, news magazine, or business or
+> financial publication of general and regular circulation; (E) a federal covered investment adviser; (F) a bank
+> or savings institution; (G) any other person that is excluded by the Investment Advisers Act of 1940 from the
+> definition of investment adviser; or (H) any other person excluded by rule or order under this [Act].
+>
+> **(16)** "Investment adviser representative" means an individual employed by or associated with an investment
+> adviser … and who makes any recommendations or otherwise gives investment advice **regarding securities** …
+>
+> **SECTION 403. (a)** It is unlawful for a person to transact business in this State as an investment adviser
+> unless the person is registered under this [Act] as an investment adviser or is exempt …
+> **(b)** … exempt …: (1) a person without a place of business in this State that is registered under the
+> securities act of the state in which the person has its principal place of business if its only clients in this
+> State are: [(A)–(D) профессионалы, institutional investors, bona fide preexisting clients …]; **(2) a person
+> without a place of business in this State if the person has had, during the preceding 12 months, not more than
+> five clients that are residents of this State** in addition to those specified under paragraph (1); or
+> (3) any other person exempted by rule or order under this [Act].
+
+**Выжимка (модельный закон).** Гипотеза «financial planner презюмируется инвестсоветником без ценных бумаг»
+по тексту USA 2002 **не подтверждается**: вторая фраза § 102(15) включает financial planner, который
+«provides **investment advice**» или holds itself out as providing «**investment advice**», а весь контекст
+определения и соседнего (16) — advice «regarding securities». Фраза расширяет круг ЛИЦ (планировщик, для
+которого совет — «integral component of other financially related services»), но не ПРЕДМЕТ. Рыночный
+смысл тот же, что федерально: без ценных бумаг — не investment adviser. 🔴 Но ветка holding out в модельном
+законе есть: называть себя «providing investment advice» опасно само по себе. Де-минимис § 403(b)(2)
+(≤5 клиентов-резидентов за 12 мес. без места деятельности в штате) для массового SaaS бесполезен.
+
+**Источник 9.** Joel Seligman, «The New Uniform Securities Act», *Washington University Law Quarterly*, vol. 81,
+p. 243 (2003), journals.library.wustl.edu/lawreview/article/6457/galley/23290/download/ — прямой `curl`,
+**HTTP 200, 904 835 б, PDF 57 стр.**, `pdftotext`, 16.09.2026. Статья репортёра разработки USA 2002
+(доктрина; текст совпадает по смыслу с Official Comment к § 102(15) — сам Comment в этом заходе НЕ снят,
+версия NCCUSL «without comments»).
+
+> The definition of "investment adviser" is in Section 102(15). This term generally follows the definition in
+> Section 202(a)(11) of the Investment Advisers Act of 1940, but has been updated to take into account new media
+> such as the Internet.[24]
+> **The second sentence in the term addressing financial planners is new. The purpose of this sentence is to
+> achieve functional regulation of financial planners who satisfy the definition of investment adviser.**[25]
+> This reference is not intended to preclude persons who hold a formally recognized financial planning or
+> consulting designation or certification from using this designation. **The use by a person of a title,
+> designation or certification as a financial planner or other similar title, designation, or certification
+> alone does not require registration as an investment adviser.**
+>
+> [fn. 24] **The first sentence in Section 102(15) is identical to the first sentence in the 1956 Act Section
+> 401(f)** and the counterpart language in Section 202(a)(11). … These terms have been returned to Section
+> 102(15) because of the intention that this definition be construed uniformly with the definition in
+> Section 202(a)(11) of the Investment Advisers Act of 1940. …
+> [fn. 25] Cf. … Investment Advisers Release No. IA-1,092, 39 SEC Docket 494 (Oct. 8, 1987) (similar approach
+> in SEC Interpretative Release).
+
+**Выжимка.** 🟢 Гипотеза пункта 1 **опровергнута для модельного закона прямым текстом разработчика**:
+(1) в USA 1956 § 401(f) фразы о financial planner нет вовсе — первая фраза идентична федеральной;
+(2) в USA 2002 фраза добавлена для «functional regulation of financial planners **who satisfy the definition
+of investment adviser**», т. е. тех, кто советует о ценных бумагах; (3) сам титул «financial planner»
+регистрации **не требует**; (4) толковать предписано единообразно с § 202(a)(11) Advisers Act и IA-1092 —
+значит, вывод Г21 (без securities — вне) переносится на штаты модельного закона. Остаются: штаты с
+собственными законами о financial planners вне securities act (Невада — см. выше) и штаты, отступившие
+от модельного текста. Это проверяется ниже.
+
+**Источник 10.** U.S. GAO, GAO-11-235 «Consumer Finance: Regulatory Coverage Generally Exists for Financial
+Planners, but Consumer Protection Issues Remain», 18.01.2011, gao.gov/assets/a314689.html — прямой `curl` 403
+(388 б), через `r.jina.ai` **HTTP 200, 125 846 б**, 16.09.2026. Отчёт федерального аудитора (не норма, не
+позиция регулятора; внутри — пересказ позиций SEC staff и NASAA).
+
+> Most states regulate the use of the title "financial planner," and state securities and insurance laws can
+> apply to the misuse of this title and other titles. For example, **according to NASAA, at least 29 states
+> specifically include financial planners in their definition of investment adviser.**[25] …
+> [25] The District of Columbia and Puerto Rico also include financial [planners …]
+>
+> As noted earlier, the activities a financial planner normally engages in generally include advice related to
+> securities--and such activities make financial planners subject to regulation under the Advisers Act. …
+> **SEC staff told us that financial planners holding even broad discussions of securities--for example, what
+> proportion of a portfolio should be invested in stocks--would be required to register** as investment advisers
+> or investment adviser representatives. **In theory, a financial planner could offer only services that do not
+> fall under existing regulatory regimes--for example, advice on household budgeting--but such an example is
+> likely hypothetical and such a business model may be hard to sustain.** SEC and NASAA staff, a majority of the
+> state securities regulators we spoke with, and many representatives of the financial services industry told us
+> that they were not aware of any individuals serving as financial planners who were not regulated as investment
+> advisers or regulated under another regulatory regime. Some regulators and industry representatives also said
+> that, **to the extent that financial planners offered services that did not fall under such regulation, the new
+> Bureau of Consumer Financial Protection potentially could have jurisdiction over such services.**[27]
+>
+> … Federal and state regulators told us **they generally focused their oversight and enforcement actions on
+> financial planners' activities rather than the titles they use.** Moreover, NASAA has said that no matter what
+> title financial planners use, most are required to register as investment adviser representatives …
+
+**Выжимка.** «29 штатов включают financial planners в определение investment adviser» — это та самая фраза
+модельного USA 2002 (штаты, принявшие его или аналог), и по Seligman она работает только для планировщиков,
+советующих о securities. Федеральный аудитор прямо называет «advice on household budgeting» сервисом **вне
+существующих режимов** (на 2011 г.) и указывает на CFPB как на возможного регулятора такого сервиса — это
+новый хвост: CFPB/UDAAP, а не регистрация. Надзор, по словам регуляторов, смотрит на **деятельность, а не
+титул** — это против гипотезы «holding out как financial planner сам по себе требует регистрации».
+
+**Источник 11.** 🔴 Washington, **RCW 21.20.005(8)** (Securities Act of Washington, Definitions),
+app.leg.wa.gov/RCW/default.aspx?cite=21.20.005 — прямой `curl`, **HTTP 200, 122 119 б**, 16.09.2026.
+Норма закона штата, действующая редакция; история: «[2011 c 336 s 594; 2002 c 65 s 1; 1998 c 15 s 1;
+1994 c 256 s 3. Prior: 1993 c 472 s 14; 1993 c 470 s 4; 1989 c 391 s 1; …]».
+
+> **(8) "Investment adviser"** means any person who, for compensation, engages in the business of advising
+> others, either directly or through publications or writings, as to the value of securities or as to the
+> advisability of investing in, purchasing, or selling securities, or who, for compensation and as a part of a
+> regular business, issues or promulgates analyses or reports concerning securities. "Investment adviser" also
+> includes financial planners and other persons who, as an integral component of other financially related
+> services, (a) provide the foregoing investment advisory services to others for compensation as part of a
+> business or (b) hold themselves out as providing the foregoing investment advisory services to others for
+> compensation. **Investment adviser shall also include any person who holds himself or herself out as a
+> financial planner.** "Investment adviser" does not include (a) a bank, savings institution, or trust company,
+> (b) a lawyer, accountant, certified public accountant …, engineer, or teacher whose performance of these
+> services is solely incidental …, (c) a broker-dealer …, (d) a publisher of any bona fide newspaper, news
+> magazine, news column, newsletter, or business or financial publication or service, whether communicated in
+> hard copy form, by electronic means, or otherwise, **that does not consist of the rendering of advice on the
+> basis of the specific investment situation of each client**, (e) a radio or television station, (f) a person
+> whose advice, analyses, or reports relate only to securities exempted by RCW 21.20.310(1), (g) an investment
+> adviser representative, or (h) such other persons not within the intent of this paragraph as the director may
+> by rule or order designate.
+>
+> **(9) "Investment adviser representative"** means … individual … employed by or associated with an investment
+> adviser, and who does any of the following: (a) Makes any recommendations or otherwise renders advice regarding
+> securities; (b) Manages accounts or portfolios of clients; (c) Determines which recommendation or advice
+> regarding securities should be given; (d) Solicits, offers, or negotiates for the sale of or sells investment
+> advisory services; …
+
+**Источник 12.** Washington DFI, Securities Act Interpretive Statement 22 (адаптирован 01.04.2002, W. M. Beatty,
+General Counsel), dfi.wa.gov/industry/securities-act-interpretive-statements/securities-act-interpretive-statement-22 —
+через `r.jina.ai` **HTTP 200, 9 905 б**, 16.09.2026. Позиция отдела ценных бумаг штата (толкование, не норма).
+Цитирует тогдашнюю редакцию (номер пункта (6), текст про financial planner идентичен) и регистрационную норму:
+
+> **RCW 21.20.040(3)** It is unlawful for any person to transact business in this state as an investment adviser
+> or investment adviser representative unless: (a) The person is so registered or exempt from registration under
+> this chapter; (b) the person has no place of business in this state and (i) the person's only clients in this
+> state are [профессиональные клиенты] …, or (ii) **during the preceding twelve-month period the person has had
+> fewer than six clients who are residents of this state** other than those specified in (b)(i) …; (c) … adviser
+> to an investment company …; (d) the person is a federal covered adviser and … complied with … RCW 21.20.050;
+> or (e) the person is excepted from the definition of investment adviser under section 202(a)(11) of the
+> Investment Advisers Act of 1940.
+> (Текст (3) — в редакции 2002 г. по цитате DFI; актуальная редакция RCW 21.20.040 в заходе не снималась.)
+
+**Выжимка (Вашингтон).** 🔴 **Гипотеза пункта 1 ПОДТВЕРЖДЕНА для штата Вашингтон — текстом закона.**
+Третья фраза RCW 21.20.005(8) — самостоятельная ветка определения, не связанная словами с securities:
+«any person who holds himself or herself out as a financial planner». В отличие от модельного закона (где
+разработчик прямо сказал, что титул сам по себе регистрации не требует), здесь законодатель штата написал
+обратное. Следствие по RCW 21.20.040(3): «transact business in this state as an investment adviser» без
+регистрации незаконно; де-минимис — меньше шести клиентов-резидентов за 12 мес. при отсутствии места
+деятельности в штате — массовому сервису не подходит. Исключение (d) для издателей не работает: оно снято,
+если издание «consist[s] of the rendering of advice on the basis of the specific investment situation of each
+client», а мы персонализированы. Исключение (3)(e) отсылает к **изъятиям** из § 202(a)(11) (банки, юристы,
+издатели …), а не к «не подпадающим под определение» — толкования DFI на этот счёт в заходе не найдено.
+**Инженерный вывод:** в продукте, доступном резидентам Вашингтона, **нельзя называть себя «financial
+planner» / «financial planning»** — ни в интерфейсе, ни в маркетинге, ни в App Store. Функция при этом не
+меняется: по функции (без securities) мы вне первой и второй веток, как федерально. Попадание — только через
+титул, и снимается словарём.
+
+**Источник 13.** North Carolina, G.S. 78C-2(1) (Investment Advisers Act of North Carolina), ncleg.gov/enactedlegislation/statutes/html/bychapter/chapter_78c.html —
+прямой `curl` **403** (4 545 б), через `r.jina.ai` **HTTP 200, 90 964 б**, 16.09.2026. Норма закона штата.
+
+> **(1) "Investment adviser"** means any person who, for compensation, engages in the business of advising
+> others … as to the value of securities or as to the advisability of investing in, purchasing, or selling
+> securities, or who, for compensation and as part of a regular business, issues or promulgates analyses or
+> reports concerning securities. "Investment adviser" also includes financial planners and other persons who,
+> as an integral component of other financially related services, provide the foregoing investment advisory
+> services to others for compensation and as a part of a business or who hold themselves out as providing the
+> foregoing investment advisory services to others for compensation. "Investment adviser" does not include: …
+
+**Выжимка.** Северная Каролина — типичный штат модели 1986/2002: фразы «holds himself out as a financial
+planner» **нет**; планировщик попадает только через «**the foregoing** investment advisory services» (т. е.
+по securities). Контрольный пример того, что Вашингтон — отступление от модели, а не норма.
+
+**Источник 14.** Beach Street Legal LLC, «When Does a Financial Planner Need to Register as an Investment
+Adviser?», 01.02.2018, beachstreetlegal.com/when-does-a-financial-planner-need-to-register-as-an-investment-adviser/ —
+через `r.jina.ai` **HTTP 200, 8 475 б**, 16.09.2026. Комментарий юрфирмы; содержит цитату **Official Comment
+No. 15 к USA 1956 (в ред. NASAA 1986)** — первоисточник комментария в заходе снять не удалось (см. ниже).
+
+> NASAA adopted this clarifying amendment to include financial planners in 1986, largely in response to
+> Investment Advisers Act Release No. 770 (the predecessor to Release No. 1092). However, Comment No. 15 to the
+> Uniform Securities Act goes on to say that
+> > The provision defining an "investment adviser" to include financial planners […] **should not be construed
+> > to mean that all financial planners fall within the definition by virtue of their designation as "financial
+> > planners." Financial planners rendering advice exclusively in such nonsecurities areas as insurance and budget
+> > management, for example, would not be covered by the definition. However, persons offering "total financial
+> > planning" would be holding themselves out as providing investment advisory services. For similar reasons, the
+> > drafters thought it inappropriate to define an "investment adviser" as "a person who holds himself out as a
+> > financial planner.**"
+
+**Выжимка.** Разработчики модели **сознательно отказались** от формулы, которую затем принял Вашингтон.
+Для нас две вещи: (1) «budget management» прямо назван вне определения — наш базовый функционал;
+(2) 🔴 «**total financial planning**» = holding out как инвестсоветник — ещё одна запрещённая формулировка
+в словарь продукта («comprehensive / holistic / total financial planning»).
+
+**Источник 15 (первоисточник к 14).** NASAA, «Uniform Securities Act (1956), as amended» с комментариями,
+PDF 57 стр., `r.jina.ai/http://www.nasaa.org/wp-content/uploads/2011/08/UniformSecuritesAct1956withcomments.pdf` —
+**HTTP 200, 229 875 б**, 16.09.2026 (прямой `curl` к nasaa.org — 403). Модельный закон + официальный
+комментарий разработчиков (NASAA).
+
+> **§ 401(f)** "Investment adviser" means any person who, for compensation, engages in the business of advising
+> others … as to the value of securities or as to the advisability of investing in, purchasing, or selling
+> securities, or who, for compensation and as a part of a regular business, issues or promulgates analyses or
+> reports concerning securities. "Investment adviser" also includes financial planners and other persons who, as
+> an integral component of other financially related services, provide the foregoing investment advisory services
+> to others for compensation and as part of a business or who hold themselves out as providing the foregoing
+> investment advisory services to others for compensation. …
+>
+> **Comment .15** The clarifying amendment [in Section 401(f)] … was largely patterned after the language found in
+> SEC Release No. IA-770 of August 13, 1981. The drafters feel that any person in the business of providing advice
+> or issuing reports or analyses regarding securities for compensation is an investment adviser. … **The provision
+> defining an "investment adviser" to include financial planners … should not be construed to mean that all
+> financial planners fall within the definition by virtue of their designation as "financial planners." Financial
+> planners rendering advice exclusively in such non-securities areas as insurance and budget management, for
+> example, would not be covered by the definition. However, persons offering "total financial planning" would be
+> holding themselves out as providing investment advisory services. For similar reasons, the drafters thought it
+> inappropriate to define an "investment adviser" as "a person who holds himself out as a financial planner."** A
+> definition so worded would cover persons who, while not rendering investment advice, sell insurance and other
+> non-securities financial products as "financial planners." Extending the "investment adviser" definition to
+> those persons would possibly involve an incursion on the regulatory jurisdiction of state regulators other than
+> the state securities administrator. **It should be noted, however, that use of the term "financial planner" by a
+> person engaged in product sales only without disclosing that he or she is merely a salesperson may constitute a
+> deceptive practice that should be addressed by state financial services and consumer protection agencies.**
+> … For purposes of the exclusions in Sections 401(f)(3) and 401(f)(4), financial planners and others who hold
+> themselves out as providing investment advisory services for compensation may not claim that the services
+> rendered are "solely incidental" to another activity.
+
+**Выжимка.** Цитата Beach Street Legal сверена с первоисточником — совпадает. Вашингтон прямо принял формулу,
+которую NASAA назвала неуместной. Последняя фраза комментария — второй, не-регистрационный риск: титул
+«financial planner» у того, кто на деле продаёт продукты (для нас — партнёрская выдача), может быть deceptive
+practice по законам штатов о защите потребителей.
+
+**Источник 16.** 🔴 Washington, **RCW 21.20.040** (действующая редакция; история «[2016 c 61 s 1; 2002 c 65 s 3; …]»),
+app.leg.wa.gov/RCW/default.aspx?cite=21.20.040 — прямой `curl`, **HTTP 200, 114 370 б**, 16.09.2026. Норма закона.
+
+> (3) It is unlawful for any person to transact business in this state as an investment adviser or investment
+> adviser representative unless: (a) The person is so registered or exempt from registration under this chapter;
+> (b) the person has no place of business in this state and … (ii) during the preceding twelve-month period the
+> person has had fewer than six clients who are residents of this state …; (c) …; (d) the person is a federal
+> covered adviser and … complied with … RCW 21.20.050; or (e) the person is excepted from the definition of
+> investment adviser under section 202(a)(11) of the Investment Advisers Act of 1940.
+> **(4) It is unlawful for any person, other than a federal covered adviser, to hold himself or herself out as, or
+> otherwise represent that he or she is a "financial planner," "investment counselor," or other similar term, as
+> may be specified in rules adopted by the director, unless the person is registered as an investment adviser or
+> investment adviser representative, is exempt from registration as an investment adviser or investment adviser
+> representative under RCW 21.20.040, or is excluded from the definition of investment adviser under RCW 21.20.005.**
+
+**Источник 17.** Washington Administrative Code **WAC 460-24A-040** «Use of certain terms deemed similar to
+"financial planner" or "investment counselor"», app.leg.wa.gov/WAC/default.aspx?cite=460-24A-040 — прямой `curl`,
+**HTTP 200, 111 108 б**, 16.09.2026. Правило регулятора (DFI Securities Division); ред. WSR 19-03-133, eff. 18.02.2019.
+
+> (1) For the purposes of RCW 21.20.040(4), use of any term, or abbreviation for a term, including the word
+> "financial planner" or the word "investment counselor" is considered the same as the use of either of those
+> terms alone.
+> (2) For the purposes of RCW 21.20.040(4), terms that are deemed similar to "financial planner" and "investment
+> counselor" include, but are not limited to, the following: **(a) Financial consultant; (b) Investment consultant;
+> (c) Money manager; (d) Investment manager; (e) Investment planner;** (f) Chartered financial consultant or its
+> abbreviation ChFC; (g) Certified financial planner or its abbreviation CFP®; or **(h) Any combination of terms
+> similar to the above if used in a manner that implies to the general public that the individual or entity using
+> the terms is in the business of providing investment advisory or financial planning services.**
+
+**Источник 18.** **WAC 460-24A-045** «Holding out as a financial planner», app.leg.wa.gov/WAC/default.aspx?cite=460-24A-045 —
+прямой `curl`, **HTTP 200, 112 652 б**, 16.09.2026. Правило регулятора; ред. WSR 19-03-133, eff. 18.02.2019.
+
+> If you use a term deemed similar to "financial planner" or "investment counselor" under WAC 460-24A-040(2), you
+> will not be considered to be holding yourself out as a financial planner for purposes of RCW 21.20.005 and
+> 21.20.040 under the following circumstances:
+> (1) You are not in the business of providing advice relating to the purchase or sale of securities, and would
+> not, but for your use of such a term, be an investment adviser required to register pursuant to RCW 21.20.040; and
+> (2) You do not directly or indirectly receive a fee for providing investment advice. …; and
+> (3) You deliver to every customer, **at least forty-eight hours before accepting any compensation**, including
+> commissions from the sale of any investment product, a written disclosure including the following information:
+> (a) You are not registered as an investment adviser or investment adviser representative in the state of
+> Washington; **(b) You are not authorized to provide financial planning or investment advisory services and do not
+> provide such services;** and (c) A brief description of your business which description must include a statement
+> of the kind of products offered or services provided … and of the basis on which you are compensated …; and
+> (4) You have each customer to whom a disclosure described in subsection (3) … is given **sign a written dated
+> acknowledgment of receipt** of the disclosure; and
+> (5) You retain the executed acknowledgments … but in no case for less than three years from date of execution …; and
+> (6) If you received compensation from the customer on more than one occasion, you need give the customer the
+> disclosure … only on the first occasion unless the information in the disclosure becomes inaccurate …
+
+Попутно (контекст, не норма): WSR 08-09-126 (DFI, proposed rules, 22.04.2008; lawfilesext.leg.wa.gov, прямой
+`curl` 200, 13 458 б) — цель поправок: «a person who uses a term or abbreviation thereof, **or engages in any
+conduct, that would lead a reasonable person to believe** that the person is holding himself or herself out as a
+"financial planner" … is therefore subject to registration as an investment adviser»; HB 2885-S (1999–2000,
+digest, 200, 6 983 б) — законопроект о членстве в организациях с «financial planner» в названии.
+
+**Выжимка (Вашингтон, окончательно).** Механизм двухслойный: (а) титул делает лицом «investment adviser»
+(RCW 21.20.005(8), третья фраза) → нужна регистрация (21.20.040(3)); (б) отдельный запрет титула без
+регистрации (21.20.040(4)). Перечень титулов — открытый и широкий: **«money manager», «financial consultant»,
+«investment planner»** и любая комбинация, создающая впечатление «financial planning services». Безопасная гавань
+WAC 460-24A-045 доступна тем, кто не советует о securities (это мы), но требует письменного раскрытия **за 48 часов
+до любой оплаты** с подписью клиента и хранением 3 года, причём само раскрытие обязано сказать «**не оказываем
+услуг финансового планирования**» — то есть гавань несовместима с маркетингом «financial planning». Для
+онлайн-подписки выполнимость «written dated acknowledgment» электронной подписью текстом правила не решена.
+🔴 **Ответ по штату: регистрация НЕ нужна, пока мы не используем титулы из WAC 460-24A-040 (включая «money
+manager») и не создаём впечатления «financial planning services». С титулом — нужна (или гавань 045 с её
+процедурой).** Толкований DFI, прямо применённых к приложениям/SaaS, в заходе не найдено.
+
+**Источник 19.** 🔴 Maryland Securities Act, **Md. Code, Corps. & Ass'ns § 11-101(i)** (Justia, «2025 Maryland Statutes»),
+`r.jina.ai/https://law.justia.com/codes/maryland/corporations-and-associations/title-11/subtitle-1/section-11-101/` —
+**HTTP 200, 10 312 б**, 16.09.2026. (Официальный mgaleg.maryland.gov через прокси — 200, 17 299 б, но текст статьи
+не отрендерен, только оболочка сайта.) Норма закона штата; сверка с официальным сайтом не выполнена.
+
+> **(i)(1) "Investment adviser" means a person who, for compensation:**
+> (i) Engages in the business of advising others … as to the value of securities or as to the advisability of
+> investing in, purchasing, or selling securities, or who, for compensation and as a part of a regular business,
+> issues or promulgates analyses or reports concerning securities; **or**
+> (ii) **1. Provides or offers to provide, directly or indirectly, financial and investment counseling or advice, on
+> a group or individual basis;**
+> **2. Gathers information relating to investments, establishes financial goals and objectives, processes and
+> analyzes the information gathered, and recommends a financial plan;** or
+> **3. Holds out as an investment adviser in any way, including indicating by advertisement, card, or letterhead,
+> or in any other manner indicates that the person is, a financial or investment "planner", "counselor",
+> "consultant", or any other similar type of adviser or consultant.**
+> (2) "Investment adviser" does not include: (i) An investment adviser representative; (ii) A bank, savings
+> institution, or trust company; (iii) A lawyer, certified public accountant, engineer, insurance producer, or
+> teacher whose performance of investment advisory services is solely incidental … ; (iv) A broker-dealer … ;
+> **(v) A publisher of any bona fide newspaper, news column, newsletter, news magazine, or business or financial
+> publication or service, whether communicated in hard copy form, or by electronic means, or otherwise, that does not
+> consist of the rendering of advice on the basis of the specific investment situation of each client;**
+> (vi) A federal covered adviser; or (vii) Any other person not within the intent of this subsection as the
+> Commissioner by rule or order designates.
+
+**Выжимка (Мэриленд).** 🔴 **Самый широкий из найденных штатов — и он ловит нас не только титулом, но и
+функцией.** Ветка (ii) — альтернативная к securities-ветке (i) (соединитель «or») и слова «securities» не
+содержит. Три самостоятельных триггера, каждый — «for compensation»:
+- (ii)1 — «financial **and** investment counseling or advice». Союз «and» даёт довод, что нужен и финансовый,
+  и инвестиционный совет вместе; у нас инвестиционного совета нет. Довод текстовый, толкования не добыто.
+- (ii)2 — **описание процесса финпланирования почти один в один с нашим конвейером**: собрать информацию, задать
+  финансовые цели, обработать и проанализировать, рекомендовать финансовый план. Единственная опора против —
+  слова «information **relating to investments**». Если вклады/накопительные счета/резерв считать «investments»
+  в бытовом смысле — FINPILOT попадает. Толкования Maryland Securities Division в заходе не найдено.
+- (ii)3 — титул: «financial … "planner", "counselor", "consultant", **or any other similar type of adviser**».
+  Шире Вашингтона: ловит и «financial adviser», и «financial coach» по «similar type».
+
+**Источник 20.** Colorado Securities Act, **C.R.S. § 11-51-201(9.5)** (Justia),
+`r.jina.ai/https://law.justia.com/codes/colorado/title-11/securities/article-51/part-2/section-11-51-201/` —
+**HTTP 200, 22 732 б**, 16.09.2026. Норма закона штата (по Justia, без сверки с официальным сайтом).
+
+> (9.5)(a)(I) "Investment adviser" means any person who, for compensation, engages in the business of advising
+> others … as to the value of securities or as to the advisability of investing in, purchasing, or selling
+> securities, or who, for compensation and as part of a regular business, issues or promulgates analyses or reports
+> concerning securities.
+> (II) "Investment adviser" includes financial planners or other persons who, as an integral component of other
+> financially related services, provide investment advisory services to others for compensation and as a part of a
+> business or who hold themselves out as providing investment advisory services to others for compensation.
+> (b) "Investment adviser" does not include: (I) A federal covered adviser; (II) A publisher of a bona fide
+> newspaper, magazine, or business or financial publication with a regular paid circulation; …
+
+**Выжимка (Колорадо).** Модельная формула 1986 — отдельного титульного триггера нет; «investment advisory services»
+по контексту (I) — о securities. Колорадо для нас по регистрации нейтрален (по тексту определения).
+
+**Источник 21.** Maryland, **§ 11-401(b)** «Transaction of business by unregistered person unlawful» (Justia, 2025),
+`r.jina.ai/https://law.justia.com/codes/maryland/corporations-and-associations/title-11/subtitle-4/section-11-401/` —
+**HTTP 200, 16 761 б**, 16.09.2026. Норма закона штата.
+
+> (b) A person may not transact business in this State as an investment adviser or as an investment adviser
+> representative unless: (1) The person is registered …; (2) The person's only clients in this State are investment
+> companies … or insurance companies; or (3) The person has no place of business in this State, and: (i) The
+> person's only clients in this State are [институциональные] …; or **(ii) During the preceding 12-month period, the
+> person has had no more than five clients who: 1. Are residents of the State; and 2. Are not the types of clients
+> described in item (i) …**
+> (e) By rule or order, the Commissioner may modify the requirements of this section or exempt any … investment
+> adviser … if the Commissioner determines that: (1) Compliance … is not necessary or appropriate for the protection
+> of investors; and (2) The exemption is consistent with the public interest …
+
+**Выжимка.** Де-минимис — не более пяти клиентов-резидентов за 12 месяцев без места деятельности в штате;
+массовый сервис его превышает с первой недели. Попадание под § 11-101(i)(1)(ii) означает **регистрацию в
+Мэриленде** (федеральная регистрация недоступна: у нас нет ни securities-совета, ни активов под управлением,
+а «federal covered adviser» — это лицо, зарегистрированное по § 203 Advisers Act). Выход (e) — индивидуальное
+изъятие по приказу Commissioner, т. е. no-action/exemptive запрос в Maryland Securities Division.
+
+**Источник 22.** Maryland, **COMAR 02.02.05.20** «Exemption from the Maryland Securities Act, … § 11-101(i)(2), … for
+Certain Individuals», `r.jina.ai/https://www.law.cornell.edu/regulations/maryland/COMAR-02-02-05-20` — **HTTP 200,
+6 422 б**, 16.09.2026. Правило регулятора (Maryland Division of Securities); принято 07.12.1992 (19:24 Md. R. 2125).
+Ссылки внутри правила — на старую нумерацию § 11-101(h), ныне (i).
+
+> A. An individual broker-dealer agent who: (1) … holds out to the public, as set forth in … § 11-101(h)(1)(ii)3 …,
+> **by use of the title "financial consultant", "financial adviser", or similar title or designation**; (2) Does not
+> in any other manner hold out as an investment adviser or representative; … (5) Has passed … the Series 7 examination …
+> B. An individual insurance producer who: (1) **Falls within the definition of "investment adviser" … solely by
+> incident of holding out to the public … by use of the registered trademark "ChFC", "Chartered Financial
+> Consultant", "NAIFA" …**
+> D. An individual who falls within the definition of "investment adviser" … solely by incident of holding out to the
+> public … but who: (1) Uses the registered trademark "ChFC", "Chartered Financial Consultant", "CFP", or "Certified
+> Financial Planner" solely in the context of: (a) Acting as a teacher or researcher …, (b) Employment in the employee
+> benefits … unit of a business entity that is not an investment adviser, or (c) Employment by an agency of …
+> government; …
+
+**Выжимка.** Сам регулятор Мэриленда исходит из того, что **одного титула достаточно**, чтобы лицо «falls within the
+definition of investment adviser» — иначе этих изъятий не понадобилось бы (тот же довод «от противного», что в Г21
+по CCD II Art. 16(6)). Изъятия выданы узким группам лиц (агенты брокеров, страховые агенты, преподаватели); для
+сервиса-приложения изъятия нет. Титул «**financial adviser**» прямо назван.
+Доктрина: John A. Gray, «Accountants' Obligations under Maryland's New Investment Adviser Law», 22 U. Balt. L.F. (1991)
+— закон принят весной 1989, вступал в силу 01.07.1989 и 01.10.1990 (по сниппету выдачи). Текст **не добыт**:
+прямой `curl` 403, `WebFetch` 403, `r.jina.ai` 200/228 б — Cloudflare «Just a moment…».
+
+### Г26.4 SEC no-action letters — в оригинале
+
+**Источник 23.** SEC Division of Investment Management, **RDM Infodustries, Inc.**, no-action letter, 25.03.1996
+(Our Ref. No. 96-100; Eileen M. Smiley, Senior Counsel), sec.gov/divisions/investment/noaction/1996/rfminfodustries032596.pdf —
+через `r.jina.ai` **HTTP 200, 7 102 б, PDF 4 стр.** (OCR скана, опечатки оригинального распознавания сохранены
+частично; исправлены только очевидные), 16.09.2026. **Позиция staff, не Комиссии.**
+
+> … Section 202(a)(11), in pertinent part, defines the term "investment adviser" to mean any person who, for
+> compensation, engages in the business of advising others as to the value of securities or as to the advisability of
+> investing in, purchasing, or selling securities, or who issues or promulgates analyses or reports concerning
+> securities. As we discussed in our telephone conversation on March 8, 1996, **your letter does not present
+> sufficient facts upon which to make a determination whether RDM must register under the Advisers Act.** …
+> The staff of the Division of Investment Management, in a number of letters, has expressed its views regarding the
+> circumstances when the presentation of securities data or information constitutes an analysis or report for
+> purposes of section 202(a)(11). **The staff has taken the position that information relating to securities does not
+> constitute an analysis or report if: (1) the information is readily available to the public in its raw state;
+> (2) the categories of information presented are not highly selective; and (3) the information is not organized or
+> presented in a manner that suggests the purchase, holding, or sale of any security or securities.** See, e.g.,
+> Missouri Innovation Center, Inc. (pub. avail. Oct. 17, 1995); Datastream International (pub. avail. Mar. 15, 1993);
+> EJV Partners, L.P.; Univu System (pub. avail. Dec. 7, 1992). …
+> Finally, the Division …, having repeatedly expressed its views …, **will no longer respond to such requests for
+> interpretative or no-action letters in this area unless they present novel or unusual issues.** …
+> [fn. 2] … See also Media General Financial Services, Inc. (pub. avail. July 20, 1992); Investex Investment Exchange,
+> Inc. (pub. avail. Apr. 9, 1990); Charles Street Securities, Inc. (pub. avail. Feb. 27, 1987); Butcher & Singer, Inc.
+> (pub. avail. Jan. 2, 1987).
+> [Запрос RDM: «provide raw, unbiased financial data from Latin American corporations to stockbrokers and securities
+> dealers».]
+
+**Выжимка.** 🟡 **Письмо — не отказ в действиях, а отказ определиться** («insufficient facts») с отсылкой к
+трёхэлементному тесту для **данных о ценных бумагах**. Плейз цитирует его в поддержку тезиса «selective list of
+securities is advice» — в оригинале этого нет дословно, есть обратная сторона теста (не highly selective).
+К нам письмо по предмету не относится (у нас нет данных о securities); годится только как иллюстрация: staff
+закрыл тему для типовых запросов с 1996 г., значит новый no-action по «не-securities сервису» — возможен лишь как
+«novel or unusual issue».
+
+**Источник 24.** SEC Division of Investment Management, письмо **U.S. Department of Labor**, 22.02.1996
+(Jack W. Murphy, Associate Director (Chief Counsel), адресат Olena Berg, PWBA), sec.gov/divisions/investment/noaction/1996/usdol022296.pdf —
+через `r.jina.ai` **HTTP 200, 3 494 б, PDF 2 стр.** (OCR), 16.09.2026. Позиция staff.
+
+> … In our letter to you dated December 5, 1995, …, we stated that an employer that provides investment-related
+> information to its employees who participate in the employer's plan would not, as a result, be in the business of
+> providing investment advice and therefore would not be an "investment adviser" as defined in the Advisers Act. …
+> **our position is based on the unique nature of the employment relationship. Consequently, our position is not
+> intended to address whether a third-party service provider meets the definition of investment adviser** under the
+> Advisers Act. Whether such a person meets the definition … continues to depend on the application of all the factors
+> set out in Section 202(a)(11), including the type of information provided.[1] We note, however, that as a general
+> matter, **information that simply describes or explains the various investment options available through a plan,
+> without including any analysis or recommendation with respect to those options, would not constitute "investment
+> advice"** as that term is used in the Advisers Act.
+> [1] Investment Advisers Act Release No. 1092 (October 8, 1987) provides the staff's views regarding the scope of
+> Section 202(a)(11) …
+
+**Выжимка.** Для нас — только подтверждение уже известного: сторонний сервис оценивается по IA-1092 и по типу
+информации; «analysis or recommendation» по инвестиционным опциям — совет. Работодательский (B2B-wellness)
+«щит» из письма 05.12.1995 на стороннего поставщика **не распространяется** — это важно для канала продаж через
+работодателей: работодатель защищён, мы — нет.
+
+**Индекс писем.** Страница SEC «Division of Investment Management Staff No-Action and Interpretive Letters»
+(через `r.jina.ai`, **HTTP 200, 577 924 б**, 16.09.2026), разделы «Investment Advisers Act Status» (20 писем,
+1993–2009) и «… – Publishers» (6 писем): **ни одного письма про budgeting, debt, credit counseling или financial
+planning software** по заголовкам. **Robert R. Champion (22.09.1986) в индексе отсутствует** — письма до ~1993
+на sec.gov в большинстве не выложены; текст не добыт (каналы: `WebSearch` ×1 — только цитаты у Plaze/Proskauer;
+индекс SEC; PLI-глава Kirsch — `curl` 200/12 374 б, но HTML-заглушка, не PDF).
+
+### Г26.3 CCD II Art. 3(17) — национальная транспозиция (Германия, дословно)
+
+**Источник 25.** Gesetz zur Umsetzung der Richtlinie (EU) 2023/2225 … vom 12. Mai 2026, **BGBl. 2026 I Nr. 139**
+(18.05.2026), официальный PDF recht.bund.de/bgbl/1/2026/139/regelungstext.pdf — прямой `curl`, **HTTP 200, 921 242 б**
+(тот же размер, что в Г16 12.09.2026), `pdftotext`, 16.09.2026. Норма закона (вступает 20.11.2026, Art. 16(1)).
+В Г16 акт найден, но статьи о Beratung не цитировались — ниже новое.
+
+Art. 1 Nr. 32 (BGB, § 511 в новой редакции):
+> „§ 511 **Beratungsleistungen bei Verbraucherdarlehensverträgen**".
+> „(1) Der Darlehensgeber hat den Darlehensnehmer zu informieren, ob für ihn **individuelle Empfehlungen zu einem oder
+> mehreren Geschäften, die im Zusammenhang mit einem Verbraucherdarlehensvertrag stehen (Beratungsleistungen)**,
+> erbracht werden oder erbracht werden können. Bevor der Darlehensgeber für den Darlehensnehmer solche
+> Beratungsleistungen erbringt, hat er den Darlehensnehmer über die sich aus Artikel 247 § 18 des
+> Einführungsgesetzes zum Bürgerlichen Gesetzbuche ergebenden Einzelheiten in der dort vorgesehenen Form zu
+> informieren."
+> „(3) Der Darlehensgeber hat dem Darlehensnehmer auf Grund der Prüfung gemäß Absatz 2 in dessen bestem Interesse ein
+> geeignetes oder mehrere geeignete Produkte zu empfehlen oder ihn darauf hinzuweisen, dass er kein Produkt empfehlen
+> kann. … (4) Der Darlehensgeber ist verpflichtet, den Darlehensnehmer zu warnen, wenn ein Verbraucherdarlehensvertrag
+> unter Berücksichtigung der finanziellen Situation des Darlehensnehmers möglicherweise ein spezifisches Risiko für
+> ihn birgt."
+
+Art. 7 Nr. 6 (GewO, новый § 34k «Darlehensvermittler»):
+> „(1) Wer gewerbsmäßig gegen eine Vergütung, die aus einer Geldzahlung oder einem sonstigen vereinbarten
+> wirtschaftlichen Vorteil bestehen kann, den Abschluss von Allgemein-Verbraucherdarlehensverträgen nach § 491
+> Absatz 2 des Bürgerlichen Gesetzbuchs oder von Finanzierungshilfen nach § 506 Absatz 1 …, mit Ausnahme von Verträgen
+> im Sinne des § 34i Absatz 1 Satz 1, vermitteln oder die Gelegenheit zum Abschluss solcher Verträge nachweisen **oder
+> Dritte zu solchen Verträgen beraten** oder in anderer Weise beim Abschluss eines solchen Vertrages behilflich sein
+> will (Darlehensvermittler), **bedarf nach Maßgabe der folgenden Bestimmungen der Erlaubnis der zuständigen
+> Behörde.**"
+> „(3) Die Erlaubnis nach Absatz 1 ist zu versagen, wenn … 3. der Antragsteller nicht durch eine vor der Industrie- und
+> Handelskammer erfolgreich abgelegte Prüfung nachweist, dass er die für die Vermittlung von **oder Beratung zu**
+> Allgemein-Verbraucherdarlehensverträgen … notwendige Sachkunde … besitzt."
+> „(4) Einer Erlaubnis nach Absatz 1 bedürfen nicht: 1. Kreditinstitute …, 2. Kapitalverwaltungsgesellschaften …,
+> 3. Gewerbetreibende, die als Kleinstunternehmen oder KMU … gelten und die lediglich zur Finanzierung der von ihnen
+> abgeschlossenen Warenverkäufe oder zu erbringenden Dienstleistungen eine Tätigkeit nach Absatz 1 ausüben."
+> „(5) Gewerbetreibende nach Absatz 1, die eine unabhängige Beratung anbieten oder als unabhängige Berater auftreten
+> (**Honorar-Darlehensberater**), 1. müssen für ihre Empfehlung für oder gegen einen Allgemein-Verbraucherdarlehensvertrag
+> … eine ausreichende Zahl von auf dem Markt verfügbaren Verträgen einbeziehen und 2. dürfen vom Darlehensgeber für ihre
+> Beratungsleistung keine Zuwendungen annehmen …"
+> „(8) … in das Register nach § 11a Absatz 1 Satz 1 eintragen zu lassen …"
+
+**Выжимка (Германия).** 🟡 **Подтверждение Г21 частичное.** Германия переносит Art. 3(17) дословно
+(«individuelle Empfehlungen zu einem oder mehreren Geschäften, die im Zusammenhang mit einem
+Verbraucherdarlehensvertrag stehen»), а допуск к «Beratung» даёт через **лицензию § 34k GewO** (экзамен в IHK,
+регистр, для независимых — статус Honorar-Darlehensberater). Но формулировка § 34k(1) привязана к **заключению**
+договора («den Abschluss … vermitteln … oder Dritte zu solchen Verträgen beraten … beim Abschluss … behilflich
+sein»). Совет «какой из уже действующих кредитов гасить первым» текстом § 34k(1) **прямо не назван**: довод «за нас» —
+вся конструкция нормы про заключение; довод «против» — «Dritte zu solchen Verträgen beraten» стоит отдельным
+членом перечня и не ограничен словом «Abschluss». Вывод Г21 по уровню директивы это не отменяет, а по
+Германии оставляет открытым: **лицензионный крючок для «совета по существующему долгу» в немецком тексте
+неоднозначен**. Разъяснений BMJV/BaFin/DIHK в заходе не найдено.
+
+**Не добыто по п. 3:** Q&A Еврокомиссии и EBA по Art. 3(17) — не найдены (`WebSearch` ×2: выдача — текст директивы,
+LEGISSUM, блоги PwC, Deloitte, recent-ecl; официальных толкований нет). Позиции AMF (Франция) и Banca d'Italia —
+не искались отдельно (бюджет). Статья «Debt Counseling from the Directive No. 2023/2225 … and Perspectives for
+Transposition» (ResearchGate) — не открывалась. Ирландия (CCPC) и Италия (Legal500) — уже в Г2.2 выше.
+
+## ИТОГ Г26
+
+### Таблица по пунктам
+
+| № | Пункт | Статус | Норма-основание | Что меняет для красной линии |
+|---|---|---|---|---|
+| 1 | Штаты США: financial planner без ценных бумаг | **добыто; гипотеза подтверждена ЧАСТИЧНО — для двух штатов** | USA 1956 § 401(f) + Comment .15 (NASAA); USA 2002 § 102(15), § 403; Seligman 81 Wash. U. L.Q. 243; **RCW 21.20.005(8), 21.20.040(3)–(4); WAC 460-24A-040, -045 (Вашингтон)**; **Md. Code Corps. & Ass'ns § 11-101(i)(1)(ii), § 11-401(b); COMAR 02.02.05.20 (Мэриленд)**; NRS 628A.010–.040 (Невада); G.S. 78C-2(1) (N. Carolina); C.R.S. 11-51-201(9.5) (Colorado); GAO-11-235 | 🟢 Модельный закон (оба издания) и типовые штаты (NC, CO) титул «financial planner» без securities **не ловят** — разработчики прямо отказались от такой формулы, «budget management» назван вне определения. 🔴 **Вашингтон** ловит **одним титулом** (перечень: financial planner, financial consultant, **money manager**, investment planner и любые комбинации, намекающие на «financial planning services»). 🔴 **Мэриленд** ловит титулом («financial … planner / counselor / consultant or any other similar type of adviser») **и, вероятно, функцией** — (ii)2 описывает сбор данных → цели → анализ → «recommends a financial plan». 🟠 **Невада** регистрации не требует, но накладывает фидуциарную обязанность, ответственность за gross negligence и **E&O/bond от $1 млн** на того, кто советует «upon provision for income to be needed in the future». Новые запреты словаря: «financial planner/planning», «money manager», «financial consultant/adviser/counselor», «total/comprehensive financial planning» |
+| 2 | s. 418 FSMA и PERG 2.4 | **добыто дословно** | FSMA s. 418(1), (4), (5), (6); s. 19; s. 21(1)–(3); FPO 2005 Sch. 1 para. 5B; PERG 2.3.2G–2.3.3G, 2.4.1G–2.4.6G, 2.9.15G–2.9.17G | 🔴 **s. 418 — норма-расширитель, защитой быть не может**; наш случай решается общим смыслом «in the UK» в s. 19, и FCA (guidance) прямо называет интернет примером деятельности в UK без присутствия (PERG 2.4.6G). Исключений overseas persons для debt counselling нет (PERG 2.9.15G — третье подтверждение). Business test выполняется подпиской. Сверх этого — **s. 21(3)**: debt counselling — controlled activity (FPO Sch. 1 para. 5B), реклама, «capable of having an effect in the UK», — отдельное нарушение |
+| 3 | Толкования CCD II Art. 3(17) | **частично** | BGBl. 2026 I Nr. 139: § 511 BGB n.F., § 34k GewO | Германия переносит Art. 3(17) дословно и лицензирует «Beratung» через § 34k GewO, но текст лицензии привязан к **заключению** договора — для совета по **существующему** долгу немецкий крючок неоднозначен. Толкований Комиссии/EBA/BaFin/AMF/Banca d'Italia **не найдено**. Вывод Г21 (на уровне директивы — внутри) **не опровергнут** |
+| 4 | SEC no-action letters в оригинале | **частично (2 письма)** | RDM Infodustries (25.03.1996); letter to U.S. DOL (22.02.1996); индекс SEC IM | Ни одного письма по budgeting/debt/planning software в индексе SEC нет. RDM — отказ определиться + тест для данных о securities (у Plaze процитирован шире оригинала). DOL-1996: «щит» работодателя **на стороннего поставщика не распространяется**. **Champion (1986) не добыт** — в индексе SEC отсутствует |
+
+### 🔴 Прямой ответ: нужна ли нам регистрация хоть в одном штате США?
+
+**Да — в двух штатах условно, и в одном из них, возможно, безусловно.**
+- **Вашингтон — да, если мы используем титул** «financial planner» или сходный (включая «money manager»,
+  «financial consultant», любую комбинацию, создающую впечатление «financial planning services»):
+  RCW 21.20.005(8) делает такое лицо investment adviser, 21.20.040(3)–(4) требует регистрации, де-минимис —
+  меньше шести клиентов-резидентов. **Без такого титула — нет** (функционально мы вне первой и второй веток).
+  Альтернатива регистрации — гавань WAC 460-24A-045, но её обязательное раскрытие «не оказываем услуг
+  финансового планирования» с подписью за 48 часов до оплаты несовместимо с позиционированием «financial planning».
+- **Мэриленд — да при титуле** (§ 11-101(i)(1)(ii)3, регулятор сам исходит из «достаточно титула» — COMAR
+  02.02.05.20), и **возможно — даже без титула**: ветка (ii)2 описывает процесс финпланирования без слова
+  «securities», единственная опора против — «information relating to investments». Толкования Maryland Securities
+  Division не найдено; при запуске на резидентов Мэриленда это **вопрос к местному юристу или exemptive-запрос
+  по § 11-401(e)**, а не к словарю.
+- **Невада — регистрации нет, но есть обязанности и $1 млн E&O/bond** (NRS 628A.040), если NRS 628A применима
+  к автоматическому сервису и иностранному поставщику (не решено).
+- Во всех остальных просмотренных (NC, CO, модельный закон 1956/2002) — **нет**. Полного прохода по 50 штатам
+  **не было**: кроме Вашингтона и Мэриленда могут существовать другие отступления от модели.
+
+### 🔴 Прямой ответ: защищает ли нас s. 418 FSMA в UK?
+
+**Нет.** s. 418 только **добавляет** случаи, когда деятельность считается осуществляемой в UK (UK-офис, UK-заведение,
+AIF, крипто), и не содержит ни одного случая «не считается» (s. 418(1); PERG 2.4.3G: «extends the meaning»).
+Для нас она нейтральна, а вопрос решается общим смыслом «in the United Kingdom» в s. 19, который FCA толкует
+против нас: иностранец без места деятельности в UK может осуществлять деятельность в UK «by means of the
+internet» (PERG 2.4.6G, guidance, не закон и не суд). Исключений для overseas persons по debt counselling нет,
+business test выполнен, а s. 21(3) независимо ловит рекламу, «capable of having an effect in the UK».
+**Единственная реальная защита по британскому долговому контуру — не вести деятельность в UK фактически:**
+не принимать резидентов UK в долговой модуль, не таргетировать UK (валюта, кредиторы, реклама). Это вывод
+из совокупности норм; судебного толкования интернет-случая в заходе не добыто.
+
+### Что изменилось на общей карте
+
+| Юрисдикция | Было после Г21 | Стало после Г26 |
+|---|---|---|
+| США, штаты | «не проверены» | 🟢 модельные штаты — вне; 🔴 **WA — внутри при титуле**; 🔴 **MD — внутри при титуле, возможно и по функции**; 🟠 **NV — фидуциарий + $1 млн E&O без регистрации** |
+| UK, территориальность | «не исследована, последняя линия» | 🔴 **линии нет**: s. 418 не защищает, PERG 2.4.6G против нас, + s. 21(3) по рекламе |
+| ЕС (DE) | «внутри по директиве» | без изменений; немецкий лицензионный текст (§ 34k GewO) для существующего долга неоднозначен |
+
+### Что осталось неизвестным
+
+1. Полный проход по 50 штатам на отступления от модели (титульные и функциональные ветки) — сделаны только
+   WA, MD, NV, NC, CO, FL (по сниппету — без фразы о planner; первоисточник не открывался).
+2. Толкование Maryland Securities Division к § 11-101(i)(1)(ii)2 («information relating to investments»);
+   статья Gray, 22 U. Balt. L.F. (1991) — Cloudflare на всех трёх каналах.
+3. Применимость NRS 628A к автоматическому сервису и к поставщику без присутствия в Неваде; применимость
+   «transact business in this state» (WA, MD) к иностранному SaaS — толкований не найдено.
+4. Выполнимость подписи «written dated acknowledgment» (WAC 460-24A-045(4)) электронно.
+5. Судебная практика UK по s. 19 для интернет-поставщика (LexisNexis Practice Note платный, не открывался).
+6. Q&A Еврокомиссии/EBA по Art. 3(17); позиции BaFin, AMF, Banca d'Italia; разъяснения BMJV/DIHK к § 34k GewO.
+7. SEC no-action Robert R. Champion (1986) — нет в индексе SEC; нужен Westlaw/Lexis.
+8. 🆕 Хвост: CFPB/UDAAP как возможный регулятор «household budgeting» сервиса (GAO-11-235) — не исследовался.
+
+### Процесс — прозрачно
+
+Тип запроса: **breadth-first**, 4 независимых под-вопроса. **Субагентов — ноль**: все пункты сняты вахтой
+прямыми запросами (отступление от метода «минимум один субагент» — осознанное, ради правила «сырьё в файл после
+каждого источника» и после сегодняшних падений агентов на лимите). Собственных `WebSearch` — 11. `WebFetch` — 1
+(403). Запись в файл — **16 отдельных дописываний** по ходу, до итогового ответа. Каналы: прямой `curl`
+(legislation.gov.uk, app.leg.wa.gov, uniformlaws.org, wustl.edu, recht.bund.de, lawfilesext.leg.wa.gov);
+`r.jina.ai` (FCA Handbook, NRS, NASAA, GAO, ncleg, Justia, Cornell COMAR, sec.gov, dfi.wa.gov, Beach Street Legal,
+Baker McKenzie). Не прошли: nasaa.org и ncleg.gov напрямую (403), gao.gov напрямую (403), scholarworks.law.ubalt.edu
+(403 / Cloudflare через прокси), mgaleg.maryland.gov (оболочка без текста), buzer.de через прокси (145 б).
+Exa отключена, Wayback не пробовался (429/503 весь день по вводной).
+
+
+## ДОБОР Г27 (16.09.2026)
+
+Батч Г27 очереди пробелов (COVERAGE_AUDIT_4 → Г27): право США на уровне штатов, территориальность,
+CFPB/UDAAP, электронная подпись WA. Метод: breadth-first; вахта снимает первоисточники сама, запись в файл
+после каждой группы штатов. Установленное в Г26 (WA, MD, NV, модельный закон, NC, CO) не переоткрывается.
+
+### П1. Штаты — группа 1 (крупные рынки), первоисточники
+
+Ключ к чтению: в модельном законе 1956 года после поправки NASAA 1986 года стоит фраза «also includes financial
+planners and other persons who, as an integral component of other financially related services, provide **the
+foregoing investment advisory services** … or who hold themselves out as providing **the foregoing** investment
+advisory services». «Foregoing» = совет **по ценным бумагам**. Эта формула титулом «financial planner» НЕ ловит —
+она ловит планировщика, который советует по securities. Отступление (как WA, MD) — только там, где титул или
+«financial planning» связан с регулированием **без** слова securities.
+
+**California** — Corp. Code § 25009 (Justia через r.jina.ai: прямой HTTP 403, прокси HTTP 200, 3 186 б, 16.09.2026;
+https://law.justia.com/codes/california/code-corp/title-4/division-1/part-1/section-25009/). Дословно:
+> «(b) "Investment adviser" also includes any person who uses the title "financial planner" **and** who, for compensation,
+> engages in the business, whether principally or as part of another business, of advising others, either directly or
+> through publications or writings, as to the value of securities or as to the advisability of investing in, purchasing
+> or selling securities, or who, for compensation and as part of a regular business, publishes analyses or reports
+> concerning securities. This subdivision does not apply to: … (2) an attorney at law, accountant, engineer, or teacher
+> whose performance of these services is solely incidental to the practice of his or her profession, so long as these
+> individuals do not use the title "financial planner;" …» (Amended by Stats. 1996, Ch. 631, eff. 01.01.1997)
+Выжимка: титул упомянут, но **конъюнктивно** с советом по securities. Сам по себе титул не ловит. → **нет**.
+
+**Minnesota** — Minn. Stat. § 45.026 «REGULATION OF BUSINESS OF FINANCIAL PLANNING» — **отдельный закон о
+планировщиках, аналог NV 628A** (прямой curl, HTTP 200, 63 740 б, 16.09.2026; https://www.revisor.mn.gov/statutes/cite/45.026). Дословно:
+> «Subd. 1 … (b) "Financial planner" means a person who, on advertisements, cards, signs, circulars, letterheads, or in
+> another manner, indicates that the person is a "financial planner," "financial counselor," "financial adviser,"
+> "investment counselor," "investment adviser," "financial consultant," or other similar designation, title, or
+> combination is considered to be representing that the person is engaged in the business of financial planning.
+> (c) "Advertisement" includes: (1) printed or published material, audiovisual material, and descriptive literature of a
+> financial planner used in direct mail, newspapers, magazines, other periodicals, … (4) statements, written or oral, by a
+> financial planner.
+> Subd. 2. Fiduciary duty. Persons who represent that they are financial planners have a fiduciary duty to persons for
+> whom services are performed for compensation. In an action for breach of fiduciary duty, a person may recover actual
+> damages resulting from the breach, together with costs and disbursements.
+> Subd. 3. Penalty. A financial planner is subject to section 45.027, subdivision 5.» (History: 1987 c 336 s 1)
+Выжимка: регистрации нет; **титул** («financial adviser», «financial counselor», «financial consultant», «или сходный»)
+→ фидуциарная обязанность перед платными клиентами + гражданский иск + санкции комиссара по § 45.027 subd. 5.
+Ни слова о securities. → **только при титуле** (последствие — фидуциарий, не регистрация).
+
+**Michigan** — MCL 451.2102a(e) (legislature.mi.gov через прокси: прямой 403, прокси HTTP 200, 9 121 б;
+https://www.legislature.mi.gov/printDocument.aspx?objectName=mcl-451-2102a&version=txt). Дословно:
+> «(e) "Investment adviser" means a person that, for compensation, engages in the business of advising others, either
+> directly or through publications or writings, as to the value of securities or the advisability of investing in,
+> purchasing, or selling securities … The term includes a financial planner or other person that, as an integral
+> component of other financially related services, provides investment advice to others for compensation as part of a
+> business or that holds itself out as providing investment advice to others for compensation.»
+Выжимка: USA 2002 § 102(15) дословно; «investment advice» = по securities. → **нет**.
+
+**Texas** — Gov't Code § 4001.059 (statutes.capitol.texas.gov: прямой HTTP 200, но SPA-оболочка 250 874 б без текста;
+через прокси HTTP 200, 23 768 б; https://statutes.capitol.texas.gov/Docs/GV/htm/GV.4001.htm). Дословно:
+> «Sec. 4001.059. INVESTMENT ADVISER. "Investment adviser" includes a person who, for compensation, engages in the
+> business of advising another, either directly or through publications or writings, with respect to the value of
+> securities or to the advisability of investing in, purchasing, or selling securities or a person who, for compensation
+> and as part of a regular business, issues or adopts analyses or a report concerning securities, **as may be further
+> defined by board rule**.» (Acts 2019, 86th Leg., H.B. 4171, eff. 01.01.2022)
+Выжимка: слова planner нет; «further defined by board rule» — см. ниже проверку правил TSSB. → **нет** (по закону).
+
+**Florida** — Fla. Stat. § 517.021(20) (leg.state.fl.us прямой curl, HTTP 200, 49 917 б, 16.09.2026;
+http://www.leg.state.fl.us/statutes/index.cfm?App_mode=Display_Statute&URL=0500-0599/0517/Sections/0517.021.html). Дословно:
+> «(20)(a) "Investment adviser" means a person, other than an associated person of an investment adviser or a federal
+> covered adviser, that receives compensation, directly or indirectly, and engages for all or part of the person's time,
+> directly or indirectly, or through publications or writings, in the business of advising others as to the value of
+> securities or as to the advisability of investments in, purchasing of, or selling of securities.»
+Выжимка: **сниппет Г26 подтверждён первоисточником** — ни planner, ни holding out в определении нет; во всём § 517.021
+слово «planner» не встречается ни разу (0 совпадений). → **нет**.
+
+**New York** — GBL § 359-eee(1)(a) (nysenate.gov через прокси: прямой 403, прокси HTTP 200, 8 987 б;
+https://www.nysenate.gov/legislation/laws/GBS/359-EEE). Дословно:
+> «(a) "Investment adviser" shall mean any person who, for compensation, engages in the business of advising members of
+> the public, either directly or through publications or writings within or from the state of New York, as to the value
+> of securities or as to the advisability of investing in, purchasing, or selling or holding securities, or who, for
+> compensation and as a part of a regular business issues or promulgates analyses or reports concerning securities to
+> members of the public within or from the state of New York.»
+Выжимка: planner — 0 совпадений в секции. Территориальный признак «within or from the state of New York» (к П2). → **нет**.
+
+**Illinois** — 815 ILCS 5/2.11 (ilga.gov через прокси, HTTP 200, 3 603 б;
+https://www.ilga.gov/Documents/legislation/ilcs/documents/081500050K2.11.htm). Дословно:
+> «"Investment adviser" means any person who, for compensation, engages in this State in the business of advising others
+> … as to the value of securities or as to the advisability of investing in, purchasing, or selling securities … or any
+> financial planner or other person who, as an integral component of other financially related services, provides
+> investment advisory services to others for compensation and as part of a business, or who holds himself or herself out
+> as providing investment advisory services to others for compensation»
+Выжимка: формула 1986 года; «investment advisory services» — по securities. Территория: «engages in this State». → **нет**.
+
+**Ohio** — ORC § 1707.01(X)(1) (codes.ohio.gov через прокси, HTTP 200, 34 411 б; https://codes.ohio.gov/ohio-revised-code/section-1707.01).
+> «(X)(1) "Investment adviser" means any person who, for compensation, engages in the business of advising others, either
+> directly or through publications or writings, as to the value of securities or as to the advisability of investing in,
+> purchasing, or selling securities, or who, for compensation and as a part of regular business, issues or promulgates
+> analyses or reports concerning securities.»
+Выжимка: чистый 1956 без поправки 1986. → **нет**.
+
+**Virginia** — Va. Code § 13.1-501 (law.lis.virginia.gov, прямой HTTP 200, 40 171 б; https://law.lis.virginia.gov/vacode/title13.1/chapter5/section13.1-501/).
+> «"Investment advisor" … also includes financial planners and other persons who, as an integral component of other
+> financially related services, provide the foregoing investment advisory services to others for compensation and as a
+> part of a business or who hold themselves out as providing the foregoing investment advisory services to others for
+> compensation.» → формула 1986, **нет**.
+
+**Massachusetts** — M.G.L. c. 110A § 401(m) (malegislature.gov через прокси, HTTP 200, 12 277 б;
+https://malegislature.gov/Laws/GeneralLaws/PartI/TitleXV/Chapter110A/Section401).
+> «''Investment adviser'' also includes financial planners and other persons who, as an integral component of other
+> financially related services, provide the foregoing investment advisory services to others for compensation and as a
+> part of a business or who hold themselves out as providing the foregoing investment advisory services to others for
+> compensation.» → формула 1986, **нет**.
+
+**New Jersey** — N.J.S.A. 49:3-49(g)(1) (Justia через прокси, HTTP 200, 19 614 б; https://law.justia.com/codes/new-jersey/title-49/section-49-3-49/).
+> «(ii) any financial planner and other person who provides investment advisory services to others for compensation and
+> as part of a business or who holds himself out as providing investment advisory services to others for compensation.»
+Выжимка: без «integral component», но «investment advisory services» отсылает к (i) — securities. → **нет**.
+
+**Georgia** — O.C.G.A. § 10-5-2 (Justia через прокси, HTTP 200, 59 603 б; https://law.justia.com/codes/georgia/title-10/chapter-5/article-1/section-10-5-2/).
+> «The term includes a financial planner or other person that, as an integral component of other financially related
+> services, provides investment advice to others for compensation as part of a business or that holds itself out as
+> providing investment advice to others for compensation.» → USA 2002, **нет**.
+
+### П1. Штаты — группа 2 (25 юрисдикций), первоисточники
+
+Все сняты 16.09.2026. Ниже — **дословно операционная фраза** каждого определения (вводная часть везде одна:
+«for compensation, engages in the business of advising others … as to the value of securities or [as to] the
+advisability of investing in, purchasing, or selling securities …»). Проверка на отступление: поиск по всему
+снятому тексту слов «planner», «financial planning», «holds himself/itself/themselves» — счётчик в скобках.
+
+Три типа формул:
+- **Т56** — модель 1956 без поправки: только securities, planner не упомянут.
+- **Т86** — поправка NASAA 1986: «also includes financial planners and other persons who, as an integral component of
+  other financially related services, provide **the foregoing** investment advisory services … or who hold themselves
+  out as providing **the foregoing** investment advisory services to others for compensation».
+- **Т02** — USA 2002 § 102(15): «The term includes a financial planner or other person that, as an integral component of
+  other financially related services, provides investment advice to others for compensation as part of a business or
+  that holds itself out as providing investment advice to others for compensation» (где «investment advice» — по
+  securities в смысле первой фразы; WI и SC уточняют прямо: «investment advice **regarding securities**»).
+
+| Штат | Норма | Формула | Канал, HTTP, размер | planner/holdout в тексте | Ловит нас |
+|---|---|---|---|---|---|
+| Pennsylvania | 70 P.S. § 1-102(j) (Act 1972-284) | Т56 + «publications, writings **or electronic means**» | legis.state.pa.us через прокси, 200, 234 445 б | 0 | нет |
+| Alabama | Code § 8-6-2 | Т86 («“Investment adviser” also includes financial planners … the foregoing investment advisory services …») | Justia через прокси (прямой 403), 200, 11 770 б | 2 (обе в Т86) | нет |
+| Arizona | A.R.S. § 44-3101(5) | Т86 дословно | azleg.gov прямой, 200, 8 217 б | 3 | нет |
+| Connecticut | C.G.S. § 36b-3(11) | Т56 («“Investment adviser” means any person who … concerning securities») | cga.ct.gov прямой, 200, 284 473 б (вся глава 672a) | **0 во всей главе** | нет |
+| Delaware | 6 Del. C. § 73-103(10) | Т86 дословно | delcode.delaware.gov прямой, 200, 32 563 б | 2 | нет |
+| District of Columbia | D.C. Code § 31-5601.01(17)(A) | Т86-вариант: «shall include financial planners or other persons who, as an integral component of other financially related services, provide investment advisory services to others for compensation, or as a part of a business, hold themselves out as providing investment advisory services …» | code.dccouncil.gov прямой, 200, 44 046 б | 2 | нет |
+| Idaho | Idaho Code § 30-14-102(15) | Т02 | через прокси, 200, 20 003 б | 2 | нет |
+| Indiana | IC 23-19-1-2(15) | Т02 | Justia через прокси, 200, 20 341 б | 2 | нет |
+| Iowa | Iowa Code § 502.102(15) | Т02 | legis.iowa.gov PDF прямой, 200, 75 173 б (pdftotext) | 2 | нет |
+| Kansas | K.S.A. 17-12a102(15) | Т02 | ksrevisor.gov прямой, 200, 35 875 б | 2 | нет |
+| Kentucky | KRS 292.310(11) | Т56 | Justia через прокси, 200, 13 654 б | 0 | нет |
+| Louisiana | La. R.S. 51:702(7) | Т56 | Justia через прокси, 200, 17 196 б | 0 | нет |
+| Maine | 32 M.R.S. § 16102(15) | Т02 (PL 2005, c. 65) | legislature.maine.gov прямой, 200, 65 383 б | 3 (третья — в определении IAR) | нет |
+| Mississippi | Miss. Code § 75-71-102(15) | Т02 | Justia через прокси, 200, 20 108 б | 2 | нет |
+| Missouri | RSMo § 409.1-102(15) | Т02 | revisor.mo.gov прямой, 200, 50 589 б | 2 | нет |
+| Montana | MCA § 30-10-103(12)(b) | Т86-вариант: «(ii) represents to any person that the financial planner or other person provides **the investment advisory services described in subsection (12)(a)**» | leg.mt.gov прямой, 200, 34 715 б | 2 | нет |
+| Nebraska | Neb. Rev. Stat. § 8-1101(7) | Т86 дословно | nebraskalegislature.gov через прокси, 200, 17 879 б | 2 | нет |
+| North Dakota | N.D.C.C. § 10-04-02(10) | Т86 («The term includes financial planners … the foregoing investment advisory services …») | ndlegis.gov PDF главы 10-04 прямой, 200, 318 722 б | 2 | нет |
+| Oklahoma | 71 O.S. § 1-102(17) | Т02 | Justia через прокси, 200, 21 389 б | 2 | нет |
+| Rhode Island | R.I. Gen. Laws § 7-11-101(11) | Т56 | rilegislature.gov через прокси, 200, 16 349 б | 0 | нет |
+| South Carolina | S.C. Code § 35-1-102(15) | Т02 + «investment advice **regarding securities**» | scstatehouse.gov (глава 35-1) прямой, 200, 222 431 б | 2 | нет |
+| Tennessee | T.C.A. § 48-1-102(13) | Т02-вариант («who holds oneself out as providing investment advice») | Justia через прокси, 200, 20 329 б | 1 | нет |
+| Vermont | 9 V.S.A. § 5102(15) | Т02 | legislature.vermont.gov прямой, 200, 82 005 б | 3 (третья — IAR) | нет |
+| Wisconsin | Wis. Stat. § 551.102(15)(a) | Т02 + «publications, writings, or electronic means» + «regarding securities» | docs.legis.wisconsin.gov через прокси, 200, 18 374 б | 2 | нет |
+| Wyoming | Wyo. Stat. § 17-4-102(a)(xv) | Т02 | Justia через прокси, 200, 19 053 б | 3 (третья — IAR) | нет |
+
+URL: PA https://www.legis.state.pa.us/WU01/LI/LI/US/HTM/1972/0/0284..HTM · AL https://law.justia.com/codes/alabama/title-8/chapter-6/article-1/section-8-6-2/ ·
+AZ https://www.azleg.gov/ars/44/03101.htm · CT https://www.cga.ct.gov/current/pub/chap_672a.htm · DE https://delcode.delaware.gov/title6/c073/sc01/index.html ·
+DC https://code.dccouncil.gov/us/dc/council/code/sections/31-5601.01 · ID https://legislature.idaho.gov/statutesrules/idstat/Title30/T30CH14/SECT30-14-102/ ·
+IN https://law.justia.com/codes/indiana/title-23/article-19/chapter-1/section-23-19-1-2/ · IA https://www.legis.iowa.gov/docs/code/502.102.pdf ·
+KS https://www.ksrevisor.gov/statutes/chapters/ch17/017_012a_0102.html · KY https://law.justia.com/codes/kentucky/chapter-292/section-292-310/ ·
+LA https://law.justia.com/codes/louisiana/revised-statutes/title-51/rs-51-702/ · ME https://legislature.maine.gov/statutes/32/title32sec16102.html ·
+MS https://law.justia.com/codes/mississippi/title-75/chapter-71/article-1/section-75-71-102/ · MO https://revisor.mo.gov/main/OneSection.aspx?section=409.1-102 ·
+MT https://leg.mt.gov/bills/mca/title_0300/chapter_0100/part_0010/section_0030/0300-0100-0010-0030.html · NE https://nebraskalegislature.gov/laws/statutes.php?statute=8-1101 ·
+ND https://ndlegis.gov/cencode/t10c04.pdf · OK https://law.justia.com/codes/oklahoma/title-71/section-71-1-102/ · RI https://webserver.rilegislature.gov/Statutes/TITLE7/7-11/7-11-101.htm ·
+SC https://www.scstatehouse.gov/code/t35c001.php · TN https://law.justia.com/codes/tennessee/title-48/chapter-1/part-1/section-48-1-102/ ·
+VT https://legislature.vermont.gov/statutes/section/09/150/05102 · WI https://docs.legis.wisconsin.gov/statutes/statutes/551/i/102 · WY https://law.justia.com/codes/wyoming/title-17/chapter-4/article-1/section-17-4-102/
+
+Выжимка группы 2: **ни одна из 25 юрисдикций не отступает от модели** в сторону титула без securities. Во всех
+формулах Т86/Т02 титул «financial planner» — только пример лица, которое советует **по securities** или выдаёт себя
+за такого советника. Проверка (б) и (в) этим проходом покрыта лишь в пределах определения и соседних секций главы
+о ценных бумагах; отдельные законы о планировщиках вне securities-кодексов искались отдельно (см. ниже).
+
+### П1. Штаты — группа 3 (9 юрисдикций, добор после неверных путей), первоисточники
+
+Первый заход дал оболочки/404: akleg.gov (JS-якорь, 14 930 б без текста), Justia с неверным подразделом для AR, HI,
+NH, NM, AK (страницы без текста статьи, 0 совпадений «securit»), gc.nh.gov (прямой 403, прокси 345 б),
+capitol.hawaii.gov (прокси 924 б). Правильные адреса найдены поиском, сняты через r.jina.ai 16.09.2026.
+
+| Штат | Норма | Формула | Канал, HTTP, размер | Ловит нас |
+|---|---|---|---|---|
+| Alaska | AS 45.56.900(18) | Т02: «“investment adviser” includes a financial planner or other person that, as an integral component of other financially related services, provides investment advice to others for compensation as part of a business or that holds itself out as providing investment advice to others for compensation» | Justia 2018 через прокси, 200, 20 080 б; FindLaw через прокси 200, 29 894 б (текущая редакция, то же) | нет |
+| Arkansas | Ark. Code § 23-42-102(9)(B) | Т02-вариант: «“Investment adviser” includes a financial planner or other person that, as an integral component of other financially related services, provides or holds himself, herself, or itself out as providing investment advice to others for compensation and as part of a business.» | Justia через прокси, 200, 24 245 б | нет |
+| Hawaii | HRS § 485A-102 | Т02 | Justia через прокси, 200, 18 543 б | нет |
+| New Hampshire | RSA 421-B:1-102(26) | Т02 | Justia через прокси, 200, 41 808 б | нет |
+| New Mexico | NMSA § 58-13C-102 | Т02 | Justia (ред. 2021) через прокси, 200, 31 526 б | нет |
+| Oregon | ORS 59.015(20)(a) | Т56-вариант, **без planner**: «“State investment adviser” means a person who, for compensation: (A) Engages all or part of the time of the person, **in this state**, in the business of advising others … as to the value of securities …; (B) … managing an investment or trading account in securities …; (C) Issues or promulgates, as part of a regular business in this state, analyses or reports concerning securities.» Во всей главе 59 — 0 совпадений «planner» | oregonlegislature.gov через прокси (прямой не соединился), 200, 171 945 б | нет |
+| South Dakota | SDCL § 47-31B-102(15) | Т02 | sdlegislature.gov через прокси (прямой API — оболочка), 200, 18 461 б | нет |
+| Utah | Utah Code § 61-1-13(1)(q)(ii) | Т86-вариант как у MT: «"Investment adviser" includes a financial planner or other person who: (A) as an integral component of other financially related services, provides **the investment advisory services described in Subsection (1)(q)(i)** …» | le.utah.gov через прокси (прямой — SPA), 200, 37 338 б | нет |
+| West Virginia | W. Va. Code § 32-4-401(g) | Т86 дословно | code.wvlegislature.gov через прокси (прямой — без текста), 200, 13 179 б | нет |
+
+URL: AK https://law.justia.com/codes/alaska/2018/title-45/chapter-56/article-4/section-45.56.900/ и https://codes.findlaw.com/ak/title-45-trade-and-commerce/ak-st-sect-45-56-900/ ·
+AR https://law.justia.com/codes/arkansas/title-23/subtitle-2/chapter-42/subchapter-1/section-23-42-102/ · HI https://law.justia.com/codes/hawaii/title-26/chapter-485a/section-485a-102/ ·
+NH https://law.justia.com/codes/new-hampshire/title-xxxviii/chapter-421-b/section-421-b-1-102/ · NM https://law.justia.com/codes/new-mexico/2021/chapter-58/article-13c/article-1/section-58-13c-102/ ·
+OR https://www.oregonlegislature.gov/bills_laws/ors/ors059.html · SD https://sdlegislature.gov/Statutes/47-31B-102 · UT https://le.utah.gov/xcode/Title61/Chapter1/61-1-S13.html · WV https://code.wvlegislature.gov/32-4-401/
+
+Промежуточный итог (а): из 45 штатов + DC **ни один** не расширяет определение investment adviser на титул или
+«financial planning» без связи с ценными бумагами. Отступления от модели по-прежнему два — WA и MD (Г26).
+Единственный новый крючок — **Minnesota § 45.026** (отдельный закон, вне securities-кодекса, п. (в)).
+
+### П1(б)(в). Отдельные законы о планировщиках и ограничения титулов вне securities-кодексов
+
+**Поиск.** Два WebSearch-запроса («state law regulating use of title financial planner…», «financial planner title
+protection state legislation…»). Итог: кроме NV 628A (Г26) найдены **Minnesota § 45.026** (выше, группа 1) и
+**Connecticut Public Act 17-120** — новый.
+
+**Connecticut — Public Act No. 17-120 (sHB 6992), «AN ACT PROTECTING THE INTERESTS OF CONSUMERS DOING BUSINESS WITH
+FINANCIAL PLANNERS»**. Статус (cga.ct.gov через прокси, HTTP 200, 18 627 б, 16.09.2026;
+https://www.cga.ct.gov/asp/cgabillstatus/cgabillstatus.asp?selBillType=Bill&which_year=2017&bill_num=6992):
+«6/6/2017 Senate Passed as Amended by House Amendment Schedule A · 6/16/2017 Public Act 17-120 · 7/5/2017 Signed by the
+Governor». Текст акта (прямой curl, HTTP 200, 3 992 б; https://www.cga.ct.gov/2017/ACT/pa/2017PA-00120-R00HB-06992-PA.htm), дословно:
+> «Section 1. (NEW) (Effective from passage) (a) For purposes of this section and section 2 of this act, (1) "fiduciary
+> duty" means a duty to act with prudence in the best interests of a consumer with undivided loyalty to such consumer, and
+> (2) **"financial planner" means a person offering individualized financial planning or investment advice to a consumer
+> for compensation where such activity is not otherwise regulated by state or federal law.**
+> (b) No financial planner shall, in connection with an agreement with a consumer to provide financial planning or
+> investment advice for compensation, use a certificate, professional designation or form of advertising expressing or
+> implying that such person has special training, education or experience in advising or serving senior citizens, unless
+> such person has obtained a certificate, title or designation as described in section 36b-4 of the general statutes.
+> (c) **A financial planner shall disclose to a consumer, upon request, whether or not such financial planner has a
+> fiduciary duty to such consumer for each recommendation such financial planner makes to such consumer.**
+> Sec. 2. (NEW) … the Banking Commissioner shall provide on the department's Internet web site links to educational
+> materials on (1) financial planning and other designations … Approved July 5, 2017»
+Анализ OLR к первоначальной редакции (cga.ct.gov через прокси, HTTP 200, 5 342 б;
+https://cga.ct.gov/2017/BA/2017HB-06992-R000014-BA.htm) — позиция законодательного аппарата, не закон: «a "financial
+planner" is a person offering individualized financial planning or investment advice to a consumer for compensation who
+is not otherwise regulated by the federal Employee Retirement Income Security Act (ERISA), Investment Advisers Act, or
+Securities Exchange Act». Итоговый текст шире: «not otherwise regulated by state **or federal** law».
+Выжимка: **единственный найденный штат, где «financial planner» определён ПО ФУНКЦИИ и именно для тех, кого
+securities-режим не ловит** — то есть ровно для нас (индивидуальный план за подписку). Обязанности лёгкие:
+(1) не заявлять особой квалификации по обслуживанию пожилых («senior») без сертификата по CGS § 36b-4;
+(2) **по запросу клиента раскрывать, есть ли фидуциарная обязанность по каждой рекомендации**. Регистрации,
+лицензии, страховки нет. Санкция в акте не названа (вероятный канал — CUTPA, не проверено). Кодификация в
+C.G.S. **не установлена**: в главе 672a (securities) слова «planner» нет вовсе (0 совпадений на 284 473 б); поиск
+«P.A. 17-120, S. 1» результата не дал. → **ловит по функции, последствия минимальные**.
+
+**GAO-11-235** (18.01.2011; gao.gov через прокси, HTTP 200, 125 846 б; https://www.gao.gov/assets/a314689.html) —
+отчёт органа Конгресса, не закон. Дословно:
+> «Most states regulate the use of the title "financial planner," and state securities and insurance laws can apply to
+> the misuse of this title and other titles. For example, according to NASAA, at least 29 states specifically include
+> financial planners in their definition of investment adviser.[Footnote 25] According to NAIC, in many states,
+> regulators can use unfair trade practice laws to prohibit insurance agents from holding themselves out as financial
+> planners when in fact they are only engaged…»
+> «[25] The District of Columbia and Puerto Rico also include financial planners in their definitions of investment
+> adviser, according to NASAA.»
+> «Federal and state regulators told us they generally focused their oversight and enforcement actions on financial
+> planners' activities rather than the titles they use.»
+Выжимка: «29 штатов включают planners в определение» — это формулы Т86/Т02, которые наш проход прочитал дословно:
+все они привязаны к совету по securities. Цифра GAO **не противоречит** нашему выводу, а объясняет его: «regulate the
+title» у GAO = «planner, советующий по securities, — инвестсоветник». Страховой канал (unfair trade practices против
+**insurance agents**) к нам не относится — мы не страховые агенты.
+
+**Защита титула «financial planner»** — FPA (financialplanningassociation.org через прокси, HTTP 200, 5 645 б;
+https://www.financialplanningassociation.org/advocacy/policy-center/title-protection): позиция отраслевой ассоциации —
+«Currently, the term "financial planner" can be used freely and without basis for marketing purposes». Ни одного
+принятого закона о защите титула на странице не названо. Поиск принятых законов после 2023 г. — не дал результатов;
+**полноту по 2024–2026 не гарантирую** (сессии легислатур не просматривались поштучно).
+
+**Страховые правила о «senior»-титулах** (NASAA/NAIC Model Rule on Use of Senior-Specific Certifications) — существуют во
+многих штатах (упоминание — CGS § 36b-4(c) в анализе OLR; Conn. Agencies Regs. § 38a-432b-2), но адресованы
+участникам сделок с securities и страховым агентам. Нам — только как запрет слов «senior specialist», «retirement
+specialist for seniors» и т. п. без сертификата (через CT PA 17-120 § 1(b) это касается и нас).
+
+### П4. Электронная подпись под раскрытием WAC 460-24A-045(4) — Washington UETA (RCW 1.80) и E-SIGN
+
+**WAC 460-24A-045** (полная глава 460-24A, app.leg.wa.gov прямой curl, HTTP 200, 397 673 б, 16.09.2026;
+https://app.leg.wa.gov/wac/default.aspx?cite=460-24A&full=true) — дословно, целиком (правило регулятора):
+> «Holding out as a financial planner. If you use a term **deemed similar to** "financial planner" or "investment counselor"
+> under WAC 460-24A-040(2), you will not be considered to be holding yourself out as a financial planner for purposes of
+> RCW 21.20.005 and 21.20.040 under the following circumstances: (1) You are not in the business of providing advice
+> relating to the purchase or sale of securities, and would not, but for your use of such a term, be an investment
+> adviser required to register pursuant to RCW 21.20.040; and (2) You do not directly or indirectly receive a fee for
+> providing investment advice. … and (3) You deliver to every customer, at least forty-eight hours before accepting any
+> compensation, including commissions from the sale of any investment product, a **written disclosure** including the
+> following information: (a) You are not registered as an investment adviser or investment adviser representative in the
+> state of Washington; (b) You are not authorized to provide financial planning or investment advisory services and do not
+> provide such services; and (c) A brief description of your business …; and (4) You have each customer to whom a
+> disclosure described in subsection (3) of this section is given **sign a written dated acknowledgment of receipt** of the
+> disclosure; and (5) You **retain the executed acknowledgments** … for so long as you continue to receive compensation from
+> such customers, but in no case for less than three years from date of execution of the acknowledgment; and (6) If you
+> received compensation from the customer on more than one occasion, you need give the customer the disclosure … only on
+> the first occasion unless the information in the disclosure becomes inaccurate …» (WSR 19-03-133, eff. 18.02.2019)
+Попутное уточнение к Г26: гавань буквально покрывает **«term deemed similar to "financial planner"»** (список -040(2)),
+а не сам титул «financial planner». Кто называет себя дословно «financial planner», гаванью, по тексту, не пользуется.
+
+**Washington UETA, chapter 1.80 RCW** (app.leg.wa.gov прямой curl, HTTP 200, 160 575 б, 16.09.2026;
+https://app.leg.wa.gov/rcw/default.aspx?cite=1.80&full=true). Закон. Дословно:
+> «RCW 1.80.010 … (10) "Electronic signature" means an electronic sound, symbol, or process attached to or logically
+> associated with a record and executed or adopted by a person with the intent to sign the record. … (15) "Record" means
+> information that is inscribed on a tangible medium or that is stored in an electronic or other medium and is retrievable
+> in perceivable form. … "Transaction" means an action or set of actions occurring between two or more persons relating to
+> the conduct of business, commercial, or governmental affairs.»
+> «RCW 1.80.020 Scope. (1) … this chapter applies to electronic records and electronic signatures relating to a
+> transaction. (2) This chapter does not apply to a transaction to the extent it is governed by: (a) A law governing the
+> creation and execution of wills … (b) Title 62A RCW other than …» (исключения нас не касаются)
+> «RCW 1.80.030 … applies to any electronic record or electronic signature created … on or after June 11, 2020.»
+> «RCW 1.80.040 … (2) This chapter applies only to transactions between parties each of which has agreed to conduct
+> transactions by electronic means. Whether the parties agree … is determined from the context and surrounding
+> circumstances, including the parties' conduct. (3) A party that agrees to conduct a transaction by electronic means may
+> refuse to conduct other transactions by electronic means. The right granted by this subsection may not be waived…»
+> «RCW 1.80.060 … (3) If a law requires a record to be in writing, an electronic record satisfies the law. (4) If a law
+> requires a signature, an electronic signature satisfies the law.»
+> «RCW 1.80.070 (1) If parties have agreed to conduct a transaction by electronic means and a law requires a person to
+> provide, send, or deliver information in writing to another person, the requirement is satisfied if the information is
+> provided, sent, or delivered … in an electronic record capable of retention by the recipient at the time of receipt. An
+> electronic record is not capable of retention by the recipient if the sender or its information processing system
+> inhibits the ability of the recipient to print or store the electronic record.»
+> «RCW 1.80.110 (1) If a law requires that a record be retained, the requirement is satisfied by retaining an electronic
+> record of the information in the record which: (a) Accurately reflects the information … and (b) Remains accessible for
+> later reference.»
+> «RCW 1.80.190 … This chapter modifies, limits, and supersedes the electronic signatures in global and national commerce
+> act, 15 U.S.C. Sec. 7001 et seq., **but does not modify, limit, or supersede section 101(c) of that act, 15 U.S.C. Sec.
+> 7001(c)**, or authorize electronic delivery of any of the notices described in section 103(b) of that act…»
+
+**E-SIGN, 15 U.S.C. § 7001(c)** (govinfo.gov прямой curl, HTTP 200, 18 380 б, 16.09.2026;
+https://www.govinfo.gov/content/pkg/USCODE-2023-title15/html/USCODE-2023-title15-chap96-subchapI-sec7001.htm). Закон. Дословно:
+> «(c) Consumer disclosures (1) Consent to electronic records. Notwithstanding subsection (a), if a statute, **regulation,
+> or other rule of law** requires that information relating to a transaction or transactions in or affecting interstate or
+> foreign commerce be provided or made available to a consumer in writing, the use of an electronic record … satisfies the
+> requirement … if— (A) the consumer has affirmatively consented to such use and has not withdrawn such consent; (B) the
+> consumer, prior to consenting, is provided with a clear and conspicuous statement— (i) informing the consumer of (I) any
+> right or option of the consumer to have the record provided or made available on paper or in nonelectronic form, and
+> (II) the right of the consumer to withdraw the consent … (ii) informing the consumer of whether the consent applies …
+> (iii) describing the procedures the consumer must use to withdraw consent … and (iv) informing the consumer (I) how,
+> after the consent, the consumer may, upon request, obtain a paper copy …; (C) the consumer— (i) prior to consenting, is
+> provided with a statement of the hardware and software requirements for access to and retention of the electronic
+> records; and (ii) consents electronically, or confirms his or her consent electronically, in a manner that reasonably
+> demonstrates that the consumer can access information in the electronic form …; and (D) [при смене требований — повторно]
+> (2) … (B) Verification or acknowledgment. If a law that was enacted prior to this chapter expressly requires a record to
+> be provided or made available by a specified method that requires verification or acknowledgment of receipt, the record
+> may be provided or made available electronically only if the method used provides verification or acknowledgment of
+> receipt (whichever is required).»
+Список исключений § 7003(b) (govinfo, HTTP 200, 5 180 б) — судебные документы, уведомления об отключении
+коммунальных услуг, выселении/изъятии жилья, отмене страховки жизни/здоровья, отзыве товара, перевозке опасных
+грузов; раскрытия инвестсоветников в нём нет.
+
+**Выжимка П4.** Да — **электронно выполнимо**, но при трёх условиях: (1) клиент согласился вести сделку
+электронно (RCW 1.80.040(2); подписка онлайн — это и есть поведение-согласие); (2) раскрытие по (3) дано записью,
+которую клиент может сохранить и распечатать, не заблокированной (RCW 1.80.070(1)); (3) «written dated
+acknowledgment» (4) — электронная подпись (клик «Подтверждаю получение» с меткой времени, логически связанный с
+записью раскрытия) удовлетворяет требованию подписи (RCW 1.80.060(4) + определение 1.80.010(10)); хранение 3 года —
+электронно (1.80.110). **Поверх — процедура согласия потребителя E-SIGN § 7001(c)**: Вашингтон прямо её сохранил
+(RCW 1.80.190), а § 7001(c) распространяется и на «regulation», т. е. на WAC. Значит, перед электронным раскрытием —
+отдельное явное согласие с уведомлением о праве на бумагу, отзыве, техтребованиях и «демонстрацией доступа».
+Толкования DFI Washington именно к 045(4) **не найдено** (поиск по главе 460-24A: слова «internet» — 0 совпадений;
+«electronic» — только про электронную подачу форм в IARD/CRD, -047). Статус вывода — **толкование из текста норм**,
+не позиция регулятора. Практический смысл ограничен: гавань -045 нам всё равно неудобна (требует заявить «не оказываем
+услуг финансового планирования» и не покрывает дословный титул «financial planner»).
+
+### П2. Территориальность и интернет — часть 1 (модельный приказ NASAA 1997)
+
+**NASAA, «Interpretive Order Concerning Broker-Dealers, Investment Advisers, Broker-Dealer Agents and Investment Adviser
+Representatives Using the Internet for General Dissemination of Information on Products and Services», adopted April 27,
+1997** — модельный приказ (не закон; действует в штате, только если его издал администратор штата). nasaa.org напрямую
+HTTP 403 (2 341 б); через r.jina.ai HTTP 200, 7 209 б, 16.09.2026; https://www.nasaa.org/wp-content/uploads/2011/07/26-Interpretive_Order.pdf. Дословно:
+> «WHEREAS the [Administrator] further acknowledges that in certain instances, by distributing information on available
+> products and services through Internet Communications available to persons in this state, broker-dealers, investment
+> advisers … could be construed as "transacting business" for purposes of Sections 201(a) and 201(c) of the Act so as to
+> require registration in this state, since the Internet Communications would be received in this state regardless of the
+> intent of the person originating such communication; …
+> 1. … investment advisers … who use … the Internet … to distribute information on available products and services
+> through certain communications made on the Internet directed generally to anyone having access to the Internet … shall
+> not be deemed to be "transacting business" in this state … **based solely on that fact** if the following conditions are
+> observed: A. The Internet Communication contains a legend in which it is clearly stated that (1) the … investment adviser
+> … may only transact business in this state if first registered, excluded or exempted …; and (2) follow-up, individualized
+> responses to persons in this state … that involve … **the rendering of personalized investment advice for compensation**
+> … will not be made absent compliance with state … registration requirements, or an applicable exemption or exclusion;
+> B. The Internet Communication contains a mechanism, including and without limitation, technical "firewalls" or other
+> implemented policies and procedures, designed reasonably to ensure that prior to any subsequent, direct communication
+> with prospective customers or clients in this state, said … investment adviser … is first registered in this state or
+> qualifies for an exemption or exclusion from such requirement. …
+> C. The Internet Communication **does not involve** either effecting or attempting to effect transactions in securities,
+> or **the rendering of personalized investment advice for compensation**, as may be, in this state over the Internet,
+> **but is limited to the dissemination of general information on products and services**; …
+> 2. The position expressed in this Interpretive Order extends to state … registration requirements only, and does not
+> excuse compliance with applicable securities registration, antifraud or related provisions»
+Выжимка: «Internet Advice Exemption» в модели NASAA — **изъятие для РЕКЛАМЫ, а не для СОВЕТА**. Условие C прямо
+исключает «personalized … advice for compensation … over the Internet». Наш продукт — ровно индивидуальный совет за
+подписку через сайт. Если штат считает нас investment adviser (WA/MD при титуле), приказ нас **не защищает**; он
+защищает только сайт-витрину, пока жителю штата не выдан ни один персональный план, и требует легенду + firewall.
+
+### П2. Территориальность и интернет — часть 2 (WA, MD, NV, MN, федеральный уровень)
+
+**Washington — Securities Act Policy Statement PS-20, «Internet Advertising By Broker-Dealers, Investment Advisers, And
+Their Representatives», adopted 08.09.1997** (Securities Administrator Deborah R. Bortner) — **позиция регулятора**
+(policy statement), не закон и не правило. dfi.wa.gov прямой curl, HTTP 200, 29 933 б, 16.09.2026;
+https://dfi.wa.gov/industry/securities-act-interpretive-statements/securities-act-policy-statement-20 (реестр позиций —
+https://dfi.wa.gov/industry/securities-act-interpretive-statements, HTTP 200, 56 692 б). Дословно:
+> «Question presented: Is a broker-dealer, investment adviser, securities salesperson, or investment adviser
+> representative "transacting business in this state" by disseminating general information over the Internet that is
+> available to residents of this state? Statute: RCW 21.20.040 states that "it is unlawful for any person to transact
+> business in this state" as a broker-dealer, salesperson, investment adviser, or investment adviser representative unless
+> he or she is registered under this chapter. …
+> Conclusion: Broker-dealers, investment advisers, and their representatives who use the Internet to distribute
+> information on available products and services through communications directed generally to anyone having access to the
+> Internet shall not be deemed to be "transacting business" in this state for purposes of RCW 21.20.040, based solely on
+> that fact, if the following conditions are observed: A. The Internet Communication contains a legend which clearly
+> states that: (1) the … investment adviser … may not transact business in Washington unless appropriately registered, or
+> excluded or exempted from such registration; and (2) follow-up, individualized responses to persons in this state …
+> that involve … the rendering of personalized investment advice for compensation, will not be made absent compliance with
+> the appropriate registration requirements, or an applicable exemption or exclusion; B. … technical "firewalls" or other
+> implemented policies and procedures, designed to reasonably ensure that prior to any direct communication with
+> prospective customers or clients in this state, said … investment adviser … is first registered in this state or
+> qualifies for an exemption or exclusion …; C. The Internet Communication does not involve … **the rendering of
+> personalized investment advice for compensation in this state**, but is limited to the dissemination of general
+> information on products and services; …»
+Выжимка: WA принял модель NASAA 1997 почти дословно. Для нас — то же, что по модели: **витрина защищена, советы
+жителям WA — нет**. В RCW 21.20 отдельной секции о территориальном действии (аналога § 414 модели 1956) **не
+найдено**: поиск по полной главе (433 127 б, https://app.leg.wa.gov/rcw/default.aspx?cite=21.20&full=true) фраз «is made
+in this state», «originates from» — 0 совпадений. Операционный критерий — «transact business in this state»
+(RCW 21.20.040(3)), не определённый в законе; PS-20 — единственное найденное толкование, и оно исходит из того, что
+персональный совет жителю WA через интернет = деятельность «in this state». Собственный де-минимис WA —
+RCW 21.20.040(3)(b) (без места деятельности в штате и в пределах клиентского порога — установлено в Г26).
+
+**Maryland — Corps. & Ass'ns § 11-801 «Scope of Title»** (Justia через прокси, HTTP 200, 3 369 б, 16.09.2026;
+https://law.justia.com/codes/maryland/corporations-and-associations/title-11/subtitle-8/section-11-801/). Закон. Дословно:
+> «(a) Sections 11-301, 11-302, 11-303, 11-304, 11-401, 11-501, and 11-703 of this title apply to any person who: …
+> (2) Offers or provides investment advisory services if: (i) The contract for the investment advisory services is
+> executed in this State; (ii) **The investment advisory services are rendered in this State**; or (iii) Any action
+> instrumental in effecting prohibited conduct is taken in this State, **whether or not either party is then present in
+> this State**. …
+> (c) For the purpose of this section, an offer to sell or to buy is made in this State, whether or not either party is
+> then present in this State, if the offer: (1) Originates from this State; or (2) Is directed by the offeror to this
+> State and received at the place to which it is directed …
+> (e) An offer to sell or to buy, or to provide investment advisory services, is not made in this State if: (1) The
+> publisher circulates … any bona fide newspaper or other publication of general, regular, and paid circulation which is
+> not published in this State …; or (2) A radio or television program originating outside this State is received in this
+> State.
+> (f) Sections 11-302 and 11-401(b) of this title, as well as § 11-304 … apply if any act instrumental in effecting
+> prohibited conduct is done in this State, whether or not either party is then present in this State.»
+Выжимка: § 11-401 (регистрация) распространяется на того, кто «provides investment advisory services … rendered in this
+State» — **присутствие не нужно**. Изъятие (e) — только для газет и радио/ТВ; интернет туда не вписан. Аналога PS-20 в
+COMAR 02.02.05 **не найдено** (полная глава, regs.maryland.gov прямой curl, HTTP 200, 176 613 б; «internet» — 0,
+«electronic» — только электронная подача в IARD, .10); издавал ли Maryland Securities Commissioner отдельный приказ —
+**не установлено** (один WebSearch без результата; реестр приказов не просматривался).
+
+**Nevada — NRS 628A** (leg.state.nv.us через прокси, HTTP 200, 5 783 б, 16.09.2026; https://www.leg.state.nv.us/NRS/NRS-628A.html):
+> «3. "Financial planner" means a person who for compensation advises others upon the investment of money or upon
+> provision for income to be needed in the future, or who holds himself or herself out as qualified to perform either of
+> these functions, but does not include: (a) An attorney … (b) A certified public accountant … (c) A producer of
+> insurance …» (Added to NRS by 1993, 1372)
+Выжимка: в главе нет ни территориальной нормы, ни упоминания резидентов/«in this State», кроме исключений и
+«violated any law of this State». Применимость к иностранному сервису решается общими нормами о юрисдикции
+(long-arm, NRCP 4.2(a)) и коллизионным правом — **толкований применительно к 628A не найдено**. Разумный вывод:
+иск клиента-резидента Невады к нам по 628A.030 возможен в суде Невады, если мы целенаправленно обслуживаем жителей
+штата (подписка, оплата, персональный план) — это вывод из общих принципов, не норма.
+
+**Minnesota — § 45.026** — территориальной нормы тоже нет (текст выше, группа 1); применяется через общие полномочия
+комиссара § 45.027 subd. 5 (снято 16.09.2026, прямой curl, revisor.mn.gov/statutes/cite/45.027): «Whenever it appears to
+the commissioner that any person has engaged or is about to engage in any act or practice constituting a violation of
+any law, rule, or order related to the duties and responsibilities entrusted to the commissioner, the commissioner may
+bring an action in the name of the state … to enjoin the acts or practices and to enforce compliance … The terms of this
+subdivision govern an action … including an action against a person who, for whatever reason, claims that the subject
+law … does not apply to the person.»
+
+**Федеральный уровень.**
+(1) **Национальный де-минимис NSMIA, 15 U.S.C. § 80b-18a(d)** (govinfo прямой, HTTP 200, 6 186 б;
+https://www.govinfo.gov/content/pkg/USCODE-2023-title15/html/USCODE-2023-title15-chap2D-subchapII-sec80b-18a.htm). Закон:
+> «(d) National de minimis standard. No law of any State … requiring the registration, licensing, or qualification as an
+> investment adviser shall require an investment adviser to register with the securities commissioner of the State … or
+> to comply with such law (other than any provision thereof prohibiting fraudulent conduct) if the investment adviser—
+> (1) does not have a place of business located within the State; and (2) during the preceding 12-month period, has had
+> fewer than 6 clients who are residents of that State.»
+Оговорка: «investment adviser» в федеральном акте — по 15 U.S.C. § 80b-2(a)(11), т. е. советник **по securities**.
+Лицо, которое инвестсоветник только по титульному правилу штата (WA/MD), под федеральное определение не подпадает, и
+распространяется ли на него § 80b-18a(d) — **спорно; толкования не найдено**. Для запуска это не щит: < 6 клиентов
+— не бизнес-модель.
+(2) **SEC Rule 203A-2(e) «Internet investment advisers»** (eCFR API прямой, HTTP 200, 20 119 б;
+https://www.ecfr.gov/api/renderer/v1/content/enhanced/current/title-17?part=275&section=275.203A-2) — правило SEC:
+> «The prohibition of section 203A(a) of the Act (15 U.S.C. 80b-3a(a)) does not apply to: … (e) Internet investment
+> advisers. (1) An investment adviser that: (i) Provides investment advice to all of its clients exclusively through an
+> operational interactive website at all times during which the investment adviser relies on this paragraph (e); …
+> (2) … "operational interactive website" means a website, mobile application, or similar digital platform through which
+> the investment adviser provides digital investment advisory services on an ongoing basis to more than one client …»
+Выжимка: это **не изъятие из регистрации**, а право регистрироваться в SEC вместо штатов; доступно только
+инвестсоветнику по федеральному определению (securities). Нам, не советующим по ценным бумагам, **неприменимо и не
+нужно**. Термин «Internet Adviser Exemption» в отраслевой прессе относится именно к этому правилу, а не к изъятию для
+персонального совета; путать их нельзя.
+
+**Выжимка П2.** Ни одна найденная норма не выводит иностранный онлайн-сервис из-под законов WA, MD, NV, MN, если он
+**оказывает персональные услуги жителям штата**. MD прямо говорит «rendered in this State … whether or not either party
+is then present»; WA (PS-20) и модель NASAA освобождают только общую информацию на сайте, не персональный совет.
+Защита — не изъятие, а **геоблок/отказ в обслуживании** жителей конкретных штатов (или отказ от титула в WA/MD).
+
+### П3 (🆕). CFPB и UDAAP для бюджетно-долгового сервиса вне режимов инвестсоветника
+
+Источник текста: **govinfo.gov по адресам `USCODE-2023-title12/...-sec54xx.htm` отдал страницу «Page Not Found»**
+(HTTP 200, 43 107/44 165 б — размер ошибки одинаков для всех секций; путь `chap53-subchapV-partA-…` — 404,
+`chap53-subchapV-sec…` — страница-ошибка). Рабочий канал — **uscode.house.gov через `r.jina.ai`** (без браузерного
+UA; с UA прокси отдаёт капчу Cloudflare): § 5481 — HTTP 200, 36 205 б; § 5531 — 200, 4 222 б; § 5536 — 200, 2 675 б,
+все 16.09.2026.
+
+**12 U.S.C. § 5481(15)(A)(viii)** — ключевая норма (Закон; CFPA 2010 § 1002). Дословно:
+> «(15) Financial product or service (A) In general. The term "financial product or service" means— … (viii) **providing
+> financial advisory services** (other than services relating to securities provided by a person regulated by the
+> Commission or a person regulated by a State securities Commission, but only to the extent that such person acts in a
+> regulated capacity) **to consumers on individual financial matters** or relating to proprietary financial products or
+> services (other than by publishing any bona fide newspaper, news magazine, or business or financial publication of
+> general and regular circulation, including publishing market data, news, or data analytics or **investment information
+> or recommendations that are not tailored to the individual needs of a particular consumer**), including—
+> (I) **providing credit counseling to any consumer**; and (II) **providing services to assist a consumer with debt
+> management or debt settlement**, modifying the terms of any extension of credit, or avoiding foreclosure; …»
+
+**§ 5481(5)** «consumer financial product or service»:
+> «means any financial product or service that is described in one or more categories under— (A) paragraph (15) and is
+> **offered or provided for use by consumers primarily for personal, family, or household purposes**; or (B) clause (i),
+> (iii), (ix), or (x) of paragraph (15)(A), and is delivered, offered, or provided in connection with a consumer
+> financial product or service referred to in subparagraph (A).»
+
+**§ 5481(6)** «covered person»:
+> «means— (A) any person that engages in offering or providing a consumer financial product or service; and (B) any
+> affiliate of a person described in subparagraph (A) if such affiliate acts as a service provider to such person.»
+
+**§ 5531 «Prohibiting unfair, deceptive, or abusive acts or practices»** (CFPA § 1031):
+> «(a) In general. The Bureau may take any action authorized under part E to prevent a covered person or service provider
+> from committing or engaging in an unfair, deceptive, or abusive act or practice under Federal law in connection with any
+> transaction with a consumer for a consumer financial product or service, or the offering of a consumer financial product
+> or service.
+> (b) … The Bureau may prescribe rules applicable to a covered person or service provider identifying as unlawful unfair,
+> deceptive, or abusive acts or practices …
+> (c) Unfairness (1) … unless the Bureau has a reasonable basis to conclude that— (A) the act or practice causes or is
+> likely to cause substantial injury to consumers which is not reasonably avoidable by consumers; and (B) such substantial
+> injury is not outweighed by countervailing benefits to consumers or to competition. …
+> (d) Abusive. The Bureau shall have no authority … to declare an act or practice abusive … unless the act or practice—
+> (1) **materially interferes with the ability of a consumer to understand a term or condition** of a consumer financial
+> product or service; or (2) takes unreasonable advantage of— (A) **a lack of understanding on the part of the consumer of
+> the material risks, costs, or conditions** of the product or service; (B) the inability of the consumer to protect the
+> interests of the consumer in selecting or using a consumer financial product or service; or (C) **the reasonable
+> reliance by the consumer on a covered person to act in the interests of the consumer**.»
+
+**§ 5536 «Prohibited acts»** (CFPA § 1036):
+> «(a) In general. It shall be unlawful for— (1) any covered person or service provider— (A) to offer or provide to a
+> consumer any financial product or service not in conformity with Federal consumer financial law …; or (B) **to engage in
+> any unfair, deceptive, or abusive act or practice**; (2) any covered person or service provider to fail or refuse, as
+> required by Federal consumer financial law … (A) to permit access to or copying of records; (B) to establish or maintain
+> records; or (C) to make reports or provide information to the Bureau; or (3) any person to knowingly or recklessly
+> provide substantial assistance to a covered person … in violation of section 5531 …»
+
+**GAO-11-235, сноска 27** (позиция органа Конгресса, 2011; текст снят выше):
+> «[27] Section 1011 of the Dodd-Frank Act established the Bureau of Consumer Financial Protection to regulate "the
+> offering and provision of consumer financial products or services under the Federal consumer financial laws." A
+> financial product or service is defined in section 1002(15)(A)(viii) of the act to include financial advisory services
+> to consumers on individual financial matters, with the exception of advisory services related to securities provided by
+> a person regulated by SEC or a state securities commission … **Accordingly, it appears that the bureau may have
+> jurisdiction over financial planners to the extent that they may offer services that would not be under the jurisdiction
+> of SEC or a state securities commission.**»
+> «In theory, a financial planner could offer only services that do not fall under existing regulatory regimes—for example,
+> **advice on household budgeting**—but such an example is likely hypothetical…»
+
+**Правоприменительный пример: CFPB, In re Hello Digit, LLC, 2022-CFPB-0007, consent order 10.08.2022** — акт
+правоприменения, не закон (files.consumerfinance.gov: прямой curl HTTP 403, через `r.jina.ai` HTTP 200, 42 070 б;
+https://files.consumerfinance.gov/f/documents/cfpb_hello-digit-llc_consent-order_2022-08.pdf; карточка дела —
+https://www.consumerfinance.gov/enforcement/actions/hello-digit-llc/, через прокси HTTP 200, 2 339 б). Дословно:
+> «I. Jurisdiction 1. The Bureau has jurisdiction over this matter under §§ 1053 and 1055 of the CFPA, 12 U.S.C. §§ 5563
+> and 5565. … IV. Bureau Findings and Conclusions … 5. Digit is a financial-technology company with its principal place of
+> business in San Francisco, California. 6. **Digit is a "covered person" under 12 U.S.C. § 5481(6).** 7. Digit has offered
+> and provided a **personal-finance-management application** to consumers since February 2015. … Digit uses its own
+> proprietary algorithm to analyze consumers' checking-account data to determine when and how much to save for each
+> consumer.»
+Санкции по делу — $2,7 млн штрафа и не менее $68 145 возмещения. Оговорка: Digit **перемещал деньги** клиентов
+(автопереводы на счёт), то есть подпадал ещё и под (15)(A)(iv)-(v); наш продукт денег не двигает, и на «covered person»
+у нас работает именно (15)(A)(viii).
+
+**🔴 Прямой ответ П3: да, подпадаем.** Совет по **порядку погашения долгов** — это «services to assist a consumer with
+debt management» (§ 5481(15)(A)(viii)(II)) и одновременно «financial advisory services … on individual financial
+matters»; бюджетная часть — «credit counseling»/советы по личным финансам того же подпункта. Изъятие для securities
+нам не помогает (мы вне SEC/штатов по ценным бумагам — именно поэтому мы **внутри** CFPA), изъятие для издателей не
+применимо прямо по тексту: оно снято для рекомендаций, «tailored to the individual needs of a particular consumer», —
+а наши рекомендации персональные по определению продукта. Подписка = «for compensation» здесь даже не требуется:
+достаточно «offering or providing» потребителю для личных/семейных целей (§ 5481(5)).
+**Что из этого следует практически.** (1) Регистрации/лицензии у CFPB **нет** — режим не разрешительный: Бюро
+надзирает и наказывает. (2) Надзор (examinations) над небанками — только по § 5514 (крупные участники рынков,
+определённых правилом Бюро; рынков «credit counseling»/«debt management» среди принятых правил о larger participants
+нет — **проверено по списку рынков, но не по каждому правилу: считать «не установлено окончательно»**). (3) **Запрет
+UDAAP (§ 5536(a)(1)(B)) действует независимо от размера и надзора**, и полномочия по § 5531(d)(2)(C) прямо ловят
+«reasonable reliance by the consumer on a covered person to act in the interests of the consumer» — то есть язык
+продукта («мы действуем в ваших интересах», «оптимальный план») создаёт нам абьюзивный риск, если результат
+расходится с обещанием. (4) Нормы о территориальном действии CFPA в § 5481 нет; в найденных делах ответчики —
+американские компании. Применимость к иностранному поставщику, обслуживающему потребителей в США, **не установлена
+первоисточником** (дел против иностранного поставщика в заходе не найдено); текст «any person that engages in offering
+or providing» географии не содержит.
+
+## ИТОГ Г27
+
+### Полная таблица: 50 штатов + DC
+
+Колонки: **(а)** отступает ли определение investment adviser от модели в сторону «financial planner»/«holds out» БЕЗ
+связи с ценными бумагами · **(б)** запрет/ограничение титулов · **(в)** отдельный закон о financial planners вне
+securities-кодекса · **Ловит** — да (без титула) / титул (только при использовании титула) / нет / не установлено.
+Формулы: Т56 — модель 1956 (planner не упомянут), Т86 — поправка NASAA 1986 («the foregoing … advisory services»),
+Т02 — USA 2002 § 102(15). Все три формулы привязаны к совету по securities и нас не ловят.
+
+| # | Юрисдикция | Норма | (а) | (б) | (в) | Ловит |
+|---|---|---|---|---|---|---|
+| 1 | Alabama | Code § 8-6-2 | Т86 | нет | нет | нет |
+| 2 | Alaska | AS 45.56.900(18) | Т02 | нет | нет | нет |
+| 3 | Arizona | A.R.S. § 44-3101(5) | Т86 | нет | нет | нет |
+| 4 | Arkansas | § 23-42-102(9)(B) | Т02-вар. | нет | нет | нет |
+| 5 | California | Corp. Code § 25009(b) | титул «financial planner» **конъюнктивно** с securities | нет самостоятельного | нет | нет |
+| 6 | Colorado *(Г26)* | C.R.S. 11-51-201(9.5) | модель | нет | нет | нет |
+| 7 | Connecticut | C.G.S. § 36b-3(11) (Т56) + **PA 17-120 (2017)** | нет (в securities) | senior-designations § 1(b) | **да — PA 17-120: «financial planner» по ФУНКЦИИ** | **да, без титула** (обязанности: не заявлять senior-квалификацию; по запросу раскрыть наличие фидуциарной обязанности) |
+| 8 | Delaware | 6 Del. C. § 73-103(10) | Т86 | нет | нет | нет |
+| 9 | District of Columbia | D.C. Code § 31-5601.01(17)(A) | Т86-вар. | нет | нет | нет |
+| 10 | Florida | Fla. Stat. § 517.021(20) | Т56, слова «planner» в секции нет | нет | нет | **нет** (сниппет Г26 подтверждён первоисточником) |
+| 11 | Georgia | O.C.G.A. § 10-5-2 | Т02 | нет | нет | нет |
+| 12 | Hawaii | HRS § 485A-102 | Т02 | нет | нет | нет |
+| 13 | Idaho | § 30-14-102(15) | Т02 | нет | нет | нет |
+| 14 | Illinois | 815 ILCS 5/2.11 | Т86-вар., «in this State» | нет | нет | нет |
+| 15 | Indiana | IC 23-19-1-2(15) | Т02 | нет | нет | нет |
+| 16 | Iowa | § 502.102(15) | Т02 | нет | нет | нет |
+| 17 | Kansas | K.S.A. 17-12a102(15) | Т02 | нет | нет | нет |
+| 18 | Kentucky | KRS 292.310(11) | Т56 | нет | нет | нет |
+| 19 | Louisiana | R.S. 51:702(7) | Т56 | нет | нет | нет |
+| 20 | Maine | 32 M.R.S. § 16102(15) | Т02 | нет | нет | нет |
+| 21 | **Maryland** *(Г26)* | Corps. & Ass'ns § 11-101(i)(1)(ii); § 11-401(b); § 11-801 | **да**: ветка (ii)2 описывает процесс планирования, (ii)3 ловит титул | **да** (§ 11-101(i)(1)(ii)3 + COMAR 02.02.05.20) | нет | **титул — да; по функции — вероятно да, не разрешено** |
+| 22 | Massachusetts | M.G.L. c. 110A § 401(m) | Т86 | нет | нет | нет |
+| 23 | Michigan | MCL 451.2102a(e) | Т02 | нет | нет | нет |
+| 24 | **Minnesota** | Minn. Stat. § 45.026 | нет (в securities) | **да — перечень титулов** | **да — отдельный закон о business of financial planning** | **титул** (последствие: фидуциарная обязанность + иск + § 45.027 subd. 5) |
+| 25 | Mississippi | § 75-71-102(15) | Т02 | нет | нет | нет |
+| 26 | Missouri | § 409.1-102(15) | Т02 | нет | нет | нет |
+| 27 | Montana | MCA § 30-10-103(12) | Т86-вар. | нет | нет | нет |
+| 28 | Nebraska | § 8-1101(7) | Т86 | нет | нет | нет |
+| 29 | **Nevada** *(Г26)* | NRS 628A.010–.040 | нет (регистрации нет) | титул «holds himself out as qualified» | **да — NRS 628A** | **да при совете «upon provision for income to be needed in the future» или при титуле**: фидуциарий, ответственность, E&O/bond от $1 млн |
+| 30 | New Hampshire | RSA 421-B:1-102(26) | Т02 | нет | нет | нет |
+| 31 | New Jersey | N.J.S.A. 49:3-49(g)(1) | Т86-вар. | нет | нет | нет |
+| 32 | New Mexico | NMSA § 58-13C-102 | Т02 | нет | нет | нет |
+| 33 | New York | GBL § 359-eee(1)(a) | Т56, «within or from the state of New York» | нет | нет | нет |
+| 34 | North Carolina *(Г26)* | G.S. 78C-2(1) | Т86 | нет | нет | нет |
+| 35 | North Dakota | N.D.C.C. § 10-04-02(10) | Т86 | нет | нет | нет |
+| 36 | Ohio | ORC § 1707.01(X)(1) | Т56 | нет | нет | нет |
+| 37 | Oklahoma | 71 O.S. § 1-102(17) | Т02 | нет | нет | нет |
+| 38 | Oregon | ORS 59.015(20) | Т56-вар., «in this state», planner в главе 0 раз | нет | нет | нет |
+| 39 | Pennsylvania | 70 P.S. § 1-102(j) | Т56 + «electronic means» | нет | нет | нет |
+| 40 | Rhode Island | § 7-11-101(11) | Т56 | нет | нет | нет |
+| 41 | South Carolina | § 35-1-102(15) | Т02 + «regarding securities» | нет | нет | нет |
+| 42 | South Dakota | SDCL § 47-31B-102(15) | Т02 | нет | нет | нет |
+| 43 | Tennessee | T.C.A. § 48-1-102(13) | Т02-вар. | нет | нет | нет |
+| 44 | Texas | Gov't Code § 4001.059; 7 TAC 107.2, 116.1 | Т56 + «as may be further defined by board rule»; в правилах planner нет | нет | нет | нет |
+| 45 | Utah | § 61-1-13(1)(q)(ii) | Т86-вар. | нет | нет | нет |
+| 46 | Vermont | 9 V.S.A. § 5102(15) | Т02 | нет | нет | нет |
+| 47 | Virginia | § 13.1-501 | Т86 | нет | нет | нет |
+| 48 | **Washington** *(Г26)* | RCW 21.20.005(8), .040(3)–(4); WAC 460-24A-040, -045; PS-20 | **да — титул без securities** | **да — расширенный перечень титулов** (-040) | нет | **титул — да** (гавань -045 покрывает только «сходные» термины, не сам титул) |
+| 49 | West Virginia | § 32-4-401(g) | Т86 | нет | нет | нет |
+| 50 | Wisconsin | § 551.102(15)(a) | Т02 + «regarding securities» | нет | нет | нет |
+| 51 | Wyoming | § 17-4-102(a)(xv) | Т02 | нет | нет | нет |
+
+### 🔴 В скольких штатах нас ловит
+
+- **Без титула — 1 штат: Connecticut** (PA 17-120: «financial planner» = кто предлагает индивидуальное финансовое
+  планирование или совет за плату и **не урегулирован иначе**). Последствия минимальные: запрет заявлять
+  senior-квалификацию + раскрытие по запросу о наличии фидуциарной обязанности. Регистрации нет.
+- **Плюс 1 спорный без титула: Maryland** (ветка § 11-101(i)(1)(ii)2 — сбор данных → цели → анализ → «recommends a
+  financial plan»; единственная опора против — «information relating to investments»). Не разрешено ни в Г26, ни в Г27;
+  толкований Maryland Securities Division нет.
+- **Только при титуле — 4 штата: Washington, Maryland, Minnesota, Nevada.** Вашингтон и Мэриленд — с регистрацией
+  инвестсоветника; Миннесота и Невада — без регистрации, но с фидуциарной обязанностью (NV — ещё и страховка/бонд
+  от $1 млн). Невада ловит и без титула, если совет касается «provision for income to be needed in the future» —
+  накопительные цели под это подпадают по букве.
+- **Остальные 46 юрисдикций — нет.** Сплошной проход выполнен: 51 из 51 (46 в Г27 + 5 в Г26), по каждой снят
+  первоисточник, не сниппет. «Не проверено по бюджету» — **ноль** позиций по пункту (а).
+- Оговорка по полноте (б)/(в): отдельные законы вне securities-кодексов искались поисковыми запросами и найдены три
+  (NV, MN, CT). **Поштучный проход по кодексам всех штатов на предмет «financial planner» вне securities-раздела не
+  делался** — это другая работа объёмом ещё в один батч; вероятность пропустить ещё один CT-подобный закон не нулевая.
+
+### 🔴 Защищает ли нас Internet Advice Exemption
+
+**Нет.** Изъятие, которое в отрасли называют «Internet Adviser Exemption», — это два разных механизма, и ни один
+не наш:
+1. **Модельный приказ NASAA 1997** (в WA — PS-20 от 08.09.1997) освобождает от «transacting business in this state»
+   только **общую информацию на сайте**, и прямо требует, чтобы коммуникация **не включала** «the rendering of
+   personalized investment advice for compensation», плюс легенду и firewall. Персональный план за подписку — ровно то,
+   что условие C исключает.
+2. **SEC Rule 203A-2(e)** — не изъятие от регистрации, а право интернет-советника регистрироваться в SEC вместо
+   штатов; доступно только советнику по ценным бумагам. Нам неприменимо.
+Территориальность против нас: MD § 11-801(a)(2)(ii) — «investment advisory services are rendered in this State …
+whether or not either party is then present in this State»; изъятие (e) распространяется на газеты и радио/ТВ, интернет
+в нём отсутствует. В WA территориальной нормы нет вовсе, критерий — «transact business in this state», и PS-20 читает
+его против нас. Реальная защита — **не изъятие, а геоблок** (не обслуживать резидентов конкретных штатов) либо отказ
+от титула там, где ловит титул. Национальный де-минимис NSMIA (15 U.S.C. § 80b-18a(d): нет места деятельности в штате
+и < 6 клиентов-резидентов за 12 месяцев) как бизнес-модель не годится, и его применимость к «инвестсоветнику только по
+титульному правилу штата» спорна.
+
+### 🔴 Подпадаем ли под CFPB
+
+**Да, по прямому тексту закона.** Совет по порядку погашения долгов и по бюджету — «financial advisory services …
+to consumers on individual financial matters», включая «credit counseling» и «services to assist a consumer with debt
+management» (12 U.S.C. § 5481(15)(A)(viii)); продукт для личных/семейных целей делает его «consumer financial product
+or service» (§ 5481(5)), а нас — «covered person» (§ 5481(6)). Изъятие для securities-советников нам не помогает
+(мы вне SEC — и именно поэтому внутри CFPA), издательское изъятие снято для рекомендаций, «tailored to the individual
+needs of a particular consumer». Разрешительного режима нет: нет ни лицензии, ни регистрации — есть **запрет UDAAP**
+(§ 5536(a)(1)(B)) и полномочия Бюро (§ 5531), включая «abusive» через «reasonable reliance by the consumer on a covered
+person to act in the interests of the consumer» (§ 5531(d)(2)(C)). Прецедент по персональному финансовому приложению —
+Hello Digit (2022-CFPB-0007): «Digit is a "covered person" under 12 U.S.C. § 5481(6)», $2,7 млн штрафа. Применимость к
+**иностранному** поставщику первоисточником не подтверждена и не опровергнута — географического ограничения в тексте
+нет, дел против иностранцев не найдено.
+
+### 🔴 Электронная подпись под WAC 460-24A-045(4)
+
+Выполнимо электронно: RCW 1.80.060(3)–(4) (электронная запись и подпись удовлетворяют требованиям «в письменной
+форме» и «подпись»), 1.80.070(1) (запись, пригодная к сохранению), 1.80.110 (электронное хранение 3 года) — при
+условии согласия сторон вести сделку электронно (1.80.040(2)). **Поверх — процедура согласия потребителя E-SIGN
+15 U.S.C. § 7001(c)**, которую Вашингтон сохранил (RCW 1.80.190) и которая распространяется на «regulation», т. е. на
+WAC. Толкования DFI именно к 045(4) нет — вывод из текста норм. Практическая ценность мала: сама гавань -045 требует
+заявить «не оказываем услуг финансового планирования» и, по букве, покрывает лишь термины, «сходные» с «financial
+planner», а не сам титул.
+
+### 🔴 Запрещённые для продукта слова и формулировки (сводно по США)
+
+Красная зона (использование = самостоятельное основание регулирования, без изменения функциональности):
+- **«financial planner», «financial planning services», «financial planning»** — WA (RCW 21.20.005(8), WAC 460-24A-040),
+  MD (§ 11-101(i)(1)(ii)3), MN (§ 45.026(1)(b)), CA (§ 25009(b) — вместе с советом по securities).
+- **«financial consultant», «financial adviser/advisor», «financial counselor», «investment counselor», «investment
+  adviser», «money manager», «investment planner»** и любые комбинации, создающие впечатление услуг финансового
+  планирования — WA (перечень -040), MD («any other similar type of adviser»), MN (перечень § 45.026(1)(b)).
+- **«wealth manager», «wealth management»** — прямо в перечнях не найдено, но подпадает под «similar designation,
+  title, or combination» (MN) и «combinations» (WA): считать красной зоной по аналогии, не по букве.
+- **«holding out as qualified to advise upon the investment of money or upon provision for income to be needed in the
+  future»** — формула NRS 628A.010(3); избегать буквальных обещаний «обеспечим доход в будущем».
+- **«senior specialist», «certified senior adviser», «retirement specialist for seniors»** и любые обозначения особой
+  подготовки по работе с пожилыми без соответствующего сертификата — CT PA 17-120 § 1(b) (для нас как «financial
+  planner» по функции), CGS § 36b-4(c), плюс аналогичные модельные правила NASAA/NAIC в других штатах.
+Жёлтая зона (создаёт риск по CFPA § 5531(d)(2)(C) и по антифрод-нормам, а не отдельный режим):
+- «действуем в ваших интересах», «фидуциарный», «в вашу пользу», «best interest» — порождают «reasonable reliance …
+  to act in the interests of the consumer»;
+- «оптимальный/лучший план», «гарантированно погасите долг за N месяцев», «guaranteed» — WAC 460-24A-140 запрещает
+  «guarantees of success» для советников, а для всех прочих это классическое deceptive practice;
+- «инвестиционный совет», «рекомендуем вложить», любые имена конкретных ценных бумаг/фондов — переводит нас в
+  securities-режим во всех 51 юрисдикциях сразу.
+Нейтральные формулировки, которые остаются доступными: «сервис расчёта распределения свободного денежного потока»,
+«калькулятор/модель погашения долгов», «инструмент планирования бюджета» (**без** слова «planner» в роли титула лица),
+«справочный расчёт, не является индивидуальной инвестиционной рекомендацией».
+
+### Что осталось неизвестным по Г27
+
+1. Кодификация CT PA 17-120 в C.G.S. (в главе 672a слова «planner» нет; поиск «P.A. 17-120, S. 1» результата не дал) и
+   санкция за нарушение § 1 (вероятный канал — CUTPA, не проверено).
+2. Издавал ли Maryland Securities Commissioner интернет-приказ в стиле NASAA 1997 (в COMAR 02.02.05 его нет; реестр
+   приказов Division of Securities не просматривался).
+3. Толкование Maryland § 11-101(i)(1)(ii)2 (функциональная ветка) — хвост из Г26, не снят.
+4. Применимость CFPA к иностранному поставщику без присутствия в США — дел не найдено; норма географии не содержит.
+5. Есть ли среди правил CFPB о «larger participants» рынок, покрывающий credit counseling/debt management (проверен
+   перечень рынков, не каждое правило).
+6. Законы штатов о financial planners **вне** securities-кодексов сверх найденных трёх (NV, MN, CT) — поштучный проход
+   по всем кодексам не делался.
+7. Принятые в 2024–2026 гг. законы о защите титула «financial planner» — на странице FPA ни одного не названо, поиск
+   принятых актов результата не дал; поштучно сессии легислатур не просматривались.
+8. Законы штатов о **debt management services / debt adjusting** (лицензирование посредников между должником и
+   кредиторами) в Г27 не исследовались — отдельный класс норм, кандидат в следующий батч: по букве UDMSA они ловят
+   посредничество и получение средств, а не чистый совет, но проверка не проводилась.
+
+### Процесс — прозрачно
+
+Тип запроса: **breadth-first** (51 независимая юрисдикция + 3 самостоятельных под-вопроса). **Субагентов — ноль**:
+всё снято вахтой, ради правила «сырьё в файл после каждой группы» и после падения на лимите аккаунта в середине
+батча (обрыв произошёл на переходе к П3; записанное к тому моменту — П1 целиком, П2, П4 — уцелело, работа
+продолжена с этого места на другом аккаунте). Записей в файл — **8 дописываний** по ходу.
+Собственных `WebSearch` — 12. Каналы: прямой `curl` (leg.state.fl.us, azleg.gov, cga.ct.gov, delcode.delaware.gov,
+code.dccouncil.gov, legis.iowa.gov, ksrevisor.gov, legislature.maine.gov, revisor.mo.gov, leg.mt.gov, ndlegis.gov,
+rilegislature.gov (через прокси), scstatehouse.gov, legislature.vermont.gov, law.lis.virginia.gov, app.leg.wa.gov,
+dfi.wa.gov, regs.maryland.gov, govinfo.gov, ecfr.gov, revisor.mn.gov, statutes.capitol.texas.gov (оболочка),
+law.cornell.edu); `r.jina.ai` (Justia — 12 штатов, nysenate.gov, malegislature.gov, ilga.gov, codes.ohio.gov,
+legislature.mi.gov, legislature.idaho.gov, nebraskalegislature.gov, oregonlegislature.gov, sdlegislature.gov,
+le.utah.gov, code.wvlegislature.gov, docs.legis.wisconsin.gov, legis.state.pa.us, nasaa.org, gao.gov, leg.state.nv.us,
+uscode.house.gov, files.consumerfinance.gov, financialplanningassociation.org).
+Не прошли: govinfo по Title 12 (страница-ошибка на всех вариантах пути — лечится uscode.house.gov через прокси);
+uscode.house.gov напрямую (соединение 000); files.consumerfinance.gov и consumerfinance.gov напрямую (403);
+akleg.gov (JS-якорь без текста); gc.nh.gov (403), capitol.hawaii.gov (через прокси 924 б) — обойдены через Justia;
+пять адресов Justia с неверным подразделом (AK, AR, HI, NH, NM) — исправлены поиском.
+🔴 Замер канала: **`r.jina.ai` нельзя звать с браузерным User-Agent** — прокси в этом случае отдаёт капчу Cloudflare;
+без UA тот же адрес отвечает 200.
+
+
+---
+
+## ДОБОР Г28 (16.09.2026)
+
+**Состояние каналов на начало работы** (замер 16.09.2026, `curl -sk --http1.1`, таймаут 25 с):
+`WebSearch` — доступен. `Exa` (`mcp__exa__*`) — 🟢 работает. `r.jina.ai` (без браузерного UA) — **HTTP 200**,
+367 б. OpenAlex — **200**, 16 851 б. Crossref — **200**, 2 482 б. EuropePMC — **200**, 1 190 б.
+**Wayback — 429** (117 б) на старте и **429** при повторной проверке через час: лежит, вопреки пометке 🟢
+в задании. `pravo.gov.ru` — **200**, 27 995 б. `consultant.ru` — **200**, 47 360 б.
+`gesetze-im-internet.de` — доступен и напрямую, и через прокси; 🔴 **`/gewo/__34k.html` отдаёт HTTP 404**
+(216 б) — и это оказалось содержательным фактом, а не сбоем (см. ниже). `rkn.gov.ru` — **403**.
+
+Область добора: пункт 7 очереди Г28 — § 34k GewO и статус Schuldnerberatung в немецком праве.
+Пункты 1–6 (152-ФЗ, КоАП, РКН) — в файле `pdf_statement_parsing_accuracy_2026-09-13.md`.
+
+### Пункт 7. Германия: нужна ли лицензия § 34k GewO для совета по УЖЕ СУЩЕСТВУЮЩЕМУ долгу
+
+**Статус: добыто, включая текст нормы и материалы законодателя. Ответ: нет, не нужна — лицензия
+привязана к заключению нового договора. Но найдена вторая, более близкая к нам преграда: RDG.**
+
+#### 7.1. 🔴 Почему § 34k не открывался в Г26: его ещё нет в действующей редакции
+
+`https://www.gesetze-im-internet.de/gewo/__34k.html` — **HTTP 404** и напрямую, и через `r.jina.ai`.
+В оглавлении GewO (`https://r.jina.ai/https://www.gesetze-im-internet.de/gewo/index.html` — **HTTP 200,
+30 760 б**) идут подряд «§ 34j Verordnungsermächtigung» → «**§ 34l Verordnungsermächtigung**»: **§ 34k
+в оглавлении отсутствует**, при этом § 34l уже опубликован и на § 34k прямо ссылается.
+
+Причина: **§ 34k вступает в силу 20.11.2026**, то есть через два месяца после даты этого добора.
+Портал `gesetze-im-internet.de` публикует действующую редакцию и параграф ещё не показывает.
+Подтверждение — карточка NWB Gesetze: «**§ 34k [tritt am 20.11.2026 in Kraft:] Darlehensvermittler**»
+(`https://datenbank.nwb.de/Dokument/136661_34k/`, найдено через Exa, дата публикации карточки 19.07.2026).
+Норма о вступлении — Art. 16 закона-имплементатора, дословно из Beschlussempfehlung BT-Drs. 21/5381:
+«Artikel 16 Inkrafttreten (1) **Dieses Gesetz tritt vorbehaltlich des Absatzes 2 am 20. November 2026
+in Kraft.** (2) Am Tag nach der Verkündung treten in Kraft: 1. Artikel 1 Nummer 6 Buchstabe c und Nummer 19,
+**2. in Artikel 7 Nummer 6 § 34l der Gewerbeordnung** sowie 3. Artikel 15.»
+
+То есть § 34l введён в силу на день после опубликования (чтобы министерство успело издать подзаконный акт),
+а сам § 34k — только с 20.11.2026. Это ровно объясняет картину «§ 34l есть, § 34k 404».
+
+#### 7.2. Закон-имплементатор: реквизиты
+
+**«Gesetz zur Umsetzung der Richtlinie (EU) 2023/2225 über Verbraucherkreditverträge und zur Regelung
+der Förderung klimaneutraler Mobilität».** Принят Бундестагом **17.04.2026**; опубликован в
+Bundesgesetzblatt Teil I: `https://www.recht.bund.de/bgbl/1/2026/139/VO.html` (BGBl. I 2026 Nr. 139).
+Правительственный проект — BT-Drs. **21/1851** (текст: `dserver.bundestag.de`, копия
+`inkasso.de/fileadmin/user_upload/mitgliederinformationen/2025_09_29_RegE_21_1851.pdf`);
+Beschlussempfehlung und Bericht профильного комитета — BT-Drs. **21/5381**
+(`https://dserver.bundestag.de/btd/21/053/2105381.pdf`); отчёт бюджетного комитета — BT-Drs. **21/5382**.
+Референтский проект BMJV — `https://www.bmjv.de/SharedDocs/Gesetzgebungsverfahren/DE/2025_VerbraucherkreditRL.html`
+(RegE от 03.09.2025).
+
+Срок транспозиции по Art. 48 Abs. 1 CCD II — 20.11.2025 — **Германией пропущен**; срок применения
+Art. 48 Abs. 2 — 20.11.2026 — соблюдён. Формулировка Noerr, дословно: «Die in Art. 48 Abs. 1 VK-RL 2023
+vorgesehene Umsetzungsfrist (20.11.2025) konnte damit – wie auch in anderen EU-Mitgliedstaaten – nicht
+eingehalten werden. Der maßgebliche Anwendungszeitpunkt des 20.11.2026 gemäß Art. 48 Abs. 2 VK-RL 2023
+wird gleichwohl gewahrt.» (`https://www.noerr.com/de/insights/gesetz-zur-umsetzung-der-verbraucherkreditrichtlinie-2023-beschlossen`,
+17.04.2026 — **комментарий юрфирмы, не норма**.)
+
+#### 7.3. § 34k Abs. 1 GewO — дословно (редакция, вступающая в силу 20.11.2026)
+
+Источник текста: NWB Gesetze, карточка § 34k (через Exa).
+
+> «(1) Wer gewerbsmäßig **gegen eine Vergütung**, die aus einer Geldzahlung oder einem sonstigen
+> vereinbarten wirtschaftlichen Vorteil bestehen kann, **den Abschluss** von Allgemein-Verbraucher­
+> darlehensverträgen nach § 491 Absatz 2 des Bürgerlichen Gesetzbuchs oder von Finanzierungshilfen
+> nach § 506 Absatz 1 des Bürgerlichen Gesetzbuchs, mit Ausnahme von Verträgen im Sinne des § 34i
+> Absatz 1 Satz 1, **vermitteln** oder **die Gelegenheit zum Abschluss solcher Verträge nachweisen**
+> oder **Dritte zu solchen Verträgen beraten** oder **in anderer Weise beim Abschluss eines solchen
+> Vertrages behilflich** sein will (Darlehensvermittler), bedarf nach Maßgabe der folgenden Bestimmungen
+> der Erlaubnis der zuständigen Behörde.»
+
+🔴 **Разбор четырёх альтернатив — это и есть ответ на вопрос Г26.** Все четыре грамматически подчинены
+одному дополнению — «den Abschluss … von Verträgen»:
+1. `vermitteln` — посредничество при **заключении**;
+2. `die Gelegenheit zum Abschluss … nachweisen` — указание на возможность **заключить**;
+3. `Dritte zu solchen Verträgen beraten` — консультирование **к таким договорам**, то есть к их заключению;
+4. `in anderer Weise beim Abschluss … behilflich sein` — прямо «при **заключении**».
+
+Третья альтернатива — единственная, где формально нет слова «Abschluss», и именно она давала сомнение
+в Г26. Она снимается двумя внутренними подтверждениями из того же параграфа:
+
+- **Abs. 5 Satz 1 Nr. 1** (о Honorar-Darlehensberater), дословно: «müssen **für ihre Empfehlung für oder
+  gegen einen Allgemein-Verbraucherdarlehensvertrag** oder eine Finanzierungshilfe im Sinne des Absatzes 1
+  **eine ausreichende Zahl von auf dem Markt verfügbaren Verträgen einbeziehen**». Требование «перебрать
+  достаточное число доступных НА РЫНКЕ договоров» имеет смысл только для выбора **нового** продукта.
+  К уже взятому долгу оно неприменимо по конструкции.
+- **Abs. 5 Satz 1 Nr. 2**: консультант «dürfen vom Darlehensgeber für ihre Beratungsleistung keine
+  Zuwendungen annehmen» — запрет вознаграждения от кредитора, то есть регулируется ситуация продажи.
+
+Плюс внешнее подтверждение из материалов законодателя: в Gesetzesbegründung прямо выведены из-под
+лицензии «Tippgeber» — те, кто лишь сводит потенциального заёмщика с кредитором (пересказ Noerr, дословно:
+«dass "Tippgeber", die lediglich Kontakte zwischen potenziellen Darlehensnehmern und Darlehensgebern
+herstellen oder einen Darlehensvermittler vermitteln, nicht unter die Erlaubnispflicht fallen»).
+
+**Второй независимый фильтр — «gegen eine Vergütung».** Noerr, дословно: «Das Gesetz präzisiert, dass
+die Erlaubnispflicht **nur bei der Vermittlung gegen eine Vergütung** eingreift, die aus einer Geldzahlung
+oder einem sonstigen vereinbarten wirtschaftlichen Vorteil bestehen kann <…> Ein bloß mittelbar
+angestrebter wirtschaftlicher Vorteil dürfte somit künftig keine Erlaubnispflicht für die
+Darlehensvermittlung auslösen.» Вознаграждение должно быть **за посредничество/консультацию по договору**;
+подписка за пользование софтом, не привязанная к заключению кредитного договора, под это не подводится.
+
+**Что ещё нового в § 34k, важного для картины:**
+- Abs. 3 Satz 1 Nr. 3 — обязательный **Sachkundenachweis** (экзамен в IHK) по «fachliche und rechtliche
+  Grundlagen sowie Kundenberatung»; ранее по § 34c хватало Zuverlässigkeit и geordnete Vermögensverhältnisse.
+- Abs. 4 Nr. 1 — исключение для кредитных институтов с лицензией § 32 Abs. 1 KWG.
+- Abs. 4 Nr. 3 — исключение для микро-, малых и средних предприятий, которые ведут такую деятельность
+  **лишь для финансирования собственных продаж товаров/услуг**.
+- Abs. 5 Satz 2 — 🔴 **несовместимость ролей**: «Honorar-Darlehensberater dürfen keine Tätigkeit als
+  Darlehensvermittler und Darlehensvermittler dürfen keine Tätigkeit als Darlehensberater ausüben.»
+- Abs. 6 — обязанность непрерывного обучения; Abs. 7 — запрет привязки вознаграждения персонала
+  к планам продаж; Abs. 8 — обязательная регистрация в реестре § 11a GewO.
+- Переход (§ 162 GewO): держатели разрешения по § 34c должны подать заявление на новое разрешение
+  **до 31.05.2027**, иначе старое гаснет **19.11.2027**.
+- Сопутствующий подзаконный акт — «Verordnung zur Umsetzung der Richtlinie (EU) 2023/2225 über
+  Verbraucherkreditverträge im Gewerberecht», BR-Drs. 320/26 (`https://dserver.bundestag.de/brd/2026/0320-26.pdf`):
+  детализирует Sachkundeprüfung (три блока: Kundenberatung; fachliche Kenntnisse für die Vermittlung von
+  und die Beratung zu Allgemeinverbraucherdarlehen; Finanzierung und Kreditprodukte), Weiterbildung
+  и порядок регистрации. Оценка нагрузки на бизнес только от обязанности обучения — **62 794 000 евро в год**.
+
+#### 7.4. § 511 BGB: что такое Beratungsleistung
+
+Действующая (до 20.11.2026) редакция § 511 Abs. 1 BGB — дословно
+(`https://r.jina.ai/https://www.gesetze-im-internet.de/bgb/__511.html` — **HTTP 200, 1 492 б**):
+
+> «(1) Bevor der Darlehensgeber dem Darlehensnehmer **individuelle Empfehlungen zu einem oder mehreren
+> Geschäften erteilt, die im Zusammenhang mit einem Immobiliar-Verbraucherdarlehensvertrag stehen
+> (Beratungsleistungen)**, hat er den Darlehensnehmer über <…> zu informieren.»
+
+Abs. 2, дословно: «Vor Erbringung der Beratungsleistung hat sich der Darlehensgeber über den Bedarf,
+die persönliche und finanzielle Situation sowie über die Präferenzen und Ziele des Darlehensnehmers
+zu informieren, soweit dies **für eine passende Empfehlung eines Darlehensvertrags** erforderlich ist.»
+Abs. 3: «Der Darlehensgeber hat dem Darlehensnehmer <…> **ein geeignetes oder mehrere geeignete Produkte
+zu empfehlen** oder ihn darauf hinzuweisen, dass er kein Produkt empfehlen kann.»
+
+С 20.11.2026 та же конструкция распространяется на Allgemein-Verbraucherdarlehen (Art. 1 Nr. 28 закона;
+ссылка на § 511 в новой ч. 1 § 506 BGB — из BT-Drs. 21/5381). **Ключевое:** Beratungsleistung во всех
+редакциях определена через **рекомендацию ПРОДУКТА** — «Empfehlung eines Darlehensvertrags», «geeignete
+Produkte empfehlen». Рекомендация «в каком порядке гасить уже имеющиеся долги» продуктом не является.
+
+#### 7.5. Schuldnerberatung: требует ли немецкое право отдельного статуса
+
+**Да — и это преграда, более близкая к нашему продукту, чем § 34k.** Механизм не лицензионный
+(не GewO), а запретительный (RDG).
+
+**RDG § 3, дословно** (`https://r.jina.ai/https://www.gesetze-im-internet.de/rdg/__3.html` — HTTP 200, 782 б):
+«Die selbständige Erbringung außergerichtlicher Rechtsdienstleistungen ist unzulässig, soweit sie nicht
+erlaubt wird durch dieses Gesetz oder durch oder aufgrund anderer Gesetze.» — **общий запрет** с оговоркой
+о разрешениях, а не разрешительный порядок.
+
+**RDG § 2 Abs. 1, дословно** (HTTP 200, 1 495 б): «Rechtsdienstleistung ist **jede Tätigkeit in konkreten
+fremden Angelegenheiten, sobald sie eine rechtliche Prüfung des Einzelfalls erfordert**.»
+Abs. 2 отдельно относит к Rechtsdienstleistung инкассо. Abs. 3 перечисляет, что ею НЕ является
+(научные заключения, третейские и примирительные органы, обсуждение с представительствами работников).
+
+**RDG § 8 Abs. 1 Nr. 3, дословно** (HTTP 200, 1 104 б): разрешены Rechtsdienstleistungen, которые
+оказывают «**nach Landesrecht als geeignet anerkannte Personen oder Stellen im Sinn des § 305 Abs. 1 Nr. 1
+der Insolvenzordnung**». Там же Nr. 4 — «Verbraucherzentralen und andere mit öffentlichen Mitteln
+geförderte Verbraucherverbände».
+
+**InsO § 305 Abs. 1 Nr. 1, дословно** (HTTP 200, 3 848 б): должник обязан приложить к заявлению
+«eine Bescheinigung, die von einer **geeigneten Person oder Stelle** auf der Grundlage persönlicher
+Beratung und eingehender Prüfung der Einkommens- und Vermögensverhältnisse des Schuldners ausgestellt ist
+und aus der sich ergibt, daß eine **außergerichtliche Einigung mit den Gläubigern über die
+Schuldenbereinigung auf der Grundlage eines Plans** innerhalb der letzten sechs Monate <…> erfolglos
+versucht worden ist; <…> **die Länder können bestimmen, welche Personen oder Stellen als geeignet
+anzusehen sind**.»
+
+**Конструкция целиком:** внесудебная юридическая услуга запрещена (§ 3 RDG), если не разрешена; для
+Schuldnerberatung разрешение даётся через признание земельным правом «geeignete Stelle» по § 305 Abs. 1
+Nr. 1 InsO (§ 8 Abs. 1 Nr. 3 RDG). То есть **отдельный статус нужен, он признаётся землёй, а не
+федерацией, и критерии у каждой земли свои.**
+
+**Спасательный клапан — RDG § 5 Abs. 1, дословно** (HTTP 200, 805 б): «Erlaubt sind Rechtsdienstleistungen
+im Zusammenhang mit einer anderen Tätigkeit, **wenn sie als Nebenleistung zum Berufs- oder Tätigkeitsbild
+gehören**. Ob eine Nebenleistung vorliegt, ist nach **ihrem Inhalt, Umfang und sachlichen Zusammenhang
+mit der Haupttätigkeit** unter Berücksichtigung der Rechtskenntnisse zu beurteilen, die für die
+Haupttätigkeit erforderlich sind.» Abs. 2 называет три закрытых случая презумпции (Testamentsvollstreckung,
+Haus- und Wohnungsverwaltung, Fördermittelberatung) — нас там нет, значит для нас работает только
+общий тест Abs. 1.
+
+**Косвенное подтверждение того, что законодатель видит Schuldnerberatung отдельным институтом:**
+(1) BMJV прямо пишет, дословно: «**Weitere Regelungen zur Schuldnerberatung werden durch einen separaten
+Referentenentwurf geschaffen**, der ebenfalls durch das Bundesministerium der Justiz und für
+Verbraucherschutz erarbeitet wird» — то есть долговое консультирование регулируется ОТДЕЛЬНЫМ законом,
+не этим; (2) новый **§ 18a Abs. 8c KWG** обязывает кредитные институты «Darlehensnehmer von AVD, die in
+finanzielle Schwierigkeiten geraten sind, frühzeitig zu erkennen» и «diese Darlehensnehmer **an
+Schuldnerberatungsdienste zu verweisen**» — банк обязан направить к Schuldnerberatung, а не оказывать её.
+
+#### 7.6. Прямой ответ на вопрос пункта
+
+**Нужна ли немецкая лицензия § 34k GewO для совета по УЖЕ СУЩЕСТВУЮЩЕМУ долгу? — Нет.**
+Три независимых основания:
+1. **Текст нормы.** Все четыре альтернативы § 34k Abs. 1 подчинены «den Abschluss … von Verträgen».
+   Существующий долг договором, который предстоит заключить, не является.
+2. **Внутренняя логика параграфа.** Abs. 5 требует от Honorar-Darlehensberater перебирать «доступные
+   на рынке договоры» — операция, не имеющая смысла применительно к уже выданному кредиту.
+3. **Определение Beratungsleistung в § 511 BGB** — это рекомендация **продукта** («Empfehlung eines
+   Darlehensvertrags», «geeignete Produkte empfehlen»). Наш вывод «гаси лавиной: сначала долг под 29 %,
+   потом под 17 %» рекомендацией продукта не является.
+
+🔴 **Но ответ на исходный вопрос Г26 неполон, если остановиться здесь: в Германии нас ловит не GewO,
+а RDG.** Совет «в каком порядке гасить долги» сам по себе вне RDG — это арифметика, а не
+«rechtliche Prüfung des Einzelfalls». Но соседние функции переводят продукт под § 2 Abs. 1 RDG:
+разбор конкретного кредитного договора на предмет ничтожности, расчёт последствий досрочного
+погашения по конкретным условиям, подготовка Schuldenbereinigungsplan, переговоры с кредиторами.
+**Это ровно тот же класс границы, что мы уже проводили по другим юрисдикциям: «расчёт и раскладка» —
+можно, «оценка правовых последствий конкретного договора» — нельзя без статуса.**
+Для Германии статус получается не лицензией предпринимателя, а признанием земли по § 305 Abs. 1 Nr. 1 InsO.
+
+**Ограничение добытого:** § 34k ещё не действует (20.11.2026), поэтому **судебной практики и
+административных толкований по нему нет и быть не может**. Текст получен из коммерческой базы
+NWB Gesetze и из материалов законодателя (BT-Drs. 21/1851, 21/5381, BR-Drs. 320/26) — это надёжно,
+но это текст и намерение законодателя, а не правоприменение. К вопросу вернуться после 20.11.2026.
+Комментарий Noerr — **мнение юрфирмы**, использован только как подтверждающий пересказ Gesetzesbegründung,
+а не как источник нормы.
+
+## ИТОГ Г28 (пункт 7)
+
+| Пункт | Статус | Норма или разъяснение со ссылкой | Что меняет для продукта |
+|---|---|---|---|
+| 7. Лицензия § 34k GewO для совета по существующему долгу | **добыто** | § 34k Abs. 1 GewO (вступает 20.11.2026; текст — NWB `datenbank.nwb.de/Dokument/136661_34k/`): все альтернативы привязаны к «den Abschluss … von Verträgen». Закон-имплементатор — BGBl. I 2026 Nr. 139, принят 17.04.2026; Art. 16 Abs. 1: «tritt … am 20. November 2026 in Kraft» (BT-Drs. 21/5381) | **Лицензия не нужна.** Наш модуль по существующим долгам под § 34k не подпадает: нет ни посредничества, ни указания на возможность заключить договор, ни рекомендации продукта, ни вознаграждения за посредничество |
+| 7а. Почему § 34k не открывался в Г26 | **добыто** | `gesetze-im-internet.de/gewo/__34k.html` — HTTP 404; в оглавлении GewO § 34j → § 34l, § 34k отсутствует, потому что ещё не в силе | Технический факт для канона добычи: **404 на `gesetze-im-internet.de` может означать «норма принята, но не вступила», а не «нормы нет»** — проверять через NWB/BGBl./BT-Drucksachen |
+| 7б. Schuldnerberatung: отдельный статус | **добыто** | § 3 RDG (общий запрет внесудебных юруслуг) + § 2 Abs. 1 RDG (определение) + § 8 Abs. 1 Nr. 3 RDG (разрешено «geeignete Stellen» по § 305 Abs. 1 Nr. 1 InsO) + § 305 Abs. 1 Nr. 1 InsO («die Länder können bestimmen, welche Personen oder Stellen als geeignet anzusehen sind») | 🔴 **Да, отдельный статус нужен — но только если деятельность дотягивает до Rechtsdienstleistung.** Признание даёт земля, не федерация. Для нас: расчёт порядка погашения — вне RDG; разбор конкретного договора, Schuldenbereinigungsplan, переговоры с кредиторами — внутри. Клапан — § 5 Abs. 1 RDG (Nebenleistung), но общим тестом, без презумпции |
+| 7в. Сопутствующее, добытое попутно | **добыто** | § 18a Abs. 8c KWG (новая редакция): банк обязан выявлять заёмщиков в затруднении и направлять их «an Schuldnerberatungsdienste» | Рынок B2B: с 20.11.2026 у немецких банков появляется **законная обязанность направлять** — это спрос на канал, а не только на софт |
+
+🔴 **Прямой ответ на вопрос батча: немецкая лицензия для совета по существующему долгу НЕ нужна.**
+Преграда в Германии лежит не в GewO, а в RDG, и проходит она по той же линии, которую мы уже
+провели в других юрисдикциях: считать и раскладывать — можно, оценивать правовые последствия
+конкретного договора — нельзя без признанного статуса.
+
+**Каналы по пункту 7.** Собственных `WebSearch` — 0; Exa `web_search_exa` — 1 (он и дал § 34k целиком
+и BT-Drucksachen). `curl` через `r.jina.ai`: `gesetze-im-internet.de` (GewO index, § 34k, § 34l,
+BGB § 511, InsO § 305, RDG §§ 2, 3, 5, 8) — все HTTP 200, кроме § 34k (404). Прямой `curl -sk --http1.1`
+к `gesetze-im-internet.de` — работает, `-L` не требуется. `dip.bundestag.de` отдельно не понадобился:
+`dserver.bundestag.de` и `recht.bund.de` найдены через Exa. `garant.ru`/`consultant.ru` к этому пункту
+не применялись.
+
+---
+
+## ДОБОР Г30.3 — Exa (16.09.2026)
+
+**Каналы на начало работы (16.09.2026, ~21:30 МСК):** Exa `mcp__exa__web_search_exa` — 🟢 работает (5 результатов на пробный запрос
+про SEC no-action letters); `r.jina.ai` без UA → `sec.gov` **HTTP 200**, 13 806 б; OpenAlex **200**, 18 199 б; Crossref **200**, 2 472 б;
+Wayback `web/2024/https://www.sec.gov/` **302** (жив); Wayback CDX для `docs.ozon.ru` — **503**, 11 832 б (мигает). `pdftotext` — есть.
+
+Область: разделы «осталось неизвестным» блоков Г16, Г21, Г26, Г27, Г28 этого файла. Сверка с последним упоминанием выполнена:
+Г16 «Ирландия» закрыта в Г21 (п. 5), «ОАЭ onshore» — в Г21 (п. 6), «territoriality UK» — в Г26 (п. 2), «штаты США» — в Г27 (51 из 51),
+«§ 34k GewO» — в Г28, «CFPB» — в Г27. Открытыми на вход Г30.3 остались: (1) SEC no-action letters в оригинале + Champion;
+(2) толкования CCD II Art. 3(17); (3) законы штатов о debt management services (хвост Г27 п. 8); (4) CFPB larger participants (Г27 п. 5);
+(5) CT PA 17-120 — кодификация и санкция (Г27 п. 1); (6) Stripe — практика KYC для граждан РФ (Г16-Р); (7) MD функциональная ветка,
+NRS 628A к иностранцу, UK s. 19 практика, CBUAE регламенты — второстепенные, проходятся по остатку бюджета.
+
+### Г30.3-М1. SEC no-action letters: Champion (1986) и письма о financial planning — ЧАСТИЧНО (реквизиты и содержание по вторичным, оригинала нет)
+
+**Что сделано.** Exa `web_search_exa` — 3 запроса («Robert R. Champion SEC no-action letter 1986…»; «SEC staff no-action letter software program
+generates financial plan…»; «Champion 1986 … real estate coins precious metals…»). Скачаны и разобраны:
+- Plaze, «Regulation of Investment Advisers by the U.S. SEC» (SEC DIM, апрель 2012), `https://marottaonmoney.com/wp-content/uploads/2020/05/rplaze-042012.pdf` —
+  прямой `curl -sL` **HTTP 200, 411 315 б**, `pdftotext`;
+- 45 Wash. & Lee L. Rev. 1139 (1988), «SEC Release 1092 on the Investment Advisers Act of 1940…» (студенческая Note),
+  `https://scholarlycommons.law.wlu.edu/cgi/viewcontent.cgi?article=2389&context=wlulr` — 🔴 прямой `curl` с UA **HTTP 403, 5 651 б** (HTML-заглушка),
+  **`mcp__exa__web_fetch_exa` — полный текст, ~59 КБ**. Это ровно класс «отказ инструмента ≠ отсутствие источника»;
+- Proskauer, «Regulation of Investment Advisers by the U.S. SEC» (обновлённый Plaze, 2019+), `https://www.proskauer.com/insights/download-pdf/2460` — сниппеты Exa;
+- датасет DOJ (зеркало `tommycarstensen.com/epstein/…/EFTA01074865.html`) — сниппет Exa; использован **только ради Westlaw-цитаты**, как источник низкого доверия.
+
+**Первичка дословно.**
+
+Plaze (SEC DIM, 2012), разд. II.A.3.a, с текстом сноски 7:
+> «The SEC staff has stated that advice about real estate, coins, precious metals, or commodities is not advice about securities. 7 … The SEC staff has stated
+> in this regard: (i) advice about market trends is advice about securities; (ii) advice about the selection and retention of other advisers is advice about
+> securities; (iii) advice about the advantages of investing in securities versus other types of investments (e.g., coins or real estate) is advice about
+> securities; (iv) providing a selective list of securities is advice about securities even if no advice is provided as to any one security; and (v) asset
+> allocation advice is advice about securities.»
+> «7 Robert R. Champion, SEC Staff No-Action Letter (Sept. 22, 1986).»
+
+Proskauer (редакция Plaze) — то же, с разнесением: «advice about real estate, 17 coins, precious metals, or commodities is not advice about securities. 18»;
+«17 Brighton Pacific Realty Asset Mgmt. Co., SEC Staff Letter (Feb. 10, 1992)…»; «18 Robert R. Champion, SEC Staff No-Action Letter (Sept. 22, 1986).»;
+«22 RDM Infodustries … See Media General Financial Services, SEC Staff No-Action Letter (July 20, 1992). The letter notes that the staff does not believe
+that information is … presented in a manner suggesting the purchase, holding, or sale of securities, where the customer or subscriber, and not the
+information provider, selects the search criteria or requests that the service provide certain select information.»
+
+DOJ-датасет (вторичный, неизвестный автор меморандума):
+> «Advice about types of assets that are not securities, such as real estate, commodities, diamonds, precious metals, coins, and stamps, would not bring
+> a person within the Advisers Act.' … 2 See, e.g., Robert R. Champion, SEC No-Action Letter, 1986 WL 68317 (Sept. 22, 1986); Thomas Beard, SEC No-Action Letter …»
+
+45 Wash. & Lee L. Rev. 1139 (1988), текст и сноски 61–68:
+> «In Sinclair-deMarinis an attorney asked the SEC whether Sinclair-deMarinis, a New York corporation dealing in numismatics, needed to register under the
+> Advisers Act. … The SEC responded, first, that numismatics do not qualify as securities under section 202(a)(18) of the Advisers Act. Id. The SEC advised,
+> therefore, that a business that provides advice solely on numismatics need not register under the Advisers Act. Id. The SEC indicated, however, that
+> Sinclair might qualify as an investment adviser if Sinclair provided advice concerning the advisability of investing in numismatics relative to securities.»
+> (Sinclair-deMarinis, Inc., SEC No-Action Letter, May 1, 1981; Thomas Beard, SEC No-Action Letter, May 8, 1975 — LEXIS, Fedsec library, Noact file)
+>
+> «[In] a no-action letter to Linda Arnold, for example, the SEC considered whether Ms. Arnold, a licensed dealer in life and health insurance and annuities,
+> needed to register as an investment adviser. Ms. Arnold was considering whether to begin providing limited financial planning services to her clients.
+> Ms. Arnold emphasized that she would restrict her recommendations to categories of investments and recommend no specific investments. Although Ms. Arnold
+> stressed that she would neither hold herself out to the public as an investment adviser, provide analysis or reports on securities, nor have custody of
+> clients' funds, the SEC responded that Ms. Arnold might qualify as an investment adviser under the Advisers Act. The SEC warned that if Ms. Arnold offered
+> clients more than a general discussion of the advisability of investing in securities in the context of a conference concerning a client's financial plan,
+> Ms. Arnold's activities might qualify her as an investment adviser. Furthermore, the SEC cautioned that advice concerning specific categories of investments
+> such as bonds, mutual funds, and technology stocks also could qualify as investment advice under the Advisers Act.»
+> (Linda Arnold, SEC No-Action Letter, Aug. 23, 1984; Southmark … Services, SEC No-Action Letter, 1984 — LEXIS)
+
+**Выжимка.** Реквизит Champion уточнён: **1986 WL 68317**; по содержанию письмо — опора тезиса штаба SEC «совет о НЕ-ценных бумагах
+(недвижимость, монеты, драгметаллы, товары) — не совет о ценных бумагах». Это позиция регулятора (staff), не закон. Для FINPILOT:
+совет «гасить долг / пополнить резерв на счёте / копить на цель» — по той же логике совет о не-ценных бумагах; **но** пара Sinclair-deMarinis
+и Linda Arnold проводит ту же границу, что IA-1092 (Г21): как только сравнивается «X против ценных бумаг» или называются **категории**
+инвестиций (облигации, фонды) в контексте финплана — штаб допускает статус советника. Новое к словарю продукта: категории инструментов
+(«облигации», «фонды») в выдаче — тоже риск, не только конкретные бумаги. Media General (1992): если критерии выбирает **пользователь**,
+а не поставщик, — это не совет; подтверждает наш разграничитель «пользователь задаёт вход».
+
+**Письма, специально посвящённые budgeting / debt / planning software, не найдены и в Г30.3**: три запроса Exa, индекс SEC (Г26) — отрицательно;
+terms.law описывает письмо «FPL» о программе финпланирования и SunAmerica, но реквизитов (дата, номер) не даёт — **консультант, реквизиты
+не проверяемы, в юрблок не брать**. Оригинал Champion — только Westlaw (1986 WL 68317) / LEXIS Fedsec Noact; открытого канала нет
+(письма до 2001 г. на `sec.gov` не выкладываются — вывод из индекса SEC, Г26). Статус: **частично**, класс 2 (платная база).
+
+
+### Г30.3-М2. Законы штатов о debt management services (хвост Г27 п. 8) — ✅ ДОБЫТО; 🔴 ловит ли нас: модель — НЕТ, Невада — СПОРНО
+
+**Источники (все сняты 16.09.2026):**
+- UDMSA (ULC, окончательный текст с официальными комментариями), `https://www.ftc.gov/sites/default/files/documents/public_events/consumer-protection-and-debt-settlement-industry/udmsafinal.pdf` —
+  прямой `curl -sL` **HTTP 200, 422 105 б**, `pdftotext -layout`. Найден через Exa. Это модельный закон + комментарий разработчиков (не закон штата).
+- Venable LLP, «Reflections on Five Years of the UDMSA», 01.07.2010 — сниппет Exa (мнение юрфирмы; перечень штатов со ссылками на кодексы).
+- NRS ch. 676A (Невада), `https://www.leg.state.nv.us/NRS/NRS-676A.html` через `r.jina.ai` — **HTTP 200, 125 074 б**.
+- 205 ILCS 665 (Иллинойс), `https://ilga.gov/legislation/ilcs/ilcs3.asp?ActID=1203&ChapterID=20` — **`mcp__exa__web_fetch_exa`, полный текст акта**;
+  🔴 прямой `curl -sk --http1.1` к `www.ilga.gov/…/020506650K2.htm` — **000 (таймаут 120 с)**, `r.jina.ai` на `ActID=1204` и печатную версию — 200, но
+  **не тот акт** (ActID 1204 ≠ 665; моя ошибка адреса, исправлена через Exa).
+- C.R.S. § 12-14.5-202 (Колорадо, ред. 2016) и Del. Code tit. 6 ch. 24A (Делавэр, ред. 2010) — сниппеты Exa с Justia.
+- N.D.C.C. ch. 13-11, `https://ndlegis.gov/cencode/t13c11.pdf` — прямой `curl -sL` **HTTP 200, 142 186 б**: это «DEBT-SETTLEMENT PROVIDERS», не UDMSA.
+
+**Первичка дословно.**
+
+UDMSA § 2(9) (модельный текст):
+> «(9) “Debt-management services” means services as an intermediary between an individual and one or more creditors of the individual for the purpose
+> of obtaining concessions, but does not include: (A) legal services provided in an attorney-client relationship …; (B) accounting services provided in an
+> accountant-client relationship …; or (C) financial-planning services provided in a financial planner-client relationship by a member of a
+> financial-planning profession whose members the administrator, by rule, determines are (i) licensed by this state; (ii) subject to a disciplinary
+> mechanism; (iii) subject to a code of professional responsibility; and (iv) subject to a continuing-education requirement.»
+> «(7) “Concessions” means assent to repayment of a debt on terms more favorable to an individual than the terms of the contract between the individual and a creditor.»
+> «(13) “Plan” means a program or strategy in which a provider furnishes debt-management services to an individual and which includes a schedule of payments
+> to be made by or on behalf of the individual and used to pay debts owed by the individual.»
+
+UDMSA, официальный комментарий к § 2, п. 8 (позиция разработчиков — ключевая для нас):
+> «8. Paragraph (9) (debt-management services): The definition encompasses the activity of entities that act as an intermediary between an individual and
+> the individual's creditors, for the purpose of changing the terms of the original contract between the individual and those creditors. There is no
+> requirement that the individual's money flow through the provider. … The definition includes the services of credit-counseling entities even if the
+> concessions offered by creditors are not subject to negotiation. **It does not include services that consist solely of counseling or education
+> concerning the management of personal finance.** Nor does it include the activity of a creditor that compromises a claim with its debtor, because the
+> creditor is not operating as an intermediary.»
+
+Перечень принявших (Venable, 2010, с кодексами): «Utah became the first state to adopt the Act in 2006. Since then, the UDMSA has been adopted in six
+additional jurisdictions, Colorado, Delaware, Nevada, Rhode Island, Tennessee, and the U.S. Virgin Islands.» — Utah Code § 13-42-101 et seq.;
+Colo. Rev. Stat. § 12-14.5-201 et seq. (сейчас — C.R.S. §§ 5-19-201 — 5-19-242, Justia 2024); Del. Code tit. 6 § 2401A et seq. (у Делавэра —
+«1 or more **unsecured** creditors»); Nev. Rev. Stat. ch. 676A; R.I. Gen. Laws ch. 19-14.8 (действует, Justia 2025); Tenn. Code Ann. § 47-18-5401 et seq.
+(🟠 по адресу Justia `47-18-5402` сейчас лежит «Foreclosure-Related Rescue Services» — номер перенесён или часть отменена; не сверено);
+V.I. Code Ann. tit. 12A. **Итого 6 штатов + Виргинские о-ва.** Принятий после 2010 г. в выдаче Exa не найдено (ND в 2011 принял собственный закон
+о debt-settlement providers, не UDMSA). Страница ULC с картой принятий грузится скриптом — `r.jina.ai` 200/10 266 б, карты в тексте нет.
+
+NRS 676A.140 (Невада) — 🔴 **отступает от модели**:
+> «“Debt-management services” means services as an intermediary between an individual and one or more creditors of the individual for the purpose of
+> obtaining concessions **and includes credit counseling, the development and implementation of debt-management plans and debt settlement services.**
+> The term does not include: 1. Legal services … 2. Accounting services … 3. Financial-planning services provided in a financial planner-client relationship
+> by a member of a financial-planning profession whose members the Commissioner, by regulation, determines are: (a) Licensed by this State; (b) Subject to a
+> disciplinary mechanism; (c) Subject to a code of professional responsibility; and (d) …»
+NRS 676A.110: «“Credit counseling” means **providing education and assistance to an individual concerning debts owed by the individual** which may include,
+without limitation, the development and implementation of a debt-management plan.»
+NRS 676A.300(1): «a provider may not provide debt-management services to an individual who it reasonably should know resides in this State at the time it
+agrees to provide the services, unless the provider is registered under this chapter.»
+NRS 676A.270(1)–(2): «This chapter does not apply to an agreement with an individual who the provider has no reason to know resides in this State …
+does not apply to a provider to the extent that the provider: (a) Provides or agrees to provide debt-management, educational or counseling services to an
+individual who the provider has no reason to know resides in this State …; or (b) **Receives no compensation for debt-management services** from or on behalf
+of the individuals to whom it provides the services or from their creditors.»
+
+205 ILCS 665/2 (Иллинойс, свой закон, не UDMSA):
+> «"Credit counselor" means an individual, corporation, or other entity that is not a debt management service that provides (1) guidance, educational programs,
+> or advice for the purpose of addressing budgeting, personal finance, financial literacy, saving and spending practices, or the sound use of consumer credit;
+> or (2) assistance or offers to assist individuals and families with financial problems by providing counseling; or (3) a combination …»
+> «"Debt management service" means the planning and management of the financial affairs of a debtor for a fee **and the receiving of money from the debtor
+> for the purpose of distributing it to the debtor's creditors** in payment or partial payment of the debtor's obligations or soliciting financial
+> contributions from creditors. The business of debt management is conducted in this State if … the debt management business solicits or contracts with
+> debtors located in this State. … This term shall not include … (g) **Credit counselors, only when providing services described in the definition of
+> credit counselor in this Section.**»
+205 ILCS 665/3: «It shall be unlawful for any person to operate a debt management service … without first having obtained a license»; 665/16(a):
+«Any person who engages in the business of debt management service without a license shall be guilty of a Class 4 felony.»
+
+**🔴 Прямой ответ: ловит ли нас это определение?**
+- **Модель UDMSA (UT, CO, DE, RI, TN, VI) — НЕТ.** Два независимых основания: (1) по тексту — нужен посредник между человеком и кредитором
+  «for the purpose of obtaining concessions»; FINPILOT с кредиторами не контактирует и уступок не добивается; (2) официальный комментарий разработчиков
+  прямо исключает «services that consist solely of counseling or education concerning the management of personal finance». Оговорка: комментарий
+  ULC — толковательный материал, не закон штата; суды штатов его обычно учитывают, но не обязаны.
+- **Иллинойс — НЕТ, и сильнее, чем в модели.** Лицензия нужна за связку «планирование + **получение денег должника для распределения кредиторам**»
+  (союз «and»), денег мы не принимаем; кроме того, совет о бюджете и личных финансах — это «credit counselor», прямо выведенный из-под лицензии (g).
+- 🔴 **Невада — СПОРНО, это новый риск.** Законодатель Невады дописал «and includes credit counseling», а «credit counseling» определил как
+  «education and assistance to an individual concerning debts owed by the individual» — буквально наш долговой модуль. Грамматически возможны два
+  прочтения: (а) credit counseling включается только как разновидность посредничества ради уступок (тогда нас не ловит); (б) credit counseling — самостоятельный
+  вид DMS (тогда ловит и требует регистрации по 676A.300 для резидентов Невады). Толкования Nevada FID в выдаче нет. Изъятие 676A.270(2)(b)
+  «no compensation» нам недоступно при платной подписке. Это **тот же штат**, где Г26–Г27 нашли NRS 628A (фидуциарий + E&O $1 млн) —
+  Невада теперь проблемна по двум главам.
+- **Практический вывод для L9:** в США долговой модуль безопасен в модельных штатах и в Иллинойсе; для резидентов **Невады** — геоблок долгового модуля
+  или бесплатный режим для них до получения толкования (вывод из текста норм, не позиция регулятора).
+
+**Не добыто по пункту:** текущий список принявших UDMSA из первоисточника ULC (карта — JS); проверка редакций UT, RI, TN, VI поштучно (использован перечень Venable 2010
+и Justia для CO, DE, RI); толкование Nevada FID к 676A.140/110.
+
+
+### Г30.3-М3. Толкования CCD II Art. 3(17) — официальных толкований НЕТ (подтверждено третий раз); 🔴 НОВОЕ: немецкий SchuBerDG § 4 — монополия «независимых» на Schuldnerberatung
+
+**Что сделано.** Exa `web_search_exa` — 3 запроса (EN: Commission/EBA guidance; DE: Begründung § 511 BGB / Schuldnerberatung; DE: статус SchuBerDG).
+Скачаны: BT-Drs. 21/1847 (правительственный законопроект SchuBerDG), `https://dserver.bundestag.de/btd/21/018/2101847.pdf` — прямой `curl -sL`
+**HTTP 200, 252 996 б**; BT-Drs. 21/2774 (Beschlussempfehlung Rechtsausschuss), `https://dserver.bundestag.de/btd/21/027/2102774.pdf` — **HTTP 200, 244 513 б**;
+страница Vermittlungsausschuss «Laufende Vermittlungsverfahren» через `r.jina.ai` — **HTTP 200, 12 655 б**. Сниппеты Exa: EUR-Lex (текст CCD II и
+резюме legissum), COM(2021) 347 (предложение Комиссии), A&L Goodbody «CCD2 Report» (юрфирма), Ireland Department of Finance consultation,
+ECDN «CCD II Transposition» (НКО), CEPS explainer (аналитика), BT-Drs. 21/5883, 21/5930, hib 12.05 и 15.05.2026, BAG-SB 08.05.2026, bundestagszusammenfasser.de.
+
+**(а) Толкование Art. 3(17) на уровне ЕС.** Ни Q&A Комиссии, ни мнения/руководства EBA по «advisory services» CCD II в выдаче нет. Единственное
+официальное пояснение сути Art. 16 — пояснительная записка Комиссии к проекту (COM(2021) 347), дословно по сниппету: «Article 16 (advisory services)
+establishes standards to ensure that, where advice is given by the creditor, the credit intermediary or the provider of crowdfunding credit services,
+consumers are made aware of this, without introducing any obligation to provide advice.» — это позиция Комиссии о **целях** нормы, а не о её охвате.
+CEPS (2023, аналитика): «In other domains of financial services, implementing standards and guidelines have become widespread, but not for consumer credit»
+— уровень 2 для CCD не предусмотрен, т. е. EBA-руководств по Art. 3(17) **и не ожидается** по конструкции директивы (вывод из обзора, не из акта).
+Вывод Г21 (охват доказывается от противного через Art. 16(6)(b)–(c)) остаётся единственной опорой; опровержения нет.
+
+**(б) Национальные позиции по Art. 16(6).** Ирландия (A&L Goodbody по итогам консультации Минфина, август 2025; юрфирма): «In Ireland, credit advisory services
+can be provided to consumers by solicitors and accountants, as well as by personal insolvency practitioners and ‘MABS’. The Minister has decided that this
+discretion should be exercised in a manner that facilitates these professional individuals and organisations …» — дерогацию 16(6) Ирландия использует
+**только** для юристов, бухгалтеров, PIP и государственной MABS; коммерческого приложения в перечне нет. Позиций BaFin, AMF, Banca d'Italia в выдаче нет;
+по ECDN (НКО) Италия и Франция на 2025 г. транспозицию статьи о debt advice не завершили.
+
+**(в) 🔴 Германия: SchuBerDG — первичка дословно (BT-Drs. 21/1847 и 21/2774).**
+
+§ 2 (законопроект; комитет его не менял):
+> «Schuldnerberatungsdienst im Sinne dieses Gesetzes ist die individuelle fachliche, rechtliche oder psychologische Unterstützung von Verbrauchern, die
+> Schwierigkeiten bei der Erfüllung ihrer finanziellen Verpflichtungen haben oder haben könnten. § 3 des Rechtsdienstleistungsgesetzes bleibt unberührt.»
+
+Обоснование «Zu § 2» (21/1847):
+> «Dabei kann die fachliche Unterstützung zum Beispiel **die Analyse der finanziellen Situation der Verbraucherin oder des Verbrauchers und darauf aufbauend
+> Empfehlungen für den Umgang mit den finanziellen Verpflichtungen** umfassen. … Inhaltlich folgt der Begriff dem in Deutschland bereits etablierten Ansatz
+> der Schuldnerberatung und begründet deshalb keine neue Kategorie bzw. kein neues Angebot der Schuldnerberatung.»
+
+§ 4 в редакции, принятой Бундестагом 14.11.2025 (Beschlussempfehlung 21/2774):
+> «(1) Schuldnerberatungsdienste nach § 2 darf nur erbringen, wer unabhängiger professioneller Anbieter ist.
+> (2) Professionelle Anbieter sind solche Anbieter, die über ausreichende fachliche Kenntnisse sowie Wissen und Sachverstand in der Erbringung von
+> Schuldnerberatungsdiensten nach § 2 verfügen.
+> (3) Eine Unabhängigkeit ist insbesondere dann nicht gegeben, wenn es sich um folgende Arten von Anbietern handelt: 1. einen Kreditgeber oder einen
+> Kreditvermittler …, 2. einen Kreditkäufer oder einen Kreditdienstleister …, 3. einen Anbieter, der auch zu Kredit-, Finanz- oder Versicherungsdienstleistungen,
+> Dienstleistungen, die der Vermögensverwertung des Verbrauchers dienen, oder zu ähnlichen Dienstleistungen gewerblich berät oder diese erbringt oder
+> vermittelt, oder 4. einen Anbieter, bei dem ein anderer als einer der in den Nummern 1 bis 3 genannten Interessenkonflikte vorliegt.
+> (4) Unabhängige professionelle Anbieter von Schuldnerberatungsdiensten sind insbesondere Einrichtungen in der Trägerschaft von 1. Wohlfahrtsverbänden,
+> Verbraucherzentralen, kreisfreien Städten, Landkreisen oder Gemeinden, 2. eingetragenen Vereinen …, 3. sonstigen juristischen Personen …, die ausschließlich
+> und unmittelbar gemeinnützige oder mildtätige Zwecke verfolgen …»
+
+§ 3 Abs. 1 в редакции Бундестага: «Die Schuldnerberatungsdienste sollen Verbrauchern kostenlos angeboten werden. In besonders begründeten Ausnahmefällen können
+Schuldnerberatungsdienste abweichend von Satz 1 höchstens gegen ein begrenztes Entgelt angeboten werden. Dieses Entgelt darf maximal die Betriebskosten des
+Anbieters für den Schuldnerberatungsdienst decken …»; обоснование 21/1847: «Um Betriebskosten handelt es sich dann nicht mehr, wenn die Einrichtung des Anbieters
+eines Schuldnerberatungsdienstes das Ziel verfolgt, mit dem Entgelt einen Gewinn zu erwirtschaften.»
+
+**Статус (на 16.09.2026):** Бундестаг принял 14.11.2025; Бундесрат **отказал в согласии 08.05.2026** (BT-Drs. 21/5883: «gemäß Artikel 104a Absatz 4 des
+Grundgesetzes nicht zuzustimmen»); правительство **13.05.2026 созвало Vermittlungsausschuss** (BT-Drs. 21/5930); страница Vermittlungsausschuss на 16.09.2026:
+«**Es liegt noch kein Termin für die Sitzung des Vermittlungsausschusses vor.**» Закон **не вступил в силу**; предмет спора — финансирование Länder (ст. 104a GG), а не § 2/§ 4.
+
+**🔴 Что это меняет.** Если SchuBerDG вступит в нынешней редакции, в Германии «индивидуальная фактическая поддержка» потребителя, который «имеет или **может иметь**»
+трудности с обязательствами, — в том числе, по обоснованию, «анализ финансового положения и рекомендации по обращению с обязательствами» — **может оказывать
+только независимый профессиональный провайдер**, по общему правилу бесплатно, максимум за покрытие издержек без прибыли. Коммерческая подписка FINPILOT
+с долговым модулем для немецких пользователей попадает под § 2 по букве и не проходит § 3 (прибыль); по § 4(3) Nr. 4 коммерческий интерес как «иной
+конфликт интересов» — толкование не проверено. Это **сильнее** вывода Г28 по § 34k GewO («лицензия не нужна»): там вопрос о лицензии посредника, здесь —
+о монополии статуса на сам совет. Смягчающие обстоятельства: (1) закон окончательно не принят; (2) адресат § 1 — Länder, и из текста неясно, задуман ли § 4
+как запрет для всех рыночных лиц или как требование к тем, кого Länder засчитывают в сеть; **санкции за нарушение § 4 в тексте нет** — проверено `grep`
+по снятым 21/1847 и 21/2774: «Bußgeld» и «Ordnungswidrigkeit» — 0 вхождений; (3) граница «haben könnten» (профилактика) не определена.
+**Практически для L9:** до решения Vermittlungsausschuss немецкий долговой модуль — «не запускать без местного юриста»; ЕС-вывод Г21 это только усиливает.
+
+
+### Г30.3-М4. CFPB larger participants (Г27 п. 5) и CT PA 17-120 (Г27 п. 1) — ✅ ДОБЫТО
+
+**CFPB.** Источники: 12 CFR part 1090 — eCFR (оглавление, сниппет Exa) и govinfo `CFR-2025-title12-vol9-part1090.pdf` (сниппет Exa); CFPB
+«Institutions subject to CFPB supervisory authority» (сниппет Exa); Final Rule 89 FR 99582 (10.12.2024). Дословно (CFR 2025, оглавление части 1090):
+«1090.104 Consumer Reporting Market. 1090.105 Consumer debt collection market. 1090.106 Student loan servicing market. 1090.107 International Money Transfer
+Market. 1090.108 Automobile financing market. 1090.109 General-use digital consumer payment applications market.» Страница CFPB (позиция регулятора):
+«To date, this includes larger participants in the following markets: consumer reporting, consumer debt collection, student loan servicing, international
+money transfer, and automobile financing.» Final Rule 2024: «nonbank covered persons generally are subject to the CFPB's regulatory and enforcement
+authority and to applicable Federal consumer financial law» — независимо от надзора.
+**Ответ:** рынка «credit counseling / debt management / budgeting» среди larger-participant рынков **нет** (6 из 6 просмотрены). FINPILOT не попадает
+под плановый надзор CFPB как larger participant; остаётся вывод Г27 — covered person под UDAAP и enforcement. 🟠 Расхождение источников: CFR 2025
+содержит § 1090.109, а страница CFPB перечисляет только пять рынков — вероятно, правило о платёжных приложениях отменено в 2025 г.; первоисточник
+отмены не снимался (к нам не относится: мы не проводим платежей).
+
+**Коннектикут PA 17-120.** Источник: `https://www.cga.ct.gov/2017/act/pa/2017PA-00120-R00HB-06992-PA.htm` (текст акта, сниппет Exa); OLR bill analysis
+2016 SB-265 (сниппет Exa); Dechert OnPoint 03.04.2018 (юрфирма). Дословно, Sec. 1:
+> «(a) … (2) "financial planner" means a person offering individualized financial planning or investment advice to a consumer for compensation where such
+> activity is not otherwise regulated by state or federal law. (b) No financial planner shall, in connection with an agreement with a consumer to provide
+> financial planning or investment advice for compensation, use a certificate, professional designation or form of advertising expressing or implying that such
+> person has special training, education or experience in advising or serving senior citizens, unless … (c) A financial planner shall disclose to a consumer,
+> upon request, whether or not such financial planner has a fiduciary duty to such consumer for each recommendation such financial planner makes to such consumer.»
+Sec. 2 — только обязанность Banking Commissioner разместить образовательные материалы. Оба раздела помечены «(NEW) (Effective from passage)».
+**Ответ:** акт действует с 05.07.2017 (Dechert); номер кодификации в C.G.S. в выдаче не найден; **санкции в тексте акта нет** (ни штрафа, ни ссылки на CUTPA —
+вероятный канал остаётся гипотезой). Для нас обязанности прежние (Г27): не заявлять «senior»-квалификацию; по запросу пользователя из CT — ответить, есть ли
+у нас фидуциарная обязанность. В продукт: шаблон ответа «FINPILOT не несёт фидуциарной обязанности» для резидентов CT.
+
+### ИТОГ Г30.3 (regulation_world_advice_boundary)
+
+| Пункт | Был статус | Стал | Приём |
+|---|---|---|---|
+| SEC no-action letters в оригинале, Champion 1986 | частично (2 письма), Champion не добыт | **частично**: Champion — реквизит 1986 WL 68317 + содержание (не-securities advice); +4 письма по вторичным (Sinclair-deMarinis 1981, Linda Arnold 1984, Media General 1992, Thomas Beard 1975); оригиналы — только Westlaw/LEXIS | Exa search ×3; **Exa fetch пробил 403** на W&L Law Review; Plaze через `curl` |
+| Толкования CCD II Art. 3(17) (EC, EBA, BaFin, AMF, BdI) | не найдено | **отрицательный результат подтверждён** + Ирландия (дерогация 16(6) только для юристов/бухгалтеров/PIP/MABS) | Exa search ×2 |
+| 🆕 Германия: SchuBerDG § 2–4 | не было в файле (Г16 знал только статус) | **добыт дословно**: монополия «независимых» провайдеров на Schuldnerberatung, бесплатность; закон в Vermittlungsausschuss без даты | Exa search → `curl` BT-Drs. 21/1847, 21/2774; `r.jina.ai` vermittlungsausschuss.de |
+| Законы штатов о debt management (UDMSA) | не исследовались | **добыто**: модель и IL не ловят; 🔴 **NV спорно** (includes credit counseling); 6 штатов + VI | Exa search ×2, Exa fetch (ILCS, после 000 у `curl`), `curl` FTC PDF, `r.jina.ai` NRS |
+| CFPB larger participants | не проверено | **добыто**: 6 рынков, credit counseling нет | Exa search |
+| CT PA 17-120 кодификация и санкция | не найдено | **частично**: текст акта; кодификация не найдена; санкции в акте нет | Exa search |
+| Stripe: практика KYC для граждан РФ (Г16-Р) | не добыто | **не пробовалось** в Г30.3 — бюджет ушёл на право ЕС/США; остаётся | — |
+| MD функциональная ветка, NRS 628A к иностранцу, UK s. 19, CBUAE регламенты | не добыто | **не пробовались** — второстепенные | — |
+
+
+---
+
+## ДОБОР Г30.3 — второй заход (16.09.2026)
+
+**Состояние каналов на начало (16.09.2026, 22:05–22:15 МСК, после смены аккаунта):** Exa `mcp__exa__web_search_exa` — 🟢 работает;
+`r.jina.ai` без UA → `sec.gov` **200**; Crossref **200**; `cbr.ru` **200**; `web.archive.org/web/2024/…` — **302**, но
+🔴 **Wayback CDX — 503 «Internet Archive: Temporarily Offline»** (канал мёртв на момент работы); **OpenAlex — 429** (был 200 накануне);
+`rkn.gov.ru` — **000**, `pd.rkn.gov.ru` — **403**. Предыдущий заход оборвался на лимите аккаунта (HTTP 429) до первой записи — здесь всё с нуля.
+
+### Г30.3-В1. 🔴 Перечень штатов, принявших UDMSA, по первоисточнику ULC — НЕ ДОБЫТ (причина точная)
+
+Пройденные каналы:
+- `https://www.uniformlaws.org/committees/community-home?CommunityKey=e327d09d-edb7-4f3c-95c9-f32a5679e7c1` — `r.jina.ai` **200, 10 236 б** и
+  `mcp__exa__web_fetch_exa` **200**: в HTML присутствует только заголовок раздела «### Legislative Bill Tracking» и под ним **пусто**; данные подтягивает
+  скрипт платформы Higher Logic. Ни одного названия штата в выдаче нет;
+- `https://www.uniformlaws.org/api/legislation/bills?communityKey=…`, `…/HigherLogic/Legislation/LegislationList.aspx?CommunityKey=…`,
+  `…/acts/catalog/current/d`, `…/legislation/activity` — прямой `curl` с UA, все **HTTP 200** (70 514 / 70 659 / 160 782 / 72 016 б), но это та же
+  SPA-оболочка: `grep` по «utah|colorado|rhode island|nevada|enacted» — **ноль совпадений**;
+- Wayback (снимок страницы акта, где карта принятий раньше была статической) — **CDX 503**, архив офлайн;
+- Exa-поиск по запросу «uniformlaws.org … legislative enactment status map enacted states list» вернул ту же страницу ULC (пустую),
+  каталог актов ULC (описание акта без статуса) и обзор Venable 2010.
+
+**Что добыто вместо этого (первоисточники штатов и легислатур, не обзор):**
+- Utah Code § 13-42-101 и далее; Colo. Rev. Stat. (ныне **C.R.S. §§ 5-19-201 — 5-19-242**, Justia, ред. 2024); Del. Code tit. 6 ch. 24A;
+  **NRS ch. 676A** (снят целиком через `r.jina.ai`, 125 074 б); **R.I. Gen. Laws ch. 19-14.8** — подтверждена страница самой легислатуры
+  `webserver.rilegislature.gov/Statutes/TITLE19/19-14.8/INDEX.htm` («Chapter 14.8 Uniform Debt-Management Services Act»); Tenn. Code Ann. § 47-18-5401 и далее;
+  V.I. Code Ann. tit. 12A.
+- Отчёт Joint Legislative Council Висконсина (PRL 2007-05, `docs.legis.wisconsin.gov`) фиксирует состояние на 2007 г. дословно: «The UDMSA has been adopted
+  in three other states (Delaware, Rhode Island, and Utah) and introduced in at least three others (Colorado, Hawaii, and Missouri) to date» — то есть
+  Гавайи, Миссури и сам Висконсин **вносили, но в перечне принявших не значатся**.
+- Северная Дакота: `ndlegis.gov/cencode/t13c11.pdf` (**200, 142 186 б**) — глава 13-11 называется «DEBT-SETTLEMENT PROVIDERS», это **не** UDMSA.
+
+**Вывод по пункту.** Состав «6 штатов + Виргинские острова» (UT, CO, DE, NV, RI, TN, VI) подтверждён **первоисточниками самих юрисдикций**, а не обзором 2010 г.
+Чего первоисточник ULC мог бы добавить — принятия после 2010 г.; их наличие **не подтверждено и не опровергнуто**: страница статуса ULC отдаётся скриптом,
+Wayback офлайн. 🔴 Это «не добыто» инструментальное, не содержательное; закрывается одним открытием страницы ULC в браузере с включённым JS.
+
+### Г30.3-В2. Мэриленд, функциональная ветка § 11-101(i)(1)(ii)2 — ✅ ДОБЫТА ПРАКТИКА (толкования как такового нет)
+
+Первоисточники — акты самого регулятора (Securities Commissioner of Maryland, публикуются на `oag.maryland.gov`), сняты через Exa:
+- Summary Order, High Point (01.02.2018), `oag.maryland.gov/i-need-to/Documents/pdfs/Securities/2018/highpoint_summary_order_020118.pdf`;
+- Order to Show Cause, Richards (11.02.2026), `…/Securities/2026/20250560_OSC_Richards_021126.pdf`;
+- OSC, Yost (2013); Final Judgment, Morley / The New Wealth (18.12.2018).
+Во всех четырёх Комиссар цитирует определение целиком, включая нашу ветку, дословно:
+> «section 11-101(i) of the Act defines “investment adviser” to mean any person who, for compensation, … provides or offers to provide financial or investment
+> counseling or advice; **or gathers information relating to investments, establishes financial goals and objectives, processes and analyzes the information
+> gathered, and recommends a financial plan**; or holds out as an investment adviser in any way …»
+🔴 **Но ни в одном деле ветка (ii)2 не является единственным основанием:** High Point — «referring to themselves as a “financial advisor”» и «wealth management»
+в названии; Richards — советы по конкретным бумагам NovaTech; Morley — «executing financial planning agreements … investing the funds in securities products,
+managing the securities portfolios»; Yost — «holding out as investment advisers, providing advice regarding securities».
+**Ответ:** самостоятельного применения функциональной ветки к сервису **без securities и без титула** в практике Мэриленда не найдено; отдельного толкования
+Division (no-action, FAQ, интерпретирующий приказ) в выдаче нет. Опора против нас в тексте остаётся прежней («information relating to **investments**»),
+и теперь к ней добавлен фактический аргумент: регулятор в известных делах всегда имел второй крючок. Риск снижается с «вероятно да» до **«не подтверждён практикой»**.
+Каналы: Exa-поиск (1 запрос), первоисточники — PDF с сайта Генпрокурора штата; `mgaleg.maryland.gov` отдаёт текст § 11-101 целиком (через индекс Exa),
+хотя прямой фетч страницы в Г26 давал оболочку.
+
+### Г30.3-В3. Stripe и бенефициар-гражданин РФ — ЧАСТИЧНО (первички Stripe нет, консультанты единогласны)
+
+Пройденные каналы: Exa-поиск (1 запрос); ранее (Г16) — сама страница Stripe о запрещённых бизнесах и высокорисковых юрисдикциях (Россия по гражданству
+там **не названа**), страница требований Stripe UAE — пустая, sanctions FAQ — 404.
+Что добыто сейчас (всё — консультанты и форумы, первоисточника Stripe нет):
+- wyomingllc.co (2026): «Stripe suspended services for Russian-connected accounts in March 2022. This restriction applies regardless of whether you operate
+  through a Wyoming LLC. Russian passport holders face automatic rejection during Stripe's identity verification process»;
+- usllcglobal.com (28.04.2026): «Founders applying from Pakistan, Bangladesh, Nigeria, Iran, Russia, Vietnam … trigger heightened scrutiny», рассматривается как
+  риск-вес страны, а не запрет;
+- edeal.ai (15.05.2026) — разбор через право, а не практику: OFAC Determination от 08.05.2022 к EO 14071 запрещает услуги «to any person **located in** the
+  Russian Federation», и вывод консультанта: вид на жительство вне РФ снимает территориальный признак, «access to fintech infrastructure: Stripe, Wise, Mercury…»;
+- reddit r/stripe (12.02.2026) и r/llc (21.05.2026) — отказы в верификации у резидентов ОАЭ без связи с гражданством РФ.
+**Ответ:** прямых свидетельств Stripe (правило, письмо, страница) о гражданах РФ по-прежнему нет; консультанты сходятся, что **паспорт РФ на этапе KYC
+ведёт к отказу**, а рабочий путь — резидентство вне РФ. Для L9 это остаётся риском уровня «практика поставщика», не нормой. Статус: **частично**,
+причина — Stripe своей политики по гражданству не публикует, а проверить эмпирически мы не можем.
+
+### Г30.3-В4. Невада, NRS 628A к автоматическому сервису и поставщику без присутствия — ЧАСТИЧНО (норма дословно, толкований нет)
+
+Первоисточник — `https://www.leg.state.nv.us/NRS/NRS-628A.html` (через индекс Exa; ранее гл. 676A снята через `r.jina.ai`, 200/125 074 б),
+дублирование — nevada.public.law. Дословно:
+> «**NRS 628A.020 Duties of financial planner.** A financial planner has the duty of a fiduciary toward a client. A financial planner shall disclose to a client,
+> at the time advice is given, any gain the financial planner may receive… A financial planner shall make diligent inquiry of each client to ascertain initially,
+> and keep currently informed concerning, the client's financial circumstances and obligations and the client's present and anticipated obligations to and goals
+> for his or her family.»
+> «**NRS 628A.030.** … The circumstances giving rise to liability … are that the financial planner: (a) Violated any element of his or her fiduciary duty;
+> (b) Was grossly negligent in selecting the course of action advised, in the light of all the client's circumstances known to the financial planner; or
+> (c) Violated any law of this State in recommending the investment or service.»
+> «**NRS 628A.040.** … a financial planner shall maintain insurance covering liability for errors or omissions, or a surety bond … in an amount of $1,000,000 or more.»
+Подтверждение отраслевой аналитикой (ICI/IDC, «2017 Changes to Nevada's Financial Planner Law…»): «The law imposes **no registration, licensure, or qualification
+requirements** on financial planners»; с 01.07.2017 (SB 383) из определения убраны изъятия для брокеров-дилеров и инвестсоветников. Отчёт OLR Коннектикута
+(2017-R-0142) пересказывает то же.
+🔴 **Чего нет:** ни одного решения суда Невады, мнения AG или разъяснения Securities Division о применении гл. 628A к **автоматическому** сервису и к поставщику
+**без присутствия в штате**; территориальной нормы сама глава не содержит. Пройденные каналы: Exa-поиск (1 запрос), leg.state.nv.us, nevada.public.law,
+justia, cga.ct.gov, idc.org; `nvsos.gov` — **Incapsula-заглушка** («Request unsuccessful»). Вывод Г26 остаётся: обязанности есть, регистрации нет,
+применимость к нам — открытый вопрос, решается геоблоком или местным юристом.
+
+### Г30.3-В5. 🔴 UK, территориальность s. 19 FSMA — ДОБЫТО, и это ПРЯМОЕ ПОПАДАНИЕ В НАШ СЛУЧАЙ
+
+Первоисточник — заявление самого регулятора: FCA, «FCA takes action against Neil Woodford and W4.0 for operating without authorisation»,
+`https://www.fca.org.uk/news/statements/fca-takes-action-against-neil-woodford-and-w40-operating-without-authorisation`, 08.06.2026 (текст из индекса Exa;
+подтверждён The Guardian 08.06.2026 и FTAdviser 08.06.2026). Дословно:
+> «The FCA has started civil proceedings against Mr Neil Woodford and W4.0. The FCA alleges that Mr Woodford and W4.0 are providing regulated investment advice
+> and making financial promotions through the **subscription-based platform, www.w4pz.com**, without authorisation. In the FCA's view, the activity breaches
+> **sections 19 and 21** of the Financial Services and Markets Act 2000 (FSMA). The FCA is seeking an injunction… **W4.0 is the trading name of W Four Point Zero
+> FZE LLC and is registered in the United Arab Emirates.**»
+Сопутствующее (вторичное, отраслевые обзоры): по делу FCA v HTX (High Court, 2026) — «For communications originating outside the UK, the test is whether the
+promotion is **capable of having an effect in the UK**. There is no requirement to demonstrate that the firm actively targeted UK consumers. Accessibility alone
+can be sufficient»; индикаторы, на которые ссылался регулятор: английский язык, приём фунтов, верификация по британским документам, доступность с британских
+IP; защита — «effective geo-blocking, restricting UK-issued identification documents, removing GBP functionality».
+Судебная первичка по s. 19 для интернет-деятельности (BAILII, взяты реквизиты): FCA v Avacade [2020] EWHC 2175 (Ch); FCA v 24HR Trading Academy [2021] EWHC 648 (Ch);
+FCA v Skinner [2020] EWHC 1097 (Ch) — все о британских лицах, поэтому вопрос «иностранец через интернет» в них не решается; ближайший живой прецедент — именно W4.0.
+**Ответ на пункт:** гипотеза Г26 подтверждена практикой: **регистрация за рубежом (включая фризону ОАЭ) не защищает**, FCA идёт в суд по ss. 19 и 21 против
+подписочной платформы, обслуживающей британских резидентов. Для L9: единственная рабочая защита по UK — **фактический геоблок и отказ от британских атрибутов**
+(язык/валюта/идентификация), а не юридическая конструкция. Оговорка: дело W4.0 — об **инвестиционном** совете (art. 53 RAO); наш контур — долговой (art. 39E),
+прямого дела по нему нет, но территориальная логика общая для s. 19.
+
+### Г30.3-В6. 🔴 ОАЭ: закон, на который опирался вывод Г21, ЗАМЕНЁН — DFL 14/2018 → **DFL 6/2025** (в силе с 16.09.2025)
+
+Первоисточник — CBUAE Rulebook (консолидированный текст), через `r.jina.ai`:
+- `…/rulebook/article-61-licensed-financial-activities` — **200, 18 707 б**, пометка «**DFL 6/2025 Effective from 16/9/2025 Status: In-Force**». Перечень
+  лицензируемой деятельности целиком: «a. Taking deposits… b. Providing credit facilities… c. Providing funding facilities… d. Providing **open finance services**.
+  e. currency exchange and money transfer… f. payment services using Virtual Assets. g. stored values services, retail payments and digital money services.
+  h. **Arranging, promoting, marketing for Licensed Financial Activities.** i. Acting as a principal in financial products… j. insurance, reinsurance…»;
+  п. 2: Совет директоров вправе «Add, delete, or amend activities … following consultation with the ‘Financial Stability Board’».
+- `…/rulebook/article-60-prohibition-carrying-or-promoting-financial-activities-without-license` — **200, 17 547 б**: «1. No Person may carry on any of the
+  Licensed Financial Activities without obtaining the required license… 2. Licensed Financial Activities shall only be carried on, **in or from within the State**,
+  by Persons licensed… 3. **Promotion** of any of the Licensed Financial Activities and financial products shall only be carried on in or from the State…
+  The promotion … shall mean any form of communication, by any means, aimed at inviting or offering to enter into any transaction… 7. No Person shall present
+  themselves as a Licensed Financial Institution if they are not.»
+**Что это меняет.** Вывод Г21 п. 6 («перечень исчерпывающий, совета в нём нет → в ОАЭ onshore мы вне лицензирования») **сохраняется и в новом законе**: ни
+«financial consultation», ни «advice» в перечне ст. 61 нет. Но 🔴 **реквизит в файле устарел**: ссылаться нужно на **Federal Decree-Law No. (6) of 2025, Art. 61**
+(в силе с 16.09.2025), а не на DFL 14/2018 в ред. 9/2021, и держать в уме ст. 60(2)–(3) — территориальный критерий «in or from within the State» и отдельный
+запрет промоушена. Осторожность по п. «h» («arranging, promoting, marketing for Licensed Financial Activities») сохраняется в прежнем виде: партнёрская выдача
+кредитов переводит нас под лицензию.
+**Подзаконка Совета директоров и режим SCA:** перечень лицензий SCA добыт (документ SCA «Licensing of the financial activities and jobs approval»,
+`sca.gov.ae/assets/7949008c/…`, из индекса Exa): пятая категория — «Arrangement and advice», в перечне активностей значатся «**Financial Consultations**»,
+«Financial advisor (issuance manager)», «Listing advisor», причём ст. 2: «No financial activity may be practiced unless after obtaining a license and/or approval…
+from the Authority», а сфера — «any person who practices any of the financial activities … **inside the state**». 🟠 То есть **«финансовые консультации» в ОАЭ
+лицензирует SCA, а не CBUAE** — и это ровно тот режим, который Г21 не проверял. Наш модуль не касается ценных бумаг, а перечень SCA построен вокруг рынка
+капитала; но вывод «в ОАЭ во всех контурах мы вне лицензирования» теперь требует оговорки: **режим SCA «Financial Consultations» не исследован дословно**
+(прямой `curl` к `uaelegislation.gov.ae` — **403**, `r.jina.ai` — 403 + капча Cloudflare; текст SCA взят из индекса Exa, постатейно не сверялся).
+
+### Г30.3-В7. Коннектикут PA 17-120: кодификация и санкция — ✅ ОТВЕТ ПОЛУЧЕН (акт НЕ кодифицирован)
+
+Первоисточники (Exa): текст акта `cga.ct.gov/2017/act/pa/2017PA-00120-R00HB-06992-PA.htm`; глава 672a C.G.S. `cga.ct.gov/current/pub/chap_672a.htm`;
+анализ OLR к предшествующему законопроекту 2016 SB-265; страница Департамента банковского надзора `portal.ct.gov/DOB/Consumer/Consumer-Education/Choosing-A-Financial-Planner`.
+Оба раздела акта помечены «**(NEW) (Effective from passage)**» и **не привязаны к статье C.G.S.**; в действующей главе 672a («Uniform Securities Act»,
+§§ 36b-2 — 36b-34) норм о «financial planner» нет — § 36b-4(c) регулирует senior-обозначения только «in connection with the offer, sale or purchase of any security».
+Сам акт ссылается на § 36b-4 лишь как на стандарт сертификата: «unless such person has obtained a certificate, title or designation as described in section 36b-4
+of the general statutes».
+**Ответ:** PA 17-120 остался **некодифицированным публичным актом** (действует с 05.07.2017 сам по себе); отдельной санкции в нём нет — ни штрафа, ни ссылки
+на CUTPA. Гипотеза Г27 о CUTPA как канале ответственности **не подтверждена и не опровергнута**: в тексте акта её нет, практики не найдено.
+Для продукта обязанности прежние и дешёвые: не заявлять senior-квалификацию; по запросу резидента CT отвечать, есть ли фидуциарная обязанность.
+
+### Г30.3-В8. Пункты, по которым непройденных каналов не осталось
+
+- **SEC no-action letter Robert R. Champion (1986 WL 68317)** — оригинал доступен только в Westlaw/LEXIS (Fedsec Noact). Пройдено: индекс SEC (Г26),
+  Exa ×3 (Г30.3 первый заход), открытые репозитории. Открытых каналов больше нет; содержание письма известно из Plaze (SEC DIM) и Proskauer. **Закрываю как «частично, класс 2 (платная база)».**
+- **Толкования CCD II Art. 3(17) Комиссией/EBA** — пройдено: Exa ×2, EUR-Lex, страница Комиссии по consumer protection, CEPS-обзор. Уровень 2 для CCD
+  не предусмотрен (CEPS), Q&A Комиссии по директиве не публикуется. **Закрываю как доказанный отрицательный результат** с оговоркой: национальные позиции
+  (DE — § 511 BGB и SchuBerDG, IE — дерогация 16(6)) добыты и заменяют отсутствующее толкование ЕС.
+- **Stripe по гражданству бенефициара** — пройдено: страница Stripe (Г16), Exa ×1; политики по гражданству Stripe не публикует. **Частично, дальше — только эмпирика.**
+
+
+---
+
+## ДОБОР Г31.1 — Wayback (16.09.2026)
+
+**Состояние каналов (замер 16.09.2026 19:32–20:50 UTC; системная дата среды — 16.09):**
+`wayback/available` — 429 с редкими окнами 200; `cdx/search/cdx` — **503** «Temporarily Offline»;
+🟢 replay `web/<ts>[id_]/<URL>` — **200** при паузе ≥ 18 с; `archive.ph` — 200, «No results»
+по нужным адресам; Common Crawl — шлюз запросов **504**; DTIC — техобслуживание второй день.
+
+### Г31.1-П1. Перечень штатов, принявших UDMSA — ❌ НЕ ДОБЫТО, канал исчерпан
+
+**Что искали:** список принявших штатов на `uniformlaws.org`, который на живом сайте
+подгружается скриптом (блок «Legislative Bill Tracking» / Enactment Map).
+
+**Пройденные каналы, все с кодами:**
+
+| Канал | Результат |
+|---|---|
+| Живой сайт, `curl` с браузерным UA, верный CommunityKey `e327d09d-edb7-4f3c-95c9-f32a5679e7c1` | **200, 106 856 б** — но блок «Legislative Bill Tracking» пуст, в HTML только теги `#ConsumerProtectionandLabor`, `#BusinessOrganizations`, `#UniformAct` |
+| `r.jina.ai` без браузерного UA (по канону) | **200, 10 236 б** — полный отрендеренный текст страницы, **списка штатов в нём нет**; видны только «Related Versions: Debt-Management Services Act 2008 / 2005» и три документа библиотеки (Enactment Kit, Final Act, Committee Archive) |
+| Разбор HTML на предмет эндпоинта данных | найден только сторонний хост `api.connectedcommunity.org` (Higher Logic); именованного эндпоинта карты принятия в разметке нет |
+| Wayback replay, снимок **23.05.2024 11:21:03 UTC** (200, 143 322 б) | **тот же пустой блок** — виджет не отрабатывал и в момент съёмки |
+| Wayback, легаси-адреса `uniformlaws.org/Act.aspx?title=Debt-Management+Services+Act` и `/LegislativeFactSheet.aspx?title=…` (на старом сайте карта была в HTML) | **404** — «has not archived that URL», обе формы (`+` и `%20`) |
+| `archive.ph` (захватывает отрисованный JS, поэтому пробовался специально) | **404 / «No results»** — снимков этой страницы нет вовсе |
+
+🔴 **Вывод по каналу, а не по вопросу:** список принявших штатов **не существует в виде
+статического текста ни в одной сохранённой редакции страницы** — ни в архиве Wayback за 2024,
+ни в archive.today, ни в легаси-адресах. Виджет Higher Logic рендерит его из стороннего API,
+который архивы не сохраняют. Добор по Wayback этот пункт закрыть **не может в принципе**, и
+дальнейшие попытки по этому каналу бессмысленны — пункт переводится из класса 4 («лежал чужой
+сервис») в **класс 2** (нужен headless-браузер либо ручное открытие владельцем).
+
+**Что есть взамен, чтобы пункт не остался пустым (вторичный источник с постатейными
+ссылками на кодексы, найден через Exa).** Venable LLP, «Reflections on Five Years of the Uniform
+Debt-Management Services Act», 21.07.2010 — по состоянию **на июль 2010 года**:
+
+> «the UDMSA was approved by the National Conference of Commissioners on Uniform State Laws
+> in 2005, and **Utah** became the first state to adopt the Act in 2006. Since then, the UDMSA
+> has been adopted in six additional jurisdictions, **Colorado, Delaware, Nevada, Rhode Island,
+> Tennessee, and the U.S. Virgin Islands**.»
+
+с постатейными ссылками: Utah Code § 13-42-101 et seq. (в силе с 01.01.2007); Colo. Rev. Stat.
+§ 12-14.5-201 et seq. (01.01.2008); Del Code tit. 6 § 2401A et seq. (17.01.2007);
+Nev. Rev. Stat. § 676A (01.07.2010); R.I. Gen. Laws § 19-14.8 (01.07.2007);
+Tenn. Code Ann § 47-18-5401 et seq. (01.07.2010); V.I. Code Ann tit. 12A (27.06.2010).
+
+И там же — важная для нас пропорция, объясняющая, почему счёт именно по UDMSA вторичен:
+
+> «Overall, today **49 states have what we consider to be a debt adjusting statute**, which are
+> the primary state laws that regulate the industry. In 2005, out of the states that had debt
+> adjusting statutes, **about 25 required licensing. That number has since risen to about 37.**»
+
+🔴 **Содержательная поправка к постановке вопроса.** Считать «сколько штатов приняли UDMSA»
+— мерить не ту величину. Единообразный акт приняли 7 юрисдикций, но **debt adjusting statutes
+есть у 49 штатов**, и лицензирование требуют около 37. Риск для нас определяется вторым числом,
+а не первым: попасть под лицензирование можно в штате, который UDMSA никогда не принимал.
+Это согласуется с хвостом Г27 («законы штатов о debt management services / debt adjusting —
+отдельный класс норм, и он к нам ближе, чем режим советников»). 🟡 Числа 49 и 37 — **по
+состоянию на 2010 год и из вторичного источника**; как актуальные их брать нельзя, нужен
+поштучный проход по кодексам (открытая задача Г27).
+
+## ИТОГ Г31.1 (в этом файле)
+
+- Пунктов класса 4, отработанных здесь: **1** (перечень штатов UDMSA).
+- Закрыто снимком: **0**.
+- 🔴 Переклассифицировано: **1** — из класса 4 в класс 2 (архивы этот пункт закрыть не могут
+  принципиально, нужен headless-браузер).
+- Побочный результат: вопрос переформулирован — считать надо debt adjusting statutes
+  (≈ 49 штатов, ≈ 37 с лицензированием, данные 2010 г.), а не принятия UDMSA (7 юрисдикций).

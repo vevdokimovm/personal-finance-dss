@@ -2109,3 +2109,242 @@ Benartzi взяли числа из разных строк. Сравнение 
 - Не сработало: SAGE, APA, QJE (закрыты); scholar.law.colorado.edu (403 и антибот, r.jina.ai —
   228 байт пустышки); BYU (403); HKU (500); ResearchGate (403); Semantic Scholar (429);
   **Exa — MCP-сервер не подключён в этой сессии**.
+
+---
+
+# ДОБОР Г30.2 — Exa (16.09.2026)
+
+**Состояние каналов:** `mcp__exa__web_search_exa` — **работает** (один вызов отбит временным
+«You've hit Exa's free MCP rate limit», повтор прошёл; падением это не считается);
+`curl` + UA на `publications.bof.fi` → **403 (5 857 Б)**; `r.jina.ai` без UA на тот же адрес →
+**200, 89 069 Б, 36 страниц**. Сессия прерывалась лимитом аккаунта (HTTP 429), продолжена
+после смены аккаунта; гейты перепроверены вахтой.
+
+**Сверка со списком.** Не переоткрывались: Madrian & Shea (w7682 добыт в Д11.4, ранняя версия 1999 —
+закрыта по заданию), Dai—Milkman—Riis (Д11.4.2), Hagger 2010 и Meyer 2015 (Г8.3), Brown & Lahey WP (Г8.1).
+
+## Г30.2-10. 🟡 GPS (Falk et al.) по России — источник данных найден, но лицензия меняет дело
+
+**Было:** «GPS: patience/risk для России — JS-страница рейтингов; TLS-ошибка curl; 3 PDF без таблицы».
+
+**Exa нашла:** страницу загрузок проекта `https://gps.econ.uni-bonn.de/downloads` — там лежит
+**страновой набор данных (GPS country + доп. показатели) и Stata-код**, то есть значения по России
+существуют в машиночитаемом виде, а не только в JS-рейтинге. Из текста страницы дословно:
+> «This work is licensed under a **Creative Commons Attribution-NonCommercial-ShareAlike 4.0**
+> International License.»
+> «You can download the merged country level dataset (GPS country plus additional measures) here.»
+
+Из рабочей версии NBER w23943 (найдена Exa, `https://doi.org/10.3386/w23943`) дословно:
+> «Notable exceptions include … **Russia (1,498 obs.)**» — выборка по России 1 498 человек (медиана по странам 1 000).
+> «a one standard deviation increase in patience is associated with a roughly **15 % increase
+> of the probability of saving** relative to the baseline probability of **26.7 %**.»
+
+И региональные средние (QJE 2018, табл. III, авторская копия `https://benjamin-enke.com/pdf/Global_preferences.pdf`), дословно по строке:
+> «**Eastern Europe − 0.12 − 0.12 − 0.02 0.10 − 0.22 − 0.07 16**» (терпение, склонность к риску,
+> позитивная и негативная взаимность, альтруизм, доверие; 16 стран)
+> «Western Europe 0.49 − 0.11 0.06 0.04 − 0.04 0.10 11»
+
+🔴 **Лицензия NC — главное в этом пункте.** Данные GPS нельзя встраивать в коммерческий продукт
+(FINPILOT — коммерческий SaaS). Ссылаться в исследовании и в обосновании можно, использовать
+значения как параметры модели в продукте — **нет**, без отдельного разрешения briq.
+**Само число по России в файле не извлечено**: архив загрузок за формой согласия, в этом заходе
+не выгружался. Статус: частично — источник, размер выборки, региональная средняя Восточной Европы
+(терпение −0,12 против +0,49 у Западной) и условия лицензии добыты; точное значение по России — нет.
+
+## Г30.2-11. 🟡 Co-holding и сберегательное поведение в РФ — российская эмпирика найдена, но co-holding в строгом смысле по-прежнему нет
+
+**Было:** «Co-holding в России — не найдено ни на русском, ни на английском»; «Российские полевые RCT —
+в двух заходах не найдены».
+
+Exa-запрос на русском вернул пласт наблюдательных работ:
+
+1. **Semenova M. Save or borrow – what determines Russian households' financial strategies?
+   BOFIT Discussion Papers 28/2011** (Банк Финляндии), RLMS-HSE, 17-я волна (2008).
+   `curl` 403 → `r.jina.ai` **200, 89 069 Б**. Дословно:
+   > «Financial literacy … **lost its significance at the onset of the financial crisis**. Household income …
+   > was found to have much less influence on savings and to have a positive influence on borrowing,
+   > confirming the rationing theory rather than inter-temporal choice theory. **Surprisingly, the fear
+   > of job loss does not make people save more, contrary to the precautionary motive.**»
+2. **«Запас прочности и финансовое обременение: кредитно-сберегательное поведение средневозрастных
+   россиян»**, журнал «ЭКО», 29.01.2026, `https://ecotrends.ru/index.php/eco/article/view/4939`
+   (опрос 2023 г.). Из аннотации дословно:
+   > «Группа финансового неблагополучия, состоящая из **несформировавших сбережения и одновременно
+   > имеющих непогашенные кредиты, составляет 31 %** средневозрастных россиян.»
+3. **ЭСФ ВШЭ** (`https://ojs.hse.ru/index.php/ecsoc/article/download/23860/20044/`), опросы 2009–2023,
+   12 963 респондента: «лишь около **трети населения имеет сбережения**», у большинства их хватит
+   «на срок менее года»; недоверие институтам — препятствие росту сбережений.
+4. Кадочникова (RLMS, 28-я волна, 2019, логит/пробит, N = 6 642) и Гамукин (Финансы: теория
+   и практика, 2025, агрегаты ЦБ 2011–2024) — реквизиты зафиксированы, тексты не выгружались.
+
+🔴 **Честная граница.** 31 % — это «**нет** сбережений **и** есть долг», то есть противоположность
+co-holding (co-holding — «**есть** сбережения **и** есть дорогой долг»). Измерения co-holding
+на российских данных **по-прежнему не найдено** — теперь уже тремя каналами (WebSearch, OpenAlex, Exa).
+Полевых RCT по дефолтам и напоминаниям в РФ Exa тоже не выдала: **вся найденная российская база —
+наблюдательная**. Для блока B5 это значит: перенос западных экспериментальных эффектов на РФ
+по-прежнему не подтверждён ни одним российским экспериментом.
+
+**Что важно для продукта:** (а) у трети целевой аудитории сбережений нет вовсе, и треть средневозрастных —
+«без сбережений с долгом»: для них вопрос «гасить или копить» вырождается в «сначала резерв»;
+(б) по Семеновой страх потерять работу **не** рождает резерв сам — значит, подсказка о резерве
+не будет «проповедью уже решённого».
+
+## Г30.2-12. 🟢 Gal & McShane 2012 — полный текст ДОБЫТ (был «SAGE, пейволл; числа из пресс-релиза Kellogg»)
+
+**Чем взято:** Exa нашла авторскую копию журнальной редакции на личном сайте соавтора (приём
+«копия у автора»). `https://blakemcshane.com/Papers/jmr_debt.pdf` — `curl` **200, 1 116 368 Б**,
+`pdftotext` → 126 676 симв. SAGE в той же выдаче — антибот («Just a moment…»).
+
+Реквизиты из колонтитула, дословно: «ISSN: 0022-2437 (print) … **Vol. XLIX (August 2012), 487–501**».
+**Gal D., McShane B. B. Can Small Victories Help Win the War? Evidence from Consumer Debt Management //
+Journal of Marketing Research. 2012. Vol. 49, No. 4. P. 487–501. DOI 10.1509/jmr.11.0272.**
+
+Дословно, данные:
+> «access to data from a random sample of **5943 clients** who … **4169 of the 5943 clients** who
+> successfully settle at least one [account] … (i.e., [5943 − 4169]/5943 = **30 %**)»
+
+Дословно, главный вывод (итоговый раздел):
+> «the **fraction of debt accounts paid off appears to be a better predictor** of whether the consumer
+> eliminates his debts **than the fraction of the total dollar debt paid off** … the dollar balance
+> of closed debt accounts was **not predictive** of debt elimination when accounting for the fraction
+> of debt accounts closed.»
+
+🔴 **Ограничение, которое пресс-релиз не передавал и которое бьёт по переносу на FINPILOT** (с. 491):
+> «which times are **made by the debt settlement firm rather than the consumer**. In deciding which
+> accounts to negotiate and settle at a given time, the debt settlement firm takes account of several
+> factors…»
+
+То есть порядок закрытия счетов выбирал **не человек**, а компания по урегулированию долгов;
+выборка — клиенты такой компании (долги сокращались переговорами, «typically … about 50 %» по Kellogg
+Insight). Это корреляционная работа на специфической популяции, а не эксперимент со стратегией
+snowball. Числа «+14 % через год, +43 % к четвёртому году» — **только из пресс-материала Kellogg
+Insight** (`https://insight.kellogg.northwestern.edu/article/to_beat_debt_consider_starting_small`),
+в тексте статьи не сверены — не цитировать как числа статьи.
+
+**Для продукта:** вывод Г8 («snowball — разрешённое переопределение с ценой в рублях, не рекомендуемый
+режим») **усилен**: самая цитируемая «доказательная» опора snowball оказалась наблюдательной и снятой
+на людях, которые порядок сами не выбирали.
+
+## Г30.2-13. ⚪ Hamilton 2023 — полный текст по-прежнему НЕ добыт
+
+Exa нашла только карточку RePEc (`https://ideas.repec.org/a/wly/soecon/v89y2023i3p830-859.html`)
+и пересказы; Wiley в выдаче — баннер без статьи. Рабочей версии под другим названием Exa не выдала.
+Реквизиты уточнены: **Southern Economic Journal 89(3): 830–859, DOI 10.1002/soej.12612**, данные SCF 2016.
+Дословно из аннотации (сверено с RePEc): «the average household pays an additional **1.8 %–4.3 %**
+in interest, leading to an aggregate transfer … of between **$46.2 and $53.9 billion**» и «greater
+pecuniary penalties on **low-income** households, on Black households, and on households with more
+initial debts». Каналы: WebFetch 403, r.jina.ai капча Wiley (прежде), Exa — только аннотация.
+
+## Г30.2-14. 🟢 Vohs et al. 2021 — читаемый полный текст ДОБЫТ (был «curl 200, но pdftotext вернул пустой текст»)
+
+**Чем взято:** Exa нашла репозиторную копию принятой рукописи в Брунельском университете
+`https://bura.brunel.ac.uk/bitstream/2438/28246/1/FullText.pdf` и препринт PsyArXiv
+`https://doi.org/10.31234/osf.io/e497p`; текст отдан Exa в выдаче (прежний файл был, видимо, сканом).
+Реквизиты дословно: «Psychological Science, **32(10), 1566-1581**. DOI 10.1177/0956797621989733».
+
+Дословно:
+> «We conducted a preregistered, multi-laboratory project (**k = 36; N = 3531**) … Confirmatory tests
+> found a **non-significant result, d = 0.06**.»
+> «the standardized mean performance difference … was not statistically significant,
+> **d = 0.06 [-.02, 0.14]**»
+> «The model-averaged Bayes factor indicated that the data are **4.4 times more likely under the
+> point-null hypothesis**»
+> «Exploratory analyses on the full sample … found a statistically significant effect (**d = 0.08**)»
+> «Our preregistered exclusion criteria led us to exclude data from **nearly a third** of the overall sample»
+
+И важная сверка с нашим Г8.3а — авторы сами называют обе опорные величины:
+> «Hagger et al.'s (2010) meta-analysis, which reported an overall effect size of **d = 0.62**, and
+> Hagger et al.'s (2016) registered replication report, which reported … **d = 0.04**.»
+
+**Итог для продукта:** «истощение силы воли» как механизм в продукт не закладывать — вывод Г8 подтверждён
+вторым многолабораторным тестом по первоисточнику (предрегистрированный эффект ≈0, разведочный 0,08).
+
+## Г30.2-15. 🟡 «Correcting the Record on Financial Education» — след найден, тождество не доказано
+
+Exa по точному названию документа не нашла. Рядом в выдаче — профиль J. G. Lynch (ResearchGate, закрыт)
+и работа **Fernandes D., Lynch J., Kim L. «Publication Bias in Financial Economics: The Case of Studies
+of the Effects of Financial Education on Financial Behavior»**, SSRN 2025 (DOI 10.2139/ssrn.5385386
+и 10.2139/ssrn.5772062), плюс SSRN-карточка «Smaller Effects After Adjusting for Publication Bias…».
+Это та же исследовательская линия (Фернандес—Линч, мета-анализ 2014 г. о финобразовании), но
+**что «Correcting the Record» — именно этот текст, не подтверждено**. SSRN — капча (замер прошлых
+заходов), полный текст не взят. Статус: авторы-кандидаты установлены, текст не добыт.
+
+---
+
+## ИТОГ Г30.2 — behavioral_execution_gap
+
+| Пункт | Был статус | Стал | Приём Exa / причина |
+|---|---|---|---|
+| Gal & McShane 2012, полный текст | не добыто (SAGE) | 🟢 **добыто** | авторская копия на сайте соавтора; `curl` 200, 1 116 368 Б |
+| Vohs et al. 2021 | не добыто (пустой pdftotext) | 🟢 **добыто** | репозиторий Брунеля + PsyArXiv, текст отдан Exa |
+| GPS по России | не добыто | 🟡 **частично** | найдена страница загрузок и лицензия CC BY-NC-SA; N России 1 498; число по РФ за формой согласия не взято |
+| Co-holding в РФ | не найдено | 🟡 **частично**: смежная эмпирика (31 % «без сбережений с долгом», Семенова BOFIT 28/2011, ЭСФ ВШЭ); co-holding в строгом смысле — не найден | Exa-запрос на русском; BOFIT через `r.jina.ai` (curl 403) |
+| Российские полевые RCT | не найдено | ⚪ **не найдено и Exa** | вся найденная база наблюдательная |
+| «Correcting the Record» | не добыто | 🟡 **частично** (авторы-кандидаты) | тождество не доказано; SSRN капча |
+| Hamilton 2023 | не добыто | ⚪ **осталось** (реквизиты уточнены) | Exa — только аннотация; Wiley закрыт |
+| Gollwitzer & Sheeran 2006 | не добыто | ⚪ не переоткрывалось | перекрыто мета-анализом 2024/25 |
+| Росстат КОУЖ, доверие к банкам | не запрашивалось | ⚪ не переоткрывалось | вне бюджета; частично перекрыто ЭСФ ВШЭ (доверие и сбережения) |
+| Дефолт в советующем продукте | открытый вопрос | ⚪ | исследовательский вопрос, не проблема доступа |
+| Madrian & Shea 1999; Dai—Milkman—Riis; Hagger 2010 | закрыто ранее | ⚪ не переоткрывалось | по заданию / Д11 / Г8 |
+
+**Главное число по файлу: Exa перевела 2 пункта в «добыто» полностью и 3 — частично.**
+
+**Меняет ли канон/прогноз/новизну:** канон — нет. Два продуктовых следствия:
+(1) 🔴 **snowball теряет главную «полевую» опору**: Gal & McShane — корреляция на клиентах компании
+урегулирования долгов, где порядок закрытия выбирала **компания**, а не человек; решение Г8
+(snowball — только переопределение с ценой в рублях) усилено;
+(2) 🔴 **данные GPS нельзя использовать как параметры коммерческого продукта** (лицензия NonCommercial) —
+если где-то в планах стояла калибровка терпения/риска по GPS, это юридически закрыто без разрешения briq.
+
+---
+
+## ДОБОР Г31.5 — отказ адреса (17.09.2026)
+
+**Каналы (замер 17.09.2026):** Crossref `/works/<doi>` **200** (15 752 б) · Unpaywall **200** · S2 `/paper/DOI:` **200** на `10.2139/ssrn.5385386`, **404** на `10.2139/ssrn.5772062` (записи в S2 нет — не отказ канала) · S2 `search/bulk` **200** · Exa search **работает**, Exa fetch по SSRN — `CRAWL_LIVECRAWL_TIMEOUT` · KOPS DSpace 7 `bitstreams/…/content` **200**.
+
+### Г31.5-B1. 🟢 «Correcting the Record on Financial Education» — ТОЖДЕСТВО ДОКАЗАНО, авторский абстракт ДОБЫТ ДОСЛОВНО
+
+Последнее упоминание — Г30.2-15 (стр. 2261): «след найден, тождество не доказано; SSRN — капча». Все прежние заходы (Д11.4.3, Г30.2) били в **SSRN** (страница, `Delivery.cfm`, прокси, Wayback) и ResearchGate. **Депозит Crossref по тому же DOI не запрашивался** — класс Г31.5: закрыт был один хост, а не метаданные.
+
+**Тождество — по совпадению DOI в двух независимых индексах:**
+- S2 `/paper/DOI:10.2139/ssrn.5385386` — **200, 933 б**: `"title": "Correcting the Record on Financial Education: Smaller Effects After Adjusting for Publication Bias"`, авторы Daniel Fernandes, John G. Lynch, Lena Kim, 2025, `openAccessPdf.status: "GREEN"` → тот же SSRN DOI.
+- Crossref `/works/10.2139/ssrn.5385386` — **200, 15 752 б**: `title` = «Publication Bias in Financial Economics: The Case of Studies of the Effects of Financial Education on Financial Behavior», те же три автора, 2025, **`abstract` депонирован**.
+- Crossref `/works/10.2139/ssrn.5772062` — **200**: тот же заголовок «Publication Bias in Financial Economics…», те же авторы, абстракта нет.
+- Unpaywall `10.2139/ssrn.5385386` — **200**, `green`, единственная локация — `doi.org/10.2139/ssrn.5385386`.
+Вывод: SSRN-запись 5385386 **переименована** из «Correcting the Record…» (заголовок в S2 — снимок раннего индексирования) в «Publication Bias in Financial Economics…»; 5772062 — повторная выкладка той же работы. **Одна работа, три авторa, два заголовка.**
+
+**Абстракт ДОСЛОВНО (Crossref, депозит SSRN, теги JATS сняты):**
+
+> «Publication bias is an under-appreciated problem in financial economics, and existing methods for detecting and correcting it rest on restrictive assumptions. We revisit these issues in the context of Kaiser et al.'s (2022, Journal of Financial Economics) highly influential meta-analysis of 76 randomized controlled trials (RCTs) on financial education. Their headline uncorrected finding was that, compared to a control group, those receiving financial education improved financial behavior on average by 0.10 standard deviations, five times more than an earlier RCT-based estimate of Fernandes et al. (2014, Management Science). Many interpreted this as evidence that financial education had improved. Citing Andrews and Kasy (2019, American Economic Review), Kaiser et al. corrected for "symmetric" publication bias that favors statistically significant results regardless of sign. Yet when true effects are small but positive, random sampling produces many valid estimates of the "wrong" sign. We reanalyze their data using Andrews and Kasy's preferred correction for meta-analysis, which accounts for selective reporting based on both significance and sign. This model fits the data better than the symmetric model nested within it. **Corrected estimates decline to 0.018–0.033 standard deviations.** Kaiser et al. also analyze heterogeneity across intervention types but do not correct those estimates for bias. **Once corrected, the effects shrink, and conclusions about which interventions work best change.** We conclude that **most financial education programs yield only small behavioral effects, and fewer interventions show benefits exceeding costs than Kaiser et al. suggest.** Similar corrections also reduce estimated impacts on financial knowledge.»
+
+**Выжимка.** Числа 0.018–0.033 SD в §3.1-тер переводятся из «сниппет» в **«авторский абстракт, первоисточник-метаданные»**; полный текст (таблицы по типам интервенций) по-прежнему за капчей SSRN. Новое против сниппета: (а) механизм — асимметричная по знаку коррекция Andrews & Kasy лучше описывает данные, чем симметричная, вложенная в неё; (б) **поправка меняет и ранжирование типов интервенций** — значит, разбивку Kaiser et al. 2022 по типам использовать нельзя; (в) то же сжатие — и для эффекта на **знания**, не только поведение.
+
+### Г31.5-B2. 🟢 Sheeran, Listrom & Gollwitzer 2024/25 — «регуляция аффекта» добрана из того же открытого файла
+
+Запись стр. 408: «регуляция аффекта — цифра не добыта полностью (обрыв чтения по бюджету)» — случай «не дочитал при открытой копии».
+`https://kops.uni-konstanz.de/server/api/core/bitstreams/d703c468-46e9-47fc-8900-d32d7d19c8d9/content` — **HTTP 200, 416 930 б**, sha256 `d450e195207de67a213f5afd39b99f358f3486e0b8891202f1681253b7291506`, `pdftotext -layout`.
+
+**Table 1 ДОСЛОВНО (выборка строк; без коррекции на публикационное смещение):**
+
+| Feature | k | d | 95% CI | I² |
+|---|---|---|---|---|
+| Behaviour change | 301 | .27 | [.23, .31] | 78.5 |
+| — Health | 259 | .26 | [.21, .30] | 78.7 |
+| — Academic behaviours | 14 | .25 | [.03, .47] | 55.5 |
+| — Voting | 6 | .14 | [−.003, .29] | 72.6 |
+| Cognitive performance | 204 | .47 | [.40, .54] | 63.4 |
+| **Affect regulation** | **26** | **.66** | **[.50, .81]** | **6.3** |
+| — Disgust | 10 | .77 | [.49, 1.05] | 0.0 |
+| — Fear | 8 | 1.22 | [.85, 1.58] | 0.0 |
+| — Anxiety/stress/arousal | 8 | .44 | [.26, .62] | 0.0 |
+| Social judgement | 20 | .52 | [.41, .62] | 0.0 |
+
+И дословно о пробелах литературы: «There were also few cross-cultural studies or studies of consumer behaviour (e.g., Gollwitzer & Sheeran, 2009).»
+
+**Выжимка.** 🔴 В таблице исходов **нет категории финансового поведения вовсе** (сбережения, погашение долга); ближайшее — «Behaviour change» d = .27 до коррекции, а RoBMA по всему массиву даёт d ≈ .15 (стр. 404–406 файла). Любая ссылка на implementation intentions как на опору для «плана погашения» — перенос из здоровья и учёбы, а не прямой замер.
+
+## ИТОГ Г31.5 — behavioral_execution_gap
+
+2 кандидата, **2 закрыты**: «Correcting the Record» — **Crossref `/works/<doi>`** (депонированный абстракт; SSRN и прокси не нужны) + S2 для доказательства тождества; Sheeran et al. — **прямой `curl` по уже известному KOPS-адресу** (дочитка).
+
+🔴 **Что меняет обоснование (канон не трогается):** эффект финансового образования после асимметричной коррекции — **0.018–0.033 SD**, и выбор «какие интервенции работают» по Kaiser 2022 ненадёжен; любая часть продукта, обосновываемая «обучением пользователя», не может ссылаться на поведенческий эффект обучения как на существенный. Для implementation intentions финансовых замеров в мета-анализе нет.
+Задолженности нет. Полный текст Fernandes–Lynch–Kim (таблицы по типам) остаётся за капчей SSRN — открытой копии не знает ни один индекс.

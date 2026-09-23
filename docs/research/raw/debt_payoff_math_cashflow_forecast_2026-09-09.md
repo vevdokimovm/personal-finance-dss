@@ -622,3 +622,42 @@ Telyukova показывает, что одновременное держани
    перед использованием в юридически значимых материалах.
 10. **Страницы 11-16 и 32+ файла w20125** (детали эксперимента, Tables 6-7 по choice study)
     не читались. Файл открывается по прямому URL и читается через Read с параметром `pages`.
+
+---
+
+## ДОБОР Г31.5 — отказ адреса (17.09.2026)
+
+**Каналы (замер 17.09.2026):** Unpaywall **200** · Crossref **200** · NBER прямой `curl -sL` **200** · `cepr.org` прямой `curl` с UA **403, 4 544 б** · `r.jina.ai` без UA — **200** (замер общий по сессии).
+
+Раздел «ЧТО ОСТАЛОСЬ НЕДОСТУПНЫМ» этого файла (стр. 598–622; более поздних доборов в файле нет) числит два пункта класса Г31.5.
+
+### Г31.5-D1. CEPR «Untangling the credit card debt puzzle» — 🟢 УЖЕ ДОБЫТ в соседнем файле, запись здесь устарела
+
+Отказ записан по одному адресу (`cepr.org/…pdf` → 403). Сегодня тот же адрес снова **403, 4 544 б** — но текст работы **добыт через `r.jina.ai` (HTTP 200, 55 536 б)** и разобран в `macro_in_forecast_2026-09-10.md`, стр. 521–540. Реквизиты оттуда: Vihriälä E., University of Oxford, версия 29.04.2019 (не «2023» — 2023-02 это каталог выкладки CEPR); финские банковские микроданные, 519 940 домохозяйств, помесячно 2014–2016. Ключевой вывод (дословно там же): «only one quarter of puzzle households accept the offer … there is no evidence for increased exit from the puzzle group … strategic liquidity/precautionary borrowing motives are unlikely to be a sufficient explanation for the credit card debt puzzle». Пункт 6 списка снимается ссылкой; повторно не добывался.
+
+### Г31.5-D2. 🟢 Gross & Souleles (2002) — ПОЛНЫЙ ТЕКСТ ДОБЫТ (рабочая версия NBER)
+
+Запись «Не открыт, только упоминание у Telyukova» — случай «не скачивал при существующей открытой копии».
+- Crossref `query.bibliographic` — **200**: три записи одной работы — QJE `10.1162/003355302753399472` (**117(1):149–185**), NBER `10.3386/w8314`, SSRN `10.2139/ssrn.213011`.
+- Unpaywall по журнальному DOI — **200**, `is_oa: False`, `closed` (журнальная версия закрыта).
+- 🟢 `https://www.nber.org/system/files/working_papers/w8314/w8314.pdf` — **HTTP 200, 266 352 б, `application/pdf`**, 53 стр., sha256 `0c7877bdd532b98e9b5a0fd9475453d9968f30aaa8946470b5f1a5ca5688b6eb`. Страница абстракта в PDF нечитаема (шрифт без таблицы Unicode), основной текст читается.
+
+**ДОСЛОВНО, введение (с. 2–3):**
+
+> «About 2/3 of households have at least one bankcard, and of these households at least 56 percent – a remarkably large fraction – are borrowing on their bankcards, that is, paying interest, not just transacting [1995 Survey of Consumer Finances (SCF)].»
+>
+> «To preview the results, we find that increases in credit limits generate an immediate and significant rise in debt, counter to the PIH. The average "MPC out of liquidity" (dDebt/dLimit) ranges between 10-14 percent. The MPC is much larger for people starting near their credit limit, providing concrete evidence that liquidity constraints are often binding. However, the MPC is significant even for people starting well below their limit. We show that this response is consistent with buffer-stock models of precautionary saving. Nonetheless, there are other results that conventional models cannot easily explain, such as the fact that many credit card borrowers simultaneously hold low yielding assets. Unlike most other studies, we also find strong effects from changes in account-specific interest rates. The average long-run elasticity of debt to the interest rate is approximately -1.3. Less than half of this elasticity represents balance-shifting across cards, with most reflecting net changes in total borrowing. The elasticity is larger for decreases in interest rates than for increases, which can explain the widespread use of temporary promotional rates.»
+
+**ДОСЛОВНО, разд. VII, «portfolio puzzle» (с. 31–32):**
+
+> «Most puzzling of all, over 90 percent of people with credit card debt have some very liquid assets in checking and savings accounts, which usually yield at most 1-2 percent. … To accommodate cash transactions, Table VI allows for one month's worth of gross total household income to be kept in liquid assets for transactions purposes, which is arguably generous. Yet 1/3 of credit card borrowers still have more than this much income in liquid assets. These assets could instead have been used to pay down their credit card debt. These results persist even for people with substantial debt. For over 10 percent of bankcard-holding households, bankcard debt amounts to more than one month's income. Yet again about 1/3 of these high-debt households have over one month's income in liquid assets.»
+>
+> «Such behavior is puzzling, apparently inconsistent with no-arbitrage and thus inconsistent with any conventional model. Perhaps behavioral models of self-control or mental accounts might help explain it.»
+
+**Выжимка.** (1) Первое документирование ко-холдинга подтверждено первоисточником: >90 % заёмщиков по картам держат ликвидные активы; **треть — сверх месячного дохода** даже после вычета «щедрого» транзакционного остатка в один месяц. (2) Эластичность долга по ставке ≈ −1,3 (длинная), асимметричная — больше на снижение ставки. (3) MPC из кредитного лимита 10–14 %. Данные — США, счета эмитентов 1995–1998 (рабочая версия 2001).
+
+## ИТОГ Г31.5 — debt_payoff_math_cashflow_forecast
+
+2 кандидата, **2 закрыты**: CEPR — ссылкой на уже добытый через `r.jina.ai` текст в `macro_in_forecast` (прямой адрес по-прежнему 403); Gross & Souleles — **прямым `curl` по NBER** (рабочая версия; журнальная закрыта).
+
+🔴 **Что меняет обоснование (канон не трогается):** порог «один месяц дохода как транзакционный остаток» в Gross & Souleles назван авторами «arguably generous» и при нём треть заёмщиков всё равно держит лишнюю ликвидность. Это первоисточник для довода, что ко-холдинг — не артефакт транзакционного спроса, и прямая опора для правил резерва против дорогого долга. Противовес уже в базе — Zinman 2006 и Vihriälä 2019 (см. `approach_validity` Г31.4-D5 и `macro_in_forecast`); спор не разрешён, но теперь обе стороны на первоисточниках. Пункты 5 и 6 списка снимаются. Задолженности нет.

@@ -3287,3 +3287,1036 @@ sustainability, but for other classes of problems, such a guideline is unnecessa
 > more sense than another in a specific problem situation.** A systematic axiomatic analysis of
 > decision procedures and algorithms is yet to be carried out.»
 
+
+---
+
+# ДОБОР Г30.1 — Exa (16.09.2026)
+
+**Состояние каналов на начало блока (замеры 16.09.2026, свои, не предположения):**
+`mcp__exa__web_search_exa` — работает (ответы с полными highlights, первый же запрос по Dawes 1979
+вернул семь релевантных источников). `mcp__exa__web_fetch_exa` — работает, PDF Graefe 2013 разобран
+в текст. **Wayback `web.archive.org` — HTTP 302, 0 байт** (редирект, не 429; но на снимки не
+опирался). OpenAlex `api.openalex.org` — **HTTP 200, 14 007 байт**. Unpaywall — HTTP 200, отвечает.
+Semantic Scholar не запрашивался (по условию батча — 429 без ключа).
+
+**Зачем блок:** Exa была недоступна агентам с 08.09.2026, поэтому каждое «не добыто» в этом файле —
+непроверенный пункт. Ниже — только то, что оставалось открытым по ПОСЛЕДНЕМУ упоминанию в файле
+(сверено: Dawes 1979, Dawes & Corrigan 1974, Grove 2000, Meehl 1978, Методрекомендации ЦБ 3-МР,
+Mohammadi & Rezaei 2020, TOPSIS/SAW CC BY, рамка Wątróbski — уже добыты, не переоткрывались).
+
+## Г30.1-1. Einhorn & Hogarth 1975 — оригинал по-прежнему закрыт, но АБСТРАКТ добыт ДОСЛОВНО
+
+Было (стр. ~2622): «оригинал НЕ добыт, добыт пересказ соавтора (Hogarth 2006)»; условие «R² ≤ .5»
+держалось только на пересказе Гигеренцера.
+
+**Проверка доступности, сделанная заново:**
+- Unpaywall `10.1016/0030-5073(75)90044-6` → HTTP 200, **`is_oa: false`, `best_oa_location: null`,
+  `has_repository_copy: false`** (снято 16.09.2026). То есть открытой копии не существует вовсе,
+  а не «мы её не нашли». Это отличает отрицательный результат от непроверенного.
+- ScienceDirect `0030507375900446` — только `abs/`-страница, полного текста нет.
+- Exa-поиск описанием идеальной страницы (полный текст / рабочая версия / репозиторий) — полного
+  текста не вернул ни по одному запросу.
+
+**Добыто через Exa — полный абстракт дословно** (источник: OpenAIRE-монитор
+`https://oamonitor.ireland.openaire.eu/rfo/sfi_rfo/search/publication?pid=10.1016%2F0030-5073%2875%2990044-6`,
+снято через Exa 16.09.2026; текст совпадает с карточкой ScienceDirect):
+
+> «The general problem of forming composite variables from components is prevalent in many types of
+> research. A major aspect of this problem is the weighting of components. Assuming that composites
+> are a linear function of their components, composites formed by using standard linear regression
+> are compared to those formed by simple unit weighting schemes, i.e., where predictor variables are
+> weighted by 1.0. **The degree of similarity between the two composites, expressed as the minimum
+> possible correlation between them, is derived. This minimum correlation is found to be an
+> increasing function of the intercorrelation of the components and a decreasing function of the
+> number of predictors.** Moreover, the minimum is fairly high for most applied situations. The
+> predictive ability of the two methods is compared. For predictive purposes, unit weighting is a
+> viable alternative to standard regression methods because unit weights: **(1) are not estimated
+> from the data and therefore do not "consume" degrees of freedom; (2) are "estimated" without error
+> (i.e., they have no standard errors); (3) cannot reverse the "true" relative weights of the
+> variables.** Predictive ability of the two methods is examined as a function of sample size and
+> number of predictors. **It is shown that unit weighting will be superior to regression in certain
+> situations and not greatly inferior in others.** Various implications for using unit weighting are
+> discussed and applications to several decision making situations are illustrated.»
+
+🔴 **Что это меняет для нас.** В абстракте первоисточника **числа .5 нет**. Названы два параметра,
+от которых зависит близость композитов: интеркорреляция признаков (растёт — сходство растёт) и
+число предикторов (растёт — сходство падает). Значит формулировка «Einhorn & Hogarth 1975 показали,
+что равные веса выигрывают при R² ≤ .5» — **атрибуция позднейших авторов, а не цитата**; см. п. 2.
+
+## Г30.1-2. Откуда на самом деле взялось условие «R² ≤ .5» — прослежено до пересказов, первоисточник не подтверждает
+
+Дословно у Гигеренцера и Брайтона (Gigerenzer G., Brighton H. «Homo Heuristicus: Why Biased Minds
+Make Better Inferences», *Topics in Cognitive Science* 1 (2009), с. 111; открытая копия
+`https://library.mpib-berlin.mpg.de/ft/gg/GG_Homo_2009.pdf`, добыто через Exa 16.09.2026):
+
+> «Early attempts to answer this question indicated that **tallying succeeded when linear
+> predictability of the criterion was moderate or small (R² ≤ .5), the ratio of objects to cues was
+> 10 or smaller, and the cues were correlated (Einhorn & Hogarth, 1975).**»
+
+Та же формулировка у Goldstein D. G., Gigerenzer G. «Fast and frugal forecasting», *International
+Journal of Forecasting* 25 (2009) (`https://www.dangoldstein.com/papers/GoldsteinGigerenzer_FastFrugalForecasting_IJF09.proof.pdf`,
+добыто через Exa):
+
+> «Einhorn and Hogarth (1975) asked in which environments equal weights are as good as or better
+> than regression weights, and **concluded that typical preconditions include moderate to low linear
+> predictability (R² of 0.5 or smaller) and correlated predictors.**»
+
+🟡 **Статус условия: подтверждено как устойчивая позиция литературы (две независимые публикации
+той же школы, дословно), но НЕ как цитата из Einhorn & Hogarth.** Оригинал закрыт (см. п. 1),
+абстракт числа не содержит. В наших документах ссылаться следует на Gigerenzer & Brighton 2009,
+с. 111 — а не на Einhorn & Hogarth 1975 — либо на первоисточники п. 3, где пороги измерены прямо.
+
+## Г30.1-3. 🔴 Найден ЛУЧШИЙ первоисточник порогов, чем спорная ссылка на Einhorn & Hogarth: Dana & Dawes 2004
+
+Dana J., Dawes R. M. «The Superiority of Simple Alternatives to Regression for Social Science
+Predictions». *Journal of Educational and Behavioral Statistics* 29(3), Fall 2004, **с. 317–331**,
+DOI 10.3102/10769986029003317. Абстракт добыт дословно, сверен по трём независимым площадкам
+(SAGE `journals.sagepub.com/doi/10.3102/10769986029003317`; ERIC `eric.ed.gov/?id=EJ727514`;
+RePEc `ideas.repec.org/a/sae/jedbes/v29y2004i3p317-331.html`) — все три через Exa, 16.09.2026,
+тексты идентичны:
+
+> «Some simple, nonoptimized coefficients (e.g., correlation weights, equal weights) were pitted
+> against regression in extensive prediction competitions. After drawing calibration samples from
+> large supersets of real and synthetic data, the researchers observed which set of sample-derived
+> coefficients made the best predictions when applied back to the superset. **When adjusted R from
+> the calibration sample was < .6, correlation weights were typically superior to regression
+> coefficients, even if the sample contained 100 observations per predictor; unit weights were
+> likewise superior to all methods if adjusted R was < .4.** Correlation weights were generally the
+> best method. **It was concluded that regression is rarely useful for prediction in most social
+> science contexts.**»
+
+И вторичная, но дословная сводка того же результата у Graefe (см. п. 4):
+
+> «Dana and Dawes (2004) analyze the relative predictive performance of regression and equal weights
+> for five real non-experimental social science datasets and a large number of synthetic datasets.
+> **They find that regression weights do not yield more accurate forecasts than equal weights unless
+> sample size is larger than one hundred observations per predictor. Only in cases in which
+> prediction error was likely to be very small (adjusted R² > .9), the authors found regression to
+> outperform equal weights in samples with five observations per predictor.**»
+
+🔴 **Это сильнее и новее того, на чём файл стоял до сих пор.** Порог Дауэса 1979 (15–20 наблюдений
+на признак) был получен в 1970-е; Dana & Dawes 2004 на реальных и синтетических данных дают
+**100 наблюдений на признак** как границу, ниже которой регрессия не выигрывает вовсе. Наш случай
+(нет измеримого критерия, веса откалиброваны по согласию с экспертами) лежит глубоко в зоне, где
+по этому источнику подгонка весов не окупается. Плюс уточнение: у них лучший метод — **не единичные
+веса, а корреляционные** (веса = корреляция признака с критерием). Для нас это отдельная
+проверяемая альтернатива в N5: базовых линий должно быть ДВЕ, равные веса и корреляционные.
+
+## Г30.1-4. Четыре аналитических условия в готовой формулировке (Graefe 2013, открытый PDF)
+
+Graefe A. «Improving forecasts using equally weighted predictors» (препринт статьи в *Journal of
+Business Research*), PDF `https://statmodeling.stat.columbia.edu/wp-content/uploads/2013/08/Graefe-2013-Improving-forecasts-using-equally-weighted-predictors-JBR.pdf`
+— **добыт `mcp__exa__web_fetch_exa`, HTTP 200, разобран в текст 16.09.2026** (20 стр.). Дословно,
+разд. 2.5 «Conditions for the relative performance of multiple regression and equal weights models»:
+
+> «Analytical solutions to the problem derived several conditions for when equal weights can
+> outperform regression weights when predicting new data (Davis-Stober, Dana, & Budescu, 2010;
+> Einhorn & Hogarth, 1975). These conditions are common for many problems in the social sciences.
+> In general, **the relative performance of equal weights increases if
+> 1. the regression model fits the data poorly (i.e., the multiple correlation coefficient R² is low),
+> 2. the ratio of observations per predictor variable is low (i.e., in situations with small samples
+>    and a large number of predictor variables),
+> 3. predictor variables are highly correlated, and
+> 4. there is measurement error in the predictor variables.**»
+
+Там же, разд. 2.3, точная формулировка отношения двух моделей (полезна для наших тестов):
+
+> «**The equal-weights model is a special case of the multiple regression model with all bi's = g.**
+> That is, the equal-weight method only needs to estimate two parameters (d and g).»
+
+И эмпирический итог самого Graefe (абстракт, дословно): «Across the ten elections from 1976 to 2012,
+**equally weighted predictors reduced the forecast error of the original regression models on average
+by four percent.** An equal-weights model that includes all variables provided well-calibrated
+forecasts that **reduced the error of the most accurate regression model by 29% percent**.»
+
+🔴 Условие 4 (ошибка измерения предикторов) для нас прямое: входы FINPILOT — самоотчётные и
+импортированные суммы с шумом; это довод в пользу простой свёртки, которого в файле раньше не было
+в виде цитаты.
+
+## Г30.1-5. Wainer 1976 — оригинал закрыт подтверждённо; найдена свежая ветка полемики
+
+Было (стр. ~2975): «оригинал НЕ добыт; добыто свидетельство спора (de Rooij et al. 2019)».
+
+**Перепроверка каналов 16.09.2026:** Unpaywall `10.1037/0033-2909.83.2.213` → HTTP 200,
+**`is_oa: false`, `best_oa_location: null`, `has_repository_copy: false`**. Exa-поиск («scanned
+reprint», «full text», «archive copy») полного текста не дал: выдача — PsycNET-карточка,
+ResearchGate-заглушка, Google Scholar, и постороннее совпадение по названию (студенческое эссе
+о двойном отрицании на yumpu.com). **Вывод: статья закрыта наглухо, это теперь отрицательный
+результат, а не пробел.** Сниппет аннотации PsycNET (дословно, добыт через Exa):
+
+> «Reviews the literature and shows that **under very general circumstances coefficients in multiple
+> regression models can be replaced with equal weights with almost no loss in accuracy on the
+> original data sample.** It is then shown that **these equal weights will have greater robustness
+> than least squares regression coefficients.**»
+
+**Новое, чего в файле не было:** полемика вокруг Уэйнера документирована ещё двумя откликами
+в самих журналах — Laughlin J. E. «Comment on "Estimating coefficients in linear models: It don't
+make no nevermind"», *Psychological Bulletin* 85(2), 1978, с. 247, DOI 10.1037/0033-2909.85.2.247;
+и Keren G., Newman J. R. «Additional considerations with regard to multiple regression and equal
+weighting», *Organizational Behavior and Human Performance* 22(2), окт. 1978, DOI
+10.1016/0030-5073(78)90010-7 (реквизиты — карточки DOI через Exa, HTTP 200; полные тексты закрыты).
+Плюс в том же выпуске OBHP 22(1), 1978, с. 93–102 — «A predictive-validity-based procedure for
+choosing between regression and equal weights» (ScienceDirect `0030507378900077`, закрыта).
+🔴 То есть в литературе 1978 года существует **процедура выбора между регрессией и равными весами
+по предиктивной валидности** — прямой методический аналог нашей проверки N5. Полный текст закрыт,
+но факт существования процедуры зафиксирован.
+
+Доступная замена по существу (уже была в файле, подтверждается): de Rooij et al., arXiv:1911.11463 —
+«Wainer claimed equal regression weights are beneficial in almost any circumstance, while Pruzek and
+Frederick claimed that only in very limited situations equal weighting is beneficial».
+
+## Г30.1-6. Что изменилось в выводе И.1 после этого блока
+
+1. Тезис «равные веса не хуже подогнанных» теперь стоит **не только на Dawes**: добавлен
+   количественный первоисточник Dana & Dawes 2004 (пороги adjusted R < .6 и < .4; 100 наблюдений
+   на предиктор) и аналитическая сводка условий Graefe 2013 с ссылкой на Davis-Stober, Dana &
+   Budescu 2010.
+2. 🔴 **Условие «R² ≤ .5» следует перестать приписывать Einhorn & Hogarth 1975.** Их абстракт
+   (добыт дословно) такого числа не содержит; число появляется у Гигеренцера и соавторов как
+   пересказ. Ссылку в наших документах заменить на Gigerenzer & Brighton 2009, с. 111.
+3. Появилась **вторая базовая линия для N5** — корреляционные веса (Dana & Dawes: «Correlation
+   weights were generally the best method»), а не только равные веса.
+4. Ошибка измерения предикторов добавлена в список условий, работающих на простую свёртку
+   (Graefe 2013, условие 4) — для FINPILOT это условие выполняется по построению входных данных.
+
+## Г30.1-7. Wang & Luo 2009 — полный текст закрыт, но ГЛАВНОЕ УТВЕРЖДЕНИЕ добыто из абстракта самих авторов
+
+Было (стр. ~2957): «не добыт и с поиском… известен только через пересказ Aires & Ferreira».
+
+Exa вернула карточку ScienceDirect `https://www.sciencedirect.com/science/article/pii/S0895717708002860`
+с полным абстрактом (снято 16.09.2026). Дословно:
+
+> «Analytic hierarchy process (AHP) has been criticized for its possible rank reversal phenomenon
+> caused by the addition or deletion of an alternative. **This paper shows the fact that the rank
+> reversal phenomenon occurs not only in the AHP but also in many other decision making approaches
+> such as the Borda–Kendall (BK) method for aggregating ordinal preferences, the simple additive
+> weighting (SAW) method, the technique for order preference by similarity to ideal solution
+> (TOPSIS) method, and the cross-efficiency evaluation method in data envelopment analysis (DEA).
+> Numerical examples are provided to illustrate the rank reversal phenomenon in these popular
+> decision making approaches.**»
+
+🔴 **Статус пункта: «известен через пересказ» → «утверждение подтверждено словами самих авторов».**
+Для нашего спора это важно: в файле (И.2) стоял конфликт «Ciardiello & Genovese 2023 (SAW не
+подвержен) против Wang & Luo 2009 (подвержен)», и вторая сторона держалась на пересказе третьих лиц.
+Теперь обе стороны цитируются напрямую. Полный текст (числовые примеры, механика примеров для SAW)
+остаётся закрытым: Elsevier, Unpaywall OA-локаций не даёт, Exa полного текста не нашла.
+
+**Дополнительно найдена независимая обзорная работа, подтверждающая ту же классификацию** (открытый
+доступ, SciELO/Pesquisa Operacional): Aires R. F. de F., Ferreira L. «The rank reversal problem in
+multi-criteria decision making: a literature review», DOI 10.1590/0101-7438.2018.038.02.0331, 2018.
+Дословно: «RR refers to a change in the ordering among alternatives previously defined, after the
+addition or removal of an alternative from the group previously ordered (Lootsma, 1993; Buede &
+Maxwell, 1995; Saaty & Sagir, 2009; Wang & Luo, 2009)» и «**Wang & Luo (2009) explained (and
+exemplified) that the RRP occurs not only in the AHP but also in many other decision-making methods,
+such as Borda-Kendall (Kendall, 1962), SAW, TOPSIS, and in DEA.**» Там же зафиксирована типология,
+которой мы пользуемся: «**Type #1: added to (or removed from) the problem**».
+🟡 Также там упомянут Zanakis et al. 1998 — сравнение восьми методов, включая MEW и SAW; это
+кандидат в отдельный источник по устойчивости SAW, в нашем файле его раньше не было.
+
+## Г30.1-8. Keeney & Raiffa 1976 — книга закрыта, но ТЕОРЕМА добыта дословно из университетского курса
+
+Было (стр. ~2878): «оригинал НЕ добыт; вторичная выкладка».
+
+Через Exa найден курс Purdue (Dr. Jitesh H. Panchal, DELP, слайды по решению многокритериальных
+задач), где условия сформулированы как теоремы со ссылкой на главы 3, 5 и 6 Keeney & Raiffa.
+Источник: `https://engineering.purdue.edu/DELP/education/decision_making_slides/Module_04___Decisions_under_Certainty.pdf`
+(ссылка на главу 3 K&R) и `…/Module_07___Multi_attribute_Utility_Theory.pdf` (главы 5–6), снято
+через Exa 16.09.2026. Дословно, Module 04:
+
+> **Definition (Preferentially Independent).** «The pair of attributes X and Y is preferentially
+> independent of Z if the conditional preferences in the (x, y) space given z0 do not depend on z0.»
+>
+> **Theorem.** «A value function v may be expressed in an additive form
+> v(x, y, z) = vX(x) + vY(y) + vZ(z), where vX, vY, and vZ are single-attribute value functions,
+> **if and only if {X, Y} are preferentially independent of Z, {X, Z} are preferentially independent
+> of Y, and {Y, Z} are preferentially independent of X.**»
+>
+> **Corresponding Tradeoffs Condition.** «A preference structure is additive and therefore has an
+> associated value function of the form v(x, y) = vX(x) + vY(y) … **if and only if the corresponding
+> tradeoffs condition is satisfied.**»
+
+И формулировка для n критериев (EPFL, Chen & Pu «Survey of Preference Elicitation Methods»,
+`https://infoscience.epfl.ch/handle/20.500.14299/214701`, 2004, через Exa), дословно:
+
+> «**Mutual Preferential Independence**: The attributes {x1,...,xn} are mutually preferentially
+> independent if every subset Y of X is preferentially independent of its complementary set.
+> **Theorem of Additive Value Function**: Given attributes {x1,...,xn}, n ≥ 3, an additive value
+> function … **exists if and only if the attributes are mutually preferentially independent.**»
+
+И различение ценностной и полезностной ветки (Purdue, Module 07): «Utility independence is a
+[stronger condition]: if S is UI then S is PI. The converse [is not true]».
+
+🔴 **Что это даёт нам конкретно.** Условие применимости взвешенной суммы теперь стоит на точной
+формулировке «тогда и только тогда», а не на пересказе: **аддитивная ценностная функция
+существует ТОГДА И ТОЛЬКО ТОГДА, когда критерии взаимно предпочтительно независимы**. Это
+превращает Д.3.4 из «нам говорили, что нужна независимость» в проверяемое требование к нашей
+модели: для набора критериев FINPILOT взаимная предпочтительная независимость должна быть либо
+показана, либо явно объявлена допущением. Сама книга (Wiley, 1976) остаётся закрытой; пиратские
+библиотеки не использовались.
+
+## Г30.1-9. 🔴 Fleming & DeMets 1996 — ПОЛНЫЙ ТЕКСТ ДОБЫТ (был «не добыт, взята замена»)
+
+Было (стр. ~2674): «текст НЕ добыт; замена — сам Флеминг, NCBI Bookshelf».
+
+Exa нашла **зеркало полного текста у третьей стороны** — материал, приложенный к судебному
+аффидевиту в ЮАР (Treatment Information Group), то есть копия статьи вне сайта издателя:
+`http://www.tig.org.za/pdf-files/affidavit-aug06/75%20Fleming%20and%20De%20Mets.pdf`
+— `curl` с браузерным UA → **HTTP 200, 476 721 байт, `application/pdf`**, снято 16.09.2026;
+`pdftotext -layout` → **89 840 байт текста**, полная статья с таблицами и списком из 79 ссылок.
+Реквизиты: Fleming T. R., DeMets D. L. «Surrogate End Points in Clinical Trials: Are We Being
+Misled?» *Annals of Internal Medicine* 125(7), 1 октября 1996, **с. 605–613**,
+DOI 10.7326/0003-4819-125-7-199610010-00011, PMID 8815760.
+
+**Главный тезис — дословно, раздел «Requirements for a Surrogate End Point»:**
+
+> «**A correlate does not a surrogate make.** It is a common misconception that if an outcome is a
+> correlate (that is, correlated with the true clinical outcome) it can be used as a valid surrogate
+> end point (that is, a replacement for the true clinical outcome). However, **proper justification
+> for such replacement requires that the effect of the intervention on the surrogate end point
+> predicts the effect on the clinical outcome — a much stronger condition than correlation.**»
+
+> «Prentice [11] developed criteria that are sufficient to validate surrogate end points in phase 3
+> trials. These criteria essentially require that **the surrogate must be a correlate of the true
+> clinical outcome and fully capture the net effect of treatment on the clinical outcome.** Although
+> the first criterion is usually easy to verify, the second is not.»
+
+**Порог точности — дословно, заключение:**
+
+> «The validity of a surrogate end point has rarely been rigorously established. Occurrence of
+> false-positive and false-negative results must be low, **typically in the range of 2.5% to 10%**,
+> in definitive trials… **Predictions having an accuracy of approximately 50%, such as the accuracy
+> seen with the CD4 count in the HIV setting, are as uninformative as a toss of a coin.**»
+
+**Канонический пример провала суррогата (CAST) — дословно:**
+
+> «Three new drugs (encainide, flecainide, and moricizine) were found to suppress arrhythmias
+> effectively and were approved by the Food and Drug Administration (FDA)… **more than 200 000
+> persons per year eventually took these drugs in the United States.** The Cardiac Arrhythmia
+> Suppression Trial (CAST) … **The encainide and flecainide arms of the trial were terminated early
+> when 33 sudden deaths occurred in patients taking either drug compared with only 9 in the matching
+> placebo group.** … After the data were finalized, the sudden death comparison was **43 и 16**, and
+> the number of deaths was **63 in the encainide and flecainide group and 26 in the placebo group.**»
+
+**Итоговая рекомендация авторов — дословно (абстракт):**
+
+> «Surrogate end points can be useful in **phase 2 screening trials** for identifying whether a new
+> intervention is biologically active… **In definitive phase 3 trials, except for rare circumstances
+> in which the validity of the surrogate end point has already been rigorously established, the
+> primary end point should be the true clinical outcome.**»
+
+🔴 **Что это меняет для нас — прямо и неприятно.** Наш промежуточный показатель (согласие
+рекомендации с экспертом, снижение ПДН, прирост подушки) — это **суррогат** финансового
+благополучия. Первоисточник даёт нам не аналогию, а правило: корреляции суррогата с целевым
+исходом НЕДОСТАТОЧНО; требуется, чтобы **эффект вмешательства на суррогат предсказывал эффект на
+конечный исход**, и чтобы суррогат **полностью улавливал чистый эффект вмешательства** (критерий
+Прентиса). Ни то, ни другое у нас не показано. Практический вывод для раздела 5 и 7: пока такой
+проверки нет, суррогатные метрики допустимы как **фаза 2** («продукт вообще что-то делает,
+стоит ли ставить настоящий эксперимент»), но не как доказательство пользы. Формулировки вида
+«улучшаем финансовое благополучие» на суррогате не обосновываются — по этому первоисточнику это
+именно та ошибка, за которую заплатили CAST-ом.
+
+## Г30.1-10. Netemeyer et al. 2018 — ПУНКТЫ ШКАЛЫ ДОБЫТЫ ПОЛНОСТЬЮ (было: «не добыты, web appendix A»)
+
+Было (стр. ~2538, ~2577): «ЧАСТИЧНО: дословный абстракт; полный текст НЕ добыт… Не добыто: списки
+антецедентов, коэффициенты, пункты шкал (web appendix A)».
+
+Exa нашла независимый академический реестр инструментов **DMIDI** (Decision Making Individual
+Differences Inventory, Society for Judgment and Decision Making):
+`https://ipn.sjdm.org/dmidi/Perceived_Financial_Well_Being_Scale.html` (снято 16.09.2026), где
+шкала воспроизведена со ссылкой на Netemeyer et al. 2018, JCR 45(1), 68–89. Дословно:
+
+> «**10 items using 5-point scale ratings (1 = does not describe me at all to 5 = describes me
+> completely)**. Sub-scales: 2: current money management stress and expected future financial
+> security.»
+>
+> **Expected Future Financial Security:** «I am becoming financially secure. / I am securing my
+> financial future. / I will achieve the financial goals that I have set for myself. / I have saved
+> (or will be able to save) enough money to last me to the end of my life. / I will be financially
+> secure until the end of my life.»
+>
+> **Current Money Management Stress:** «Because of my money situation, I feel I will never have the
+> things I want in life. / I am behind with my finances. / My finances control my life. / Whenever I
+> feel in control of my finances, something happens that sets me back. / I am unable to enjoy life
+> because I obsess too much about money.»
+
+**Плюс добыт расширенный абстракт с числами** (версия доклада ACR, PDF на scispace
+`https://scispace.com/pdf/how-am-i-doing-financial-well-being-its-potential-4ntc9145gf.pdf`,
+через Exa). Дословно:
+
+> «Current money management stress was predicted by traits and behaviors that are negative and more
+> short-term oriented: **making only minimal payments, lacking in self-control, and being
+> materialistic.** Behaviors and traits that reflect longer-term thinking, such as **planning for
+> money long-term and a willingness to take investment risk**, were related to future financial
+> security.»
+>
+> «**The measures developed in the present research — future financial security and money management
+> stress — collectively explained 33% (Study 4) and 39% (Study 5) of the variance in well-being.**»
+>
+> «**Within the battery of controls in the model, financial literacy showed a small negative partial
+> effect on perceived future financial security, and had no effect on money management stress.**
+> This finding is consistent with existing literature on the lack of relationship between financial
+> knowledge and financial outcomes.»
+>
+> «The effect of **current money management stress on well-being is stronger for low-income
+> individuals**, and the effect of **future financial security is stronger for younger individuals.**»
+
+🔴 **Что это даёт продукту.** (1) У нас теперь есть **готовый валидированный инструмент из 10
+пунктов** для измерения заявленного конечного исхода — именно то, чего требовал раздел Д.2
+(фальсифицируемость «повышаем благополучие»). Инструмент двухфакторный, и это меняет постановку:
+измерять надо ДВА разных исхода, а не один «уровень благополучия». (2) Антецеденты названы, и один
+из них — **«making only minimal payments»** — ровно то, на что бьёт наш Avalanche-фильтр долгов;
+это прямая связка функции продукта с антецедентом измеряемого исхода. (3) 🔴 **Финансовая
+грамотность в их модели на будущую финансовую защищённость влияет слабо ОТРИЦАТЕЛЬНО, а на стресс
+не влияет вовсе** — довод против «образовательного» позиционирования продукта. Коэффициенты
+моделей и web appendix A (психометрика: нагрузки, α, инвариантность) остаются закрытыми: JCR/OUP,
+SSRN-карточка 10.2139/ssrn.3485990 без полного текста.
+
+## ИТОГ Г30.1 — approach_validity
+
+| Пункт | Был статус | Стал | Чем взят |
+|---|---|---|---|
+| Einhorn & Hogarth 1975, оригинал | не добыт | **частично добыт** (полный абстракт дословно) | Exa → OpenAIRE-монитор; Unpaywall подтвердил `is_oa: false` |
+| Условие «R² ≤ .5» | держалось на пересказе, источник не проверен | **проверено и переатрибутировано** | Exa → MPIB PDF Gigerenzer & Brighton 2009 с. 111 + Goldstein & Gigerenzer 2009; в абстракте первоисточника числа нет |
+| Пороги «равные vs подогнанные» | только Dawes 1979 (15–25:1) | **добыт новый количественный первоисточник** Dana & Dawes 2004 (adj. R < .6 и < .4; 100 набл./предиктор) | Exa → SAGE + ERIC + RePEc, три совпадающие копии абстракта |
+| Аналитические условия превосходства равных весов | россыпью по пересказам | **добыты списком, дословно** (Graefe 2013, 4 условия) | `mcp__exa__web_fetch_exa` PDF, HTTP 200 |
+| Wainer 1976, оригинал | не добыт | **не добыт — подтверждено закрытым** | Unpaywall `is_oa: false`, `has_repository_copy: false`; Exa полного текста не нашла. Новое: отклики Laughlin 1978 и Keren & Newman 1978 |
+| Keeney & Raiffa 1976, предпочтительная независимость | не добыт, вторичная выкладка | **добыто дословно как теорема** («тогда и только тогда») | Exa → слайды Purdue (Panchal) + EPFL Chen & Pu |
+| Wang & Luo 2009 | не добыт, только пересказ Aires & Ferreira | **частично добыт** — утверждение про SAW дословно от самих авторов | Exa → абстракт ScienceDirect + открытый обзор Aires & Ferreira 2018 |
+| Roy 1991 (ELECTRE) | не добыт | **не добыт** — не переоткрывался в этом блоке (закрыт Springer, проверено в прошлом заходе) | — |
+| Fleming & DeMets 1996 | не добыт, взята замена | 🔴 **ДОБЫТ ПОЛНОСТЬЮ** (89 840 байт текста) | Exa → зеркало у третьей стороны (аффидевит TIG), `curl` HTTP 200, 476 721 байт |
+| Netemeyer et al. 2018, пункты шкалы и антецеденты | не добыты (web appendix A) | 🔴 **ДОБЫТЫ** — все 10 пунктов дословно + антецеденты + доли дисперсии | Exa → реестр DMIDI (SJDM) + расширенный абстракт ACR |
+
+**Главное число по файлу `approach_validity`: из 9 пунктов «не добыто» Exa перевела в «добыто»
+или «частично добыто» — 7.** Полностью закрытыми остались 2 (Wainer 1976, Roy 1991), причём по
+Wainer это теперь подтверждённый отрицательный результат (Unpaywall: открытой копии не существует),
+а не непроверенный пункт. Приёмы, которые сработали: копия у третьей стороны (Fleming — аффидевит),
+реестр инструментов вместо статьи (Netemeyer — DMIDI), другая публикация тех же авторов
+(Netemeyer — доклад ACR), университетский курс вместо книги (Keeney & Raiffa — Purdue/EPFL),
+агрегатор метаданных вместо издателя (Einhorn & Hogarth — OpenAIRE).
+
+---
+
+## ДОБОР Г31.2 — прокси (16.09.2026)
+
+**Каналы на начало работы (парный замер):** `r.jina.ai` **без UA** → `www.monarchmoney.com/pricing`
+**HTTP 200, 5 509 байт** содержимого; тот же адрес, тот же прокси, **с UA Chrome/127** → **HTTP 403,
+5 743 байта**, `<title>Just a moment...`. 🔴 Ошибка «звать прокси с браузерным UA» подтверждена
+прямым замером. Exa — 🟢; Wayback **replay** — 🟢; Crossref, Unpaywall — 🟢 (200).
+
+### Г31.2-9. 🔴 Khashadourian & Harrison 2024 — ПОЛНЫЙ ТЕКСТ ДОБЫТ (был пункт 3 раздела «Не добыто»: Wiley 403, прокси 514 б капча, Exa недоступна)
+
+**Прежний статус** (§8 «Не добыто», пункт 3): «`WebFetch` Wiley — HTTP 403; `r.jina.ai` — HTTP 200,
+514 байт, капча. Exa как независимый канал недоступен в этой сессии… "No such tool available"».
+Пункт был **прямо по теме участка 2** и висел непроверенным из-за отказа инструментов.
+
+**Реквизиты (Crossref, HTTP 200):** Khashadourian E., Harrison A. F. «**Perceptions or behavior?
+An evaluation of CFPB's financial well-being scale using household financial ratios**»,
+*Financial Planning Review*, **DOI 10.1002/cfp2.1194**, опубликовано **01.09.2024**.
+🔴 **Поправка к нашей записи: авторов двое, не один** (Allen F. Harrison — corresponding author,
+California Baptist University; Edmund Khashadourian — Westcliff University).
+Unpaywall (200): `is_oa: true`, `oa_status: **hybrid**`, `has_repository_copy: false`, единственная
+OA-локация — `onlinelibrary.wiley.com/doi/pdfdirect/10.1002/cfp2.1194` (publisher).
+
+**Каналы 16.09.2026:**
+
+| Канал | Код / результат |
+|---|---|
+| `r.jina.ai` **без UA**, `onlinelibrary.wiley.com/doi/…` (контроль на Wiley) | 200 у прокси, **515 б**, «Just a moment… This page maybe requiring CAPTCHA» — 🔴 **без UA то же самое: не наша ошибка вызова** |
+| `mcp__exa__web_fetch_exa`, `/doi/10.1002/cfp2.1194` | `CRAWL_LIVECRAWL_TIMEOUT` |
+| `mcp__exa__web_fetch_exa`, **`/doi/pdfdirect/10.1002/cfp2.1194`** | 🟢 **200, полный текст статьи** (абстракт, введение, обзор, модель, формулы, выборка, результаты) |
+
+🔴 **Приём, который сработал и стоит запомнить:** по «человеческому» адресу статьи Exa упала
+в таймаут, а по адресу **`pdfdirect` из ответа Unpaywall** отдала текст целиком. Спрашивать
+Unpaywall о точном адресе OA-локации **до** попытки фетча — дешевле, чем перебирать адреса.
+
+#### Первичный материал — ДОСЛОВНО
+
+**Абстракт:**
+> «This article creates a typology to assess four categories of financial well-being based on
+> a combination of household financial ratios. Most financial wellbeing scales are based on
+> subjective measures (i.e., perceptions), as objective markers have not reliably encapsulated
+> financial well-being. We define a conceptual model, the **equilibrium model of the household
+> (EMH)**, and use **discriminant analysis** to extract categories of financial well-being.
+> The continuum of these categories is **financially distressed (lowest), financially fragile,
+> financially stable, and financially flourishing (highest)**. Our results demonstrate these
+> categories are consistent with the Consumer Financial Protection Bureau's (CFPB) Financial
+> Well-Being Scale, a subjective scale. Higher CFPB scores were associated with higher category
+> ranks… **However, we argue that the claim whereby the CFPB scale measures a concept beyond
+> traditional financial measures is imprecise and may even reflect the existence of noise in the
+> CFPB's data, raising questions about its reliability.**»
+
+**Претензия к обоснованию CFPB (дословно):**
+> «The developers of the CFPB scale claim that it measures something fundamentally different than
+> what objective indicators of financial status could potentially measure. To make their point,
+> researchers refer to the **high standard deviation of the distribution of scores in the national
+> sample** to claim that none of the objective measures can independently determine financial
+> well-being (CFPB, 2017).»
+
+**Состояние области (дословно):**
+> «Yet, while defined as a measure that includes both objective and subjective components, when
+> actually analyzed, **almost all existing scales or tools are based solely on subjective measures**
+> (Netemeyer et al., 2018; Prawitz et al., 2006; Sorgente & Lanz, 2019).»
+> «…**neither the CFPB's Financial Well-Being Scale nor any other financial well-being scale,
+> directly compares or contrasts to a complete set of household financial ratios**.»
+
+**Четыре коэффициента EMH и их эталоны — дословно (Table 1):**
+> **Estimated Monthly Savings Rate (EMS)** — «the difference between monthly net income and monthly
+> expenses as a share of monthly gross income». Эталоны: «**10% recommended by Greninger et al.
+> (1996)**»; «Benchmark value of **0** used in this study to separate households who are able to
+> manage a monthly budget from those who do not».
+> **Percentage of Fixed Expenses (PFE)** — «the proportion of fixed expenses to the net monthly
+> expenses». «**No specific benchmarks exist** for this indicator. This study assumes a value
+> **≤65%** to be consistent with the idea of a healthy budget composition.»
+> **Credit Insolvency Ratio (CIR)** — «a variant of debt service to income ratio… the proportion of
+> monthly **nonmortgage** payments to net monthly income». «**Less than 15%** by Greninger et al. (1996).»
+> **Average Liquidity Ratio (ALR)** — «the amount of liquid assets (cash and near cash assets)
+> relative to monthly expenses». «Between **200% and 600%** by Griffith (1985) or **300%**
+> recommended by Greninger et al. (1996); **250%** if after-tax income is used in the denominator
+> per DeVaney (1994); a benchmark value of **200%** is used in this study.»
+
+**Формулы (дословно):** `EMS = (MNI − TME)/MGI × 100` · `PFE = FE/MNI × 100` ·
+`CIR = MP₀/MNI × 100` · `ALR = LNLA/TME × 100`, где MNI — чистый месячный доход, TME — суммарные
+месячные расходы, MGI — валовой месячный доход, FE — постоянные расходы, MP₀ — все неипотечные
+месячные платежи по долгам, LNLA — все ликвидные и окололиквидные активы, «including money in
+checking and savings accounts, college savings, retirement accounts, and other financial investments».
+
+**Иерархия контуров (дословно):**
+> «The EMH framework not only delineates four pivotal financial ratios but also established
+> a **hierarchy** among these ratios to define various stages of household financial well-being
+> (**EMS → PFE → CIR → ALR**). The hierarchy… posits that households strive to achieve financial
+> equilibrium, **first in the short run by balancing the household budget and generating a positive
+> saving rate and then, in the long run, by managing household debt and liquid asset accumulation**.»
+
+**Порог свободного потока (дословно, формула 5):**
+> «We replaced EMS with a measure of household cash flow such that a value of 1 is assigned if the
+> monthly **free cash flow** of the household is positive and **>3% of the monthly household
+> expenses**… using a 3% threshold for free cash flow offers the added confidence that any potential
+> EMS categories are defined based on the condition of a free cashflow of ≥3% of total monthly
+> expenses.»
+
+**Метод и выборка (дословно):** 4 бинарные переменные по эталонам → «2⁴ or **16 possible ordinal
+ranks**» → сведение линейным дискриминантным анализом. «Existing research suggested financial
+well-being scales consist of **four to seven categories**». Отобрана **четырёхкатегорийная** модель
+(Model 3): «all discriminant functions… were significant (**Wilk's = 0.827, χ²(2) = 76.52,
+p < 0.001**)… explained the highest variance, **61%**… achieved a **classification hit rate of
+81.3%**». Данные: онлайн-опрос Qualtrics, поле апрель–середина мая 2022, **506 ответов**, после
+чистки **416**; фильтры — возраст **25–60**, доход <$50 тыс. (30 % выборки), $50–100 тыс. (50 %),
+>$100 тыс. (20 %); «On average, participants spent over **18 min** completing the survey»; размер
+домохозяйства 2,98 ± 1,51. Проверка ANOVA: Левен `L(3,406) = 0,315, p = 0,0815` — гомогенность
+дисперсий удержана; нормальность по Колмогорову—Смирнову подтверждена только в крайних категориях
+(Flourishing и Distressed).
+
+#### Выжимка — что это меняет для участка 2
+
+1. 🔴 **Главный вывод статьи бьёт ровно в ту точку, ради которой пункт и заводился.** Соответствие
+   между объективной типологией и субъективной шкалой CFPB **есть** (выше ранг — выше балл, это
+   довод за конструктную валидность), **но** авторы прямо называют обоснование CFPB неточным:
+   довод «высокое стандартное отклонение баллов ⇒ объективные показатели не определяют
+   благополучие» может отражать **шум в данных**, а не сверх-объективный конструкт. Для нашего §2
+   это означает: **ссылаться на CFPB-шкалу как на эталон «истины» нельзя**, у неё оспорена
+   надёжность в рецензируемом источнике 2024 г.
+2. 🔴 **Готовый внешний набор контуров и порогов, совпадающий с нашим по структуре.** Четыре
+   коэффициента EMH — свободный поток, гибкость бюджета, долговая нагрузка (**неипотечная**),
+   ликвидность в месяцах расходов — и иерархия **сначала поток и бюджет, потом долг и резерв**.
+   Это независимое подтверждение выбора наших контуров и, что важнее, **их порядка**.
+3. 🔴 **Числа, которые можно брать как внешние ориентиры (не канон, предложение к §2):**
+   свободный поток **> 3 % расходов** как рабочий порог «положительного потока» на самоотчётных
+   данных; постоянные расходы **≤ 65 %** чистых расходов; неипотечная долговая нагрузка
+   **< 15 %** чистого дохода; резерв **≥ 200 %** месячных расходов (2 месяца) как нижняя планка,
+   при «здоровом» коридоре 200–600 %.
+   🔴 **Сопоставление с MaPS (Г31.2-3, `bank_patents_…`):** британская государственная шкала меряет
+   резерв ступенями до «6 months or longer», американские эталоны — от 2 до 6 месяцев. Наш дефолт
+   резерва оказывается внутри коридора, подтверждённого двумя независимыми внешними источниками.
+4. 🟡 **Ограничения, которые надо назвать, если цитируем:** самоотчётные данные (не банковские
+   выписки), n = 416, США, возраст 25–60, поле — 2022 г.; нормальность подтверждена не во всех
+   группах; порог 3 % введён именно как защита от занижения расходов в самоотчёте — то есть это
+   **артефакт метода сбора**, а не природная константа.
+5. ⚪ **Канон, прогноз, новизну, юрблок — не меняет.** Это опора для §участок 2 и для будущего
+   обоснования порогов; правок в `docs/math_model.md` не предлагаю.
+
+### Г31.2-10. Roy 1991 (ELECTRE) — прокси дал СПИСОК ЛИТЕРАТУРЫ, тела статьи нет
+
+Прежняя запись: «Springer `content/pdf/10.1007/BF00134132.pdf` → HTTP 200, 3 038 байт HTML
+(проверочная страница)… Unpaywall `is_oa: False`». 🔴 **`r.jina.ai` по этому пункту не пробовался
+вовсе** — канал числился неприменимым.
+
+Замер 16.09.2026: `curl -s "https://r.jina.ai/https://link.springer.com/article/10.1007/BF00134132"`
+→ **HTTP 200, 10 984 байта**, заголовок «The outranking approach and the foundations of electre
+methods». 🔴 **Прокси Springer пробил** (в отличие от Wiley и ScienceDirect), но на странице
+Springer у статьи 1991 г. **нет абстракта** — отдался только **список литературы** (Bouyssou,
+Brans/Mareschal/Vincke PROMETHEE, Keeney & Raiffa 1976, Roy 1968/1981/1985/1989/1990,
+Roy & Bouyssou 1987, Roberts 1979 и др.).
+
+**Итог пункта:** статус содержательно **не меняется** — ELECTRE в Д.4.1 по-прежнему изложен
+по памяти/пересказу. Но зафиксировано полезное о канале: **Springer прокси отдаёт**, значит
+для более новых статей Springer (где абстракт на странице есть) этот канал рабочий, и прежнее
+«Springer закрыт» было слишком широким обобщением.
+
+### Г31.2-11. Перепроверенные и НЕ сдвинувшиеся пункты
+
+| Пункт | Замер 16.09.2026 | Итог |
+|---|---|---|
+| **Wang & Luo 2009** (ScienceDirect `pii/S0895717708002860`) | `r.jina.ai` **без UA** → 200 у прокси, **112 999 б**, тело — оболочка Cloudflare `Just a moment...` | ❌ не добыт; **не наша ошибка вызова**. ScienceDirect закрыт для прокси как класс (то же на втором адресе, см. `calibration_ground_truth`, Г31.2-7) |
+| **Fleming & DeMets 1996** (acpjournals) | не переоткрывался | ✅ уже добыт в Г30.1-9 через зеркало третьей стороны — пункт закрыт, не переоткрываю |
+| **Netemeyer et al. 2018** | не переоткрывался | ✅ закрыт в Г30.1-10 |
+| **Wainer 1976** | не переоткрывался | подтверждённый отрицательный результат (Unpaywall: OA-копии не существует), не класс антибота |
+| **DeMiguel, Garlappi & Uppal 2009** | не переоткрывался в этом подбатче — бюджет ушёл на Khashadourian | 🔴 **ЗАДОЛЖЕННОСТЬ**, см. ниже |
+| **Campbell & Fiske 1959; CONSORT-AI / SPIRIT-AI** | не переоткрывались | не класс прокси: первое не добывалось вовсе, второе — неотработанный участок |
+
+## ИТОГ Г31.2 — approach_validity
+
+- Закрыт **1 пункт полностью** (Khashadourian & Harrison 2024 — полный текст, четыре коэффициента,
+  пороги, критика надёжности CFPB) и **1 частично по каналу** (Roy 1991: прокси Springer пробил,
+  но тела статьи на странице нет).
+- 🔴 **Нашей ошибкой вызова прокси не оказался ни один пункт:** Wiley и ScienceDirect отдают ту же
+  капчу и без UA.
+- 🔴 **Ошибка «отказ инструмента = отсутствие источника» — 2 раза:** (1) Khashadourian числился
+  недобытым, потому что Exa в той сессии не была подключена (PIT-035), а второго захода не делали;
+  (2) по Roy 1991 прокси **не пробовался вовсе**, а «Springer закрыт» было записано как свойство
+  издателя.
+- 🔴 **Содержательное изменение одно и оно про опору, а не про вывод:** участок 2 больше не может
+  опираться на шкалу CFPB как на эталон — её надёжность оспорена рецензируемой работой 2024 г.;
+  взамен появился внешний набор контуров EMH с числовыми порогами, совпадающий с нашим по структуре
+  и порядку. Канон модели v3.0.0, формулировка новизны, юрблок и код — **без изменений**.
+
+### ЗАДОЛЖЕННОСТЬ Г31.2 (непройденное, отдельным списком)
+
+1. **DeMiguel, Garlappi & Uppal 2009 (RFS 22(5):1915–1953)** — не переоткрывался в этом подбатче
+   (бюджет). Непробованное: Unpaywall → адрес OA-локации → Exa по этому адресу (приём, сработавший
+   на Khashadourian); авторские страницы LBS/UBC.
+2. **Wang & Luo 2009** — ScienceDirect закрыт для прокси и Exa. Непробованное: Wayback replay
+   **страницы статьи** (не `/pdf`) — приём, сработавший на Choupani в `calibration_ground_truth`.
+3. **Economic Record 2022** (Wiley) и **Choupani 2017** (CEUS) — пейволл/антибот издателя,
+   действие владельца или межбиблиотечный доступ.
+
+---
+
+## ДОБОР Г31.4 — Semantic Scholar и долги Г31.2 (16.09.2026)
+
+**Каналы на начало работы (замер 16.09.2026, `curl -skL --http1.1`, коды дословно):**
+Unpaywall **200** (1 126 б) · Crossref **200** (7 853 б) · OpenAlex **200** (23 652 б) ·
+EuropePMC **200** (995 б) · `r.jina.ai` **200** (367 б, без браузерного UA) ·
+Wayback replay **200** (54 059 б, 5,2 с) · `curl`/`pdftotext`/`tesseract` — все три в системе.
+🔴 **Semantic Scholar РАСЩЕПЛЁН ПО ЭНДПОИНТАМ:** `/graph/v1/paper/search` — **429 на 4 из 4
+попыток** (174 б, паузы 6–8 с); `/paper/search/bulk` — **200** (3 043 б); `/paper/DOI:<doi>` —
+**200 на 3 из 3**; `/paper/DOI:<doi>/citations` — **200** (611 б). То есть запись «S2 = 429»
+в Д3–Д6 и Г18 описывала ОДИН эндпоинт из четырёх, а не канал. Ключ `SEMANTIC_SCHOLAR_API_KEY`
+нужен только для релевантного `/paper/search`; для работы по DOI и по графам цитирования
+он НЕ нужен.
+
+### Г31.4-D2. Wang & Luo 2009 — 🟡 ЧАСТИЧНО (реквизиты и абстракт от издателя; полный текст по-прежнему за антиботом)
+
+Задолженность Г31.2 №2: «не пробован Wayback по СТРАНИЦЕ статьи (не по PDF)». Приём применён.
+
+| Канал | Адрес | Код / размер | Итог |
+|---|---|---|---|
+| 🟢 **Wayback replay, СТРАНИЦА** | `web.archive.org/web/2018/https://www.sciencedirect.com/science/article/pii/S0895717708002860` | **HTTP 200, 86 330 б** (то же на срезах 2013 и 2021: 200 / 86 331 б) | **страница отдаётся целиком**, абстракт и реквизиты читаемы |
+| Wayback replay, `/pdf` | тот же pii + `/pdf` | **404, 4 722 б** (срезы 2019 и 2022) | снимка PDF в архиве нет |
+| Wayback replay, `/pdfft` | тот же pii + `/pdfft` | 200, 57 554 б, **`text/html`** | не PDF, оболочка |
+| Unpaywall `10.1016/j.mcm.2008.06.019` | api.unpaywall.org | **200, 2 443 б** | 🔴 **`is_oa: true`, `oa_status: "bronze"`**, единственная локация — `sciencedirect.com/…/S0895717708002860/pdf` (host_type `publisher`) |
+| Semantic Scholar `paper/DOI:…` | api.semanticscholar.org | **200** | `openAccessPdf.status: "BRONZE"`, тот же URL; `citationCount: 274`; **`tldr` присутствует**; `abstract: null` (изъят издателем) |
+| Exa `web_fetch_exa` по `/pdf` и по странице | — | отдал абстракт + полный список литературы | **тела статьи нет** |
+| `r.jina.ai` **без UA** по `/pdf` | — | **HTTP 200, 113 002 б** | тело — капча Elsevier: «Title: Just a moment... / # Are you a robot? / Please confirm you are a human by completing the captcha challenge below». **Подтверждает: ScienceDirect закрыт для прокси как класс, и это не наша ошибка вызова** |
+
+🔴 **Содержательная поправка к нашей записи.** До сих пор файл писал «полный текст закрыт»
+без уточнения статуса. На деле статья **формально открытая (bronze OA, «Open archive»,
+«Under an Elsevier user license»)** — закрыт не доступ, а бот-канал. Это разные вещи:
+пейволла здесь нет, есть антибот, и Wayback-снимка PDF просто не сделано.
+
+**Точные реквизиты (дословно со снимка Wayback и из Exa):** Wang Ying-Ming, Luo Ying.
+«On rank reversal in decision analysis». *Mathematical and Computer Modelling*,
+**Volume 49, Issues 5–6, March 2009, Pages 1221–1229**. DOI `10.1016/j.mcm.2008.06.019`.
+Copyright © 2008 Elsevier Ltd.
+
+**Абстракт ДОСЛОВНО (снимок Wayback 2018, он же Exa):**
+
+> «Analytic hierarchy process (AHP) has been criticized for its possible rank reversal
+> phenomenon caused by the addition or deletion of an alternative. This paper shows the fact
+> that the rank reversal phenomenon occurs not only in the AHP but also in many other decision
+> making approaches such as the Borda–Kendall (BK) method for aggregating ordinal preferences,
+> **the simple additive weighting (SAW) method**, the technique for order preference by
+> similarity to ideal solution (TOPSIS) method, and the cross-efficiency evaluation method in
+> data envelopment analysis (DEA). Numerical examples are provided to illustrate the rank
+> reversal phenomenon in these popular decision making approaches.»
+
+**Что осталось недобытым именно здесь:** сам численный пример для SAW (раздел в теле статьи,
+с. 1221–1229) — он и разрешил бы противоречие «SAW подвержен / не подвержен RR» окончательно.
+Каналы, на которых пункт стоит: Wayback (снимка PDF нет — 404), ScienceDirect прямой и через
+прокси (капча), Exa (тело не отдаёт). **Непройденного канала по этому пункту не осталось**,
+кроме межбиблиотечного заказа, который нам недоступен.
+
+### Г31.4-D2а. 🟢 Зато граф цитирования S2 дал то, чего не дал полный текст
+
+Это и есть та добавленная стоимость Semantic Scholar сверх OpenAlex/Crossref, ради которой
+заводился подбатч. Запрос `/paper/DOI:10.1016/j.mcm.2008.06.019/citations?limit=100` —
+**HTTP 200, 39 689 б**, 274 цитирующие работы. Среди них по теме «rank reversal + нормировка»:
+
+| Год | Работа | Открытая копия |
+|---|---|---|
+| 2025 | **Borda A. et al. «Closing a 17-Year Gap: Algorithmic Detection and Empirical Prevalence of Rank Reversal in MCDA»**, arXiv `2508.00129` | 🟢 да |
+| 2026 | «A Trend Analysis of Rank Reversal in Widely Used Decision-Making Methods», DOI `10.1002/mcda.70027` | нет |
+| 2021 | «Materials selection method using improved TOPSIS **without rank reversal based on linear max-min normalization**», IOP | 🟢 да |
+| 2023 | «FairAW – Additive weighting without discrimination», DOI `10.3233/IDA-226898` | CLOSED |
+
+**arXiv 2508.00129 добыт целиком:** `arxiv.org/pdf/2508.00129v1`, **HTTP 200, 258 394 б,
+PDF 1.5, 6 страниц**, `pdftotext -layout` → 542 строки. Заголовок в самом файле отличается
+от того, под которым его индексирует S2: «Algorithmic Detection of Rank Reversals, Transitivity
+Violations, and Decomposition Inconsistencies in Multi-Criteria Decision Analysis»,
+Borda A., Cabral J. B., Giarda G., Gimenez Irusta D. N., Pacheco P., Schachner A. R.
+(CONICET / FAMAF-UNC, Аргентина), arXiv:2508.00129v1 [cs.AI], 31 июля 2025.
+
+🔴 **Осторожно с названием: обещание «Empirical Prevalence» в заголовке S2 в самом тексте
+НЕ выполнено.** Это методологическая работа: три теста и их реализация, **таблицы
+распространённости RR по методам в шестистраничной версии нет**. Числа «сколько процентов
+задач дают RR у SAW» из неё взять нельзя.
+
+**Что из неё реально полезно нам, дословно.** Пятитипная классификация RR со ссылкой
+на тот же обзор Aires & Ferreira 2018, который у нас уже добыт:
+
+> «Type I occurs when the final rank order of the alternatives changes if an irrelevant
+> alternative is added to (or removed from) the problem. Type II when the indication of the
+> best alternative changes if a non-optimal alternative is replaced by another worse one.
+> Type III appears when the transitivity property is violated if an irrelevant alternative
+> is added to (or removed from) the problem. Type IV appears when the transitivity property
+> is violated through problem decomposition, where rankings of smaller sub-problems conflict…»
+
+И — **косвенное подтверждение нашей гипотезы о причине расхождения**: в их эталонном
+конвейере нормировка стоит ОТДЕЛЬНЫМИ шагами перед методом принятия решения
+(`SumScaler(target="weights")`, `VectorScaler(target="matrix")`, затем `TOPSIS()`),
+то есть RR приписывается связке «нормировка + метод», а не методу самому по себе.
+Это ровно то различение, которым файл объяснял конфликт «García-Cascales & Lamata 2012
+(SAW не страдает) против Wang & Luo 2009 (страдает)»: первые исключали перенормировку,
+второй — нет. 🟡 Подтверждение косвенное (устройство их конвейера), прямого утверждения
+«у SAW RR возникает только при перенормировке» в тексте нет.
+
+🟢 **Практический выход, годный к применению без правки канона:** тесты реализованы в открытой
+библиотеке — класс `RankInvariantChecker`, модуль `skcriteria.ranksrev.rank_invariant_check`
+(Scikit-Criteria). RRT1 (мутация субоптимальных альтернатив), RRT2 (парная транзитивность,
+критерий строгий: тест проходит **только** при нулевой доле нарушений), RRT3 (согласованность
+при декомпозиции). Это даёт готовый инструмент **измерить** устойчивость нашего SAW
+на наших 66 альтернативах вместо спора по литературе — и прямо смыкается с задачей Г30.2-К
+(переставляет ли порядок переход от номинальных величин к реальным). Заведение такой проверки —
+решение владельца; канон здесь не трогается.
+
+### Г31.4-D5. 🔴 УЧАСТОК «CIRCULARITY / NORMATIVE-VS-DESCRIPTIVE» — ПЕРВЫЙ ЖИВОЙ ЗАХОД
+
+Задолженность Г31.2 №5, и по ней **не было ни одного захода ни разу**: `grep` по этому файлу
+и по `calibration_ground_truth` на «circular / циркуляр / замкнут / порочн / нормативн /
+revealed preference / Bernheim / Beshears / Sugden» даёт **ноль совпадений до этого блока**.
+То есть это не «плохо искали» — участка не существовало.
+
+#### Что именно проверяется
+
+Вопрос владельца в постановке: **не обосновываем ли мы нормативные пороги дескриптивными
+данными (что люди делают) и наоборот.** В терминах литературы это стык
+**revealed (дескриптивных) и normative преференций**, и у него есть устоявшийся корпус.
+
+#### Добытые первоисточники
+
+| Работа | Адрес и код | Что даёт |
+|---|---|---|
+| **Beshears J., Choi J. J., Laibson D., Madrian B. C. «How Are Preferences Revealed?»**, NBER WP 13976, май 2008 | `nber.org/system/files/working_papers/w13976/w13976.pdf`, **HTTP 200, 195 946 б**, PDF 1.3, `pdftotext` → 876 строк, sha256 `2cd20dcf6ccaa277f0cd1c94fe2e2682a4783a039d11751d587c742e5e4b8f0e` | рабочая рамка: когда наблюдаемое ≠ нормативное и что с этим делать |
+| **Bernheim B. D., Rangel A. «Beyond Revealed Preference: Choice Theoretic Foundations for Behavioral Welfare Economics»**, NBER WP 13737, январь 2008 | `nber.org/system/files/working_papers/w13737/w13737.pdf`, **HTTP 200, 390 464 б**, 2 368 строк | «мягкая» позиция: критерий, который **никогда не перебивает выбор** |
+| **Infante G., Lecouteux G., Sugden R. «Preference purification and the inner rational agent…»**, *Journal of Economic Methodology* 23(1):1–25, 2016, DOI `10.1080/1350178X.2015.1070527` | Unpaywall → **`is_oa: true`, `hybrid`**, репозиторий UEA `ueaeprints.uea.ac.uk/id/eprint/57618/1/Preference_purification_and_the_inner_rational_agent.pdf` — **HTTP 200, 493 292 б**, 1 419 строк, «© 2016 The Author(s)», sha256 `4b8e9bbe2be11fb958183530a4e020e3f6935abf9d32088fc9926e3feae4633d` | сама критика циркулярности |
+| **Sugden R. «Looking for a psychology for the inner rational agent»**, 01.06.2015 | `ueaeprints.uea.ac.uk/id/eprint/54622/1/psychology_of_inner_agent_1506_01.pdf`, **HTTP 200, 133 403 б**, 22 стр. | развёрнутая версия того же довода |
+
+Канал поиска — **Semantic Scholar `/paper/search/bulk`** (запросы `"inner rational agent"`
+**200, 4 820 б, total 10**; `"How are preferences revealed"` **200, 1 832 б, total 4**;
+`"beyond revealed preference"` **200, 3 496 б, total 7**; запрос `"preference purification"`
+единственный получил **429**). Ни OpenAlex, ни Crossref такой связки по фразе не давали —
+это **чистый выигрыш от S2**.
+
+#### Позиция 1 — Beshears et al.: разрыв реален, и у него есть ПЯТЬ признаков
+
+Абстракт дословно (с. 1):
+
+> «**Revealed preferences are tastes that rationalize an economic agent's observed actions.
+> Normative preferences represent the agent's actual interests.** It sometimes makes sense to
+> assume that revealed preferences are identical to normative preferences. But there are many
+> cases where this assumption is violated. We identify **five factors that increase the
+> likelihood of a disparity between revealed preferences and normative preferences: passive
+> choice, complexity, limited personal experience, third-party marketing, and intertemporal
+> choice.** We then discuss **six approaches** that jointly contribute to the identification of
+> normative preferences: structural estimation, active decisions, asymptotic choice, aggregated
+> revealed preferences, reported preferences, and informed preferences. **Each of these
+> approaches uses consumer behavior to infer some property of normative preferences without
+> equating revealed and normative preferences.** We illustrate these issues with evidence from
+> savings and investment outcomes.»
+
+🔴 **Это прямое попадание в нас: все пять «красных флагов» — ровно наша предметная область.**
+Личные финансы — это пассивный выбор (ничего не делать = выбор), сложность, редкий личный
+опыт (ипотеку берут раз-два в жизни), маркетинг третьей стороны (банк продаёт кредит)
+и межвременной выбор. По Beshears et al. это максимально неблагоприятный набор условий
+для того, чтобы считать наблюдаемое поведение нормой.
+
+#### Позиция 2 — Bernheim & Rangel: не перебивать выбор
+
+Абстракт дословно (с. 1): критерий строится на «unambiguous choice relation: roughly, x is
+(strictly) unambiguously chosen over y (written xP\*y) if y is never chosen when x is available…
+it is also **the most discerning welfare criterion that never overrules choice**». Механика —
+разделение характеристик самих альтернатив и **«ancillary conditions»** (обрамление, момент
+выбора, порядок предъявления): по ним ранжирование не производится.
+
+#### Позиция 3 — Infante, Lecouteux & Sugden: собственно обвинение в циркулярности
+
+Абстракт дословно (с. 1):
+
+> «Neoclassical economics assumes that individuals have stable and context-independent
+> preferences, and uses preference satisfaction as a normative criterion. By calling this
+> assumption into question, behavioural findings cause fundamental problems for normative
+> economics. A common response to these problems is to treat deviations from conventional
+> rational choice theory as **mistakes**, and to try to **reconstruct the preferences that
+> individuals would have acted on, had they reasoned correctly**. We argue that this
+> **preference purification** approach implicitly uses a **dualistic model of the human being,
+> in which an inner rational agent is trapped in an outer psychological shell**. This model is
+> psychologically and philosophically problematic.»
+
+Сугден, развёрнуто (2015, с. 5), формулирует, из чего именно состоит подозреваемая связка:
+
+> «(2) The normative criterion is the satisfaction of each individual's **latent preferences**,
+> defined as the preferences he would reveal in the absence of any errors that might be caused
+> by limitations of attention, information, cognitive ability or self-control. <…>
+> (4) In the cases to which behavioural welfare economics is to be applied, latent preferences
+> **are assumed to be context-independent**.»
+
+И вывод (2015, с. 3):
+
+> «A psychological explanation of context-dependent choices **does not need a concept of 'true'
+> preference**. In the most credible of such explanations, responses to contextual cues are an
+> integral part of the mental processes of decision-making. **The idea of recovering latent
+> preferences by removing the influence of these cues seems incoherent.**»
+
+🔴 **Суть обвинения в нашем переводе.** Если норму («как надо») выводить из поведения,
+очищенного от «ошибок», то критерий «что считать ошибкой» нельзя взять из того же поведения —
+его вносит аналитик. Тогда нормативный вывод лишь выглядит выведенным из данных, а на деле
+в них заложен заранее. Это и есть циркулярность, и она не лечится увеличением объёма данных.
+
+#### 🔴 Предметный пример ровно этого спора — прямо в нашем материале (Zinman 2006)
+
+Пример не гипотетический. Ко-холдинг (дорогой долг рядом с дешёвым резервом) описан у нас
+как ошибка, цену которой снимает продукт (Gathergood & Weber: 12 % ДХ, £650/год —
+см. `calibration_ground_truth`, Г31.4-D3). **Zinman 2006 на тех же данных утверждает
+обратное** (добыт в этом же подбатче, `macro_in_forecast`, Г31.4-D4а), дословно, с. 18:
+
+> «BHLL is **not foregone arbitrage and therefore not a puzzle per se** for neoclassical
+> models of consumer choice. <…> Several calculations suggest that **the implicit value of
+> liquidity can rationalize nearly all of the BHLL** on household balance sheets.»
+
+То есть одно и то же наблюдаемое поведение одна школа зовёт ошибкой, другая — рациональным
+ответом на неучтённую ценность ликвидности. **Дескриптивные данные сами по себе спор
+не решают** — он решается тем, какую норму исследователь принёс с собой. Это лучший
+из возможных аргументов, что участок был не пустой формальностью.
+
+#### 🔴 АУДИТ НАШИХ СОБСТВЕННЫХ ПОРОГОВ ПО ЭТОМУ КРИТЕРИЮ
+
+Разложено по источнику обоснования, по `docs/math_model.md` (§3.4, §6, §9, §10, таблица
+констант, §«Почему ликвидность мягкая»). **Это диагностика, не предложение правок.**
+
+| Порог / элемент | Откуда взят по канону | Тип обоснования | Риск циркулярности |
+|---|---|---|---|
+| $D_{\max}=0{,}40$ (ПДН) | «ЦБ РФ, Указ. № 4892-У; экспертиза G3» | **нормативный** (регуляторная норма) | 🟢 **нет.** Норма внешняя, установлена регулятором, из поведения не выводится |
+| $R_t \geq 0$ | определение: нельзя распределить больше, чем есть | **аналитический** (тождество) | 🟢 нет |
+| $r_{\text{bench}}$, Avalanche-фильтр | арифметика сравнения ставок | **аналитический** | 🟢 нет |
+| Целевая подушка $L^{*}$ = 3–6 мес. | «явные target-константы **всех четырёх экспертных движков** и норматив **Greninger (1996)**» | 🔴 **дескриптивный, поданный как нормативный** | 🔴 **ДА.** Это факт о том, что советуют консультанты, а не вывод о том, что оптимально для пользователя |
+| Floor резерва **2 месяца** | «калибровка **второй сертификацией**, ADR-006» | 🔴 дескриптивный (консенсус экспертов) | 🔴 да |
+| Веса SAW по 5 профилям риска | калибровка по согласию с **консенсусом четырёх экспертных движков** (v3.1.0: 51,9 % → 87,4 %) | 🔴 дескриптивный | 🔴 да |
+| Горизонт-пороги 12 / 36 мес. | «Экспертный коридор G5» | 🔴 дескриптивный | 🔴 да |
+| Порог токсичности, кромка ПСК 300 % | «порог валидатора 300 % остаётся» при **расколе экспертов 2/2** | 🔴 дескриптивный, причём **без консенсуса** | 🔴 да, в усиленной форме |
+
+🔴 **Главный вывод аудита — и он про метод проверки, а не про сами числа.**
+Большинство калибруемых констант получено из **экспертного консенсуса**, то есть из
+дескриптивного факта «так поступают советники». Дальше эти же константы работают как
+**норматив** для пользователя. Само по себе это законно (Beshears et al. прямо перечисляют
+«reported preferences» и «informed preferences» среди шести легитимных способов выводить
+нормативное из поведения — но с оговоркой «**without equating revealed and normative
+preferences**»).
+
+🔴 **Проблема у нас не в калибровке, а в ВАЛИДАЦИИ.** Метрика сертификации — «согласие
+с экспертным консенсусом» (78,63 % в раунде 5 при попарном коридоре самих экспертов
+58,18–79,99 %). Мы **калибруем по экспертам и проверяем согласием с экспертами**. Такая
+проверка не может обнаружить ошибку, общую для всех четырёх движков: если советники
+систематически ошибаются в одну сторону, модель воспроизведёт ошибку и получит за это
+высокий балл. Это замкнутый контур в чистом виде, и его **нельзя разомкнуть внутри
+той же процедуры**.
+
+🟢 **И канон это уже частично знает — в формулировке раунда 5 есть прямое признание:**
+полоса $L_t \in [1;2)$ переопределена как «не зона ошибки модели, а зона **отсутствия
+профессионального консенсуса**» (амплитуда ответов экспертов 66 п. п. на одних и тех же
+портретах). Это ровно точка, где дескриптивный источник нормы **перестаёт её выдавать**:
+эксперты не сходятся, значит «как надо» из их поведения не извлекается. Запись в каноне
+честная, но из неё не сделан методологический вывод — что при отсутствии консенсуса
+нормативный порог вообще не имеет дескриптивного основания.
+
+#### Что из этого следует (кандидаты, решение — за владельцем; канон НЕ тронут)
+
+1. **Разделить в документации три класса оснований** — регуляторный (ПДН), аналитический
+   ($R_t$, Avalanche) и калиброванный по экспертам (подушка, веса, горизонты). Сейчас они
+   лежат в одной таблице констант вперемешку, и читатель не видит, что $D_{\max}$ и $L^{*}$
+   держатся на источниках разной природы и разной прочности. Это правка **только документации**.
+2. **Хотя бы одна метрика валидации, независимая от экспертов** — например, реализованный
+   исход на синтетике (снижение переплаты по Avalanche) вместо согласия с мнением.
+   Это размыкает контур; согласие с экспертами при этом остаётся, но перестаёт быть
+   единственным.
+3. **Beshears et al. дают готовый чек-лист «красных флагов»** для мест, где нельзя брать
+   поведение пользователя за норму (пассивный выбор — в том числе наши дефолты и умолчания;
+   сложность; отсутствие опыта; межвременной выбор). Проверить по нему экраны выбора —
+   дешёвая и конкретная работа.
+4. **Позиция Bernheim & Rangel — готовая защита формулировки продукта:** «наиболее
+   информативный критерий, который **никогда не перебивает выбор**». Она совместима
+   с тем, что мы уже делаем (рекомендация по умолчанию + объяснение, а не принуждение),
+   и снимает обвинение в патернализме, не требуя доказывать существование «истинных»
+   предпочтений пользователя.
+5. 🔴 **Чего делать НЕ надо:** «очищать» предпочтения пользователя, достраивая, что он
+   выбрал бы «если бы рассуждал правильно». Именно эту конструкцию Infante–Lecouteux–Sugden
+   разбирают как психологически безосновательную, и она же — самая уязвимая позиция
+   при внешней экспертизе.
+
+**Границы этой находки.** Ни одно из добытого не даёт числа и не требует смены канона.
+Предмет — **устройство обоснования**, а не значения порогов; все пороги остаются как есть.
+Новизна продукта не затрагивается: спор normative/descriptive относится к обоснованию,
+не к объекту и не к методу.
+
+## ИТОГ Г31.4 (СВОДНЫЙ — по всему подбатчу, семь файлов)
+
+### 1. Арифметика приёмки
+
+| | Число |
+|---|---|
+| Задолженностей Г31.2 в задании | 6 |
+| Из них закрыто полностью | **5** (D1 DeMiguel, D3 Gathergood & Weber, D4 Telyukova, D5 circularity, D6 смещение Минэка) |
+| Закрыто частично | **1** (D2 Wang & Luo — реквизиты и абстракт от издателя; тела статьи нет) |
+| Пунктов «не добыто» взято в работу сверх задолженностей | 7 |
+| Из них закрыто полностью | **4** (Abadie 2021; Hagger 2010 «по существу»; Many Labs 3/4 — отрицательным результатом; Fox 1966 — реквизиты) |
+| Закрыто частично | **1** (Tunçel & Hammitt — аннотация) |
+| Подтверждено закрытыми | **2** (Zhou & Mamon; репликация эффекта владения — её нет) |
+| Отклонено с названным основанием (S2 неприменим / уже пройден / не требуется) | **9** |
+| **Итого затронуто пунктов** | **13 закрыто или уточнено, 9 обоснованно отклонено** |
+
+Файлы: `approach_validity`, `calibration_ground_truth`, `macro_in_forecast`,
+`behavioral_finance_field`, `closed_forever_retry`, `causal_effect_measurement`,
+`optimization_solvers` (+ `_dobor_lit`).
+
+### 2. 🔴 ГЛАВНОЕ ПО КАНАЛУ: «Semantic Scholar = 429» было НЕВЕРНО, и ключ НЕ НУЖЕН
+
+Замер 16.09.2026, без ключа, паузы 6–8 с, каждый отказ повторён:
+
+| Эндпоинт | Попыток | Коды |
+|---|---|---|
+| `/graph/v1/paper/search` | **4** | **429, 429, 429, 429** (174 б) |
+| `/graph/v1/paper/search/bulk` | 9 | **200 во всех девяти** |
+| `/graph/v1/paper/DOI:<doi>` | 8 | **200 во всех восьми** |
+| `/graph/v1/paper/DOI:<doi>/citations` | 3 | **200 во всех трёх** |
+
+Лежит **один эндпоинт из четырёх** — релевантный поиск. Запись «S2 = 429» в доборах Д3–Д6
+и Г18 описывала его, а не канал: всё, что делается по DOI, и оба графа цитирования были
+доступны всё это время. Это тот же класс Г31.5 («отказ одного адреса записан как свойство
+источника»), но применённый к каналу целиком.
+
+🔴 **Ответ на вопрос задания «стоит ли заводить `SEMANTIC_SCHOLAR_API_KEY`»: НЕТ.**
+Ключ нужен только для `/paper/search`, а его функция полностью закрывается фразовым
+`/paper/search/bulk`. Все три решающих находки подбатча получены **без ключа**.
+
+**Сколько пунктов закрыл ИМЕННО Semantic Scholar — 3 решающих, 3 частичных, 3 пустых:**
+
+| Вклад | Пункты |
+|---|---|
+| 🟢 **Решающий** (другие каналы связку не давали) | **(1)** вся литература по circularity — Infante/Lecouteux/Sugden, Beshears, Bernheim & Rangel (`search/bulk`; ни OpenAlex, ни Crossref по фразе их не дают); **(2)** RRR эффекта истощения самоконтроля — через `tldr` закрытого Hagger 2010 и `search/bulk`; **(3)** arXiv 2508.00129 по rank reversal — через `/citations` Wang & Luo |
+| 🟡 Частичный | Zinman 2006 (нашёл единственную запись, копию дала Exa); Gathergood & Weber (дал `CCBY` — основание брать легально); Fox 1966 (третье подтверждение реквизитов) |
+| ⚪ **Пустой** | Tunçel & Hammitt, Zhou & Mamon, DeMiguel — по закрытым работам **Elsevier изымает абстракт и из S2 тоже**, S2 не добавляет к OpenAlex ничего |
+
+**Правило, выведенное из этого:** S2 ценен **графами цитирования и `tldr`**, а не как
+замена Unpaywall. Против Elsevier он бесполезен; против «найти более позднюю работу,
+уточняющую или опровергающую наш источник» — незаменим.
+
+### 3. 🔴 Что из добытого МЕНЯЕТ канон, прогноз, новизну или обоснование порогов
+
+🟢 **Канон модели (`docs/math_model.md`) — НЕ меняется ничем из добытого. Ни одного кандидата
+на правку формул, порогов или инвариантов. Формулировка новизны и код — тоже не затронуты.**
+
+**Меняется ОБОСНОВАНИЕ — четыре пункта, по убыванию значимости:**
+
+1. 🔴 **Обоснование порогов: найдена замкнутая петля в ВАЛИДАЦИИ** (Г31.4-D5).
+   Большинство калибруемых констант — подушка $L^{*}$ 3–6 мес., floor 2 мес., веса SAW,
+   горизонты 12/36 мес., кромка ПСК 300 % — взяты из **экспертного консенсуса**, то есть
+   из дескриптивного факта «так поступают советники», и работают как **норматив**.
+   Само по себе это законно (Beshears et al. перечисляют такие способы среди шести
+   легитимных). 🔴 **Но метрика сертификации — тоже согласие с экспертами.** Мы калибруем
+   по экспертам и проверяем согласием с экспертами; такая проверка не способна обнаружить
+   ошибку, общую для всех четырёх движков. Канон это уже частично знает: полоса
+   $L_t \in [1;2)$ переопределена как «зона отсутствия профессионального консенсуса»
+   (амплитуда 66 п. п.) — ровно точка, где дескриптивный источник нормы перестаёт её
+   выдавать. Методологический вывод из этой записи не сделан.
+   **Что чисто:** $D_{\max}=0{,}40$ (норма ЦБ, Указ. № 4892-У), $R_t \geq 0$ и Avalanche
+   (аналитические) — циркулярности не подвержены.
+   **Кандидаты (решение владельца):** (а) разделить в документации три класса оснований —
+   регуляторный, аналитический, калиброванный по экспертам; (б) завести хотя бы одну
+   метрику валидации, независимую от экспертов (реализованный исход на синтетике);
+   (в) 🔴 **не** «очищать» предпочтения пользователя достройкой «что бы он выбрал,
+   рассуждая правильно» — это самая уязвимая позиция при внешней экспертизе.
+
+2. 🔴 **Запрет на аргументацию: «расходуемая сила воли» (ego depletion) — эффекта нет**
+   (Г31.4-B3, B4). d = 0,62 по 198 тестам у Hagger 2010 против d = 0,020 и −0,031
+   с ДИ через ноль в его же предзарегистрированной репликации на 24 лабораториях, плюс
+   независимый нуль на >2 000 участников Many Labs 3. Механики и обоснования вида
+   «не грузи пользователя решениями, воля кончится» из продукта и из защиты убрать.
+   **Не затронуто:** импульсивность как устойчивая черта и эффекты дефолта/инерции
+   (49 %→86 %) — они мерены иначе и на реальных деньгах.
+
+3. 🔴 **Прогнозный контур: смещение официального прогноза измерено — и ОНО НЕ ПРО ИНФЛЯЦИЮ**
+   (Г31.4-D6). Минэк по реальному ВВП на третий прогнозный год: **+2,3 п. п.** (2005–2020),
+   **+1,6 п. п.** без кризисов; по реальным располагаемым доходам ≈ **+4,1** и ≈ **+3,7 п. п.**
+   Знак устойчив (гистограмма почти вся справа от нуля) — в отличие от инфляционного прогноза
+   ЦБ (+0,36 п. п., АКРА прямо пишет «смещение сложно назвать систематическим»).
+   🔴 **Переносить +2,3 п. п. на инфляционный контур нельзя** — измерено по другим
+   показателям. Применимо к одному: если цели когда-нибудь будут индексироваться
+   по официальному прогнозу **доходов**, брать его без дисконта нельзя. Это довод
+   в пользу нынешнего решения, а не против него.
+
+4. 🔴 **Числа, подлежащие замене в наших же файлах** (обоснование, не канон):
+   - Telyukova: **73 % / 55 центов → 44–56 % / 100 % медианной ликвидности** (наши числа
+     из снятой версии MPRA 2007); новое: **\$734 в год = 1,5 % посленалогового дохода**.
+   - Gathergood & Weber: **12 %, £3 800, £650/год**; «4 % выборки несут £1 300» →
+     «каждый пятый ко-холдер несёт £1 000»; связь с импульсивностью ослаблена
+     («In most estimates»).
+   - Ликвидностная премия в п. п.: из «не найдена» в 🔴 **«ведущие работы её сознательно
+     не выражают в п. п.»** — значит единой надбавки к $r_{\text{bench}}$ нет литературного
+     основания вовсе. Довод против конструкции надбавки, а не повод искать число.
+   - DeMiguel: страницы привязаны к RFS 1915–1953; добавлено окно 1600/3200 мес. (панель F).
+   - Fox 1966: `10.1287/MNSC.13.3.210`, Management Science 13(3):210 — третье подтверждение.
+
+**Отдельно, как инструмент, а не как вывод:** тесты на rank reversal реализованы в открытой
+библиотеке — `RankInvariantChecker`, модуль `skcriteria.ranksrev.rank_invariant_check`
+(Scikit-Criteria; RRT1 мутация, RRT2 транзитивность с нулевым допуском, RRT3 декомпозиция).
+Даёт возможность **измерить** устойчивость нашего SAW на 66 альтернативах вместо спора
+по литературе и прямо смыкается с задачей **Г30.2-К**. Заведение проверки — решение владельца.
+
+### 4. Что осталось неизвестным (честно) и ЗАДОЛЖЕННОСТЬ
+
+**Не добыто, каналы исчерпаны — непройденного канала не осталось:**
+- **Wang & Luo 2009, тело статьи** (численный пример для SAW, который окончательно разрешил бы
+  спор «SAW подвержен rank reversal или нет»). Пройдено: Wayback страницы **200** (абстракт
+  добыт), Wayback `/pdf` **404**, Wayback `/pdfft` 200 но HTML, ScienceDirect прямой и через
+  прокси — капча Elsevier, Exa — только абстракт и литература. 🔴 Статья при этом **формально
+  открытая (bronze, «Open archive»)** — закрыт не доступ, а бот-канал.
+- **Tunçel & Hammitt 2014, полный текст** — Unpaywall/OpenAlex/S2 все `closed`, открытых копий
+  не существует. Аннотация добыта целиком.
+- **Fox 1966, полный текст** — S2 `CLOSED`, DTIC на обслуживании (оба идентификатора),
+  у RAND файла нет.
+- **Zhou & Mamon 2012** — `CLOSED` в четвёртом канале подряд.
+- **Hagger et al. 2010, полный текст** — APA PsycNet пейволл, handle HKU мёртв (500).
+  **Надобность отпала** (см. §3 п. 2).
+
+**🔴 ЗАДОЛЖЕННОСТЬ (не пробовалось, отдельным списком, как требует задание):**
+1. **Крупной многолабораторной репликации эффекта владения** нет в открытом доступе —
+   запрос S2 дал `total: 0`. Это отрицательный результат по существу, но **целевой поиск
+   по конкретным именам (Plott & Zeiler и др.) не делался** — если понадобится, это
+   отдельный узкий заход.
+2. **Правовой блок**, вынесенный за периметр подбатча осознанно (S2 его не индексирует):
+   FCA Consumer Duty (PS22/9, FG22/5), CFPB, DSA ст. 40, EU AI Act, корпоративные IRB;
+   798-П, 5809-У, Приказ РКН № 68, Обзор ВС. Адрес — **Г30.3**.
+3. **Русский языковой пакет `tesseract`** в системе отсутствует (`--list-langs` → `eng`,
+   `osd`, `snum`). Цифры с графика АКРА сняты и сверены прямым чтением, но для будущих
+   русских картинок пакет `rus` надо доустановить — иначе OCR по кириллице непригоден.
+
+**Пиратские источники не использовались; российский корневой сертификат не ставился;
+канон, формулировка новизны и код продукта не правились.**

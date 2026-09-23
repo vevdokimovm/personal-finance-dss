@@ -3320,3 +3320,338 @@ payments will be plowed right back into paying off the other debts».
 Это не доказательство (в книге нет данных), но расхождение с каноном нужно знать при цитировании.
 
 **Статус Г8.2: 🟢 добыт** (полный текст, неофициальная копия без пагинации — см. оговорку выше).
+
+---
+
+# ДОБОР Г30.1 — Exa (16.09.2026)
+
+**Состояние каналов (свои замеры 16.09.2026):** `mcp__exa__web_search_exa` — работает;
+`mcp__exa__web_fetch_exa` — работает, но **на ScienceDirect отдал `CRAWL_LIVECRAWL_TIMEOUT`**
+(то есть издатель не пробит и этим каналом — замер, а не предположение). Wayback — **HTTP 302**.
+OpenAlex, Unpaywall — HTTP 200. `curl -skL` по `acrwebsite.org/volumes/v42/acr_v42_17515.pdf` —
+**HTTP 404, 172 345 байт HTML** (очередной случай «большой размер тела при отказе», как и
+зафиксировано в П5.3.4/П5.3.5).
+
+Взяты пункты, остававшиеся открытыми по последнему упоминанию: П5.3.3–П5.3.7. Закрытое ранее
+(ВНДН, КОУЖ, PSID-кодбуки, объём выборки ВНДН, пороги 200×/1000×, 50/30/20, Шульгин и др.)
+не переоткрывалось.
+
+## Г30.1-17. 🔴 Besharat, Varki & Craig (2015) — ДОБЫТ ФАКТИЧЕСКИЙ МАТЕРИАЛ ТРЁХ ЭКСПЕРИМЕНТОВ (было: «сниппет, первоисточник не открыт»)
+
+Было (П5.3.7): «НЕ ДОБЫТ… содержательно интересна та, которая **2015**, а не 2014… 🟡 это сниппет,
+первоисточник не открыт».
+
+Реквизиты подтверждены по карточке репозитория Университета Кентукки
+(`https://scholars.uky.edu/en/publications/keeping-consumers-in-the-red-hedonic-debt-prioritization-within-m/`,
+через Exa 16.09.2026), дословно: **Journal of Consumer Psychology, том 25, выпуск 2, с. 311–316,
+6 страниц, DOI 10.1016/j.jcps.2014.08.005, State: Published — 2015.** То есть правка П5.3.7
+(«год 2015, а не 2014») подтверждена официальной карточкой.
+
+**Через Exa добыто тело статьи — дословно.**
+
+Постановка и главный эффект:
+> «we demonstrate that **when debt is incurred for a hedonic purchase (as opposed to a utilitarian
+> purchase) and it is realized in the distant past (as opposed to the proximal past), customers with
+> multiple credit card debts are more likely to reduce the NUMBER of credit card debts rather than
+> decrease the TOTAL COST of debt across all accounts**, thus amplifying the effects reported by
+> Amar et al. (2011). … For example, **between a $300 loan with a 6% interest rate and a $3000 loan
+> with a 12% interest rate, a person would pay off the $300 loan faster if it were incurred for a
+> hedonic purchase compared to a utilitarian purchase.**»
+
+🔴 **Числа эксперимента 2 (то, чего не было в файле вовсе) — дословно:**
+> «An ANOVA was performed with the proportion of smaller debt repaid as the dependent variable and
+> debt type, timing, and APR as the independent factors. The three-way interaction was significant
+> (**F(1, 272) = 4.56, p < .05**) revealing that the interaction between debt type and timing was
+> dependent on whether the APR was 12% or 18%. … **when APR was 18%** … **irrespective of proximal
+> past (M hedonic-18% = .54 vs. M utilitarian-18% = .49; F(1, 272) = 1.09, p > .10) or distant past
+> timing (M hedonic-18% = .47 vs. M utilitarian-18% = .48) — individuals allocated most of their
+> money towards the smaller debt, regardless of the debt nature.** However, **when the smaller debt
+> APR was 12%**, the main effect of debt type (**F(1, 272) = 22.20**), debt timing
+> (**F(1, 272) = 5.36**), and the interaction (**F(1, 272) = 12.63**) were significant …
+> **M hedonic-12% = .45 vs. M utilitarian-12% = .31** (проксимальное прошлое) и
+> **M hedonic-12% = .59 vs. M utilitarian-12% = .27** (дальнее прошлое).»
+
+Выводы авторов — дословно:
+> «Experiment 1a shows that consumers prefer to repay hedonic debt faster than utilitarian debt…
+> Experiment 1b demonstrates that **even in the presence of cost information and real financial
+> incentives, participants still prioritize hedonic, low APR debts.** Although the decreased
+> enjoyment of the hedonic purchase leads consumers to reduce the hedonic debt faster when it has
+> low APR, **consumers act rationally when the interest rate is high regardless of the type of
+> debt.**»
+> «**The temptation to pay off past, hedonic debts may override optimal allocation intentions and
+> keep debtors in debt longer than necessary.**»
+
+Выборка (дословный фрагмент описания эксперимента 2): «…**seventeen mTurk workers participated**…
+SD = 6.73; **151 men**; **M credit cards = 5.22**; 37 responses were excluded…» (число участников в
+выдаче обрезано слева — привожу как есть, не достраиваю).
+
+🔴 **Что это даёт продукту — важная и неудобная деталь для Avalanche-фильтра.** (1) Отклонение от
+оптимального порядка погашения **не универсально: при высокой ставке (18 %) тип долга перестаёт
+влиять — люди и так гасят меньший остаток**; эффект «гедонического» долга проявляется на **умеренной
+ставке (12 %)**. (2) 🔴 **Сообщение полной стоимости долга и денежный стимул НЕ устранили
+искажение** (эксперимент 1b) — это прямой довод против того, что достаточно «показать переплату»,
+и в пользу того, что рекомендация должна быть действием, а не информированием. Именно этот пункт
+раньше держался у нас на пересказе. (3) Механизм — ожидаемое удовольствие от покупки, а не
+финансовая логика; значит объяснение пользователю, почему Avalanche выгоднее, должно бить не
+в арифметику, а в этот мотив.
+
+## Г30.1-18. Dana & Dawes 2004 — ДОБЫТ (в этом файле значился «НЕ ДОБЫТ»)
+
+Было (П5.3.6): «НЕ ДОБЫТ… Wayback 404, r.jina.ai по SAGE — 403 (Cloudflare)… совпадает с вердиктом
+Unpaywall (`closed`)».
+
+**Полный текст остаётся закрытым, но абстракт с числовыми порогами добыт дословно и сверен по трём
+независимым площадкам** (SAGE, ERIC `EJ727514`, RePEc `sae:jedbes:v:29:y:2004:i:3:p:317-331`) —
+через Exa 16.09.2026. Подробности и цитата — в соседнем файле темы,
+`approach_validity_2026-09-10.md`, блок **Г30.1-3** (чтобы не дублировать материал между файлами).
+
+Короткое существо для этого файла: **при adjusted R < .6 корреляционные веса превосходят
+регрессионные даже при 100 наблюдениях на предиктор; при adjusted R < .4 единичные веса
+превосходят все методы; регрессия выигрывала только при adjusted R² > .9.** Для калибровки весов
+нашей модели это означает: **эталон для сравнения — не «подогнанные веса», а равные и
+корреляционные**, и при нашем объёме данных подгонка весов не окупается.
+
+## Г30.1-19. Politis & Romano 1994, Blanchett et al. 2012, Choupani & Mamdoohi — перепроверены, статус НЕ изменился
+
+Все три прогнаны через Exa 16.09.2026; ни один не открылся. Это **подтверждённые отрицательные
+результаты**, а не непроверенные пункты.
+
+- **Politis & Romano 1994 «The Stationary Bootstrap», JASA 89(428): 1303–1313** — Exa-поиск даёт те
+  же три адреса (Taylor & Francis abs, JSTOR 2290993, агрегаторы); открытой копии нет. Совпадает с
+  прошлым замером: автор сам работу не выкладывает, каталог препринтов начинается с 1999 г.
+  §3.3(б) остаётся на сводке.
+- **Blanchett, Kowara & Chen 2012, Retirement Management Journal 2(3): 7–18** — журнальной копии
+  нет; расхождение пагинации «7–18» (страница автора) против «7–20» (сводка поиска) остаётся
+  неразрешённым, в файле писать как неподтверждённое.
+- **Choupani & Mamdoohi, Transportation Research Procedia 17 (2016): 223–233 (gold OA)** — 🔴
+  **`mcp__exa__web_fetch_exa` по ScienceDirect вернул `CRAWL_LIVECRAWL_TIMEOUT`**, то есть и Exa
+  этот PDF не берёт. Ранее: `r.jina.ai` — 403 Cloudflare, Wayback — HTML-редирект вместо PDF.
+  Парадокс сохраняется: статья юридически открыта (CC-лицензия), фактически недоступна ни одним
+  из четырёх каналов. Цитата про округление в ре-сэмплинге остаётся со сводки.
+
+## ИТОГ Г30.1 — calibration_ground_truth
+
+| Пункт | Был статус | Стал | Чем взят |
+|---|---|---|---|
+| Besharat et al. — какая из двух работ и её содержание | НЕ ДОБЫТ, реквизиты под вопросом, только сниппет | 🔴 **ДОБЫТО**: год 2015 подтверждён карточкой UKY, добыты три эксперимента с F-статистиками и средними | Exa (тело статьи в индексе) + репозиторий Университета Кентукки |
+| Dana & Dawes 2004 | НЕ ДОБЫТ | **частично добыт** — абстракт с порогами дословно, тремя совпадающими копиями | Exa → SAGE + ERIC + RePEc (материал записан в `approach_validity`, Г30.1-3) |
+| Politis & Romano 1994 | НЕ ДОБЫТ | **не добыт — подтверждено закрытым** | Exa: открытых копий нет |
+| Blanchett, Kowara & Chen 2012 | НЕ ДОБЫТ | **не добыт — подтверждено**; расхождение пагинации не разрешено | Exa |
+| Choupani & Mamdoohi (TRP 2016, gold OA) | НЕ ДОБЫТ (r.jina.ai 403, Wayback — HTML) | **не добыт**; 🔴 новый замер: Exa по ScienceDirect — `CRAWL_LIVECRAWL_TIMEOUT` | Exa |
+| ВНДН: регламент доступа к микроданным | НЕ ДОБЫТ | **не переоткрывался** (вне списка Г30.1, путь через зеркало tochno.st уже зафиксирован) | — |
+| ОКБ (SPA-сайт) | не добыто ничего | **не переоткрывался** (бюджет) | — |
+| RLMS «Citing the Data» | НЕ ДОБЫТО, дублировать не стали | **не переоткрывался** | — |
+
+**Главное число по файлу `calibration_ground_truth`: из 5 проверенных пунктов «не добыто» Exa
+перевела в «добыто»/«частично добыто» — 2** (Besharat 2015 — полностью по существу, Dana & Dawes —
+абстракт с числами). Три (Politis & Romano, Blanchett, Choupani) подтверждены как закрытые всеми
+доступными каналами, включая Exa. 🔴 **Отдельный результат батча: издательский ScienceDirect Exa
+НЕ пробивает** (`CRAWL_LIVECRAWL_TIMEOUT`) — в отличие от репозиториев и агрегаторов, где она
+работает; это граница канала, которую стоит помнить в остальных подбатчах Г30.
+
+---
+
+## ДОБОР Г31.2 — прокси (16.09.2026)
+
+**Каналы на начало работы (парный замер):** `r.jina.ai` **без UA** → `www.monarchmoney.com/pricing`
+**HTTP 200, 5 509 байт** содержимого; тот же адрес через прокси **с UA Chrome/127** → **HTTP 403,
+5 743 байта** `Just a moment...`. Ошибка вызова прокси с UA подтверждена. Exa — 🟢;
+Wayback **replay** — 🟢; Unpaywall и Crossref — 🟢 (200).
+
+### Г31.2-7. 🟡 Choupani & Mamdoohi 2016 (TRP 17: 223–233, gold OA) — АБСТРАКТ ДОБЫТ; статус меняется с «не добыт ничем» на «частично»
+
+**Прежний статус** (§Д.4.2, таблица П5.3.4 и Г30.1-19): «`r.jina.ai` — 403 Cloudflare, Wayback —
+HTML-редирект вместо PDF, `mcp__exa__web_fetch_exa` по ScienceDirect — `CRAWL_LIVECRAWL_TIMEOUT`.
+Парадокс: статья юридически открыта (CC), фактически недоступна ни одним из четырёх каналов».
+
+**Реквизиты уточнены через Crossref (HTTP 200):** Choupani A.-A., Mamdoohi A.R. **«Population
+Synthesis Using Iterative Proportional Fitting (IPF): A Review and Future Research»**,
+*Transportation Research Procedia* **17** (2016) **223–233**, **DOI 10.1016/j.trpro.2016.11.078**,
+pii **S2352146516306925**. Unpaywall (200): `is_oa: true`, `oa_status: **gold**`, единственная
+OA-локация — `sciencedirect.com/science/article/pii/S2352146516306925/pdf`, host_type `publisher`.
+
+**Каналы 16.09.2026:**
+
+| Канал | Адрес | Код | Размер | Итог |
+|---|---|---|---|---|
+| `r.jina.ai` **без UA** | `…/S2352146516306925/pdf` | 200 у прокси | 113 054 б | тело — оболочка `Just a moment...` + `Target URL returned error 403`; 🔴 **без UA результат тот же — не наша ошибка вызова** |
+| `r.jina.ai` **без UA** | `…/pii/S0895717708002860` (Wang & Luo, для контроля) | 200 | 112 999 б | та же оболочка Cloudflare. **ScienceDirect закрыт для прокси как класс** |
+| Wayback replay | `web/2018/…/S2352146516306925/pdf` | **200** | 46 603 б **HTML** | снимок **05.06.2022 05:37:21 UTC** — страница-пересылка Elsevier «Preparing your download… Request ID: 71668e503fee90b5», PDF в архив не попал. Подтверждает прежнюю запись «HTML вместо PDF» |
+| Wayback replay | `web/2019/…/pii/S2352146516306925` (страница статьи, без `/pdf`) | **200** | 92 226 б | 🟢 **абстракт целиком** |
+
+#### Первичный материал — абстракт дословно (Wayback, страница статьи)
+
+> «Activity-Based travel demand modeling requires the detailed socioeconomic data of the study area
+> population. Since the collection of such detailed data for the whole population is too expensive,
+> if not infeasible, population synthesis has been proposed to predict the data and produce them
+> synthetically based on a sample. This much cheaper alternative for forecasting population
+> characteristics is based on iterative proportional fitting (IPF)… This paper seeks to critically
+> review the state of the art of IPF, classify the peer-reviewed literature, investigate the major
+> problems of IPF, and identify gaps for future research… **Our review shows that integer conversion
+> and zero-cell are among the most important problems necessitating empirical investigation.
+> Unbiased tabular (controlled) rounding methods should be developed to integerize the fractional
+> numbers estimated by IPF for the frequency of household types. Zero-cell problem, although already
+> dealt with, still lacks unbiased solutions. Simulation-based synthesis can help to avoid zero-cell
+> problem while it has many other advantages.**»
+> Ключевые слова: «population synthesis · iterative proportional fitting (IPF) · integer conversion ·
+> zero-cell problem · validation framework». Рецензирование: «Peer-review under responsibility of
+> the Department of Civil Engineering, Indian Institute of Technology Bombay», © 2016 The Author(s),
+> Elsevier B.V.
+
+#### Что это меняет для участка 2 (синтетические популяции)
+
+1. 🔴 **Тезис про округление больше не держится на сниппете.** Раньше цитата о «marginal
+   distributions-controlled rounding» была снята с поисковой сводки и приписана работе 2017 г.
+   Теперь **сами авторы в абстракте 2016 г.** говорят: «**Unbiased tabular (controlled) rounding
+   methods should be developed** to integerize the fractional numbers estimated by IPF» — то есть
+   на 2016 г. несмещённого метода округления, по их обзору, **не существует**, это открытая
+   проблема, а не готовый рецепт. Нашу формулировку в §участок 2 надо привести к этому: целочисление
+   после IPF — известная нерешённая проблема, а не деталь реализации.
+2. 🔴 **Вторая проблема, которой у нас не было вовсе: zero-cell.** «Zero-cell problem, although
+   already dealt with, still lacks unbiased solutions». Для наших 12 000 портретов это прямой риск:
+   комбинации признаков, отсутствующие в выборке-основе, IPF воспроизвести не может.
+3. 🟢 **Авторская рекомендация в нашу сторону:** «**Simulation-based synthesis can help to avoid
+   zero-cell problem** while it has many other advantages» — довод в пользу симуляционного
+   порождения популяции вместо чистого IPF.
+4. 🟡 **Полный текст по-прежнему не добыт** (в архив попала страница-пересылка, а не PDF), и цитата
+   про округление из работы **2017** г. (CEUS 68: 78–88, Unpaywall `closed`, 0 OA-локаций) остаётся
+   не подтверждённой первоисточником. Но статус пункта меняется с «не добыто ничем» на
+   **«абстракт первоисточника добыт, содержательное утверждение подтверждено авторами»**.
+
+### Г31.2-8. Перепроверенные и НЕ сдвинувшиеся пункты
+
+| Пункт | Замер 16.09.2026 | Итог |
+|---|---|---|
+| Choupani & Mamdoohi **2017** (CEUS 68:78–88) | не переоткрывался отдельно; Unpaywall ранее `closed`, 0 OA-локаций | ❌ пейволл; прокси пейволл не обходит — подтверждено на Wiley/SSRN/ScienceDirect в этом же подбатче |
+| Politis & Romano 1994 | не переоткрывался | подтверждённый отрицательный результат (Г30.1-19), не класс антибота |
+| Blanchett, Kowara & Chen 2012 | не переоткрывался | работы нет в OpenAlex и Crossref — проверить нечем, не вопрос канала |
+| ВНДН (регламент микроданных), ОКБ, RLMS | не переоткрывались | ОКБ — SPA, нужен headless-браузер; остальные — не класс прокси |
+
+## ИТОГ Г31.2 — calibration_ground_truth
+
+- **Частично закрыт 1 пункт** (Choupani & Mamdoohi 2016: абстракт дословно, две проблемы IPF
+  названы авторами), каналом **Wayback replay страницы статьи** — после того как прокси без UA
+  и Exa по ScienceDirect отказали.
+- 🔴 **Нашей ошибкой вызова прокси не оказался ни один пункт.** Замерено прямо: ScienceDirect
+  отдаёт прокси оболочку Cloudflare **и с UA, и без него** — это защита издателя, класс закрыт
+  как таковой.
+- 🔴 **Ошибка «отказ инструмента = отсутствие источника» — 1 раз:** Wayback раньше проверялся
+  только по адресу `/pdf` (где лежит страница-пересылка Elsevier) и не проверялся по адресу
+  **страницы статьи**, где абстракт был всё это время.
+- Канон модели, прогноз, новизна, юрблок — **не меняются**; меняется формулировка §участок 2
+  (округление и zero-cell как открытые проблемы IPF, довод за симуляционный синтез).
+
+---
+
+## ДОБОР Г31.4 — Semantic Scholar и долги Г31.2 (16.09.2026)
+
+**Каналы на начало работы (замер 16.09.2026, `curl -skL --http1.1`, коды дословно):**
+Unpaywall **200** (1 126 б) · Crossref **200** (7 853 б) · OpenAlex **200** (23 652 б) ·
+EuropePMC **200** (995 б) · `r.jina.ai` **200** (367 б, без браузерного UA) ·
+Wayback replay **200** (54 059 б, 5,2 с) · `curl`/`pdftotext`/`tesseract` — все три в системе.
+🔴 **Semantic Scholar расщеплён по эндпоинтам:** `/graph/v1/paper/search` — **429 на 4 из 4
+попыток** (174 б, паузы 6–8 с); `/paper/search/bulk` — **200**; `/paper/DOI:<doi>` —
+**200 на 3 из 3**; `/paper/DOI:<doi>/citations` — **200**. Запись «S2 = 429» в Д3–Д6 и Г18
+описывала ОДИН эндпоинт из четырёх.
+
+### Г31.4-D3. 🟢 Gathergood & Weber — ДОБЫТА ОПУБЛИКОВАННАЯ ВЕРСИЯ (JEBO 107 (2014) 455–469). Расхождение версий ЗАКРЫТО
+
+Задолженность Г31.2 №3. Предписанные каналы (SSRN Delivery.cfm, CORE, OpenAIRE) отработаны
+и **не понадобились** — сработала профилактика Г31.5: сначала спросить у Unpaywall ТОЧНЫЙ
+адрес открытой копии.
+
+| Шаг | Адрес | Код / размер | Итог |
+|---|---|---|---|
+| Crossref, поиск по библиографии | api.crossref.org | 200 | DOI опубликованной версии **`10.1016/j.jebo.2014.04.018`**, JEBO **т. 107, с. 455–469**; отдельно SSRN-препринт `10.2139/ssrn.2005031` |
+| Unpaywall по DOI | api.unpaywall.org | **200, 3 525 б** | 🔴 **`is_oa: true`, `oa_status: "hybrid"`**; три локации: издательская `sciencedirect.com/…/S0167268114001231/pdf` + **репозитории `eprints.nottingham.ac.uk/29811/` и `nottingham-repository.worktribe.com/output/726053`** |
+| Semantic Scholar по DOI | api.semanticscholar.org | **200** | `openAccessPdf.status: "HYBRID"`, 🔴 **`license: "CCBY"`**; `citationCount: 99`; **абстракт отдан ПОЛНОСТЬЮ** (в отличие от Elsevier-записей выше) |
+| eprints, прямой | `eprints.nottingham.ac.uk/29811/` | **404, 466 893 б** | страница-заглушка |
+| worktribe, прямой | `…/output/726053` | **403, 5 486 б** | антибот |
+| worktribe через `r.jina.ai` без UA | — | **200, 549 б** | «Just a moment… Performing security verification» — капча, тела нет |
+| 🟢 **Wayback replay, страница eprints** | `web.archive.org/web/2018/http://eprints.nottingham.ac.uk/29811/` | **200, 32 821 б** | **выдал точное имя файла PDF: `1-s2.0-S0167268114001231-main.pdf`** |
+| 🟢 **Wayback replay, PDF** | `web.archive.org/web/20190105221234/http://eprints.nottingham.ac.uk/29811/1/1-s2.0-S0167268114001231-main.pdf` | **HTTP 200, 529 778 б, `application/pdf`** | **PDF 1.4, 16 страниц, опубликованная вёрстка Elsevier**, sha256 `329ef389d35c0b5d0f9037fea9d3267d8e078c9141d9022390a7c683ca79c1aa` |
+
+Правовой статус чист: на первой странице PDF — «This article is made available under the
+Creative Commons Attribution licence», в подвале статьи — «© 2014 The Authors. Published by
+Elsevier B.V. This is an open access article under the CC BY license». Пиратские каналы
+не задействованы.
+
+**Абстракт опубликованной версии ДОСЛОВНО (с. 455):**
+
+> «We use UK survey data to analyze the puzzling co-existence of high cost revolving consumer
+> credit alongside low yield liquid savings in household balance sheets, which we name the
+> 'co-holding puzzle'. Approximately **12% of households in our sample co-hold, on average,
+> £3800 of revolving consumer credit** on which they incur interest charges, even though they
+> could immediately pay down all this debt using their liquid assets. Co-holders are typically
+> more financially literate, with above average income and education. **In most estimates**
+> co-holding is also associated with impulsive spending behavior on the part of the household.
+> Our results provide empirical support to theoretical models in which households co-hold
+> as a means of managing self-control problems.»
+
+**Введение, дословно (с. 456):**
+
+> «using UK data, we find that 12% of UK households hold, on average, £3800 of revolving credit
+> on multiple credit products for which they incur interest charges even though they could
+> immediately pay down all this debt using their liquid assets (and with a month's income in
+> liquid assets to spare). By 'co-holding' credit and assets, these households incur on average
+> approximately **£650 () in unnecessary interest charges per annum. One-in-five
+> 'co-holders' incur £1000 () in interest charges per annum due to co-holding.**»
+
+**Ещё дословно, эконометрический результат (с. 457):**
+
+> «a household which exhibits impulsiveness in spending decisions is approximately **70% more
+> likely to co-hold at least £1000** of consumer credit. Estimates also imply that among
+> co-holders impulsiveness is associated with co-holding approximately £3100, on average,
+> equivalent to foregoing **£550 in interest payments per annum**.»
+
+**Выборка (с. 457–458, раздел 2):** опрос **октября 2010**, **2 584 домохозяйства**; средний
+доход ДХ **£35 600**, медианный **£30 000**; 70 % — собственники жилья. Среди ко-холдеров
+**199 ДХ** могли погасить долг полностью, **100 ДХ** — частично; среднее ко-холдинга
+**£3 800**, медианное **£2 500**. Заёмщики: средний потребдолг £6 900, медиана £3 100.
+Сберегатели: средние сбережения £21 500, медиана £10 000.
+
+### 🔴 Разрешение расхождения версий (П5.3.1 закрывается)
+
+Раздел П5.3.1 оставил открытым: 12 % / £3 800 (аннотация публикации) против 14 % / £3 400
+(рабочий документ CFCM 12/04 от 20.02.2013), и запретил цитировать числа без указания версии.
+Теперь обе версии прочитаны целиком, и картина такая:
+
+| Показатель | WP CFCM 12/04 (20.02.2013) | 🟢 **JEBO 107 (2014) 455–469 — версия записи** |
+|---|---|---|
+| Доля ко-холдеров | 14 % | **12 %** |
+| Средний объём ко-холдинга | £3 400 | **£3 800** |
+| Лишние проценты в год, в среднем | £600 | **£650 ()** |
+| «Хвост» | 4 % **выборки** несут £1 300 | **каждый пятый КО-ХОЛДЕР несёт £1 000 ()** |
+| Связь с импульсивностью | «is also associated» | **«In most estimates** is also associated» — формулировка ОСЛАБЛЕНА |
+
+🔴 **Практический вывод для нас — правило цитирования, а не правка канона.** (1) Цитировать
+следует **опубликованные** числа: **12 %, £3 800, £650 в год**. (2) Хвост переформулирован
+не косметически: WP говорил о 4 % ВЫБОРКИ, публикация — о 20 % КО-ХОЛДЕРОВ (то есть
+≈2,4 % выборки при доле ко-холдеров 12 %), и сумма снижена с £1 300 до £1 000. Наша прежняя
+запись «4 % несут £1 300» опиралась на снятую авторами версию и **подлежит замене**.
+(3) Ослабление «In most estimates» означает, что связь ко-холдинга с импульсивностью
+в публикации подана осторожнее, чем в WP, — при ссылке на неё как на поведенческое основание
+это надо воспроизводить.
+
+**Что это меняет в продукте.** Величина «цена ошибки, которую снимает FINPILOT» остаётся
+защитимой и измеренной, но её правильное значение — **£650 в год на ко-холдящее ДХ**
+(не £600), а 12 % — доля таких ДХ в британской выборке 2010 года. 🟡 Перенос на РФ
+по-прежнему запрещён: другая страна, другой год, другой набор кредитных продуктов;
+годится только как методический образец постановки задачи. **Канон модели, формулировка
+новизны и код не затрагиваются.**
+
+## ИТОГ Г31.4
+
+По этому файлу: **1 пункт закрыт** — Gathergood & Weber добыты **опубликованной версией
+JEBO 107 (2014) 455–469** (CC BY, через Wayback по странице репозитория Ноттингема, адрес
+которой дал Unpaywall). Расхождение версий из П5.3.1 **разрешено**: версия записи —
+**12 %, £3 800, £650/год, каждый пятый ко-холдер £1 000**; прежняя запись «4 % выборки несут
+£1 300» взята из снятого рабочего документа и подлежит замене. Формулировка связи
+с импульсивностью в публикации **ослаблена** («In most estimates»).
+**Вклад Semantic Scholar:** дал полный абстракт и, главное, **лицензию `CCBY`** — то есть
+основание брать текст легально; но адрес открытой копии дал Unpaywall, а файл — Wayback.
+Частичный вклад, не решающий.
+Не добыто по файлу: ничего нового не открылось. Задолженности нет.
+🔴 Канон, новизна, код — не затронуты; меняется **правило цитирования чисел**.
+
+**Сводный итог всего подбатча Г31.4** — в `approach_validity_2026-09-10.md`, блок «ИТОГ Г31.4 (СВОДНЫЙ)».

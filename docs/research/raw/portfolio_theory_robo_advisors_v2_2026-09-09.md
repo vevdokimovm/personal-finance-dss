@@ -783,3 +783,41 @@ box-ограничениями и ограничением отклонения 
 
 **Живых источников, давших содержательный материал: 11.**
 Из них полнотекстовых PDF первоисточников: 3 (DGU, Michaud, Vanguard ADV).
+
+---
+
+## ДОБОР Г31.5 — отказ адреса (17.09.2026)
+
+**Каналы (замер 17.09.2026):** Unpaywall **200** · Crossref **200** · S2 `/paper/DOI:` **200** · Exa search **работает** · `r.jina.ai` без UA **200** (но на SSRN — капча) · прямой `curl` на `globalmarkets.statestreet.com` **200**.
+
+Последние упоминания в файле: стр. 414–418 (KPT, пять адресов), 727, 775 (SSRN 403), 30/778 (зеркало DGU `bauer.uh.edu` 403). Доборов после реестра источников в файле нет.
+
+### Г31.5-P1. DeMiguel–Garlappi–Uppal 2009 — ЗАКРЫТ В ДРУГОМ ФАЙЛЕ, здесь запись устарела
+
+Отказ зеркала `bauer.uh.edu/rsusmel/phd/DeMiguel-Garlappi-Uppal-RFS.pdf` (403) — отказ одного адреса. Журнальная версия RFS 22(5):1915–1953 **добыта** в Г31.4-D1 (`optimization_solvers_2026-09-10_dobor_lit.md`, стр. 487 и далее). Повторно не добывалась.
+
+### Г31.5-P2. Kritzman, Page, Turkington 2010 — ⛔ полный текст НЕ ДОБЫТ; ОТКЛОНЁН как кандидат класса, но добыт авторский ретроспективный текст
+
+Файл уже проверял пять адресов (SSRN 403, windhamlabs 404, cfainstitute media 404, edisciplinas.usp.br 404, RPC — аннотация), то есть это не «один адрес». Добор по недоиспользованным каналам:
+
+| Канал | Адрес | Код / размер | Итог |
+|---|---|---|---|
+| Crossref | `query.bibliographic` | **200** | `10.2469/faj.v66.n2.6`, FAJ **66(2):31–39** |
+| Unpaywall | `…/v2/10.2469/faj.v66.n2.6` | **200** | `is_oa: False`, `closed` |
+| S2 | `/paper/DOI:10.2469/faj.v66.n2.6` | **200** | `CLOSED`, абстракт изъят, `tldr: null`, `citationCount: 156` |
+| `r.jina.ai` без UA | `papers.ssrn.com/sol3/papers.cfm?abstract_id=1591171` | **200, 491 б** | тело — «Just a moment… / Performing security verification»: **SSRN закрыт для прокси** |
+| Exa search | точный заголовок + pdf | 10 результатов | открытого PDF нет; найдена авторская заметка State Street (ниже) |
+| 🟢 прямой `curl` | `globalmarkets.statestreet.com/research/service/public/v1/article/insights/pdf/v2/b6c2c896-d450-4e57-818d-26e8a08ff816/in_defense_of_optimization_-_one_page.pdf` | **200, 218 169 б, PDF**, 3 стр., создан 02.09.2025, sha256 `83bc0c3d72f5b59bd679e61abe79f924c6c82cdf3c84458274d99dede57852c8` | ретроспектива тех же авторов (State Street Associates) |
+
+**ДОСЛОВНО (State Street Associates, «In Defense of Portfolio Optimization — It still needs defending», 2025, с. 1):**
+
+> «In our 2010 paper, we argued that such studies had a fatal flaw: in their effort to systematize historical testing of optimal portfolios, they used **implausible trailing 5-year returns** for assets as the expected returns for those assets going forward. Reasonable practitioners do not blindly extrapolate such short trends—and to the extent trends are useful, they are more likely to revert over 5 years than continue. We ran new tests with extremely simple, but plausible, expected returns. Now, textbook mean-variance optimization added plenty of value out-of-sample by recognizing the different risk levels of assets and their varying potential for diversification. The result held across asset classes, industry portfolios, factor portfolios, and individual stocks.»
+>
+> «Setting aside the obvious problem that equal weights depend on how you define the assets (do you equally weight global stocks with bonds, or 20+ individual country stock indexes with bonds?), the 1/N claim is striking.»
+
+**Выжимка.** Это маркетинговый текст банка (дисклеймер «intended for general marketing purposes»), не рецензированная работа — годится только как авторская формулировка сути. Новое против аннотации: «short-term samples» = **скользящее окно 5 лет** доходностей; и довод, что 1/N сам зависит от произвольного определения набора активов. Полный текст FAJ по-прежнему недоступен; остаток — JSTOR 27809177 и ResearchGate (Cloudflare), легальных открытых копий нет ни в одном индексе.
+
+## ИТОГ Г31.5 — portfolio_theory_robo_advisors_v2
+
+2 кандидата: **DGU — закрыт ссылкой** на Г31.4-D1; **KPT — отклонён** как не класс (пять адресов уже было), добавлены 4 адреса-отказа и авторская ретроспектива 2025 г. с уточнением окна (5 лет). Канон не затрагивается: DGU/KPT к модели v3.0.0 переносятся только как довод о цене оценки параметров, это в файле уже сделано.
+Задолженности нет.

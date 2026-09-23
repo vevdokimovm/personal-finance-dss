@@ -848,3 +848,75 @@ specifying their risk aversions».
   optimization» — выдача целиком консультантская (EP Wealth, US Bank, Ameriprise), академического
   ноль; «optimal allocation between debt repayment and saving household model» — по существу
   почти ноль.
+
+---
+
+## ДОБОР Г31.5 — отказ адреса (17.09.2026)
+
+**Каналы (замер 17.09.2026):** `nobelprize.org` прямой `curl -skL` с UA **200** · `r.jina.ai` без UA **200** · NBER прямой **200** · MIT DSpace 7 REST `discover/search/objects` **200** → `items/…/bundles` **200** → `bundles/…/bitstreams` **200** → `bitstreams/…/content` **200** · `pdftoppm` + `tesseract` (`eng`) в системе.
+
+В файле нет доборов после §8 «ЧТО ОСТАЛОСЬ НЕДОСТУПНЫМ» (стр. 837–846); последние упоминания трёх пунктов — стр. 28, 32–33, 839 («nobelprize.org (403), MIT DSpace (405)»). В `gbi_tails_closed_2026-09-10.md` эти пункты не перепроверялись (`grep` на Merton/nobelprize/63980 — ноль). Все три — класс Г31.5.
+
+### Г31.5-G1. 🟢 Нобелевская лекция Модильяни (1985) — ПОЛНЫЙ ТЕКСТ ДОБЫТ по тому же адресу
+
+- `https://www.nobelprize.org/uploads/2018/06/modigliani-lecture.pdf` прямым `curl -skL` с браузерным UA — **HTTP 200, 251 201 б, `application/pdf`**, 21 стр., sha256 `20dfc67237b8d413ff51e623a6610dfcf123868a32941ff6387cf2d6a3e68f05`, `pdftotext` → 1 081 строка. Контрольно `r.jina.ai` без UA — **200, 68 659 б**. Отказ «403» был отказом одного захода (`WebFetch`), не адреса.
+- Заголовок: **«Life Cycle, Individual Thrift and the Wealth of Nations»**, Franco Modigliani, Sloan School of Management, MIT.
+
+**ДОСЛОВНО (разд. «(1) Utility maximization and the role of Life Resources»):**
+
+> «The hypothesis of utility maximization (and perfect markets) has, all by itself, one very powerful implication - the resources that a representative consumer allocates to consumption at any age, it, will depend only on his life resources (the present value of labor income plus bequests received, if any) and not at all on income accruing currently. When combined with the self evident proposition that the representative consumer will choose to consume at a reasonably stable rate, close to his anticipated average life consumption, we can reach one conclusion fundamental for an understanding of individual saving behavior, namely that the size of saving over short periods of time, like a year, will be swayed by the extent to which current income departs from average life resources.»
+
+> «In MB-C and in the first two parts of the MB-A, we made a number of simplifying, stylized, assumptions … These were: (1) opportunities: income constant until retirement, zero thereafter; zero interest rate; and (2) preferences: constant consumption over life, no bequests. … Because the retirement span follows the earning span, consumption smoothing leads to a humped-shaped age path of wealth holding…»
+
+**Выжимка.** Пересказ Дейтона в §4.1 первоисточником подтверждён. Уточнение, важное для §4.3 («ссылаться на Модильяни–Мертона как на опору для горизонта 1–5 лет некорректно»): сам Модильяни формулирует базовую модель при **нулевой ставке, постоянном доходе до пенсии и полном рынке** — это модель распределения на горизонте жизни, а краткосрочные сбережения в ней — лишь отклонение текущего дохода от «life resources». Вывод §4.3 первоисточником усиливается, не меняется.
+
+### Г31.5-G2. 🟢 Merton «Optimum Consumption and Portfolio Rules in a Continuous-time Model» — ПОЛНЫЙ ТЕКСТ ДОБЫТ через DSpace 7 REST
+
+- Записанный отказ: `dspace.mit.edu/bitstream/handle/1721.1/63980/…pdf?sequence=1` — **405** (старый адрес DSpace 6, после миграции MIT на DSpace 7 не обслуживается).
+- Цепочка DSpace 7 (тот же приём, что добыл Abadie 2021):
+  1. `GET https://dspace.mit.edu/server/api/discover/search/objects?query=handle:1721.1/63980` — **200, 19 685 б** → item `45b93de3-551e-475d-9d42-4724ecd84484`, «Optimum consumption and portfolio rules in a continuous-time model,»;
+  2. `…/core/items/45b93de3-…/bundles` — **200, 5 288 б** → bundle `ORIGINAL` `96a3b10b-01c0-49e9-a3a1-117a211e7016`;
+  3. `…/core/bundles/96a3b10b-…/bitstreams` — **200, 2 112 б** → `62450091-e2fd-4838-86e3-b049a0993ae4` `optimumconsumpti00mert.pdf`, 2 302 235 б;
+  4. `…/core/bitstreams/62450091-…/content` — **200, 2 302 235 б, `application/pdf`**, 54 стр., sha256 `af55d619bb0b2f2cf87e3c4c847e8541d896ad9c83b903d96a1ad2b531b85c81`; OCR-слой есть, `pdftotext` → 6 254 строки.
+- 🔴 **Версия:** MIT Dept. of Economics Working Paper **No. 58, August 1970** (скан Internet Archive 2011) — рабочая версия статьи *Journal of Economic Theory* 3(4), 1971. Цитировать как WP с пометкой.
+
+**ДОСЛОВНО (введение, с. 1–2):**
+
+> «The present paper extends these results for more general utility functions, price behavior assumptions, and for Income generated also from non-capital gains sources. It is shown that if the "geometric Brownian motion" hypothesis is accepted, then a general "Separation" or "mutual fund" theorem can be proved such that, in this model, the classical Tobin mean-variance rules hold without the objectionable assumptions of quadratic utility or of normality of distributions for prices. … If the further assumption is made that the utility function of the individual is a member of the family of utility functions called the "HARA" family, explicit solutions for the optimal consumption and portfolio rules are derived and a number of theorems proved.»
+
+> (разд. о HARA, после (48)–(49)) «The manifest characteristic of (48) and (49) is that the demand functions are linear in wealth. It will be shown that the HARA family is the only class of concave utility functions which imply linear solutions.»
+
+(OCR исправлен в двух очевидных местах: «Brownlan» → «Brownian», «KARA» → «HARA».)
+
+**Выжимка.** Явные решения — только при логнормальных ценах и HARA-полезности; линейность спроса по богатству — **необходимое и достаточное** свойство HARA. Для нас это фиксирует границу переносимости: у нас нет ни стохастических цен активов, ни оптимизации полезности по времени — перенос «правил Мертона» на распределение свободного потока недопустим, что совпадает с выводом §4.3.
+
+### Г31.5-G3. 🟢 Bodie, Merton & Samuelson (1992), NBER w3954 — ПОЛНЫЙ ТЕКСТ ДОБЫТ (скан, OCR)
+
+- Запись стр. 28: «абстракт дословно; полного PDF в открытом доступе нет». Проверялась только страница `nber.org/papers/w3954`.
+- `https://www.nber.org/system/files/working_papers/w3954/w3954.pdf` прямым `curl -skL` — **HTTP 200, 1 117 822 б, `application/pdf`**, 41 стр., sha256 `ee65cf593723352ffad55ea042518330c15de6ffb5170dbb83ebddabffd1e37d`. Текстового слоя нет (`pdftotext` → 0 строк), страницы 20–30 распознаны `tesseract -l eng` при 200 dpi. Цитаты ниже — OCR, сверены по смыслу, опечатки распознавания не правились кроме очевидных.
+
+**ДОСЛОВНО (OCR, с. 20–22 рукописи):**
+
+> «The wealth effect suggests that in "normal" circumstances, the individual with flexible labor will invest a greater proportion of his financial wealth in the risky asset than his counterpart whose labor is fixed. However, it is worth making the obvious observation: An individual with flexible labor must actually want to exercise this option ex post…»
+
+> «…the individual borrows at the risk-free rate to finance his investment in the risky asset. The pure wealth effect of the individual's riskless human capital causes a significant rebalancing of his investment portfolio. As the example illustrates, the individual's degree of leverage is greatest early in the life-cycle and when his labor supply is flexible. … The model also predicts that households with greater labor flexibility will tend to have riskier investment portfolios.»
+
+> «For Part b, the proportional increase in wealth is 24%. This is to say that on top of his initial lifetime wealth ($730,000), the individual would need an additional $175,000 to bring him the same level of utility as he enjoys with flexible labor.»
+
+> «Remark 4. Similar dynamic results apply in the broader case of isoelastic utility. … The difference in investment behavior between the fixed and flexible labor cases is greatest early in the life-cycle when the individual's stock of human capital is greatest. Moreover, the welfare advantage of labor flexibility is significant for typical numerical examples. **All of this applies when the wage does not vary stochastically over time.**»
+
+**Выжимка.** 🔴 Уточнение к выводу §4.4 («риск-профиль должен зависеть от устойчивости дохода»): основной результат BMS получен для **детерминированной зарплаты** — «риск» в нём создаёт гибкость предложения труда, а не неустойчивость дохода; человеческий капитал в базовой модели **безрисковый** и потому работает как облигация, позволяющая больше риска. Стохастическая зарплата — отдельный разд. (с. 23 и далее рукописи, распознан начальный фрагмент с уравнением Беллмана). Значит, опираться на BMS для тезиса «нестабильный доход → меньше риска» напрямую нельзя: базовая модель говорит о другом механизме. Гипотеза §4.4 остаётся гипотезой, её обоснование нужно брать из ветки стохастической зарплаты (здесь не разбиралась — см. ЗАДОЛЖЕННОСТЬ).
+
+## ИТОГ Г31.5 — goal_based_investing_lifecycle
+
+3 кандидата, **3 закрыты полным текстом:**
+
+| Пункт | Записанный отказ (один адрес) | Чем закрыт |
+|---|---|---|
+| Модильяни, Нобелевская лекция | `nobelprize.org` 403 (`WebFetch`) | **прямой `curl -skL` с UA по тому же адресу** (200, 251 201 б); контрольно `r.jina.ai` 200 |
+| Merton WP 58 (1970) / JET 1971 | `dspace.mit.edu/bitstream/handle/…` 405 | **DSpace 7 REST**, 4 шага, все 200 |
+| Bodie–Merton–Samuelson 1992 | проверялась только страница `nber.org/papers/w3954` | **прямой `curl` по `system/files/working_papers/w3954/w3954.pdf`** (200) + OCR `tesseract` |
+
+🔴 **Что меняет обоснование (канон не трогается):** тезис §4.4 «гибкость дохода → больше риска ex ante» в базовой модели BMS получен при **нестохастической зарплате** и безрисковом человеческом капитале; как опору для связки «устойчивость дохода ↔ риск-профиль» его цитировать без оговорки нельзя. Выводы §4.1 и §4.3 первоисточниками подтверждены.
+
+**ЗАДОЛЖЕННОСТЬ по файлу:** OCR разд. BMS о стохастической зарплате (с. 23+ рукописи, страницы PDF 29–41) не выполнялся — нужен, если §4.4 пойдёт в обоснование. HBR Merton 2014 (пейволл) и EDHEC (регистрационная стена, см. `gbi_tails_closed`) — не класс Г31.5, не брались.

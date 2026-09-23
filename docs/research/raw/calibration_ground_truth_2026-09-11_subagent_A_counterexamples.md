@@ -236,3 +236,276 @@ Brown & Lahey 2015) закрыты.
 находят работу по известному названию, но не находят её зеркала — поэтому блок 1 остался без
 полных текстов, хотя зеркала Dawes 1979 в вебе почти наверняка есть. Это ограничение прогона,
 и оно повлияло на результат: блок 1 держится на реквизитах, блок 2 — на прочитанном тексте.
+
+---
+
+## ДОБОР Г31.2 — прокси (16.09.2026)
+
+**Каналы на начало работы:** `r.jina.ai` **без UA** — 🟢 (контроль `monarchmoney.com/pricing`:
+**200, 5 509 б**; тот же адрес с браузерным UA — **403, 5 743 б**, капча самого прокси).
+Exa — 🟢. Crossref, Unpaywall, NBER — 🟢. **В исходной сессии этого файла были мертвы три канала
+обнаружения из четырёх** (`WebSearch` 400/400, Exa 404, `r.jina.ai` 401) — именно поэтому блок 1
+остался без полных текстов, о чём агент честно написал сам.
+
+### Г31.2-15. 🔴 Brown & Lahey — РАБОТА ОПОЗНАНА И ДОБЫТА ЦЕЛИКОМ (было «реквизиты не установлены, отдельно не искал»)
+
+**Реквизиты (Crossref, HTTP 200):** Brown A. L., Lahey J. N. «**Small Victories: Creating Intrinsic
+Motivation in Task Completion and Debt Repayment**», *Journal of Marketing Research*, **2015**,
+**DOI 10.1509/jmr.14.0281**. Рабочая версия — **NBER Working Paper № 20125, май 2014**,
+«Small Victories: Creating Intrinsic Motivation in **Savings and** Debt Reduction»,
+**DOI 10.3386/w20125**, JEL C91, D03, D14.
+
+**Канал:** `curl` с браузерным UA по `nber.org/system/files/working_papers/w20125/w20125.pdf` →
+**HTTP 200, 769 726 байт PDF** → `pdftotext -layout` → **110 658 знаков**. Прокси и Exa
+не понадобились. 🔴 Пункт был не «закрыт», а **не искался**.
+
+#### Первичный материал — ДОСЛОВНО (NBER WP 20125)
+
+**Абстракт:**
+> «One popular approach contradicts traditional economic theory by suggesting that people in debt
+> should **pay off their debts from smallest size to largest regardless of interest rate**, to realize
+> quick motivational gains from eliminating debts. We more broadly define this idea as "**small
+> victories**"… Consistent with the idea of small victories, we find that when a mildly unpleasant
+> task is broken down into parts of unequal size, subjects complete these parts **faster when they
+> are arranged in ascending order** (i.e., from smallest to largest) rather than descending order…
+> **Yet when subjects are given the choice over three different orderings, subjects choose the
+> ascending ordering least often.**»
+
+**Результат эксперимента 1 (дословно):**
+> «…subjects performed in the ascending ordering **1.42 seconds per cell faster** on average than in
+> the descending ordering (**significant at the 5% level**)… when ascending is compared to the pooled
+> results of both descending and even orders (**1.23 seconds per cell faster**, two-sided
+> **p = 0.019**). …A Kruskal-Wallis test indicates the differences for all three orders are
+> significant at the 10% level (**p = 0.084**). Both the Cuzick trend test and the Jonckheere-Terpstra
+> test… find the ascending-even-descending ordering to be significant, with **p-values of 0.0260
+> and 0.0265**.»
+> «A higher percentage of subjects (**71%, 22 of 31**) complete the task in ascending than
+> **descending (48%, 14 of 29)** or **even (58%, 18 of 31)**. A Pearson's chi-square test reveals
+> this difference is meaningful at the **10% level**.»
+
+**Результат эксперимента 2 и гетерогенность (дословно):**
+> «In a second study we find when subjects are given the opportunity to choose among all three orders
+> they **choose the ascending ordering, the one that provides the most motivational benefit, least
+> often**. Additionally, regression results suggest there is **subject heterogeneity** in the benefits
+> of the small victories approach. Those with **higher self-control, better critical reasoning skills,
+> and higher risk aversion**… **benefit more** from having chosen ascending. We argue a plausible
+> extension of this result suggests **the people least in need of this intervention are the ones most
+> likely to benefit from it**.»
+
+🔴 **Границы применимости, названные самими авторами (дословно):**
+> «…we show in Section VI that it will **only be useful to borrowers in specific cases of debt-reduction
+> where interest rates between loans do not differ greatly. In the event of large differences in
+> interest rates**…» (далее авторы разбирают, что мотивационный выигрыш перекрывается процентными
+> потерями).
+> Механизм признан **социально-когнитивным**, а не goal-gradient: «suggesting **social-cognitive
+> factors dominate** in this environment» — ускорение идёт от накопления завершённых подзадач,
+> а не от приближения к концу текущей.
+
+#### Выжимка — что это значит для нашего долгового контура
+
+1. 🔴 **Это лабораторное подтверждение snowball с точно очерченной границей, и граница — наша.**
+   Эффект «малых побед» существует и измерен (ascending быстрее descending, 71 % против 48 %
+   доведённых до конца), **но авторы сами ограничивают его случаем, когда ставки по долгам
+   различаются несильно**. Наш Avalanche-фильтр оптимизирует ровно по ставке — то есть спор
+   «snowball против avalanche» в первоисточнике решается **не в пользу одного из методов, а через
+   разброс ставок в конкретном портфеле долгов**.
+2. 🔴 **Самый неудобный для продукта результат:** при свободном выборе люди выбирают ascending
+   **реже всего**, а выигрывают от него сильнее те, у кого и так выше самоконтроль. То есть
+   «дать пользователю выбрать стратегию» — не нейтральная опция: она систематически уводит от
+   порядка, дающего мотивационный выигрыш, и работает лучше всего на тех, кому помощь нужна меньше.
+   Это довод за **рекомендацию по умолчанию с объяснением**, а не за меню стратегий.
+3. 🟡 **Перенос ограничен**: лаборатория, задача копирования ячеек за 30 минут, n порядка 30 на
+   ячейку дизайна, значимости на уровне 5–10 %. Числа брать как направление эффекта, не как
+   величину для нашей модели.
+4. ⚪ **Канон не меняется.** Avalanche остаётся; появляется обоснованное место для оговорки
+   в пользовательском объяснении: при близких ставках порядок «от меньшего долга» стоит
+   мотивационно дороже, чем проигрывает по процентам.
+
+### Г31.2-16. 🟡 Gathergood & Weber 2014 («самая дешёвая дыра для добора») — числа добыты, полный текст нет
+
+**Каналы 16.09.2026:**
+
+| Канал | Адрес | Результат |
+|---|---|---|
+| `curl`+UA | `nottingham-repository.worktribe.com/726053/1/1-s2.0-S0167268114001231-main.pdf` | **HTTP 403, 5 808 б** HTML |
+| `r.jina.ai` **без UA** | тот же PDF | **200 у прокси, 578 б**, «Performing security verification… This website uses a security service to protect against malicious bots» — 🔴 **и без UA антибот держит** |
+| `mcp__exa__web_search_exa` | — | 🟢 нашла репозиторную копию (CC BY 4.0, 419 Кб) и SSRN `abstract_id=2005031` |
+| `mcp__exa__web_fetch_exa` | тот же PDF | 200, но отдана **карточка репозитория**, не тело PDF |
+
+**Добыто дословно (абстракт авторов, совпадает в трёх независимых копиях — репозиторий Ноттингема,
+SSRN, издательская карточка):**
+> «We use UK survey data to analyze the puzzling co-existence of high cost revolving consumer credit
+> alongside low yield liquid savings in household balance sheets, which we name the '**co-holding
+> puzzle**'. **Approximately 12% of households in our sample co-hold, on average, £3800 of revolving
+> consumer credit** on which they incur interest charges, **even though they could immediately pay
+> down all this debt using their liquid assets**. Co-holders are typically **more financially
+> literate, with above average income and education**. In most estimates co-holding is also associated
+> with **impulsive spending behavior**… Our results provide empirical support to theoretical models
+> in which households **co-hold as a means of managing self-control problems**.»
+Лицензия репозиторной копии — **CC BY 4.0**; депонирована 07.09.2015; том 107, JEBO.
+
+**Что это меняет:** 🔴 **прямой контрпример нашему инварианту «свободный поток сначала на долг
+по максимальной ставке».** 12 % британских домохозяйств осознанно держат дорогой револьверный
+долг (£3 800 в среднем) при достаточной ликвидности — и это **не безграмотность**: со-держатели
+**более** финансово грамотны и обеспечены, а механизм — управление самоконтролем. Для продукта это
+означает: рекомендация «погасить карту из резерва» будет отвергаться частью пользователей
+рационально, и это не дефект расчёта. Полный текст (регрессии, спецификации) **не добыт** —
+остаётся задолженностью.
+
+### Г31.2-17. Перепроверенные реквизиты и оставшееся закрытым
+
+| Пункт | Замер 16.09.2026 | Итог |
+|---|---|---|
+| **Telyukova 2013** | 🔴 **DOI в нашей таблице НЕВЕРЕН.** `10.1093/restud/rds050` → Unpaywall **404 Not Found** (не «пустой ответ» — такого DOI нет). Crossref: правильный — **`10.1093/restud/rdt001`**, «Household Need for Liquidity and the Credit Card Debt Puzzle», *The Review of Economic Studies*, **09.01.2013** | реквизиты исправлены; полный текст не запрашивался — задолженность |
+| Dawes 1979; Dawes & Corrigan 1974; Einhorn & Hogarth 1975; Wainer 1976; Grove et al. 2000; Hogarth & Karelaia 2007; Amar et al. 2011; Kettle et al. 2016 | не переоткрывались в этом подбатче | по части из них Г30.1 уже дал абстракты (Einhorn & Hogarth, Dana & Dawes) — см. `approach_validity`; остальные — `closed` по Unpaywall, не класс антибота |
+| Besharat, Carrillat & Ladik 2014 | не переоткрывался | установлено ранее: green-запись без файла в бандле — дефект репозитория, не канал |
+| «Circularity» / normative-vs-descriptive | не переоткрывался — бюджет | 🔴 **ЗАДОЛЖЕННОСТЬ**: именно этот пункт был закрыт при трёх мёртвых каналах и остаётся самым непроверенным в файле |
+
+## ИТОГ Г31.2 (в этом файле)
+
+- Закрыт **1 пункт полностью** (Brown & Lahey: опознан, добыт целиком, 110 658 знаков),
+  **1 частично** (Gathergood & Weber: ключевые числа дословно, полный текст нет),
+  **1 исправлен по реквизитам** (Telyukova: DOI в нашей таблице не существует).
+- 🔴 **Нашей ошибкой вызова прокси не оказался ни один пункт** — репозиторий Ноттингема держит
+  антибот и без UA.
+- 🔴 **Ошибка «отказ инструмента = отсутствие источника» — 2 раза:** Brown & Lahey **не искались
+  вовсе** при мёртвых каналах обнаружения, а лежат в открытом NBER; Gathergood & Weber записаны
+  как «не скачивал — бюджет», хотя открытая копия под CC BY существует.
+- 🔴 **Содержательно это самый важный блок подбатча:** добыт первоисточник, который одновременно
+  **подтверждает** мотивационный эффект snowball и **ограничивает** его случаем близких ставок,
+  плюс показывает, что свободный выбор стратегии уводит людей от полезного порядка. Канон
+  (Avalanche-фильтр) **не опровергнут**; появляется материал для формулировки объяснения
+  пользователю и довод против «меню стратегий».
+
+### ЗАДОЛЖЕННОСТЬ Г31.2 (по этому файлу)
+
+1. Полный текст **Gathergood & Weber 2014** — репозиторий Ноттингема за антиботом; непробованное:
+   SSRN `Delivery.cfm` по `abstract_id=2005031`, CORE, OpenAIRE.
+2. **Telyukova 2013** по исправленному DOI `10.1093/restud/rdt001` — Unpaywall/репозитории UCSD.
+3. Участок «**circularity / normative-vs-descriptive в prescriptive analytics**» — поисковый заход
+   на живых каналах не делался ни разу.
+
+---
+
+# 🔴 СВОДНЫЙ ИТОГ ПОДБАТЧА Г31.2 (16.09.2026) — по всем семи тронутым файлам
+
+*Сводка положена сюда как в последний тронутый файл; блоки `## ИТОГ Г31.2` есть в каждом.*
+
+## 1. Главное число подбатча
+
+🔴 **Нашей ошибкой вызова прокси (браузерный UA) не оказался НИ ОДИН из 12 перепроверенных
+отказов — ноль.**
+
+При этом **сама ошибка реальна и замерена в этом же прогоне**:
+`https://r.jina.ai/https://www.monarchmoney.com/pricing` **без UA** → **HTTP 200, 5 509 байт
+содержимого**; тот же адрес, тот же прокси, **с UA Chrome/127** → **HTTP 403, 5 743 байта**,
+`<title>Just a moment...` (Cloudflare **самого прокси**). Гипотеза Г31.3 подтверждена как класс
+и **опровергнута как объяснение наших конкретных записей**: все зафиксированные «прокси не пробил
+Cloudflare» относятся к защите **целевого сайта**, которая держится и без UA. Проверено на
+`maps.org.uk`, `onlinelibrary.wiley.com`, `papers.ssrn.com`, `sciencedirect.com` (двумя адресами),
+`help.monarch.com`, `psidonline.isr.umich.edu`, `nottingham-repository.worktribe.com`, `habr.com`.
+
+🔴 **Отдельный вывод по каналу, годный на будущее:** у прокси есть **устойчивая сигнатура отказа
+цели** — тело **300–600 байт** с заголовком `Just a moment...` либо `Warning: Target URL returned
+error 403`. Тело в сотню килобайт с тем же заголовком (ScienceDirect, 112 999 б) — оболочка
+Cloudflare, тоже пустышка. **Прокси пробивает Springer, но не пробивает Wiley, ScienceDirect, SSRN,
+Cloudflare-защиту MaPS, Хабра, PSID и Worktribe.**
+
+## 2. Второе число, и оно оказалось важнее
+
+🔴 **Ошибка «отказ инструмента записан как отсутствие источника» — 7 раз за подбатч**
+(в Г30.1–Г30.4 — 20 раз, в Г30.4 — 9, в Г31.1 — вскрыт ложный «Wayback лежит»):
+
+| # | Пункт | Что было записано | Что оказалось |
+|---|---|---|---|
+| 1 | MaPS FFT, опросник | «Wayback лежит» (Г24) | Wayback **replay** отдал PDF с первой попытки |
+| 2 | Choupani & Mamdoohi 2016 | «Wayback — HTML вместо PDF» | проверялся только адрес `/pdf`; **страница статьи** в архиве содержит абстракт |
+| 3 | Khashadourian 2024 | «Exa недоступна в этой сессии» | Exa по адресу **из Unpaywall** (`pdfdirect`) отдала полный текст |
+| 4 | Roy 1991 | «Springer закрыт» | прокси Springer **пробивает** (у статьи 1991 г. просто нет абстракта на странице) |
+| 5 | PSID | «сайт 403, данных не добыл» | соседний хост `simba.isr.umich.edu` открыт, документация с кодами переменных находится поиском |
+| 6 | Brown & Lahey 2015 | «отдельно не искал» | лежит в **открытом NBER** (WP 20125), 769 726 б PDF |
+| 7 | Gathergood & Weber 2014 | «не скачивал — бюджет» | открытая копия **CC BY 4.0** существует; числа добыты |
+
+**Вывод для протокола:** класс, ради которого заводился Г31, реален, но его причина не в UA
+и не в прокси. Она в том, что **отказ ОДНОГО адреса записывается как свойство источника**.
+Дешёвая профилактика, подтверждённая трижды за этот подбатч: спросить Unpaywall/Crossref точный
+адрес OA-локации **до** попытки фетча; пробовать **соседний адрес того же ресурса** (страница
+вместо PDF, второй хост, рабочая версия вместо журнальной).
+
+## 3. Что закрыто
+
+| Файл | Пункт | Было | Стало | Канал |
+|---|---|---|---|---|
+| `causal_effect_measurement` | X5 Tech, «От A/B к Causal Inference» | Хабр 403, «вне приоритета» | 🟢 **полный текст** | Exa |
+| `bank_patents_wellness_scoring` + `competitors_2026_refresh` | MaPS Financial Fitness Tool | «9 формулировок и веса не добыты» | 🟢 **все 9 вопросов дословно + 4 принципа взвешивания + методика из 5 шагов** | **Wayback replay** (снимок 23.06.2024) + Exa |
+| `approach_validity` | Khashadourian & Harrison 2024 | Wiley 403, Exa не подключена | 🟢 **полный текст**, 4 коэффициента с порогами | Exa по адресу из Unpaywall |
+| `calibration_…_subagent_B` | PSID, долговой блок | «не установлено по всем колонкам» | 🟢 **установлен с кодами переменных и оговорками** | Exa (User Guide ISR) + прокси |
+| `calibration_…_subagent_A` | Brown & Lahey | «реквизиты не установлены» | 🟢 **опознана и добыта целиком** | `curl` → NBER PDF → `pdftotext` |
+| `calibration_ground_truth` | Choupani & Mamdoohi 2016 | «не добыт ничем» | 🟡 **абстракт дословно** | Wayback replay страницы статьи |
+| `calibration_…_subagent_A` | Gathergood & Weber 2014 | «не скачивал» | 🟡 **ключевые числа дословно** | Exa |
+| `macro_in_forecast` | Gust et al., JEDC | «отказ канала, Exa 503» | ⚪ **переклассифицирован в пейволл** + реквизиты и поправка к аффилиации | Exa |
+| `approach_validity` | Roy 1991 | «Springer закрыт» | ⚪ **канал открыт, тела статьи нет** | прокси |
+
+**Итого: 5 пунктов закрыто полностью, 2 частично, 1 переклассифицирован, 1 исправлен по
+реквизитам (Telyukova: DOI `10.1093/restud/rds050` не существует, верный — `10.1093/restud/rdt001`),
+1 поправка авторства (Khashadourian — авторов двое).**
+
+## 4. 🔴 Меняет ли добытое канон, прогноз, новизну или юрблок
+
+**Канон модели v3.0.0 — НЕТ. Формулировку новизны — НЕТ. Юрблок — НЕТ. Прогноз — НЕТ.**
+Изменения касаются **опор и формулировок объяснений**, и это материал для решения владельца,
+а не правка:
+
+1. 🔴 **Долговой контур — самое содержательное.** Brown & Lahey (NBER WP 20125): эффект «малых
+   побед» измерен (ascending на **1,42 с/ячейку** быстрее descending, p < 0,05; доведших задачу
+   до конца **71 % против 48 %**), **но сами авторы ограничивают его случаем, когда ставки
+   по долгам различаются несильно**. Avalanche не опровергнут; появляется обоснованное место
+   для оговорки в пользовательском объяснении. Второй результат той же работы —
+   **при свободном выборе люди выбирают выигрышный порядок реже всего**, а выигрывают от него
+   те, у кого выше самоконтроль, — довод **против «меню стратегий»** и за рекомендацию
+   по умолчанию с объяснением.
+2. 🔴 **Контрпример инварианту «поток сначала на дорогой долг».** Gathergood & Weber: **12 %**
+   британских домохозяйств держат в среднем **£3 800** дорогого револьверного долга при достаточной
+   ликвидности, и это поведение **более** грамотных и обеспеченных — управление самоконтролем.
+   Часть отказов от нашей рекомендации будет рациональной.
+3. 🔴 **Участок валидности: шкала CFPB больше не эталон.** Khashadourian & Harrison 2024
+   (рецензируемо): соответствие объективной типологии и CFPB есть, но довод CFPB «высокое σ баллов
+   ⇒ объективные показатели не работают» назван неточным и, возможно, отражающим **шум в данных**.
+   Взамен — внешний набор контуров EMH с числами: свободный поток **> 3 %** расходов, постоянные
+   расходы **≤ 65 %**, неипотечная долговая нагрузка **< 15 %** дохода, резерв **≥ 200 %** месячных
+   расходов (коридор 200–600 %), и иерархия **поток → бюджет → долг → резерв**, совпадающая
+   с нашей по порядку.
+4. 🔴 **Резерв: два независимых внешних ориентира сошлись.** MaPS (государственный инструмент UK)
+   меряет резерв ступенями до «**6 months or longer**»; американские эталоны — **2–6 месяцев**.
+   Наш дефолт попадает в подтверждённый коридор.
+5. 🟡 **Калибровка популяции.** Choupani & Mamdoohi: целочисление после IPF («unbiased tabular
+   rounding **should be developed**») и **zero-cell** — открытые проблемы, а не детали реализации;
+   авторы рекомендуют **симуляционный** синтез. PSID: `credit card debt` **исключает convenience
+   use**; компоненты **импутированы hot-deck**; формулировка вопроса меняет ответ радикально
+   (**57 %** ответивших «нет» на сложный вопрос отвечали «да» на простой).
+6. 🟡 **Причинная оценка.** X5 Tech — второй российский промышленный первоисточник после ВТБ:
+   при мягком самоотборе ошибка I рода **12 % вместо 5 %** и «стремится к 100 %» при жёстком;
+   снижать дисперсию (CUPED), не сняв смещение, — строить доверительный интервал вокруг ложного
+   эффекта.
+
+## 5. ЗАДОЛЖЕННОСТЬ Г31.2 — непройденное, отдельным списком (не выдаётся за результат)
+
+1. **DeMiguel, Garlappi & Uppal 2009** — не переоткрывался (бюджет). Приём: Unpaywall → адрес
+   OA-локации → Exa по нему (сработал на Khashadourian).
+2. **Wang & Luo 2009** — ScienceDirect закрыт прокси и Exa. Непробованное: Wayback replay
+   **страницы статьи** (сработало на Choupani).
+3. **Полный текст Gathergood & Weber 2014** — Worktribe за антиботом; непробованное: SSRN
+   `Delivery.cfm` (`abstract_id=2005031`), CORE, OpenAIRE.
+4. **Telyukova 2013** по исправленному DOI `10.1093/restud/rdt001`.
+5. **«Circularity / normative-vs-descriptive в prescriptive analytics»** — поисковый заход
+   на живых каналах не делался ни разу.
+6. **Смещение прогнозов Минэка в п. п. (график АКРА)** — нужен **OCR** (`tesseract`), канал
+   в системе есть, по пункту не применялся.
+7. **Economic Record 2022 (Wiley)**, **Choupani 2017 (CEUS)**, **CBA–MI Tech Reports № 2/3/5**
+   (за логином Okta), **реестр ФИПС** (блокировка по сети), **WO2026074314A1 / KR102121857B1** —
+   действия владельца или платные/институциональные каналы, поиском не решаются.
+
+**Метод подбатча:** один агент, **подагентов 0**; `WebSearch` — **0 вызовов**;
+`mcp__exa__web_search_exa` — 2, `mcp__exa__web_fetch_exa` — 5; `curl` через `r.jina.ai` **без UA** —
+16 адресов, `curl` прямой — 6, Wayback replay — 4, Crossref — 3, Unpaywall — 3, `pdftotext` — 3 PDF.
+Все семь файлов дописаны `cat >>` по ходу работы, до итогового ответа.

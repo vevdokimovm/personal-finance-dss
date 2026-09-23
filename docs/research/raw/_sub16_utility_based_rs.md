@@ -700,3 +700,31 @@ Adomavicius & Kwon предлагают не только взвешенную �
 
 **Файлы на диске (временные, не в репозитории):** извлечённые тексты лежали в
 scratchpad-каталоге сессии; PDF-первоисточники доступны по URL, указанным выше.
+
+---
+
+## ДОБОР Г31.5 — отказ адреса (17.09.2026)
+
+**Каналы (замер 17.09.2026):** Crossref **200** · Unpaywall **200** · S2 `/paper/DOI:` **200** · 🔴 `basepub.dauphine.fr` — прямой `curl` **000, 0 б** (соединение не установлено), `r.jina.ai` **422** «Domain 'basepub.dauphine.fr' could not be resolved» — хост снят с DNS · Wayback replay **302 → 200**.
+
+Кандидаты по файлу (последние упоминания — стр. 535–546; позже в файле ничего нет; в `constraint_based_utility_recsys` — стр. 1175 «пейвол Elsevier»):
+- Jacquet-Lagrèze & Siskos 1982 (UTA) — «открытая копия в рамках бюджета не найдена» — класс «не пробовал, бюджет».
+- Chen & Pu «Survey of Preference Elicitation Methods» — 🟢 **уже добыт** в `approach_validity_2026-09-10.md` (стр. 3538, EPFL). Здесь запись устарела.
+
+### Г31.5-S1. Jacquet-Lagrèze & Siskos 1982 — 🟢 авторская аннотация ДОБЫТА; 🔴 метка «green, CC BY-SA» ложная, полного текста нет
+
+- Crossref — **200**: `10.1016/0377-2217(82)90155-2`, *EJOR* **10(2):151–164**.
+- Unpaywall — **200**: `is_oa: True`, `oa_status: "green"`, локация `basepub.dauphine.fr/handle/123456789/13111`. S2 — **200**: `openAccessPdf.status: "GREEN"`, `license: "CCBYSA"`, тот же адрес, `citationCount: 1123`.
+- Адрес мёртв на уровне DNS (коды выше) — BIRD, репозиторий Université Paris-Dauphine, выведен из работы.
+- Wayback по СТРАНИЦЕ репозитория: `web.archive.org/web/2020/<адрес>` — **302** на снимок **08.12.2022** (`20221208070214`); снимок — **HTTP 200, 32 754 б**. 🔴 В записи **нет ни одного файла** (ни `bitstream`, ни `citation_pdf_url`; единственный PDF на странице — справка интерфейса `AideHelp.pdf`). Запись BIRD — только метаданные и аннотация; метки Unpaywall/S2 «green» и «CC BY-SA» поставлены по наличию записи в репозитории, а не файла. Второй подряд такой случай в этом подбатче (см. Ng et al. 2012 в `dp_vs_enumeration`).
+
+**Аннотация ДОСЛОВНО (снимок BIRD 08.12.2022, «Abstract (EN)»):**
+
+> «The purpose of the method presented in this paper is to assess additive utility functions which aggregate multiple criteria in a composite criterion, using the information given by a subjective ranking on a set of stimuli or actions (weak-order comparison judgments) and the multicriteria evaluations of these actions. It is an ordinal regression method using linear programming to estimate the parameters of the utility function. Stability and sensitivity analysis leads to the assessment of a set of utility functions by means of post-optimality analysis techniques in linear programming. Finally, a simple illustrative example is presented and some extensions of the method are proposed.»
+
+**Выжимка.** Подтверждает пересказ файла (§4.2) первоисточником-аннотацией: UTA — **порядковая регрессия через ЛП**, восстанавливающая аддитивную полезность по **ранжированию** набора альтернатив, и выдающая **множество** совместимых функций (пост-оптимальный анализ), а не одну. Для калибровки весов по экспертным ранжированиям это прямой, 1982 г., предшественник подхода Felfernig et al. (подгонка скоринговых правил под эталонные ранжирования, см. `constraint_based_utility_recsys` Г31.5-C2); UTA при этом честно признаёт неединственность решения — довод против публикации одного набора весов как «откалиброванного».
+
+## ИТОГ Г31.5 — _sub16_utility_based_rs
+
+2 кандидата: **Chen & Pu — закрыт ссылкой** (`approach_validity`); **UTA 1982 — аннотация добыта через Wayback по странице репозитория**, полный текст не существует в открытом виде (запись без файла, Elsevier — закрыт). Пройденные адреса: `api.crossref.org/works/…`, `api.unpaywall.org/v2/…`, `api.semanticscholar.org/graph/v1/paper/DOI:…`, `basepub.dauphine.fr/handle/123456789/13111` (000), `r.jina.ai/https://basepub.dauphine.fr/…` (422), `web.archive.org/web/20221208070214/…` (200, без файла).
+Канон не затрагивается. Задолженности нет.

@@ -2236,3 +2236,40 @@ Wayback с `id_`. Все HTTP-коды и размеры проставлены 
   Federgruen (INFORMS), Michaud (FAJ).
 
 **Конец добора Г4.**
+
+---
+
+## ДОБОР Г31.5 — отказ адреса (17.09.2026)
+
+**Каналы на начало работы (замер 17.09.2026):** Unpaywall **200** · Crossref **200** · OpenAlex **200** · S2 `/paper/DOI:` **200** · S2 `search/bulk` **200** · Exa search **работает** · `r.jina.ai` без UA **200** · Wayback CDX: `josquin.cti.depaul.edu` **200**, `ist.tugraz.at` **200**, 🔴 `facweb.cs.depaul.edu` — **503 два раза подряд** (11 832 б, пауза 20 с) — записано как отказ ОДНОГО запроса CDX, не Wayback.
+
+Кандидат класса по файлу — один: **Felfernig & Burke, ICEC '08** (последнее упоминание — стр. 1278: «ACM 403 на оба канала»; в Г4 этот пункт не перепроверялся — Г4 работал IUI '08, а не ICEC '08). Проверено, что «оба канала» означали ОДИН адрес `dl.acm.org/doi/pdf/…` двумя клиентами.
+
+### Г31.5-C1. Felfernig & Burke ICEC '08 — ⛔ НЕ ДОБЫТ, но теперь по пройденным адресам, а не по одному
+
+| Канал | Адрес | Код / размер | Итог |
+|---|---|---|---|
+| Unpaywall | `api.unpaywall.org/v2/10.1145/1409540.1409544` | **200** | `is_oa: False`, `oa_status: "closed"` |
+| OpenAlex | `api.openalex.org/works/doi:10.1145/1409540.1409544` | **200** | `is_oa: False`, `any_repository_has_fulltext: False`, единственная локация — `doi.org` |
+| S2 | `/graph/v1/paper/DOI:10.1145/1409540.1409544` | **200, 1 187 б** | `openAccessPdf.status: "CLOSED"`, `abstract: null` (изъят издателем), `citationCount: 310`, DBLP `conf/ACMicec/FelfernigB08`; 🟢 **`tldr` отдан** (ниже) |
+| Exa search | запрос по точному заголовку + «ICEC 2008 pdf» | 10 результатов | только библиографические записи (researchr, Google Scholar, ссылки в чужих статьях); **открытой копии нет** |
+| Exa fetch | `dl.acm.org/doi/pdf/10.1145/1409540.1409544` и `dl.acm.org/doi/10.1145/1409540.1409544` | `CRAWL_LIVECRAWL_TIMEOUT` оба | не отдано |
+| `r.jina.ai` по ACM DL | — | не повторялся: замер Г4 (11.09.2026) на соседнем DOI того же хоста — 200/463 б, Cloudflare «Performing security verification» | ACM DL закрыт для прокси |
+| Wayback CDX, страница автора Burke (старый хост) | `josquin.cti.depaul.edu/~rburke/*` | **200, 312 699 б** | ни одного файла с `felf/icec/constrain` в имени |
+| Wayback CDX, страница автора Burke (новый хост) | `facweb.cs.depaul.edu/rburke/*` | **503, 503** | не проверено — ЗАДОЛЖЕННОСТЬ (см. ниже) |
+| Wayback CDX, PDF TU Graz | `ist.tugraz.at/*`, `mimetype:application/pdf` | **200, 137 410 б** | ни одного файла `icec/burke/constraint-based` |
+
+**S2 `tldr` ДОСЛОВНО** (машинная аннотация, не авторская — цитировать только с этой пометкой): «A taxonomy of recommendation knowledge sources and algorithmic approaches is introduced and the most prevalent techniques of constraint-based recommendation are discussed, and open research issues are outlined.»
+
+**Выжимка.** Прежний статус «не прочитан в оригинале» остаётся, но основание сменилось с «ACM 403» на «легальной открытой копии не существует ни в одном индексе (Unpaywall, OpenAlex, S2), авторские страницы Burke (josquin) и TU Graz в архиве её не содержат». Уточнение реквизитов по DBLP/researchr: в ACM ICPS vol. 342 статья значится как **Article 3, 10 pages**; «pp. 17–26» встречается во вторичных ссылках (INTELLIREQ, OpenReq) — оба варианта описывают одну работу.
+
+### Г31.5-C2. Felfernig et al. 2013 AI Communications (продолжение IUI '08) — подтверждено закрытым, но S2 дал содержание
+
+Unpaywall `10.3233/AIC-120543` — **200**, `is_oa: False`, `closed`. S2 `/paper/DOI:` — **200, 1 468 б**, абстракт изъят, `citationCount: 20`, **`tldr` ДОСЛОВНО:** «This work presents an approach to the automated adaptation of utility constraint sets which is based on solutions for nonlinear optimization problems and increases the applicability of constraint-based recommendation technologies by allowing the automated reproduction of example item rankings specified by marketing and sales experts.»
+Подтверждает вывод Г4 (стр. 1955–1962): работа — о **калибровке весов/скоринговых правил под эталонные ранжирования экспертов** через нелинейную оптимизацию, а не о ремонте пустого множества альтернатив.
+
+## ИТОГ Г31.5 — constraint_based_utility_recsys
+
+1 кандидат класса, **0 закрыто полным текстом, 1 переквалифицирован** из «отказ одного адреса» в «открытой копии нет ни в одном из пройденных индексов и авторских архивов» (+ `tldr` S2 по ICEC '08 и AIC 2013). Канон и новизна не затрагиваются: содержание ICEC '08 в файле уже снято с канонических пересказов тех же авторов (Handbook 2015), и найденный `tldr` им не противоречит.
+
+**ЗАДОЛЖЕННОСТЬ по файлу:** Wayback CDX по `facweb.cs.depaul.edu/rburke/*` — два 503 подряд; повторить в следующей сессии. Arxiv `2102.09005` и `papers.phmsociety.org/…/1948/957` (заместители IUI '08, стр. 1968–1971) не скачивались и в этот заход — сознательно: пункт Г4.1, под который они шли, закрыт Junker/Reiter/Rodler, а IUI '08 признан не относящимся к Г4.1; для вопроса калибровки весов они не нужны (это алгоритмы диагностики, не калибровки).

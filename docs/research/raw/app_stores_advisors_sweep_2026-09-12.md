@@ -940,3 +940,46 @@ RuStore разобраны с выписками цитат в редакции 
    (`itunes.apple.com/<country>/rss/<chart>/limit=100/genre=6015/json`), тогда как
    преемник `rss.applemarketingtools.com` мёртв (504). Метаданные к id из чарта добираются
    батчами по 100 через `lookup?id=a,b,c`.
+
+---
+
+## ДОБОР Г30.4 — Exa (16.09.2026)
+
+**Состояние каналов (коды, замер 16.09.2026):** `mcp__exa__web_search_exa` — работает; `mcp__exa__web_fetch_exa` — `brightmoney.co/pricing` **200**, `brightmoney.co/` **200**, `usetoya.com` **200** (через search); `play.google.com/store/apps/details?id=ru.bezdolgov.app` → **CRAWL_NOT_FOUND**; `apps.apple.com/ru/app/id1521551594` → **CRAWL_NOT_FOUND**. Подагентов: 0. Закрываются пункты 5 и 6 списка «Что осталось неизвестным — редакция 2».
+
+### Г30.4-А1 — 🔴 Toya AI: возраст ОТДЕЛЁН от спроса, и метод оказался НЕ тем, что заявляла реклама
+
+Пункт 5 редакции 2 («Возраст продуктов не отделён от отсутствия спроса… Разрешается только внешними данными, не витриной»). Внешние данные добыты.
+
+**Профиль компании** (`https://linkedin.com/company/toya-ai`, Exa, 200), дословно: «Toya AI is an AI debt payoff app that analyzes credit cards and loans, builds a personalized payoff plan, tracks credit score, and helps individuals become debt-free faster. **Toya AI employs 2 people** (+100.0% YoY, +1 person), **founded in 2025**. Headquartered in **San Diego**, California»; «Key Executives: **Anishek Kamal: Founder**»; «Linkedin Followers: **92**».
+🔴 **Трафик сайта, дословно:** «Monthly visits: **2,423**; Global rank: **8,463,878**; Bounce rate: 38.0%; Pages per visit: 1.2; Average visit duration: 0s».
+
+**Что это значит для нашего вывода.** Toya AI — **компания из двух человек с 2 423 визитами в месяц**, а не «молодой продукт, которому не дали времени». Ноль оценок в витрине — не артефакт возраста: у продукта попросту нет аудитории на втором году. Гипотеза «ниша пуста, потому что продукты молодые» по этому кейсу **не подтверждается**; ближе к данным объяснение «спроса на платного советника по долгам в вебе почти нет», что согласуется с кладбищем Г14 (Gauss, ReadyForZero, Path, Mine, Clerkie).
+
+🔴 **ПОПРАВКА К НАХОДКЕ Г30.3.** Г30.3 записал Toya AI как «Not just snowball or avalanche» — ближайший к нам по методу. **Собственный FAQ продукта говорит иное** (`https://usetoya.com/`, Exa, 200), дословно: «**How does Toya AI decide what to pay first?** Toya AI analyzes your balances, interest rates, and due dates to recommend the payment that **saves you the most interest and reduces your timeline the fastest**. You always see the impact before you act.» Минимизация процентов по ставкам — это **и есть avalanche**, дополненный датами платежей. Маркетинговая строка «не просто snowball или avalanche» **не подтверждается описанием механики у самого вендора**. Прочее дословно из FAQ: «Is Toya AI debt consolidation? **No.** Toya AI does not consolidate or move your debt»; «What can I connect… Credit cards, student loans, auto loans, personal loans… Plaid, Fincity, Spinwheel, and Quiltt»; «Toya AI uses **soft pulls only**»; «**Payments are coming soon.** Today, Toya AI helps you build and follow a payoff plan.» Позиционирование основателя дословно: «I know what it feels like to have a good salary and still feel stuck because of debt. The hardest part was not budgeting. **It was not having a plan I could trust.**»
+**Итог поправки:** Toya AI — одноконтурный (только долги), метод = avalanche + сроки, резерва и целей нет. **Наш зазор по методу в долговом контуре Toya AI НЕ закрывает.** Ближайшим по формулировке задачи остаётся Ray (см. добор Г30.4 в `desktop_web_catalogs_sweep`), а по гибридному правилу — DebtMeltPro; оба — не детерминированное распределение на множестве альтернатив.
+
+### Г30.4-А2 — Bright Money: 🟢 цена сверена с сайтом (пункт 6) и 🔴 продукт ЖИВ, вопреки записи Г14
+
+Пункт 6 редакции 2 («цена $97/год снята с карточки App Store, с сайтом продукта не сверялась»). `https://www.brightmoney.co/pricing` через Exa — **HTTP 200**, полный текст.
+
+Дословно: «**Premium — 46% OFF — $8.08 / $14/month — Billed $97 annually**»; полная сетка: «1M Plan - $14 billed monthly; **12M Plan - $97 billed annually**; 6M Plan - $68 billed every 6 months; 3M Plan - $39 billed every 3 months». Прочие тарифы: «Basic $0», «Starter $5/month», доп. услуги «Monthly Reporting $4/month», «Past Reporting $35/One time».
+🟢 **Число $97/год совпало с карточкой App Store дословно.** Расхождения нет.
+
+Состав Premium дословно: «Bright Membership includes credit monitoring, card manager, budget planner, **debt paydown plan** and credit building solutions via rent and bill reporting»; в карточке тарифа: «Cash Advance Offers, **LoanGPT - AI Assistant**, **AI Budget Planner**, Smart Round-Ups, Cash Rewards».
+
+🔴 **Поправка к Г14.** Итог Г14 относил Bright Money к кладбищу: «(Gauss, Bright Money, Ready For Zero → Avant)… мертвы». **Сайт жив и торгует на 16.09.2026**, с обновлённым позиционированием — `https://www.brightmoney.co/`, дословно: «**The world's first AI Loan Assistant** — Your smart way to better loans and credit cards»; «Loan offers up to $10,000¹»; «Secured credit line starting $50 at 0% APR⁴»; «A personal money manager, powered by AI — **Customized debt pay-off plan · Save spare change, build savings** · Track balances, savings, and your progress»; «One-on-one help, with 93% customer rating⁶ — Real humans. By email or chat»; юрлицо «Bright Capital Inc, 50 California St, Suite 1621, San Francisco CA 94111».
+**Как это читать:** Bright Money **не умер, а сменил объект** — из советника по погашению долга в **брокера кредитных предложений и сервис построения кредитной истории** («AI Loan Assistant», «Loan offers»). Советник по долгам остался, но как функция подписки, а монетизация переехала на выдачу займов. Это третий раз за кампанию, когда продукт нашего класса выживает **только сменив бизнес-модель на посредничество в продаже финпродуктов** (ср. Empower → управление активами, ReadyForZero → Avant). 🔴 Для нашей РФ-модели это прямо запрещённый путь (тема 18/19: посредничество втягивает в лицензируемую деятельность) — и объясняет, почему поле «чистого советника на подписке» пусто не по недосмотру, а по экономике.
+🟡 Оговорка: два контура у Bright названы рядом («debt pay-off plan» и «save spare change, build savings»), но механизма выбора между ними в публичных текстах нет; round-ups — это автоматическое округление, не распределение свободного потока. Классификация Г13/Г14 по объекту не меняется.
+
+### Г30.4-А3 — «Без Долгов»: ❌ НЕ ДОБЫТО, канал Exa не берёт карточки магазинов
+
+Пункт 2 редакции 2 (главная неопределённость темы: есть ли в «Без Долгов» реальный выбор между досрочкой и подушкой). Каналы: `mcp__exa__web_fetch_exa` по карточке Google Play и по карточке App Store → **CRAWL_NOT_FOUND оба**; `mcp__exa__web_search_exa` русским запросом по названию и функциям → выдача **нерелевантна целиком** (главные страницы МТС Банка, banki.ru, Ингосстраха, АТБ, scoring.ru, Home Credit KZ — то есть семантический поиск ушёл в тему «досрочное погашение кредита» вообще, продукт не различил). Ранее пройдено: `r.jina.ai` поверх Play (Г13, карточки выдачи без полного описания), `backapi.rustore.ru` (Г13). **Остаётся неразрешимым без установки APK** — это был вывод Г13, и Exa его не меняет. Класс: «требует действия владельца (установка приложения)», не «источника не существует».
+
+### Г30.4-А4 — полные описания Google Play и листинг категории RuStore: ❌ ограничение канала подтверждено
+
+Пункты 1 и 3 редакции 2. Exa индексирует веб, но карточки `play.google.com/store/apps/details` отдаёт `CRAWL_NOT_FOUND` (проверено на двух адресах) — Google Play закрыт для её краулера так же, как для `WebFetch`. Листинг категории RuStore невозможен на стороне API (`query` обязателен, HTTP 400 без него) — это устройство чужого API, Exa к нему отношения не имеет. **Оба пункта переводятся из «не добыто» в «ограничение канала», с полным перечнем пройденного: `curl`+UA → `r.jina.ai` → `backapi.rustore.ru` → Exa fetch → Exa search.**
+
+## ИТОГ Г30.4 (этот файл)
+
+**2 полностью, 2 нет с причиной.** Добыто: 🔴 Toya AI — возраст отделён от спроса внешними данными (2 сотрудника, 2 423 визита/мес, 92 подписчика в LinkedIn), и **поправка к Г30.3**: собственный FAQ описывает минимизацию процентов по ставкам, то есть avalanche со сроками, а не «не просто snowball или avalanche»; Bright Money — цена $97/год сверена с сайтом дословно, 🔴 продукт **жив** вопреки записи Г14 о кладбище, но сменил объект на «AI Loan Assistant» (брокер кредитных предложений). Нет: «Без Долгов» (Exa `CRAWL_NOT_FOUND` по обеим карточкам, поиск нерелевантен — нужна установка APK, действие владельца), полные описания Google Play и листинг категории RuStore (ограничение чужих каналов, исчерпано пятью способами). Сводный итог по всему Г30 — в `bank_patents_wellness_scoring_2026-09-09.md`.

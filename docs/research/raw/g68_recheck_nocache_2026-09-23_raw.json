@@ -1,0 +1,1670 @@
+[
+ {
+  "url": "http://eprints.nottingham.ac.uk/29811/",
+  "code": "200",
+  "bytes": 2532,
+  "cls": "content",
+  "deny": null,
+  "cached": false,
+  "body_file": "12804743123ea78f.txt"
+ },
+ {
+  "url": "http://eprints.nottingham.ac.uk/29811/1/1-s2.0-S0167268114001231-main.pdf",
+  "code": "200",
+  "bytes": 2567,
+  "cls": "content",
+  "deny": null,
+  "cached": false,
+  "body_file": "d9ab6860f8fbc71a.txt"
+ },
+ {
+  "url": "http://hdl.handle.net/10822/819907",
+  "code": "200",
+  "bytes": 840,
+  "cls": "blocked",
+  "deny": "Target URL returned error 404",
+  "cached": false,
+  "body_file": "6192a7d4a93a87f0.txt"
+ },
+ {
+  "url": "http://publications.europa.eu/resource/celex/32022R2065",
+  "code": "200",
+  "bytes": 301913,
+  "cls": "content",
+  "deny": null,
+  "cached": false,
+  "body_file": "b68ad5085100b940.txt"
+ },
+ {
+  "url": "http://publications.europa.eu/resource/celex/32024R1689",
+  "code": "200",
+  "bytes": 593815,
+  "cls": "content",
+  "deny": null,
+  "cached": false,
+  "body_file": "f0a41d577f7990e5.txt"
+ },
+ {
+  "url": "http://publications.europa.eu/resource/celex/32026R1744",
+  "code": "200",
+  "bytes": 114547,
+  "cls": "content",
+  "deny": null,
+  "cached": false,
+  "body_file": "9b96dad8dc5e6f8c.txt"
+ },
+ {
+  "url": "http://www.econ.duke.edu/~brossi/GiacominiRossi08.pdf",
+  "code": "200",
+  "bytes": 219,
+  "cls": "empty",
+  "deny": "Target URL returned error 404",
+  "cached": false,
+  "body_file": "3de10ac94f12e025.txt"
+ },
+ {
+  "url": "http://www.kremlin.ru/acts/bank/50768",
+  "code": "200",
+  "bytes": 35991,
+  "cls": "content",
+  "deny": null,
+  "cached": false,
+  "body_file": "1f00ecd28149c34f.txt"
+ },
+ {
+  "url": "https://4pda.to/forum/index.php?showtopic=452161&st=1500",
+  "code": "200",
+  "bytes": 1925,
+  "cls": "blocked",
+  "deny": "Just a moment",
+  "cached": false,
+  "body_file": "d46aae0c05755335.txt"
+ },
+ {
+  "url": "https://academic.oup.com/rfs/article/22/5/1915/1592901",
+  "code": "200",
+  "bytes": 489,
+  "cls": "blocked",
+  "deny": "Just a moment",
+  "cached": false,
+  "body_file": "1f04dd614d38c2ed.txt"
+ },
+ {
+  "url": "https://adilet.zan.kz/rus/docs/Z030000461_",
+  "code": "200",
+  "bytes": 109,
+  "cls": "empty",
+  "deny": null,
+  "cached": false,
+  "body_file": "debc05e4a05616de.txt"
+ },
+ {
+  "url": "https://ads.vk.ru/documents/recommendation",
+  "code": "200",
+  "bytes": 6522,
+  "cls": "content",
+  "deny": null,
+  "cached": false,
+  "body_file": "7a4505baf76acfdb.txt"
+ },
+ {
+  "url": "https://alfabank.ru/get-money/credit-cash/",
+  "code": "200",
+  "bytes": 144,
+  "cls": "empty",
+  "deny": null,
+  "cached": false,
+  "body_file": "f9a5490b45c6a9db.txt"
+ },
+ {
+  "url": "https://alfabank.ru/make-money/deposits/",
+  "code": "200",
+  "bytes": 142,
+  "cls": "empty",
+  "deny": null,
+  "cached": false,
+  "body_file": "afaf7cac47048505.txt"
+ },
+ {
+  "url": "https://arxiv.org/pdf/1810.11078",
+  "code": "200",
+  "bytes": 153422,
+  "cls": "content",
+  "deny": null,
+  "cached": false,
+  "body_file": "b2e755b836360a76.txt"
+ },
+ {
+  "url": "https://atty54.ru/2024/11/27/пара-слов-о-мсс/",
+  "code": "200",
+  "bytes": 5049,
+  "cls": "content",
+  "deny": null,
+  "cached": false,
+  "body_file": "a42fa902f3cab47d.txt"
+ },
+ {
+  "url": "https://b.mtsbank.ru/",
+  "code": "200",
+  "bytes": 78,
+  "cls": "empty",
+  "deny": null,
+  "cached": false,
+  "body_file": "2c9fa760d7d18ebe.txt"
+ },
+ {
+  "url": "https://blakemcshane.com/Papers/jmr_debt.pdf",
+  "code": "200",
+  "bytes": 85309,
+  "cls": "content",
+  "deny": null,
+  "cached": false,
+  "body_file": "ff684fbbb6c2449e.txt"
+ },
+ {
+  "url": "https://br.fas.gov.ru/",
+  "code": "422",
+  "bytes": 603,
+  "cls": "http_422",
+  "deny": null,
+  "cached": false,
+  "body_file": "34bb7aaa4ccc6a97.txt"
+ },
+ {
+  "url": "https://campbell.scholars.harvard.edu/sites/g/files/omnuum5881/files/campbell/files/campbellcocco_qje2003.pdf",
+  "code": "200",
+  "bytes": 112151,
+  "cls": "content",
+  "deny": null,
+  "cached": false,
+  "body_file": "6f3f6ae8e2799eb1.txt"
+ },
+ {
+  "url": "https://cdep.ru/?id=23",
+  "code": "200",
+  "bytes": 6013,
+  "cls": "content",
+  "deny": null,
+  "cached": false,
+  "body_file": "8e41b25d86c95983.txt"
+ },
+ {
+  "url": "https://confluence.korona.net/display/FAKTURA",
+  "code": "422",
+  "bytes": 718,
+  "cls": "http_422",
+  "deny": null,
+  "cached": false,
+  "body_file": "55e9dfe0db9e2b31.txt"
+ },
+ {
+  "url": "https://continent-online.com/Document/?doc_id=36844127",
+  "code": "200",
+  "bytes": 34872,
+  "cls": "content",
+  "deny": null,
+  "cached": false,
+  "body_file": "7a7457cb045972e7.txt"
+ },
+ {
+  "url": "https://creativecommons.org/licenses/by-sa/3.0/legalcode",
+  "code": "200",
+  "bytes": 22289,
+  "cls": "content",
+  "deny": null,
+  "cached": false,
+  "body_file": "5b10d73ba94ea2ed.txt"
+ },
+ {
+  "url": "https://crei.cat/wp-content/uploads/users/working-papers/rossi_modelcomp2015.pdf",
+  "code": "200",
+  "bytes": 59099,
+  "cls": "content",
+  "deny": null,
+  "cached": false,
+  "body_file": "8dafdf55720e1a4b.txt"
+ },
+ {
+  "url": "https://ctlj.colorado.edu/wp-content/uploads/2015/08/Meyer-final.pdf",
+  "code": "200",
+  "bytes": 193896,
+  "cls": "content",
+  "deny": null,
+  "cached": false,
+  "body_file": "acbfb92f8f4a17a6.txt"
+ },
+ {
+  "url": "https://cyberleninka.ru/article/n/otsenka-predskazatelnoy-sily-investorov-v-opredelenii-klyuchevoy-stavki-tsb-rf-s-pomoschyu-llm",
+  "code": "200",
+  "bytes": 67883,
+  "cls": "content",
+  "deny": null,
+  "cached": false,
+  "body_file": "a1f5cc4f4fc3bdd0.txt"
+ },
+ {
+  "url": "https://dash.harvard.edu/bitstream/handle/1/3157876/campbell_household.pdf",
+  "code": "200",
+  "bytes": 883,
+  "cls": "blocked",
+  "deny": "Target URL returned error 405",
+  "cached": false,
+  "body_file": "872ebb2b0f6efd63.txt"
+ },
+ {
+  "url": "https://data.sec.gov/submissions/CIK",
+  "code": "200",
+  "bytes": 665,
+  "cls": "blocked",
+  "deny": "Target URL returned error 404",
+  "cached": false,
+  "body_file": "6e785c0b9a67b3e0.txt"
+ },
+ {
+  "url": "https://dataverse.unc.edu/dataverse/rlms-hse",
+  "code": "200",
+  "bytes": 3096,
+  "cls": "content",
+  "deny": null,
+  "cached": false,
+  "body_file": "c2249601b2629a71.txt"
+ },
+ {
+  "url": "https://delcode.delaware.gov/title6/c024a/index.html",
+  "code": "200",
+  "bytes": 85587,
+  "cls": "content",
+  "deny": null,
+  "cached": false,
+  "body_file": "3f1669ab52c6aaa8.txt"
+ },
+ {
+  "url": "https://discovery.ucl.ac.uk/id/eprint/1353830/",
+  "code": "200",
+  "bytes": 3190,
+  "cls": "blocked",
+  "deny": "Target URL returned error 404",
+  "cached": false,
+  "body_file": "497d0ecf3e33e924.txt"
+ },
+ {
+  "url": "https://dl.acm.org/doi/10.1145/1378773.1378802",
+  "code": "200",
+  "bytes": 463,
+  "cls": "blocked",
+  "deny": "Just a moment",
+  "cached": false,
+  "body_file": "0e5a2900b378f09a.txt"
+ },
+ {
+  "url": "https://docs.ozon.ru/common/ozon-finance/statement/",
+  "code": "200",
+  "bytes": 993,
+  "cls": "blocked",
+  "deny": "Target URL returned error 403",
+  "cached": false,
+  "body_file": "d648cabe29585c32.txt"
+ },
+ {
+  "url": "https://docs.ozon.ru/legal/algorithms/recomendation-algorithms/",
+  "code": "200",
+  "bytes": 498,
+  "cls": "blocked",
+  "deny": "Antibot Challenge",
+  "cached": false,
+  "body_file": "409be1309e52b66c.txt"
+ },
+ {
+  "url": "https://docs.ozon.ru/legal/terms-of-use/site/algorithms/",
+  "code": "200",
+  "bytes": 998,
+  "cls": "blocked",
+  "deny": "Target URL returned error 403",
+  "cached": false,
+  "body_file": "06d23eb2c5f89ccb.txt"
+ },
+ {
+  "url": "https://domrfbank.ru/mortgage/early-repayment/",
+  "code": "200",
+  "bytes": 596,
+  "cls": "blocked",
+  "deny": "Target URL returned error 404",
+  "cached": false,
+  "body_file": "b783a9771b910281.txt"
+ },
+ {
+  "url": "https://ec.europa.eu/newsroom/dae/redirection/document/128561",
+  "code": "422",
+  "bytes": 343,
+  "cls": "http_422",
+  "deny": null,
+  "cached": false,
+  "body_file": "409f7538bba0bc58.txt"
+ },
+ {
+  "url": "https://econs.online/articles/monetarnaya-politika/chto-takogo-znaet-bank-rossii-chego-ne-znayut-analitiki/",
+  "code": "200",
+  "bytes": 843,
+  "cls": "blocked",
+  "deny": "CAPTCHA",
+  "cached": false,
+  "body_file": "a43bdecb72a66c99.txt"
+ },
+ {
+  "url": "https://econs.online/articles/povedencheskaya-ekonomika/",
+  "code": "200",
+  "bytes": 792,
+  "cls": "blocked",
+  "deny": "CAPTCHA",
+  "cached": false,
+  "body_file": "c5cf68d8976f65ae.txt"
+ },
+ {
+  "url": "https://eprints.gla.ac.uk/353695/2/353695.pdf",
+  "code": "200",
+  "bytes": 70076,
+  "cls": "content",
+  "deny": null,
+  "cached": false,
+  "body_file": "1124c67e5ff90f09.txt"
+ },
+ {
+  "url": "https://escholarship.org/content/qt0ww2c04z/qt0ww2c04z.pdf",
+  "code": "200",
+  "bytes": 687,
+  "cls": "blocked",
+  "deny": "Target URL returned error 403",
+  "cached": false,
+  "body_file": "4c2843b46d314d42.txt"
+ },
+ {
+  "url": "https://fas.gov.ru/",
+  "code": "422",
+  "bytes": 588,
+  "cls": "http_422",
+  "deny": null,
+  "cached": false,
+  "body_file": "f70328bde6ffd0a3.txt"
+ },
+ {
+  "url": "https://fas.gov.ru/documents",
+  "code": "422",
+  "bytes": 633,
+  "cls": "http_422",
+  "deny": null,
+  "cached": false,
+  "body_file": "706904b4ad9d9886.txt"
+ },
+ {
+  "url": "https://fas.gov.ru/pages/vazhnaya-informacziya/rassmotrenie-del.html",
+  "code": "422",
+  "bytes": 833,
+  "cls": "http_422",
+  "deny": null,
+  "cached": false,
+  "body_file": "7b1ddd20a9608ac1.txt"
+ },
+ {
+  "url": "https://fas.gov.ru/robots.txt",
+  "code": "422",
+  "bytes": 638,
+  "cls": "http_422",
+  "deny": null,
+  "cached": false,
+  "body_file": "a996010d25abdedb.txt"
+ },
+ {
+  "url": "https://fas.gov.ru/search?q=",
+  "code": "422",
+  "bytes": 633,
+  "cls": "http_422",
+  "deny": null,
+  "cached": false,
+  "body_file": "579ec9f46a0cc839.txt"
+ },
+ {
+  "url": "https://fas.gov.ru/sitemap.xml",
+  "code": "422",
+  "bytes": 643,
+  "cls": "http_422",
+  "deny": null,
+  "cached": false,
+  "body_file": "f0ada2bfcbb8ae2a.txt"
+ },
+ {
+  "url": "https://finance.ozon.ru/",
+  "code": "200",
+  "bytes": 550,
+  "cls": "blocked",
+  "deny": "Antibot Challenge",
+  "cached": false,
+  "body_file": "14286d4e73790989.txt"
+ },
+ {
+  "url": "https://finhealthnetwork.org/research/from-insight-to-impact-the-next-phase-of-financial-health-measurement/",
+  "code": "200",
+  "bytes": 111912,
+  "cls": "content",
+  "deny": null,
+  "cached": false,
+  "body_file": "19fd5e4c39089516.txt"
+ },
+ {
+  "url": "https://finhealthnetwork.org/wp-content/uploads/2021/11/FinHealthScoreToolkit-2021.pdf",
+  "code": "200",
+  "bytes": 252,
+  "cls": "blocked",
+  "deny": "Just a moment",
+  "cached": false,
+  "body_file": "12f64bcce729688e.txt"
+ },
+ {
+  "url": "https://finhealthnetwork.org/wp-content/uploads/2026/03/From-Insight-to-Impact_-The-Next-Phase-of-Financial-Health-Measurement.pdf",
+  "code": "200",
+  "bytes": 296,
+  "cls": "blocked",
+  "deny": "Just a moment",
+  "cached": false,
+  "body_file": "e5cc4e6ab483a670.txt"
+ },
+ {
+  "url": "https://fips.ru/",
+  "code": "200",
+  "bytes": 820,
+  "cls": "blocked",
+  "deny": "DDoS-Guard",
+  "cached": false,
+  "body_file": "15e8b25b6f985169.txt"
+ },
+ {
+  "url": "https://fssp.gov.ru/api/ssp-pages",
+  "code": "200",
+  "bytes": 576,
+  "cls": "blocked",
+  "deny": "Вы превысили лимит",
+  "cached": false,
+  "body_file": "b379aa2fe30e14fb.txt"
+ },
+ {
+  "url": "https://habr.com/ru/articles/576666/",
+  "code": "200",
+  "bytes": 13136,
+  "cls": "content",
+  "deny": null,
+  "cached": false,
+  "body_file": "a682acbe694acaa0.txt"
+ },
+ {
+  "url": "https://habr.com/ru/news/764976/",
+  "code": "200",
+  "bytes": 23222,
+  "cls": "content",
+  "deny": null,
+  "cached": false,
+  "body_file": "9ad711268d7c94c7.txt"
+ },
+ {
+  "url": "https://hansard.parliament.uk/commons/2025-01-09/debates/6D09A5E2-5CE7-46E7-B272-03328ED1C36F/DebtAdviceServices",
+  "code": "200",
+  "bytes": 13452,
+  "cls": "content",
+  "deny": null,
+  "cached": false,
+  "body_file": "6da2fe9c18766840.txt"
+ },
+ {
+  "url": "https://help-bank.ozon.ru/individuals/personal-account/statement",
+  "code": "200",
+  "bytes": 499,
+  "cls": "blocked",
+  "deny": "Antibot Challenge",
+  "cached": false,
+  "body_file": "a83bb94897c48852.txt"
+ },
+ {
+  "url": "https://help.mail.ru/legal/terms/adsvk/recommendation/",
+  "code": "200",
+  "bytes": 31394,
+  "cls": "content",
+  "deny": null,
+  "cached": false,
+  "body_file": "211b2fcfb90cbce5.txt"
+ },
+ {
+  "url": "https://help.monarch.com/api/v2/help_center/en-us/articles/44373293932052.json",
+  "code": "200",
+  "bytes": 33656,
+  "cls": "content",
+  "deny": null,
+  "cached": false,
+  "body_file": "455501fc92d24c5b.txt"
+ },
+ {
+  "url": "https://help.monarch.com/hc/en-us/articles/44373293932052-Using-Pay-Down-Goals",
+  "code": "200",
+  "bytes": 23656,
+  "cls": "content",
+  "deny": null,
+  "cached": false,
+  "body_file": "225d561c46a5e820.txt"
+ },
+ {
+  "url": "https://home.ubalt.edu/tmitch/642/articles%20syllabus/locke%20latham%20new%20dir%20gs%20curr%20dir%20psy%20sci%202006.pdf",
+  "code": "200",
+  "bytes": 20938,
+  "cls": "content",
+  "deny": null,
+  "cached": false,
+  "body_file": "a82a738082612b93.txt"
+ },
+ {
+  "url": "https://ict-online.ru/news/Roskomnadzor-soobshchil-o-snizheniye-chisla-utechek-v-2025-godu-321202",
+  "code": "200",
+  "bytes": 60668,
+  "cls": "content",
+  "deny": null,
+  "cached": false,
+  "body_file": "092b154e92627b61.txt"
+ },
+ {
+  "url": "https://ideas.repec.org/a/inm/ormnsc/v60y2014i8p1861-1883.html",
+  "code": "200",
+  "bytes": 32204,
+  "cls": "content",
+  "deny": null,
+  "body_file": "9ba3f795a2f13023.txt"
+ },
+ {
+  "url": "https://ideas.repec.org/a/wly/soecon/v89y2023i3p830-859.html",
+  "code": "200",
+  "bytes": 16556,
+  "cls": "content",
+  "deny": null,
+  "body_file": "1bdb4996d811d636.txt"
+ },
+ {
+  "url": "https://kad.arbitr.ru/Kad/SearchInstances",
+  "code": "200",
+  "bytes": 618,
+  "cls": "blocked",
+  "deny": "Target URL returned error 451",
+  "body_file": "80e756a5c2f2e344.txt"
+ },
+ {
+  "url": "https://legalacts.ru/doc/federalnyi-zakon-ot-20072020-n-211-fz-o-sovershenii-finansovykh/",
+  "code": "200",
+  "bytes": 256942,
+  "cls": "content",
+  "deny": null,
+  "body_file": "a3ffef9edc235070.txt"
+ },
+ {
+  "url": "https://marottaonmoney.com/wp-content/uploads/2020/05/rplaze-042012.pdf",
+  "code": "200",
+  "bytes": 191163,
+  "cls": "content",
+  "deny": null,
+  "body_file": "ed6ebe9c16f98160.txt"
+ },
+ {
+  "url": "https://med.stanford.edu/content/dam/sm/s-spire/documents/PD.locke-and-latham-retrospective_Paper.pdf",
+  "code": "200",
+  "bytes": 72696,
+  "cls": "content",
+  "deny": null,
+  "body_file": "bec2374a41af8042.txt"
+ },
+ {
+  "url": "https://mironline.ru/support/list/mcc/",
+  "code": "422",
+  "bytes": 230,
+  "cls": "http_422",
+  "deny": null,
+  "body_file": "68c3edb51e8c54e9.txt"
+ },
+ {
+  "url": "https://mkb.ru/business/cash/dbo",
+  "code": "422",
+  "bytes": 653,
+  "cls": "http_422",
+  "deny": null,
+  "body_file": "55b5e5ba16d046ff.txt"
+ },
+ {
+  "url": "https://moneyadvicetrust.org/partnerships/our-funding/",
+  "code": "200",
+  "bytes": 3135,
+  "cls": "content",
+  "deny": null,
+  "body_file": "07e9f361abbbf0c3.txt"
+ },
+ {
+  "url": "https://new.fips.ru/",
+  "code": "200",
+  "bytes": 832,
+  "cls": "blocked",
+  "deny": "DDoS-Guard",
+  "body_file": "bc092e9271448f17.txt"
+ },
+ {
+  "url": "https://new.fips.ru/registers-web/",
+  "code": "200",
+  "bytes": 846,
+  "cls": "blocked",
+  "deny": "DDoS-Guard",
+  "body_file": "570c09cb37cab3b9.txt"
+ },
+ {
+  "url": "https://nottingham-repository.worktribe.com/output/925152",
+  "code": "200",
+  "bytes": 549,
+  "cls": "blocked",
+  "deny": "Just a moment",
+  "body_file": "695b02516a9d6940.txt"
+ },
+ {
+  "url": "https://obdx.gks.ru/",
+  "code": "200",
+  "bytes": 2614,
+  "cls": "content",
+  "deny": null,
+  "body_file": "7025099d529f8028.txt"
+ },
+ {
+  "url": "https://old.adilet.zan.kz/rus/docs/Z030000461_",
+  "code": "422",
+  "bytes": 723,
+  "cls": "http_422",
+  "deny": null,
+  "body_file": "bbb1264905a7a1da.txt"
+ },
+ {
+  "url": "https://opencorpora.org/",
+  "code": "200",
+  "bytes": 953,
+  "cls": "blocked",
+  "deny": "Target URL returned error 521",
+  "body_file": "25b331d26b80c697.txt"
+ },
+ {
+  "url": "https://opencorpora.org/?page=downloads",
+  "code": "400",
+  "bytes": 405,
+  "cls": "http_400",
+  "deny": null,
+  "cached": false,
+  "body_file": "6ad574db9201ab01.txt"
+ },
+ {
+  "url": "https://ops.epo.org/3.2/rest-services/family/publication/docdb/",
+  "code": "200",
+  "bytes": 621,
+  "cls": "blocked",
+  "deny": "Target URL returned error 403",
+  "body_file": "683cef70c44a6471.txt"
+ },
+ {
+  "url": "https://orderly.myafsa.com/entiresection/a0001000200020007/general-rules",
+  "code": "200",
+  "bytes": 126799,
+  "cls": "content",
+  "deny": null,
+  "body_file": "989e9ea7e50c852d.txt"
+ },
+ {
+  "url": "https://otexts.com/fpp3/ses.html",
+  "code": "200",
+  "bytes": 14355,
+  "cls": "content",
+  "deny": null,
+  "cached": false,
+  "body_file": "ae65bfceee936eab.txt"
+ },
+ {
+  "url": "https://papers.ssrn.com/sol3/Delivery.cfm/SSRN_ID3485990_code17371.pdf?abstractid=3485990&mirid=1",
+  "code": "200",
+  "bytes": 529,
+  "cls": "blocked",
+  "deny": "Just a moment",
+  "cached": false,
+  "body_file": "070650c764966024.txt"
+ },
+ {
+  "url": "https://papers.ssrn.com/sol3/papers.cfm?abstract_id=1591171",
+  "code": "200",
+  "bytes": 491,
+  "cls": "blocked",
+  "deny": "Just a moment",
+  "cached": false,
+  "body_file": "58623c3be26b1365.txt"
+ },
+ {
+  "url": "https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3485990",
+  "code": "200",
+  "bytes": 491,
+  "cls": "blocked",
+  "deny": "Just a moment",
+  "cached": false,
+  "body_file": "6a8d0356b03fc989.txt"
+ },
+ {
+  "url": "https://papers.ssrn.com/sol3/papers.cfm?abstract_id=5385386",
+  "code": "200",
+  "bytes": 491,
+  "cls": "blocked",
+  "deny": "Just a moment",
+  "cached": false,
+  "body_file": "fe0520775d1a720a.txt"
+ },
+ {
+  "url": "https://patentscope.wipo.int/search/en/result.jsf?query=",
+  "code": "200",
+  "bytes": 26711,
+  "cls": "content",
+  "deny": null,
+  "cached": false,
+  "body_file": "effe2747f5ec985e.txt"
+ },
+ {
+  "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC10337295/",
+  "code": "200",
+  "bytes": 96558,
+  "cls": "content",
+  "deny": null,
+  "cached": false,
+  "body_file": "db59caa182fc872b.txt"
+ },
+ {
+  "url": "https://privetmir.ru/",
+  "code": "200",
+  "bytes": 162,
+  "cls": "empty",
+  "deny": null,
+  "cached": false,
+  "body_file": "6c409405bad33062.txt"
+ },
+ {
+  "url": "https://prokazan.ru/adverting/view/vtb-zapustil-ii-servis-podbora-finansovyh-produktov-dla-sostoatelnyh-klientov",
+  "code": "200",
+  "bytes": 17142,
+  "cls": "content",
+  "deny": null,
+  "cached": false,
+  "body_file": "b4e014a73bbe62ee.txt"
+ },
+ {
+  "url": "https://psidonline.isr.umich.edu/Guide/Overview.aspx",
+  "code": "200",
+  "bytes": 3392,
+  "cls": "content",
+  "deny": null,
+  "cached": false,
+  "body_file": "630ecf5857789db7.txt"
+ },
+ {
+  "url": "https://raw.githubusercontent.com/hflabs/okved/master/okved_2.csv",
+  "code": "200",
+  "bytes": 172,
+  "cls": "empty",
+  "deny": "Target URL returned error 404",
+  "cached": false,
+  "body_file": "cfe5903d32b20903.txt"
+ },
+ {
+  "url": "https://reestr.digital.gov.ru/help/",
+  "code": "200",
+  "bytes": 214,
+  "cls": "empty",
+  "deny": "Target URL returned error 403",
+  "cached": false,
+  "body_file": "9bd65090dd2899f1.txt"
+ },
+ {
+  "url": "https://rjmf.econs.online/upload/iblock/ca3/RJMF_77-04_ENG_Baybuza.pdf",
+  "code": "200",
+  "bytes": 48722,
+  "cls": "content",
+  "deny": null,
+  "cached": false,
+  "body_file": "843cc2f544f7b7c5.txt"
+ },
+ {
+  "url": "https://rkn.gov.ru/news/rsoc/news52266.htm",
+  "code": "422",
+  "bytes": 703,
+  "cls": "http_422",
+  "deny": null,
+  "cached": false,
+  "body_file": "7b83491d0476123f.txt"
+ },
+ {
+  "url": "https://rkn.gov.ru/search/",
+  "code": "422",
+  "bytes": 623,
+  "cls": "http_422",
+  "deny": null,
+  "cached": false,
+  "body_file": "3a06114a18a3af28.txt"
+ },
+ {
+  "url": "https://rkn.gov.ru/search/?q=08-118602",
+  "code": "422",
+  "bytes": 683,
+  "cls": "http_422",
+  "deny": null,
+  "cached": false,
+  "body_file": "b1b02b61d0b2dc51.txt"
+ },
+ {
+  "url": "https://rlms-hse.cpc.unc.edu/data/availability/",
+  "code": "200",
+  "bytes": 2907,
+  "cls": "content",
+  "deny": null,
+  "cached": false,
+  "body_file": "62fe37cb54f0de9b.txt"
+ },
+ {
+  "url": "https://rosstat.gov.ru/folder/13397",
+  "code": "200",
+  "bytes": 40942,
+  "cls": "content",
+  "deny": null,
+  "cached": false,
+  "body_file": "61220f485682fa50.txt"
+ },
+ {
+  "url": "https://rosstat.gov.ru/free_doc/new_site/KOUZ-2024/index.html",
+  "code": "422",
+  "bytes": 919,
+  "cls": "http_422",
+  "deny": null,
+  "cached": false,
+  "body_file": "5f1e59d0b87f055b.txt"
+ },
+ {
+  "url": "https://rosstat.gov.ru/free_doc/new_site/KOUZ22/index.html",
+  "code": "200",
+  "bytes": 434,
+  "cls": "blocked",
+  "deny": "Target URL returned error 404",
+  "cached": false,
+  "body_file": "6c85f714c77b0562.txt"
+ },
+ {
+  "url": "https://rosstat.gov.ru/microdata",
+  "code": "200",
+  "bytes": 31151,
+  "cls": "blocked",
+  "deny": "Target URL returned error 404",
+  "cached": false,
+  "body_file": "6ba2b3c4ff076b5e.txt"
+ },
+ {
+  "url": "https://rosstat.gov.ru/storage/mediabank/urov_14g",
+  "code": "200",
+  "bytes": 229,
+  "cls": "empty",
+  "deny": "Target URL returned error 404",
+  "cached": false,
+  "body_file": "81b31a59a04d75a3.txt"
+ },
+ {
+  "url": "https://rosstat.gov.ru/storage/mediabank/urov_14g.xlsx",
+  "code": "200",
+  "bytes": 31542,
+  "cls": "blocked",
+  "deny": "Target URL returned error 404",
+  "cached": false,
+  "body_file": "6d713aa0284a8dd0.txt"
+ },
+ {
+  "url": "https://s3.amazonaws.com/pdf.sumobrain.com/US",
+  "code": "200",
+  "bytes": 637,
+  "cls": "blocked",
+  "deny": "Target URL returned error 403",
+  "cached": false,
+  "body_file": "623fdf9378e17f74.txt"
+ },
+ {
+  "url": "https://scholarlycommons.law.wlu.edu/cgi/viewcontent.cgi?article=2389&context=wlulr",
+  "code": "200",
+  "bytes": 98280,
+  "cls": "content",
+  "deny": null,
+  "cached": false,
+  "body_file": "93ce3f818d61a180.txt"
+ },
+ {
+  "url": "https://searchplatf.rospatent.gov.ru/",
+  "code": "422",
+  "bytes": 270,
+  "cls": "http_422",
+  "deny": null,
+  "cached": false,
+  "body_file": "cd852d1e65ee0592.txt"
+ },
+ {
+  "url": "https://searchplatf.rospatent.gov.ru/search?q=…",
+  "code": "400",
+  "bytes": 0,
+  "cls": "http_400",
+  "deny": null,
+  "cached": false
+ },
+ {
+  "url": "https://sifted.eu/articles/cleo-ceo-teases-ipo",
+  "code": "200",
+  "bytes": 5804,
+  "cls": "content",
+  "deny": null,
+  "cached": false,
+  "body_file": "03350f4036c9da2f.txt"
+ },
+ {
+  "url": "https://sm.rtb.mts.ru/s",
+  "code": "200",
+  "bytes": 103,
+  "cls": "empty",
+  "deny": null,
+  "cached": false,
+  "body_file": "fde75fb56edb378d.txt"
+ },
+ {
+  "url": "https://solutions.fas.gov.ru/",
+  "code": "422",
+  "bytes": 638,
+  "cls": "http_422",
+  "deny": null,
+  "cached": false,
+  "body_file": "6a73202f859d61c5.txt"
+ },
+ {
+  "url": "https://sovcombank.ru/credits",
+  "code": "200",
+  "bytes": 211,
+  "cls": "empty",
+  "deny": "Target URL returned error 401",
+  "body_file": "77d9e65fce27a4ff.txt"
+ },
+ {
+  "url": "https://sovcombank.ru/pages/cardvip3",
+  "code": "200",
+  "bytes": 218,
+  "cls": "empty",
+  "deny": "Target URL returned error 401",
+  "body_file": "9b0a00bf71b2c35e.txt"
+ },
+ {
+  "url": "https://sovcombank.ru/vklady",
+  "code": "200",
+  "bytes": 210,
+  "cls": "empty",
+  "deny": "Target URL returned error 401",
+  "body_file": "ebc2d96b8a3588b0.txt"
+ },
+ {
+  "url": "https://sozd.duma.gov.ru/oz/b",
+  "code": "422",
+  "bytes": 638,
+  "cls": "http_422",
+  "deny": null,
+  "body_file": "fe9533334aa383c5.txt"
+ },
+ {
+  "url": "https://stat.mtsbank.ru/",
+  "code": "200",
+  "bytes": 8107,
+  "cls": "content",
+  "deny": null,
+  "body_file": "7b4f63ee8d65f945.txt"
+ },
+ {
+  "url": "https://tass.ru/ekonomika/27628471",
+  "code": "200",
+  "bytes": 3118,
+  "cls": "content",
+  "deny": null,
+  "body_file": "40047855d397fdbc.txt"
+ },
+ {
+  "url": "https://tgstat.ru/finances",
+  "code": "200",
+  "bytes": 4578,
+  "cls": "blocked",
+  "deny": "Target URL returned error 404",
+  "body_file": "42bf10b987148025.txt"
+ },
+ {
+  "url": "https://tochka.com/self-employed/",
+  "code": "200",
+  "bytes": 312,
+  "cls": "blocked",
+  "deny": "Target URL returned error 403",
+  "body_file": "02dd96eb43d4b87f.txt"
+ },
+ {
+  "url": "https://tochno.st/datasets/surveys",
+  "code": "200",
+  "bytes": 9847,
+  "cls": "content",
+  "deny": null,
+  "body_file": "c0b502410a707ed2.txt"
+ },
+ {
+  "url": "https://uralsib.ru/api/directory-engine/files/accounting-statements/gbfo_2025_s8wxugtm.pdf",
+  "code": "422",
+  "bytes": 1122,
+  "cls": "http_422",
+  "deny": null,
+  "body_file": "f260c7ef51e1e046.txt"
+ },
+ {
+  "url": "https://vbo-help.mkb.ru/",
+  "code": "422",
+  "bytes": 613,
+  "cls": "http_422",
+  "deny": null,
+  "body_file": "9d99126dab2af2f1.txt"
+ },
+ {
+  "url": "https://vc.ru/2690469",
+  "code": "200",
+  "bytes": 30260,
+  "cls": "blocked",
+  "deny": "Target URL returned error 404",
+  "body_file": "6cb70a85f213b070.txt"
+ },
+ {
+  "url": "https://vfokuse.mail.ru/news/69631873",
+  "code": "200",
+  "bytes": 14007,
+  "cls": "content",
+  "deny": null,
+  "body_file": "4c66360eae6db7a0.txt"
+ },
+ {
+  "url": "https://web.archive.org/web/20170829141229id_/http://www.dentalage.co.uk/wp-content/",
+  "code": "403",
+  "bytes": 731,
+  "cls": "http_403",
+  "deny": null,
+  "body_file": "7958bb2f8ef41861.txt"
+ },
+ {
+  "url": "https://web.archive.org/web/20191224123555id_/http://base.garant.ru:80/72179746/",
+  "code": "403",
+  "bytes": 731,
+  "cls": "http_403",
+  "deny": null,
+  "body_file": "57a99862115a9cff.txt"
+ },
+ {
+  "url": "https://web.archive.org/web/2022id_/",
+  "code": "403",
+  "bytes": 731,
+  "cls": "http_403",
+  "deny": null,
+  "body_file": "e25b7ef330436d1a.txt"
+ },
+ {
+  "url": "https://web.archive.org/web/2024/",
+  "code": "403",
+  "bytes": 731,
+  "cls": "http_403",
+  "deny": null,
+  "body_file": "f19fdc068cea47e0.txt"
+ },
+ {
+  "url": "https://web.archive.org/web/20240409182224id_/https://onlinelibrary.wiley.com/doi/full/10.1002/soej.12612",
+  "code": "403",
+  "bytes": 731,
+  "cls": "http_403",
+  "deny": null,
+  "body_file": "a671210f26f4e09e.txt"
+ },
+ {
+  "url": "https://web.archive.org/web/20251119023745id_/…",
+  "code": "403",
+  "bytes": 731,
+  "cls": "http_403",
+  "deny": null,
+  "body_file": "d0a0094ec3466964.txt"
+ },
+ {
+  "url": "https://worldwide.espacenet.com/patent/search/",
+  "code": "200",
+  "bytes": 502,
+  "cls": "blocked",
+  "deny": "Just a moment",
+  "body_file": "0b9238f2f75b3d09.txt"
+ },
+ {
+  "url": "https://www.acpjournals.org/doi/pdf/10.7326/0003-4819-125-7-199610010-00011",
+  "code": "200",
+  "bytes": 519,
+  "cls": "blocked",
+  "deny": "Just a moment",
+  "body_file": "6a32148898963637.txt"
+ },
+ {
+  "url": "https://www.aeaweb.org/articles/pdf/doi/10.1257/aer.20180288",
+  "code": "200",
+  "bytes": 492,
+  "cls": "blocked",
+  "deny": "Just a moment",
+  "body_file": "ebfe7ca15c676785.txt"
+ },
+ {
+  "url": "https://www.amocrm.ru/developers/content/platform/monetization",
+  "code": "200",
+  "bytes": 8851,
+  "cls": "content",
+  "deny": null,
+  "body_file": "0e7f83108f7dac57.txt"
+ },
+ {
+  "url": "https://www.barbararossi.eu/research",
+  "code": "422",
+  "bytes": 673,
+  "cls": "http_422",
+  "deny": null,
+  "body_file": "a2aafa5e62878453.txt"
+ },
+ {
+  "url": "https://www.bleepingcomputer.com/news/artificial-intelligence/anthropic-wants-claude-to-analyze-your-bank-account-and-financial-data/",
+  "code": "200",
+  "bytes": 32694,
+  "cls": "blocked",
+  "deny": "Target URL returned error 403",
+  "cached": false,
+  "body_file": "d1d8144ffdd8975a.txt"
+ },
+ {
+  "url": "https://www.bspb.ru/business/distant-services",
+  "code": "200",
+  "bytes": 21921,
+  "cls": "content",
+  "deny": null,
+  "cached": false,
+  "body_file": "84e7c01074bebb56.txt"
+ },
+ {
+  "url": "https://www.cbr.ru/crosscut/lawacts/file/9937",
+  "code": "200",
+  "bytes": 104428,
+  "cls": "content",
+  "deny": null,
+  "cached": false,
+  "body_file": "8c48bea5ad9e192f.txt"
+ },
+ {
+  "url": "https://www.cbr.ru/explan/359-fz/",
+  "code": "200",
+  "bytes": 96838,
+  "cls": "content",
+  "deny": null,
+  "cached": false,
+  "body_file": "d8e1435f7dec96dd.txt"
+ },
+ {
+  "url": "https://www.cbr.ru/press/PR/?file=16122014_004000Key_rate.htm",
+  "code": "503",
+  "bytes": 95,
+  "cls": "http_503",
+  "deny": null,
+  "cached": false,
+  "body_file": "8fa2c119ecd26a72.txt"
+ },
+ {
+  "url": "https://www.cbr.ru/press/pr/?file=16122014_004533dkp2014-12-16T00_39_23.htm",
+  "code": "200",
+  "bytes": 4859,
+  "cls": "content",
+  "deny": null,
+  "cached": false,
+  "body_file": "5d617d4aac625bed.txt"
+ },
+ {
+  "url": "https://www.cbr.ru/protection_rights/",
+  "code": "200",
+  "bytes": 6013,
+  "cls": "content",
+  "deny": null,
+  "cached": false,
+  "body_file": "1ee9e0857e472055.txt"
+ },
+ {
+  "url": "https://www.cbr.ru/s/newbik",
+  "code": "422",
+  "bytes": 329,
+  "cls": "http_422",
+  "deny": null,
+  "cached": false,
+  "body_file": "77f5ce3143132413.txt"
+ },
+ {
+  "url": "https://www.cbr.ru/vfs/mcirabis/BIKNew/YYYYMMDDED01OSBR.zip",
+  "code": "200",
+  "bytes": 911,
+  "cls": "blocked",
+  "deny": "Target URL returned error 404",
+  "cached": false,
+  "body_file": "79d869e9d0626c35.txt"
+ },
+ {
+  "url": "https://www.cnews.ru/news/line/2023-08-30_bank_sankt-peterburg_obnovil",
+  "code": "200",
+  "bytes": 32612,
+  "cls": "content",
+  "deny": null,
+  "cached": false,
+  "body_file": "74ac0da96f3c3f8c.txt"
+ },
+ {
+  "url": "https://www.commbank.com.au/digital/fwbscore",
+  "code": "200",
+  "bytes": 358,
+  "cls": "blocked",
+  "deny": "Target URL returned error 502",
+  "cached": false,
+  "body_file": "d30d702471d75a04.txt"
+ },
+ {
+  "url": "https://www.consultant.ru/document/cons_doc_LAW_155986/8010678fe385f06b25a48465610d110690a6d609/",
+  "code": "200",
+  "bytes": 12757,
+  "cls": "content",
+  "deny": null,
+  "cached": false,
+  "body_file": "c8bb239d33af8028.txt"
+ },
+ {
+  "url": "https://www.consultant.ru/document/cons_doc_LAW_28165/deeb3189e859806a5eda495b89553a10d0f9b393/",
+  "code": "200",
+  "bytes": 19002,
+  "cls": "content",
+  "deny": null,
+  "cached": false,
+  "body_file": "5924e01eef0056e7.txt"
+ },
+ {
+  "url": "https://www.davidmblanchett.com/research",
+  "code": "200",
+  "bytes": 48506,
+  "cls": "content",
+  "deny": null,
+  "cached": false,
+  "body_file": "efb1682bb9c14861.txt"
+ },
+ {
+  "url": "https://www.decisionskills.com/uploads/5/1/6/0/5160560/locke_latham_2019_the_development_of_goal_setting_theory_50_years.pdf",
+  "code": "200",
+  "bytes": 61567,
+  "cls": "content",
+  "deny": null,
+  "cached": false,
+  "body_file": "2075261d52b4e2e2.txt"
+ },
+ {
+  "url": "https://www.ecb.europa.eu/stats/ecb_surveys/hfcs/html/researcher_hfcn.en.html",
+  "code": "200",
+  "bytes": 82889,
+  "cls": "blocked",
+  "deny": "Target URL returned error 404",
+  "cached": false,
+  "body_file": "2e5500d501847949.txt"
+ },
+ {
+  "url": "https://www.financialplanningassociation.org/sites/default/files/2021-04/MAR04%20Determining%20Withdrawal%20Rates%20Using%20Historical%20Data.pdf",
+  "code": "200",
+  "bytes": 38151,
+  "cls": "content",
+  "deny": null,
+  "cached": false,
+  "body_file": "ae3f42dd2371f33e.txt"
+ },
+ {
+  "url": "https://www.fips.ru/iiss/",
+  "code": "200",
+  "bytes": 837,
+  "cls": "blocked",
+  "deny": "DDoS-Guard",
+  "cached": false,
+  "body_file": "0d57ca6cd5465f5b.txt"
+ },
+ {
+  "url": "https://www.garant.ru/products/ipo/prime/doc/413852580/",
+  "code": "200",
+  "bytes": 34013,
+  "cls": "content",
+  "deny": null,
+  "cached": false,
+  "body_file": "dd4864fbb31c77cd.txt"
+ },
+ {
+  "url": "https://www.glenmede.com/wp-content/uploads/2024/08/The-Journal-of-Wealth-Management_Inflation-Spike.pdf",
+  "code": "200",
+  "bytes": 261,
+  "cls": "content",
+  "deny": null,
+  "cached": false,
+  "body_file": "d373fb67641b9237.txt"
+ },
+ {
+  "url": "https://www.google.com/sorry/…",
+  "code": "200",
+  "bytes": 1194,
+  "cls": "blocked",
+  "deny": "Target URL returned error 429",
+  "cached": false,
+  "body_file": "3cea3e222cc4c115.txt"
+ },
+ {
+  "url": "https://www.iso20022.org/message-set/1246/download",
+  "code": "422",
+  "bytes": 349,
+  "cls": "http_422",
+  "deny": null,
+  "cached": false,
+  "body_file": "47f2d9d3889e5777.txt"
+ },
+ {
+  "url": "https://www.jclinepi.com/article/",
+  "code": "200",
+  "bytes": 13586,
+  "cls": "blocked",
+  "deny": "Target URL returned error 404",
+  "cached": false,
+  "body_file": "b82e6f41c86db92d.txt"
+ },
+ {
+  "url": "https://www.law.cornell.edu/supremecourt/text/472/181",
+  "code": "200",
+  "bytes": 145482,
+  "cls": "content",
+  "deny": null,
+  "cached": false,
+  "body_file": "b2f7f97526c12821.txt"
+ },
+ {
+  "url": "https://www.mnb.hu/letoltes/giacomini-raffaella-20090311.pdf",
+  "code": "200",
+  "bytes": 61324,
+  "cls": "content",
+  "deny": null,
+  "cached": false,
+  "body_file": "ae05c2910ee24cad.txt"
+ },
+ {
+  "url": "https://www.monarchmoney.com/pricing",
+  "code": "200",
+  "bytes": 5509,
+  "cls": "content",
+  "deny": null,
+  "cached": false,
+  "body_file": "58836664f15e8571.txt"
+ },
+ {
+  "url": "https://www.moneyhelper.org.uk/en/getting-help-and-advice/financial-advisers/guide-to-financial-adviser-fees",
+  "code": "200",
+  "bytes": 561,
+  "cls": "blocked",
+  "deny": "Just a moment",
+  "cached": false,
+  "body_file": "3505bc7cd538083f.txt"
+ },
+ {
+  "url": "https://www.nber.org/system/files/working_papers/w24161/w24161.pdf",
+  "code": "200",
+  "bytes": 154767,
+  "cls": "content",
+  "deny": null,
+  "cached": false,
+  "body_file": "aa3813314707f794.txt"
+ },
+ {
+  "url": "https://www.nber.org/system/files/working_papers/w9759/w9759.pdf",
+  "code": "200",
+  "bytes": 114979,
+  "cls": "content",
+  "deny": null,
+  "cached": false,
+  "body_file": "4537d4668c8d803e.txt"
+ },
+ {
+  "url": "https://www.nefe.org/_images/research/Effect-of-Financial-Literacy-on-Financial-Behaviors/Effect-of-Financial-Education-on-Financial-Behaviors-Final-Report.pdf",
+  "code": "200",
+  "bytes": 176479,
+  "cls": "content",
+  "deny": null,
+  "cached": false,
+  "body_file": "5ec36a32ce46c286.txt"
+ },
+ {
+  "url": "https://www.nejm.org/doi/full/10.1056/NEJM198707163170304",
+  "code": "200",
+  "bytes": 480,
+  "cls": "blocked",
+  "deny": "Just a moment",
+  "cached": false,
+  "body_file": "b651cd68e2a53fcf.txt"
+ },
+ {
+  "url": "https://www.nspk.ru/",
+  "code": "200",
+  "bytes": 2228,
+  "cls": "content",
+  "deny": null,
+  "cached": false,
+  "body_file": "0a32aa5c73de88e1.txt"
+ },
+ {
+  "url": "https://www.proskauer.com/insights/download-pdf/2460",
+  "code": "200",
+  "bytes": 432055,
+  "cls": "content",
+  "deny": null,
+  "cached": false,
+  "body_file": "cb03d174097d744f.txt"
+ },
+ {
+  "url": "https://www.retailinvestor.org/pdf/Bengen1.pdf",
+  "code": "422",
+  "bytes": 814,
+  "cls": "http_422",
+  "deny": null,
+  "cached": false,
+  "body_file": "e6cb0121dc831a54.txt"
+ },
+ {
+  "url": "https://www.revenuecat.com/blog/growth/subscription-app-trends-benchmarks-2026",
+  "code": "200",
+  "bytes": 18183,
+  "cls": "content",
+  "deny": null,
+  "cached": false,
+  "body_file": "41f38dab98ad0721.txt"
+ },
+ {
+  "url": "https://www.revenuecat.com/state-of-subscription-apps-2026-utilities",
+  "code": "200",
+  "bytes": 110,
+  "cls": "empty",
+  "deny": null,
+  "cached": false,
+  "body_file": "53776f411c7c9b04.txt"
+ },
+ {
+  "url": "https://www.revenuecat.com/state-of-subscription-apps/",
+  "code": "200",
+  "bytes": 163285,
+  "cls": "content",
+  "deny": null,
+  "cached": false,
+  "body_file": "8c436dc52ea93870.txt"
+ },
+ {
+  "url": "https://www.revolut.com/blog/post/introducing-new-and-improved-analytics/",
+  "code": "200",
+  "bytes": 3046,
+  "cls": "content",
+  "deny": null,
+  "cached": false,
+  "body_file": "750f7a8a9498b27c.txt"
+ },
+ {
+  "url": "https://www.rocketshiphq.com/revenuecat-state-of-subscription-apps-2025-summary/",
+  "code": "200",
+  "bytes": 30509,
+  "cls": "content",
+  "deny": null,
+  "cached": false,
+  "body_file": "8901360a7339ccd0.txt"
+ },
+ {
+  "url": "https://www.sberbank.ru/ru/person/bank_cards/debit-cards/sbercard",
+  "code": "200",
+  "bytes": 107,
+  "cls": "empty",
+  "deny": null,
+  "cached": false,
+  "body_file": "97942cfd5de23610.txt"
+ },
+ {
+  "url": "https://www.sberbank.ru/ru/person/credits/money/consumer_unsecured",
+  "code": "200",
+  "bytes": 108,
+  "cls": "empty",
+  "deny": null,
+  "cached": false,
+  "body_file": "813df2024b624bee.txt"
+ },
+ {
+  "url": "https://www.sciencedirect.com/science/article/pii/S0957417411013625",
+  "code": "200",
+  "bytes": 10408,
+  "cls": "content",
+  "deny": null,
+  "cached": false,
+  "body_file": "833306bdbfc27e92.txt"
+ },
+ {
+  "url": "https://www.sciencedirect.com/topics/social-sciences/goal-setting-theory",
+  "code": "200",
+  "bytes": 27604,
+  "cls": "content",
+  "deny": null,
+  "cached": false,
+  "body_file": "267561eb6ae44806.txt"
+ },
+ {
+  "url": "https://www.sec.gov/files/rules/interp/1987/ia-1092.pdf",
+  "code": "200",
+  "bytes": 36162,
+  "cls": "content",
+  "deny": null,
+  "cached": false,
+  "body_file": "c80afa1c058c2e3b.txt"
+ },
+ {
+  "url": "https://www.sec.gov/rules/interp/ia-1092.pdf",
+  "code": "200",
+  "bytes": 10037,
+  "cls": "blocked",
+  "deny": "Target URL returned error 404",
+  "cached": false,
+  "body_file": "8b4cbea16e1ced42.txt"
+ },
+ {
+  "url": "https://www.starlingbank.com/features/round-ups/",
+  "code": "200",
+  "bytes": 9582,
+  "cls": "content",
+  "deny": null,
+  "cached": false,
+  "body_file": "3585670c9f15d898.txt"
+ },
+ {
+  "url": "https://www.tbank.ru/cards/debit-cards/tinkoff-black/",
+  "code": "200",
+  "bytes": 64126,
+  "cls": "content",
+  "deny": null,
+  "cached": false,
+  "body_file": "a260a4e8f399cf3d.txt"
+ },
+ {
+  "url": "https://www.tbank.ru/deposit/",
+  "code": "422",
+  "bytes": 638,
+  "cls": "http_422",
+  "deny": null,
+  "cached": false,
+  "body_file": "c431f7e8ddb2edfa.txt"
+ },
+ {
+  "url": "https://www.tbank.ru/loans/cash-loan/",
+  "code": "200",
+  "bytes": 53352,
+  "cls": "content",
+  "deny": null,
+  "cached": false,
+  "body_file": "a3eac25395822e37.txt"
+ },
+ {
+  "url": "https://www.vtb.ru/personal/investicii/robot/",
+  "code": "200",
+  "bytes": 16945,
+  "cls": "content",
+  "deny": null,
+  "cached": false,
+  "body_file": "3fdd059a1d097641.txt"
+ },
+ {
+  "url": "https://www.vtb.ru/personal/kredit/nalichnymi/",
+  "code": "200",
+  "bytes": 11625,
+  "cls": "content",
+  "deny": null,
+  "cached": false,
+  "body_file": "26a8907a13af1e11.txt"
+ },
+ {
+  "url": "https://www.vtb.ru/personal/vklady/",
+  "code": "200",
+  "bytes": 11436,
+  "cls": "blocked",
+  "deny": "Target URL returned error 404",
+  "cached": false,
+  "body_file": "11a886a50f696fab.txt"
+ },
+ {
+  "url": "https://www1.fips.ru/iiss/",
+  "code": "200",
+  "bytes": 840,
+  "cls": "blocked",
+  "deny": "DDoS-Guard",
+  "cached": false,
+  "body_file": "fae5fc2ee649f977.txt"
+ },
+ {
+  "url": "https://www1.fips.ru/registers-web/",
+  "code": "200",
+  "bytes": 849,
+  "cls": "blocked",
+  "deny": "DDoS-Guard",
+  "cached": false,
+  "body_file": "463e51176808c25f.txt"
+ },
+ {
+  "url": "https://xn--h1alcedd.xn--d1aqf.xn--p1ai/news/obzor-stavok-po-ipoteke-v-bankakh-na-20-maya-2026-goda/",
+  "code": "200",
+  "bytes": 45003,
+  "cls": "content",
+  "deny": null,
+  "cached": false,
+  "body_file": "0a54815d0117f88b.txt"
+ }
+]

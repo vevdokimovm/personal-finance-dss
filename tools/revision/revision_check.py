@@ -48,7 +48,39 @@ SKIP_DIRS = frozenset({
     # «битые ссылки»/legacy-паттерны, не имеющие отношения к содержанию FINPILOT. SKIP_DIRS
     # писался до появления `_base/` в этом репо, поэтому не ловил её раньше.
     "_base",
+    # Дерево мутационного тестирования: `mutmut` копирует сюда ИЗМЕНЁННЫЕ копии наших
+    # файлов, чтобы проверить, ловят ли их тесты. Судить копию нашими же проверками
+    # бессмысленно вдвойне: она заведомо испорчена по замыслу, и правка туда не вносится
+    # (следующий прогон перезапишет). Тот же вывод, что уже сделан для `dist/` и `_base/`.
+    "mutants",
 })
+
+# 🔴 Первичный материал исследований (правило §9 в `CLAUDE.md`): хранится ДОСЛОВНО,
+# правка под гейт запрещена прямо. Наши проверки к нему неприменимы по построению:
+#
+# - цитата чужого репозитория (`app/Factory/TransactionJournalFactory.php`, `tests/
+#   test_parser.py` чужого проекта) совпадает с REF_PATTERN и читается как битая ссылка
+#   на НАШ путь;
+# - «95% доверительный интервал» из цитируемой научной работы читается как утечка
+#   параметра нашей модели v2.x, хотя это методика чужого исследования;
+# - иероглиф в дословном ответе агента читается как токен-глюк.
+#
+# **Почему класс, а не список.** До 23.09.2026 это лечилось поштучно: три записи
+# в `LEGACY_ALLOWLIST_FILES`, пять в `CJK_ALLOWLIST`, десяток пар в `LINK_ALLOWLIST`.
+# Корпус вырос до 188 файлов, и КАЖДАЯ новая тема роняла preflight заново тем же
+# способом — список мог только догонять. Довод уже записан в этом файле для
+# `GENERATED_PREFIXES`: «свойство пути не зависит от того, кто на него сослался,
+# поэтому и проверяется свойство». Здесь свойство — «чужой текст, хранимый дословно».
+#
+# 🔴 Канарейка при этом НЕ выключена: в `raw/` её находки уходят в информационные
+# строки, а не в провалы, и остаются видимыми. Вне `raw/` иероглиф по-прежнему провал.
+RAW_MATERIAL_PREFIX = "docs/research/raw/"
+
+
+def _is_raw_material(relative: str) -> bool:
+    """Файл — дословно сохранённое сырьё исследования, а не наш текст (§9)."""
+    return relative.startswith(RAW_MATERIAL_PREFIX)
+
 
 # Источник считается замороженным (ссылки были верны на своей версии — не чиним).
 FROZEN_HINTS = (
@@ -109,6 +141,21 @@ LINK_ALLOWLIST = {
         "трёх других файлов (см. ниже), WATCHLOG пропущен при первом проходе.",
     ("docs/test_run_optimization.md", "tests/test_x.py"):
         "плейсхолдер синтаксиса в примере команды pytest",
+    # Добавлено 23.09.2026 при переводе сырья исследований на классовое исключение
+    # (`RAW_MATERIAL_PREFIX`). Эти три живут ВНЕ `raw/`, поэтому классом не закрываются,
+    # и каждая имеет свою причину — общего свойства у них нет.
+    ("docs/research/queue/NIGHT-RUN-BRIEF_2026-09-17.md",
+     "docs/research/queue/NIGHT-RUN-REPORT_2026-09-17.md"):
+        "отчёт ночного прогона, который бриф ЗАКАЗЫВАЕТ на будущее: ссылка описывает "
+        "обязательство, а не существующий файл. Прогон шёл по темам очереди, отдельный "
+        "отчёт не писался — его заменил статус в GAP_QUEUE",
+    ("docs/research/queue/GAP_QUEUE.md", "tests/fixtures/faktura_wb_bank_sample.xml"):
+        "путь внутри ЧУЖОГО репозитория (mrflxxxme/dds2-sandbox), названный в цитате "
+        "реестра тем: тот же класс, что сырьё §9, но файл лежит вне raw/",
+    ("docs/research/queue/GAP_QUEUE.md",
+     "docs/model/expert_certification/from_scratch/COMPARISON_2026-09-XX.md"):
+        "имя с плейсхолдером даты (XX) — план сравнения моделей, файл появится с реальной "
+        "датой. Тот же класс, что tests/test_x.py строкой выше",
     ("knowledge/business/android_google_play_pipeline.md", "docs/PWA_УСТАНОВКА.md"):
         "плановый ассет вехи 8 (PWA), ещё не создан",
     ("knowledge/business/ios_app_store_pipeline.md", "docs/PWA_УСТАНОВКА.md"):
@@ -149,6 +196,30 @@ LINK_ALLOWLIST = {
         "отчёт о выборе направления: сравнение с тогдашним styles.css (снесён v8.47.0)",
     ("docs/pitfalls.md", "frontend/static/css/styles.css"):
         "PIT-022 описывает состояние ДО сноса — путь указывает на то, что тогда читалось",
+    # 🔴 Добавлено 16.09.2026 (§9). Пути ЧУЖИХ репозиториев в дословных выдержках
+    # исследования: так устроены Sberbank2Excel, ofxstatement и конвертеры банков —
+    # это цитата их дерева, а не ссылка на наш файл. Проверка ищет их у нас и не находит
+    # по построению; править сырьё под гейт правило §9 запрещает.
+    ("docs/research/raw/debt_data_sources_rf_2026-09-10.md", "tests/samples/alfabank.csv"):
+        "путь в чужом репозитории конвертера выписок, дословная выдержка (§9)",
+    ("docs/research/raw/debt_data_sources_rf_2026-09-10.md", "tests/samples/sberbank.csv"):
+        "то же",
+    ("docs/research/raw/debt_data_sources_rf_2026-09-10.md", "tests/samples/vtb.csv"):
+        "то же",
+    ("docs/research/raw/pdf_statement_parsing_accuracy_2026-09-13.md",
+     "tests/samples/alfabank.csv"):
+        "то же",
+    ("docs/research/raw/pdf_statement_parsing_accuracy_2026-09-13.md",
+     "tests/sberbankPDF2Excel_test.py"):
+        "файл тестов Sberbank2Excel — разбор его устройства в Г20 (§9)",
+    ("docs/research/raw/pdf_statement_parsing_accuracy_2026-09-13.md",
+     "tests/test_data/_SBER_DEBIT_2107_anonymized_reduced.txt"):
+        "образец корпуса Sberbank2Excel, цитата структуры (§9)",
+    ("docs/research/raw/pdf_statement_parsing_accuracy_2026-09-13.md",
+     "docs/recommended-template-fields.md"):
+        "документ чужого проекта (ofxstatement), цитата (§9)",
+    ("reports/photo-notes/telegram-FINPILOT-Product-text.md", "scripts/tg_import.py"):
+        "заметка владельца с телефона описывает задуманный скрипт, которого ещё нет",
 }
 
 # Паттерны устаревшей мат-модели v2.x (не должны заявляться как текущий факт).
@@ -181,6 +252,11 @@ LEGACY_ALLOWLIST_FILES = frozenset({
     # Правка сырья под гейт запрещена правилом §9 напрямую.
     "docs/research/raw/behavioral_execution_gap_2026-09-10.md",
     "docs/research/raw/prescriptive_quality_metrics_2026-09-10.md",
+    # Добавлено 16.09.2026, тот же класс (§9): «95% CI» в цитатах чужих работ.
+    "docs/research/raw/behavioral_finance_field_2026-09-10.md",
+    # Тест аллоулистов сам называет паттерн «21 альтернатив» в своём тексте —
+    # неизбежное самосовпадение, как у самого revision_check.py строкой выше.
+    "tests/test_revision_allowlists_cover_research_raw.py",
 })
 
 # Маркеры «это старое / переход» в строке — упоминание legacy легитимно, не факт.
@@ -274,6 +350,13 @@ CJK_ALLOWLIST: dict[str, str] = {
     # ссылку на сырьё единственным способом сверки.
     "docs/research/queue/RESEARCH_QUEUE.md":
         "дословные корейские дисклеймеры Toss/KakaoBank рядом с переводом (§9)",
+    # 🔴 Добавлено 16.09.2026 (§9), батчи Г24 и Г25: дословные корейские цитаты —
+    # заголовок поста блога KakaoBank, текст ошибки их движка, примеры тегов операций,
+    # и корейское название патента KR102121857B1. Это первичный материал, не токен-глюк.
+    "docs/research/raw/competitors_2026_refresh_2026-09-12.md":
+        "дословные корейские цитаты KakaoBank в добор Г24 (§9)",
+    "docs/research/raw/bank_patents_wellness_scoring_2026-09-09.md":
+        "корейское название патента KR102121857B1 в патентной таблице (§9)",
 }
 
 
@@ -352,8 +435,12 @@ class LinkChecker:
         frozen_broken = 0
         allowed = 0
         generated = 0
+        raw_material = 0
         for path in self._scanner.files():
             rel = self._scanner.relative(path)
+            if _is_raw_material(rel):
+                raw_material += 1
+                continue
             text = path.read_text(encoding="utf-8", errors="ignore")
             for match in REF_PATTERN.finditer(text):
                 ref = match.group(1).rstrip(".,);:").split("#")[0]
@@ -371,6 +458,9 @@ class LinkChecker:
         result.infos.append(Finding("сводка", f"замороженных пропущено: {frozen_broken}"))
         result.infos.append(Finding("сводка", f"allowlist принято: {allowed}"))
         result.infos.append(Finding("сводка", f"порождаемых путей пропущено: {generated}"))
+        result.infos.append(
+            Finding("сводка", f"сырья исследований пропущено: {raw_material}")
+        )
         return result
 
 
@@ -389,6 +479,8 @@ class LegacyModelChecker:
         for path in self._scanner.files():
             rel = self._scanner.relative(path)
             if self._scanner.is_frozen(rel) or rel in LEGACY_ALLOWLIST_FILES:
+                continue
+            if _is_raw_material(rel):
                 continue
             lines = path.read_text(encoding="utf-8", errors="ignore").splitlines()
             for line_no, line in enumerate(lines, 1):
@@ -427,12 +519,22 @@ class CjkCanaryChecker:
                 match = CJK_PATTERN.search(line)
                 if match:
                     snippet = line.strip()[:60]
-                    result.failures.append(Finding(
+                    finding = Finding(
                         f"{rel}:{line_no}",
                         f"CJK-символ '{match.group()}' в: {snippet}",
-                    ))
+                    )
+                    # Сырьё §9: находка остаётся видимой, но гейт не валит — править
+                    # дословно сохранённый ответ запрещено, а молча прятать нельзя.
+                    if _is_raw_material(rel):
+                        result.infos.append(finding)
+                    else:
+                        result.failures.append(finding)
         if result.ok:
-            result.infos.append(Finding("сводка", "CJK-символов в дереве продукта: 0"))
+            in_raw = len(result.infos)
+            result.infos.append(Finding(
+                "сводка",
+                f"CJK-символов в дереве продукта: 0; в сырье исследований (§9): {in_raw}",
+            ))
         return result
 
 

@@ -1892,3 +1892,247 @@ load average 2,6–2,8): прогон 1 — время MILP и сетка про
 Каналы литературы: WebSearch → WebFetch → `curl` с браузерным UA → `pdftotext
 -layout`; `r.jina.ai` не использовался (401 с нашей сети), Exa недоступна.
 Суммарно по двум заходам подагентов: WebSearch 26, WebFetch 3, curl ~47.
+
+---
+
+# ДОБОР Г30.1 — Exa (16.09.2026)
+
+**Состояние каналов (свои замеры 16.09.2026):** `mcp__exa__web_search_exa` — работает, но 🔴 **один
+раз вернула отказ «You've hit Exa's free MCP rate limit»** (запрос по Michaud 1989), при этом
+параллельный запрос в том же ходе прошёл, и следующий вызов через минуту тоже прошёл — то есть
+отказ **временный, по частоте**, а не «сервис лёг». Фиксирую как измеренную границу канала.
+`mcp__exa__web_fetch_exa` — работает; им взята страница RAND, отдавшая **`WebFetch` → HTTP 403**.
+`curl -skL` — работает (им взят PDF на 2,4 МБ, см. ниже). Wayback — HTTP 302.
+
+## Г30.1-20. 🔴 ГЛАВНАЯ НАХОДКА ПОДБАТЧА: задача распределения денежного потока между кредитами формализована как MILP, и Avalanche доказательно НЕ оптимален
+
+Это ровно та литература, которую прошлые заходы пометили недобытой («формулировка распределения
+потока как задачи математического программирования»).
+
+**Rios-Solis Y. A., Saucedo-Espinosa M. A., Caballero-Robledo G. A. «Repayment policy for multiple
+loans». *PLoS ONE* 12(4): e0175782, опубликовано 21.04.2017, DOI 10.1371/journal.pone.0175782.**
+Аффилиации: Universidad Autónoma de Nuevo León (Systems Engineering), Rochester Institute of
+Technology, CINVESTAV-Monterrey. **Лицензия Creative Commons Attribution** (в тексте статьи
+дословно: «This is an open access article distributed under the terms of the Creative Commons
+Attribution License»). Канал: Exa-поиск по описанию задачи → `curl -skL --http1.1` по
+`https://pdfs.semanticscholar.org/5c18/d886f09b66d0bd8dc0a324b2963073f34a98.pdf` — **HTTP 200,
+2 455 690 байт, `application/pdf`**; `pdftotext -layout` → **63 297 байт текста**, 12 страниц.
+Данные авторов выложены отдельно: `https://doi.org/10.6084/m9.figshare.4823518.v1`.
+
+**Абстракт — дословно:**
+> «The Repayment Policy for Multiple Loans is about a given set of loans and a monthly incoming cash
+> flow: **what is the best way to allocate the monthly income to repay such loans?** In this article,
+> we close the almost 20-year-old open question about how to model the repayment policy for multiple
+> loans problem together with its computational complexity. Thus, **we propose a mixed integer linear
+> programming model that establishes an optimal repayment schedule by minimizing the total amount of
+> cash required to repay the loans. We prove that the most employed repayment strategies, such as
+> the highest interest debt and the debt snowball methods, are not optimal.** Experimental results on
+> simulated cases based on real data show that our methodology obtains **on average more than 4% of
+> savings**, that is, the debtor pays approximately 4% less to the bank or loaner… **In certain
+> cases, the debtor can save up to 40%.**»
+
+**Определение «highest interest» (= наш Avalanche) их словами — дословно, чтобы не было спора
+о том, ту ли стратегию они опровергают:**
+> «The first strategy requires the debtor to **make a list of all its loans, ranked by interest rate
+> in nonincreasing order.** The debtor then needs to **satisfy the minimum payment of all its loans**
+> considering the order of the list. **Once all the minimum payments are covered, the remaining extra
+> money is allocated to the loan in the first place of the list.** After the first ranked debt has
+> been paid, it is erased from the list… **Many financial experts would affirm that the highest
+> interest plan is the best strategy to minimize the total repayment amount. As we will see, our
+> model shows that this is far from true.**»
+> «The debt snowball method is similar… but loans are ordered with respect to their balance…
+> Other financial experts argue that, even if the popular debt snowball method does not reduce the
+> total amount paid to the bank, **it may have psychological benefits.**»
+
+**Сложность — дословно:**
+> «we close the almost 20 year old open question about the complexity of the RPML which, we find,
+> **belongs to the NP-hard complexity class** … Meanwhile **the simplified versions of RPML
+> considered in [1] and [2] belongs to the polynomial class**…»
+> Механика доказательства (дословно): «Since the right-hand side of Eq (16) is a constant and
+> variables Zjt are binary, **these equations correspond to the restrictions of the multiple knapsack
+> problem, which is an NP-hard [problem]**.»
+
+**Числа сравнения стратегий — дословно:**
+> «By using the RPML methodology we obtain **on average more than 4% of savings** … This behavior is
+> more dramatic when compared with the **debt snowball rule (more than 6%)**, and the **average rule
+> (more than 5%)**. When the RPML problem is solved with our model, **the proximity to the optimum is
+> 0.06 on average, and it is reached in around 600 seconds.** Notice that the instances with 12 loans
+> are the hardest to solve…»
+> «In Fig 2 we present a particular instance that **would save 40% of the total repayments** by using
+> RPML instead of the highest interest plan. This improvement is the best one obtained from the
+> **550 instances** that were tested and, remarkably, **it has only two bank loans and two credit
+> card loans.**»
+> «Table 3 indicates that **a higher number of home loans results in the most difficult instances**
+> because the gap and the solving times are larger. Indeed, house-related debts are usually
+> long-term obligations that are translated as more variables in the RPML model.»
+
+Дизайн эксперимента (дословные фрагменты): сравниваемые правила — «**3. Snow: the snowball plan,
+where the loans with minimum balance are favored**», «highest interest», «average plan»; выборка —
+**550 инстансов** (110 с четырьмя долгами, 110 с восемью и T = 120, 110 с восемью и T = 240,
+220 с двенадцатью долгами).
+
+🔴 **Что это значит для FINPILOT — прямо и без смягчения.**
+1. **Формулировка задачи как математического программирования СУЩЕСТВУЕТ и опубликована**
+   (MILP: целевая функция (3), ограничения (4)–(15)). Пункт «литература по формулировке
+   распределения потока как задачи мат. программирования не добыта» — **закрыт**.
+2. 🔴 **Наш Avalanche-фильтр опровергнут как оптимальный в опубликованном первоисточнике.** Не
+   «подвергнут сомнению», а именно доказательно: авторы приводят контрпримеры и измеряют разрыв —
+   **в среднем свыше 4 %, в предельном случае 40 % переплаты** против оптимального расписания.
+   Это НЕ означает, что Avalanche в продукте неверен: он остаётся хорошей эвристикой и, в отличие от
+   MILP, объясним пользователю и считается мгновенно. Но **формулировки вида «оптимальный порядок
+   погашения» в наших документах и интерфейсе некорректны** и должны быть заменены на
+   «эвристика, минимизирующая переплату при последовательном погашении».
+3. **Задача NP-трудна.** Это снимает вопрос «почему бы не считать точный оптимум»: у авторов
+   MILP на 12 кредитах решается порядка **600 секунд** со средним зазором 0,06 — для интерактивного
+   СППР это неприемлемо, и наш выбор эвристики получает обоснование, которого раньше не было.
+4. **Разрыв растёт на длинных обязательствах** (ипотека) — для нашего рынка это самый частый
+   крупный долг; значит именно там эвристика хуже всего, и это место для честной оговорки
+   в документации модели.
+5. У них целевая функция — **минимизация суммарного оттока денег**; у нас многокритериальная свёртка
+   с резервом и целями. То есть их результат бьёт не по всей нашей модели, а по долговому блоку —
+   и именно там его надо процитировать.
+
+⬜ Не извлечено в этом заходе: точная запись ограничений (4)–(15) и таблицы 3–4 построчно — PDF
+на диске, при необходимости берётся из него без повторного похода в сеть.
+
+## Г30.1-21. Смежная формализация, которой в файле не было: три независимые работы
+
+Все найдены Exa 16.09.2026 по описанию задачи; ранее в теме не упоминались.
+
+1) **Alaluf M., Crippa G., Geng S., Jing Z., Krishnan N., Kulkarni S. et al. «Reinforcement Learning
+Paycheck Optimization for Multivariate Financial Goals», arXiv:2403.06011 (09.03.2024).** Дословно:
+> «We study **paycheck optimization**, which examines how to allocate income in order to achieve
+> several competing financial goals. **For paycheck optimization, a quantitative methodology is
+> missing, due to a lack of a suitable problem formulation.** To deal with this issue, **we formulate
+> the problem as a utility maximization problem.** The proposed formulation is able to (i) unify
+> different financial goals; (ii) incorporate user preferences regarding the goals; (iii) **handle
+> stochastic interest rates.**»
+> «we leverage **piecewise-linear utility functions**. Whenever a goal is active … the corresponding
+> utility function is negative, while it becomes zero otherwise… **it is possible to express the
+> user-specific preference for each goal via the slope of the utility function — the steeper the
+> slope, the more beneficial it is to allocate income to the corresponding goal.**»
+🔴 **Для нас:** это ближайший зарубежный аналог нашей постановки (распределение дохода между
+конкурирующими целями с учётом предпочтений пользователя), и он **датирован 2024 годом и сам
+заявляет, что до него методологии не было**. Прямо касается формулировки новизны: наша новизна
+не может стоять на «никто не формализовал распределение дохода между целями». Кусочно-линейные
+функции полезности с наклоном как выражением предпочтения — **функциональный аналог наших весов**.
+
+2) **«Scheduling Personal Finances via Integer Programming», *Journal of Mathematical Modelling and
+Algorithms in Operations Research* (Springer), 19.08.2012, DOI 10.1007/s10852-012-9201-9.** Дословно
+из карточки: «We describe **an integer programming model and algorithms for scheduling personal
+finances via the examination of a linear combination of the weighted objectives to be maximized.**
+Solving the integer programming problem provides **an optimal financial schedule which reflects an
+individual's goals and preferences.**» 🔴 То есть **линейная свёртка взвешенных критериев в личных
+финансах опубликована ещё в 2012 году** — это прямой предшественник нашей SAW-постановки, которого
+в теме не было. Полный текст за пейволлом Springer (не пробивался).
+
+3) **de Zarzà I., de Curtò J., Roig G., Calafate C. T. «Optimized Financial Planning: Integrating
+Individual and Cooperative Budgeting Models with LLM Recommendations», *AI* 5(1):6 (MDPI),
+25.12.2023, DOI 10.3390/ai5010006.** Дословно, с формулой: «**max_x { U(x) : x ∈ F, G(x) ≤ 0,
+H(x) = 0 }** (2) … **foundational mathematical models that describe budgeting optimization
+problems**, and (2) computational algorithms that **incorporate the LLM's recommendations into
+financial decision-making processes. The objective of maximizing savings by allocating monthly
+income across various expense categories**…»
+🟡 Для нас: работающий пример связки «оптимизационная модель + языковая модель как советчик» —
+архитектурный ориентир и одновременно ещё один предшественник по объекту.
+
+4) **Godbole A., Shah Z., Mudholkar R. S. «Preventing Household Bankruptcy: The One-Third Rule in
+Financial Planning with Mathematical Validation and Game-Theoretic Insights», *JRFM* 18(4):185
+(MDPI), 04.2025, DOI 10.3390/jrfm18040185; препринт arXiv:2501.15557.** Дословно: «This paper
+analyzes **the 1/3 Financial Rule, a method of allocating income equally among debt repayment,
+savings, and living expenses.** … The research develops theoretical foundations using **utility
+maximization theory, demonstrating how equal allocation emerges as a solution under standard
+economic assumptions.**» 🔴 Прямо смыкается с блоком про 50/30/20 в `calibration_ground_truth`:
+у «правил долей» появилось формальное обоснование через максимизацию полезности, и это свежий
+(2025) источник, которого в теме не было.
+
+## Г30.1-22. Fox (1966) и Federgruen & Groenevelt (1986) — полные тексты закрыты, но АБСТРАКТЫ добыты дословно
+
+**Fox B. L. «Discrete Optimization Via Marginal Analysis», *Management Science* 13(3), ноябрь 1966,
+с. 210–216, DOI 10.1287/mnsc.13.3.210.** Абстракт дословно (карточки ACM DL и PsycNET через Exa,
+тексты совпадают):
+> «**Discrete optimization subject to one constraint is attacked by Lagrangian analysis. Incremental
+> allocation schemes are given that generate undominated allocations. In an important special case,
+> the complete family of undominated allocations is generated.**»
+🔴 **Про RAND-копию — замер, закрывающий строку «RAND 404».** Карточка
+`https://www.rand.org/pubs/papers/P3288-1.html`: `WebFetch` → **HTTP 403**;
+`mcp__exa__web_fetch_exa` → **разобрана**. Дословно со страницы: «**Document Number: P-3288-1;
+Pages: 13; Year: 1966; Availability: Web Only; Copyright: RAND Corporation**» и
+«**Unauthorized posting of this publication online is prohibited; linking directly to this product
+page is encouraged.**» Прямых ссылок на PDF на странице **нет**; пробы
+`content/dam/rand/pubs/papers/{2006,2008}/P3288-1.pdf` → **HTTP 404, 17 342 байта HTML** обе.
+**Вывод: копии RAND в открытом доступе не существует**, и это теперь установленный факт, а не
+неудача канала. Условия оптимальности жадной схемы остаются на вторичном источнике (arXiv:2503.11107).
+
+**Federgruen A., Groenevelt H. «The Greedy Procedure for Resource Allocation Problems: Necessary and
+Sufficient Conditions for Optimality», *Operations Research* 34(6), декабрь 1986, с. 909–918,
+DOI 10.1287/opre.34.6.909.** 🔴 **Абстракт добыт дословно — и он содержит ровно ту теорему, которая
+в файле стояла вторичным пересказом:**
+> «In many resource allocation problems, the objective is to **allocate discrete resource units to a
+> set of activities so as to maximize a concave objective function subject to upper bounds on the
+> total amounts allotted to certain groups of activities. If the constraints determine a polymatroid
+> and the objective is linear, it is well known that the greedy procedure results in an optimal
+> solution. In this paper we extend this result to objectives that are "weakly concave," a property
+> generalizing separable concavity.** We exhibit large classes of models for which the set of
+> feasible solutions is a polymatroid and for which efficient implementations of the greedy procedure
+> can be given.»
+
+Для нас: условие применимости жадной схемы (нашего Avalanche — по сути жадного правила) теперь
+сформулировано словами авторов: **полиматроидная структура ограничений + «слабо вогнутая» целевая
+функция.** Ограничения нашей задачи (минимальные платежи, ПДН ≤ 0,40, Rt ≥ 0) полиматроид не
+образуют — что согласуется с результатом Rios-Solis et al. (Г30.1-20) о неоптимальности жадного
+правила. **Это два независимых источника, сходящихся в одной точке.**
+
+## ИТОГ Г30.1 — optimization_solvers
+
+| Пункт | Был статус | Стал | Чем взят |
+|---|---|---|---|
+| Литература: распределение потока как задача мат. программирования | НЕ ДОБЫТА | 🔴 **ДОБЫТА, полный текст CC BY** (Rios-Solis et al., PLoS ONE 2017, 63 297 байт текста) | Exa-поиск по описанию задачи → `curl` S2, HTTP 200, 2 455 690 байт |
+| Оптимальность Avalanche / highest-interest | считалась данностью | 🔴 **ОПРОВЕРГНУТА первоисточником**: не оптимальна, разрыв >4 % в среднем, до 40 % | тот же источник |
+| Сложность задачи | не рассматривалась | **NP-трудна** (сведение к multiple knapsack), простые версии — полиномиальны | тот же источник |
+| Fox (1966), полный текст | НЕ ДОБЫТ (RAND 404, DTIC) | **не добыт — подтверждено закрытым**; добыт абстракт дословно + реквизиты RAND P-3288-1 | Exa fetch страницы RAND (`WebFetch` там 403) |
+| Federgruen & Groenevelt (1986), полный текст | НЕ ДОБЫТ, теорема вторично | **частично добыт**: абстракт с условиями (полиматроид + weak concavity) дословно от авторов | Exa |
+| Michaud (1989), цитата «estimation-error maximizers», с. 33 | НЕ ПОДТВЕРЖДЕНА | **не проверена в этом заходе** — 🔴 именно на этом запросе Exa вернула rate limit; статус прежний, в кавычках со страницей не ставить | — |
+| Goldfarb & Iyengar (2003), out-of-sample числа | не добыты | **не переоткрывались** (бюджет) | — |
+| Gomory–Baumol 1960, Wolsey 1981, Katoh et al. 2013 | не добыты | **не переоткрывались** (бюджет) | — |
+
+**Главное число по файлу `optimization_solvers`: из 5 проверенных пунктов «не добыто» Exa перевела
+в «добыто»/«частично добыто» — 3**, причём один из них (MILP-постановка) не просто закрыл пробел,
+а **опроверг содержательное допущение продукта об оптимальности Avalanche**. Fox подтверждён
+закрытым, Michaud не проверен из-за временного rate limit Exa.
+
+---
+
+## ДОБОР Г31.4 — Semantic Scholar и долги Г31.2 (16.09.2026)
+
+**Каналы на начало работы:** Unpaywall **200** · Crossref **200** · OpenAlex **200** ·
+EuropePMC **200** · `r.jina.ai` **200** (без браузерного UA) · Wayback replay **200** ·
+`curl`/`pdftotext` в системе. 🔴 **Semantic Scholar расщеплён по эндпоинтам:**
+`/graph/v1/paper/search` — **429 на 4 из 4 попыток**; `/paper/search/bulk`,
+`/paper/DOI:<doi>`, `/paper/DOI:<doi>/citations` — **200**.
+
+**Правка к §Д8.4 этого файла.** Раздел Д8.4 добыл DeMiguel, Garlappi & Uppal (2009)
+**рабочей версией** и оговаривал, что номера страниц — не RFS. В подбатче Г31.4 добыта
+**журнальная версия RFS 22(5):1915–1953** (Wayback по адресу
+`faculty.london.edu/avmiguel/DeMiguel-Garlappi-Uppal-RFS.pdf`, **HTTP 200, 295 823 б**,
+PDF 39 страниц, колонцифры 1916–1953). Числа сверены и совпадают; оговорка о страницах
+**снимается**, привязка: абстракт с. 1915, аналитический результат с. 1919, панели E/F
+с. 1941, заключение с. 1947.
+
+🔴 **Новое сверх рабочей версии** (с. 1941, дословно): «Even in panel F, in which the Sharpe
+ratio for the 1/N portfolio is only 0.08, for a portfolio with 25 assets, the estimation window
+needed is more than **1600** months, and for a portfolio with 50 assets, it is more than
+**3200** months». То есть даже в самом благоприятном для оптимизатора сценарии требуемое
+окно на порядок больше практических 60–120 месяцев. Аргумент §5 «точное решение неточной
+задачи» этим **усиливается**; канон не трогается.
+
+Полный разбор — в `optimization_solvers_2026-09-10_dobor_lit.md`, блок Г31.4-D1.
+
+## ИТОГ Г31.4
+
+Закрыт 1 пункт (журнальная версия DeMiguel). Semantic Scholar его **не закрывал** —
+подтвердил `CLOSED`; закрыл Wayback. Задолженности по файлу нет.
+🔴 Канон, новизна, код — не затронуты.
+
+**Сводный итог всего подбатча Г31.4** — в `approach_validity_2026-09-10.md`,
+блок «ИТОГ Г31.4 (СВОДНЫЙ)».

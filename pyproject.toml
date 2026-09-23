@@ -9,3 +9,23 @@ ignore = ["E731", "E501"]
 [tool.ruff.lint.per-file-ignores]
 # env-переменные выставляются до импорта приложения (паттерн тестовой БД)
 "tests/conftest.py" = ["E402"]
+
+# Мутационное тестирование (пилот Р1.0, 16.09.2026). Покрытие меряет, какие строки
+# исполнились; мутационный балл меряет, ловят ли тесты испорченное поведение — для ядра
+# модели это важнее процента покрытия. Пилот сознательно узкий: три модуля ядра и их
+# собственные тесты, чтобы получить первое ЧИСЛО, а не гонять сутки по всему дереву.
+[tool.mutmut]
+# mutmut копирует дерево в mutants/ — копировать надо ВЕСЬ пакет `app`, иначе conftest
+# не находит app.database; мутируем при этом только три модуля ядра (only_mutate).
+source_paths = ["app"]
+only_mutate = ["app/core/avalanche.py", "app/core/ranking.py", "app/core/filtering.py"]
+# Гейт покрытия ≥90 % валит мутационный прогон: три файла тестов дают меньше 90 %,
+# pytest выходит с кодом 1, и mutmut считает это поломкой команды, а не «мутант выжил».
+pytest_add_cli_args = ["--no-cov", "-p", "no:cacheprovider"]
+# Сбор статистики зависимостей падает на нашем conftest — отключаем, для балла он не нужен.
+track_dependencies = false
+pytest_add_cli_args_test_selection = [
+    "tests/test_avalanche.py",
+    "tests/test_ranking.py",
+    "tests/test_filtering.py",
+]

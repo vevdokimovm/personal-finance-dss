@@ -416,3 +416,149 @@ Enigma: Is Optimized Optimal?», **ICFA Continuing Education Series, 1989, вы�
 сколько её надёжно есть. 🔴 Но сформулировать это в наших документах надо **своими словами со
 ссылкой на реквизиты**, а не поддельной цитатой.
 
+
+---
+
+# ДОБОР Г30.1 — Exa (16.09.2026)
+
+**Состояние каналов:** Exa search/fetch работают; 🔴 однократный временный отказ
+«You've hit Exa's free MCP rate limit» (по запросу про Michaud 1989), следующий вызов прошёл.
+`WebFetch` по `rand.org` — **HTTP 403**, `mcp__exa__web_fetch_exa` по тому же URL — разобрал.
+`curl -skL` — работает. Wayback — HTTP 302.
+
+**Материал этого добора записан в основной файл темы**
+`optimization_solvers_2026-09-10.md`, блоки **Г30.1-20 … Г30.1-22** (чтобы первичный текст
+не дублировался в двух файлах). Здесь — только изменения статусов пунктов A/B/C этого файла.
+
+| Пункт этого файла | Был статус | Стал |
+|---|---|---|
+| **A. Fox (1966)** — «НЕ добыт (DTIC maintenance, RAND 404). Нужен повтор.» | не добыт | **повтор сделан, результат отрицательный и теперь ОКОНЧАТЕЛЬНЫЙ**: карточка RAND P-3288-1 разобрана (13 стр., «Availability: Web Only», «Unauthorized posting … is prohibited»), ссылок на PDF нет, обе пробы `content/dam/...` → HTTP 404. **Добыт абстракт дословно** (ACM DL + PsycNET). Условия оптимальности жадной схемы остаются на arXiv:2503.11107 |
+| **B. Federgruen & Groenevelt (1986)** — полный текст не добыт, пересказ | вторично | **частично добыт**: абстракт авторов дословно, с условиями «**if the constraints determine a polymatroid and the objective is linear** … we extend this result to objectives that are "**weakly concave**"» |
+| **C. Michaud (1989)** — цитата «estimation-error maximizers, p. 33» не подтверждена | не подтверждена | **статус не изменился**: запрос упёрся в временный rate limit Exa, повтор не делался (бюджет подбатча). Запрет из прошлого захода в силе: **в кавычках с номером страницы не ставить** |
+| Goldfarb & Iyengar (2003), out-of-sample | не добыты | не переоткрывались |
+| Gomory–Baumol 1960 / Wolsey 1981 (субаддитивная двойственность) | не добыты | не переоткрывались |
+| Katoh–Shioura–Ibaraki 2013 (Springer, пейволл) | не добыт | не переоткрывался |
+
+🔴 **Главное для этого файла — не в списке выше.** Найдена и добыта полным текстом работа, меняющая
+рамку всего участка: **Rios-Solis, Saucedo-Espinosa, Caballero-Robledo, «Repayment policy for
+multiple loans», PLoS ONE 12(4): e0175782 (2017), CC BY** — MILP-постановка распределения месячного
+дохода между несколькими кредитами, доказательство **NP-трудности** задачи и доказательство, что
+**правило наибольшей ставки (наш Avalanche) и snowball НЕ оптимальны** (разрыв в среднем свыше 4 %,
+в предельном случае 40 %). Это смыкается с пунктом B: жадная процедура оптимальна при
+полиматроидных ограничениях и слабо вогнутой цели — условия, которых наша задача с минимальными
+платежами и ПДН не выполняет. Подробности и дословные цитаты — в основном файле, блок Г30.1-20.
+
+**Главное число по файлу `_dobor_lit`: из 3 пунктов (A, B, C) Exa сдвинула 2** — A закрыт как
+подтверждённо недоступный с добытым абстрактом, B переведён в «частично добыт» дословным абстрактом;
+C остался непроверенным из-за временного rate limit.
+
+---
+
+## ДОБОР Г31.4 — Semantic Scholar и долги Г31.2 (16.09.2026)
+
+**Каналы на начало работы (замер 16.09.2026, `curl -skL --http1.1`, коды дословно):**
+Unpaywall **200** (1 126 б) · Crossref **200** (7 853 б) · OpenAlex **200** (23 652 б) ·
+EuropePMC **200** (995 б) · `r.jina.ai` **200** (367 б, без браузерного UA) ·
+Wayback replay **200** (54 059 б, 5,2 с) · `curl`/`pdftotext`/`tesseract` — все три в системе.
+**Semantic Scholar — РАСЩЕПЛЁН ПО ЭНДПОИНТАМ, см. ниже: `/paper/search` 429×4,
+всё остальное 200.**
+
+### Г31.4-0. 🔴 ГЛАВНОЕ ПО КАНАЛУ: «Semantic Scholar = 429» — НЕВЕРНО. Лежит ОДИН эндпоинт из четырёх
+
+Замер 16.09.2026, без ключа, паузы 6–8 с между вызовами, каждый отказ повторён:
+
+| Эндпоинт | Попыток | Коды | Размер ответа |
+|---|---|---|---|
+| `/graph/v1/paper/search?query=…` (релевантный поиск) | 4 | **429, 429, 429, 429** | 174 б (текст отказа) |
+| `/graph/v1/paper/search/bulk?query=…` | 1 | **200** | 3 043 б, `total: 11` |
+| `/graph/v1/paper/DOI:<doi>?fields=…` | 3 | **200, 200, 200** | 876 б |
+| `/graph/v1/paper/DOI:<doi>/citations?…` | 1 | **200** | 611 б |
+
+Это ровно класс Г31.5 («отказ ОДНОГО АДРЕСА записан как свойство источника»), только
+применённый к каналу целиком. В доборах Д3–Д6 и Г18 запись «S2 = 429» означала на деле
+«лежит `/paper/search`»; поиск по названию заменяется на `/paper/search/bulk`, а всё,
+что делается по DOI (метаданные, `openAccessPdf`, `tldr`, графы цитирования), было
+доступно всё это время.
+
+🔴 **Ответ на вопрос «заводить ли ключ `SEMANTIC_SCHOLAR_API_KEY`»: ключ нужен только
+ради релевантного `/paper/search`; для наших задач (проверка по DOI, поиск открытой
+копии, поиск более поздних опровержений через `/citations`) он НЕ нужен.**
+
+### Г31.4-D1. DeMiguel, Garlappi & Uppal 2009 — 🟢 ДОБЫТА ЖУРНАЛЬНАЯ ВЕРСИЯ (RFS 22(5):1915–1953)
+
+Задолженность Г31.2 №1. Предписанный приём «Unpaywall → точный адрес открытой копии → Exa»
+выполнен и дал **отрицательный** результат; закрыл пункт другой канал — Wayback по адресу,
+который «отдавал HTML вместо PDF».
+
+| Канал | Адрес | Код / размер | Итог |
+|---|---|---|---|
+| Unpaywall `v2/10.1093/rfs/hhm075` | api.unpaywall.org | **200, 1 126 б** | `is_oa: false`, `oa_status: closed`, `best_oa_location: null`, `oa_locations: 0` → **точного адреса открытой копии не существует** |
+| OpenAlex `works/doi:10.1093/rfs/hhm075` | api.openalex.org | **200** | `is_oa false`, обе локации не-OA (RFS, RePEc-хэндл) |
+| Semantic Scholar `paper/DOI:10.1093/rfs/hhm075` | api.semanticscholar.org | **200, 876 б** | `openAccessPdf.status: "CLOSED"`, `url: ""`; абстракт изъят издателем (`elided by the publisher`); `citationCount: 3246` |
+| 🟢 **Wayback replay** | `web.archive.org/web/2015/http://faculty.london.edu/avmiguel/DeMiguel-Garlappi-Uppal-RFS.pdf` | **HTTP 200, 295 823 б, `application/pdf`** | **PDF 1.2, 39 страниц — ЖУРНАЛЬНАЯ вёрстка RFS**, sha256 `a3a315fa78de3a0042d43323504a485a98bbd100c744df44b29f0b32d8c9ff30` |
+
+**Почему это журнальная, а не рабочая версия — доказательство из самого файла (дословно):**
+колонтитул на каждой развороте «`The Review of Financial Studies / v 22 n 5 2009`»;
+на первой странице «`doi:10.1093/rfs/hhm075   Advance Access publication December 3, 2007`»
+и «`C The Author 2007. Published by Oxford University Press on behalf of The Society for
+Financial Studies`»; колонцифры идут **1916…1953**, последняя строка файла — `1953`.
+39 страниц = 1915–1953, ровно диапазон RFS.
+
+**Дословно, абстракт (с. 1915):**
+
+> «We evaluate the out-of-sample performance of the sample-based mean-variance model, and
+> its extensions designed to reduce estimation error, relative to the naive 1/N portfolio. Of the
+> 14 models we evaluate across seven empirical datasets, none is consistently better than the
+> 1/N rule in terms of Sharpe ratio, certainty-equivalent return, or turnover, which indicates
+> that, out of sample, the gain from optimal diversification is more than offset by estimation
+> error. Based on parameters calibrated to the US equity market, our analytical results and
+> simulations show that the estimation window needed for the sample-based mean-variance
+> strategy and its extensions to outperform the 1/N benchmark is around 3000 months for a
+> portfolio with 25 assets and about 6000 months for a portfolio with 50 assets. This suggests
+> that there are still many "miles to go" before the gains promised by optimal portfolio choice
+> can actually be realized out of sample. (JEL G11)»
+
+**Дословно, введение, с. 1919:**
+
+> «Based on parameters calibrated to US stock-market data, we find that the critical
+> length of the estimation window is 3000 months for a portfolio with only 25
+> assets, and more than 6000 months for a portfolio with 50 assets. The severity
+> of estimation error is startling if we consider that, in practice, these portfolio
+> models are typically estimated using only 60 or 120 months of data.»
+
+**Дословно, результаты, с. 1941** (важная оговорка, которой не было в нашей выжимке):
+
+> «In panel E, we find that for a portfolio with 25 assets, the estimation window needed for the
+> sample-based mean-variance policy to outperform the 1/N policy is more than
+> 3000 months, and for a portfolio with 50 assets, it is more than 6000 months.
+> Even in panel F, in which the Sharpe ratio for the 1/N portfolio is only 0.08,
+> for a portfolio with 25 assets, the estimation window needed is more than 1600
+> months, and for a portfolio with 50 assets, it is more than 3200 months.»
+
+**Дословно, с. 1934:** «Sections 1.6.1 and 1.6.2, do not outperform 1/N in a statistically significant way.»
+
+**Дословно, заключение, с. 1947:** «for a portfolio with only 25 assets, the estimation window
+needed is more than 3000 months, and for a portfolio with 50 assets, it is more
+than 6000 months, while typically these parameters are estimated using 60–120 months of data.»
+
+**Что это меняет у нас.** Три числа (14 моделей / 7 датасетов / 3000 и 6000 месяцев),
+которые раздел D этого файла разрешал цитировать только по страницам РАБОЧЕЙ версии,
+теперь **привязаны к страницам RFS**: абстракт с. 1915, аналитический результат с. 1919,
+таблица-панель E/F с. 1941, заключение с. 1947. Оговорка «номера страниц ниже — страницы
+рабочей версии, не RFS 1915–1953» из раздела D **снимается**. Содержательных расхождений
+между версиями по этим числам не обнаружено. 🔴 **Новое сверх рабочей версии:** нижняя
+граница 1600/3200 месяцев для панели F (Sharpe 1/N = 0,08) — то есть даже в самом
+благоприятном для оптимизатора сценарии требуемое окно на порядок больше практических
+60–120 месяцев. Аргумент «точное решение неточной задачи» этим усиливается, канон не трогается.
+
+## ИТОГ Г31.4
+
+По этому файлу: **1 пункт закрыт** — DeMiguel, Garlappi & Uppal 2009 добыт **журнальной
+версией RFS 22(5):1915–1953** (Wayback по адресу, который прежде «отдавал HTML вместо PDF»).
+Оговорка раздела D «номера страниц — рабочей версии, не RFS» снимается; добавлено число,
+которого в рабочей версии не было (окно 1600/3200 мес. для панели F).
+**Semantic Scholar этот пункт НЕ закрывал** — он лишь подтвердил `CLOSED`; закрыл Wayback.
+Не добыто по файлу: ничего не осталось. Задолженности нет.
+🔴 Канон, новизна, код — не затронуты.
+
+**Сводный итог всего подбатча Г31.4** — в `approach_validity_2026-09-10.md`, блок «ИТОГ Г31.4 (СВОДНЫЙ)».

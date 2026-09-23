@@ -82,18 +82,25 @@ class TestCanaryStillCatchesRealGlitches:
         assert len(result.failures) == 1
         assert "docs/leak.md:1" == result.failures[0].location
 
-    def test_allowlisted_path_is_skipped_only_for_its_own_path(self, tmp_path):
-        """Исключение действует на один путь, а не на каталог целиком."""
+    def test_raw_material_is_exempt_by_class_but_stays_visible(self, tmp_path):
+        """🔴 Контракт ИЗМЕНЁН 23.09.2026, и прежний тест держал старый.
+
+        Раньше исключение действовало на один путь, и тест это проверял: файл
+        `raw/`, не внесённый в аллоулист, обязан был валить гейт. Корпус вырос
+        до 188 файлов, каждая новая тема роняла preflight заново, а править сырьё
+        запрещено правилом §9 — список мог только догонять. Исключение стало
+        КЛАССОМ (`_is_raw_material`), и тест переписан под новый контракт, а не
+        удалён: разница между «гейт уточнили» и «гейт сняли» держится на том,
+        что находка в сырье остаётся ВИДИМОЙ в информационных строках.
+        """
         raw = tmp_path / "docs" / "research" / "raw"
         raw.mkdir(parents=True)
-        allowed = next(iter(CJK_ALLOWLIST))
-        target = tmp_path / allowed
-        target.parent.mkdir(parents=True, exist_ok=True)
-        target.write_text(f"{HANGUL}\n", encoding="utf-8")
         (raw / "other_file.md").write_text(f"{HANGUL}\n", encoding="utf-8")
         result = CjkCanaryChecker(tmp_path).run()
-        locations = [f.location for f in result.failures]
-        assert locations == ["docs/research/raw/other_file.md:1"]
+        assert result.failures == []
+        assert any(
+            f.location == "docs/research/raw/other_file.md:1" for f in result.infos
+        ), "сырьё не валит гейт, но и не исчезает из вывода"
 
     def test_legacy_pattern_outside_allowlist_is_still_a_failure(self, tmp_path):
         (tmp_path / "docs").mkdir()

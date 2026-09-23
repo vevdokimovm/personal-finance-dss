@@ -583,3 +583,34 @@ patterns/sludge (см. п.3, OSC 2024). Это стоит явно зафикс�
 зависит от воспринимаемой сложности задачи. Требует проверки по первоисточнику до использования как
 факта.
 
+
+---
+
+## ДОБОР Г31.5 — отказ адреса (17.09.2026)
+
+**Каналы (замер 17.09.2026):** Crossref `/works/<doi>` **200** (12 540 б) · Unpaywall **200** · S2 `/paper/DOI:` **200** (записанный в файле «429 дважды» — это эндпоинт `/paper/search`, см. Г31.4) · Exa search **работает**.
+
+Кандидат по файлу — п. 6 списка отказов (стр. 565–568): **Hodge, Mendoza & Sinha 2021** — «Semantic Scholar API дважды вернул HTTP 429, полный текст не добыт; есть только пересказ из сниппета». Позже в файле не упоминается. Класс Г31.5: отказ одного эндпоинта одного сервиса.
+
+### Г31.5-T1. 🟢 Hodge, Mendoza & Sinha (2021) — АВТОРСКИЙ АБСТРАКТ ДОБЫТ ДОСЛОВНО; полный текст закрыт
+
+- Crossref `query.bibliographic` — **200**: журнальная версия `10.1111/1911-3846.12641`, *Contemporary Accounting Research* **38(1):770–792**; рабочая — `10.2139/ssrn.3158004`.
+- Crossref `/works/10.1111/1911-3846.12641` — **200, 12 540 б**, **абстракт депонирован Wiley**.
+- Unpaywall — **200**, `is_oa: False`, `closed`, локаций нет. S2 `/paper/DOI:` — **200**, `CLOSED`, `citationCount: 47`.
+- Exa search — SSRN-карточка 3158004 (40 стр., «Contemporary Accounting Research, Forthcoming», последняя ревизия 20.07.2020; ссылка на `Delivery.cfm` — за капчей SSRN, замеры прошлых заходов), Illinois Experts (метаданные + тот же абстракт); открытого PDF нет.
+
+**Абстракт ДОСЛОВНО (Crossref, журнальная версия):**
+
+> «We examine the effect of humanizing (naming) robo‐advisors on investor judgments, which has taken on increased importance as robo‐advisors have become increasingly common and there is currently little SEC regulation governing key aspects of their use. In our first experiment, we predict and find that **investors are more likely to rely on the investment recommendation of an unnamed robo‐advisor, whereas they are more likely to rely on the investment recommendation of a named human advisor**. Theory suggests one reason that naming a robo‐advisor may have drawbacks pertains to the complexity of the task the robo‐advisor performs. We explore the importance of task complexity in our second experiment. We predict and find that **investors are less likely to rely on a named robo‐advisor when the advisor is perceived to be performing a relatively complex task**, consistent with our first experiment, and **more likely to rely on a named robo‐advisor when the advisor is perceived to be performing a relatively simple task**, consistent with prior research on human‐computer interactions. … Lastly, our study has practical implications for wealth management firms by demonstrating the potentially negative effects of making robo‐advisors more humanlike in an attempt to engage and attract users.»
+
+**Выжимка.** 🟡-пересказ в файле заменяется авторским абстрактом. Результат — взаимодействие «очеловечивание × сложность задачи»: для **сложной** задачи (распределение денег между долгами, резервом и целями — сложная) **имя/персона у алгоритма снижает опору на совет**, для простой — повышает. Это прямой довод против персонажа-ассистента с именем в ядре рекомендации FINPILOT; уместен разве что для простых сценариев. Ограничение: эксперименты на инвестиционных рекомендациях, выборка и размеры эффекта в абстракте не названы — полный текст за SSRN/Wiley.
+
+### Г31.5-T2. «Harm-aware recommendation» (OHARS) — не брался
+
+Стр. 531: «полный текст не зафетчен — бюджет». Сознательно не добирался: сам файл установил, что предметная область OHARS — дезинформация и вредный контент соцсетей, а не финансы; полный текст воркшоп-материалов вывод о терминологическом пробеле не изменит. Не класс Г31.5 по существу (нет вопроса, на который отвечал бы источник).
+
+## ИТОГ Г31.5 — _sub17_trust_and_harm
+
+2 пункта: **Hodge et al. 2021 — закрыт авторским абстрактом через Crossref `/works/<doi>`** (полный текст — Wiley/SSRN, закрыт); OHARS — обоснованно не брался.
+🔴 **Что меняет обоснование (канон не трогается):** для сложной задачи распределения денег очеловечивание рекомендательного движка (имя, персона) экспериментально снижает опору на совет — довод для продуктового/UX-решения, не для модели.
+Задолженности нет.

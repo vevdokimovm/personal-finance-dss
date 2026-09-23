@@ -1137,3 +1137,52 @@ while investing 100 minus your age percent in stocks reduces welfare by 2.00%»;
 home.uchicago.edu). `pdftoppm` + `Read` картинки — 1 раз (формула Rust). `r.jina.ai` не использовался
 (по указанию). Все числа добора взяты из разобранных PDF/XML, кроме Д9 (97,8 % — аннотация arXiv,
 помечено) и Lettau–Uhlig (аннотация, помечено).
+
+---
+
+## ДОБОР Г31.5 — отказ адреса (17.09.2026)
+
+**Каналы (замер 17.09.2026):** Unpaywall **200** · Crossref **200** · S2 `/paper/DOI:` **200** · Exa search **работает** · Wayback replay **302 → 200** (снимок `id_`, пауза 20 с) · `r.jina.ai` без UA **200** · 🔴 прямой `curl` на `ink.library.smu.edu.sg` — **200, но 212 б**: заглушка антибота Incapsula (`/_Incapsula_Resource`), не страница.
+
+Последнее упоминание пунктов — список «Всё ещё не добыто» (стр. 1123–1130), позже доборов нет.
+
+### Г31.5-E1. 🟢 Lettau & Uhlig (1999) — ПОЛНЫЙ ТЕКСТ ДОБЫТ со снимка авторской страницы
+
+- Запись: `home.uchicago.edu/~huhlig/papers/uhlig.lettau.aer.1999.pdf` — **404**. Отказ ОДНОГО адреса, архив не проверялся.
+- Unpaywall `10.1257/aer.89.1.148` — **200**, `is_oa: False`, `closed`.
+- Wayback `web.archive.org/web/2010/<тот же URL>` — **302** на снимок **01.03.2017** (`20170301111855`).
+- `https://web.archive.org/web/20170301111855id_/http://home.uchicago.edu/~huhlig/papers/uhlig.lettau.aer.1999.pdf` — **HTTP 200, 284 880 б, `application/pdf`**, 28 стр., sha256 `f9a584854ebca735d1f7dc3ecd676f6b1a5c75db3153f1fc3aa5b09ed4bd0365`. Это **журнальная вёрстка AER** (колонтитулы «LETTAU AND UHLIG: RULES OF THUMB», номера страниц журнала, напр. 169).
+
+**Абстракт ДОСЛОВНО:** «This paper studies decision-making with rules of thumb in the context of dynamic decision problems and compares it to dynamic programming. A rule is a fixed mapping from a subset of states into actions. Rules are compared by averaging over past experiences. This can lead to favoring rules which are only applicable in good states. Correcting this good state bias requires solving the dynamic program. We provide a general framework and characterize the asymptotic properties. We apply it to provide a candidate explanation for the sensitivity of consumption to transitory income.»
+
+**Механизм ДОСЛОВНО (введение):** «We find that the learning scheme investigated here often gives rise to a "good state bias," favoring rules which make possibly bad decisions, but are applicable only in good states (as measured by the value function). The intuition is as follows: even though the dynamic nature of the decision problem is taken into account when evaluating past performance, the learning algorithm fails to distinguish between good luck and smart behavior. This way, a suboptimal rule may be "falsely" learned to be superior to some other rule, which always implements the "correct" dynamic programming solution.»
+
+**Вывод ДОСЛОВНО (разд. VII):** «Strengths provide a crude average of values across all states where a particular rule is applied. As a result, a suboptimal rule might dominate the optimal one if it is applicable only in "good" states of the world: bad decisions in good times can "feel better" than good decision in bad times. … It was furthermore shown that adjusting the learning algorithm to correct the good state bias cannot be done in a simple way.»
+
+**Выжимка.** 🟡-пометка «По аннотации, не первоисточник» снимается: механизм подтверждён. Вывод файла («к нашей схеме — оценка правил симуляцией вперёд, а не по прошлому опыту — прямо не относится») **устоял**, но с уточнением, где он перестаёт быть верным: good state bias возникает, когда правила сравнивают **средним исходом по состояниям, в которых правило применялось**. Если мы когда-либо будем выбирать/калибровать правило по **реализованным исходам пользователей** (Г31.4-D5 предлагал «метрику, независимую от экспертов, по реализованному исходу»), эта ловушка становится прямой: правило, срабатывающее у пользователей в хорошем положении, будет выглядеть лучше. Сравнение нужно делать на одних и тех же состояниях (симуляция по общему набору сценариев), а не по истории применения.
+
+### Г31.5-E2. Ng, Ding, Cheng & Lam (2012) — абстракт ДОБЫТ; 🔴 метка Unpaywall «green» ЛОЖНАЯ, полного текста нет
+
+- Запись стр. 1127: «пейволл Springer, не пробовались дальше выдачи».
+- Crossref — **200**: `10.1007/s10479-011-0872-9`, *Annals of Operations Research* **192(1):141–150**; Gupta, Kunnathur & Dandapani 1987 — `10.1016/0305-0483(87)90020-x`, *Omega* 15:323–330, «Optimal repayment policies for multiple loans».
+- Unpaywall по Ng 2012 — **200**, 🔴 `is_oa: True`, `oa_status: "green"`, локация `ink.library.smu.edu.sg/lkcsb_research/3179` (`submittedVersion`). S2 — **200**, `openAccessPdf.status: "GREEN"` на тот же адрес.
+- Прямой `curl -skL` по адресу — **200, 212 б** (Incapsula). `r.jina.ai` без UA — **200, 10 845 б**: запись Digital Commons **только с метаданными и абстрактом**; вместо файла — «Link to Full Text» → `doi.org/10.1007/s10479-011-0872-9`. **Полного текста в репозитории нет — метка «green» ставится по наличию записи, а не файла.**
+- Exa search — RePEc (`Download Restriction: Access to full text is restricted to subscribers`), PolyU Scholars Hub (только метаданные), MaRDI, researchr: открытого PDF нет.
+- Gupta et al. 1987 — Unpaywall **200** `closed`; S2 **200** `CLOSED`, абстракт изъят, `tldr: null`.
+
+**Абстракт Ng et al. 2012 ДОСЛОВНО (SMU InK, совпадает с RePEc и PolyU):** «We study the multi-loan-repayment problem by formulating it as a single-machine scheduling problem with preemptive and time-dependent processing times **to minimize the makespan**. We transform the scheduling problem into a continuous non-linear optimization problem and obtain an **approximate solution** by solving a series of the corresponding linear programming problems. We also identify agreeable conditions for the problem and discuss the computational complexity of the problem.» (В записи SMU заголовок другой: «Preemptive Scheduling Policy for Multiple Loan Repayment».)
+
+**Выжимка.** 🔴 Уточняет пересказ Ríos-Solís в файле («упрощённые постановки Gupta и Ng — полиномиальные (LP)»): у Ng et al. критерий — **makespan, т. е. срок полного погашения, а не суммарные проценты**, и решение — **приближённое** через серию LP; оптимальности Avalanche работа не доказывает и по постановке доказывать не может. Вывод файла «утверждать, что в них доказана оптимальность Avalanche, нельзя» — подтверждён по абстракту и усилен.
+
+### Г31.5-E3. Zeldes (1989) — ОТКЛОНЁН как кандидат класса
+
+Не один адрес: Oxford Academic, Columbia, EconPapers уже были. Добор: Crossref — **200**, реальный DOI **`10.2307/2937848`** (JSTOR), QJE 104(2):275; Unpaywall — **200**, `closed`; S2 — **200**, `CLOSED`, `citationCount: 888`. Рабочей версии NBER у этой статьи нет (ближайшая — Zeldes «Consumption: Beyond Certainty Equivalence», NBER `10.3386/w2496`, другая работа). Статус «пейволл» подтверждён тремя индексами.
+
+## ИТОГ Г31.5 — dp_vs_enumeration
+
+4 пункта: **Lettau & Uhlig — закрыт полным текстом (Wayback `id_` по адресу, давшему 404)**; **Ng et al. 2012 — абстракт добыт (`r.jina.ai` по репозиторию, куда указал Unpaywall), полного текста нет — метка green ложная**; Gupta 1987 и Zeldes 1989 — подтверждены закрытыми, не класс. Powell ADP (книга Wiley) — не класс, не брался.
+
+🔴 **Что меняет обоснование (канон не трогается):**
+1. Ng et al. 2012 оптимизирует **срок полного погашения**, а не проценты, и решает **приближённо** — ссылаться на неё как на «формальную постановку оптимального погашения» в смысле Avalanche нельзя.
+2. Lettau & Uhlig: любая будущая калибровка/выбор правила **по реализованным исходам пользователей** подвержена good state bias — сравнение правил допустимо только на общем наборе сценариев. Прямо касается предложения (б) из Г31.4-D5.
+Задолженности нет.

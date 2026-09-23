@@ -442,3 +442,121 @@ Lloyds, NatWest, HSBC, OCBC, UOB TMRW, Kakao, Toss, Revolut, Starling, N26, CBA,
 - Всё, что в файле 08.09 по банкам, не перечисленным в сводной таблице выше (Citi, US Bank, TD,
   Lloyds, NatWest, HSBC, Nordea, Swedbank, OCBC, UOB, Kakao, Westpac, CBA, Itaú, Starling,
   Revolut, MoneyLion), — **остаётся без URL и в этом прогоне не проверялось**.
+
+---
+
+## ДОБОР Г31.5 — отказ адреса (17.09.2026)
+
+**Каналы (замер 17.09.2026):** `www.ing.nl` прямой `curl -skL` (HTTP/2) — **exit 92** (обрыв потока), с `--http1.1` — **000, таймаут 40 с** · `r.jina.ai` без UA — **200, 346 б** (только заголовок: «page contains shadow DOM»), с `X-With-Shadow-Dom: true` + `X-Timeout: 30` — **200, 278 б** (кэш, только заголовок) · Exa fetch — `CRAWL_LIVECRAWL_TIMEOUT` · Wayback replay — **302 → снимок 09.05.2026**, `id_` **200, 13 872 б** — SPA-оболочка (`ing-app-open-loader.js`), текста 33 знака · **Exa search — работает, выдала текст с соседних адресов**.
+
+Кандидат по файлу — §8 ING «Kijk Vooruit» (стр. 215–228, 349, 382, 428, 438): «канал недоступен», описание только из `ing.com/sustainability`. Отказ записан по ОДНОМУ адресу продуктовой страницы (`ing.nl/en/…/kijk-vooruit`). Позже в файле и в других файлах `raw/` пункт не перепроверялся.
+
+### Г31.5-W1. 🟢 ING Kijk Vooruit — механика подтверждена официальными страницами-соседями и прессой
+
+Продуктовая страница по-прежнему не отдаёт текст ни одному каналу (коды выше: это клиентский рендер, а не отказ сервера). Закрыто соседними адресами того же ресурса, найденными Exa search:
+
+**1. Официальная страница ING «Inzicht»** — `https://www.ing.nl/particulier/digitaal-bankieren/app/inzicht` (текст отдан Exa), ДОСЛОВНО:
+> «Weten welke uitgaves er nog aankomen? Dat kan met Kijk Vooruit. Zo zie je welke vaste inkomsten en uitgaven je nog kan verwachten. Dus geen verrassingen voor jou, wel zo fijn.» … «### Kijk Vooruit — Welke bij- en afschrijvingen komen eraan? Laat je niet verrassen.»
+(«Хотите знать, какие расходы ещё впереди? Для этого Kijk Vooruit: видно, какие регулярные поступления и списания ещё ожидать».) Там же о соседней функции категоризации: «Het indelen gebeurt volledig automatisch, er komt geen mens aan te pas… En dat doen we pas nadat je toestemming hebt gegeven» — категоризация только после отдельного согласия, включая «bijzondere persoonsgegevens».
+
+**2. Официальное описание приложения ING в App Store NL** — `https://apps.apple.com/nl/app/ing-nederland/id474495017`, ДОСЛОВНО: «Als je wil, kijk je **35 dagen vooruit**: je ziet toekomstige af- en bijschrijvingen.»
+
+**3. Механика прогноза со слов ING (iCulture, 06.07.2016)** — `https://www.iculture.nl/nieuws/ing-mobiel-bankieren-toekomstige-uitgaven/`, ДОСЛОВНО: «Deze worden met een rekenkundig computermodel berekend, aldus de ING. **De datum van zo'n voorspelling wordt bepaald op basis van de laatste vier afschrijvingen, het bedrag op basis van de laatste vijf afschrijvingen.** De Kijk Vooruit-functie kan 35 dagen in de toekomst kijken.»
+
+**4. Эволюция и независимая проверка:** Consumentenbond, 11.08.2016 (`consumentenbond.nl/betaalrekening/ing-kijkt-vooruit`): «overzicht van de 'zekere én voorspelde' afschrijvingen van de komende 35 dagen … bij een proef kwamen wij nog **enkele onjuiste voorspellingen** tegen»; Droidapp, 18.04.2018: «Vanaf nu krijg je tijdens het scrollen door de verwachte af- en bijschrijvingen **het voorspelde saldo** te zien»; Androidworld, 11.01.2023: в Kijk Vooruit добавлены периодические инвестиционные взносы и изъятия; SeniorWeb, 10.03.2025: «In de app van ING staat 'Kijk Vooruit' **standaard uit**».
+
+**Выжимка.** Вердикт §8 файла («прогноз баланса, дескриптив-плюс, ставок и распределения нет») **подтверждён** и уточнён фактами: горизонт **35 дней**; прогноз — «уверенные» (поручения, инкассо) + «предсказанные» регулярные списания; **дата — по последним 4 списаниям, сумма — по последним 5**; с 2018 — прогнозный остаток; функция по умолчанию выключена; независимая проверка находила ошибки прогноза. Советов и распределения денег нет ни в одном источнике.
+
+## ИТОГ Г31.5 — banks_world_pfm_v2
+
+1 кандидат, **закрыт** соседними адресами того же ресурса (официальная страница `ing.nl/particulier/…/inzicht` + App Store ING) и прессой, найденными **Exa search**; сама продуктовая страница — SPA, текст не отдаёт ни прямому `curl`, ни прокси, ни Exa fetch, ни Wayback (`id_`-снимок — оболочка). Пометка 🟡 «не подтверждено первичной страницей» в §8 снимается.
+
+🔴 **Что это даёт прогнозу (канон не трогается):** у крупного банка прогноз регулярных списаний устроен как **правило «последние 4 даты / последние 5 сумм» на горизонте 35 дней** — это готовая наивная базовая линия, против которой стоит мерить наш SES+Монте-Карло на короткой истории (связка с вопросом 4 `debt_payoff_math_cashflow_forecast` о SES на 3–12 наблюдениях). Остальные банки из «Осталось незакрытым» (Citi, US Bank, TD, Lloyds, NatWest, HSBC, OCBC, UOB, Kakao, Toss, Revolut, Starling, N26, CBA, Itaú) — не класс Г31.5 (материал без URL, а не отказ адреса); частично закрыты в `banks_apac_neobanks` и `competitors_2026_refresh`, в этот заход не брались.
+
+---
+
+## ИТОГ Г31.5 (СВОДНЫЙ — по всему подбатчу, 13 файлов, 17.09.2026)
+
+**Процесс.** Один агент, **подагентов 0**, `WebSearch` 0. Exa search — 7 вызовов, Exa fetch — 5 (все пять `CRAWL_LIVECRAWL_TIMEOUT`). Остальное — прямые `curl`, `r.jina.ai` без UA, API Crossref/Unpaywall/S2/OpenAlex, DSpace 7 REST, Wayback, `pdftotext`/`pdftoppm`+`tesseract`, чтение отрисованных страниц PDF. Один обрыв сессии на лимите АККАУНТА (HTTP 429 харнесса) до первой записи — после смены аккаунта всё выполнено заново, блоки дописывались по ходу через `cat >>`.
+
+**Тронутые файлы:** `mcda_saw_alternatives`, `constraint_based_utility_recsys`, `recsys_finance_domain_specifics`, `debt_payoff_math_cashflow_forecast`, `goal_based_investing_lifecycle`, `portfolio_theory_robo_advisors_v2`, `prescriptive_quality_metrics`, `dp_vs_enumeration`, `behavioral_execution_gap`, `bank_patents_wellness_scoring`, `_sub16_utility_based_rs`, `_sub17_trust_and_harm`, `banks_world_pfm_v2`. Все — файлы, где серия Г31.1/31.2/31.4 не проходила или оставила долг.
+
+### 1. Арифметика
+
+| Исход | Число | Пункты |
+|---|---|---|
+| Кандидатов рассмотрено (сверены с последним упоминанием) | **31** | |
+| 🟢 Закрыто полностью (полный текст / формула / факт подтверждён) | **14** | RAFSI, O'Shea, Vafaei, Duc Trung, Gross & Souleles, Модильяни, Merton WP 58, Bodie–Merton–Samuelson, Triantaphyllou & Sánchez, Lettau & Uhlig, Sheeran et al. (Table 1), WO2026074314A1 формула, KR102121857B1 формула, ING Kijk Vooruit |
+| 🟡 Частично (авторский абстракт / аннотация, полного текста нет) | **6** | Fernandes–Lynch–Kim («Correcting the Record»), Hodge et al. 2021, Ng et al. 2012, UTA 1982, Felfernig AIC 2013 (`tldr`), Kritzman–Page–Turkington (авторская ретроспектива) |
+| 🔗 Закрыто ссылкой — запись устарела, источник уже добыт в другом файле | **5** | CEPR/Vihriälä, DeMiguel–Garlappi–Uppal, Chen et al. CSUR, SSRN 5043646 (Синяков), Chen & Pu |
+| ⛔ Подтверждено закрытым / отклонено как не класс Г31.5 | **4** | Felfernig & Burke ICEC '08, Sharaf 2022, Gupta 1987, Zeldes 1989 |
+| ⚪ Не брались с названной причиной | **2** | Feinstein & Cicchetti (уже на многих каналах), OHARS (нет вопроса для источника) |
+
+**Ложных пунктов (закрытых ранее, но взятых в работу) — 0**: пять «устаревших» записей опознаны сверкой ДО похода в сеть и закрыты ссылкой, а не повторной добычей.
+
+### 2. 🔴 КАКОЙ КАНАЛ ЗАКРЫЛ КАЖДЫЙ ПУНКТ — и что мы недоиспользуем
+
+| Канал | Закрыл | Пункты |
+|---|---|---|
+| **Прямой `curl` по СОСЕДНЕМУ адресу того же ресурса** (другой путь на хосте / разбор HTML вместо счётчика разметки) | **4** | Gross & Souleles (`nber.org/system/files/…pdf` вместо страницы), BMS (то же), WO и KR (секция `claims` в том же HTML, что был «0 пунктов») |
+| **`r.jina.ai` без UA** | **3** | RAFSI (MDPI), Duc Trung (metrology-journal), Ng 2012 абстракт (SMU за Incapsula) |
+| **Прямой `curl` по ТОМУ ЖЕ адресу** (прежний отказ — отказ одного захода) | **2** | O'Shea (`peterdeeney.com`), Модильяни (`nobelprize.org`) |
+| **Crossref `/works/<doi>` — депонированный абстракт** | **2** | «Correcting the Record», Hodge et al. |
+| **Exa search → новый адрес, которого нет в OA-индексах** | **2 + 1 частично** | Triantaphyllou & Sánchez (авторский PDF на `csc.lsu.edu`), ING (официальные соседние страницы + App Store); KPT-ретроспектива |
+| **Wayback** | **2** | Lettau & Uhlig (`id_` по мёртвому адресу автора), UTA (снимок страницы репозитория → аннотация) |
+| **Unpaywall → точный адрес репозитория** | **1** | Vafaei (`run.unl.pt`) |
+| **DSpace 7 REST** | **1** | Merton WP 58 (MIT; handle-адрес давал 405) |
+| **S2 `/paper/DOI:`** | решающий для тождества | «Correcting the Record» = SSRN 5385386 (S2 хранит старый заголовок, Crossref — новый); `tldr` для ICEC '08 и AIC 2013 |
+| **Дочитка уже открытого файла** | **1** | Sheeran et al. (KOPS) |
+| Exa fetch | **0** из 5 | все `CRAWL_LIVECRAWL_TIMEOUT` (ACM ×2, Springer, SSRN, ING) |
+
+🔴 **Три недоиспользуемых канала, выведенные из таблицы:**
+1. **Crossref `/works/<doi>` как источник АБСТРАКТА.** Wiley и SSRN депонируют полные авторские абстракты; все прежние заходы по «Correcting the Record» били в SSRN (капча) и ни разу не спросили Crossref. Для SSRN-работ это первый шаг, не последний.
+2. **Разбор HTML вместо счётчика.** «0 пунктов `claims`» у WO2026074314A1 держалось через Г15 и Г30.4 при **том же размере страницы 149 331 б** — секция была в HTML всё это время. Проверять содержимое секции, а не метку/markdown.
+3. **Exa search как поиск АДРЕСА, а не текста.** Exa fetch в этом заходе не отдал ничего, а Exa search дважды нашёл адрес, которого не знают Unpaywall/S2/OpenAlex (авторский каталог PDF, соседние страницы банка).
+
+🔴 **Отрицательный замер, важный для порядка каналов:** метки **Unpaywall/S2 «green» дважды оказались ЛОЖНЫМИ** — Ng et al. 2012 (SMU InK) и UTA 1982 (BIRD Dauphine, ещё и `CCBYSA`): запись в репозитории есть, **файла нет**. «Green» означает «есть запись», а не «есть текст»; вывод «открытая копия существует» по одной метке делать нельзя.
+
+### 3. 🔴 ЧТО ИЗ ДОБЫТОГО МЕНЯЕТ КАНОН, ПРОГНОЗ, НОВИЗНУ, ЮРБЛОК ИЛИ ОБОСНОВАНИЕ ПОРОГОВ
+
+**Канон модели (`docs/math_model.md`) — НЕ меняется ничем. Код и формулировка новизны не правились.**
+
+**НОВИЗНА — один пункт, самый значимый в подбатче:**
+- 🔴 **WO2026074314A1 (1Finance, приоритет 2024-10-02), пп. 8 и 19 формулы:** защищена «weighted combination of the plurality of financial metrics», у каждой метрики «ideal value, a minimum threshold, and a maximum threshold», зависящие от профиля и стадии жизни и **«updated based on a change in the one or more macroeconomic factors»**. Пока формула числилась «недоступной», это не учитывалось. Опора новизны на **метод распределения потока на множестве альтернатив с инвариантами** — устояла (в формуле распределения, перечисления альтернатив и порядка погашения нет). Опора на «взвешенные метрики с профильными порогами и макро-обновлением» — **не устояла**. Решение о формулировке — владельца (`bank_patents_wellness_scoring`, Г31.5-K1).
+
+**ЮРБЛОК:**
+- Тот же WO: срок входа в нацфазу РФ ≈ **2027-05-02**. Если войдёт — любая будущая функция «оценка финансового здоровья с весами по профилю» требует сверки с пп. 1/8/13/19. KR102121857B1 — только Корея, до 2038, риска в РФ нет.
+
+**ПРОГНОЗ:**
+- ING Kijk Vooruit: прогноз регулярных списаний — **дата по последним 4, сумма по последним 5, горизонт 35 дней**; по независимой проверке — с ошибками. Готовая наивная базовая линия для замера нашего SES+Монте-Карло на короткой истории.
+
+**ОБОСНОВАНИЕ ПОРОГОВ И МЕТРИК (по убыванию значимости):**
+1. **Метрика устойчивости совета SM** (`prescriptive_quality_metrics` §3.2) по первоисточнику Triantaphyllou & Sánchez — это **PT-критический критерий**; критическое изменение веса **может не существовать** (условие 8b), у авторов sens = 0. Без обработки этого случая SM на части портретов не определена.
+2. **Интервалы устойчивости весов SAW в замкнутой форме** (O'Shea et al. 2026, формулы 16–18) — анализ чувствительности пяти риск-профилей без Монте-Карло.
+3. **«Теоремы RAFSI о rank reversal» не существует** — устойчивость показана экспериментом; итоговая функция RAFSI — это SAW с нормировкой к фиксированным опорным точкам. Ссылаться как на «экспериментально проверенную конструкцию», не «доказанную».
+4. **Lettau & Uhlig 1999:** калибровка/выбор правил **по реализованным исходам пользователей** подвержена good state bias — сравнивать правила только на общем наборе сценариев. Прямо касается предложения (б) из Г31.4-D5 («метрика по реализованному исходу»).
+5. **Gross & Souleles 2002 (первоисточник ко-холдинга):** >90 % заёмщиков по картам держат ликвидность, **треть — сверх месячного дохода** даже после «щедрого» транзакционного остатка. Довод за правила «резерв против дорогого долга» теперь на первоисточнике; противовес (Zinman 2006, Vihriälä 2019) уже в базе.
+6. **Bodie–Merton–Samuelson 1992:** «гибкость труда → больше риска» получено при **нестохастической зарплате**; как опору для связи «устойчивость дохода ↔ риск-профиль» цитировать без оговорки нельзя.
+7. **Ng et al. 2012** минимизирует **срок полного погашения (makespan), приближённо** — не опора для оптимальности Avalanche.
+8. **Финобразование:** после асимметричной коррекции **0.018–0.033 SD**, и ранжирование типов интервенций из Kaiser 2022 меняется; в мета-анализе implementation intentions **нет ни одного финансового исхода**.
+9. **UX, не модель:** Hodge et al. 2021 — для сложной задачи очеловечивание (имя, персона) робо-советника **снижает** опору на совет.
+
+### 4. ЧТО ОСТАЛОСЬ НЕИЗВЕСТНЫМ
+
+- **Felfernig & Burke ICEC '08** — полный текст. Пройдено: `api.unpaywall.org/v2/10.1145/1409540.1409544` (closed), `api.openalex.org/works/doi:10.1145/1409540.1409544` (closed), `api.semanticscholar.org/graph/v1/paper/DOI:10.1145/1409540.1409544` (CLOSED), Exa search по заголовку, Exa fetch `dl.acm.org/doi/pdf/…` и `dl.acm.org/doi/…` (timeout), Wayback CDX `josquin.cti.depaul.edu/~rburke/*` (200, файла нет), Wayback CDX `ist.tugraz.at/*` PDF (200, файла нет).
+- **Fernandes–Lynch–Kim, полный текст** (таблицы по типам интервенций) — SSRN за капчей; ни один индекс копии не знает.
+- **Hodge et al. 2021, полный текст** — Wiley закрыт, SSRN `Delivery.cfm` за капчей.
+- **Ng et al. 2012 и Gupta et al. 1987, полные тексты** — Springer/Elsevier закрыты; «green» у Ng ложный.
+- **UTA 1982, полный текст** — Elsevier закрыт; BIRD Dauphine снят с DNS, в архивной записи файла нет.
+- **ING Kijk Vooruit, продуктовая страница** — SPA; текст не отдаёт ни один канал (закрыто соседними адресами, но сама страница непрочитана).
+
+### 5. ЗАДОЛЖЕННОСТЬ (непройденное, отдельным списком)
+
+1. **Wayback CDX `facweb.cs.depaul.edu/rburke/*`** — **503 два раза подряд** (пауза 20 с): страница публикаций Burke на новом хосте не проверена; последний шанс на авторскую копию ICEC '08.
+2. **BMS 1992, раздел о стохастической зарплате** (страницы PDF 29–41) — не распознавался OCR; нужен, если тезис «устойчивость дохода ↔ риск» пойдёт в обоснование.
+3. **arXiv 2102.09005 и `papers.phmsociety.org/…/1948/957`** (заместители IUI '08) — не скачивались сознательно: пункт Г4.1 закрыт другими источниками; взять, только если понадобятся алгоритмы диагностики несовместных ограничений.
+4. **Тарифы Дзен-мани и CoinKeeper в прошлых редакциях; программа Aha!'24** (`debt_data_sources_rf`, долг Г31.1) — в этот заход не брались: низкий приоритет по записи владельца; Aha!'24 — не отказ адреса, а неизвестный домен.
+5. **ОАЭ, режим SCA «Financial Consultations»** (`pdf_statement_parsing_accuracy`, Г30.3: `uaelegislation.gov.ae` 403 + капча) — соседний хост `sca.gov.ae` не проверялся.
+6. **Банки из «Осталось незакрытым» `banks_world_pfm_v2`** (Citi, US Bank, TD, Lloyds, NatWest, HSBC, OCBC, UOB, Kakao, Toss, Revolut, Starling, N26, CBA, Itaú) — не класс Г31.5 (нет URL, а не отказ адреса); сверка с `banks_apac_neobanks`/`competitors_2026_refresh` не делалась.
+
+**Пиратские источники не использовались; российский корневой сертификат не ставился; канон модели, формулировка новизны и код продукта не правились.**

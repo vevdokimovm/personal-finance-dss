@@ -1556,3 +1556,61 @@ criteria for reporting of methods of Delphi studies are required.»
    итеративной процедурой с обратной связью, нельзя интерпретировать как независимое согласие
    наблюдателей — а каппа считается именно для независимых оценок.
 
+
+---
+
+## ДОБОР Г31.5 — отказ адреса (17.09.2026)
+
+**Каналы (замер 17.09.2026):** Unpaywall **200** · Crossref **200** · S2 `/paper/DOI:` **200** · Exa search **работает** · прямой `curl -skL` на `www.csc.lsu.edu` **200** (http и https).
+
+Кандидаты класса по файлу и их последнее упоминание:
+- **Triantaphyllou & Sánchez 1997** — стр. 869: «Wiley — пейволл; страница автора csc.lsu.edu отдала только аннотацию». Проверялась СТРАНИЦА автора, не его каталог PDF. Класс Г31.5. В доборе Г4 (стр. 934+) не перепроверялся.
+- Chen et al. CSUR 51(1) (стр. 870, 1273: Ноттингем 403) — 🟢 **уже добыт** в `closed_forever_retry_2026-09-16.md`, Г18.1 (курсовая копия UW, HTTP 200, 351 596 б). Здесь запись устарела, повторно не добывался.
+- Feinstein & Cicchetti 1990 (стр. 1012+) — закрыт на Unpaywall/ScienceDirect/прокси, аннотация добыта; не класс (не один адрес). Не брался.
+
+### Г31.5-Q1. 🟢 Triantaphyllou & Sánchez 1997 — ПОЛНЫЙ ТЕКСТ ДОБЫТ (авторская копия)
+
+- Crossref — **200**: `10.1111/j.1540-5915.1997.tb01306.x`, *Decision Sciences* **28(1):151–194**; вторая запись — глава книги Triantaphyllou «Multi-criteria Decision Making Methods: A Comparative Study», Springer, `10.1007/978-1-4757-3157-6_8`, с. 131–175.
+- Unpaywall — **200**, `is_oa: False`, `closed`. S2 `/paper/DOI:` — **200**, `CLOSED`, `citationCount: 633`.
+- 🟢 Exa search по точному заголовку вернул прямой адрес авторского PDF, которого нет ни в одном OA-индексе: **`http://www.csc.lsu.edu/trianta/Journal_PAPERS1/MCDM_SensitivityAnalysis_by_Triantaphyllou1.pdf`**.
+- `curl -skL` с UA — **HTTP 200, 468 592 б, `application/pdf`**, 51 стр. (рукопись с пометкой «Published in: Decision Sciences, Vol. 28, No. 1, pp. 151-194, Winter 1997»), sha256 `86182766f846f8ad03bd9b58131c19057a5c14b9caba2a5c442dbd3d60655aaa`, `pdftotext` → 3 880 строк. Формулы сняты чтением отрисованных страниц 10–13 (`pdftotext` ломает дроби).
+
+**ДОСЛОВНО — WSM и его допущение (с. 6):**
+
+> «P_i = Σ_{j=1..N} a_ij W_j, for i = 1,2,3,...,M. (3) … The supposition which governs this model is the **additive utility** assumption. However, the WSM should be used only when the decision criteria can be expressed in identical units of measure (e.g., only dollars, or only pounds, or only seconds, etc.).»
+
+**ДОСЛОВНО — абсолютные против относительных изменений (с. 8–9):**
+
+> «In the first way the interest is on whether the indication of the best (top) alternative changes or not. On the second definition the interest is on changes on the ranking of any alternative. … suppose that the two criteria C1 and C2 have weights W1 = 0.30 and W2 = 0.50 … when the first weight becomes W′1 = 0.35 … the second weight becomes W′2 = 0.57 … In absolute terms for both criteria, the first criterion is the most critical criterion. … However, when one considers relative terms … for C1 is: |W1 − W′1| × 100/W1 = 16.67, while for C2 it is: |W2 − W′2| × 100/W2 = 14.00. … Therefore, when the relative changes are considered, then the most critical criterion is C2.»
+>
+> «Therefore, a total of four alternative definitions can be considered. These are coded as Absolute Any (AA), Absolute Top (AT), Percent Any (PA), and Percent Top (PT). … it is more meaningful to use relative changes. Therefore, in this paper the emphasis will be on relative (percent) changes…»
+
+**ДОСЛОВНО — определения (с. 10–11):**
+
+> «DEFINITION 1: Let δ_k,i,j (1 ≤ i < j ≤ M and 1 ≤ k ≤ N) denote the minimum change in the current weight W_k of criterion C_k such that the ranking of alternatives A_i and A_j will be reversed. Also, define as: δ′_k,i,j = δ_k,i,j × 100/W_k (6). … it is possible for a given pair of alternatives and a decision criterion, the critical change to be infeasible.»
+>
+> «DEFINITION 2: The Percent-Top (or PT) critical criterion is the criterion which corresponds to the smallest |δ′_k,1,j| (1 ≤ j ≤ M and 1 ≤ k ≤ N) value.»
+> «DEFINITION 3: The Percent-Any (or PA) critical criterion is the criterion which corresponds to the smallest |δ′_k,i,j| (1 ≤ i < j ≤ M and 1 ≤ k ≤ N) value.»
+> «DEFINITION 4: The criticality degree of criterion C_k, denoted as D′_k, is the smallest percent amount by which the current value of W_k must change, such that the existing ranking of the alternatives will change. That is: D′_k = min_{1≤i<j≤M} {|δ′_k,i,j|}»
+> «DEFINITION 5: The sensitivity coefficient of criterion C_k, denoted as sens(C_k), is the reciprocal of its criticality degree: sens(C_k) = 1/D′_k. **If the criticality degree is infeasible (i.e., impossible to change any alternative rank with any weight change), then the sensitivity coefficient is set equal to zero.**»
+
+**ДОСЛОВНО — Теорема 1 (с. 12), для WSM и AHP:**
+
+> «δ_1,1,2 < (P2 − P1)/(a21 − a11), if (a21 > a11), or: δ_1,1,2 > (P2 − P1)/(a21 − a11), if (a21 < a11). (7a) Furthermore, the following condition should also be satisfied for the new weight W*1 = W1 − δ_1,1,2 to be feasible: 0 ≤ W*1 … δ_1,1,2 ≤ W1. (7b) **In these developments it is not required to have W*_i ≤ 1 because these weights are re-normalized to add up to one.** … it may be **impossible** to reverse the existing ranking of the alternative A1 and A2 by making changes on the current weight of criterion C1. This situation occurs when the value of the ratio (P2 − P1)/(a21 − a11) is greater than W1.»
+>
+> «THEOREM 1: When the WSM, AHP, or ideal mode AHP methods are used, the quantity δ′_k,i,j (1 ≤ i < j ≤ M and 1 ≤ k ≤ N), by which the current weight W_k of criterion C_k needs to be modified (after normalization) so that the ranking of the alternatives A_i and A_j will be reversed, is given as follows: δ′_k,i,j < (P_j − P_i)/(a_jk − a_ik) × 100/W_k, if (a_jk > a_ik) or: δ′_k,i,j > (P_j − P_i)/(a_jk − a_ik) × 100/W_k, if (a_jk < a_ik). (8a) Furthermore, the following condition should also be satisfied for the value of δ′_k,i,j to be feasible: (P_j − P_i)/(a_jk − a_ik) ≤ W_k. (8b)»
+
+**Выжимка и сверка с тем, что записано в §3.2 файла (восстановлено по Jaini & Utyuzhnikov 2016).**
+1. Метод в файле восстановлен **верно по существу**: минимальное возмущение веса с последующей перенормировкой, аналитически для WSM.
+2. 🔴 **Три уточнения, которых в §3.2 нет:**
+   (а) Предложенный в файле «Stability margin `SM = min_k |δ*_k|/w_k` при смене рекомендованной альтернативы» — это ровно **PT-критический критерий** (Def. 2), а не PA (Def. 3–4, смена любого ранга). Для совета по одной рекомендованной альтернативе PT — правильный выбор, но называть его надо так, и **D′_k/sens(C_k) из Def. 4–5 — это PA**, их нельзя подставлять вместо PT.
+   (б) **Критическое изменение может не существовать** (8b): если (P_j − P_i)/(a_jk − a_ik) > W_k, никакое изменение веса k не переставляет пару. В формуле SM файла этот случай не обработан — минимум по пустому множеству не определён; у авторов sens = 0 (Def. 5). При реализации это надо закрыть явно, иначе SM даст деление на ноль или ложный «0 %».
+   (в) Абсолютная и относительная мера **дают разные критические критерии** на одних данных (пример 0.30/0.50 выше). Выбор относительной меры в файле совпадает с выбором авторов — теперь со ссылкой на первоисточник.
+3. Оговорка авторов о применимости WSM — «only when the decision criteria can be expressed in identical units» — у нас выполняется только после нормировки к безразмерной шкале; это то же условие, что и в споре о нормировке (см. `mcda_saw_alternatives`, Г31.5-M1).
+
+## ИТОГ Г31.5 — prescriptive_quality_metrics
+
+3 кандидата: **Triantaphyllou & Sánchez 1997 — закрыт полным текстом** (канал: **Exa search** дал прямой адрес авторского PDF, скачан `curl`; ни Unpaywall, ни S2, ни OpenAlex этого адреса не знают); **Chen et al. CSUR — закрыт ссылкой** на Г18.1; Feinstein & Cicchetti — не класс, не брался.
+
+🔴 **Что меняет обоснование (канон не трогается):** предложенная метрика устойчивости совета (SM, §3.2) по первоисточнику — PT-критический критерий; при реализации обязательна обработка **недостижимого** критического изменения (8b) — авторы кладут sens = 0. Без этого метрика на части портретов будет неопределена. Заведение метрики — решение владельца.
+Задолженности нет.

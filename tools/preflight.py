@@ -111,10 +111,18 @@ def _foreign(path: Path) -> bool:
     return any(part in FOREIGN_DIRS for part in path.parts)
 
 
+# Первичный материал исследований (§9) хранится дословно — мягкий перенос, попавший
+# в него из скопированного источника, править запрещено тем же правилом. Разбор класса —
+# `RAW_MATERIAL_PREFIX` в `tools/revision/revision_check.py`.
+RAW_MATERIAL_PREFIX = "docs/research/raw"
+
+
 def soft_hyphens(repo: Path) -> list[str]:
     hits = []
     for path in repo.rglob("*.md"):
         if _foreign(path):
+            continue
+        if path.relative_to(repo).as_posix().startswith(RAW_MATERIAL_PREFIX):
             continue
         if SOFT_HYPHEN in _read(path):
             hits.append(str(path.relative_to(repo)))

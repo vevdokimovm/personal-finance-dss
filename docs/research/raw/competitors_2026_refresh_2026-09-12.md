@@ -602,3 +602,1095 @@ toolfox.ru (dateModified 2026-07-13, HTTP 200) пишет «Конкретных
 **Mac-DebtLens** двигают жанр в сторону «продукт сам применяет avalanche», но метод всё ещё выбирает пользователь;
 (3) **Ray** — LLM поверх детерминированных калькуляторов, то есть «совет» там не воспроизводим и не проверяем;
 (4) на рынке РФ Финуслуги подтверждают тот же расклад: индекс + подбор своих продуктов, распределения нет.
+
+
+## ДОБОР Г24 (16.09.2026)
+
+Каналы на 16.09.2026: `WebSearch`, `curl -sk --http1.1` с браузерным UA, `r.jina.ai`, открытые API сайтов. **Wayback лежит**
+(`archive.org/wayback/available` → 429, CDX → 503 «Temporarily Offline», проверено в начале). Exa отключена.
+
+### Г24.3 Monarch Pay Down Goals — пункт уже был закрыт в Г15.8(в); перепроверен по свежей редакции статьи
+
+🔴 **Поправка к очереди.** `COVERAGE_AUDIT_3.md` числит пункт открытым («Г15: `help.monarch.com` 403»), но он **закрыт
+в этом же файле** блоком «ДОБОР Г15 — Г15.8(в)» (12.09.2026, `r.jina.ai` → 200, 23 655 байт). Аудит взял статус из
+раздела «не добыто» основного прохода, не заметив добора. Перепроверка сделана ради главного вопроса — советует ли
+Monarch метод.
+
+**Канал изменился.** 16.09.2026 `r.jina.ai` по той же статье → HTTP 200, **314 байт**, тело — Cloudflare-челлендж
+(«Just a moment... Enable JavaScript and cookies to continue», внутренний код 403). То есть за четыре дня антибот
+ужесточили, и прокси его больше не пробивает. 🟢 **Рабочий обход — открытый Zendesk Help Center API:**
+`https://help.monarch.com/api/v2/help_center/en-us/articles/44373293932052.json` → **HTTP 200, 33 536 байт** (тот же
+результат с `monarchmoney.zendesk.com`); поиск `…/api/v2/help_center/articles/search.json?query=snowball` → **HTTP 200,
+66 115 байт**, 2 результата. Статья «Using Pay Down Goals»: `edited_at` 2026-06-24, `updated_at` **2026-09-08**.
+
+**Все места статьи со словами recommend / default / suggest / method / first, дословно:**
+
+> «Recommended: Toggle Exclude account from pay down projection if you pay off the account monthly (like a credit card
+> you don't carry a balance on).»
+> «Pick your payoff method: Avalanche: Pay highest-interest debts first (saves more in total interest) · Snowball: Pay
+> smallest balances first (builds momentum faster) · Planned payments: Pay only the scheduled minimum or planned payments»
+> «The chart will automatically update as you change numbers and payoff methods.»
+> «…helps you see which debts to focus on first.»
+> «We recommend including all accounts in the projection to ensure your budget yields the exact same projection you planned.»
+
+**Ответ на главный вопрос.** В справке Monarch слово «recommend» применяется **только к настройке проекции** (исключать
+карты без остатка, включать все счета), **ни разу — к выбору метода**. Метод выбирает пользователь из трёх; продукт
+подписывает каждый однострочной выгодой («saves more in total interest» / «builds momentum faster») и пересчитывает
+график. Порядок по ставке продукт **применяет**, если выбран Avalanche, но **не советует** его выбрать. Второй результат
+поиска — «Introducing Goals 3.0» (обновлён 2026-09-14) — по заголовку анонс, не механика; не разбирался.
+Вывод Г15.8(в) **подтверждён по редакции от 08.09.2026 без изменений.**
+
+**Для нас (канал):** у справочных центров на Zendesk антибот стоит на HTML, а **API `/api/v2/help_center/` открыт** —
+тот же приём стоит пробовать на любом `*/hc/en-us/articles/*`, отдающем 403.
+
+### Г24.4 Lunch Money и Empower — долги и цели; советующего слоя нет ни у того, ни у другого
+
+**Lunch Money.**
+
+Источник 1: `https://lunchmoney.app/features` — `curl`+UA **HTTP 200, 48 538 байт**; `r.jina.ai` **HTTP 200, 4 587 байт**;
+16.09.2026 (в Г14 `WebFetch` давал 403, `curl` — 200 и 0 байт; сегодня `curl` отдал тело). Полный список разделов
+страницы «All Features», дословно по заголовкам: «Import transactions · Net worth calculator · Multi currency support ·
+Crypto portfolio tracker · Transaction utilities · Categories & Tags · Rules engine · Budgeting · Recurring expenses ·
+Calendar · Analytics · Stats & Trends · Collaboration · Web-first · World-class support · Security». **Ни долгов, ни
+целей, ни рекомендаций в перечне из 16 разделов нет.** Единственное упоминание целей: «Net worth calculator — Track your
+net worth over time for an overall view of your progress towards your goals.»
+
+Источник 2: `https://support.lunchmoney.app/guides/budgeting/faq` — `curl`+UA **HTTP 200, 648 001 байт**; `r.jina.ai`
+**HTTP 200, 9 326 байт**; 16.09.2026. Дословно:
+
+> «## How do I set up goals in Lunch Money?
+> This feature will be coming soon! Stay tuned by upvoting the feature request here
+> (https://feedback.lunchmoney.app/general-feature-request/p/savings-and-goals).»
+> «## How do I set up sinking funds in Lunch Money? Sinking funds help save for future expenses. In Lunch Money, you can
+> achieve this by: Creating a category for each fund (e.g., "Car Repairs") · Budgeting money to it monthly · Using budget
+> presets to regularly fund the category · Setting rollover to "same category" so funds accumulate»
+
+🟡 Вторичные обзоры (`thecollegeinvestor.com`, `homebudgettools.com` в выдаче) пишут, что Lunch Money «allows users to set
+financial goals, such as saving for a specific purpose or paying off debt» — **опровергается первоисточником**: целей
+в продукте нет, это запрос в трекере фич; «цели» у обзорщиков — категории бюджета с переносом остатка.
+
+**Empower (Personal Dashboard).**
+
+Источник 1: `https://www.empower.com/tools/debt-paydown` — `curl`+UA **HTTP 200, 264 517 байт**; `r.jina.ai` **HTTP 200,
+21 338 байт**; 16.09.2026 (в Г14 — 404/301 по другим адресам). Маркетинговая страница, дословно: «Paying down debt is
+such a good look · More freedom, less stress — give your finances a refresh.» · «Lower debt, raise your credit score, and
+more — Lower interest costs · Better rates for loans · Lower insurance costs · Extra money to spend» · «Make a plan and move
+toward a brighter financial future.» · «See exactly how far you've come.» Методики, очерёдности, упоминания avalanche/
+snowball на странице нет. В подвале: «This material is for informational purposes only and is not intended to provide
+investment, legal or tax recommendations or advice.»
+
+Источник 2 — справка через **открытый Zendesk API** (HTML справки не пробовался, API ответил сразу):
+`https://support-personalwealth.empower.com/api/v2/help_center/articles/search.json?query=debt%20paydown` → **HTTP 200,
+32 731 байт**, 9 статей; `…?query=emergency%20fund` → **200, 74 798 байт**; `…?query=savings%20planner` → **200, 99 382 байта**,
+52 статьи; 16.09.2026. Дословно:
+
+> «Accounts are not listed in the Debt Paydown tool» (id 360042774954, обновлена 2026-08-19): «The Debt Paydown tool lists
+> Mortgage, Loan, and Credit Card accounts that have at least two Interest transactions categorized as 'Service
+> Charges/Fees' within the last 90 days.»
+> «Dashboard Overview» (id 201169740, обновлена 2026-09-01): «Emergency Fund: This shows a bar graph for a full year of the
+> amounts of cash in your bank accounts (blue) for each month, compared to the target emergency fund range (green) you are
+> aiming for each month.» · «Debt Paydown: This shows how much of your debt you have been able to pay and what remains for
+> the current calendar year. At the bottom of the graph you will see the change to the debt amount for this year, which is
+> calculated as the year-to-date balance change of your linked debt (liability) accounts.»
+> «How do I adjust the amounts saved in the Savings Planner?» (id 360025979013, 2026-01-29): «The Savings Planner page allows
+> you to view the amount you have saved this year based on the Cash Flow of each investment account.»
+> «Cash Goals - Empower Personal Cash» (id 39238829820055, 2026-06-22): «Cash Goals allow users to set aside money within
+> their Cash account for specific purposes (such as an emergency fund, vacation, or short-term savings goal).» · «The
+> 'Emergency Fund' is a default goal included in the account. It cannot be renamed or deleted…» · «If a goal is selected:
+> Funds are withdrawn from that goal first. If there isn't enough, funds will then come from other goals, followed by the
+> unallocated balance.»
+
+🟡 Вторичное (выдача `WebSearch`, обзоры): «Empower's calculator allows you to create a personalized plan to pay down debt
+faster and save on interest», эмерджентный фонд «calculates how much money you need to cover three to six months' living
+expenses». Совпадает с записью Г8 (`competitors_recommendation_engines`, строка 165: фиксированное правило 3–6 месяцев).
+Первоисточником «personalized plan» не подтверждён — справка описывает Debt Paydown как **трекер годового изменения
+баланса**.
+
+**Выжимка.**
+- **Lunch Money** — чистый трекер: долгов и целей как сущностей нет, цели — «coming soon» в трекере фич; советующего слоя нет.
+- **Empower** — долг и резерв как **виджеты мониторинга**: Debt Paydown = изменение баланса долгов с начала года (счёт попадает
+  в инструмент, только если у него ≥2 процентных транзакций за 90 дней); Emergency Fund = остаток кэша против целевого
+  коридора; Cash Goals = конверты в собственном кэш-продукте с обязательной целью «Emergency Fund» (то есть резерв
+  продвигается как воронка в депозит Empower). Очерёдности погашения, метода, распределения потока между долгом и резервом —
+  **нет** ни в справке, ни на странице инструмента. Советующий слой Empower — платный человек-советник (Personal Strategy),
+  а не алгоритм дашборда.
+- **Для нас:** оба закрываются как «угрозы нет» (Lunch Money) и «косвенная, мониторинг» (Empower). Интересная деталь Empower —
+  **признак долга по процентным транзакциям** (≥2 за 90 дней): так они отличают долг под процент от беспроцентного, не спрашивая
+  ставку. У нас ставка — вход модели, но этот признак годится как проверка правдоподобия введённой ставки на импорте.
+
+### Г24.5 Тарифы Дзен-мани на Android; цена «Финздоровья» Финуслуг — и находка сверх вопроса: платный «Финтрекер» целей
+
+**Дзен-мани, Android.**
+
+Источник 1 — Google Play RU: `https://play.google.com/store/apps/details?id=ru.zenmoney.androidsub&hl=ru&gl=RU`, `curl`+UA →
+**HTTP 200, 1 154 216 байт**, 16.09.2026. Дословно из разметки карточки: «Покупки в приложении» · «**От 129,00 ₽ до 2 990,00 ₽
+за товар**» · «1 000 000+» установок. Сетку по позициям Google Play без входа в аккаунт не раскрывает — только диапазон.
+
+Источник 2 — RuStore: `https://www.rustore.ru/catalog/app/ru.zenmoney.androidsub`, `curl`+UA → **HTTP 200, 361 475 байт**:
+«Дзен-мани: учет расходов — скачать для Android 3,5★ бесплатно … Официальная версия (8.4.0) в RuStore — 20 тыс + у[становок]».
+Цен покупок страница не содержит; API `backapi.rustore.ru/applicationData/overallInfo/ru.zenmoney.androidsub` → **HTTP 400, 0 байт**
+(как в Г15).
+
+Источник 3 — страница оплаты веб-версии (канал, через который в РФ платят владельцы Android без биллинга Google Play):
+`https://zenmoney.ru/a/#subscription`, `curl`+UA → **HTTP 200, 21 486 байт**, 16.09.2026. Дословно:
+
+> «Поддержите развитие проекта — переходите на Премиум · На месяц **199 руб./мес** · На год 125 руб./мес **1490 руб.** ·
+> Навсегда 0 руб./мес **2990 руб.** · Для перехода к оплате — выберите период подписки сверху. … Подписка автоматически
+> продлится после завершения оплаченного периода. … Для оплаты через Robokassa нажмите на выбранный период подписки сверху.
+> Подписку также можно оплатить переводом через ЮМани (ex. Яндекс.Деньги)…»
+
+Источник 4 — справка «Нужна ли мне Премиум-подписка?» `https://support.zenmoney.ru/knowledge-bases/2/articles/1-nuzhna-li-mne-premium-podpiska`,
+`curl`+UA → **HTTP 200, 53 661 байт** («Последнее изменение: 3 года назад»). Цен нет; дословно о канале: «Оплачивая подписку
+в приложении, вы оформляете подписку в Appstore / Play Маркет. … При оплате подписки на сайте веб-версии вы платите нам напрямую
+разовым через Robokassa…» Что даёт подписка: «Все отчёты в разделе Аналитика · Раздел Плательщики и получатели · Разделы
+планирования: Бюджет и Планы · Фильтр поиска в списке операций · Сканирование чеков по QR-коду · Доступ к платным подключениям».
+
+Вторичное (выдача `WebSearch`, агрегаторы `a2is.ru`, `toolfox.ru`, `truesharing.ru`): «149 ₽/мес или 1 190 ₽/год … семейный
+тариф 249 ₽/мес … для Android подписка навсегда за 2490 рублей» — **первоисточником не подтверждено**, расходится с сайтом.
+
+**Выжимка по Дзен-мани.** Первоисточниками на 16.09.2026: **веб/Robokassa — 199 ₽/мес, 1 490 ₽/год, 2 990 ₽ навсегда**;
+**iOS (Г15) — 249 ₽/мес, 1 490 ₽/год**; **Google Play — позиции от 129 до 2 990 ₽** (разбивка не видна). Годовая цена
+1 490 ₽ и «навсегда» 2 990 ₽ совпадают по всем каналам; месячная у Apple на 50 ₽ выше (комиссия магазина). Отдельной
+«Android-сетки» нет: Android-пользователь в РФ либо платит через Google Play (диапазон 129–2 990 ₽), либо на сайте по веб-ценам.
+Сетка 149/1 190 ₽ — устаревшая (2024), повторяется агрегаторами.
+
+**Финуслуги — «Финздоровье» и «Финуслуги+».**
+
+Источник 5 — `https://finuslugi.ru/services/subscription` («Финуслуги+»), `curl`+UA → **HTTP 200, 350 737 байт**, 16.09.2026
+(в Г15 искомые страницы «Финуслуги+» давали 404 — адрес другой). Дословно:
+
+> «Подписка Финуслуги + · Получайте бонусы с подпиской · 1 бонус = 1 ₽ · Ваши преимущества с подпиской: +1% годовых Бонусами
+> к доходу по вкладам до 1 млн ₽ · 10% Возврат за страховки · +1% К остатку на Кошельке»
+> «**Сервисы в подписке**: Детальная кредитная сводка — Проверьте, не взяли ли на вас кредит мошенники · **Финтрекер — Подскажем,
+> как быстрее накопить на цель**»
+> «Выбирайте подходящий для себя тариф: На год Выгода 798 ₽ **3990 ₽** 333 ₽ в месяц · На месяц **399 ₽** · Подключите на месяц
+> за 1 ₽ с промокодом PODPISKA09 Он действует с 1 по 21 сентября и только для новых клиентов»
+
+Источник 6 — новость «Финуслуги запустили подписку с финансовыми привилегиями», 20.01.2026,
+`https://finuslugi.ru/navigator/news/novosti_bankovskoj_otrasli/finuslugi_zapustili_podpisku_finuslugi_plus_s_finansovymi_privilegiyami`,
+`curl`+UA → **HTTP 200, 484 083 байта**. Дословно:
+
+> «19 января 2026 года маркетплейс для денег Финуслуги запустил новый сервис — подписку «Финуслуги+». Ее владельцам будет
+> доступен сервис по подбору инвестиционного портфеля, состоящего из различных инструментов для решения конкретных задач:
+> **формирования финансовой подушки или накопления на первоначальный взнос по ипотеке, образование детям, а также развитие
+> бизнеса. В будущем клиенты Финуслуг смогут также добавлять собственные цели.**»
+> «Стоимость подписки составит 399 ₽ в месяц, при оплате подписки на год выгода составит 20%: годовая стоимость составит 3990
+> вместо 4788 ₽.»
+
+Источник 7 — промо «Финздоровья» `https://promo.finuslugi.ru/fin_health/` (`curl`+UA → **HTTP 200, 425 770 байт**) и статья
+«Как проверить финансовое здоровье на Финуслугах» (обновлена 31.10.2025) `https://finuslugi.ru/navigator/kak-ehto-rabotaet/stat_proverit-finansovoe-zdorove`
+(`curl`+UA → **HTTP 200, 527 508 байт**). **Ни на одной из двух страниц нет ни цены, ни слова «подписка», ни слова «бесплатно»
+применительно к самому сервису** (grep по «бесплат|стоим|оплат|подписк» в тексте промо — 0 совпадений). В статье бесплатность
+названа только у компонента: «Проверьте свой кредитный рейтинг бесплатно!». В меню сайта сервисы разнесены: «Сервисы: Узнать
+о себе — **Финансовое Здоровье** · Кредитный рейтинг · Кредитная история · Инвестиционный рейтинг …» и отдельно «Получить бонусы —
+**Подписка Финуслуги+**».
+
+**Выжимка по Финуслугам.**
+- **Цена «Финздоровья»: 0 ₽ — вывод по составу подписки, не по прямой фразе.** Единственная платная подписка Финуслуг
+  («Финуслуги+», 399 ₽/мес, 3 990 ₽/год, с 19.01.2026) перечисляет свои сервисы — «Детальная кредитная сводка» и «Финтрекер»;
+  «Финздоровья» среди них нет, а в меню оно стоит в бесплатном разделе «Узнать о себе». Сервис — воронка в продукты
+  маркетплейса, не источник выручки. 🟡 Прямой фразы «Финздоровье бесплатно» первоисточник не содержит (поиск её приписывает).
+- 🔴 **Находка сверх вопроса — «Финтрекер» внутри «Финуслуги+».** Платный сервис с января 2026: цель («финансовая подушка»,
+  первоначальный взнос, образование, бизнес; свои цели — «в будущем») → **подбор инвестиционного портфеля** «как быстрее
+  накопить на цель». Это ближайший к FINPILOT российский продукт по объекту «резерв + цели», но: (а) долгов в нём нет вовсе;
+  (б) рекомендация — **портфель инструментов маркетплейса** (вклады, облигации), а не распределение свободного потока между
+  долгом, резервом и целями; (в) механика подбора не раскрыта (страница — одна строка). Угроза — **косвенная, новая**:
+  российский игрок уже продаёт «совет по накоплению на цель» по подписке за 399 ₽/мес — это ценовой ориентир для нашего
+  тарифа и сигнал, что слово «подушка» в позиционировании занято. Механику Финтрекера стоит добрать отдельным пунктом.
+
+### Г24.6 Чарты App Store, категория «Финансы» (genre 6015): RU, US, GB, DE — снято 16.09.2026
+
+**Каналы.** (1) `https://rss.applemarketingtools.com/api/v2/ru/apps/top-free/50/apps.json` → **HTTP 301** на
+`rss.marketingtools.apple.com` → **HTTP 200, 29 630 байт** («Топ бесплатных приложений», updated Wed, 16 Sep 2026 10:48:04 +0000).
+🟡 **API v2 фильтра по жанру не принимает** — это общий топ всех категорий; из финансовых в нём Ozon Банк (жанр «Финансы»),
+для категорийного топа он непригоден. (2) Рабочий канал — **старый iTunes RSS с жанром**:
+`https://itunes.apple.com/{cc}/rss/{topfreeapplications|topgrossingapplications}/limit=50/genre=6015/json`, все 8 запросов
+**HTTP 200** (RU free 269 014 байт, RU grossing 301 127; US 250 408 / 254 623; GB 230 864 / 243 914; DE 217 243 / 242 848),
+`updated` 2026-09-16T03:47:42-07:00…03:47:50-07:00. (3) Описания отобранных приложений — iTunes Lookup API
+`https://itunes.apple.com/lookup?id=…&country=…`, все 7 → HTTP 200 (9–16 КБ). `apps.apple.com` не трогался (429).
+🟡 Топ-чарты — один срез в один день; позиции в «кассовом» топе категории волатильны.
+
+**RU — топ бесплатных, Финансы (50), дословно названия:**
+1 Ozon Банк · 2 Налоги ФЛ · 3 ОТП Банк Онлайн · 4 Райффайзен Онлайн Банк Россия · 5 Штрафы ГИБДД официальные ПДД · 6 Госуслуги
+Биометрия · 7 Alfa by Bank Alfalah · 8 Revius - Учет Расходов · 9 Газ Онлайн · 10 FinamTrade · **11 Финансы, бюджет с CoinKeeper** ·
+12 Сравни. Кредит, ОСАГО, Займы · 13 Здоровье и страхование · 14 РЕСО Мобайл · 15 Bybit · 16 Korona · 17 Банки.ру · 18 АТБ банк ·
+19 РосШтрафы · 20 myDSS 2.0 · 21 Финансы - расходы и доходы · 22 Привет! Китай · 23 Манимен: Онлайн Займы · 24 МосОблЕИРЦ Онлайн ·
+25 Cifra Markets · 26 еКапуста · 27 Trust · 28 Alif · 29 Квартплата+ · 30 Kaspi.kz · 31 Я коплю · 32 ОСАГО bip.ru ·
+33 Antarctic Wallet · 34 Целевые Финансы: займы онлайн · 35 ТНС Энерго · 36 Макси Займ · 37 До Зарплаты · 38 ПО-РУБЛЮ · 39 MBANK ·
+40 Webbankir · 41 Барашка-занимашка · 42 Тройка · 43 Creditnova · 44 Турбозайм · 45 Аксиома · 46 Ренессанс страхование ·
+47 Вебзайм · 48 One Click Money · 49 Транспондеры · 50 Робот Займер.
+(Сбер, Т-Банк, ВТБ в App Store RU отсутствуют — удалены с 2022–2023, поэтому в чарте их нет; это свойство канала, не рынка.)
+
+**RU — топ кассовых, Финансы (50):**
+1 TradingView · 2 Штрафы ГИБДД официальные ПДД · 3 Учет расходов - Money Flow · 4 Аренда Про · 5 Кошелек: расходы, учет, бюджет ·
+**6 YNAB** · 7 Moneon · 8 Monefy · 9 Штрафы ГИБДД официальные и ПДД · 10 Settle Up · 11 Финансы ОК · 12 Просто Деньги ·
+13 Финансовый учет с Easybank · 14 Splitwise · **15 Долги и накопления** · 16 Учет Расходов и Доходов - GUAP ·
+17 Анализ расходов и финансов · 18 Мой Авто · 19 Money Pro · 20 Keeper · 21 Доходы ОК · 22 Бюджет и финансы - Деньги ОК ·
+23 Доходы: Учет расходов доходов · 24 Qalta · 25 Финансы – Расходы и Доходы · 26 Fleur · 27 Money Manager (Remove Ads) · 28 CarScope ·
+29 Bobby · 30 Kittysplit · 31 Axia · 32 Финансы - расходы и доходы · 33 Учёт маршрутов · 34 Spending Tracker · **35 Кредиты: Кредитный
+калькулятор** · **36 Дзен-мани** · 37 Бюджет - Расходы и Доходы (1С-Рарус) · 38 Snowball Income · 39 Drivvo · 40 Tipfolio · 41 Splid ·
+42 My Валюта · 43 Cocono · **44 Где деньги: Финансы и Долги** · 45 i know percent · 46 Трекер бюджета денег · 47 Spent ·
+48 Investing.com · 49 Бюджет ОК · 50 Штрафы ПДД ГИБДД с фото онлайн.
+
+**US — топ кассовых, Финансы (50):**
+1 MileIQ · 2 TradingView · **3 Rocket Money** · 4 Build Credit & Money: Dovly AI · **5 YNAB** · **6 Copilot** · 7 Seeking Alpha ·
+**8 Monarch** · 9 Kudos · 10 LifeLock · 11 Lenme · 12 Breakout · 13 Aura · **14 EveryDollar** · 15 Everlance · 16 Collect ·
+17 Settlemate · 18 Webull · 19 Kraken · 20 ATLAS:EARTH · 21 Quicken · 22 Stocks To Buy Now · **23 Ditch: Pay Off Debt Faster** ·
+24 SimplyWise · 25 Solo · 26 Investing.com · 27 CardPointers · 28 dub · 29 Splitwise · 30 TipRanks · 31 Monbark · 32 ClaimHunt ·
+33 MarketWatch · 34 Easy Invoice Maker · 35 Gridwise · 36 Yahoo Finance · 37 Hurdlr · 38 IBD · 39 Payout · 40 Freebie Invoice Maker ·
+41 SubPilot · 42 Experian · 43 Shoeboxed · 44 Profit AI · 45 VectorVest · 46 Smart Receipts · 47 Snowball Analytics ·
+48 Driversnote · 49 Fleur · 50 Bitcoin Mining.
+**US — топ бесплатных** (выборка советующих/долговых): 12 Rocket Money · 22 Intuit Credit Karma · 27 Dave · 31 **Cleo AI** ·
+32 Kikoff · 38 MoneyLion · 47 Albert; остальное — банки, P2P, кэш-адвансы, рынки предсказаний (1 Polymarket, 2 Kalshi).
+
+**GB — топ бесплатных** (выборка): 23 MoneySavingExpert · 34 Emma · **36 Sprive - Mortgage Free, Faster** · 37 Moneybox ·
+41 ClearScore · 43 Credit Karma; остальное — банки и кредиторы. **GB — топ кассовых** (выборка): 4 Snoop · 5 ClearScore ·
+10 YNAB · 15 Emma · 24 Financielle · 27 WPS LifeStage Money · 32 Zerosum · 34 Banktivity · **45 MoneyWiz 2026** · 49 Spendee ·
+50 Gains.
+
+**DE — топ бесплатных** (выборка): 9 Finanzguru · 22 Fin: Haushaltsbuch · 24 Flowfy · 41 bonify. **DE — топ кассовых**:
+1 Finanzguru · 3 bonify · 6 Outbank · 10 Flowfy · 14 YNAB · 20 Finanzfluss Copilot · 27 MoneyControl · 29 StarMoney · 34 Monefy.
+
+**Проверка кандидатов «советует порядок долгов» по описаниям (iTunes Lookup, дословно):**
+
+- **Ditch: Pay Off Debt Faster** (Ditch Technologies Inc., US кассовый #23, ★4,82 / 2 614, v1.5.8 от 14.09.2026):
+  «Roundups to Debt: Send roundups from your purchases directly to your loans. … automated Payoffs chip away at your debt in the
+  background.» · «Smart Debt Tracking: See all your loans and progress in one place. Track balances and payments, and get
+  **personalized recommendations**.» · «AI Financial Assistant: Get tailored insights and answers about debt, spending, and budgeting».
+  Механика — округления в погашение + LLM-ассистент; какой долг гасить, описание **не говорит**. 🟡 «personalized recommendations»
+  не раскрыто — кандидат на проверку, но по описанию это класс Ray/Cleo (LLM), не детерминированная очерёдность.
+- **Долги и накопления** (Aliaksandr Shynkevich, RU кассовый #15, ★5 / 13, v1.19.2 от 27.07.2026): «Сбережения — Виртуальные копилки
+  для разных целей. Поддерживается пополнение сразу нескольких копилок одним действием **с учётом обязательных расходов**.» ·
+  «Кредиты — Контроль за вашими кредитами… Возможность менять процентную ставку, вносить досрочные платежи и видеть, как это влияет
+  на график выплат.» Долги и накопления в одном приложении — **единственное в RU-чарте по объекту**, но совета нет: распределение
+  по копилкам и досрочка задаются человеком, продукт пересчитывает график.
+- **Где деньги: Финансы и Долги** (Евгений Лисин, RU кассовый #44, v5.3.4 от 15.09.2026): учёт активов, «кто и сколько вам должен»,
+  «ваши долги». Трекер, совета нет.
+- **Sprive** (GB бесплатный #36, ★4,83 / 7 502): «Auto-saving: Automatically set aside spare cash to turn into mortgage overpayments» ·
+  «Set your minimum and maximum monthly saving limits…». Один долг (ипотека), автоматизация переплаты, очерёдности нет.
+- **Revius** (RU бесплатный #8, новинка v1.0.1 от 12.09.2026): ИИ-трекер расходов, «Revius Premium … 390 ₽ в месяц или 1690 ₽ в год» —
+  ценовая точка RU-рынка трекеров.
+- **Я коплю** (RU бесплатный #31, ★4,29 / 1 762): детская копилка на цель. Не конкурент.
+
+**Выжимка.**
+- **Ни в одном из 8 чартов (400 позиций) нет приложения, чьё описание обещает порядок погашения долгов с учётом ставок** или
+  распределение потока между долгом, резервом и целями. Долговые приложения в топах — трекеры (Долги и накопления, Где деньги),
+  автоматизаторы переплат (Ditch, Sprive) и LLM-ассистенты (Ditch, Cleo).
+- **RU-кассовый топ целиком занят трекерами расходов** (Money Flow, Кошелек, Moneon, Monefy, Финансы ОК, Дзен-мани #36) и YNAB (#6)
+  — платят в РФ за учёт, а не за совет. **CoinKeeper — #11 бесплатных**, Дзен-мани — #36 кассовых.
+- **US-кассовый топ** подтверждает расклад Г11: Rocket Money #3, YNAB #5, Copilot #6, Monarch #8, EveryDollar #14 — все трекеры/
+  бюджеты; из «советующих» в топе только Ditch (#23) и Cleo (#31 бесплатных), оба на LLM.
+- **Для нас:** ниша «детерминированный совет о распределении» в чартах пуста во всех четырёх странах; обратная сторона — нет и
+  доказательства спроса в виде платящих пользователей. Ценовые точки RU: Revius 390 ₽/мес, Финуслуги+ 399 ₽/мес, Дзен-мани
+  199–249 ₽/мес.
+
+Досмотр Ditch: `https://www.ditch.io/` `curl`+UA → **HTTP 200, 73 061 байт**; `r.jina.ai` → **HTTP 200, 17 928 байт**, 16.09.2026.
+Поиск по тексту на avalanche / snowball / highest interest / interest rate / which loan|debt / priorit / recommend / APR даёт
+**только** отзыв пользователя («I'd recommend to anyone with debt») и посты блога («how extra payments + Dani can make a bigg[er
+difference]», «Dani is built to fill that gap» — Dani = их ИИ-ассистент). Очерёдности погашения по ставке на сайте нет.
+Ditch закрывается как «округления в долг + LLM-ассистент», класс Cleo/Ray.
+
+### Г24.7 Правила применения рекомендательных технологий Ozon (ст. 10.2-2 149-ФЗ) — ❌ текст документа НЕ добыт, адрес установлен
+
+**Адрес документа установлен двумя независимыми путями:**
+- ссылка из статьи vc.ru «Сервисы обязали раскрывать правила применения рекомендательных технологий…» (`curl`+UA → HTTP 200,
+  189 985 байт; `r.jina.ai` → 200, 58 252 байта): редирект `api.vc.ru/v2.8/redirect?to=https://docs.ozon.ru/legal/algorithms/recomendation-algorithms/`;
+- выдача `WebSearch`: `https://docs.ozon.ru/legal/terms-of-use/site/algorithms/recomendation-algorithms/` (раздел «Работа алгоритмов Ozon»).
+
+**Пройденные каналы и что каждый вернул (16.09.2026, дословно по ответам):**
+
+| Канал | Результат |
+|---|---|
+| `curl -sk --http1.1` + UA, `/legal/algorithms/…` | **HTTP 307**, 164 байта, `Location: …/?__rr=1`, `Set-Cookie: __Secure-ETC=…` |
+| тот же `curl` с cookie-jar и следованием редиректу (`-L -c -b`, `Accept-Language: ru-RU`) | **HTTP 403**, 8 863 байта, `<title>Antibot Challenge Page</title>` (`st.ozone.ru/s3/abt-challenge/…`) |
+| `r.jina.ai`, оба адреса | HTTP 200, 498 / 521 байт, «Title: Antibot Challenge Page … Target URL returned error 403» |
+| `r.jina.ai` с `X-Engine: browser`, `X-Timeout: 30`, оба адреса | то же, тело «fab_chlg_20260916105200_… Попробуйте: обновить страницу…» — **JS-челлендж, прокси не проходит** |
+| `WebFetch` (`/legal/terms-of-use/site/…`) | «Too many redirects (exceeded 10)» |
+| `www.ozon.ru/info/recommendation-algorithms/` (догадка об альтернативном адресе) | HTTP 307, 164 байта — тот же антибот |
+| Wayback `archive.org/wayback/available?url=docs.ozon.ru/…` | **HTTP 429** (архив лежит весь день; CDX — 503) |
+| Common Crawl `index.commoncrawl.org`, 6 последних коллекций 2026 (`CC-MAIN-2026-34…-12`) | 4 × **404** (нет захватов), 2 × **504** Gateway Time-out |
+| `WebSearch` ×3 (точное название; адрес документа; Ozon Банк) | копий текста у третьих лиц нет; у Ozon Банка отдельного документа поиск не нашёл |
+
+**Причина «не добыто» — точная:** антибот Ozon (`abt-challenge`) требует исполнения JavaScript; ни `curl`, ни текстовый прокси
+(в т.ч. в браузерном режиме), ни `WebFetch` его не проходят; архивные копии недоступны (Wayback 429, Common Crawl без захватов).
+Пейволла нет — нужен настоящий браузер (headless с исполнением JS), которого в наборе каналов нет.
+
+**Что известно из вторичных источников (не текст документа):**
+- vc.ru (октябрь 2023), дословно: «**Ozon** изучает, с какими товарами взаимодействовал покупатель — это около 300 характеристик,
+  среди которых категория, бренд, цена, оценка, доступность экспресс-доставки. И вдобавок анализирует тип действия: покупка,
+  просмотр карточки, добавление в корзину или в [избранное]». Там же: «Часть сервисов учитывает также агрегированные данные по
+  другим клиентам со схожим поведением.»
+- Телеспутник, 15.04.2022 (`curl`+UA → HTTP 200, 107 176 байт) — **добровольное** раскрытие за полтора года до закона, цитата
+  официального релиза: «Рекомендательная система на Ozon отвечает за отбор товаров, релевантных контексту показа виджетов, и порядок
+  отображения этих товаров»; «в основе поиска и рекомендательных сервисов маркетплейса лежат технологии машинного обучения».
+- malls.ru, 03.10.2023 (`curl`+UA → HTTP 200, 56 274 байта): «правила использования рекомендательных алгоритмов представили, в том числе
+  крупнейшие маркетплейсы Ozon, Wildberries и "Сбермаркет"» (со ссылкой на «Ведомости»).
+
+**Что это меняет.** Для нашего собственного документа по ст. 10.2-2 образец Ozon не нужен как единственный: в той же выдаче лежат
+открытые документы того же жанра без антибота — `help.mail.ru/legal/terms/mail/recommendation/`, `ads.vk.ru/documents/recommendation`,
+`yandex.ru/legal/recommendations/` (ссылка из vc.ru), `megamarket.ru/info/recomend-info/`. 🟡 Не снимались — вне рамки пункта; если
+нужен образец формы, брать их. Пункт по Ozon закрывается как **недобываемый нашими каналами**; повторять только при появлении
+headless-браузера или оживлении Wayback.
+
+### Г24.8 Хвосты Г7: блог KakaoBank о тегах и заметках; MaPS Financial Fitness Tool; журнальная версия Economic Record
+
+**(а) KakaoBank — «통장에 바로 쓰는 가계부, 입출금통장 태그∙메모» («Бюджет-тетрадь прямо в счёте: теги и заметки
+расчётного счёта») — 🟡 частично: адрес найден, страница снята с публикации, содержание — только по сниппету выдачи.**
+
+- Адрес дал `WebSearch` («카카오뱅크 거래내역 메모 태그 기능»): `https://blog.kakaobank.com/191`.
+- `curl`+UA → **HTTP 404, 30 697 байт**; `r.jina.ai` → HTTP 200, 1 996 байт, «Warning: Target URL returned error 404» и тело нового
+  движка блога «서비스를 이용할 수 없습니다. 일시적인 오류로 화면을 불러오지 못했어요» — блог переехал на новую платформу
+  (разделы Home / Life / Brand / Series), старая нумерация постов не перенесена. Wayback — лежит (429/503).
+- FAQ `https://m.kakaobank.com/FaqView/view/9413` (из той же выдачи) → `curl` HTTP 200, 54 079 байт, но это SPA: в HTML только подвал
+  (321 символ текста), содержимое грузится скриптом.
+- Содержание по сводке выдачи `WebSearch` (🟡 вторичное — пересказ поисковика по тексту поста, не дословная цитата), перевод:
+  у расчётного счёта KakaoBank два механизма разметки: **теги — ставятся автоматически**, без действия пользователя, по способу
+  платежа (примеры `#자동이체` «автоплатёж», `#캐시백` «кэшбэк»), и позволяют собрать выписку по способу оплаты; **заметки
+  (메모) — свободный текст к отдельной операции**, их тоже можно искать и собирать в подборку, как теги, «если хотите
+  управлять деньгами по собственной классификации, которой нет в тегах». Смысл поста — «вести счёт как бюджет-тетрадь».
+- **Выжимка для нас:** KakaoBank делит разметку на **машинную (теги по способу платежа — факт, а не категория расходов)** и
+  **пользовательскую (свободная заметка с поиском)**. Автокатегоризации по смыслу трат в этой механике нет. Для FINPILOT это
+  довод держать провенанс/способ платежа отдельным полем от пользовательской категории — не смешивать в одну «метку».
+
+**(б) MaPS Financial Fitness Tool — 🟡 частично: методика построения и шкала добыты по сниппетам первоисточника, сам
+опросник (9 вопросов) — нет.**
+
+- Документы найдены `WebSearch` ×2: блог MaPS «How we developed the Financial Fitness Tool: Helping individuals to measure and quantify
+  their financial wellbeing» (`maps.org.uk/en/media-centre/financial-wellbeing-blog/2023-financial-wellbeing-blogs/how-we-developed-the-financial-fitness-tool`)
+  и PDF «Money and Pensions Service (MaPS) Financial Wellbeing Key Questions» (`maps.org.uk/content/dam/maps-corporate/en/publications/research/2024/maps-financial-fitness-tool-questionnaire.pdf`).
+- Каналы, 16.09.2026: `curl`+UA → PDF **HTTP 403, 6 028 байт** «Just a moment...», блог **403, 6 088 байт**; `WebFetch` PDF → «The server
+  returned HTTP 403 Forbidden»; `r.jina.ai` → оба 200/542–555 байт «Just a moment... This page maybe requiring CAPTCHA». Причина —
+  **Cloudflare-капча** (не антибот-заглушка: прокси прямо пишет CAPTCHA), Wayback лежит.
+- Что вернула выдача по этим двум документам (🟡 сниппеты первоисточника в пересказе поисковика):
+  «The MaPS Financial Fitness Tool consists of nine questions that retain a high Cronbach's Alpha of 0.81» · «MaPS created a simple
+  overall composite score from 22 questions, then used step-wise regression to find the questions that could most efficiently reflect
+  the longer composite score» · «Using judgment to ensure coverage of the National Goals, they settled on nine questions … aligned to
+  the narrative definition of financial wellbeing and were income neutral, if possible» · «The nine questions are compiled into an
+  overall composite Index score … on a 0-100 scale» · «respondents answer on a scale of 0 to 10, where 0 is 'not at all satisfied' and
+  10 is 'completely satisfied'» · «the middle is close to the average of the UK population (i.e. around half the population would score
+  under 50 and around half over 50)» · «These nine questions encapsulate the key outcomes of financial wellbeing – feeling confident,
+  resilient and empowered».
+- **Выжимка.** FFT — **субъективный опросник** (0–10, удовлетворённость/уверенность), сжатый регрессией из 22 вопросов до 9 при
+  α Кронбаха 0,81, со шкалой 0–100, **нормированной на население** (медиана ≈ 50). Это подтверждает вывод Г7 (Б.5): у MaPS нет
+  вычислимого по транзакциям индекса — есть психометрия. Для нас: FFT не годится как формула диагностики по данным счёта; годится как
+  **приём валидации** — сжатие длинного опросника регрессией и проверка согласованности α. Сами 9 формулировок и веса — не добыты.
+
+**(в) Economic Record 2022, Comerton-Forde et al. — журнальная версия ❌ по тексту, ✅ по статусу доступа.**
+
+- Unpaywall `https://api.unpaywall.org/v2/10.1111/1475-4932.12664` → **HTTP 200, 3 733 байта**: `is_oa: true`, `oa_status: hybrid`,
+  журнал «Economic Record»; OA-локации: **publisher, publishedVersion, лицензия cc-by-nc** (`doi.org/10.1111/1475-4932.12664`);
+  repository publishedVersion (`doi.org/10.2139/ssrn.3734752`); repository submittedVersion `docs.iza.org/dp13884.pdf`.
+  То есть журнальная версия **открыта издателем под CC BY-NC** — пейволла нет.
+- Попытки текста: `onlinelibrary.wiley.com/doi/pdfdirect/10.1111/1475-4932.12664` `curl`+UA → **HTTP 403, 5 823 байта** (Cloudflare);
+  SSRN `papers.ssrn.com/sol3/papers.cfm?abstract_id=3734752` → **HTTP 403, 5 782 байта** (в прошлых заходах SSRN через `curl` проходил —
+  сегодня нет). В Г7 `r.jina.ai` по Wiley давал антибот-заглушку.
+- **Выжимка.** Расхождение с нашей записью, найденное в Г7 по IZA DP 13884, **сверить с опубликованной версией не удалось**; остаётся на
+  submittedVersion. Причина — антибот Wiley и SSRN, не доступ: статья открыта. Повторять через браузер человека (одно скачивание PDF
+  по DOI), это пять минут, а не исследование.
+
+### Г24.9 Программы Data Fest 2026, Aha! 2025–2026, PyCon Russia 2026 — докладов о прескриптивном финансовом совете нет
+
+🔴 **Поправка к формулировке очереди.** «Отрицательный вывод по Data Fest построен на одном треке 2020 года» — уже неверно:
+в Г7.5.5 (`marketplaces_ds_practice_rf_2026-09-10.md`) проверены **официальные списки секций Data Fest 2024 и 2025** (34 секции 2025,
+из финансовых — только «Scoring»). Не хватало **2026**, Aha! и PyCon — их и добрал этот пункт.
+
+**Data Fest 2026** — `https://ods.ai/events/datafest2026`, `curl`+UA → **HTTP 200, 234 917 байт** (6 703 символа текста), 16.09.2026.
+Даты, дословно: «фест пройдет с 23 по 31 мая 2026 года … 🌐 (new) География расширяется: в 2026 добавляется Уфа!». Площадки-хосты:
+X5 Tech, Яндекс (Москва, Белград), **ВТБ** (24 мая), **Сбер** (Москва 26 мая, Новосибирск 28 мая), Лемана Тех, AvitoTech.
+Секции, перечисленные на странице (24), дословно по заголовкам «… | Data Fest 2026»:
+
+> LLM inference · GenCV · Computer Vision · Code LLM · Advanced LLM · Agentic LLM · NLP · MLOps · ML in Science ·
+> AvitoTech ML CUP 2026 · LeanAl · Data Strategy · Reliable ML · ML in DBMS · **ML in Funtech** · Mathematics & ML ·
+> ML in Manufacturing · ML in Advertising · Open Career · Data Fusion · ML in Marketplace · Data и ML в Retail · Practical ML · GenAI
+
+«ML in Funtech» — не опечатка «Fintech», дословно: «Секция посвящена применению машинного обучения в индустрии развлечений,
+охватывая гиперперсонализацию, генеративный ИИ в геймдеве, эмоциональный ИИ, инструменты для Creator Economy». В 2026 **исчезла даже
+секция «Scoring»**, бывшая в 2025; финансовых секций — **ноль**. Поиск по тексту страницы на «финанс|долг|кредит|бюджет|накоплен|банк|
+рекоменд|fintech|скоринг» — 0 совпадений (кроме названий площадок). 🟡 Страница перечисляет секции карточками; если у события есть
+секции за пределами первой выдачи, они не видны (счётчик «19 · 11 · 10 · 2 +» в шапке — участники, не секции).
+
+**Aha! (конференция Matemarketing)** — `https://ahaconf.ru/` → `curl`+UA **HTTP 200, 125 625 байт**, 16.09.2026. Дословно: «АНА'26 …
+1 билет • 2 дня • 14 мая (онлайн) • 22 мая (кластер Ломоносов) · Техническая конференция по ИИ, машинному обучению и аналитике данных ·
+1200+ участников · 70+ докладов и мастер-классов … Конференция проводится 7 раз и ежегодно собирает около 1200 продуктовых аналитиков,
+ML/DS-специалистов, product-менеджеров, CPO из e-commerce, банкинга, телекома, ритейла». Ключевые темы: «Product Science, Machine Learning
+и AI/LLM-трансформация · R&D и экономика масштабирования · … · RecSys: оценка качества рекомендаций и ранжирования · Open Source ИИ-агенты…».
+Табличная программа — Google Sheets по ссылкам со страницы, выгружено как CSV (`/export?format=csv&gid=…`):
+- лист `126rivreXGcBq-…` gid 1056210889 → **HTTP 200, 145 224 байта** — программа **2026**, ≈55 докладов;
+- лист `1R-mRG768zjpSC4w…` gid 756550449 → **HTTP 200, 138 145 байт** — программа **2025** (год в шапке), ≈75 докладов;
+  остальные три gid того же файла → HTTP 400 (листы закрыты или удалены).
+Поиск по всем ячейкам на «финанс|долг|кредит|бюджет|накоплен|сбережен|банк|рекоменд|финтех|скоринг|инвест|персональн|next best|
+благополуч». **Все финансовые совпадения, дословно (заголовки):**
+- 2026: «ДМИТРИЙ МИХЕЛЬ, DS PRODUCT UNIT LEAD, АВИТО — NEXT-BEST-ACTION В АВИТО: КАК ML И LLM АВТОМАТИЗИРУЮТ РАБОТУ СЕЙЛЗОВ» (NBA для продавцов
+  B2B, не для клиента-физлица) · «ЕЛИЗАВЕТА АФАНАСЬЕВА, SENIOR DATA SCIENTIST, ТОЧКА БАНК — ДАННЫЕ ДЛЯ ОБУЧЕНИЯ LLM…» · «АРКАДИЙ ЛЫСЯКОВ,
+  … Т-БАНК — АНАЛИТИКА ПРОТИВ ХАОСА: КАК МЫ ПРИРУЧИЛИ LLM‑АГЕНТОВ … ПОДДЕРЖКИ» · «Максим Дубровин, Senior Product Analyst, Сбер —
+  Генеративная аналитика с GigaChat…».
+- 2025: «АЛЕКСЕЙ МИГУНОВ, РУКОВОДИТЕЛЬ АНАЛИТИКИ ИНВЕСТИЦИОННЫХ И ДЕПОЗИТНЫХ ПРОДУКТОВ, Т-БАНК — ПРОДУКТ, В КОТОРОМ ЗАРАБАТЫВАЮТ ВСЕ: КАК МЫ
+  В Т-ИНВЕСТИЦИЯХ СТРОИМ ПЛАТФОРМУ В ФОРМАТЕ WIN-WIN-WIN ДЛЯ КЛИЕНТОВ, ТРЕЙДЕРОВ И БИЗНЕСА» · «ВАЛЕРИЯ КОВАЛЬЧУК, … Т-БАНК — АНАЛИТИЧЕСКАЯ
+  АЛХИМИЯ: КАК НАЙТИ ОПТИМАЛЬНЫЙ ОФФЕР БЕЗ ТЫСЯЧИ АБ-ТЕСТОВ (ОПРОСЫ МЕТОДОМ КОНДЖОИНТ-АНАЛИЗА)» · «ЕВГЕНИЙ ХОМУТОВ, … АНАЛИТИКИ ПОДПИСКИ PRO,
+  Т-БАНК — БЕЗ A/B И МАГИИ…» · «МАКСИМ ФЕДОТОВ, DATA SCIENTIST ГРУППЫ РАНЖИРОВАНИЯ И НИКИТА МОЖУГИН, … OZON БАНК — КАК ПРОЙТИ ПУТЬ ОТ
+  АНАЛИТИЧЕСКОЙ ИНИЦИАТИВЫ ДО ML-ПЛАТФОРМЫ ПЕРСОНАЛИЗАЦИИ, СЭКОНОМИВ ВРЕМЯ И ЗАРАБОТАВ МИЛЛИОНЫ» · «АНДРЕЙ КОРОЛЕВ, … Т-БАНК — CSAT ПОД
+  МИКРОСКОПОМ…» · «АНДРЕЙ МОРОЗКИН, … ФИНАМ — СОЗДАНИЕ КОРПОРАТИВНОГО AI МОЗГА…» · «НИКОЛАЙ САВУШКИН, РУК-ЛЬ СЛУЖБЫ РЕКОМЕНДАТЕЛЬНЫХ
+  ТЕХНОЛОГИЙ, ЯНДЕКС — БУДУЩЕЕ РЕКОМЕНДАТЕЛЬНЫХ СИСТЕМ».
+Всё банковское — **монетизация, персонализация офферов, A/B, поддержка**. Ни одного доклада о совете клиенту по долгам, резерву,
+накоплениям или распределению дохода.
+
+**PyCon Russia 2026** — `https://pycon.ru/` → **HTTP 200, 207 730 байт**; `https://pycon.ru/schedule` («Расписание 2026») → **HTTP 200,
+419 164 байта** (7 576 символов), 16.09.2026. «PyCon Russia состоится 24–25 июля 2026 года», два трека — Python Track и Data Track,
+≈30 докладов. Финансовые организации — только как места работы докладчиков (Точка Банк ×4, «ПАО Сбербанк FrontierAI»). Доклады этих
+спикеров, дословно: «Почему Python — плохой выбор для вайб-кодинга и что с этим делать» · «"Я их слепила из того, что было", или как
+генерировать данные для вашей модели?» · «Python performance без гадания: от production-симптома до проверенного fix'а» · «Распределенные
+блокировки в мультицод…» · «Umbrella: От AI-кодогенерации к управляемым автономным агентам». Прочие Data-доклады — LLM, агенты,
+guardrails, анонимизация. **Финансового совета нет.**
+🟡 Программы PyCon 2024 и 2025 (`/program2024`, `/program2025` → HTTP 200, ≈103 КБ, но 1 650 символов текста — программа грузится
+скриптом Tilda) **не проверены**; расписания прошлых лет по ссылкам со страницы нет.
+
+**Выжимка.** Отрицательный результат расширен: **Data Fest 2024–2026** (официальные секции трёх лет; в 2026 ушла и «Scoring»),
+**Aha! 2025–2026** (≈130 докладов по табличной программе) и **PyCon Russia 2026** — ни одного доклада о прескриптивном советнике
+для физлица, рекомендациях по долгам или накоплениям. Банки на российских DS-сценах говорят о персонализации офферов (Ozon Банк),
+монетизации (Т-Инвестиции), LLM в поддержке — то есть **рекомендация = что продать клиенту**, а не что клиенту делать с деньгами.
+Для новизны FINPILOT это подтверждение по объекту, а не по методу (метод — SAW/avalanche — известен, см. Г16–17).
+
+## ИТОГ Г24
+
+| Пункт | Статус | Факт с источником | Что это меняет для продукта |
+|---|---|---|---|
+| 3 Monarch Pay Down Goals | **добыт (был закрыт в Г15.8(в); перепроверен)** | Статья «Using Pay Down Goals» от 08.09.2026 через Zendesk API (`help.monarch.com/api/v2/help_center/en-us/articles/44373293932052.json`, 200, 33 536 б): метод — «Pick your payoff method: Avalanche … Snowball … Planned payments»; слово «recommend» — только про настройку проекции, ни разу про метод. `r.jina.ai` за 4 дня перестал пробивать (Cloudflare-челлендж) | Вывод Г15 держится: Monarch применяет avalanche, если выбрал человек, но не советует. Новый канал: Zendesk Help Center API открыт при закрытом HTML |
+| 4 Lunch Money, Empower | **добыт** | Lunch Money: 16 разделов «All Features» без долгов и целей; FAQ: «How do I set up goals… This feature will be coming soon!» (`support.lunchmoney.app/guides/budgeting/faq`, 200). Empower: Debt Paydown = «year-to-date balance change of your linked debt (liability) accounts», счёт попадает при «at least two Interest transactions … within the last 90 days»; Emergency Fund = кэш против «target emergency fund range»; Cash Goals с обязательной целью «Emergency Fund» (Zendesk API `support-personalwealth.empower.com`, 200) | Lunch Money — угрозы нет. Empower — мониторинг, совета нет; признак процентного долга по транзакциям годится нам как проверка правдоподобия ставки |
+| 5 Дзен-мани Android; цена «Финздоровья» | **добыт; цена Финздоровья — выводом** | Дзен-мани: Google Play RU «От 129,00 ₽ до 2 990,00 ₽ за товар»; веб (путь оплаты Android в РФ) «На месяц 199 руб./мес · На год 1490 руб. · Навсегда 2990 руб.» (`zenmoney.ru/a/#subscription`, 200). Финуслуги: «Финуслуги+» 399 ₽/мес, 3 990 ₽/год, в составе — «Детальная кредитная сводка» и «Финтрекер», «Финздоровья» нет (`finuslugi.ru/services/subscription`, 200); на промо Финздоровья цены нет | Ценовые точки РФ: 199–249 ₽/мес трекер, 390–399 ₽/мес «умный» сервис. 🔴 **Новый косвенный конкурент — «Финтрекер» Финуслуг** (январь 2026): цель «финансовая подушка»/первый взнос → подбор портфеля; долгов нет, механика не раскрыта |
+| 6 Чарты App Store | **добыт** | iTunes RSS genre=6015, RU/US/GB/DE × free/grossing, 8 × HTTP 200, 16.09.2026 (API v2 жанр не фильтрует). RU кассовый — трекеры (Money Flow, Кошелек, Moneon, Monefy, YNAB #6, «Долги и накопления» #15, Дзен-мани #36); US кассовый — Rocket Money #3, YNAB #5, Copilot #6, Monarch #8, EveryDollar #14, Ditch #23 | В 400 позициях нет ни одного приложения, чьё описание обещает порядок погашения по ставкам или распределение потока. Ниша пуста — и спрос на неё чартами не доказан |
+| 7 Правила рекомендательных технологий Ozon | **нет** | Адрес установлен (`docs.ozon.ru/legal/algorithms/recomendation-algorithms/`); антибот с JS-челленджем: `curl` 307→403 «Antibot Challenge Page», `r.jina.ai` (и в режиме `X-Engine: browser`) — заглушка, `WebFetch` — «Too many redirects», Wayback 429, Common Crawl — 404/504 по 6 коллекциям | Для образца документа по ст. 10.2-2 брать открытые аналоги (Mail, VK Реклама, Яндекс, Мегамаркет). Ozon — только при headless-браузере |
+| 8 KakaoBank блог; MaPS FFT; Economic Record | **частично / частично / нет** | KakaoBank: пост `blog.kakaobank.com/191` снят (404), по выдаче — теги автоматические по способу платежа, заметки — свободный текст с поиском. MaPS FFT: 9 вопросов из 22 (пошаговая регрессия), α = 0,81, ответы 0–10, индекс 0–100 с медианой ≈ 50 по населению (сниппеты `maps.org.uk`; сами документы — Cloudflare-капча). Economic Record: по Unpaywall открыт издателем, CC BY-NC; Wiley и SSRN — 403 | Разделять машинный провенанс (способ платежа) и пользовательскую метку. FFT — психометрия, не формула по транзакциям: вывод Г7 подтверждён. Сверку с журнальной версией Economic Record сделает человек одним скачиванием по DOI |
+| 9 Data Fest, Aha!, PyCon | **добыт (PyCon 2024–2025 — нет)** | Data Fest 2026: 24 секции, финансовых ноль, «Scoring» 2025 года исчезла; Aha! 2025–2026: ≈130 докладов, банковские — офферы, персонализация (Ozon Банк), поддержка; PyCon Russia 2026: ≈30 докладов, финансового совета нет | Отрицательный вывод теперь на Data Fest 2024–2026 + Aha! 2025–2026 + PyCon 2026: в российском DS-сообществе «рекомендация» значит «что продать клиенту», а не «что делать с деньгами» |
+
+🔴 **Нашёлся ли продукт, который советует ПОРЯДОК погашения долгов с учётом ставок, а не только отслеживает цель?**
+**В этом доборе — нет, ни один.** Проверены в Г24: Monarch (avalanche/snowball есть, выбирает пользователь, «recommend» к методу
+не применяется), Empower (мониторинг изменения баланса), Lunch Money (долгов и целей нет), Ditch («personalized recommendations» и
+ИИ-ассистент без раскрытой очерёдности), «Долги и накопления» и «Где деньги» (трекеры с пересчётом графика), Sprive (одна ипотека),
+«Финтрекер» Финуслуг (цели без долгов), плюс 400 позиций чартов четырёх стран.
+Для полноты из ранее добытого в этом файле: **Mac-DebtLens** (Г15.8(а)) — рекомендует метод, но только выбор из двух (avalanche/
+snowball) и только по долгам; **DebtMeltPro** (Г15.8(б)) — браузерный калькулятор с бейджем «Best Strategy», помечает самый дешёвый
+из трёх методов по сумме процентов; **Ray Finance** (Г15.7) — LLM поверх детерминированного `calculate_debt_payoff`. То есть
+**«совет порядка по ставкам» как выбор лучшего из 2–3 фиксированных методов существует** (DebtLens, DebtMeltPro, в сущности
+арифметика avalanche), но **ни один найденный продукт не ставит долг в одну свёртку с резервом и целями и не ранжирует
+альтернативы распределения свободного потока** — зазор FINPILOT по объекту устоял и в Г24.
+
+---
+
+## ДОБОР Г29 (16.09.2026)
+
+**Состояние каналов на начало работы (замер 16.09.2026, коды и размер тела ответа).**
+
+| Канал | Код | Тело | Примечание |
+|---|---|---|---|
+| WebSearch | жив | — | гейт `websearch-budget.py` зелёный на старте |
+| Exa (`mcp__exa__web_search_exa`) | 200 | выдача 10 результатов | рабочий, использован первым |
+| `r.jina.ai` (без браузерного UA) | **200** | 367 Б на `example.com` | прокси жив |
+| OpenAlex | **200** | 24 770 Б | жив |
+| Crossref | **200** | 9 372 Б (`/works/10.32609/0042-8736-2025-12-97-115`) | жив |
+| EuropePMC | **200** | 995 Б | жив |
+| **Wayback** (`archive.org/wayback/available`) | 🔴 **429** | 117 Б | **лежал на старте батча** — подтверждение записи Г28 «канал мигает»; гейт при запуске видел зелёное |
+| `fssp.gov.ru` | 200 | 2 022 Б | SPA-оболочка, содержимого в HTML нет |
+| `finuslugi.ru` | 200 | 803 300 Б | жив |
+| `bo.nalog.ru` | 302 | 0 Б | редирект, требует следования |
+| `sudact.ru` | 200 | 21 997 Б | жив |
+| `elibrary.ru` | 302 | 158 Б | редирект |
+
+🔴 Wayback лежал (429) на старте — все пункты, где он был запланирован каналом (ФССП,
+старые адреса статей), шли без него.
+
+---
+
+### Г29.1. «Финтрекер» в подписке «Финуслуги+» — что установлено
+
+**Запуск и место в продукте.** Сервис запущен **19 января 2026 года** Московской биржей
+как часть подписки «Финуслуги+». Дословно с официального релиза MOEX:
+«19 января 2026 года маркетплейс для денег Финуслуги Московской биржи запустил новый
+сервис – подписку "Финуслуги+". **Владельцам подписки доступен сервис по подбору
+инвестиционного портфеля, состоящего из различных инструментов для решения конкретных
+задач: формирования финансовой подушки или накопления на первоначальный взнос по ипотеке,
+образование детям, а также развитие бизнеса.** В будущем клиенты Финуслуг смогут также
+добавлять собственные цели» (`https://www.moex.com/n96964`, 20.01.2026).
+
+**Цена.** 399 ₽/мес, 3 990 ₽/год вместо 4 788 ₽ (выгода 20 %) — тот же релиз.
+
+**Название и обещание на витрине подписки.** Страница `https://finuslugi.ru/services/subscription`
+(HTTP 200, 350 600 байт, снято 16.09.2026) в блоке «Сервисы в подписке» содержит строку:
+«**Финтрекер** — Подскажем, как быстрее накопить на цель».
+
+**Прямых адресов у сервиса нет:** `https://finuslugi.ru/fintracker` и
+`https://finuslugi.ru/services/fintracker` — **HTTP 404** (324 088 байт страницы-ошибки,
+снято 16.09.2026). То есть «Финтрекер» живёт внутри личного кабинета/приложения за
+авторизацией и подпиской, публичной страницы с механикой у него нет.
+
+🔴 **Отбраковка источника.** Публикация `osaengine.com/ru/blog/moex-finuslugi-plus-podpiska/`
+(«MOEX запустила Finuslugi+: подписка на инвестиционные советы», 19.03.2026) описывает
+три тарифа, «персонального инвестиционного консультанта в чате», «сигналы от алгоритмических
+моделей MOEX», «приоритетное аллоцирование в IPO» и «API-доступ». **Ни один из этих
+элементов не подтверждается официальными материалами Финуслуг и MOEX**, где тариф один
+и описан как бонусы к вкладу плюс подбор портфеля под цель. Источник — блог алготрейдинговой
+платформы, признаки машинной генерации; в качестве факта о продукте **не используется**.
+
+#### Дословно со страницы подписки — состав услуги и её дисклеймер
+
+Страница `https://finuslugi.ru/services/subscription` (HTTP 200, 350 600 байт, снято 16.09.2026),
+таблица условий подписки. Дословно, строка «Финтрекер»:
+
+> **Финтрекер** — Подбор вариантов инвестиционного портфеля под выбранную цель.
+> **Результат не является индивидуальной инвестиционной рекомендацией**
+
+Соседняя строка той же таблицы (для полноты состава подписки):
+
+> Подробная кредитная сводка — Данные о кредитах, займах, долге, просрочках, самозапрете
+> и запросах кредитной истории. Обновление доступно один раз за каждый 30-дневный расчетный период
+
+🔴 Формулировка витрины («Подскажем, как быстрее накопить на цель») и формулировка
+условий («Подбор **вариантов** инвестиционного портфеля под выбранную цель») — разные.
+В условиях выбрано слово **«варианты»**, а не «портфель», и прямо приклеен отказ от ИИР.
+Это ровно та юридическая конструкция, которую тема 18 описывала как единственный способ
+не собрать полный состав индивидуальной инвестиционной рекомендации: множественность
+вариантов + отказ от индивидуальности.
+
+#### Кто юридически даёт совет
+
+Дословно из «Уведомления о рисках» в подвале всех страниц `finuslugi.ru`
+(снято 16.09.2026 с той же страницы, HTTP 200):
+
+> На сайте finuslugi.ru предоставляются услуги оператора финансовой платформы
+> ПАО Московская Биржа, а также услуги **ООО «МБ Маркетплейс», организации,
+> не являющейся оператором финансовой платформы** в соответствии с Федеральным законом
+> от 20.07.2020 № 211-ФЗ «О совершении финансовых сделок с использованием финансовой
+> платформы». Услуги оператора финансовой платформы ПАО Московская Биржа обозначены
+> пометкой «Открытие онлайн на Финуслугах». **Иная информация на сайте www.finuslugi.ru
+> считается размещенной ООО «МБ Маркетплейс»**, если иное явно не следует из существа
+> размещаемой информации. ООО «МБ Маркетплейс» входит в Группу «Московская Биржа».
+
+Там же: «Включено Банком России в реестр операторов финансовых платформ **27.08.2020**»;
+ПАО «Московская Биржа», ИНН 7702077840, ОГРН 1027739387411.
+
+🔴 **Разделение ролей — главный юридический приём Финуслуг.** Сделки (вклады, займы,
+страховки) идут через **оператора финансовой платформы** ПАО Московская Биржа по 211-ФЗ
+и помечены «Открытие онлайн на Финуслугах». Всё остальное содержимое, включая контент
+и сервисы витрины, **вменяется ООО «МБ Маркетплейс», которое оператором финплатформы
+НЕ является**. То есть подбирающий сервис вынесен из периметра лицензируемой деятельности
+по 211-ФЗ в отдельное юрлицо той же группы. К какому именно из двух лиц отнесён «Финтрекер»,
+из публичных материалов **однозначно не следует** — публичной страницы у сервиса нет
+(см. ниже), а общее правило подвала относит его к «МБ Маркетплейс».
+
+#### Конкретные инструменты: под цель «финансовая подушка» называется ОДИН фонд
+
+Цель «формирование финансовой подушки» на Финуслугах закрыта готовым продуктом
+«Финподушка» (`https://finuslugi.ru/invest/moneybox`, HTTP 200 после редиректа 307
+с `/invest/moneybox/landing`, 215 039 байт, снято 16.09.2026). Дословно из FAQ страницы:
+
+> Что такое Финподушка? Финподушка — это инвестиционная копилка на базе открытого паевого
+> инвестиционного фонда (ОПИФ) денежного рынка **«ДОХОДЪ Биржевая копилка»**.
+> <…> Пополнять можно от 100 ₽ в любое время — без брокерского счета и без опыта в инвестициях
+
+> Какая стратегия у Финподушки и куда инвестируются деньги? **Сейчас действует одна стратегия —
+> инвестирование в паи ОПИФ «ДОХОДЪ Биржевая копилка» (тикер RU000A10DJ26).** Фонд вкладывает
+> средства в сделки обратного РЕПО с НКЦ и краткосрочные рублевые облигации — это одни
+> из надежных инструментов денежного рынка. Уровень риска фонда — минимальный.
+> **В будущем Финподушка планирует добавить новые стратегии с возможностью выбора**
+
+> С учётом комиссии управляющей компании **1 % в год** и ежедневного реинвестирования дохода
+> ориентировочная доходность Финподушки на горизонте года при сохранении текущего уровня
+> ставок составляет **около 13,5 % годовых**. Доходность не гарантирована и зависит
+> от рыночных условий.
+
+Под калькулятором доходности на той же странице — дисклеймер дословно:
+«Указан примерный доход без учета налога. **Не является инвестиционной рекомендацией**».
+
+🔴 **Ответ на вопрос «называет ли конкретные инструменты»: да, называет — вплоть до тикера
+одного конкретного ОПИФ.** Причём формально это не «Финтрекер», а витрина продукта:
+на цель «подушка» стратегия ровно одна, выбирать не из чего. Множественность «вариантов»,
+на которой держится дисклеймер Финтрекера, в этой цели фактически отсутствует.
+
+#### Механика самого «Финтрекера» — за авторизацией, публично не раскрыта
+
+- `https://finuslugi.ru/fintracker` — **HTTP 404** (324 088 байт, страница-ошибка), 16.09.2026.
+- `https://finuslugi.ru/services/fintracker` — **HTTP 404**, тот же размер, 16.09.2026.
+- Иконка сервиса существует как ассет: `assets.finuslugi.ru/mp-assets/images/subscription/FINTRACKER.svg`
+  (ключ опции в вёрстке — `FINTRACKER`, рядом `CREDIT_REPORTS`).
+- Профиль риска инвестора живёт по адресу `https://lk.finuslugi.ru/investment/advisory/risk-profile`
+  — **за авторизацией** (личный кабинет). Это же единственный найденный след анкетирования
+  клиента под подбор.
+
+**Не добыто и почему:** пошаговая механика Финтрекера (какие вопросы задаёт, сколько
+вариантов выдаёт, как считает горизонт и сумму взноса, какие классы активов подставляет
+под цели «первый взнос по ипотеке», «образование детям», «развитие бизнеса»),
+а также правила сервиса («С полными правилами сервиса можно ознакомиться по ссылке» —
+в релизе MOEX ссылка не раскрыта в тексте). **Пройденные каналы:** Exa (поиск по смыслу,
+10 результатов), прямые URL `/fintracker` и `/services/fintracker` (404), лендинг подписки,
+статья журнала Финуслуг, релиз MOEX `moex.com/n96964`, `finuslugi.ru/invest/advisory`,
+`finuslugi.ru/disclosure`, перечень PDF в подвале (`platform-rules.pdf`, `user-agreement.pdf`,
+две политики конфиденциальности — правил подписки среди них нет).
+**Причина недобычи — класс 2 (нужно действие владельца):** сервис работает только
+у авторизованного пользователя с оплаченной подпиской 399 ₽/мес; публичного описания
+механики не существует ни на одной странице.
+
+---
+
+## ИТОГ Г29 (пункт 1)
+
+| Пункт | Статус | Факт с источником | Что меняет для продукта |
+|---|---|---|---|
+| Запуск и место в продукте | **да** | «Финтрекер» — сервис подписки «Финуслуги+», запущен **19.01.2026** Мосбиржей; 399 ₽/мес, 3 990 ₽/год (`moex.com/n96964`) | Появился российский подписочный сервис «цель → портфель» у инфраструктурного игрока, а не у банка |
+| Как берёт цель | **да** | Готовые цели: «формирование финансовой подушки», «накопление на первоначальный взнос по ипотеке», «образование детям», «развитие бизнеса»; «В будущем клиенты смогут также добавлять собственные цели» (релиз MOEX) | Список целей закрытый, пользовательских целей нет. У нас цель задаётся пользователем — это отличие в пользу FINPILOT, а не в ущерб |
+| Называет ли конкретные инструменты | **да, вплоть до тикера** | Цель «подушка» закрыта продуктом «Финподушка»: «**Сейчас действует одна стратегия — инвестирование в паи ОПИФ "ДОХОДЪ Биржевая копилка" (тикер RU000A10DJ26)**», комиссия УК **1 % в год**, ориентир **≈13,5 % годовых** (`finuslugi.ru/invest/moneybox`, HTTP 200, 215 039 Б) | Прямая продажа собственного продукта под видом подбора; конфликт интересов встроен в конструкцию |
+| Кто юридически даёт совет | **частично** | Сделки — услуги **оператора финансовой платформы ПАО Московская Биржа** (в реестре ЦБ с 27.08.2020), помечены «Открытие онлайн на Финуслугах». «Иная информация на сайте <…> считается размещенной **ООО "МБ Маркетплейс", организации, не являющейся оператором финансовой платформы**» | 🔴 Готовый рабочий шаблон разделения: лицензируемые сделки — в лицензированном лице, подбирающая логика — в отдельном юрлице без статуса |
+| Дисклеймер об ИИР | **да, дословно** | «**Финтрекер — Подбор вариантов инвестиционного портфеля под выбранную цель. Результат не является индивидуальной инвестиционной рекомендацией**» (`finuslugi.ru/services/subscription`, HTTP 200, 350 600 Б, 16.09.2026). Под калькулятором Финподушки: «Не является инвестиционной рекомендацией» | Формулировка, на которую стоит равняться дословно, если мы когда-либо подойдём к инвестиционному блоку |
+| Механика подбора | **нет** | `finuslugi.ru/fintracker` и `/services/fintracker` — **HTTP 404**; риск-профилирование — за авторизацией (`lk.finuslugi.ru/investment/advisory/risk-profile`); правил сервиса нет среди публичных PDF подвала | **Класс 2:** нужна оплаченная подписка 399 ₽/мес и учётная запись — решение владельца |
+
+### 🔴 Переходит ли «Финтрекер» красную линию ИИР — и чем он от нас отличается
+
+**Ответ: по формальному составу — нет, и ровно тем же приёмом, который тема 18 назвала
+нашим единственным зазором. Но фактически он стоит к линии ближе нас, а не дальше.**
+
+Тема 18 установила: мы в ОДНОМ элементе от полного состава индивидуальной
+инвестиционной рекомендации. «Финтрекер» этот элемент **имеет** — он доходит
+до **инвестиционного портфеля**, тогда как мы останавливаемся на распределении
+свободного денежного потока между долгом, резервом и целями и **не называем
+финансовых инструментов вообще**. Разница между нами и им — не в осторожности
+формулировок, а в **объекте**: у нас объект — денежный поток, у него — портфель
+финансовых инструментов.
+
+От признания рекомендации индивидуальной он уходит тремя приёмами, все три
+зафиксированы дословно выше:
+
+1. **Множественность.** В условиях подписки написано «подбор **вариантов**
+   инвестиционного портфеля», а не «портфель» — то есть выдаётся набор, выбор
+   остаётся за клиентом.
+2. **Прямой отказ.** «Результат не является индивидуальной инвестиционной
+   рекомендацией» — приклеен прямо к строке услуги, а не спрятан в подвал.
+3. **Разнесение лиц.** Подбирающий контур вменяется ООО «МБ Маркетплейс»,
+   которое **оператором финансовой платформы не является**, а сделки совершает
+   ПАО Московская Биржа как оператор.
+
+🔴 **Слабое место их конструкции, которое стоит зафиксировать:** по цели
+«финансовая подушка» **множественности вариантов фактически нет** — стратегия одна,
+фонд один, тикер один, и это собственный продукт группы Мосбиржи с комиссией УК 1 %.
+Дисклеймер о «вариантах» и реальная безальтернативность расходятся. Мы этой уязвимости
+лишены по построению: FINPILOT не продаёт инструментов и не получает вознаграждения
+от их провайдеров, поэтому нам не нужно оправдывать множественность — у нас нет
+предмета продажи.
+
+**Практический вывод для нас:** формулировку «не является индивидуальной инвестиционной
+рекомендацией» стоит взять дословно, если инвестиционный модуль (П2) когда-либо
+появится; но до тех пор наш зазор держится на более прочном основании — **отсутствии
+финансовых инструментов в выдаче вовсе**, а не на дисклеймере.
+
+**Каналы и остатки по пункту 1.** Пройдены: Exa (поиск по смыслу), прямые URL сервиса
+(404 ×2), лендинг подписки, статья журнала Финуслуг, релиз MOEX, `finuslugi.ru/invest/advisory`,
+`finuslugi.ru/disclosure`, `finuslugi.ru/invest/moneybox`, перечень PDF подвала.
+Не добыто: пошаговая механика Финтрекера и правила сервиса — **только из-под оплаченной
+подписки (класс 2)**. Отбракован как недостоверный источник `osaengine.com` (описывал
+три несуществующих тарифа, «персонального консультанта в чате» и «API-доступ» —
+ничего этого нет в официальных материалах).
+
+---
+
+## ДОБОР Г30.3 — Exa (16.09.2026)
+
+**Каналы на начало работы (16.09.2026, ~21:30 МСК):** Exa `mcp__exa__web_search_exa` — 🟢 работает; `r.jina.ai` без UA → `sec.gov` **HTTP 200**;
+OpenAlex **200**; Crossref **200**; EuropePMC REST **200**; Wayback `web/2024/…` **302** (жив), Wayback CDX — **503** (мигает).
+
+Сверка с последним упоминанием: Г15.4–Г15.8 и Г24 п. 1–6, 9 закрыты; Monarch, Дзен-мани, «Тяжеловато», CoinKeeper/MoneyWiz/Tiller (последние — в
+`pdf_statement_parsing_accuracy`, Г24) не переоткрываю. Открытыми на вход были: Ozon (Г24.7), KakaoBank/MaPS FFT/Economic Record (Г24.8),
+механика «Финтрекера» (Г29), цена «Финздоровья» Финуслуг (Г15.4 → в Г24.5 закрыта выводом), Toya AI/Spendify (Г11).
+
+### Г30.3-К1. Правила рекомендательных технологий Ozon — ❌ НЕ ДОБЫТО (все каналы, включая Exa)
+
+- `mcp__exa__web_fetch_exa` на `https://docs.ozon.ru/legal/algorithms/recomendation-algorithms/` → тело «**307 Temporary Redirect** nginx»;
+- `mcp__exa__web_search_exa` («Правила применения рекомендательных технологий Ozon…») → `docs.ozon.ru` в индексе тоже как «307 Temporary Redirect»;
+- `r.jina.ai` **без UA** (исправление замечания Г31.3): `…/recomendation-algorithms/` → **HTTP 200, 1 005 б, «Похоже, нет соединения … Target URL returned error 403»**;
+  `…/legal/algorithms/` → 200, 980 б, то же; `docs.ozon.ru/common/…/algoritmy-ozon/` → 200, 512 б, «**Antibot Challenge Page**»;
+- Wayback CDX `docs.ozon.ru/legal/algorithms/*` → **HTTP 503**.
+**Причина:** JS-челлендж Ozon; UA-ошибка вызова прокси здесь **не** причина — без UA тоже 403. Класс 2 (нужен headless-браузер).
+Вторичное (Exa): ECOMHUB 04.10.2023 и Texterra 03.10.2023 — «Ozon обновила оглавление рубрикой «Работа алгоритмов Ozon». В ней сообщается, что всего
+учитывается около 300 параметров товара: характеристики, рейтинг и покупательское поведение»; Кодекс этики в сфере ИИ (рекомендации по рекомендательным
+системам, 2023): «маркетплейс OZON в 2022 году раскрыл алгоритмы рекомендательных систем информационных блоков «Поиска» и «Рекомендаций» на сайте».
+Для образца документа по ст. 10.2-2 149-ФЗ хватает Яндекса/VK/Okko (Г16-Л) и WB (ECOMHUB приводит текст правил WB дословно).
+
+### Г30.3-К2. 🔴 Новые российские игроки «ИИ-советника»: Т-Банк «Тая» (09.2026), «Навигатор в финансах» (анонс 11.2024), FinGPT Финуслуг — ✅ ДОБЫТО
+
+**Т-Банк.**
+- kod.ru, 26.11.2024 (`r.jina.ai`, 200, 23 442 б): «В будущем Т-Банк планирует развивать стратегию «Навигатор в финансах». Например, **приложение подскажет, что
+  выгоднее: положить деньги на вклад или досрочно погасить кредит.**» — заявление банка в пересказе СМИ.
+- Ведомости, 09.09.2026 (первая редакция — текст из индекса Exa): «Т-Банк запустил бета-версию сервиса онлайн, а также выпустил отдельные приложения на мобильных
+  платформах … ИИ-ассистент Тая предназначена для решения задач, связанных с деньгами, – от покупок до накоплений и инвестиций. Пользоваться ассистентом могут
+  в том числе те, кто не является клиентом Т-Банка. … затраты на его создание оценивались в 250–300 млн руб. … Первым специализированным навыком «Таи» стал
+  подбор косметики, электроники и бытовой техники. … В дальнейшем «Таю» планируется научить **учитывать доходы и кредитную нагрузку пользователя**, подбирать
+  билеты и отели, проводить инвестиционную аналитику». Банковское обозрение, 09.09.2026 (Exa) — то же. 🔴 Та же ссылка Ведомостей через `r.jina.ai`
+  16.09.2026 (200, 33 535 б) теперь — «App Store удалил приложение с бета-версией российского ИИ-ассистента» (iOS-приложение снято из магазина).
+- axioma-ai.ru (11 и 13.09.2026, Exa) приписывает «Тае» «анализ личных расходов и доходов, советы по накоплениям» — **сайт с признаками машинной генерации,
+  в выводы не беру**.
+**Финуслуги (Мосбиржа), FinGPT.** `https://finuslugi.ru/landing/fingpt` — `curl -sk --http1.1` с UA **200, 70 458 б**; `r.jina.ai` **200, 13 168 б**. Дословно:
+«FinGPT охватывает весь рынок: инвестиционные инструменты и банковские продукты. … Нейросеть подскажет, что купить и где выгоднее разместить деньги.»;
+«Учитывает ваши цели и задачи, помогает сформировать стратегию»; FAQ: «Дает ли FinGPT инвестиционные рекомендации? Нет. Сервис предоставляет только
+информационные материалы, которые не являются индивидуальной рекомендацией.»; «Что умеет FinGPT? … Помогать с распределением активов … Подбирать вклады и
+кредиты на маркетплейсе Финуслуг»; «Использование FinGPT бесплатно»; «FinGPT работает на основе восьми AI-агентов». Под экраном: «Не является инвестрекомендацией.
+FinGPT может ошибаться.» ТАСС через swingtrading.ru, 02.06.2026 (Exa): Мосбиржа «намерена развивать … FinGPT до ИИ-агента, который будет проактивно помогать
+подбирать инвестиционную стратегию»; «пока остается в логике вопросно-ответного интерфейса».
+**Выжимка.** В РФ за 2025–2026 появились два LLM-советника у инфраструктурных игроков (Т-Банк, Мосбиржа). Оба — **вопрос-ответ поверх продуктовой витрины**,
+долгов в одну свёртку с резервом и целями не ставят; «вклад vs досрочное погашение» у Т-Банка — заявленный, но не найденный запуск. Приём FinGPT
+«не является индивидуальной рекомендацией» + «может ошибаться» — ещё один образец формулировки (к Г29). 🔴 **Для конкурентного вывода:** зазор FINPILOT
+по объекту держится, но окно сужается: Т-Банк прямо назвал нашу задачу «вклад или досрочно погасить» своей целью, а «Тая» открыта не-клиентам.
+
+### Г30.3-К3. Economic Record 2022 (Comerton-Forde et al.) — журнальная версия ✅ ДОБЫТА (институтский репозиторий мимо Wiley)
+
+- Exa `web_fetch_exa` на `onlinelibrary.wiley.com/doi/full/10.1111/1475-4932.12664` → **`CRAWL_UNKNOWN_ERROR`** (Wiley = класс ScienceDirect для Exa);
+- EuropePMC REST по DOI → 200, `hitCount: 0`;
+- **OpenAlex** `api.openalex.org/works/doi:10.1111/1475-4932.12664` → локация `https://hdl.handle.net/11343/308183` (Minerva Access, University of Melbourne);
+- DSpace 7 REST: `server/api/pid/find?id=hdl:11343/308183` → 302 → item `6b512642-…` → bundle ORIGINAL → bitstream
+  `onlinelibrary.wiley.com-doi-pdfdirect-10.1111-1475-4932.12664.pdf` (1 090 518 б) →
+  `https://minerva-access.unimelb.edu.au/server/api/core/bitstreams/7e270a15-e5ba-41e0-ba27-1c1ab17f62fb/content` — **HTTP 200, 1 159 099 б**, лицензия CC BY-NC,
+  `pdftotext -layout` → 10 680 слов. Это **издательский PDF** («© 2022 The Authors. Economic Record published by John Wiley & Sons Australia»).
+  (Прямая страница хэндла — HTML-оболочка DSpace без ссылки, `r.jina.ai` — 83 б; ссылка берётся только через REST.)
+**Дословно (журнальная версия, с. 9 PDF):**
+> «… the responses to 10 self-reported 0–4 Likert items … We multiply the sum of the responses by 2.5 to produce a 0–100 scale … formed by adding outcomes from five
+> ordered-categorical bank record measures … describe customers' payment outcomes, net spending (measured via account outflows), balances, and available funds.
+> We multiply the sum by **100/19** to produce a 0–100 scale. … In our sample, the median was 57.9 and the average was 54.0. … The scales are distinct, but strongly
+> positively related, with a **Spearman rank correlation of 0.46**. Both scales are formed from simple summations of categorical responses. … The summative reported
+> scale is correlated **99.2 per cent** with the IRT empirical Bayes mean prediction, and the summative observed scale is correlated **98.0 per cent** with the IRT
+> prediction. The reported and observed scales have high reliability, with Cronbach's alpha coefficients of **0.92 and 0.85**, respectively.»
+**Выжимка.** Журнальная версия **совпадает** с IZA DP 13884 по всем числам, которые Г7 вынес в расхождение: ρ = 0,46 (не 40 %), множитель 100/19 (не 100/9),
+α 0,92/0,85, корреляции с IRT 99,2/98,0 %. Поправка к Б.3 `bank_patents_wellness_scoring` из Г7 **подтверждена опубликованной версией**. Ручное скачивание
+владельцем больше не нужно.
+
+### Г30.3-К4. KakaoBank (пост о тегах), MaPS FFT, «Финтрекер», Toya/Spendify — частично / нет
+
+- **KakaoBank `blog.kakaobank.com/191`** — Exa (корейский запрос) поста не нашёл; найдены соседние: `tech.kakaobank.com/posts/2407-chatgpt-financial-diary/`
+  (LLM-дневник по операциям карты mini, с анонимизацией транзакций перед промптом) и **KakaoPay tech blog** «거래내역에 감성과 지능을 더하다» — дословно (перевод
+  вахты): «메모 입력 … 칩 선택 방식 … ‘무엇을 했는지 (목적)’, ‘누구와 함께였는지 (인물)’, ‘그때 기분은 어땠는지 (감정)’» — пользовательская разметка
+  операции выбором «чипов» по трём осям (цель, с кем, эмоция) плюс подсказка категории по вводу. Хакатонный проект, не продукт. Для нас — тот же вывод Г24:
+  машинный провенанс отдельно, пользовательская метка отдельно. Сам пост 191 — **не добыт** (Exa — нет в индексе; Wayback CDX — 503).
+- **MaPS Financial Foundations Tracker** — Exa нашёл только датасет MaPS MoneyView (geods.ac.uk) и индексы Bristol PFRC (7 вопросов, 0–100, пороги <30/30–49/50–79/80+ —
+  это **другой** индекс, abrdn Financial Fairness Tracker); документы MaPS FFT — **не добыты** (Exa их не индексирует, `maps.org.uk` — Cloudflare, см. Г24.8).
+- **«Финтрекер» — механика:** Exa вернул только релизы (19.01.2026) и **osaengine.com** — он опять описывает «сигналы от алгоритмических моделей MOEX»,
+  «что купить, что продать, как ребалансировать», чего нет в официальных материалах; **отбракован повторно**. Публичной механики нет; класс 2 (подписка 399 ₽).
+- **Toya AI / Spendify** — не пробовались (бюджет ушёл на К2).
+
+### ИТОГ Г30.3 (competitors_2026_refresh)
+
+| Пункт | Был статус | Стал | Приём |
+|---|---|---|---|
+| Ozon, правила рекомендательных технологий | нет | **нет** — 307/403/503 на Exa, `r.jina.ai` без UA, Wayback; класс 2 | — |
+| 🆕 Т-Банк «Тая», «Навигатор в финансах» | не было | **добыто**: анонс «вклад или досрочно погасить» (11.2024), бета «Таи» 09.09.2026, план учить кредитной нагрузке | Exa → `r.jina.ai` |
+| 🆕 FinGPT Финуслуг | не было | **добыто**: бесплатный LLM, «помогает с распределением активов», «подбирает вклады и кредиты», дисклеймер «не ИИР» | Exa → `curl`/`r.jina.ai` |
+| Economic Record 2022, журнальная версия | нет (Wiley/SSRN 403) | **добыто**: PDF издателя из Minerva Access, числа совпали с IZA DP | OpenAlex → DSpace REST (Exa: `CRAWL_UNKNOWN_ERROR`) |
+| KakaoBank пост 191 | частично | **частично**: пост не найден, добыт соседний материал KakaoPay о разметке операций | Exa |
+| MaPS FFT | частично | **без изменений** | Exa (нет в индексе) |
+| «Финтрекер», механика | нет (класс 2) | **без изменений**; osaengine отбракован повторно | Exa |
+| Toya AI / Spendify | не добыто | **не пробовалось** | — |
+
+
+## ДОБОР Г30.3 — второй заход (16.09.2026)
+
+**Каналы:** Exa — 🟢; `r.jina.ai` без UA — 200; Crossref — 200; 🔴 **Wayback CDX — 503 «Internet Archive: Temporarily Offline»**; OpenAlex — 429.
+
+### Г30.3-К5. Toya AI и Spendify — ✅ ДОБЫТО (первоисточники + независимый рейтинг)
+
+**Toya AI** (`usetoya.com`, карточка App Store `id6762570146`, тексты из индекса Exa). Дословно:
+> «Toya's the AI that does your debt math for you — then tells you exactly what to pay, and when.»; «**AI-Powered Payoff Optimization — Not just snowball or
+> avalanche.** Toya uses AI to find the smartest payoff order based on your real data, saving you more in interest than any static calculator»;
+> FAQ: «**How does Toya AI decide what to pay first?** Toya AI analyzes your balances, interest rates, and due dates to recommend the payment that saves you
+> the most interest and reduces your timeline the fastest»; «Is Toya AI debt consolidation? **No.** … You stay in control of your money»; «Payments are coming soon».
+> Цена: «Pro ($6.33/mo billed yearly)», бесплатный уровень — только агрегация; подключение — Plaid, Spinwheel, Quiltt, Fincity, read-only.
+Независимая оценка (gitnux.org, «Best Debt Payoff Software | 2026», рейтинговый обзор — вторичный): «Toya AI's core workflow pairs payoff scenario modeling with
+ongoing progress tracking… The schedule output is structured around **a chosen prioritization rule**»; слабое место — «Forecast quality drops when interest rates
+or minimums are incomplete».
+**Spendify** (`spendify.money`, блог 16.03.2026; обзоры AOL 30.01.2026 и shoppy-express 10.05.2026): загрузка выписок → ML-категоризация, «financial health
+scoring», «AI Budget Builder», прогноз на 3 месяца, «Savings Recommendation»; 🔴 отдельно: «With **Spendify's MCP server**, your AI has read access to your accounts,
+transactions, budgets, categories, merchants, and recurring charges… Secured with OAuth 2.1», «connects to Claude.ai, Claude Desktop, Claude Code, VS Code, Cursor…
+30+ tools, both read and write access»; на лендинге — «Spendify connects your accounts and builds a debt payoff plan automatically», «Debt-Free Date Dec 2027».
+Цены: $29.99 пожизненно по акции (AOL), «Your first year is just $1» (сайт).
+**Что это меняет.** Оба продукта — **долговые**, свёртки «долг + резерв + цели» с ранжированием альтернатив по-прежнему нет: Toya оптимизирует порядок погашения
+(и прямо противопоставляет себя snowball/avalanche — ближайший по духу к нашему Avalanche-фильтру, но без резерва и целей), Spendify — бюджет и здоровье
+финансов плюс план погашения, распределения свободного потока между конкурирующими целями не делает. 🟠 Новое для нас в другом: **Spendify раздаёт свои данные
+наружу через MCP с правом записи** — это модель «движок + чужой ассистент», которой в нашем разборе жанра не было.
+
+### Г30.3-К6. KakaoBank `blog.kakaobank.com/191` — ❌ НЕ ДОБЫТО, канал архива мёртв
+
+Пройдено: Exa (корейский и английский запросы, пост не в индексе; найдены соседние материалы `tech.kakaobank.com` и KakaoPay); прямой адрес — 404 (Г24);
+**Wayback**: `web.archive.org/cdx/…` → **HTTP 503** (Internet Archive офлайн на момент работы), `web/2024/…` → 302 без содержимого.
+Статус: не добыто по причине недоступности архива; повторять в Г31.1, когда Wayback поднимется.
+
+### Г30.3-К7. MaPS Financial Foundations Tracker — ❌ НЕ ДОБЫТО (третий заход, каналы исчерпаны)
+
+Пройдено: Exa-поиск (Г30.3 первый заход) — в индексе только датасет MaPS MoneyView и **другой** индекс (abrdn/Bristol PFRC: 7 вопросов, шкала 0–100,
+полосы <30 / 30–49 / 50–79 / 80+); `mcp__exa__web_fetch_exa` по двум адресам `maps.org.uk` (16.09.2026) → **`CRAWL_NOT_FOUND`** и **`CRAWL_UNKNOWN_ERROR`**;
+прямой доступ и прокси — Cloudflare-капча (Г24). Wayback — **503**. Известное о FFT (9 вопросов из 22, α = 0,81, 0–10 → 0–100, медиана ≈ 50) остаётся
+на сниппетах Г24. Причина: сайт MaPS закрыт антиботом и вне индекса Exa.
+
+
+---
+
+## ДОБОР Г31.1 — Wayback (16.09.2026)
+
+**Состояние каналов на начало работы (замер 16.09.2026 19:32–19:40 UTC; системная дата среды — 16.09, не 17.09):**
+
+| Канал | Код | Примечание |
+|---|---|---|
+| `archive.org/wayback/available` | **429** (117 б) → **200** в 19:37 → снова 429 в 19:41 | мигает, пользоваться нельзя как опорным |
+| `web.archive.org/cdx/search/cdx` | **503** (11 832 б, «Internet Archive: Temporarily Offline») | лежал всю сессию, ни одного 200 |
+| **`web.archive.org/web/<ts>/<URL>` (replay)** | 🟢 **200** | **работает**, и это единственный живой вход в архив |
+| `web.archive.org/web/<ts>id_/<URL>` | 🟢 **200** | работает, отдаёт оригинал без тулбара |
+| `timetravel.mementoweb.org` | **000** (таймаут) | мёртв |
+| `archive.ph` (archive.today) | **200**, затем **429** со второго запроса | жив, но жёстко лимитирует |
+| `index.commoncrawl.org/collinfo.json` | **200** (34 947 б) | список индексов есть |
+| `index.commoncrawl.org/CC-MAIN-2026-34-index?url=…` | **504** (167 б) | запросный шлюз лежит, как и 16.09 |
+| DTIC (`apps.dtic.mil`) | **200**, но 1 408 б «Our Site is Getting an Upgrade / We'll be back shortly» | **второй день техобслуживания** |
+
+🔴 **Главный методический вывод батча, он же поправка к аудитам № 3 и № 4.** «Wayback лежит»
+в прошлых батчах означало «лежат `available` и CDX». **Replay-эндпоинт при этом был и остаётся
+живым.** Проверка доступности архива по `wayback/available` даёт ложный отрицательный результат:
+служебные API Internet Archive и отдача снимков — разные подсистемы и падают порознь. Правильная
+проба доступности архива — запрос конкретного снимка вида `/web/2023/<URL>`, а не `available`.
+Часть пунктов класса 4 была записана непройденной именно из-за этой ошибки пробы.
+
+**Приём, которым обходится мёртвый CDX:** дату снимка не искать через CDX, а брать через
+«годовой» замещающий адрес `/web/<YYYY>/<URL>` — Wayback сам редиректит на ближайший снимок
+и печатает точный timestamp в теле (`FILE ARCHIVED ON …` и вызов `__wm.wombat(...)`).
+
+### Г31.1-К1. KakaoBank `blog.kakaobank.com/191` — 🟢 ДОБЫТО СНИМКОМ
+
+Закрывает **Г30.3-К6** («НЕ ДОБЫТО, канал архива мёртв») и строку таблицы 1062
+(«пост снят (404)», вывод держался на сниппетах выдачи).
+
+- Запрос: `https://web.archive.org/web/2023/https://blog.kakaobank.com/191` → **HTTP 200, 87 041 б**.
+- Оригинал без тулбара: `https://web.archive.org/web/20191213142021id_/https://blog.kakaobank.com/191` → **HTTP 200, 78 410 б**.
+- 🔴 **Дата снимка: 13.12.2019 14:20:21 UTC** (`FILE ARCHIVED ON 14:20:21 Dec 13, 2019`).
+- Реквизиты из JSON-LD страницы: `datePublished 2018-08-31T10:00:00+09:00`,
+  `dateModified 2019-08-21T13:28:58+09:00`, автор «카카오뱅크», платформа TISTORY.
+- Внизу поста служебная отметка банка: **«※ 이 글은 2018.08.29을 기준으로 작성되었습니다»**
+  («текст составлен по состоянию на 29.08.2018») и **«준법감시인 심의필 18-246(2018.08.29 현재)»**
+  — согласование комплаенс-контролёра № 18-246. То есть это выверенный банком материал, а не
+  вольный блог-пост.
+
+**Заголовок:** «통장에 바로 쓰는 가계부, 입출금통장 태그∙메모» —
+«Домашняя бухгалтерия прямо в счёте: теги и заметки по расчётному счёту».
+
+**Первичный текст дословно (ключевые абзацы, корейский оригинал):**
+
+> 돈 관리는 기록에서 시작한다는 말 들어보셨나요? 가계부를 쓰자니 꾸준히 기록하기 어렵고 전체
+> 내역을 정리하기 힘들어 중도 포기하는 경우가 많습니다. 어차피 돈은 통장을 거쳐서 움직이는데,
+> 통장을 가계부처럼 정리할 수 있다면 편리하지 않을까요?
+>
+> 그래서 카카오뱅크 입출금통장에는 태그와 메모 기능이 있답니다. 알아서 등록되는 태그로는 결제
+> 수단별로 내역을 모아보고, 원하는 대로 등록하는 메모로는 어디에 돈을 썼는지 정리할 수 있어요.
+
+> **알아서 등록되는 #태그**
+> 카카오뱅크 입출금통장 내역에 작은 글씨가 적혀있는 것을 볼 수 있습니다. #자동이체 혹은
+> #캐시백처럼 말이죠. … 이 글자들은 통장 내역을 분류해주는 태그입니다. 따로 등록하지 않아도
+> 자동으로 입력되어 참 편리해요.
+>
+> 이 태그들을 잘 활용하려면 각 태그에 해당하는 내역을 모아서 봐야겠죠? 태그를 모아보기 위해서는
+> 먼저 왼쪽 위의 돋보기 버튼을 누릅니다. 그리고 모아 보고 싶은 태그를 누르면! … 해당하는 내역만
+> 모아볼 수 있답니다. 태그 기능을 잘 활용한다면 따로 가계부를 쓰지 않아도 체크카드와 현금 사용
+> 비율, 특정 기간 받은 캐시백 등을 한눈에 볼 수 있어요.
+
+> **검색해서 모아보는 메모**
+> 태그에는 없는 나만의 분류로 돈을 관리하고 싶다면 메모 기능을 활용해보세요. 메모는 개별
+> 내역마다 자유롭게 등록할 수 있습니다. 태그처럼 검색해서 모아볼 수 있어요. 식비는 식비대로,
+> 쇼핑은 쇼핑대로, 용도별로 정리해두면 필요할 때마다 한 번에 확인할 수 있습니다. **기간 내
+> 총액까지 나와 지출 규모를 한눈에 알 수 있으니** 잊지 말고 체크해 보세요!
+>
+> 혹시 특정 항목의 지출이 많아 걱정이라면, 그 항목은 따로 메모로 관리하는 것을 추천합니다. …
+> 내일은 정말 달라지겠다는 염원을 담아 '택시', '택시 그만', '진짜 마지막 택시'처럼 각각 다르게
+> 메모했더라도 **'택시'만 검색하면 한 번에 모아서 볼 수 있습니다.**
+>
+> 계획에 없었던 소비 때문에 자꾸만 원치 않던 지출이 생긴다면 '지름신강림'처럼 나만의 재미있는
+> 메모로 관리해 보세요. 소비를 줄이는 계기도 되고, **매월 갑작스러운 지출을 위해 예산을 조정할
+> 수도 있겠지요?**
+
+**Перевод ключевого, по-русски:**
+- Теги (`#автоплатёж`, `#кэшбэк`) проставляются **автоматически, без участия пользователя**, и
+  классифицируют операцию **по способу/типу платежа**. Просмотр — через лупу слева вверху,
+  нажатие на тег собирает выписку по этому тегу.
+- Заметки (메모) — **произвольный текст пользователя на отдельную операцию**, ищутся подстрокой;
+  три разные заметки «такси», «хватит такси», «реально последнее такси» собираются одним
+  поиском «такси».
+- 🔴 По заметкам показывается **сумма за период** — то есть агрегат считается по
+  пользовательской метке, а не только по машинной.
+
+**Что это меняет для нас.** Вывод Г24/Г30.3, записанный по сниппетам, **подтверждён
+первоисточником и уточнён в одном месте**: прежняя формулировка «теги автоматические по способу
+платежа, заметки — свободный текст с поиском» верна, но пропускала главное — KakaoBank **считает
+итог по произвольной пользовательской метке за период** и прямо предлагает это как основание
+скорректировать бюджет на следующий месяц. Разделение провенанса (машинный тег против
+пользовательской метки), на котором мы настаивали, у KakaoBank проведено ровно так же: это два
+разных механизма с разными интерфейсами, а не один. Формулировку новизны это не трогает —
+у KakaoBank нет ни распределения свободного потока, ни ранжирования альтернатив; это учёт
+и разметка постфактум.
+
+### Г31.1-К2. Правила применения рекомендательных технологий Ozon — 🟢 ДОБЫТО СНИМКОМ
+
+Закрывает строку 1061 («**нет**; антибот с JS-челленджем: `curl` 307→403 «Antibot Challenge
+Page», `r.jina.ai` — заглушка, `WebFetch` — «Too many redirects», Wayback 429, Common Crawl —
+404/504 по 6 коллекциям; Ozon — только при headless-браузере») и одноимённый пункт класса 3
+аудита № 3. **Headless-браузер не понадобился.**
+
+**Цепочка (два шага, потому что первый снимок — редирект):**
+1. `https://web.archive.org/web/2025/https://docs.ozon.ru/legal/algorithms/recomendation-algorithms/`
+   → **HTTP 200, 2 181 б**, снимок **26.02.2024 22:17:30 UTC** — это снимок редиректа
+   на канонический адрес.
+2. `https://web.archive.org/web/20240226221730/https://docs.ozon.ru/legal/terms-of-use/site/algorithms/recomendation-algorithms/`
+   → **HTTP 200, 137 314 б**. 🔴 **Дата фактического снимка тела: 08.01.2024 03:33:09 UTC.**
+   Заголовок: «Алгоритм рекомендаций на Ozon | Помощь OZON». Правообладатель в подвале —
+   **ООО «Интернет Решения»**.
+
+Потребовалось 1 и 2 попытки соответственно с паузой 22 с: replay-эндпоинт при частых обращениях
+отдаёт 474/503, при разреженных — 200. Это и был механизм прежних «Wayback 429».
+
+**Первичный текст дословно (существенные фрагменты):**
+
+> **Общая схема работы рекомендательной системы на Ozon.**
+> Рекомендации — это набор виджетов на сайте и в приложении с подборкой товаров, которые могут
+> заинтересовать пользователя. … Виджеты рекомендаций размещаются на большинстве страниц Ozon
+> и включают в себя: виджет персональных рекомендаций на главной странице Ozon, виджет
+> персональных рекомендаций на странице избранных товаров, виджет похожих товаров на странице
+> товара, виджет сопутствующих товаров на странице товара, виджет сопутствующих товаров
+> в корзине, виджет недавно просмотренных товаров.
+
+> **1-й этап: подготовка контекста.** Загружаем списки товаров из контекста: товары, с которыми
+> взаимодействовал покупатель; товар, на странице которого находится виджет. Для каждого товара
+> из контекста собираем информацию: список категорий товара, бренд, склад товара, доступность
+> экспресс-доставки для товара и так далее. **Также узнаём характеристики пользователя,
+> например пол и возраст.**
+
+> **2-й этап: отбор кандидатов.** Рекомендательный сервис выбирает среди товаров Ozon
+> **2000–4000 кандидатов**, релевантных контексту показа рекомендаций. … При подборе
+> товаров-кандидатов ориентируемся на популярные товары на площадке и сферу интересов
+> покупателя, а также учитываем товары, которые он просмотрел или добавил в корзину.
+
+> **3-й этап: оценка моделями машинного обучения.** Рекомендательная система оценивает
+> вероятность взаимодействия пользователя с каждым товаром из 2000–4000 отобранных. При этом
+> она учитывает несколько типов взаимодействия: покупка товара, клик на карточку товара,
+> добавление в корзину, добавление в избранное. … **В качестве модели Ozon использует один
+> из методов машинного обучения — градиентный бустинг деревьев решений.**
+>
+> **Какие факторы учитывает модель машинного обучения.** Учитываются все фичи товара, влияющие
+> на его продажу. Это характеристики товара, рейтинг и покупательское поведение: оформление
+> заказа, просмотр товара или добавление в корзину. **В общей сложности рекомендательная система
+> Ozon учитывает около 300 различных фичей.**
+>
+> … товар получает оценку по шкале **от 0 до 1** для каждого типа взаимодействия.
+>
+> Например, есть фича средней конверсии товара из показа в покупку **за последние 60 дней** …
+> **Многие фичи рассчитываются на основе покупательского поведения: покупатели Ozon влияют
+> на положение товаров в выдаче рекомендаций своими действиями.**
+
+> **4-й этап: финальное ранжирование.** Для формирования выдачи каждому товару-кандидату
+> сопоставляется его оценка релевантности. Формула расчёта зависит от виджета рекомендаций,
+> но в общем случае учитывает: оценки моделей машинного обучения, полученные на предыдущем
+> этапе; **рекламную ставку, если на товар заведено рекламное продвижение**; давность посещения
+> страницы товара; другие характеристики товара, например цену и скорость доставки.
+> **Учёт этих факторов балансирует интересы покупателей, продавцов и рекламодателей.**
+
+> **5-й этап: отображение товаров.** В виджетах рекомендаций ограниченное количество мест:
+> **от 3 до 2000** в зависимости от платформы и страницы расположения виджета. … В десктопной
+> и мобильной версии сайта Ozon товары отображаются в виджетах по 6 «плиток» с возможностью
+> горизонтального пролистывания. В мобильном приложении в виджетах отображаются первые
+> 3 товара, а следующие подгружаются при горизонтальной или вертикальной прокрутке.
+
+**Что это даёт нам — образец раскрытия по ст. 10.2-2 149-ФЗ от крупного игрока.**
+1. **Глубина раскрытия — процессная, не формульная.** Раскрыты этапы, классы признаков,
+   семейство модели (градиентный бустинг), порядок числа признаков (≈ 300) и шкала оценок
+   (0–1). **Ни одна формула, ни один вес, ни один порог не приведены.** Это практическая планка
+   «достаточного» раскрытия: наш документ по 66 альтернативам и SAW может быть таким же —
+   перечень критериев и порядок ранжирования без выдачи коэффициентов.
+2. 🔴 **Ozon прямо признаёт конфликт интересов в формуле ранжирования** — «рекламная ставка»
+   стоит в одном ряду с оценками ML, и это названо «балансом интересов покупателей, продавцов
+   и рекламодателей». **У нас такого слагаемого нет и не должно быть**: в SAW-ранжировании
+   распределения свободного потока ни одна альтернатива не оплачена третьей стороной.
+   Это различие стоит держать как явную позицию в нашем документе о рекомендательных
+   технологиях: «ранжирование не содержит платных факторов».
+3. **Персональные признаки раскрываются поимённо** («пол и возраст») — то есть раскрытие
+   по 10.2-2 обязано называть категории данных о пользователе, а не только механику.
+4. Учёт поведения пользователей как фичей описан честно и в общем виде; окно (60 дней)
+   названо примером, а не нормой.
+
+### Г31.1-К3. «Финуслуги+» — ❌ не добыто, но отрицательный результат содержательный
+
+Адреса, дававшие **HTTP 404** на живом сайте (строки 561–562 выше), проверены по архиву:
+
+| Адрес | Wayback replay |
+|---|---|
+| `https://finuslugi.ru/plus` | **404** — «has not archived that URL» |
+| `https://promo.finuslugi.ru/plus/` | **404** — то же |
+
+🔴 **Толкование:** архив не сохранял этих страниц **никогда**, а не «не сохранил последнюю
+редакцию». Вместе с 404 на живом сайте это означает, что адреса `finuslugi.ru/plus`,
+`/subscription`, `/finuslugi_plus`, `promo.finuslugi.ru/plus/` — **наши догадки, а не
+существовавшие страницы**. Прежняя запись «страницы "Финуслуги+" (404 на живом сайте)» неявно
+предполагала, что страница была и исчезла; это предположение опровергнуто. Подписка «Финуслуги+»
+живёт за авторизацией (класс 2, 399 ₽/мес — хвост Г29), и подбором адресов её не достать.
+Перебор адресов по этому пункту прекратить.
+
+## ИТОГ Г31.1 (в этом файле)
+
+| Пункт | Класс | Результат |
+|---|---|---|
+| KakaoBank `blog.kakaobank.com/191` | 4 | 🟢 **закрыт снимком 13.12.2019**, полный текст поста |
+| Правила рекомендательных технологий Ozon | 3/4 | 🟢 **закрыт снимком 08.01.2024**, документ целиком; headless-браузер не понадобился |
+| «Финуслуги+» | 4 → 2 | ❌ не добыт; установлено, что искомых адресов не существовало |
+
+- Закрыто снимками: **2 из 3**.
+- 🔴 Меняет выводы: **Ozon** — образец раскрытия по ст. 10.2-2 149-ФЗ получен целиком, и в нём
+  обнаружен **платный фактор («рекламная ставка») прямо в формуле ранжирования**, что даёт нам
+  явную отстройку («в нашем ранжировании платных факторов нет»). **KakaoBank** — вывод не
+  опровергнут, но уточнён: агрегат считается и по произвольной пользовательской метке.
+
+---
+
+## ДОБОР Г31.2 — прокси (16.09.2026)
+
+**Каналы на начало работы (парный замер):** `r.jina.ai` **без UA** на `www.monarchmoney.com/pricing`
+→ **HTTP 200, 5 509 байт** содержимого («Monarch Pricing: Personal Finance App Plans»); тот же адрес
+через тот же прокси **с UA Chrome/127** → **HTTP 403, 5 743 байта**, `<title>Just a moment...`.
+🔴 Ошибка «вызывать прокси с браузерным UA» подтверждена прямым замером. Exa — 🟢,
+Wayback **replay** — 🟢, `curl`+UA — 🟢.
+
+### Г31.2-5. Г24.8(б) MaPS Financial Fitness Tool — ✅ ЗАКРЫТ ПОЛНОСТЬЮ (девять вопросов дословно)
+
+Прежняя запись в Г24.8(б): «`r.jina.ai` → оба 200/542–555 байт "Just a moment… This page maybe
+requiring CAPTCHA"… **Wayback лежит**… Сами 9 формулировок и веса — **не добыты**»;
+в Г30.3 — «документы MaPS FFT не добыты (Exa их не индексирует, `maps.org.uk` — Cloudflare)».
+
+**Что сегодня:**
+- `r.jina.ai` **без UA** по PDF опросника → **200 у прокси, 558 б**, та же капча; по блогу →
+  **200, 555 б**, та же капча. 🔴 **Не наша ошибка вызова** — защита у `maps.org.uk`.
+- `mcp__exa__web_fetch_exa` по блогу → **200, полный текст** (методика из пяти шагов и принципы весов).
+- 🟢 **Wayback replay** `https://web.archive.org/web/2024/<PDF>` → **HTTP 200, 280 649 байт PDF**,
+  снимок **23.06.2024 20:21:43 GMT** (оригинал `last-modified` 12.04.2024) → `pdftotext -layout`
+  → 13 665 знаков, **опросник целиком**.
+
+**Материал дословно и разбор — в `bank_patents_wellness_scoring_2026-09-09.md`, блок «Г31.2-3»**
+(не дублирую сюда: у пункта один первоисточник, а дубль сырья — это второй источник правды).
+Кратко для картины конкуренции: девять вопросов — **B2** (удовлетворённость финположением),
+**B3** (уверенность), **J1** (справляетесь ли с платежами), **I9** (максимальный непредвиденный
+счёт, который можете покрыть), **G3** (регулярность сбережений), **NORB10** (займы на еду и счета),
+**OEQF13** (сколько месяцев проживёте без дохода, потолок «6 months or longer»), **WASOU**
+(понимание пенсий), **D5C** (наличие плана на пенсию); **B1 — разогревочный, не оценивается**.
+🟢 Вывод Г7/Г24 подтверждён первоисточником: **вычислимого по транзакциям индекса у MaPS нет**,
+это психометрия; но три вопроса из девяти ложатся ровно на наши три контура.
+
+### Г31.2-6. Перепроверка остальных пунктов с формулировкой «`r.jina.ai` не пробил»
+
+| Пункт | Замер 16.09.2026, прокси **без UA** | Класс | Итог |
+|---|---|---|---|
+| **Monarch, справка «Using Pay Down Goals»** (`help.monarch.com/hc/en-us/articles/44373293932052…`) | **200 у прокси, 314 б**, `Warning: Target URL returned error 403: Forbidden` | антибот цели | 🟢 **запись Г24 была ВЕРНОЙ**: антибот Zendesk действительно встал за те четыре дня, это не ошибка UA. Содержание пункта и так добыто через Zendesk Help Center API — статус не меняется |
+| **Economic Record 2022, Comerton-Forde et al.** (Wiley, по Unpaywall открыт CC BY-NC) | `…/doi/10.1111/1475-4932.12664` → **200, 515 б** капча; `/doi/pdfdirect/…` → **200, 525 б** капча; Exa fetch → `CRAWL_LIVECRAWL_TIMEOUT` | антибот цели | ❌ не добыт; **не наша ошибка вызова**. Остаётся действием владельца (одно скачивание по DOI) |
+| **SSRN 3734752** (та же работа, publishedVersion) | **200, 491 б**, «Just a moment… CAPTCHA» | антибот цели | ❌ не добыт |
+| **Правила рекомендательных технологий Ozon** | уже перепроверен **без UA** в Г31.1 (200, 1 005 б, «Target URL returned error 403») | JS-челлендж | ❌ подтверждён закрытым; нужен headless-браузер |
+
+## ИТОГ Г31.2 (в этом файле)
+
+- Закрыт **1 пункт** — MaPS FFT (девять вопросов + принципы весов), каналом **Wayback replay**.
+- 🔴 **Нашей ошибкой вызова прокси не оказался НИ ОДИН** из четырёх перепроверенных пунктов:
+  на `maps.org.uk`, Wiley, SSRN, `help.monarch.com` прокси без UA даёт ту же капчу, что и с UA.
+  Ошибка UA реальна как класс (подтверждена на контрольном адресе Monarch pricing: 403 → 200),
+  но в этом файле она не объясняет ни одного зафиксированного отказа.
+- 🔴 **Ошибка «отказ инструмента = отсутствие источника» — 1 раз:** «Wayback лежит» в Г24,
+  тогда как replay-адрес отдаёт PDF с первой попытки. Тот же класс, что вскрыл Г31.1.
+- Выводы файла (трекер против советника, гипотеза «совета в жанре нет ни у кого») **не меняются**.
