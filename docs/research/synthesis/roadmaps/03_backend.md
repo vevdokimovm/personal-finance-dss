@@ -196,3 +196,61 @@ B-15). Модуль импорта обязан различать два кла
 доход, то есть **исказит и ПДН, и свободный поток** — на них стоит вся модель. Правило
 сопоставления: сумма совпадает, даты в пределах допуска, направления противоположны, оба счёта
 принадлежат пользователю. Это требование к импорту, а не к числу парсеров.
+
+## Добавлено проходом по Т37 «причинность» (23.09.2026)
+
+### B-17. 🔴 Спецификация логирования решений — три таблицы плюс намерение, и она закладывается ДО первого релиза
+🔴 **Источник:** `causal_effect_measurement_2026-09-10.md`, §И1 (три таблицы), §Д1.7 (дельта
+шести полей и новая сущность), §Д1.1–Д1.3 (почему именно так), §Д5.6 (список на исполнение).
+
+**Почему это пункт бэкенда, а не аналитики.** Восстановить эти поля задним числом нельзя
+ни одним методом — Теорема 1 Дудика даёт смещение IPS ровно `|E_x[ρ·δ]|`, где `δ` —
+мультипликативная ошибка записанного propensity. Записали точно — `δ = 0` и оценка несмещена
+при любой модели вознаграждения; восстановили постфактум — `δ` неизвестен и неизмерим изнутри
+данных. Стоимость записи в момент решения — нулевая, стоимость её отсутствия — год работы.
+
+**`recommendation_impressions`** (одна строка на выдачу): `impression_id`, `user_id`, `ts`,
+`policy_id`, `policy_version`, `model_config_hash`, `context_snapshot` (jsonb — все входы модели:
+доход, обязательные платежи, долги, резерв, ПДН, риск-профиль), `context_hash`, `candidate_set`
+(все 66 альтернатив с оценками SAW **после** инвариантов), `feasible_set_size`, `shown_actions`
+(упорядоченный), `chosen_action_id`, **`propensity`** numeric(10,9) ∈ (0,1], `propensity_all`,
+`exploration_flag`, `exploration_scheme`, `exploration_param`, `eligible_for_exploration`,
+`exclusion_reason`, `assignment_bucket` smallint 0..99 (`hash(user_id + salt) % 100`),
+`ui_variant`, `is_deterministic_fallback`.
+Плюс шесть полей добора: `rng_seed` bigint, `propensity_semantics` (`action` | `slate` |
+`position`), `propensity_method` (`closed_form` | `monte_carlo`), `propensity_mc_samples`,
+`support_divergence` numeric [0,1], `logging_temperature`.
+
+**`recommendation_actions`** (реакция): `impression_id`, `ts`, `action_type` (`viewed` |
+`expanded_alternatives` | `changed_params` | `accepted` | `rejected` | `ignored`),
+`selected_action_id`, `deviation_from_recommended`, `time_to_decision_ms`, 🔴 `viewed_full_set`,
+🔴 `edited_single_category`. Последние два — единственный способ измерить узкое рамочное
+мышление (narrow bracketing) поведенчески; задним числом не восстанавливаются, и без них
+вопрос «кому именно помогает» закрыт навсегда.
+
+**`user_financial_snapshots`** (панель исходов, снимок в месяц, 🔴 **с первого дня жизни
+пользователя, включая период до первой рекомендации**): `total_debt`,
+`interest_paid_cumulative`, `reserve_amount`, `reserve_months_coverage`, `pdn`, `rt`,
+`discretionary_spending`, `nondiscretionary_spending` (контрольная метрика — не должна
+двигаться), `cash_withdrawals`, `large_ticket_count/sum`, `savings_balance`,
+`first_time_saver_flag`, и `active_days`/`sessions` 🔴 **только как диагностика механизма,
+не как исход** (FCA: «Collecting data, listing metrics or reporting MI will not, by itself,
+show whether customers are receiving good outcomes»).
+
+**`user_intent_snapshot`** — новая сущность, единственная находка темы, меняющая продукт,
+а не аналитику: `impression_id`, `intended_allocation` (jsonb — что пользователь собирался
+сделать со свободным потоком ДО показа), `intent_source` (`explicit_input` |
+`previous_month_actual` | `unknown`), `intent_captured_at` (инвариант: строго раньше
+`impression.ts`), `followed_recommendation`. Основание — Bareinboim, Forney, Pearl: «interrupt
+any reasoning agent before they execute their choice, treat this choice as intention,
+deliberate, and then act». Без намерения не вычисляется ETT, то есть **не отвечается главный
+вопрос продукта — помогла ли система тому, кто без неё поступил бы иначе.**
+
+**Пять инженерных требований.** (1) `propensity` пишется синхронно, в той же транзакции,
+что выдача. (2) 🔴 `propensity` считается **после** применения инвариантов `Rt ≥ 0` и
+`ПДН ≤ 0,40` — иначе `propensity_all` не суммируется в единицу. (3) Лог иммутабельный,
+append-only. (4) Панель исходов — с нулевого дня. (5) Если у логирующей политики нет закрытой
+формулы (инварианты режут множество, затем top-k по SAW), propensity считается **Монте-Карло**:
+механизм выбора прогоняется N раз на зафиксированном контексте, эмпирическая частота пишется
+как `propensity` с пометкой `monte_carlo` и числом итераций. Это требует, чтобы механизм
+выбора был **чистой детерминированной функцией от (контекст, конфиг, seed)** (A-20).
