@@ -13,6 +13,7 @@ from decimal import Decimal
 
 from sqlalchemy.orm import Session
 
+from app.core.avalanche import R_BENCH_FALLBACK
 from app.database.models import ManualSnapshot
 from app.ingestion.models import (
     Account,
@@ -132,7 +133,7 @@ def _deserialize(payload: dict) -> FinancialSnapshot:
         base_currency=payload.get("base_currency", "RUB"),
         risk_profile=RiskProfile(payload.get("risk_profile", 3)),
         l_min=Decimal(payload.get("l_min", "0.0")),
-        r_bench=Decimal(payload.get("r_bench", "0.14")),
+        r_bench=Decimal(str(payload.get("r_bench", R_BENCH_FALLBACK))),
         horizon_months=payload.get("horizon_months", 12),
         accounts=[
             Account(

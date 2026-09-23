@@ -29,6 +29,7 @@ from app.ingestion.models import (
     Transaction,
     TransactionType,
 )
+from app.services.cbr_rate import get_opportunity_cost_rate
 from app.services.currency import CurrencyConverter
 from app.services.event_logger import log_event
 
@@ -83,7 +84,7 @@ class SnapshotDTO(BaseModel):
     debts: list[DebtDTO] = Field(default_factory=list)
     goals: list[GoalDTO] = Field(default_factory=list)
     l_min: float = 0.0
-    r_bench: float = 0.14
+    r_bench: Optional[float] = None
     horizon_months: int = 12
 
 
@@ -125,7 +126,12 @@ def _to_snapshot(dto: SnapshotDTO) -> FinancialSnapshot:
         base_currency=dto.base_currency,
         risk_profile=RiskProfile(dto.risk_profile),
         l_min=Decimal(str(dto.l_min)),
-        r_bench=Decimal(str(dto.r_bench)),
+        # Партнёр может не присылать пороговую ставку. Тогда берём ту же динамическую,
+        # что и основной контур (канон §10.2: r_key·(1−НДФЛ), фолбэк — из настроек),
+        # а не статический литерал: иначе один и тот же снимок считался бы по разным
+        # ставкам в двух контурах, и расхождение ничем не ловилось бы (ДК-36).
+        r_bench=Decimal(str(dto.r_bench if dto.r_bench is not None
+                            else get_opportunity_cost_rate()["r_bench"])),
         horizon_months=dto.horizon_months,
         accounts=[
             Account(

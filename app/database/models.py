@@ -13,8 +13,10 @@ from sqlalchemy import (
 from app.database.types import EncryptedString
 from sqlalchemy.orm import Mapped, mapped_column
 
+from app.config import settings
 from app.database.db import Base
 from app.utils.time import utcnow
+from app.core.avalanche import R_BENCH_FALLBACK
 
 
 class Category(Base):
@@ -422,7 +424,9 @@ class UserPrefs(Base):
     l_min: Mapped[Decimal] = mapped_column(Numeric(6, 4), nullable=False, default=Decimal("0.0"))
     risk_tolerance: Mapped[int] = mapped_column(Integer, nullable=False, default=3)
     horizon: Mapped[int] = mapped_column(Integer, nullable=False, default=12)
-    r_bench: Mapped[Decimal] = mapped_column(Numeric(6, 4), nullable=False, default=Decimal("0.14"))
+    r_bench: Mapped[Decimal] = mapped_column(
+        Numeric(6, 4), nullable=False,
+        default=lambda: Decimal(str(R_BENCH_FALLBACK)))
     base_currency: Mapped[str] = mapped_column(String(3), nullable=False, default="RUB")
     # ADR-017: статус ИИС — только тип А получает численный расчёт вычета
     # (app/core/investment.py::estimate_iis_deduction), Б/three/none — текстовая нота.

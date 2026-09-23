@@ -736,7 +736,7 @@ def get_forecast(
     # ВСЕГДА (не только при отсутствии override) — иначе после override фронту неоткуда
     # взять настоящую ставку для кнопки «сбросить к реальной»: `r_bench` в ответе echo'ит
     # именно ПРИМЕНЁННУЮ ставку (override или реальную), не обе сразу.
-    ocr = get_opportunity_cost_rate(fallback=0.14)
+    ocr = get_opportunity_cost_rate()
     real_r_bench = float(ocr["r_bench"])
     if payload.r_bench is not None:
         r_bench = payload.r_bench

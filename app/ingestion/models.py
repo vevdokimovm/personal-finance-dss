@@ -15,6 +15,9 @@ from decimal import Decimal
 from enum import IntEnum
 from typing import Optional
 
+from app.config import settings
+from app.core.avalanche import R_BENCH_FALLBACK
+
 
 class RiskProfile(IntEnum):
     """Совпадает с ключами RISK_PROFILES в app.core.ranking."""
@@ -85,7 +88,8 @@ class FinancialSnapshot:
     debts: list[Debt] = field(default_factory=list)
     goals: list[Goal] = field(default_factory=list)
     l_min: Decimal = Decimal("0.0")
-    r_bench: Decimal = Decimal("0.14")
+    r_bench: Decimal = field(
+        default_factory=lambda: Decimal(str(R_BENCH_FALLBACK)))
     horizon_months: int = 12
 
 

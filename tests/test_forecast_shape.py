@@ -3,10 +3,18 @@
 
 Разбор: `docs/reports/investigations/forecast_straight_line_investigation.md`.
 
-Прогноз v3.3.0 БОЛЬШЕ НЕ прямая с одинаковой дельтой:
-  - точечный доход/расход — демпфированный Holt по РЕАЛЬНОЙ истории (наклон по данным);
-  - баланс капитализируется по r_bench ⇒ траектория выпуклая, приращения РАЗНЫЕ.
-Тесты фиксируют это, чтобы регресс к плоской линии/константной дельте был замечен.
+Прогноз НЕ прямая с одинаковой дельтой — но источник кривизны ровно один:
+  - баланс капитализируется по r_bench ⇒ траектория выпуклая, приращения РАЗНЫЕ;
+  - точечный доход/расход — SES α = 0.3 по канону §15, то есть БЕЗ компоненты тренда.
+
+🔴 Поправка v9.12.91 (ДК-37, WORK_QUEUE P0 §1). Прежняя редакция файла закрепляла второй
+источник кривизны — наклон демпфированного Holt по реальной истории. Замер Г43 показал,
+что на наших длинах истории этот наклон берётся из шума: при трёх точках тренд равен
+разнице первых двух наблюдений, и ошибка суммы за полгода втрое выше, чем у простого
+среднего (0.606 против 0.205). Наклон убран из продукта; `holt_forecast` остаётся в модуле
+как корректная реализация и тестируется здесь НАПРЯМУЮ, а не через контракт продукта.
+Регресс к плоской линии по-прежнему ловится — но теперь плоской должна быть только
+компонента дохода/расхода, а не траектория баланса.
 """
 from app.core.forecast import choose_point_forecast, holt_forecast, monthly_rate, ses_forecast
 from app.services.forecasting import build_monthly_history, forecast_indicators
@@ -46,9 +54,10 @@ class TestForecastIsCurvedNotConstantDelta:
         assert all(abs(s) <= 0.02 for s in second)  # линейно с точностью до копеек
 
 
-class TestHoltUsesRealTrend:
-    def test_rising_history_yields_rising_income_forecast(self):
-        """Растущая реальная история ⇒ наклонный (не плоский) прогноз дохода."""
+class TestProductDoesNotSlopeIncome:
+    """Продукт не наклоняет доход по истории: наклон на наших длинах берётся из шума (ДК-37)."""
+
+    def test_rising_history_does_not_tilt_the_income_forecast(self):
         rising = [50_000 * (1.08 ** i) for i in range(6)]
         fc = forecast_indicators(
             balance=100_000, rt=5_000, lt=2.0, dt=0.24,
@@ -56,12 +65,27 @@ class TestHoltUsesRealTrend:
             income_history=rising, expense_history=[45_000] * 6, r_bench=0.14,
         )["forecast"]
         income = [f["income"] for f in fc]
-        assert income[-1] > income[0]                 # прогноз растёт вслед за историей
-        assert len(set(round(x) for x in income)) > 1  # не константа
+        assert len(set(round(x, 2) for x in income)) == 1
 
-    def test_falling_history_yields_falling_income_forecast(self):
+    def test_falling_history_does_not_tilt_it_either(self):
         falling = [80_000 * (0.95 ** i) for i in range(6)]
         out = choose_point_forecast(falling, horizon=6)
+        assert out[-1] == out[0]
+
+
+class TestHoltItselfStillWorks:
+    """`holt_forecast` сохранена как реализация и проверяется напрямую — она понадобится,
+    когда вернётся тренд с проверкой значимости наклона (история от TREND_MIN_HISTORY точек)."""
+
+    def test_rising_series_gives_rising_holt_forecast(self):
+        rising = [50_000 * (1.08 ** i) for i in range(6)]
+        out = holt_forecast(rising, horizon=6)
+        assert out[-1] > out[0]
+        assert len(set(round(x) for x in out)) > 1
+
+    def test_falling_series_gives_falling_holt_forecast(self):
+        falling = [80_000 * (0.95 ** i) for i in range(6)]
+        out = holt_forecast(falling, horizon=6)
         assert out[-1] < out[0]
 
     def test_damped_trend_stays_bounded_and_non_negative(self):

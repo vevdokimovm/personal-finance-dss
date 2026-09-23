@@ -16,14 +16,16 @@ import logging
 import urllib.error
 import urllib.request
 from datetime import date, datetime, timedelta, timezone
-from typing import TypedDict
+from typing import Optional, TypedDict
 from xml.etree import ElementTree as ET
 
 from sqlalchemy import select
 
+from app.config import settings
 from app.database.db import SessionLocal
 from app.database.models import CbrKeyRate
 from app.utils.time import utcnow
+from app.core.avalanche import R_BENCH_FALLBACK
 
 _log = logging.getLogger(__name__)
 
@@ -306,7 +308,8 @@ def refresh_key_rate() -> dict[str, object]:
     }
 
 
-def get_opportunity_cost_rate(fallback: float = 0.14, tax_rate: float = 0.13) -> dict[str, object]:
+def get_opportunity_cost_rate(
+        fallback: Optional[float] = None, tax_rate: float = 0.13) -> dict[str, object]:
     """Альтернативная доходность рубля (OCR / r_bench) — порог фильтра Avalanche.
 
     Накопительные счета и короткие ОФЗ держатся рядом с ключевой ставкой ЦБ, но с
@@ -315,11 +318,14 @@ def get_opportunity_cost_rate(fallback: float = 0.14, tax_rate: float = 0.13) ->
     если его ставка выше этого ориентира.
 
     При ключевой 16% и НДФЛ 13% → r_bench ≈ 0.139, что совпадает с историческим
-    дефолтом 0.14. Если ключевую получить нельзя (нет связи / зарубежный IP) и
-    БД-кэш пуст — возвращается fallback (обычно prefs.r_bench). Никогда не падает.
+    дефолтом каскада (значение — в настройках, R_BENCH_FALLBACK).
+    Если ключевую получить нельзя (нет связи или зарубежный адрес) и БД-кэш пуст —
+    возвращается fallback (обычно prefs.r_bench). Никогда не падает.
 
     Возвращает {"r_bench": float, "source": "cbr_keyrate_post_tax"|"fallback", ...}.
     """
+    if fallback is None:
+        fallback = float(R_BENCH_FALLBACK)
     kr = get_key_rate()
     rate = kr.get("key_rate")
     if kr.get("source") in ("cbr", "cache", "cache_db") and isinstance(

@@ -11,8 +11,10 @@ from app.core.forecast import (
     build_history_from_current,
     choose_point_forecast,
     detect_trend,
+    flow_based_intervals,
     monte_carlo_intervals,
     monthly_rate,
+    net_flow_sigma,
 )
 
 
@@ -133,7 +135,15 @@ def forecast_indicators(
         })
 
     point_rt = [f["Rt"] for f in forecast]
-    intervals = monte_carlo_intervals(point_rt, horizon=horizon)
+    # Коридор строится от разброса СОБСТВЕННОГО чистого потока, а не от величины Rt
+    # (ДК-15): иначе у человека с нулевым остатком он схлопывается в точку, а у человека
+    # с запасом оказывается шире в двадцать раз при той же неопределённости дохода и трат.
+    flow_sigma = net_flow_sigma(income_history, expense_history, obligation_history)
+    intervals = flow_based_intervals(
+        point_rt, flow_sigma=flow_sigma, history_len=len(income_history or []),
+        # Rt учитывает поток месяца дважды (ДК-22) — ширина обязана это учитывать,
+        # пока формула канона такая; см. докстроку flow_based_intervals.
+        extra_flow_terms=1)
     for i, ci in enumerate(intervals):
         forecast[i]["Rt_p10"] = ci["p10"]
         forecast[i]["Rt_p50"] = ci["p50"]

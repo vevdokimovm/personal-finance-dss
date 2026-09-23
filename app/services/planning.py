@@ -41,6 +41,8 @@ from app.core.ranking import (
 )
 from app.core.recommendation import explain_alternative
 from app.utils.time import utcnow
+from app.config import settings
+from app.core.avalanche import R_BENCH_FALLBACK
 
 
 def run_planning(
@@ -49,7 +51,7 @@ def run_planning(
     obligations: list[dict[str, Any]],
     goals: list[dict[str, Any]],
     bliq: float = 0.0,
-    r_bench: float = 0.14,
+    r_bench: float | None = None,
     risk_tolerance: int = 3,
     l_min: float = L_MIN,
     today: datetime | None = None,
@@ -71,6 +73,10 @@ def run_planning(
     резерва через волатильность (income_cv). Rt/Dt/кризисный режим считаются по
     income_total (факт текущего месяца) безусловно, история на них не влияет.
     """
+    if r_bench is None:
+        # Канон §10.2: ставка динамическая; фолбэк живёт в настройках,
+        # а не литералом в сигнатуре (ДК-36).
+        r_bench = float(R_BENCH_FALLBACK)
     today = today or utcnow()
     profile = RISK_PROFILES.get(risk_tolerance, RISK_PROFILES[3])
 

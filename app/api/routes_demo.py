@@ -576,7 +576,7 @@ def _analyze_portrait(
     bliq = sum(float(a.get("amount", 0)) for a in liquid_assets)
     # r_bench — канонная ставка (ключевая ЦБ × (1−НДФЛ), фолбэк 0.14), ТА ЖЕ, что в
     # /planning: витрина «Валидация» и реальный расчёт компаундят баланс одинаково.
-    r_bench = float(get_opportunity_cost_rate(fallback=0.14)["r_bench"])
+    r_bench = float(get_opportunity_cost_rate()["r_bench"])
     balance = sum(float(g.get("current_amount", 0)) for g in goals)
 
     cf = income_total - expense_total

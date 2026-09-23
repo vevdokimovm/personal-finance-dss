@@ -87,24 +87,30 @@ def test_demo_clear_removes_data(client: TestClient) -> None:
     assert len(client.get("/api/obligations").json()) == 0
 
 
-def test_demo_forecast_direction_matches_history(client: TestClient) -> None:
-    """Прогноз идёт в сторону истории: растущий портрет — вверх, падающий — вниз.
-    Проверка через РЕАЛЬНЫЙ роут /planning/forecast, а не юнит-математику."""
+def test_demo_forecast_does_not_invent_a_trend(client: TestClient) -> None:
+    """Прогноз дохода НЕ наклоняется по истории — ни вверх, ни вниз (ДК-37).
+
+    Прежняя редакция теста требовала обратного: «растущий портрет — вверх, падающий — вниз».
+    Замер Г43 показал, что на наших длинах истории такой наклон берётся из шума и втрое
+    ухудшает ошибку суммы за полгода; канон §15 описывает SES без тренда. Проверка идёт
+    через РЕАЛЬНЫЙ роут, а не юнит-математику, — как и раньше.
+    """
     def forecast_income(case: str) -> list[float]:
         client.post("/api/demo/clear")
         client.post(f"/api/demo/load?case={case}")
         fc = client.post("/api/planning/forecast", json={"horizon": 6}).json()
         return [f["income"] for f in fc["forecast"]]
 
-    up = forecast_income("dmitriy")      # история дохода растёт
-    assert up[-1] > up[0], "растущая история должна давать растущий прогноз"
-    down = forecast_income("mikhail")    # история дохода падает
-    assert down[-1] < down[0], "падающая история должна давать падающий прогноз"
+    for case in ("dmitriy", "mikhail"):
+        income = forecast_income(case)
+        assert len(set(round(x, 2) for x in income)) == 1, \
+            f"портрет {case}: прогноз дохода не должен иметь наклона"
 
 
 def test_demo_preview_matches_planning_forecast(client: TestClient) -> None:
     """Витрина «Валидация» и реальное /planning дают прогноз ОДНОЙ формы — нет расхождения,
-    из-за которого раньше был костыль (синтетическая история). Оба трендовые, одно направление."""
+    из-за которого раньше был костыль (синтетическая история). Кривизна у обоих одна
+    и та же и идёт от капитализации баланса, а не от наклона дохода (ДК-37)."""
     case = "dmitriy"
     client.post("/api/demo/clear")
     client.post(f"/api/demo/load?case={case}")
