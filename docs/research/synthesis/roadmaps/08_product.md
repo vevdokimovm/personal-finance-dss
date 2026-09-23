@@ -2601,3 +2601,30 @@ investors on how to cut back expenses or streamline monthly budgets», — эт�
 прямо выводят его за рамки goal-based, потому что он не оперирует вероятностями достижения
 («meets only the first two properties, but not the third or fourth»). Либо мы вводим
 вероятностную метрику достижения в выдачу (M-66), либо не называем продукт goal-based.
+
+### P-82. Профессиональный стандарт прямо предписывает то, что мы делаем наоборот, — и готового образца индексации коротких целей на рынке нет
+🔴 **Источник:** `inflation_goal_indexation_2026-09-10.md`, участки 3.1 и И3.3 (FP Canada /
+Institute of Financial Planning, Projection Assumption Guidelines 2026, PDF открыт целиком).
+🔴 **Дословно, новый в 2026 году раздел «Short-Term Inflation Conditions»:** короткие отклонения
+«can meaningfully affect fixed-horizon planning scenarios, such as **budgeting, saving for a home
+purchase, debt repayment, major purchases or near-term objectives where the time horizon is
+significantly less than 10 years**; planners may need to consider the **near-term inflation
+environment**», тогда как структурное допущение «remains the appropriate anchor… for long-term
+planning horizons, typically those exceeding 10 years». Перечисленное — ровно предмет FINPILOT,
+а канон делает противоположное: подставляет долгосрочный ориентир (цель ЦБ 4 %) в цели на 3–5
+лет, да ещё с порогом 36 месяцев (РК-35).
+**Внутреннее напряжение самого стандарта названо, а не сглажено:** в разделе 2 сказано «Altering
+any of the Guideline rates to reflect the current economic data is not advised» — но это про
+горизонт 10+ лет, а второй их аргумент («изменение одной инфляции игнорирует корреляцию
+со ставками») совпадает с нашим выводом M-71: менять центр инфляции в одиночку нельзя,
+менять совместно со ставкой — нужно.
+**Где мы одни:** 🔴 у Betterment цели вне пенсионного плана оставлены **в номинале вовсе** —
+дословно «The savings model for non-PRP goals is in nominal terms and therefore does not have
+a direct inflation assumption». Vanguard Retirement Income Calculator берёт фиксированные 3 %,
+Schwab — 2,4 % от CSIM, Wealthfront — рыночную инфляцию безубыточности по 120-дневному среднему.
+То есть **готового образца индексации коротких целей нет ни у кого**, и это одновременно
+возможность и предупреждение: у них π = 2–3 %, у нас 6–8 %, поэтому их «не индексировать»
+не переносится, а наше решение придётся обосновывать самим.
+**Приём, который стоит забрать в позиционирование:** ни один из них не берёт голый таргет
+центробанка — все берут число **выше** цели (Vanguard 3 % при цели ФРС 2 %, Schwab 2,4 %)
+либо рыночную оценку; у FP Canada цель центробанка имеет вес **20 %, а не 100 %**.
