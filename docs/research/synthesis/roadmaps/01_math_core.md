@@ -1034,3 +1034,90 @@ Beancount/hledger, плюс малые проекты) **единственна�
 остальные симуляторы считают по **заданной** стратегии. Отдельно показательно, что авторы Firefly
 III **прямо отклонили** идею ИИ-рекомендаций из-за галлюцинаций — то есть в открытом сегменте
 зона не занята сознательно, а не по недосмотру.
+
+## Добавлено проходом по Т16 «constraint-based и utility-based рекомендатели» (23.09.2026)
+
+### M-41. 🔴 У нашей конструкции есть точное имя, и формула совпадает дословно с промышленной системой 2005 года
+🔴 **Источник:** `constraint_based_utility_recsys_2026-09-09.md` — Felfernig & Kiener, **IAAI-05,
+с. 1475–1482** (FSAdvisor, полный текст); Felfernig, Friedrich, Jannach, Zanker, *Recommender
+Systems Handbook* 2-е изд., **гл. 5, с. 161–190** (полный текст); Uta, Felfernig и др.,
+*Frontiers in Big Data* **7:1304439, 2024** (полный текст); Felfernig и др., **IAAI-07** (VITA).
+
+**Имя:** «**constraint-based recommender cascaded with a utility-based (MAUT) item ranking
+scheme**» — формулировка самой школы (Handbook, с. 181). Наши слои называются каждый:
+жёсткое отсечение — предикат `consistent(C ∪ R ∪ a(iα))` (Uta et al., Definition 2) и «consistent
+recommendation» (Handbook, Definition 5.2); перечислимая решётка 66 альтернатив — **table-based
+(extensional) representation**, законная ровно «if the set of offered items is limited — which is
+often the case, for example, in digital camera or **financial service** recommendation»
+(Uta et al., §3.1.1); ранжирование — **multi-attribute object rating** (FSAdvisor, с. 1480) /
+MAUT-ranking (Handbook, с. 180).
+🔴 **Формула совпадает буквально:** FSAdvisor — «the set of solutions is ordered using the formula
+**g(x) = Σ(i=1..n) eᵢ·sᵢ(x)**, where … eᵢ represents the customer's interest in dimension i, and
+sᵢ is the contribution of solution x to dimension i»; у нас `U(a) = Σ w_k·x_k^norm(a)`. Их
+измерения — profit, availability, risk; масштаб — 1–2 млн альтернатив и 300–400 ограничений против
+наших 66 и двух инвариантов.
+🔴 **И объяснение через вклад критерия тоже опубликовано** — это **HOW-explanation при
+utility-based ranking** (Uta et al., §4.5.5): «when using a utility-based approach for item ranking,
+explanations can take into account corresponding weights to explain how a recommendation has been
+determined». В FSAdvisor это работало в проде с 2003 года, а в VITA MAUT применяется **трижды**:
+для порядка выдачи, порядка **repair-действий** и порядка **объяснений**.
+**Наш аргумент против ML тоже не наш:** «A customer's taste is not of primary concern in the
+financial services domain. **Recommendations must be correct and explainable**, i.e. Collaborative
+Filtering or Content-based Filtering approaches are not the best choices» (FSAdvisor, с. 1476) —
+готовый абзац в обоснование архитектуры, со ссылкой. Там же и регуляторный мотив: директивы ЕС
+требуют «intelligent reporting… which includes explanations as to why certain products were offered».
+**Что из этого следует для новизны:** «новизна по методу» и «новизна по объяснимости» — **мертвы**
+(смыкается с M-37 и M-40). Живое и слабое: **объект** (у них рекомендуется продукт из ассортимента
+продавца, система обслуживает **агента по продажам** — 1 400 и 800 представителей соответственно,
+у нас — распределение собственного потока клиента без продавца и ассортимента) и **нерелаксируемость
+наших ограничений** (см. M-42). Слово «впервые» из формулировок убрать.
+**Измеренный эффект класса — в нашу пользу, и это стоит цитировать:** VITA (n = 205 представителей)
+дала экономию **9,0 минут на консультацию, 13,3 %** (t = 11,84, p < 0,0001) и рост продаж
+поддержанных продуктов **~50 %** (t = 9,59, p < 0,0001), окупив €100 000 внедрения за год; ⬜ но
+это самооценка в анкете и сравнение год-к-году без контрольной группы, не RCT — так и писать.
+
+### M-42. 🔴 Аддитивная свёртка законна только при additive independence — и мы сами признали её нарушение, введя floor
+🔴 **Источник:** тот же файл, §5.2, §5б.3, §5б.7 (и подфайл `_sub16_utility_based_rs.md`).
+
+**Теорема, дословно:** «The n-attribute additive utility function u(x) = Σᵢ kᵢ·uᵢ(xᵢ) **is
+appropriate if and only if the additive independence condition holds**». Иерархия условий:
+utility independence ⇒ preferential independence, обратное неверно; **mutual utility independence
+даёт мультилинейную форму**, аддитивная — её частный случай при k = 0. В детерминированном случае
+(аддитивная value-функция) нужна взаимная преференциальная независимость **и n ≥ 3** существенных
+атрибутов (Debreu 1960); у нас четыре критерия, так что n ≥ 3 выполняется, но саму независимость
+надо проверять.
+🔴 **Наш случай:** ценность «продвижения целей» зависит от того, набран ли резерв ликвидности —
+именно поэтому в модели и стоит лексикографический floor-приоритет. **Вводя floor, мы де-факто
+признали, что additive independence нарушена, и при этом ранжируем аддитивно внутри.** Варианты,
+которые надо выбрать сознательно: (а) документировать floor как явную поправку на нарушение AI;
+(б) перейти к мультипликативной форме при mutual utility independence; (в) оставить SAW и записать
+нарушение в раздел ограничений модели. Молчать — худший вариант: это первый вопрос рецензента,
+знакомого с Keeney & Raiffa.
+🔴 **И отдельная находка о самой школе:** она применяет аддитивную свёртку **вообще не проверяя**
+условий — MAUT берётся в прикладной редакции von Winterfeldt & Edwards, а **Keeney & Raiffa
+в библиографии главы Handbook отсутствуют** (проверено по полному тексту). Канонический порядок
+работ по MAUT ставит «**identifying relevant independence assumptions**» **шагом 2, до оценки
+весов**, и в инженерной практике этот шаг пропускается. Если мы проверку введём явно — это
+заявляемый вклад **методической строгости**, не новой конструкции.
+**Четыре дешёвые проверки и альтернативы, все названы в каноне, а не придуманы нами:**
+(1) **consistent family of criteria** — monotonic, exhaustive, non-redundant (в RS-литературе этим
+пренебрегают прямо по признанию авторов): проверить, не избыточны ли «ресурс» и «ликвидность»
+друг относительно друга; (2) **некомпенсаторные заменители** линейной свёртке в том же каноне —
+**min-агрегация** («worst-case similarity») и **метрика Чебышёва**, годятся как опциональный
+консервативный профиль; (3) 🔴 **реалистичный калибр эффекта мультикритериальности —
+0,3–6,3 % precision-in-top-N** против однокритериального baseline, то есть единицы процентов,
+а не разы; (4) компенсаторность стирает разницу между перекошенным и сбалансированным
+распределением с одинаковым баллом — каноническая иллюстрация: фильм 8/2 против 5/5.
+**Фиксированные веса профилей — тоже известный приём, а не особенность:** Burke 2002 описывает
+«a small number of **stereotype** preference functions» у Tête-à-Tête, и там же цена: «The user
+must construct a complete preference function… **Often this creates a significant burden
+of interaction**», плюс табличная характеристика класса — «**Suggestion ability static (does not
+learn)**». Канонический выход, если понадобится: **UTA / preference disaggregation** — восстановить
+веса из ранжирования нескольких знакомых сценариев пользователем (Jacquet-Lagrèze & Siskos, EJOR
+10(2):151–164, 1982), а не спрашивать веса напрямую; обучение весов MAUT из истории названо
+в Handbook штатным приёмом.
+🔴 **Известный риск, который надо назвать в документации:** у школы есть отдельная линия работ
+о том, что **веса utility-функции на практике оказываются неверными** и их чинят автоматической
+подгонкой под эталонные ранжирования экспертов через нелинейную оптимизацию (IUI '08; AI
+Communications 26(1):15–27, 2013 — смыкается с T-27, где посчитаны трудозатраты: 15 циклов × 12 ч).
+Наши пять профилей — ровно такой набор весов.
