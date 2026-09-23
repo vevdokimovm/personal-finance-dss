@@ -3003,3 +3003,35 @@ for customer outcomes without clearly defining what good or poor outcomes look l
 с академическим результатом из другой темы: два независимых источника — регуляторный обзор
 и эксперимент — дают один вывод. Значит метрика «согласился с советом» не годится в качестве
 меры пользы, и надо определять, что считается хорошим и плохим исходом **на каждом шаге пути**.
+
+### M-103. Наш класс систем в литературе назван: knowledge-based recommender, и его каноническое обоснование — ровно наш домен
+🔴 **Источник:** `recsys_finance_domain_specifics_2026-09-09.md`, §6.2 — обзор направления
+добыт полным текстом (открытый доступ).
+🟢 **Название и определение, годные для статьи дословно:** такие системы «considered as
+complementary to CF- and CBF-based approaches in terms of **avoiding the related cold-start
+difficulties**»; они «based on the idea of collecting the preferences of a user (preference
+elicitation) within the scope of a dialog and then to recommend items either (1) on the basis
+of a **predefined set of recommendation rules (constraints)** or (2) using similarity metrics».
+Первый вариант — буквально наша конструкция: явные предпочтения (риск-профиль) плюс правила
+и ограничения.
+🟢 **Каноническое обоснование применимости — и оно описывает наш домен точнее, чем мы сами:**
+такие системы поддерживают выработку рекомендаций «specifically in complex and **high-involvement
+item domains** [domains where **suboptimal decisions can have significant negative consequences**…]
+**where items are not bought on a regular basis**». То есть «редкие решения с дорогой ошибкой» —
+это признанный в литературе класс, а не наша риторика.
+🟢 **Два свойства этого класса, которые у нас уже есть и которые надо назвать их терминами:**
+учёт ограничений («high-risk financial services **must not be recommended** to users with a low
+preparedness to take risks» — это наши инварианты и профили) и **объяснения также в ситуации,
+когда решение не найдено** — прямая поддержка того, что мы должны честно говорить «допустимого
+плана нет» вместо пустоты (ДК-30).
+🔴 **И структурная причина, почему в финансах иначе, чем в кино** (дословно из работы 2016 года):
+«As privacy issues are significant in financial services, personal metadata and individual
+transactional data are often missing, **which causes user cold-start problem**». То есть холодный
+старт здесь — **не временное неудобство новизны пользователя, а следствие приватности**: данных нет
+не потому, что человек новый, а потому что он их не отдаёт. Значит опора на явные ответы вместо
+истории поведения — не упрощение, а требование домена.
+🟡 **Единственный найденный в обзорной литературе родственник нашего объекта** (работа 2003 года,
+пересказана в обзоре): «assists in **personal resource (money) allocation**… considers expenses,
+financial goals and time of attainment». Формулировка настолько близка к нашей, что первоисточник
+надо открыть отдельно; 🔴 **он не открыт — основная база под антиботом**, и это порождённая задача,
+а не закрытый вопрос (то же ограничение уже отмечено в РК-44 про доказанность новизны).
