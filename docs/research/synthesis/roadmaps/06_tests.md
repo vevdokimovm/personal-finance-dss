@@ -554,3 +554,70 @@ oasdiff при первом внешнем клиенте, транзитивн�
 гейт-декорация в самом продукте; еженедельная мутационная джоба в текущем виде, если гипотеза
 о мёртвом прогоне подтвердится. ⬜ Про остальные хуки данных о выходе нет — объявлять их налогом
 без счётчика нельзя.
+
+## Добавлено проходом по Г18 «закрытое насовсем» (23.09.2026)
+
+### T-27. Метаморфическое тестирование по первоисточнику, эталон трудозатрат на калибровку и две правки отчётности
+🔴 **Источник:** `closed_forever_retry_2026-09-16.md`, §Г18.1 (**Chen, Kuo, Liu, Poon, Towey,
+Tse, Zhou, «Metamorphic Testing: A Review of Challenges and Opportunities», ACM CSUR 51(1),
+Article 4, 2018** — полный текст, 27 стр.), §Г18.2 (AI Communications 26(1):15–27, 2013),
+§Г18.8 (Feinstein & Cicchetti, *J Clin Epidemiol* 43(6), обе части), §Г18.14 (Maybe Finance).
+
+🔴 **Поправка к нашей библиографии:** авторы обзора — **Chen et al.**, не «Segura et al.»
+(Segura, Fraser, Sánchez, Ruiz-Cortés — другой обзор, *IEEE TSE* 42(9):805–824, 2016).
+В очереди пробелов стояла склейка двух разных работ.
+
+**Определение, которое надо соблюдать буквально:** MR — «**a necessary property of f over
+a sequence of two or more inputs**», где необходимое свойство «can be logically deduced from
+the algorithm». Отсюда: 🔴 **наши инварианты `Rt ≥ 0` и `ПДН ≤ 0,40` — НЕ метаморфические
+отношения**, это свойства одного прогона. MR требует двух и более входов (монотонность
+по доходу, перестановочность долгов, масштаб сумм). Ценность метода для нас — именно оракульная
+проблема: «правильный» план распределения свободного потока заранее не известен, сравнивать
+не с чем, а MT «alleviates the oracle problem».
+🔴 **И прямое предупреждение обзора, которое обязано попасть в план вехи 6:** «a thorough
+evaluation of MT's overall effectiveness is **still lacking**… some previous MT experiments have
+yielded **contradictory results**… the effectiveness of MRs **has not been conclusively
+determined**», и «most of these identifications were conducted **in an ad hoc and arbitrary
+way**». То есть MT — **дополнение** к обычным тестам и мутационному анализу, не замена,
+и наш набор MR надо обосновывать явно, иначе он такой же ad hoc. Утешительное там же:
+метод осваивается «in a few hours», а «**end users may be even more appropriate or knowledgeable
+than developers for defining good MRs**».
+
+🔴 **Эталон трудозатрат на калибровку весов — чтобы перестать считать, что мы возимся слишком
+долго.** Коммерческий инвестиционный рекомендатель австрийского финсервиса: 15 параметров
+требований, 10 свойств продукта, **~150 scoring rules**, разработка 12 человеко-месяцев,
+и перед первым релизом «**new versions of the utility constraint set have been released every
+third week**… **About 15 adaptation cycles were needed**… about **12 hours per adaptation
+cycle**» = **180 часов** только на подгонку весов. Наши **пять** раундов на этом фоне — мало,
+а не много. Там же готовый шаблон теста для вехи 6: набор эталонных примеров ранжирования
+от эксперта, решение задачи **нелинейной оптимизации на минимальное изменение весов**, метрики —
+число сдвинутых правил и средняя дистанция сдвига (в их случае: 20 примеров, 71 продукт,
+503 правила, сдвинуто 340 правил, средняя дистанция 0,056 на шкале [0..10], решатель Minos
+9 464 мс). Честная оговорка авторов: «**Non-linear optimization solvers can not guarantee
+the optimality** of an identified solution». И этическая, годная нам в раздел о конфликте
+интересов: «**ranking examples can also be misused for pushing the sales**» — у нас продуктовой
+полки нет, продвигать нечего.
+
+🔴 **Правка отчётности по согласию экспертов: одной каппы недостаточно.** Feinstein & Cicchetti
+(часть I): «a **high value of p₀ can be drastically lowered by a substantial imbalance in the
+table's marginal totals**», и поправка κ_max «**does not repair either problem, and seems to make
+the second one worse**». Часть II (её в нашей очереди не было вовсе) даёт рецепт: «The problem
+can be avoided only by using **p_pos and p_neg as two separate indexes**… analogous to sensitivity
+and specificity… **the omnibus value of kappa should always be accompanied by separate individual
+values of p_pos and p_neg**». У нас перекос краевых сумм гарантирован (экспертные «одобрить /
+не одобрить» смещены в одну сторону) — значит **к каппе всегда добавлять p_pos и p_neg**.
+Это дешёвая правка, и её надо внести в отчёт по калибровке.
+
+🔴 **Класс тестов, которого у нас нет: сквозная согласованность после изменения одной
+исторической записи.** Из разбора Maybe Finance: «**Every view of the app touches nearly *all*
+the user's data. If *any* piece of data is *wrong*, every view in the app is wrong. There is
+nowhere to hide in a personal finance app**» — сдвиг даты одной операции распространяется
+на график, боковую панель, метрики и бюджеты. Тест проверяет не отдельный расчёт, а **все
+представления после одной правки задним числом**. И заодно предупреждение об их решении
+(гибридный event-sourcing с кэш-таблицами): согласованность теряется именно на кэше, значит
+тест обязан ходить и по кэш-таблицам, а не только по производным запросам.
+⬜ **Оговорка по ego depletion:** ссылаться на «истощение силы воли» как на установленный
+механизм нельзя — сам мета-анализ Hagger 2010 называет поддержку «**preliminary**» и признаёт
+мотивацию и усталость альтернативными объяснениями, а предрегистрированная многолабораторная
+репликация 2016 года тех же авторов эффект не воспроизвела (d = 0,020 и −0,031, 24 лаборатории).
+Корректная формулировка — «заявлен мета-анализом 83 работ, оспорен репликацией».
