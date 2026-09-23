@@ -99,12 +99,22 @@ def forecast_indicators(
     recurring_income/expense — суммы по регулярным операциям (is_recurring): доля
     предсказуемого потока, характеризует надёжность прогноза.
     """
+    # Сколько РЕАЛЬНЫХ месяцев принёс вызывающий — считаем до всякой достройки,
+    # иначе синтетика станет неотличима от истории (ДК-15).
+    real_months = min(
+        len(income_history or []), len(expense_history or []),
+        len(obligation_history) if obligation_history is not None else len(income_history or []),
+    )
+    synthetic = False
     if income_history is None or len(income_history) < 2:
         income_history = build_history_from_current(income_total, seed=1)
+        synthetic = True
     if expense_history is None or len(expense_history) < 2:
         expense_history = build_history_from_current(expense_total, seed=2)
+        synthetic = True
     if obligation_history is None or len(obligation_history) < 2:
         obligation_history = build_history_from_current(obligation_payments, seed=3)
+        synthetic = True
 
     income_forecast = choose_point_forecast(income_history, horizon=horizon)
     expense_forecast = choose_point_forecast(expense_history, horizon=horizon)
@@ -184,8 +194,19 @@ def forecast_indicators(
         "deficit_alert": deficit_alert,
         "trend": trend,
         "stable_baseline": stable_baseline,
+        "data_quality": {
+            "history_months": real_months,
+            "synthetic": synthetic,
+            "note": (
+                "Истории меньше двух месяцев — ряд достроен из текущих значений, "
+                "прогноз показывает порядок величины, а не траекторию. "
+                "Появится история — цифры изменятся."
+                if synthetic else
+                f"Прогноз построен на реальной истории: {real_months} мес."
+            ),
+        },
         "method": {
-            "point": "демпфированный Holt по истории + капитализация баланса (r_bench)",
-            "interval": f"{MC_SIMULATIONS} случайных сценариев, диапазон 80%",
+            "point": "SES α=0.3 (плоский, без тренда) + капитализация баланса (r_bench)",
+            "interval": "коридор 80% от разброса собственного потока (квантиль Стьюдента)",
         },
     }
