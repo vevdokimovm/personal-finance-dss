@@ -1898,6 +1898,26 @@ Roth IRA → налоговые счета → цели, с ручной пра�
 to **calculators and interactive tools** to help educate Clients about how to save…» — то есть
 распределение потока между долгом, резервом и инвестициями у них **юридически и технически
 изолировано** от оптимизатора и существует как набор необвязанных калькуляторов-подсказок.
+🔴 **Добор v2 усилил это тремя дословными местами того же документа (редакция 20.08.2026),
+и одно из них — самое содержательное во всём участке.** Во-первых, отрицаний **два, а не одно**:
+инструменты «are not integrated with the discretionary investment advisory and related online
+financial planning services» **и** «do not impact your recommended investment strategy» — это
+описание архитектуры, а не оговорка об ответственности. Во-вторых, «debt payoff calculator»
+перечислен через запятую с прочими «digital tools», то есть снова сбоку от движка. В-третьих,
+и это главное: 🔴 **они сами формулируют ядро нашей задачи и сами выносят его за периметр
+алгоритма** — «Before enrolling in a Service, Clients should consider paying off high-interest debt.
+**If potential returns on your investments are lower than your debt's interest rate, it may be best
+to prioritize debt payments first**», с отсылкой к разделу о **предполагаемых** доходностях классов
+активов. 🟢 **Причина видна из самой формулировки:** сторона «инвестиции» у них — оценка,
+сторона «долг» — договорная ставка, то есть факт; сводить факт с оценкой в одном дискреционном
+рекомендательном контуре они **не берутся** и отдают решение человеку. Ровно поэтому наша ниша
+на этом уровне рынка **не занята алгоритмически** — и ровно поэтому наше преимущество в том,
+что у нас обе стороны размена наблюдаемы (M-97).
+🟢 И четвёртое место, ближайшее к нам по названию: «Emergency savings and next dollar guidance…
+the Services also provide guidance on **how to balance competing financial objectives**, such as
+wanting to contribute more money to your retirement accounts, pay down debt, or save
+for an emergency» — это наша задача их словами, но глагол там «provide guidance», а не «compute
+allocation»: ни ставок, ни весов, ни оптимизации.
 Это ровно наш зазор, зафиксированный крупнейшим игроком в его собственном регуляторном документе.
 Рядом: **Betterment** — методология оптимизирует **только** соотношение акций и облигаций
 под каждую цель отдельно, приоритеты между целями — на пользователе, Cash Reserve — пороговый
