@@ -686,7 +686,7 @@ UOB/TMRW, Toss, Revolut, Starling, N26, CBA, Westpac, Itaú; KakaoBank добр�
 Государственная агрегация как данность (сингапурский **SGFinDex**: банки, страховщики, SGX CDP,
 CPF, HDB, IRAS; корейский **MyData** с января 2022) даёт OCBC и Toss полноту данных выше любого
 западного банка — **прескриптива это не породило**. И долг как компонент чистых активов
-(Toss 순자산, Westpac Net worth) — у западных PFM (Starling, N26, Revolut, CBA Insights) долга
+(Toss — чистые активы, Westpac Net worth) — у западных PFM (Starling, N26, Revolut, CBA Insights) долга
 в контуре нет вовсе, но и там, где он есть, это **отображение, а не аргумент решения**.
 🔴 Отдельно показательно: у CBA крупнейший ипотечный портфель Австралии, а четыре опоры Insights —
 spending, saving, bills, investing; **долга среди них нет**.
