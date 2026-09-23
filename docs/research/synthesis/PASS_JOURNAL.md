@@ -8592,3 +8592,48 @@ is actually higher than the probability of failure itself». Shortfall Risk Фу
 (Probability × Magnitude) критикуется самим автором: 50 %×10 % и 10 %×50 % дают одно 0,05,
 «most insightful when… remain as two distinct concepts». Подтверждение — Blanchett, FAJ,
 DOI 10.1080/0015198X.2022.2129947. Разнесено: T-42.
+
+### 134. `goal_based_investing_lifecycle_2026-09-09.md`
+- [x] прочитан целиком (922/922 строки, 79 535 байт, 5 чтений)
+
+Тема 13 — математика goal-based investing и life-cycle подхода, с добором Г31.5 (три записанных
+отказа закрыты полным текстом). Открыты первоисточниками: Das/Ostrov/Radhakrishnan/Srivastav
+(2018, JOIM), Alaluf et al. (2024, arXiv:2403.06011), Estrada (2018, IESE), Das/Markowitz/
+Scheid/Statman (2010, JFQA, зеркало Cambridge), Deaton (2005), UBS 3L, Betterment, Vanguard VLCM,
+Нобелевская лекция Модильяни (1985), Merton WP 58 (1970) через DSpace 7 REST, NBER w3954 (OCR).
+
+🔴 **Главное — новизна опровергнута в части постановки.** Дословно: «We study paycheck
+optimization, which examines how to allocate income in order to achieve several competing
+financial goals»; среди целей «paying out loans»; управление — доли дохода `π_t^i`, у долговых
+и накопительных целей разная динамика. Заведено РК-34, разнесено M-65. Вместе с M-64 итог:
+ни постановка, ни перебор альтернатив, ни аддитивная свёртка новизной не являются; держатся
+метод (детерминированный и объяснимый против model-free RL), ПДН ≤ 0,40 и `Rt ≥ 0`
+как ограничения, российский контур.
+
+🔴 **Контрпример против «водопада» прочитан дословно** (Appendix A: доход 1000, `p₁ = 1000`
+при ставке 0 против `p₂ = 1` при r = 0,001 — «the user will never be able to pay down Goal 2»).
+Наш Avalanche упорядочен по ставке, а не по приоритету пользователя, и в их примере дал бы
+верный ответ — но это рассуждение, и оно обязано стать тестом: T-43.
+
+🔴 **Дефект бинарного опциона.** Максимизация `P(W_T ≥ G)` эквивалентна покупке digital option
+(Browne 1999; ⚠️ первоисточник не открылся, помечено), функционал нечувствителен к глубине
+провала. Независимо подтверждено Estrada: `SSD_L(YS) = F^½·SY`, «penalizes… according to the size
+of the shortfall». Отсюда прямой вопрос к критерию `St` и альтернатива Брюнеля — важность цели
+как требуемая вероятность (Needs 90–95 %, Dreams 50–60 %), а не как вес: M-66.
+
+🔴 **Теоретическая опора названа неверно.** Дейтон о Carroll (1997): «not over the whole
+life-cycle, but over much shorter periods of a few years at a time». Наш горизонт — buffer-stock
+ветка, не Модильяни — Мертон; добор подтвердил это первоисточниками (Модильяни строит базовую
+модель при нулевой ставке и постоянном доходе; Мертон даёт явные решения только при HARA).
+Отдельная поправка: BMS (1992) обосновывают «гибкость → больше риска» при **детерминированной**
+зарплате («when the wage does not vary stochastically over time»), под наш тезис о нестабильном
+доходе их цитировать нельзя. Разнесено M-67.
+
+🔴 **Индустрия знает про размен «дорогой долг против низкодоходной цели» и не считает его
+сознательно** — UBS дословно: «holding a credit card balance at a 15 % interest rate when this
+could be paid off by an investment that yields 2 %… The 3L framework takes advantage of this
+segmenting inclination». Плюс измеренные нули (у Vanguard VLCM долга нет ни строкой, у Betterment
+тоже), планка Betterment — рекомендация при вероятности **50 %**, и ответ критикам числом:
+цена разбиения по ментальным счетам **12 б.п.** против цены ошибки в риск-аверсии; контрдовод
+Estrada — «a bucket approach and periodic rebalancing are inconsistent with each other».
+Разнесено P-81.
