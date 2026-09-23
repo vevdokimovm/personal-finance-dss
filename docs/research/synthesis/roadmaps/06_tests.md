@@ -286,3 +286,31 @@ Excel 2003 XML **пропускает пустые ячейки**, помеча�
 PDF корпуса синтетические, и в них **нет коридоров пустоты вовсе** (все зазоры 2,9 pt) —
 геометрический парсер даёт на них 0 операций не из-за дефекта, а из-за материала (D-17).
 Тест на геометрию требует живого PDF банка; сейчас такой ровно один.
+
+### T-22. A/B-иллюзия: выкатывать непроверенную логику на всех — хуже, чем сравнить на выборке
+🔴 **Источник:** `behavioral_finance_field_2026-09-10.md`, Г8.3.в — Meyer 2015, «Two Cheers
+for Corporate Experimentation», полный текст (59 страниц) добыт с сайта журнала.
+
+Понятие дословно: «"**A/B illusion**" — the widespread tendency to view a field experiment
+designed to study the effects of an existing or proposed practice as **more morally suspicious
+than an immediate, universal implementation of an untested practice**». И вывод: «Not only is
+field testing products, services, and practices usually **a more ethical option than declining
+to do so**, online companies are usually the best positioned to do so, and at the least cost».
+
+🔴 **Прямое применение у нас.** Мы обязаны измерить на своих пользователях три вещи, для которых
+в литературе чисел нет: размер предзаполненного шага, snowball-переопределение против avalanche
+и «ретроспективные проценты в рублях» (P-38). Возражение «это эксперимент над людьми» Meyer
+снимает: альтернатива — **выкатить одну непроверенную версию на всех и не узнать ничего**,
+и это этически хуже, а не лучше.
+
+**Две границы, которые ставит сама Meyer, и обе для нас обязательны:** (1) «responsible
+innovation only begins—it does not end—with a culture of continual testing. The responsible
+innovator will **respond appropriately to the results**» — то есть результат теста обязан менять
+продукт, иначе тестирование декорация; (2) отдельный раздел про «unethical underlying practices»:
+если сама практика порочна, эксперимент над её вариантами этого не лечит — тестировать можно
+**варианты**, но не оправдывать тестом сомнительную практику.
+
+**Что это значит для тестового контура:** план A/B — часть работы над исполнением, а не
+«потом, если будет время»; и в каждом плане замера заранее записано, **какой результат что
+изменит** (иначе см. границу 1). Смыкается с требованием «назвать фальсификатор заранее»
+(SR 11-7 / фальсифицируемость, T-19).
