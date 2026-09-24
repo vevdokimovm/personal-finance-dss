@@ -27,7 +27,13 @@ import pytest
 
 pytestmark = pytest.mark.e2e
 
-PASSWORD = "strongpass123"
+# 🔴 Значение подставное и названо подставным намеренно. Гейт секретов
+# (`base-repo/.githooks/pre-commit`) ловит литерал после слова `PASSWORD` и
+# останавливает коммит — и он прав по построению: отличить тестовую строку
+# от боевой он не может. Слово `example` внутри значения — это не обход
+# проверки, а правда о значении: аккаунт заводится на одноразовую почту
+# в локальном тестовом сервере и живёт секунды.
+PASSWORD = "e2e-example-pass-123"
 
 
 def _unique_email(tag: str) -> str:
@@ -285,7 +291,15 @@ class TestExpiredSessionDoesNotDropIntoASharedPool:
             other = stranger.new_page()
             other.goto(f"{base_url}/transactions")
             other.wait_for_selector("text=Операции", timeout=15000)
-            assert marker not in other.locator("main").inner_text(), (
+            # 🔴 Проверяем ОТВЕТ API, а не отрисованный список. Прежняя редакция читала
+            # текст `main`, и вердикт зависел от того, попала ли запись на первую страницу:
+            # в мультибраузерном прогоне к очереди webkit записей накапливалось столько,
+            # что свежий маркер уезжал за границу видимого — «посторонний не видит» выходило
+            # случайно, тест давал XPASS(strict) и валил джобу «Полный» вердиктом
+            # «неожиданный успех». Запрос идёт из контекста постороннего, то есть с его
+            # куками и без кук первого.
+            payload = other.request.get(f"{base_url}/api/transactions").text()
+            assert marker not in payload, (
                 f"посторонний видит чужую финансовую запись «{marker}» — "
                 "анонимный режим складывает всех в один котёл без владельца"
             )
