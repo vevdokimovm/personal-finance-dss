@@ -11,8 +11,9 @@ Live-проверка доступности через axe-core (предрел
 CDN. CSP приложения — `script-src 'self' 'unsafe-inline'`: внешний CDN
 (cdnjs) браузер отвергает, поэтому загрузка `add_script_tag(url=...)` падала
 ВСЕГДА (и в песочнице, и в CI) и тест молча скипался — то есть фактически не
-работал. Inline-инъекция через `add_script_tag(content=...)` проходит по
-`'unsafe-inline'` и не зависит от сети. Версия axe зафиксирована (4.12.1) для
+работал. С v8.56.0 CSP продукта — `script-src 'self'` без `'unsafe-inline'`,
+поэтому инъекция идёт через `page.evaluate` (CDP, вне политики страницы),
+а не `add_script_tag`, и не зависит от сети. Версия axe зафиксирована (4.12.1) для
 воспроизводимости.
 
 Покрытие: 14 публичных страниц × 2 темы (dark/light). Два уровня строгости:
@@ -93,9 +94,19 @@ def _run_axe(page, url: str, theme: str) -> list[dict]:
         "transition-delay:0s!important}"
     ))
     page.wait_for_timeout(300)
-    page.add_script_tag(content=_load_axe())
+    # 🔴 `add_script_tag(content=...)` БОЛЬШЕ НЕ РАБОТАЕТ, и это не флаки: с v8.56.0
+    # у продукта `script-src 'self'` без `'unsafe-inline'`, и браузер отвергает инъекцию
+    # («Refused to execute inline script»). Тест при этом писал в докстроке обратное —
+    # «inline-инъекция проходит по `unsafe-inline`» — и остался красным в CI на 48
+    # параметрах, зелёным локально (тир `full` в обычный прогон не входит).
+    # `page.evaluate` идёт через CDP `Runtime.evaluate`, политика страницы на него
+    # не распространяется — axe попадает в страницу, а продукт сохраняет строгий CSP.
+    page.evaluate(_load_axe())
     if not page.evaluate("typeof axe !== 'undefined'"):
-        pytest.skip("axe-core не инициализировался (браузер/CSP)")
+        pytest.fail(
+            "axe-core не инициализировался: движок проверки мёртв, и молчаливый пропуск "
+            "здесь означал бы «доступность не проверена» под видом зелёного"
+        )
     results = page.evaluate(
         "async () => await axe.run(document, "
         "{runOnly: {type: 'tag', values: ['wcag2a', 'wcag2aa']}})"
