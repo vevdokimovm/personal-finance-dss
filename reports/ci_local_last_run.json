@@ -1,0 +1,16 @@
+{
+  "tree": "e034638e1596021a",
+  "jobs": [
+    "preflight",
+    "lint",
+    "core",
+    "fast",
+    "frontend",
+    "full"
+  ],
+  "green": false,
+  "failures": [
+    "full → Нагрузка — smoke locust (headless, коротко)"
+  ],
+  "at": "2026-09-24 23:33:48"
+}

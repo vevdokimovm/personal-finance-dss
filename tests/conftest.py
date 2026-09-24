@@ -14,12 +14,20 @@ from pathlib import Path
 
 import pytest
 
+from tests.db_url import worker_database_url
+
 # По умолчанию — изолированный SQLite-файл. Но если DATABASE_URL задан извне
 # (например, PostgreSQL в CI/локальной верификации) — уважаем его, чтобы прогнать
 # тот же набор тестов на боевой СУБД.
 if not os.environ.get("DATABASE_URL"):
     _TEST_DB = tempfile.NamedTemporaryFile(suffix=".db", delete=False)
     os.environ["DATABASE_URL"] = f"sqlite:///{_TEST_DB.name}"
+else:
+    # Унаследованный адрес — признак воркера xdist: у каждого своя база, иначе
+    # восемь процессов создают схему в одном файле. Разбор — tests/db_url.py.
+    os.environ["DATABASE_URL"] = worker_database_url(
+        os.environ["DATABASE_URL"], os.environ.get("PYTEST_XDIST_WORKER")
+    )
 
 from fastapi.testclient import TestClient
 

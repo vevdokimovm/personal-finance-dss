@@ -282,6 +282,15 @@ def run(repo: Path) -> int:
 
     failures.extend(revision_check_failures(repo))
 
+    # 🔴 Гейт локального прогона. Был написан в v9.13.14 вместе с тестами — и НЕ ВЫЗВАН
+    # отсюда ни разу: тесты звали функцию напрямую, поэтому зелёное покрытие означало
+    # «функция работает», а не «правило исполняется». Полтора батча подряд `preflight`
+    # печатал «чисто» при КРАСНОМ следе с чужого дерева. Класс — «проверка написана,
+    # но не подключена»; ловится только тестом на факт вызова, он рядом.
+    from tools.ci_local import tree_hash
+
+    failures.extend(ci_local_failures(repo, tree_hash(repo)))
+
     print("=== PREFLIGHT ===")
     for item in failures:
         print(f"  ПРОВАЛ: {item}")
