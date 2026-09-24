@@ -24,6 +24,7 @@ from __future__ import annotations
 import time
 
 import pytest
+from playwright.sync_api import Error as PlaywrightError
 
 pytestmark = pytest.mark.e2e
 
@@ -40,6 +41,29 @@ def _unique_email(tag: str) -> str:
     return f"e2e-journey-{tag}-{int(time.time() * 1000)}@test.io"
 
 
+def _goto(page, url: str) -> None:
+    """Переход с ОДНОЙ повторной попыткой на срыв навигации.
+
+    🔴 Заведено 24.09.2026 по живому отказу: в CI на firefox
+    `Page.goto: NS_ERROR_FAILURE` уронил `test_registration_to_first_record`,
+    при том что локальный прогон тех же 222 тестов в трёх браузерах дал ноль
+    падений. NS_ERROR_FAILURE — обрыв соединения на стороне движка, а не дефект
+    продукта: страница до обработчика не доходит вовсе.
+
+    🔴 Повтор ровно один и ТОЛЬКО на этот класс ошибки. Глухой `retry` на любое
+    исключение превратил бы гейт в украшение: настоящая поломка тоже переживает
+    повтор. Срыв печатается — молчаливый повтор скрыл бы деградацию раннера,
+    а её надо видеть в логе.
+    """
+    try:
+        page.goto(url)
+    except PlaywrightError as first:
+        if "NS_ERROR_FAILURE" not in str(first):
+            raise
+        print(f"[e2e] срыв навигации на {url}: {first}; одна повторная попытка")
+        page.goto(url)
+
+
 def _register_fresh(page, base_url: str, tag: str) -> str:
     """Чистая регистрация — как её проходит новый человек.
 
@@ -47,7 +71,7 @@ def _register_fresh(page, base_url: str, tag: str) -> str:
     сценарий перестанет проверять ровно то, ради чего написан.
     """
     email = _unique_email(tag)
-    page.goto(f"{base_url}/register")
+    _goto(page, f"{base_url}/register")
     page.wait_for_selector("#register-email", state="visible", timeout=15000)
     page.locator("#register-email").fill(email)
     page.locator("#register-password").fill(PASSWORD)
@@ -73,7 +97,7 @@ def _grant_financial_consent(page, base_url: str) -> None:
     Тест обязан пройти этот шаг как человек — кликом по кнопке, а не запросом к API:
     выдать согласие запросом значит проверить бэкенд и не заметить пропажу кнопки.
     """
-    page.goto(f"{base_url}/transactions")
+    _goto(page, f"{base_url}/transactions")
     panel_button = page.get_by_role("button", name="Дать согласие")
     panel_button.wait_for(state="visible", timeout=15000)
     panel_button.click()
@@ -114,7 +138,7 @@ class TestFreshAccountReachesItsData:
         """
         _register_fresh(page, base_url, "plan")
 
-        page.goto(f"{base_url}/planning")
+        _goto(page, f"{base_url}/planning")
         page.wait_for_selector("text=План распределения", timeout=20000)
 
         body = page.locator("main").inner_text()
@@ -128,7 +152,7 @@ class TestFreshAccountReachesItsData:
         """
         _register_fresh(page, base_url, "consents")
 
-        page.goto(f"{base_url}/profile")
+        _goto(page, f"{base_url}/profile")
         page.wait_for_selector("text=Согласия", timeout=15000)
 
 
@@ -145,7 +169,7 @@ class TestInterfacePromisesAreKept:
         🔴 Текст выправлен, но проверялось это **чтением кода**. Здесь — эмпирически:
         обещание живёт на экране, и экран единственный, где его видно.
         """
-        page.goto(f"{base_url}/register")
+        _goto(page, f"{base_url}/register")
         page.wait_for_selector("#register-email", state="visible", timeout=15000)
 
         lede = page.locator("main").inner_text()
@@ -160,7 +184,7 @@ class TestInterfacePromisesAreKept:
         Обещание проверено выше по тексту; здесь — по поведению. Разойдись они,
         врал бы один из двух, и неизвестно который.
         """
-        page.goto(f"{base_url}/transactions")
+        _goto(page, f"{base_url}/transactions")
         page.get_by_role("button", name="Добавить операцию").click()
         page.wait_for_selector("#transaction-form-amount", state="visible", timeout=10000)
         marker = f"Гостевая-{int(time.time() * 1000)}"
@@ -171,7 +195,7 @@ class TestInterfacePromisesAreKept:
 
         _register_fresh(page, base_url, "transfer")
 
-        page.goto(f"{base_url}/transactions")
+        _goto(page, f"{base_url}/transactions")
         page.wait_for_selector("text=Операции", timeout=15000)
         assert marker not in page.locator("main").inner_text(), (
             f"гостевая запись «{marker}» попала в новый аккаунт — "
@@ -205,7 +229,7 @@ class TestUnverifiedEmailDoesNotBlockWork:
         page.get_by_role("button", name="Добавить", exact=True).click()
         page.wait_for_selector("text=Без подтверждения", timeout=15000)
 
-        page.goto(f"{base_url}/planning")
+        _goto(page, f"{base_url}/planning")
         page.wait_for_selector("text=План распределения", timeout=20000)
 
 
@@ -278,7 +302,7 @@ class TestExpiredSessionDoesNotDropIntoASharedPool:
         первого, то есть это буквально другой человек с другого устройства.
         """
         marker = f"Чужое-{int(time.time() * 1000)}"
-        page.goto(f"{base_url}/transactions")
+        _goto(page, f"{base_url}/transactions")
         page.get_by_role("button", name="Добавить операцию").click()
         page.wait_for_selector("#transaction-form-amount", state="visible", timeout=10000)
         page.locator("#transaction-form-amount").fill("4242")
@@ -289,7 +313,7 @@ class TestExpiredSessionDoesNotDropIntoASharedPool:
         stranger = page.context.browser.new_context()
         try:
             other = stranger.new_page()
-            other.goto(f"{base_url}/transactions")
+            _goto(other, f"{base_url}/transactions")
             other.wait_for_selector("text=Операции", timeout=15000)
             # 🔴 Проверяем ОТВЕТ API, а не отрисованный список. Прежняя редакция читала
             # текст `main`, и вердикт зависел от того, попала ли запись на первую страницу:
@@ -333,7 +357,7 @@ class TestWithdrawnConsentTakesEffectImmediately:
         page.get_by_role("button", name="Добавить", exact=True).click()
         page.wait_for_selector(f"text={marker}", timeout=15000)
 
-        page.goto(f"{base_url}/profile")
+        _goto(page, f"{base_url}/profile")
         withdraw = page.get_by_label("Отозвать согласие: Финансовые данные")
         withdraw.wait_for(state="visible", timeout=15000)
         withdraw.click()
@@ -342,7 +366,7 @@ class TestWithdrawnConsentTakesEffectImmediately:
             state="visible", timeout=15000
         )
 
-        page.goto(f"{base_url}/transactions")
+        _goto(page, f"{base_url}/transactions")
         page.get_by_role("button", name="Дать согласие").wait_for(
             state="visible", timeout=15000
         )
