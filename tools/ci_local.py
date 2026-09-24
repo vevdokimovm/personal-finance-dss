@@ -23,6 +23,7 @@
 from __future__ import annotations
 
 import argparse
+import json
 import os
 import re
 import shlex
@@ -42,7 +43,19 @@ BLOCKING = ("preflight", "lint", "core", "fast", "frontend")
 # Шаги установки окружения: на раннере он чистый, у нас уже собран. Гонять их локально
 # значит переустанавливать зависимости на каждый прогон — минуты впустую и риск
 # переписать рабочее окружение. Пропускаются по умолчанию, включаются `--with-install`.
-INSTALL = re.compile(r"\bpip install\b|\bnpm ci\b|playwright install|pip install --upgrade")
+# 🔴 `playwright install` СЮДА НЕ ВХОДИТ — и это исправление, оплаченное ложным красным.
+# Первая редакция считала его установкой и пропускала; фронтовые E2E тогда шли без
+# firefox и webkit и дали **100 падений** там, где CI зелёный. Установка браузеров —
+# не обустройство окружения, а предусловие самой проверки: без неё шаг проверяет
+# не продукт, а отсутствие браузера.
+INSTALL = re.compile(r"\bpip install\b|\bnpm ci\b|pip install --upgrade")
+
+# 🔴 Отпечаток прогона. Правило владельца 24.09.2026, дословно: «отныне ты должен ВСЕГДА
+# ТАКЖЕ КАК ТЕСТЫ ПРОГОНЯТЬ ГИТ ГЕЙТЫ ЗДЕСЬ ПОЛНОСТЬЮ и фиксить все ошибки на месте».
+# Правило, которое надо помнить, не работает — поэтому прогон оставляет след с хешем
+# дерева, а `tools/preflight.py` этот след проверяет и валит батч, если прогона не было
+# или он шёл на другом коде.
+STAMP = REPO_ROOT / "reports/ci_local_last_run.json"
 
 
 @dataclass(frozen=True)
@@ -137,6 +150,42 @@ def run_job(
     return failures
 
 
+def tree_hash(repo: Path) -> str:
+    """Отпечаток РАБОЧЕГО дерева: что реально проверено, а не что закоммичено."""
+    result = subprocess.run(
+        ["git", "-C", str(repo), "status", "--porcelain=v1", "-z"],
+        capture_output=True, text=True, check=False,
+    )
+    head = subprocess.run(
+        ["git", "-C", str(repo), "rev-parse", "HEAD"],
+        capture_output=True, text=True, check=False,
+    ).stdout.strip()
+    import hashlib
+
+    digest = hashlib.sha256((head + "\0" + result.stdout).encode()).hexdigest()
+    return digest[:16]
+
+
+def write_stamp(jobs: list[str], failures: list[str], repo: Path) -> None:
+    """Записать след прогона: что гонялось, чем кончилось, на каком дереве."""
+    STAMP.parent.mkdir(parents=True, exist_ok=True)
+    STAMP.write_text(
+        json.dumps(
+            {
+                "tree": tree_hash(repo),
+                "jobs": jobs,
+                "green": not failures,
+                "failures": failures,
+                "at": time.strftime("%Y-%m-%d %H:%M:%S"),
+            },
+            ensure_ascii=False,
+            indent=2,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Локальный прогон гейтов CI")
     parser.add_argument("--job", action="append", help="какие джобы гонять")
@@ -164,6 +213,7 @@ def main() -> int:
     for name in wanted:
         failures.extend(run_job(name, jobs[name], REPO_ROOT, args.with_install))
 
+    write_stamp(wanted, failures, REPO_ROOT)
     print("\n=== ИТОГ ЛОКАЛЬНОГО ПРОГОНА ===")
     if not failures:
         print("ЗЕЛЕНО. Это сильный признак, но вердикт по CI снимает "
