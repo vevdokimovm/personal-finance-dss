@@ -1,7 +1,7 @@
 # FINPILOT — СППР для персональных финансов
 
 <!-- STATUS -->
-> **Сейчас:** `v9.12.94` · 2026-09-24 · веха 9 открыта, идёт синтез корпуса и предподготовка к деплою.
+> **Сейчас:** `v9.13.0` · 2026-09-24 · веха 9 открыта, синтез корпуса завершён (12 документов из 12), идёт предподготовка к деплою.
 > Закрыты темы 16-17 очереди исследований: заявление о новизне **по методу и объяснимости
 > опровергнуто** первоисточниками школы constraint-based рекомендаций (формула свёртки
 > совпадает с FSAdvisor, IAAI-05; объяснение через вклад критерия — канонический
@@ -12,7 +12,7 @@
 <!-- /STATUS -->
 
 [![CI](https://github.com/vevdokimovm/personal-finance-dss/actions/workflows/ci.yml/badge.svg)](https://github.com/vevdokimovm/personal-finance-dss/actions/workflows/ci.yml)
-![version](https://img.shields.io/badge/version-9.12.94-blue)
+![version](https://img.shields.io/badge/version-9.13.0-blue)
 ![python](https://img.shields.io/badge/python-3.13-blue)
 ![coverage](https://img.shields.io/badge/coverage-gate%2090%25-brightgreen)
 ![tests](https://img.shields.io/badge/tests-2160%20%2B%20874-brightgreen)
