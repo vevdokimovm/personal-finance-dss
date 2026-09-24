@@ -406,7 +406,8 @@ sequenceDiagram
     participant Log as event_logger
 
     C->>R: POST /calculate (risk, l_min, overrides)
-    R->>P: _compute_plan(payload, prefs)
+    R->>R: _compute_plan(payload, prefs) — сборка входа в роутере
+    R->>P: run_planning(входные данные)
     P->>P: prepare_data + конвертация валют
     P->>Rate: r_bench = ключевая ЦБ × (1−НДФЛ)
     P->>Cache: отпечаток эффективных входов?
@@ -479,7 +480,7 @@ flowchart TD
     L3["SecurityHeadersMiddleware<br/>заголовки безопасности (+HSTS в проде)"]
     L4["CSRFMiddleware<br/>проверка origin для мутаций"]
     L5["RateLimitMiddleware<br/>лимит частоты"]
-    Router["Роут-хендлер:<br/>HTML-страница · /api/* · /v1/analyze"]
+    Router["Роут-хендлер:<br/>/api/* · /v1/analyze · отдача SPA (frontend/dist/index.html)"]
     Resp["HTTP-ответ"]
 
     Req --> L1 --> L2 --> L3 --> L4 --> L5 --> Router
@@ -572,8 +573,8 @@ flowchart TD
     end
 
     subgraph Routes["routes — маршруты TanStack Router"]
-        Public["/login · /register · /legal/* · /contacts"]
-        Private["/dashboard · /planning · /transactions · /obligations<br/>/goals · /assets · /spending · /households · /profile"]
+        Public["/login · /register · /forgot-password · /reset-password<br/>/legal/* · /join (приглашение в семью)"]
+        Private["/dashboard · /planning · /transactions · /obligations · /goals<br/>/assets · /spending · /banks · /household · /profile<br/>/insights · /experiments"]
     end
 
     subgraph Pages["pages — экраны"]
