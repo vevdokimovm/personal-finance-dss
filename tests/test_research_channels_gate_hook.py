@@ -39,6 +39,8 @@ from pathlib import Path
 
 import pytest
 
+from tests.support.workstation import requires_workstation_bins
+
 HOOK = (Path(__file__).resolve().parents[1] / ".claude" / "hooks"
         / "research-channels-gate.py")
 
@@ -246,6 +248,7 @@ def test_verdict_allows_when_all_alive(hook):
 # --- поведение процесса-хука ------------------------------------------------------
 
 
+@requires_workstation_bins
 def test_agent_allowed_when_everything_alive(tmp_path):
     assert run_hook(agent_payload(), tmp_path, ALL_ALIVE).returncode == 0
 
@@ -317,6 +320,7 @@ def test_researcher_definition_missing_blocked(tmp_path):
     assert run_hook(agent_payload(), tmp_path, ALL_ALIVE, tools_line=None).returncode == 2
 
 
+@requires_workstation_bins
 def test_tools_line_not_checked_for_other_agent_types(tmp_path):
     result = run_hook(agent_payload("design-critic"), tmp_path, ALL_ALIVE, tools_line=None)
     assert result.returncode == 0
@@ -426,12 +430,14 @@ def test_alive_needs_code_and_marker(hook):
     assert hook.classify("wayback", 200, "Example Domain") == hook.ALIVE
 
 
+@requires_workstation_bins
 def test_degraded_channel_does_not_block_agent(tmp_path):
     """Канал, живой в браузере, не имеет права останавливать очередь."""
     result = run_hook(agent_payload(), tmp_path, dict(ALL_ALIVE, jina="degraded"))
     assert result.returncode == 0
 
 
+@requires_workstation_bins
 def test_degraded_channel_is_named_loudly(tmp_path):
     """Цена молчания замерена (PIT-213): деградация обязана быть названа, не проглочена."""
     degraded = dict(ALL_ALIVE, jina="degraded", wayback="degraded")

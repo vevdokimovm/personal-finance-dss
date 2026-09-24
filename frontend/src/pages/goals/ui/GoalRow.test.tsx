@@ -154,3 +154,50 @@ describe("GoalRow — связь с активом меняет доступны
     expect(onContribute).toHaveBeenCalled();
   });
 });
+
+describe("GoalRow — формат денег и крайние состояния цели", () => {
+  /* 🔴 Эти ветки не были покрыты, а они про то, что человек видит глазами:
+     копейки показываются только на малых суммах, цель с нулевой суммой не делит
+     на ноль, просроченный срок помечается. Порог ветвей фронта (90 %) держался
+     на 89.87 % именно за счёт таких мест. */
+
+  it("на суммах до 100 000 копейки показываются у обоих чисел пары", () => {
+    render(
+      <GoalRow
+        goal={{ ...item, target_amount: 5000, current_amount: 1234.5 }}
+        onContribute={() => {}}
+        onEdit={() => {}}
+        onDeleted={() => {}}
+      />,
+    );
+
+    expect(screen.getByText((text) => text.includes("234,50"))).toBeInTheDocument();
+    expect(screen.getByText((text) => text.includes("000,00"))).toBeInTheDocument();
+  });
+
+  it("цель с нулевой суммой не делит на ноль — прогресс 0 %", () => {
+    render(
+      <GoalRow
+        goal={{ ...item, target_amount: 0, current_amount: 0 }}
+        onContribute={() => {}}
+        onEdit={() => {}}
+        onDeleted={() => {}}
+      />,
+    );
+
+    expect(screen.getByRole("progressbar")).toHaveAttribute("aria-valuenow", "0");
+  });
+
+  it("прошедший срок при незакрытой цели помечается явно", () => {
+    render(
+      <GoalRow
+        goal={{ ...item, deadline: "2020-01-01" }}
+        onContribute={() => {}}
+        onEdit={() => {}}
+        onDeleted={() => {}}
+      />,
+    );
+
+    expect(screen.getByText(/срок прошёл/i)).toBeInTheDocument();
+  });
+});

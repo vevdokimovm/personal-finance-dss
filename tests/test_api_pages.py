@@ -19,6 +19,8 @@ React, а не что-то другое» — `tests/test_spa_is_actually_served
 from __future__ import annotations
 
 import pytest
+
+from tests.support.workstation import requires_spa_build
 from fastapi.testclient import TestClient
 
 # Публичные адреса: доступны без входа, на них ведут ссылки извне и закладки.
@@ -30,6 +32,7 @@ LEGACY_PATHS = ["/dashboard", "/validation", "/contacts"]
 
 
 @pytest.mark.parametrize("path", PUBLIC_PATHS + LEGACY_PATHS)
+@requires_spa_build
 def test_path_serves_the_app(client: TestClient, path: str) -> None:
     response = client.get(path)
     assert response.status_code == 200, path

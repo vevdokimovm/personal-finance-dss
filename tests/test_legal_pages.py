@@ -14,12 +14,15 @@ from __future__ import annotations
 
 import pytest
 
+from tests.support.workstation import requires_spa_build
+
 from app.core.legal import LEGAL_DOCUMENTS
 
 DOCUMENT_IDS = sorted(LEGAL_DOCUMENTS)
 
 
 @pytest.mark.parametrize("doc_id", DOCUMENT_IDS)
+@requires_spa_build
 def test_declared_url_opens(client, doc_id):
     url = LEGAL_DOCUMENTS[doc_id]["url"]
     assert client.get(url).status_code == 200, f"{doc_id} → {url}"

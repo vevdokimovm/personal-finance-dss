@@ -16,6 +16,13 @@ import json
 import subprocess
 from pathlib import Path
 
+from tests.support.workstation import requires_base_repo_hooks
+
+# 🔴 Хук живёт в каноне `base-repo`, а не в этом репозитории: на раннере CI его нет
+# по построению, и красный там означал «нет машины владельца», а не «гейт сломан».
+# Пропуск ИМЕНОВАННЫЙ — `pytest -rs` печатает причину (см. `tests/support/workstation.py`).
+pytestmark = requires_base_repo_hooks
+
 HOOK = Path.home() / "repos" / "base-repo" / ".claude" / "hooks" / "watch-identity.sh"
 SETTINGS = Path(__file__).resolve().parents[1] / ".claude" / "settings.json"
 

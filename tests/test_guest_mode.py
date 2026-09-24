@@ -7,6 +7,8 @@ from __future__ import annotations
 
 import pytest
 
+from tests.support.workstation import requires_spa_build
+
 PORTRAITS = ["anna", "dmitriy", "mikhail", "igor", "olga", "viktor"]
 
 
@@ -34,6 +36,7 @@ class TestGuestSandbox:
     проверяема на этом уровне, и не зависит от того, каким фронтом её открывают.
     """
 
+    @requires_spa_build
     def test_guest_can_open_validation(self, client) -> None:
         assert client.get("/validation").status_code == 200
 

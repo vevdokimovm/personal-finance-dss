@@ -258,3 +258,56 @@ describe("Состав семьи — все мутации сбрасывают
     expect(invalidate).toHaveBeenCalledWith(ALL_KEY);
   });
 });
+
+describe("Чтение по выбранной семье — ключ параметризован id, пустой ответ не роняет", () => {
+  /* 🔴 Эти ветки оставались непокрытыми, и вместе с соседними держали порог
+     ветвей фронта ниже 90 % (89.87 %). Непокрытая ветка здесь не формальность:
+     `data ?? []` стоит ровно там, где потребитель сразу зовёт `.map`,
+     а `householdId as number` — там, где не-null гарантирован только `enabled`. */
+
+  it("участники выбранной семьи читаются по своему ключу", async () => {
+    listMembers.mockResolvedValue({
+      data: [{ user_id: "u-1", role: "owner", email: "owner@example.com" }],
+    });
+    const { wrapper } = makeWrapper();
+    const { result } = renderHook(() => useHouseholdMembers(7), { wrapper });
+
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+    expect(listMembers).toHaveBeenCalledWith({
+      path: { household_id: 7 },
+      throwOnError: true,
+    });
+    expect(result.current.data).toHaveLength(1);
+  });
+
+  it("пустое тело ответа по участникам даёт массив, а не undefined", async () => {
+    listMembers.mockResolvedValue({ data: undefined });
+    const { wrapper } = makeWrapper();
+    const { result } = renderHook(() => useHouseholdMembers(7), { wrapper });
+
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+    expect(result.current.data).toEqual([]);
+  });
+
+  it("приглашения читаются владельцем и по своему ключу", async () => {
+    listInvites.mockResolvedValue({ data: [{ id: 1, role: "member", status: "pending" }] });
+    const { wrapper } = makeWrapper();
+    const { result } = renderHook(() => useHouseholdInvites(7, true), { wrapper });
+
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+    expect(listInvites).toHaveBeenCalledWith({
+      path: { household_id: 7 },
+      throwOnError: true,
+    });
+    expect(result.current.data).toHaveLength(1);
+  });
+
+  it("пустое тело ответа по приглашениям даёт массив", async () => {
+    listInvites.mockResolvedValue({ data: undefined });
+    const { wrapper } = makeWrapper();
+    const { result } = renderHook(() => useHouseholdInvites(7, true), { wrapper });
+
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+    expect(result.current.data).toEqual([]);
+  });
+});
