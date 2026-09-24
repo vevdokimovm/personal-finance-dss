@@ -179,19 +179,37 @@ def run_job(
 
 
 def tree_hash(repo: Path) -> str:
-    """Отпечаток РАБОЧЕГО дерева: что реально проверено, а не что закоммичено."""
-    result = subprocess.run(
+    """Отпечаток РАБОЧЕГО дерева: что реально проверено, а не что закоммичено.
+
+    🔴 Считается СОДЕРЖИМОЕ изменённых файлов, а не строка статуса. Первая редакция
+    хешировала вывод `git status --porcelain`, который печатает только статус (` M путь`):
+    файл, уже числящийся изменённым, можно было править после зелёного прогона сколько
+    угодно — отпечаток не менялся, и `preflight` засчитывал прогон «до правки» за проверку
+    кода «после правки». Ровно та подмена объекта, против которой гейт и заводился.
+    Замер 24.09.2026: правка `docs/WATCHLOG.md` после прогона оставила отпечаток
+    `2c74eab99bd8a6cf` неизменным.
+    """
+    import hashlib
+
+    status = subprocess.run(
         ["git", "-C", str(repo), "status", "--porcelain=v1", "-z"],
         capture_output=True, text=True, check=False,
-    )
+    ).stdout
     head = subprocess.run(
         ["git", "-C", str(repo), "rev-parse", "HEAD"],
         capture_output=True, text=True, check=False,
     ).stdout.strip()
-    import hashlib
 
-    digest = hashlib.sha256((head + "\0" + result.stdout).encode()).hexdigest()
-    return digest[:16]
+    digest = hashlib.sha256()
+    digest.update(head.encode())
+    for entry in sorted(item for item in status.split("\0") if item.strip()):
+        digest.update(b"\0" + entry.encode())
+        # Путь идёт после двухсимвольного кода статуса и пробела. Удалённый файл
+        # читать нечем — его отсутствие уже отражено самой строкой статуса.
+        path = repo / entry[3:]
+        if path.is_file():
+            digest.update(b"\0" + hashlib.sha256(path.read_bytes()).digest())
+    return digest.hexdigest()[:16]
 
 
 def write_stamp(jobs: list[str], failures: list[str], repo: Path) -> None:
