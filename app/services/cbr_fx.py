@@ -13,7 +13,10 @@ import logging
 import urllib.error
 import urllib.request
 from datetime import datetime, timedelta, timezone
-from xml.etree import ElementTree as ET
+# 🔴 Разбор XML ИЗ ВНЕШНЕГО ИСТОЧНИКА идёт через `defusedxml`, а не через stdlib:
+# ответ приходит по сети с cbr.ru, и stdlib-парсер уязвим к раздуванию сущностей
+# (bandit B314). `defusedxml` — тот же интерфейс, поэтому замена точечная.
+from defusedxml import ElementTree as ET  # noqa: N812
 
 from sqlalchemy.orm import Session
 
@@ -35,6 +38,18 @@ _cache: dict[str, object] = {"rates": None, "fetched_on": None}
 # Память о недавней неудаче: не бьёмся в сеть на каждом запросе.
 _FAIL_RETRY_SECONDS = 900
 _fail_until: dict[str, object] = {"ts": None}
+
+
+def _require_https(url: str) -> None:
+    """Открывать по сети разрешено только `https://`.
+
+    🔴 bandit B310 предупреждает, что `urlopen` принимает любую схему, включая
+    `file:` — то есть строка конфигурации могла бы превратить сетевой вызов
+    в чтение локального файла. Проверка стоит здесь, а не в вызывающем коде,
+    чтобы её нельзя было забыть на новом месте вызова.
+    """
+    if not url.startswith("https://"):
+        raise ValueError(f"разрешён только https, получено: {url[:40]}")
 
 
 def parse_cbr_fx_xml(xml_text: str) -> dict[str, float]:
@@ -92,7 +107,8 @@ def fetch_cbr_fx_rates(use_cache: bool = True) -> dict[str, float] | None:
             headers={"User-Agent": _USER_AGENT, "Accept": "application/xml, text/xml, */*"},
             method="GET",
         )
-        with urllib.request.urlopen(req, timeout=_TIMEOUT_SECONDS) as resp:
+        _require_https(_CBR_FX_URL)
+        with urllib.request.urlopen(req, timeout=_TIMEOUT_SECONDS) as resp:  # nosec B310
             raw = resp.read()
         try:
             xml_text = raw.decode("windows-1251")  # ЦБ отдаёт cp1251

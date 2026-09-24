@@ -42,6 +42,18 @@ _STATUS_UNLINKED = "Аккаунт не привязан. Используйте
 _UNKNOWN = "Не понял команду. Доступно: /start, /link <код>, /unlink, /status."
 
 
+def _require_https(url: str) -> None:
+    """Открывать по сети разрешено только `https://`.
+
+    🔴 bandit B310 предупреждает, что `urlopen` принимает любую схему, включая
+    `file:` — то есть строка конфигурации могла бы превратить сетевой вызов
+    в чтение локального файла. Проверка стоит здесь, а не в вызывающем коде,
+    чтобы её нельзя было забыть на новом месте вызова.
+    """
+    if not url.startswith("https://"):
+        raise ValueError(f"разрешён только https, получено: {url[:40]}")
+
+
 class TelegramService:
     """Тонкая обёртка над Telegram Bot API. Без токена — тихий no-op."""
 
@@ -64,7 +76,8 @@ class TelegramService:
         data = json.dumps({"chat_id": chat_id, "text": text}).encode("utf-8")
         req = urllib.request.Request(url, data=data, headers={"Content-Type": "application/json"})
         try:
-            with urllib.request.urlopen(req, timeout=10) as resp:
+            _require_https(url)
+            with urllib.request.urlopen(req, timeout=10) as resp:  # nosec B310
                 return resp.status == 200
         except (urllib.error.URLError, OSError) as exc:  # сеть/таймаут — не валим вызывающий код
             logger.warning("telegram send failed: %s", exc)

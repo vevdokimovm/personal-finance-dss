@@ -17,7 +17,10 @@ import urllib.error
 import urllib.request
 from datetime import date, datetime, timedelta, timezone
 from typing import Optional, TypedDict
-from xml.etree import ElementTree as ET
+# 🔴 Разбор XML ИЗ ВНЕШНЕГО ИСТОЧНИКА идёт через `defusedxml`, а не через stdlib:
+# ответ приходит по сети с cbr.ru, и stdlib-парсер уязвим к раздуванию сущностей
+# (bandit B314). `defusedxml` — тот же интерфейс, поэтому замена точечная.
+from defusedxml import ElementTree as ET  # noqa: N812
 
 from sqlalchemy import select
 
@@ -54,6 +57,18 @@ _cache: dict[str, object] = {"rate": None, "source": None, "fetched_on": None}
 # Повторная попытка не чаще, чем раз в 15 минут.
 _FAIL_RETRY_SECONDS = 900
 _fail_until: dict[str, object] = {"ts": None, "detail": ""}
+
+
+def _require_https(url: str) -> None:
+    """Открывать по сети разрешено только `https://`.
+
+    🔴 bandit B310 предупреждает, что `urlopen` принимает любую схему, включая
+    `file:` — то есть строка конфигурации могла бы превратить сетевой вызов
+    в чтение локального файла. Проверка стоит здесь, а не в вызывающем коде,
+    чтобы её нельзя было забыть на новом месте вызова.
+    """
+    if not url.startswith("https://"):
+        raise ValueError(f"разрешён только https, получено: {url[:40]}")
 
 
 def _build_soap_body(from_date: date, to_date: date) -> bytes:
@@ -144,7 +159,8 @@ def _fetch_from_cbr() -> CbrFetchResult:
             },
             method="POST",
         )
-        with urllib.request.urlopen(req, timeout=_TIMEOUT_SECONDS) as resp:
+        _require_https(_CBR_SOAP_URL)
+        with urllib.request.urlopen(req, timeout=_TIMEOUT_SECONDS) as resp:  # nosec B310
             raw = resp.read().decode("utf-8", errors="replace")
         eff_date, rate = _parse_latest(raw)
         if rate is not None and 0 < rate < 1:

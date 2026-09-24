@@ -33,6 +33,8 @@
 from __future__ import annotations
 
 import argparse
+import json
+import os
 import re
 import sys
 from pathlib import Path
@@ -190,6 +192,54 @@ MANUAL_QUESTIONS = (
     "Если что-то объявлено невозможным — исчерпаны ли ВСЕ каналы, включая "
     "установку пакета? Пустой `which` доказательством не является.",
 )
+
+
+# 🔴 Гейты гита прогоняются ЗДЕСЬ и целиком — правило владельца 24.09.2026, дословно:
+# «отныне ты должен ВСЕГДА ТАКЖЕ КАК ТЕСТЫ ПРОГОНЯТЬ ГИТ ГЕЙТЫ ЗДЕСЬ ПОЛНОСТЬЮ
+# и фиксить все ошибки на месте!!!». Правило, которое надо помнить, не работает
+# (три ложных отчёта за сутки, два месяца красного на теге —
+# `docs/reports/incidents/ci_red_on_tags_for_a_month.md`), поэтому проверяется машиной.
+CI_LOCAL_STAMP = "reports/ci_local_last_run.json"
+CI_LOCAL_REQUIRED = ("preflight", "lint", "core", "fast", "frontend", "full")
+
+
+def ci_local_failures(
+    repo: Path, tree: str, required: tuple[str, ...] = CI_LOCAL_REQUIRED
+) -> list[str]:
+    """Прогнаны ли гейты гита локально на ЭТОМ дереве и целиком.
+
+    Args:
+        repo: корень репозитория.
+        tree: отпечаток рабочего дерева (`tools.ci_local.tree_hash`).
+        required: джобы, которые обязаны быть в прогоне.
+
+    Returns:
+        Список причин, по которым батч закрывать нельзя; пустой — можно.
+    """
+    # 🔴 Гейт СУГУБО локальный. На раннере следа нет и быть не может: он снимается
+    # на рабочей станции, отпечаток дерева там другой. Без этой строки preflight
+    # падал бы в CI всегда — то есть правило «прогоняй гейты локально» сломало бы
+    # сами гейты. Поймано до отгрузки, на разборе собственной правки.
+    if os.environ.get("CI") or os.environ.get("GITHUB_ACTIONS"):
+        return []
+    stamp = repo / CI_LOCAL_STAMP
+    if not stamp.exists():
+        return ["гейты гита локально не прогонялись: нет "
+                f"{CI_LOCAL_STAMP} (запусти `python -m tools.ci_local --job full`)"]
+    try:
+        data = json.loads(stamp.read_text(encoding="utf-8"))
+    except (json.JSONDecodeError, OSError) as exc:
+        return [f"след локального прогона нечитаем ({exc}) — прогони гейты заново"]
+    if data.get("tree") != tree:
+        return ["след локального прогона снят на ДРУГОМ дереве "
+                f"({data.get('tree')!r} вместо {tree!r}) — код менялся после проверки"]
+    missing = [job for job in required if job not in (data.get("jobs") or [])]
+    if missing:
+        return [f"локально прогнаны не все гейты, нет: {', '.join(missing)}"]
+    if not data.get("green"):
+        return ["локальный прогон гейтов КРАСНЫЙ: "
+                + "; ".join(data.get("failures") or ["причина не записана"])]
+    return []
 
 
 def run(repo: Path) -> int:

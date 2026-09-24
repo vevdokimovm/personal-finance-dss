@@ -87,9 +87,15 @@ class TestEnvironmentSteps:
     def test_npm_ci_is_an_install_step(self) -> None:
         assert is_install(Step(name="deps", run="npm ci", workdir="frontend"))
 
-    def test_playwright_install_is_an_install_step(self) -> None:
-        assert is_install(
-            Step(name="browsers", run="playwright install --with-deps chromium", workdir=None)
+    def test_playwright_install_is_NOT_skipped(self) -> None:
+        """🔴 Установка браузеров — предусловие проверки, а не обустройство окружения.
+
+        Первая редакция фильтра пропускала её, фронтовые E2E шли без firefox и webkit
+        и дали **100 падений** там, где CI зелёный. Ложное красное учит не доверять
+        инструменту — это дороже сэкономленных минут.
+        """
+        assert not is_install(
+            Step(name="browsers", run="npx playwright install --with-deps firefox", workdir=None)
         )
 
     def test_check_steps_are_not_install(self) -> None:
