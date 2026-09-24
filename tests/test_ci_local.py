@@ -21,7 +21,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from tools.ci_local import Step, is_install, jobs_with_steps, runnable, WORKFLOW
+from tools.ci_local import Step, _run, is_install, jobs_with_steps, runnable, WORKFLOW
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 
@@ -98,6 +98,66 @@ class TestEnvironmentSteps:
             Step(name="browsers", run="npx playwright install --with-deps firefox", workdir=None)
         )
 
+    def test_step_that_installs_AND_checks_is_not_skipped(self) -> None:
+        """🔴 Шаг «поставить инструмент и тут же проверить» — это ПРОВЕРКА, не установка.
+
+        Второй случай того же класса, что `playwright install`, и дороже него.
+        Шаги bandit, pip-audit и нагрузочного smoke записаны в воркфлоу как две
+        строки: `pip install -q <инструмент>` и следом сама проверка. Регулярка
+        видела первую строку и выкидывала ВЕСЬ шаг — три проверки не исполнялись
+        локально ни разу, а прогон печатал «ЗЕЛЕНО». В CI они исполняются и краснеют:
+        инструмент врал ровно в ту сторону, против которой заведён.
+        Правило: пропускаем шаг, только если УСТАНОВКА — все его команды.
+        """
+        for command in (
+            "pip install -q bandit\nbandit -q -r app -ll",
+            "pip install -q pip-audit\npip-audit -r requirements.txt",
+            "pip install -q locust\nlocust -f loadtest/locustfile.py --headless -t 30s",
+        ):
+            assert not is_install(Step(name="x", run=command, workdir=None)), command
+
+    def test_pure_install_step_with_several_lines_is_skipped(self) -> None:
+        """Шаг, где установка — ВСЕ строки, по-прежнему пропускается."""
+        assert is_install(
+            Step(
+                name="deps",
+                run="python -m pip install --upgrade pip\npip install -r requirements.txt",
+                workdir=None,
+            )
+        )
+
     def test_check_steps_are_not_install(self) -> None:
         for command in ("pytest -q", "flake8 .", "mypy app", "npm run build"):
             assert not is_install(Step(name="x", run=command, workdir=None)), command
+
+
+class TestStepFailsLikeGitHub:
+    """🔴 Шаг обязан падать на ПЕРВОЙ упавшей команде, как у GitHub.
+
+    GitHub исполняет блок `run:` через `bash --noprofile --norc -eo pipefail`.
+    Флаг `-e` валит шаг на первой же неудаче. Локальный прогон звал `shell=True`,
+    то есть `/bin/sh` БЕЗ `-e`, и код возврата шага равнялся коду ПОСЛЕДНЕЙ команды.
+
+    Цена ошибки измерена: шаг «Тесты + покрытие ядра» — это `coverage run -m pytest`
+    и следом `coverage report`. Падение pytest (`1 failed, 2436 passed`) исчезало
+    бесследно, потому что `coverage report` проходил порог и возвращал ноль. Локальный
+    прогон печатал «ЗЕЛЕНО» на упавших тестах — ровно та ложь, против которой
+    инструмент заведён, и ровно то, что владелец видел как «локально зелено,
+    а в гите упало больше тестов».
+    """
+
+    def test_first_failing_command_fails_the_step(self, tmp_path: Path) -> None:
+        step = Step(name="две команды", run="false\ntrue", workdir=None)
+        ok, _ = _run(step, tmp_path)
+        assert not ok, "падение первой команды обязано валить шаг, как `bash -e`"
+
+    def test_all_green_commands_pass(self, tmp_path: Path) -> None:
+        step = Step(name="две команды", run="true\ntrue", workdir=None)
+        ok, _ = _run(step, tmp_path)
+        assert ok
+
+    def test_pipeline_failure_is_caught(self, tmp_path: Path) -> None:
+        """`pipefail`: падение слева от пайпа не прячется за успехом справа."""
+        step = Step(name="пайп", run="false | cat", workdir=None)
+        ok, _ = _run(step, tmp_path)
+        assert not ok, "нужен `pipefail`, иначе падение в пайпе теряется"

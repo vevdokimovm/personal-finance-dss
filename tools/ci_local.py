@@ -50,6 +50,13 @@ BLOCKING = ("preflight", "lint", "core", "fast", "frontend")
 # не продукт, а отсутствие браузера.
 INSTALL = re.compile(r"\bpip install\b|\bnpm ci\b|pip install --upgrade")
 
+# 🔴 Второй случай того же класса, и дороже первого. Шаги bandit, pip-audit и
+# нагрузочного smoke записаны в воркфлоу как ДВЕ строки: `pip install -q <инструмент>`
+# и следом сама проверка. Регулярка видела первую строку и выкидывала весь шаг —
+# три проверки не исполнялись локально НИ РАЗУ, а прогон печатал «ЗЕЛЕНО», тогда как
+# в CI они исполнялись и краснели. Поэтому решение принимается не по шагу целиком,
+# а по каждой его команде: пропускаем, только если установка — ВСЕ команды шага.
+
 # 🔴 Отпечаток прогона. Правило владельца 24.09.2026, дословно: «отныне ты должен ВСЕГДА
 # ТАКЖЕ КАК ТЕСТЫ ПРОГОНЯТЬ ГИТ ГЕЙТЫ ЗДЕСЬ ПОЛНОСТЬЮ и фиксить все ошибки на месте».
 # Правило, которое надо помнить, не работает — поэтому прогон оставляет след с хешем
@@ -96,9 +103,23 @@ def runnable(step: Step) -> bool:
     return bool(step.run and step.run.strip())
 
 
+def _commands(run: str) -> list[str]:
+    """Исполняемые команды шага: без комментариев и пустых строк."""
+    return [
+        line.strip()
+        for line in run.splitlines()
+        if line.strip() and not line.strip().startswith("#")
+    ]
+
+
 def is_install(step: Step) -> bool:
-    """Шаг ставит окружение, а не проверяет продукт."""
-    return bool(step.run and INSTALL.search(step.run))
+    """Шаг ТОЛЬКО ставит окружение и ничего не проверяет.
+
+    Достаточно одной проверочной команды, чтобы шаг гонялся целиком — ровно так
+    его исполняет GitHub. Иначе локальный прогон зеленеет на невыполненной проверке.
+    """
+    commands = _commands(step.run or "")
+    return bool(commands) and all(INSTALL.search(cmd) for cmd in commands)
 
 
 def _env(repo: Path) -> dict[str, str]:
@@ -116,13 +137,20 @@ def _env(repo: Path) -> dict[str, str]:
 def _run(step: Step, repo: Path) -> tuple[bool, float]:
     cwd = repo / step.workdir if step.workdir else repo
     started = time.monotonic()
-    # `shell=True` здесь обязателен и безопасен: блок `run:` воркфлоу — это shell-скрипт
-    # по определению (многострочный, с пайпами и `&&`), и ровно так его исполняет сам
-    # GitHub. Источник строки — наш собственный `.github/workflows/ci.yml` в репозитории,
-    # а не пользовательский ввод; разбирать его на аргументы значило бы исполнять НЕ ТО,
-    # что исполняет CI, то есть терять единственный смысл инструмента.
+    # Блок `run:` воркфлоу — это shell-скрипт по определению (многострочный, с пайпами
+    # и `&&`), и ровно так его исполняет сам GitHub. Источник строки — наш собственный
+    # `.github/workflows/ci.yml`, а не пользовательский ввод; разбирать его на аргументы
+    # значило бы исполнять НЕ ТО, что исполняет CI, то есть терять смысл инструмента.
+    #
+    # 🔴 Оболочка и флаги повторяют GitHub ДОСЛОВНО: `bash --noprofile --norc -eo
+    # pipefail`. Без `-e` код возврата шага равен коду ПОСЛЕДНЕЙ команды, и падение
+    # любой предыдущей исчезает бесследно. Измерено на шаге «Тесты + покрытие ядра»
+    # (`coverage run -m pytest` и следом `coverage report`): pytest дал `1 failed`,
+    # `coverage report` прошёл порог — и прогон напечатал «ЗЕЛЕНО» на упавших тестах.
+    # Это и есть «локально зелено, а в гите упало больше тестов».
     result = subprocess.run(  # noqa: S602
-        step.run or "", shell=True, cwd=cwd, check=False, env=_env(repo)
+        ["bash", "--noprofile", "--norc", "-eo", "pipefail", "-c", step.run or ""],
+        cwd=cwd, check=False, env=_env(repo),
     )
     return result.returncode == 0, time.monotonic() - started
 

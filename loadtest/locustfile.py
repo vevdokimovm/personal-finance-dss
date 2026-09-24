@@ -178,7 +178,16 @@ class FinpilotAuthenticatedUser(_Tolerant429Mixin, HttpUser):
 
     def on_start(self) -> None:
         email = f"load_{uuid.uuid4().hex[:12]}@example.com"
-        payload = {"email": email, "password": "loadtest-pass-1", "display_name": "Load"}
+        # `consent` обязателен с юрблока L1 (v8.40.0) и намеренно не имеет значения
+        # по умолчанию в схеме: умолчание было бы предотмеченной галочкой. Сценарий
+        # отстал от контракта и давал 100 % отказов 422 — сверка гейтом,
+        # `tests/test_loadtest_matches_contract.py`.
+        payload = {
+            "email": email,
+            "password": "loadtest-pass-1",
+            "display_name": "Load",
+            "consent": True,
+        }
         with self.client.post(f"{API}/auth/register", json=payload,
                               name="POST /api/auth/register", catch_response=True) as resp:
             if resp.status_code == 429:
@@ -192,6 +201,20 @@ class FinpilotAuthenticatedUser(_Tolerant429Mixin, HttpUser):
             resp.success()
             token = (resp.json() or {}).get("access_token")
             self.headers = {"Authorization": f"Bearer {token}"} if token else {}
+        self._grant_financial_consent()
+
+    def _grant_financial_consent(self) -> None:
+        """Выдать согласие на обработку финансовых данных.
+
+        🔴 Без него КАЖДАЯ защищённая ручка отвечает 403 `consent_required`, и нагрузка
+        меряет отказ доступа вместо продукта. Согласие на финданные отдельно от согласия
+        при регистрации намеренно (юрблок L1): склеивать их нельзя. Сценарий обязан
+        проходить путь пользователя целиком, иначе цифры нагрузки не значат ничего.
+        """
+        if not self.headers:
+            return
+        self.client.post(f"{API}/consents/financial_data", headers=self.headers,
+                         name="POST /api/consents/financial_data")
 
     @task(6)
     def my_dashboard(self) -> None:
