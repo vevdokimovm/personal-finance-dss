@@ -75,7 +75,8 @@ export function HouseholdsPage() {
         closeForm();
         toast.success(t("Семейный доступ создан"));
       },
-      onError: (error) => toastMutationError(error, t("Не получилось создать. Попробуйте ещё раз.")),
+      onError: (error) =>
+        toastMutationError(error, t("Не получилось создать. Попробуйте ещё раз.")),
     });
   }
 
@@ -340,7 +341,8 @@ function HouseholdCard({
                                 // на заголовок карточки, а не в пустоту.
                                 headingRef.current?.focus();
                               },
-                              onError: (error) => toastMutationError(error, t("Не получилось убрать участника.")),
+                              onError: (error) =>
+                                toastMutationError(error, t("Не получилось убрать участника.")),
                             },
                           ),
                       })
@@ -460,7 +462,10 @@ function HouseholdCard({
                                   headingRef.current?.focus();
                                 },
                                 onError: (error) =>
-                                  toastMutationError(error, t("Не получилось отозвать приглашение.")),
+                                  toastMutationError(
+                                    error,
+                                    t("Не получилось отозвать приглашение."),
+                                  ),
                               },
                             ),
                         })

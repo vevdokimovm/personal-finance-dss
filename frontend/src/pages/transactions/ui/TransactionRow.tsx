@@ -34,11 +34,13 @@ export function TransactionRow({
         toast.undo(t("Операция «{label}» удалена.", { label }), () => {
           restoreTransaction.mutate(transaction.id, {
             onSuccess: () => toast.success(t("Операция «{label}» восстановлена.", { label })),
-            onError: (error) => toastMutationError(error, t("Не получилось восстановить. Попробуйте ещё раз.")),
+            onError: (error) =>
+              toastMutationError(error, t("Не получилось восстановить. Попробуйте ещё раз.")),
           });
         });
       },
-      onError: (error) => toastMutationError(error, t("Не получилось удалить. Попробуйте ещё раз.")),
+      onError: (error) =>
+        toastMutationError(error, t("Не получилось удалить. Попробуйте ещё раз.")),
     });
   }
 

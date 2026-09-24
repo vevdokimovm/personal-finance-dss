@@ -27,11 +27,13 @@ export function ObligationRow({
         toast.undo(t("Обязательство «{name}» удалено.", { name }), () => {
           restoreObligation.mutate(obligation.id, {
             onSuccess: () => toast.success(t("Обязательство «{name}» восстановлено.", { name })),
-            onError: (error) => toastMutationError(error, t("Не получилось восстановить. Попробуйте ещё раз.")),
+            onError: (error) =>
+              toastMutationError(error, t("Не получилось восстановить. Попробуйте ещё раз.")),
           });
         });
       },
-      onError: (error) => toastMutationError(error, t("Не получилось удалить. Попробуйте ещё раз.")),
+      onError: (error) =>
+        toastMutationError(error, t("Не получилось удалить. Попробуйте ещё раз.")),
     });
   }
 

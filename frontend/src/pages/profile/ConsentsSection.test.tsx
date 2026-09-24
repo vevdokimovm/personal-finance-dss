@@ -487,9 +487,7 @@ describe("ConsentsSection — все сочетания состояния да�
 
       render(<ConsentsSection />);
 
-      const marketingActions = [
-        ...screen.queryAllByRole("button", { name: /Рекламная рассылка/ }),
-      ];
+      const marketingActions = [...screen.queryAllByRole("button", { name: /Рекламная рассылка/ })];
       /* `queryAllByText`, а не `queryByText`: подсказку про неотзываемое согласие
          показывает и `personal_data`, и множественное совпадение бросало бы
          исключение — тест падал бы на собственной ошибке, а не на дефекте. */

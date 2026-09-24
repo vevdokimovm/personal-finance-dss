@@ -1,7 +1,7 @@
 # FINPILOT — СППР для персональных финансов
 
 <!-- STATUS -->
-> **Сейчас:** `v9.13.2` · 2026-09-24 · веха 9 открыта, синтез корпуса завершён (12 документов из 12), идёт предподготовка к деплою.
+> **Сейчас:** `v9.13.3` · 2026-09-24 · веха 9 открыта, синтез корпуса завершён (12 документов из 12), идёт предподготовка к деплою.
 > Закрыты темы 16-17 очереди исследований: заявление о новизне **по методу и объяснимости
 > опровергнуто** первоисточниками школы constraint-based рекомендаций (формула свёртки
 > совпадает с FSAdvisor, IAAI-05; объяснение через вклад критерия — канонический
@@ -12,7 +12,7 @@
 <!-- /STATUS -->
 
 [![CI](https://github.com/vevdokimovm/personal-finance-dss/actions/workflows/ci.yml/badge.svg)](https://github.com/vevdokimovm/personal-finance-dss/actions/workflows/ci.yml)
-![version](https://img.shields.io/badge/version-9.13.2-blue)
+![version](https://img.shields.io/badge/version-9.13.3-blue)
 ![python](https://img.shields.io/badge/python-3.13-blue)
 ![coverage](https://img.shields.io/badge/coverage-gate%2090%25-brightgreen)
 ![tests](https://img.shields.io/badge/tests-2160%20%2B%20874-brightgreen)
@@ -36,18 +36,19 @@
 
 ---
 
-## Текущее состояние (v9.1.0, сентябрь 2026)
+## Текущее состояние (v9.13.3, сентябрь 2026)
 
 | | |
 |---|---|
-| **Матмодель** | канон **v3.9.0**, пять раундов независимой экспертной сертификации, оценка по десяти шкалам — **87.2 / 100** |
-| **Тесты** | бэкенд **2005** на SQLite и матрице PostgreSQL, фронт Vitest **567**, e2e **201** в трёх браузерах (Chromium, Firefox, WebKit), axe-core **24** (две темы), гейт покрытия 90%, flake8 = 0, ревизионный гейт docs↔code |
-| **Вехи** | 1–8 закрыты (веха 8 — v8.55.0). **9 (деплой) идёт: предподготовка.** React 19 SPA полностью заменил Jinja2 (слой снесён, `app/templates` нет) (дашборд, планирование, операции, обязательства, цели, банки, профиль, семейный доступ); §8.2 «вынести на фронт всё, что висит только в API» закрыт (последним приехали советы по расходам, v8.54.0); CRUD-паритет закрыт полностью (5/5): обязательства, ликвидные активы, операции, цели (мягкое удаление с отменой; у целей — отдельное действие «внести прогресс», не общий edit) и бюджеты (upsert по категории). Прод-деплой пайплайн (Docker + nginx) проверен на изолированном стенде |
-| **Юрблок** | шесть требований из десяти закрыты кодом и покрыты тестами; экраны согласия/cookie-баннер на фронте — открытый шаг Э6 |
+| **Матмодель** | канон **v3.10.0**, пять раундов независимой экспертной сертификации, оценка по десяти шкалам — **87.2 / 100**. В v3.10.0 прогноз приведён к измерению: точечный — SES $\alpha=0.3$ без тренда, коридор p10–p90 — от разброса собственного потока (покрытие 80 ± 12 п.п. против прежних 7–47 %) |
+| **Тесты** | бэкенд **2401** (6 пропущено по условиям среды) (SQLite и матрица PostgreSQL), фронт Vitest **874**, e2e в трёх браузерах, axe-core (две темы), гейт покрытия 90 % (ядро — 95 %), flake8 = 0, mypy чист, ревизионный гейт docs↔code |
+| **Вехи** | 1–8 закрыты (веха 8 — v8.55.0). **9 (деплой) идёт: предподготовка.** React 19 SPA полностью заменил Jinja2 (слой снесён, `app/templates` нет); §8.2 «вынести на фронт всё, что висит только в API» закрыт; CRUD-паритет 5/5. Прод-деплой пайплайн (Docker + nginx) проверен на изолированном стенде |
+| **Исследовательский корпус** | 🟢 синтез закончен: **12 итоговых документов из 12** (`docs/research/synthesis/`). Новизна по методу и по объяснимости снята дословными источниками; держатся пять признаков, включая долг как управляемый объект и российский правовой контур |
+| **Юрблок** | шесть требований из десяти закрыты кодом и покрыты тестами; экраны согласия и cookie-баннер на фронте закрыты (v8.40.0–v8.41.0) |
 | **Веха 6** | тестирование матмодели закрыто по исчерпанию информативности метода, не по идеальности — условия возобновления зафиксированы |
 
-Подробно: `docs/reports/audits/full_revision_before_frontend.md` (ревизия и оценка
-готовности) · `docs/model/model_quality_scorecard.md` (качество модели по осям) ·
+Подробно: `docs/research/synthesis/` (что решено по продукту, модели и рынку) ·
+`docs/model/model_quality_scorecard.md` (качество модели по осям) ·
 `docs/WATCHLOG.md` (состояние и передача работы).
 
 ---
@@ -92,41 +93,52 @@ HTTP → сервисы → ядро/БД. Ядро (`app/core/`) не знае�
 
 ```mermaid
 flowchart TD
-    Client["Браузер / API-клиент"]
+    Client["Браузер (React 19 SPA) / API-клиент"]
 
-    subgraph HTTP["app/api/ — HTTP-слой (FastAPI)"]
-        Routes["routes_*.py<br/>auth · transactions · planning · goals ·<br/>obligations · liquid_assets · banks · b2b · analytics"]
-        MW["middleware.py · _guards.py<br/>CSRF · rate-limit · security-заголовки"]
+    subgraph HTTP["app/api/ — HTTP-слой (FastAPI), 28 групп роутов"]
+        Routes["auth · mfa · transactions · budgets · categories · planning ·<br/>recommendation · goals · obligations · liquid_assets · analysis ·<br/>banks · plaid · export · households · referral · subscription ·<br/>notifications · consents · telegram · b2b · analytics ·<br/>experiments · telemetry · fx · i18n · demo · user_prefs"]
+        MW["middleware.py · _guards.py · _consent_guard.py<br/>CSRF · rate-limit · security-заголовки · гейт согласия"]
     end
 
     subgraph SVC["app/services/ — прикладные сервисы"]
-        Planning["planning.py — оркестрация расчёта"]
-        Spending["spending.py — советы по тратам"]
-        Ingestion["ingestion/ — парсеры выписок<br/>CSV · XLSX · PDF · 1C"]
-        Infra["cache · currency · cbr_rate/fx ·<br/>event_logger · email_service · email_dispatch · analytics"]
+        Planning["planning.py · pipeline.py — оркестрация расчёта"]
+        Spending["spending.py · forecasting.py — советы и прогноз"]
+        Docs2["plan_export.py · report_pdf.py — выгрузка CSV/XLSX/PDF"]
+        Infra["cache · currency · cbr_rate/cbr_fx · event_logger ·<br/>email_service/email_dispatch · notifications · consent ·<br/>security · mfa · referral · subscription · telegram ·<br/>experiments/experiment_stats · analytics"]
     end
 
-    subgraph CORE["app/core/ — математическое ядро (чистые функции)"]
+    subgraph ING["app/ingestion/ — приём выписок (отдельный пакет)"]
+        Engine["engine.py · contracts.py · models.py"]
+        Providers["providers/ — банки и форматы: CSV · XLSX · PDF · 1C"]
+        Reconcile["services/statement_parser.py · statement_reconcile.py · bank_api.py"]
+    end
+
+    subgraph CORE["app/core/ — математическое ядро (чистые функции, канон v3.10.0)"]
         direction LR
-        Pipeline["preprocessing · metrics · forecast ·<br/>alternatives · avalanche · goals_priority ·<br/>filtering · ranking · recommendation"]
-        Support["categorization · envelopes · money · spending_advice"]
+        Pipeline["preprocessing · metrics · forecast · alternatives ·<br/>avalanche · amortization · goals_priority · filtering ·<br/>ranking · recommendation"]
+        Support["crisis · surplus · investment · envelopes ·<br/>categorization · category_rules · money ·<br/>spending_advice · legal · experiments"]
     end
 
     subgraph DATA["app/database/ — данные"]
-        CRUD["crud.py"]
-        Models["models.py (SQLAlchemy 2.0)"]
+        CRUD["crud.py · revocation.py · mfa_store.py"]
+        Models["models.py (SQLAlchemy 2.0) · types.py (шифрование ПДн)"]
         DB[("PostgreSQL / SQLite")]
     end
 
-    Schemas["app/schemas/ — Pydantic v2 (валидация I/O)"]
+    Schemas["app/schemas/ — Pydantic v2 (валидация I/O, раздельные in/out)"]
 
     Client --> MW --> Routes
     Routes --> Schemas
     Routes --> Planning
     Routes --> Spending
-    Routes --> Ingestion
+    Routes --> Docs2
+    Routes --> Engine
     Routes --> CRUD
+    Engine --> Providers
+    Engine --> Reconcile
+    Reconcile --> CRUD
     Planning --> Pipeline
+    Planning --> Support
     Planning --> CRUD
     Planning --> Infra
     Spending --> Support
@@ -142,18 +154,21 @@ flowchart TD
 flowchart TD
     In["Транзакции · обязательства · цели · активы · prefs"]
 
-    S1["1 · Препроцессинг<br/>агрегация, очистка, валюта"]
-    S2["2 · Базовые метрики<br/>CF → Rt=CF−ΣP · Lt=B_liq/Σe (мес) · Dt=ПДН · BLR"]
-    S3["3 · Прогноз<br/>SES + Monte-Carlo, интервал 80% [p10..p90]"]
-    S4["4 · Предобработка B_liq"]
-    S5["5 · Генерация альтернатив<br/>stars-and-bars, шаг 10% → 66 комбинаций"]
-    S6["6 · Оценка вариантов<br/>Debt Avalanche + OCR · цели: категория × срочность"]
-    S7["7 · Фильтрация<br/>жёсткие инварианты: Rt≥0 · ПДН≤0.40"]
-    S8["8 · Ранжирование SAW<br/>min-max нормализация → свёртка по весам профиля риска"]
-    S9["9 · Объяснение<br/>лучшее распределение + обоснование + топ-3"]
+    S1["1 · Подготовка данных<br/>агрегация, очистка, валюта"]
+    S2["2 · Базовые показатели<br/>CF → Rt=CF−ΣP · Lt=B_liq/Σe (мес) · Dt=ПДН · BLR · Sn"]
+    Crisis{"Rt ≥ 0 ?"}
+    CR["Кризисный режим (§12)<br/>план действий вместо распределения"]
+    S3["3 · Прогноз<br/>SES α=0.3 без тренда · коридор p10–p90<br/>от разброса собственного потока"]
+    S4["4 · Генерация альтернатив<br/>stars-and-bars, шаг 10% → 66 комбинаций"]
+    S5["5 · Фильтрация<br/>вето-инварианты Rt≥0 · ПДН≤0.40 + Avalanche-фильтр"]
+    S6["6 · Ранжирование SAW<br/>нормализация с насыщением Lt* → свёртка по весам профиля,<br/>лексикографический выбор: floor резерва, затем U(a)"]
+    S7["7 · Разовые ходы из запаса (§15)<br/>излишек B_liq → долги · дедлайновые цели · инвесттранш"]
+    S8["8 · Объяснение<br/>вклад каждого критерия · топ-3 альтернативы"]
     Out["План: Rt/Lt/Dt/BLR · распределение · прогноз · альтернативы"]
 
-    In --> S1 --> S2 --> S3 --> S4 --> S5 --> S6 --> S7 --> S8 --> S9 --> Out
+    In --> S1 --> S2 --> Crisis
+    Crisis -- "нет" --> CR --> Out
+    Crisis -- "да" --> S3 --> S4 --> S5 --> S6 --> S7 --> S8 --> Out
 ```
 
 **Что под капотом ядра:**
@@ -166,10 +181,17 @@ flowchart TD
   `r_bench` = ключевая ставка ЦБ × (1 − НДФЛ)).
 - **Stock-based ликвидность** `Lt = B_liq / Σe` — месяцы автономии (сколько продержишься
   без дохода), ортогональна потоковому ресурсу `Rt`.
-- **SES + Monte-Carlo** — прогноз баланса и свободных денег с доверительным интервалом 80%
-  (p10–p90) и алертом прогнозного дефицита.
-- **Жёсткие инварианты** — `Rt ≥ 0` (нельзя уйти в минус по потоку) и `ПДН ≤ 0.40`
-  (показатель долговой нагрузки), которые отсекают опасные варианты до ранжирования.
+- **SES (α = 0.3) без тренда** — точечный прогноз баланса и свободных денег; коридор
+  p10–p90 строится от разброса собственного потока, квантиль считается формулой
+  (Monte-Carlo для симметричного шума не нужен). Демпфированный Holt отставлен в v3.10.0:
+  на наших длинах истории он брал наклон из шума и занимал последнее место из четырнадцати
+  методов. Кривизну прогноза даёт капитализация баланса, а не тренд.
+- **Жёсткие инварианты (вето)** — `Rt ≥ 0` (нельзя уйти в минус по потоку) и `ПДН ≤ 0.40`,
+  отсекающие опасные варианты до свёртки. В литературе это additive multi-attribute value
+  model accounting for veto: некомпенсаторность без отказа от аддитивности и объяснимости.
+  🔴 Порог 0.40 — **наш собственный выбор** между 30 % (позиция просветительского органа)
+  и 50 % (грань по регулятору), а не цитата норматива; эмпирический перелом риска измерен
+  на 80 (просрочка 5,4 % против 0,8 %).
 
 Полный разбор: [`docs/math_model.md`](docs/math_model.md) (каноническая модель,
 источник истины по параметрам), [`docs/algorithm_stack.md`](docs/algorithm_stack.md) (как это
@@ -418,8 +440,8 @@ make e2e              # браузерные сквозные, бэкенд (chr
 make security         # bandit + pip-audit
 ```
 
-Фронтенд (в `frontend/`): `npm run test` (Vitest, 187 тестов), `npm run test:e2e` (Playwright,
-25 тестов, chromium/firefox/webkit), `npm run lint` / `typecheck` / `format:check`.
+Фронтенд (в `frontend/`): `npm run test` (Vitest, 874 теста в 92 файлах), `npm run test:e2e`
+(Playwright, 201 тест в 16 файлах — chromium/firefox/webkit), `npm run lint` / `typecheck` / `format:check`.
 
 > Запускайте через `python3 -m pytest` (не голый `pytest`): голая команда может подхватить
 > системный pytest вне venv.

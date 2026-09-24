@@ -75,7 +75,8 @@ export function NotificationBell() {
   function openLink(n: NotificationOut) {
     if (!n.is_read) {
       markRead.mutate(n.id, {
-        onError: (error) => toastMutationError(error, t("Не получилось отметить уведомление прочитанным.")),
+        onError: (error) =>
+          toastMutationError(error, t("Не получилось отметить уведомление прочитанным.")),
       });
     }
     // `link` есть в контракте и бэкенд его заполняет (`/goals`, `/planning`). Без
@@ -128,7 +129,10 @@ export function NotificationBell() {
                 onClick={() =>
                   markAllRead.mutate(undefined, {
                     onError: (error) =>
-                      toastMutationError(error, t("Не получилось отметить уведомления прочитанными.")),
+                      toastMutationError(
+                        error,
+                        t("Не получилось отметить уведомления прочитанными."),
+                      ),
                     // Фокус уводится на триггер ДО того, как кнопка исчезнет: она
                     // рендерится по `unread_count > 0`, и после успеха размонтируется —
                     // сфокусированный узел пропал бы, уронив фокус в <body> (тот же

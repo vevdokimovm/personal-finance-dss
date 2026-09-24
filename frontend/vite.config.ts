@@ -46,12 +46,12 @@ export default defineConfig({
          по сгенерированному клиенту и точкам входа, измеряет генератор,
          а не написанные нами тесты. */
       exclude: [
-        "src/shared/api/generated/**",  // артефакт hey-api, не наш код
+        "src/shared/api/generated/**", // артефакт hey-api, не наш код
         "src/**/*.test.{ts,tsx}",
         "src/**/*.d.ts",
-        "src/main.tsx",                 // точка входа: монтирует и всё
+        "src/main.tsx", // точка входа: монтирует и всё
         "src/vite-env.d.ts",
-        "src/routeTree.gen.ts",         // артефакт TanStack Router
+        "src/routeTree.gen.ts", // артефакт TanStack Router
         /* 🔴 Файлы маршрутов исключены ПО СВОЙСТВУ, а не ради процента.
            `createFileRoute` — макрос: плагин TanStack Router переписывает эти файлы
            при сборке, и инструмент покрытия видит вставленные им ветки, а не наш код.

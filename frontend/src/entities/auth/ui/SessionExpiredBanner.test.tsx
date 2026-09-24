@@ -36,10 +36,7 @@ describe("SessionExpiredBanner — выход из формы с умершей 
 
   it("🔴 даёт ссылку на вход, а не кнопку «Повторить»", () => {
     render(<SessionExpiredBanner />);
-    expect(screen.getByRole("link", { name: /Войти заново/ })).toHaveAttribute(
-      "href",
-      "/login",
-    );
+    expect(screen.getByRole("link", { name: /Войти заново/ })).toHaveAttribute("href", "/login");
     expect(screen.queryByRole("button", { name: /Повторить/ })).toBeNull();
   });
 

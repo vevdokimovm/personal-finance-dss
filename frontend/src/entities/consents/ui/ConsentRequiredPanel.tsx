@@ -33,7 +33,8 @@ export function ConsentRequiredPanel({
     if (grant.isPending) return;
     grant.mutate(detail.consentType as ConsentType, {
       onSuccess: onGranted,
-      onError: (error) => toastMutationError(error, t("Не получилось сохранить согласие. Попробуйте ещё раз.")),
+      onError: (error) =>
+        toastMutationError(error, t("Не получилось сохранить согласие. Попробуйте ещё раз.")),
     });
   }
 

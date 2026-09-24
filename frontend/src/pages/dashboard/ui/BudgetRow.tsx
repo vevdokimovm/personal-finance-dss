@@ -27,11 +27,13 @@ export function BudgetRow({
         toast.undo(t("Бюджет «{category}» удалён.", { category }), () => {
           restoreBudget.mutate(budget.id, {
             onSuccess: () => toast.success(t("Бюджет «{category}» восстановлен.", { category })),
-            onError: (error) => toastMutationError(error, t("Не получилось восстановить. Попробуйте ещё раз.")),
+            onError: (error) =>
+              toastMutationError(error, t("Не получилось восстановить. Попробуйте ещё раз.")),
           });
         });
       },
-      onError: (error) => toastMutationError(error, t("Не получилось удалить. Попробуйте ещё раз.")),
+      onError: (error) =>
+        toastMutationError(error, t("Не получилось удалить. Попробуйте ещё раз.")),
     });
   }
 

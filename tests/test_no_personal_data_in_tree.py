@@ -32,6 +32,14 @@ gmail, mail.ru, yandex. Прежний гейт этого не видел **п�
 должно быть правовое основание обработки по 152-ФЗ — согласие респондента на связь,
 а не только на участие в опросе. Пункт для юридического блока вехи 9.
 
+## 🔴 Что изменилось в v9.13.3 (ВЛ-29)
+
+Гейт судил всё дерево одинаково и потому требовал чистить **первичный материал
+исследований**, который правило §9 велит хранить дословно, а правило §7 разрешает
+хранить прямо в репозитории. Решение владельца 24.09.2026 — разделить по контуру:
+публикуемый файл роняет прогон, внутренний даёт предупреждение. Граница берётся
+из публикатора (`tests/support/publication_scope.py`), а не переписана сюда.
+
 ## Почему гейт нужен, хотя публикатор данные не пропускает
 
 `tools/publish/finpilot_publish_public.sh` собирает зеркало по **белому списку**
@@ -54,11 +62,26 @@ gmail, mail.ru, yandex. Прежний гейт этого не видел **п�
 from __future__ import annotations
 
 import re
+import warnings
 from pathlib import Path
 
 import pytest
 
+from tests.support.publication_scope import is_published
+
 REPO_ROOT = Path(__file__).resolve().parents[1]
+
+# 🔴 ВЛ-29, решение владельца 24.09.2026 («сделай зелёными», вариант 3).
+# Одинаковая строгость ко всему дереву противоречила правилу §7 `CLAUDE.md`:
+# опубликованные в интернете материалы разрешено хранить и анализировать ВНУТРИ
+# репозитория, и единственный инвариант — наружу ничего не уходит. Поэтому:
+#
+#   - файл уезжает в зеркало  → находка ВАЛИТ прогон (как и было);
+#   - файл остаётся внутри    → находка печатается предупреждением.
+#
+# Граница не выписана здесь константой, а считана из публикатора
+# (`tests/support/publication_scope.py`) — копия белого списка разошлась бы молча.
+# Чистка самого корпуса запрещена правилом §9: первичный материал хранится дословно.
 
 # Сквозной проход: не список каталогов, а всё дерево минус заведомо чужое.
 # 🔴 Именно поэтому гейт находит то, чего не находил прежний: список каталогов
@@ -132,6 +155,30 @@ def _scanned_files() -> list[Path]:
     return files
 
 
+def _split_by_scope(offenders: list[str]) -> tuple[list[str], list[str]]:
+    """Разложить находки на публикуемые (жёстко) и внутренние (мягко)."""
+    published = sorted(name for name in offenders if is_published(name))
+    internal = sorted(name for name in offenders if not is_published(name))
+    return published, internal
+
+
+def _warn_about_corpus(kind: str, internal: list[str]) -> None:
+    """Внутренняя находка не роняет прогон, но и не молчит.
+
+    Молчание превратило бы гейт в украшение: следующая вахта не отличила бы
+    «корпус чист» от «корпус не проверяется».
+    """
+    if internal:
+        warnings.warn(
+            f"{kind}: {len(internal)} файл(ов) во внутреннем контуре — "
+            f"{', '.join(internal[:5])}"
+            + (f" и ещё {len(internal) - 5}" if len(internal) > 5 else "")
+            + " (правило §7: хранить можно, наружу не уходит)",
+            UserWarning,
+            stacklevel=2,
+        )
+
+
 def _read(path: Path) -> str:
     try:
         return path.read_text(encoding="utf-8")
@@ -170,9 +217,11 @@ class TestNoPersonalDataInTree:
             found = {a for a in EMAIL.findall(_read(path)) if _is_personal_email(a)}
             if found:
                 offenders[str(path.relative_to(REPO_ROOT))] = len(found)
-        assert not offenders, (
-            "в дереве лежат живые почтовые адреса — это персональные данные:\n  "
-            + "\n  ".join(f"{name}: {count} шт." for name, count in sorted(offenders.items()))
+        published, internal = _split_by_scope(list(offenders))
+        _warn_about_corpus("живые почтовые адреса", internal)
+        assert not published, (
+            "в ПУБЛИКУЕМЫХ файлах лежат живые почтовые адреса — это уедет наружу:\n  "
+            + "\n  ".join(f"{name}: {offenders[name]} шт." for name in published)
             + "\nОбезличить в источнике либо занести путь в PERSONAL_DATA_EXCEPTIONS "
               "С ПРИЧИНОЙ: фильтр публикатора закрывает один путь наружу, "
               "а чекпоинт-архив — другой."
@@ -187,7 +236,9 @@ class TestNoPersonalDataInTree:
         offenders = [
             str(p.relative_to(REPO_ROOT)) for p in _scanned_files() if pattern.search(_read(p))
         ]
-        assert not offenders, f"{name} найден в: {offenders}"
+        published, internal = _split_by_scope(offenders)
+        _warn_about_corpus(name, internal)
+        assert not published, f"{name} найден в публикуемых файлах: {published}"
 
 
 class TestExceptionsAreDisciplined:
@@ -270,3 +321,37 @@ class TestGateItselfWorks:
         scanned = {p.relative_to(REPO_ROOT).parts[0] for p in _scanned_files()}
         for expected in ("knowledge", "app", "frontend", "docs"):
             assert expected in scanned, f"сквозной проход не доходит до {expected}/"
+
+
+class TestScopeSplitIsHonest:
+    """🔴 Мягкость ограничена внутренним контуром и не молчит.
+
+    Разделение на жёсткое и мягкое — самый опасный вид послабления: оно выглядит
+    как работающий гейт, пока не окажется, что мягкими стали все находки сразу.
+    Поэтому проверяется и то, что публикуемое осталось жёстким, и то, что
+    внутреннее всё-таки сообщается.
+    """
+
+    def test_published_finding_stays_hard(self) -> None:
+        published, internal = _split_by_scope(
+            ["app/main.py", "docs/research/raw/corpus.md"]
+        )
+        assert published == ["app/main.py"]
+        assert internal == ["docs/research/raw/corpus.md"]
+
+    def test_corpus_finding_is_warned_not_swallowed(self) -> None:
+        with pytest.warns(UserWarning, match="внутреннем контуре"):
+            _warn_about_corpus("телефон", ["docs/research/raw/corpus.md"])
+
+    def test_clean_corpus_is_silent(self) -> None:
+        with warnings.catch_warnings():
+            warnings.simplefilter("error")
+            _warn_about_corpus("телефон", [])
+
+    def test_corpus_really_is_outside_the_contour(self) -> None:
+        """Опора всего послабления: корпус действительно не уезжает наружу.
+
+        Мутация «добавить `docs/research` в белый список публикатора» роняет тест
+        здесь — послабление обязано отвалиться вместе с основанием.
+        """
+        assert not is_published("docs/research/raw/bank_statement_corpus_2026-09-17.md")

@@ -1,1 +1,0 @@
-function e(e){let t=new Date(e);return Number.isNaN(t.getTime())?e:new Intl.DateTimeFormat(`ru-RU`,{day:`2-digit`,month:`2-digit`,year:`numeric`,timeZone:`UTC`}).format(t)}export{e as t};

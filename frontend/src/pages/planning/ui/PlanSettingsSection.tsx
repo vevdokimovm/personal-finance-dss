@@ -112,7 +112,8 @@ export function PlanSettingsSection({ planPending = false }: { planPending?: boo
       { risk_tolerance: currentRisk, l_min: currentLMin, r_bench: currentRBench },
       {
         onSuccess: () => toast.success(t("План пересчитан по новым параметрам")),
-        onError: (error) => toastMutationError(error, t("Не получилось сохранить параметры. Попробуйте ещё раз.")),
+        onError: (error) =>
+          toastMutationError(error, t("Не получилось сохранить параметры. Попробуйте ещё раз.")),
       },
     );
   }

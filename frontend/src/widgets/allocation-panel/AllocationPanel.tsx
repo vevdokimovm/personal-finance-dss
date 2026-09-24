@@ -183,9 +183,7 @@ export function AllocationPanel({
 
        Бэкенд присылает готовый текст причины по каждой отклонённой альтернативе
        (`filter_alternatives` → `violations`), и до этой правки фронт их не читал вовсе. */
-    const reasons = Array.from(
-      new Set((rejected ?? []).flatMap((a) => a.violations ?? [])),
-    );
+    const reasons = Array.from(new Set((rejected ?? []).flatMap((a) => a.violations ?? [])));
     return (
       <section className="fp-panel">
         <h2>{t("Плана распределения нет")}</h2>

@@ -6,7 +6,8 @@
 > `math_model.md` (v3.5.0), структура сущностей и слоёв устоялась.
 > Диаграммы построены **по коду** (`app/`), а не по намерению. Формат — Mermaid (рендерится
 > в GitHub и большинстве IDE). При изменении кода, влияющего на схему, диаграмму обновляем
-> в том же батче. **Синхронизировано с кодом: v5.12.0 (2026-07-02) — 28 таблиц, MFA, ingestion-пакет, cbr.ru.**
+> в том же батче. **Синхронизировано с кодом: v9.13.3 (2026-09-24) — 31 таблица, 28 групп роутов,
+> ingestion-пакет с `providers/`, кризисный режим в конвейере, прогноз по канону v3.10.0.**
 >
 > Содержание: [1. Архитектура слоёв](#1-архитектура-слоёв) ·
 > [2. Модель данных (ER)](#2-модель-данных-er) ·
@@ -31,8 +32,8 @@ flowchart TD
     Client["Браузер / API-клиент"]
 
     subgraph HTTP["app/api/ — HTTP-слой (FastAPI)"]
-        Routes["routes_*.py<br/>auth · transactions · planning · goals · obligations ·<br/>liquid_assets · banks · b2b · analytics · subscription · fx · demo"]
-        MW["middleware.py · _guards.py<br/>CSRF · rate-limit · security-заголовки"]
+        Routes["routes_*.py — 28 групп<br/>auth · mfa · transactions · budgets · categories · planning ·<br/>recommendation · goals · obligations · liquid_assets · analysis ·<br/>banks · plaid · export · households · referral · subscription ·<br/>notifications · consents · telegram · b2b · analytics ·<br/>experiments · telemetry · fx · i18n · demo · user_prefs"]
+        MW["middleware.py · _guards.py · _consent_guard.py<br/>CSRF · rate-limit · security-заголовки · гейт согласия"]
     end
 
     subgraph SVC["app/services/ — прикладные сервисы"]
@@ -45,18 +46,18 @@ flowchart TD
     end
 
     subgraph ING["app/ingestion/ — импорт выписок (отдельный пакет, ADR-005)"]
-        Parsers["statement_parser + семейные парсеры<br/>CSV · XLSX · PDF · 1C"]
+        Parsers["engine.py · contracts.py · models.py<br/>providers/ — manual · plaid<br/>форматы: CSV · XLSX · PDF · 1C"]
     end
 
     subgraph CORE["app/core/ — математическое ядро (чистые функции)"]
         direction LR
-        Pipeline["preprocessing · metrics · forecast ·<br/>alternatives · avalanche · goals_priority ·<br/>filtering · ranking · recommendation"]
-        Support["categorization · envelopes · money · spending_advice"]
+        Pipeline["preprocessing · metrics · forecast · alternatives ·<br/>avalanche · amortization · goals_priority ·<br/>filtering · ranking · recommendation"]
+        Support["crisis · surplus · investment · envelopes ·<br/>categorization · category_rules · money ·<br/>spending_advice · legal · experiments"]
     end
 
     subgraph DATA["app/database/ — данные"]
-        CRUD["crud.py"]
-        Models["models.py (SQLAlchemy 2.0) — 28 таблиц"]
+        CRUD["crud.py · revocation.py · mfa_store.py"]
+        Models["models.py (SQLAlchemy 2.0) — 31 таблица<br/>types.py — шифрование ПДн в покое"]
         DB[("PostgreSQL / SQLite")]
     end
 
@@ -79,9 +80,9 @@ flowchart TD
 
 ---
 
-## 2. Модель данных (ER) — 28 таблиц
+## 2. Модель данных (ER) — 31 таблица
 
-Полная схема (все 28 таблиц из `app/database/models.py`). Два хаба владения: `users`
+Полная схема (все 31 таблица из `app/database/models.py`). Два хаба владения: `users`
 (почти у всех таблиц `user_id`; гость = `user_id IS NULL`) и `households` (семейные бюджеты,
 общий `household_id`). `transactions`/`obligations`/`goals`/`liquid_assets` несут soft-delete.
 Историю несут `obligation_payments`/`goal_contributions`. Инфраструктурные таблицы
@@ -104,6 +105,8 @@ erDiagram
     users ||--o{ mfa_recovery_codes : "MFA-коды"
     users ||--o{ mfa_pending_attempts : "счётчик попыток MFA"
     users ||--o{ plaid_tokens : "Open Banking"
+    users ||--o{ user_consents : "согласия 152-ФЗ (по типам и редакциям)"
+    users ||--o{ plan_advice_events : "советы по расходам: показ и реакция"
     users ||--o{ households : "владеет (owner)"
     users ||--o{ household_memberships : "участие"
 
@@ -326,7 +329,9 @@ flowchart TD
 
     S1["1 · Препроцессинг<br/><code>preprocessing.py</code><br/>агрегация, очистка, валюта"]
     S2["2 · Базовые метрики<br/><code>metrics.py</code><br/>CF → Rt=CF−ΣP · Lt=B_liq/Σe (мес) · Dt=ПДН · BLR"]
-    S3["3 · Прогноз<br/><code>forecast.py</code><br/>SES + Monte-Carlo, интервал 80% [p10..p90]"]
+    Crisis{"Rt ≥ 0 ?"}
+    CR["Кризисный режим<br/><code>crisis.py</code> (канон §12)<br/>план действий вместо распределения"]
+    S3["3 · Прогноз<br/><code>forecast.py</code><br/>SES α=0.3 без тренда; коридор p10–p90<br/>от разброса собственного потока (канон v3.10.0)"]
     S4["4 · Предобработка B_liq<br/><code>goals_priority.py</code>"]
     S5["5 · Генерация альтернатив<br/><code>alternatives.py</code><br/>stars-and-bars, шаг 10% → 66 комбинаций"]
     S6["6 · Оценка вариантов<br/><code>avalanche.py</code> (Debt Avalanche + OCR) +<br/><code>goals_priority.py</code> (цели: категория × срочность)"]
@@ -335,7 +340,9 @@ flowchart TD
     S9["9 · Объяснение<br/><code>recommendation.py</code><br/>лучшее распределение + обоснование + топ-3"]
     Out["План: Rt/Lt/Dt/BLR · распределение · прогноз · альтернативы"]
 
-    In --> S1 --> S2 --> S3 --> S4 --> S5 --> S6 --> S7 --> S8 --> S9 --> Out
+    In --> S1 --> S2 --> Crisis
+    Crisis -- "нет" --> CR --> Out
+    Crisis -- "да" --> S3 --> S4 --> S5 --> S6 --> S7 --> S8 --> S9 --> Out
 ```
 
 ---
@@ -619,7 +626,7 @@ flowchart TD
     subgraph VPS["VPS (РФ-юрисдикция)"]
         N["nginx<br/>TLS-терминация · статика · gzip ·<br/>лимиты соединений"]
         A["uvicorn × N воркеров<br/>FastAPI-приложение"]
-        PG[("PostgreSQL<br/>28 таблиц + кэш ставки ЦБ")]
+        PG[("PostgreSQL<br/>31 таблица + кэш ставки ЦБ")]
         CRON["cron<br/>ночной pg_dump 03:00 ·<br/>ротация retention"]
         N -->|proxy_pass| A
         A --> PG

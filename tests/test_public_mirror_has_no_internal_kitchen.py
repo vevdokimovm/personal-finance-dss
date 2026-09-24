@@ -39,6 +39,8 @@ from pathlib import Path
 
 import pytest
 
+from tests.support.publication_scope import is_published
+
 REPO_ROOT = Path(__file__).resolve().parents[1]
 
 # Каталоги, которые публикатор копирует в зеркало целиком (`ALLOW_DIRS`).
@@ -69,13 +71,6 @@ EXCEPTIONS: dict[str, str] = {
     "tests/test_public_mirror_has_no_internal_kitchen.py": (
         "сам гейт: перечисляет запрещённую лексику, иначе не может её искать"
     ),
-    "tests/test_block_relative_read_path.py": (
-        "тест хука рабочей станции: хук существует только внутри приватного контура"
-    ),
-    "tests/test_websearch_budget_hook.py": (
-        "тест хука рабочей станции: гейт бюджета веб-поиска живёт в приватном контуре "
-        "и к продукту отношения не имеет — как и хук PIT-018 выше"
-    ),
     "tests/test_no_personal_data_in_tree.py": (
         "не публикуется вовсе: занесён в DENY_NAME_PATTERNS публикатора — по построению "
         "называет каталог с живыми ПДн, и это его рабочие данные, а не оплошность"
@@ -96,23 +91,12 @@ DENIED_BY_PUBLISHER = (
 )
 
 
-# Тесты внутренних инструментов в зеркало не уезжают: каталог `tools/` не публикуется,
-# а тест кода, которого в зеркале нет, — ссылка в никуда. Публикатор считает этот список
-# по факту импорта, поэтому здесь то же правило, а не копия списка имён.
-# 🔴 Ловится и СТРОКОВАЯ ссылка на пакет. Тест, обращающийся к инструменту через
-# `importlib.import_module(f"{PACKAGE}.{name}")`, буквального импорта не содержит
-# вовсе — и считался публикуемым, хотя предмета его проверки в зеркале нет.
-# Поймано этим же гейтом: такой файл назвал каталог с живыми ПДн.
-_IMPORTS_TOOLS = re.compile(r"""(from|import) tools[. ]|["']tools\.""")
-
-
-def _tests_internal_tooling(path: Path) -> bool:
-    if path.suffix != ".py" or "tests" not in path.parts:
-        return False
-    try:
-        return bool(_IMPORTS_TOOLS.search(path.read_text(encoding="utf-8")))
-    except UnicodeDecodeError:
-        return False
+# Граница «уедет / не уедет» считается ОДНИМ модулем на все гейты:
+# `tests/support/publication_scope.py` разбирает белые списки публикатора и применяет
+# два механических правила отсева внутри `tests/` — тест внутреннего инструмента
+# (ссылка на `tools.`) и тест хука рабочей станции (ссылка на `.claude`). Оба предмета
+# в зеркале отсутствуют, значит тест на них — ссылка в никуда. Прежде правило жило
+# копией регулярки здесь и списком имён в `EXCEPTIONS`; копия расходилась молча.
 
 
 def _published_files() -> list[Path]:
@@ -126,7 +110,9 @@ def _published_files() -> list[Path]:
                 continue
             if SKIP_PARTS & set(path.relative_to(REPO_ROOT).parts):
                 continue
-            if _tests_internal_tooling(path):
+            # 🔴 Один источник границы на все гейты: белые списки публикатора
+            # плюс механический отсев внутри `tests/` (инструменты и хуки).
+            if not is_published(str(path.relative_to(REPO_ROOT))):
                 continue
             found.append(path)
     return found
@@ -204,6 +190,23 @@ class TestExceptionsAreDisciplined:
                 f"{rel} исключён как «не публикуется», но публикатор его не запрещает — "
                 "исключение держится на словах"
             )
+
+    def test_publisher_really_drops_tests_of_workstation_hooks(self) -> None:
+        """🔴 Тест хука рабочей станции в зеркало не уезжает — и это механизм.
+
+        Хуки живут в `.claude/`: контура рабочей станции в зеркале нет вовсе, значит
+        и тестам его там делать нечего. До v9.13.3 это держалось на списке имён
+        в `EXCEPTIONS`: каждый новый хук добавлял строку, а забытая строка давала
+        красный гейт на ровном месте — ровно так и вышло с тремя тестами гейтов
+        поиска (ВЛ-29). Теперь правило считается по факту ссылки, как и для `tools/`.
+        """
+        script = PUBLISHER.read_text(encoding="utf-8")
+        assert ".claude" in script, (
+            "публикатор больше не отсекает тесты хуков рабочей станции, "
+            "а гейт считает, что отсекает"
+        )
+        for name in ("test_watch_identity_hook.py", "test_exa_gate_hook.py"):
+            assert not is_published(f"tests/{name}"), f"{name} снова считается публикуемым"
 
     def test_publisher_really_drops_tests_of_internal_tooling(self) -> None:
         """🔴 Правило «предмет не публикуется — тест тоже» держится на публикаторе.

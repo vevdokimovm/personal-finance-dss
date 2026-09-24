@@ -63,7 +63,8 @@ export function PlanHistorySection() {
           setNote("");
           toast.success(t("План сохранён в историю"));
         },
-        onError: (error) => toastMutationError(error, t("Не получилось сохранить план. Попробуйте ещё раз.")),
+        onError: (error) =>
+          toastMutationError(error, t("Не получилось сохранить план. Попробуйте ещё раз.")),
       },
     );
   }
@@ -81,11 +82,16 @@ export function PlanHistorySection() {
         toast.undo(t("Снимок удалён"), () =>
           restore.mutate(snapshot.id, {
             onSuccess: () => toast.success(t("Снимок восстановлен")),
-            onError: (error) => toastMutationError(error, t("Не получилось восстановить снимок. Попробуйте ещё раз.")),
+            onError: (error) =>
+              toastMutationError(
+                error,
+                t("Не получилось восстановить снимок. Попробуйте ещё раз."),
+              ),
           }),
         );
       },
-      onError: (error) => toastMutationError(error, t("Не получилось удалить снимок. Попробуйте ещё раз.")),
+      onError: (error) =>
+        toastMutationError(error, t("Не получилось удалить снимок. Попробуйте ещё раз.")),
     });
   }
 

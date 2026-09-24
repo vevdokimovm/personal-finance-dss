@@ -39,11 +39,26 @@
 from __future__ import annotations
 
 import re
+import warnings
 from pathlib import Path
 
 import pytest
 
+from tests.support.publication_scope import is_published
+
 REPO_ROOT = Path(__file__).resolve().parents[1]
+
+# 🔴 ВЛ-29: внутри репозитория материал лежать может (правило §7 инструкций проекта),
+# наружу не уходит ничего. Поэтому находка судится по контуру: публикуемый файл —
+# падение, внутренний — предупреждение. Граница считана из публикатора, а не
+# переписана сюда (`tests/support/publication_scope.py`).
+
+# Телефон физлица в РФ — мобильный (код 9xx). Городской номер вида +7 495 500-55-50
+# в выписке банка — это опубликованная горячая линия организации, а не персональные
+# данные; ранняя редакция шаблона ловила её и требовала «обезличить» реквизит,
+# напечатанный банком на собственном бланке. Шаблон сведён к тому же виду, что
+# у соседнего гейта (`test_no_personal_data_in_tree.py::PHONE_RU`).
+PHONE_RU_MOBILE = re.compile(r"\+7\s?\(?9\d{2}\)?\s?\d{3}[- ]?\d{2}[- ]?\d{2}")
 
 SCANNED_DIRS = ["app", "tests", "tools", "scripts", "docs", "nginx", "alembic", "deploy"]
 
@@ -99,6 +114,26 @@ def _read(path: Path) -> str:
         return ""
 
 
+def _split_by_scope(hits: list[str]) -> tuple[list[str], list[str]]:
+    """Находки вида `путь:строка` — на публикуемые (жёстко) и внутренние (мягко)."""
+    published = [hit for hit in hits if is_published(hit.rsplit(":", 1)[0])]
+    internal = [hit for hit in hits if not is_published(hit.rsplit(":", 1)[0])]
+    return published, internal
+
+
+def _warn_about_corpus(kind: str, internal: list[str]) -> None:
+    """Внутренняя находка не роняет прогон, но и не молчит."""
+    if internal:
+        warnings.warn(
+            f"{kind}: {len(internal)} совпадение(й) во внутреннем контуре — "
+            f"{', '.join(internal[:5])}"
+            + (f" и ещё {len(internal) - 5}" if len(internal) > 5 else "")
+            + " (правило §7: хранить можно, наружу не уходит)",
+            UserWarning,
+            stacklevel=2,
+        )
+
+
 def _luhn(digits: str) -> bool:
     """Проходит ли последовательность цифр проверку Луна.
 
@@ -140,7 +175,13 @@ class TestNoSecretsInTree:
 
 
 class TestNoPersonalDataInTree:
-    """🔴 Работа идёт на синтетике — правило проекта; проверяем, что так и есть."""
+    """Персональные данные не уезжают наружу.
+
+    🔴 Прежняя формулировка («работа идёт на синтетике») устарела: правило §7 проекта
+    прямо разрешает хранить и анализировать опубликованные в открытом доступе материалы
+    внутри репозитория. Проверяется поэтому не чистота дерева, а **граница**: находка
+    в публикуемом файле валит прогон, находка во внутреннем — печатается предупреждением.
+    """
 
     def test_no_card_numbers(self) -> None:
         """Номер карты проверяется алгоритмом Луна, а не длиной."""
@@ -151,7 +192,9 @@ class TestNoPersonalDataInTree:
                 if _luhn(match.group()):
                     line = text.count("\n", 0, match.start()) + 1
                     hits.append(f"{path.relative_to(REPO_ROOT)}:{line}")
-        assert not hits, f"похоже на номер карты: {', '.join(hits[:5])}"
+        published, internal = _split_by_scope(hits)
+        _warn_about_corpus("номер карты", internal)
+        assert not published, f"похоже на номер карты: {', '.join(published[:5])}"
 
     def test_no_russian_phone_numbers_in_docs(self) -> None:
         """Телефоны в документах и отчётах.
@@ -166,13 +209,15 @@ class TestNoPersonalDataInTree:
             if relative.parts[0] not in {"docs", "tests"}:
                 continue
             text = _read(path)
-            for match in re.finditer(r"\+7\s?\(?\d{3}\)?\s?\d{3}[- ]?\d{2}[- ]?\d{2}", text):
+            for match in PHONE_RU_MOBILE.finditer(text):
                 head = text[max(0, match.start() - 80):match.start()].lower()
                 if any(hint in head for hint in PLACEHOLDER_HINTS):
                     continue
                 line = text.count("\n", 0, match.start()) + 1
                 hits.append(f"{relative}:{line}")
-        assert not hits, f"похоже на реальный телефон: {', '.join(hits[:5])}"
+        published, internal = _split_by_scope(hits)
+        _warn_about_corpus("телефон", internal)
+        assert not published, f"похоже на реальный телефон: {', '.join(published[:5])}"
 
 
 class TestGateItselfWorks:
@@ -210,3 +255,32 @@ class TestGateItselfWorks:
         """Заглушки в примерах не считаются утечкой — иначе `.env.example` был бы красным."""
         line = "DATABASE_URL=postgres" + "ql://finpilot:changeme@db:5432/finpilot"
         assert any(hint in line.lower() for hint in PLACEHOLDER_HINTS)
+
+    def test_phone_pattern_catches_a_mobile_number(self) -> None:
+        """Мобильный номер — персональные данные, шаблон обязан его видеть."""
+        # Слово example в той же строке обязательно: гейт сканирует и этот файл,
+        # а образец без него неотличим от настоящего номера (PIT-026).
+        assert PHONE_RU_MOBILE.search("example +7 916 123 45 67")
+
+    def test_phone_pattern_ignores_an_organisation_hotline(self) -> None:
+        """🔴 Горячая линия банка на его же бланке — реквизит, а не ПДн.
+
+        Ровно этот номер держал гейт красным: фикстура выписки печатает телефон
+        поддержки, и требование «обезличить» его лишено смысла.
+        """
+        assert not PHONE_RU_MOBILE.search("900     +7 495 500-55-50     www.sberbank.ru")
+
+
+class TestScopeSplitIsHonest:
+    """Мягкость ограничена внутренним контуром и не молчит."""
+
+    def test_published_hit_stays_hard(self) -> None:
+        published, internal = _split_by_scope(
+            ["app/main.py:10", "docs/research/raw/corpus.md:42"]
+        )
+        assert published == ["app/main.py:10"]
+        assert internal == ["docs/research/raw/corpus.md:42"]
+
+    def test_corpus_hit_is_warned(self) -> None:
+        with pytest.warns(UserWarning, match="внутреннем контуре"):
+            _warn_about_corpus("номер карты", ["docs/research/raw/corpus.md:42"])

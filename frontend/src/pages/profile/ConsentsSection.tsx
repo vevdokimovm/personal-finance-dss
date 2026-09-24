@@ -78,8 +78,8 @@ export function ConsentsSection() {
           }
         >
           {t(
-            "Управление согласиями временно недоступно. Ваши согласия при этом не изменились — "
-            + "повторите попытку или напишите в поддержку.",
+            "Управление согласиями временно недоступно. Ваши согласия при этом не изменились — " +
+              "повторите попытку или напишите в поддержку.",
           )}
         </StatePanel>
       </section>
@@ -90,7 +90,8 @@ export function ConsentsSection() {
     if (grant.isPending) return;
     grant.mutate(type, {
       onSuccess: () => statusRefs.current[type]?.focus(),
-      onError: (error) => toastMutationError(error, t("Не получилось сохранить согласие. Попробуйте ещё раз.")),
+      onError: (error) =>
+        toastMutationError(error, t("Не получилось сохранить согласие. Попробуйте ещё раз.")),
     });
   }
 
@@ -103,11 +104,13 @@ export function ConsentsSection() {
         // шесть роутеров разом (_FIN, app/api/router.py) — отменяемость важна не меньше.
         toast.undo(t("Согласие «{name}» отозвано.", { name: label(type) }), () => {
           grant.mutate(type, {
-            onError: (error) => toastMutationError(error, t("Не получилось восстановить согласие.")),
+            onError: (error) =>
+              toastMutationError(error, t("Не получилось восстановить согласие.")),
           });
         });
       },
-      onError: (error) => toastMutationError(error, t("Не получилось отозвать согласие. Попробуйте ещё раз.")),
+      onError: (error) =>
+        toastMutationError(error, t("Не получилось отозвать согласие. Попробуйте ещё раз.")),
     });
   }
 
@@ -201,9 +204,7 @@ export function ConsentsSection() {
                     })}
                     onClick={() => handleGrant(type)}
                   >
-                    {grant.isPending
-                      ? t("Подтверждаем…")
-                      : t("Подтвердить новую редакцию")}
+                    {grant.isPending ? t("Подтверждаем…") : t("Подтвердить новую редакцию")}
                   </Button>
                 )}
                 {state.granted ? (

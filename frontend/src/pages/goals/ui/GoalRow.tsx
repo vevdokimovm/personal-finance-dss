@@ -48,11 +48,13 @@ export function GoalRow({
         toast.undo(t("Цель «{name}» удалена.", { name }), () => {
           restoreGoal.mutate(goal.id, {
             onSuccess: () => toast.success(t("Цель «{name}» восстановлена.", { name })),
-            onError: (error) => toastMutationError(error, t("Не получилось восстановить. Попробуйте ещё раз.")),
+            onError: (error) =>
+              toastMutationError(error, t("Не получилось восстановить. Попробуйте ещё раз.")),
           });
         });
       },
-      onError: (error) => toastMutationError(error, t("Не получилось удалить. Попробуйте ещё раз.")),
+      onError: (error) =>
+        toastMutationError(error, t("Не получилось удалить. Попробуйте ещё раз.")),
     });
   }
 
