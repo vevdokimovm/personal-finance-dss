@@ -148,6 +148,12 @@ jobs:
           coverage report
       - name: E2E-smoke (chromium)
         run: |
+          # 🔴 Раннер несёт apt-репозиторий Microsoft, который 24.09.2026 начал отдавать
+          # 403 Forbidden («The repository ... is no longer signed»). `--with-deps` зовёт
+          # `apt-get update`, тот выходит ненулевым — и установка браузеров падает с кодом 100,
+          # унося джобу целиком. К нашему коду отношения не имеет; снимаем чужой источник
+          # перед установкой. Список и ключ удаляются оба: без ключа apt ругается снова.
+          sudo rm -f /etc/apt/sources.list.d/microsoft-prod.list /etc/apt/trusted.gpg.d/microsoft.gpg || true
           playwright install --with-deps chromium
           pytest -m e2e --browser chromium
 
@@ -223,14 +229,24 @@ jobs:
       - name: mypy
         run: mypy app --config-file=.mypy.ini
 
-  # ── pylint: информационно, отдельным job, чтобы его красное не валило блокирующий
-  #    выше и было видно, что именно он информационный.
+  # ── pylint: ХРАПОВИК по оценке, а не «информационно». ──────────────────────
+  # 🔴 Изменено 24.09.2026 по требованию владельца «зелёный гейт в CI целиком».
+  # Прежняя схема (`continue-on-error: true`) давала вечный красный крестик в списке
+  # проверок при зелёном прогоне: формально не блокирует, фактически — постоянный шум,
+  # на фоне которого настоящее красное неотличимо от привычного. Это тот же класс,
+  # что молчаливый пропуск: индикатор, который всегда в одном положении, не индикатор.
+  #
+  # Теперь джоба — настоящий гейт с порогом: `--fail-under` держит достигнутую оценку
+  # и падает при регрессе. Порог **только растёт**: улучшили код — подняли число здесь
+  # тем же батчем. Оценка на 24.09.2026 — 9.61/10 (231 замечание, крупнейшие классы:
+  # R0913/R0914 слишком много аргументов и локальных, C0415 импорт не наверху,
+  # R0801 дублирование). Довести до 10/10 — отдельная задача, она не отменяется
+  # этим порогом, а получает защиту от отката.
   pylint:
-    name: pylint (информационно)
+    name: pylint (храповик оценки)
     if: github.event_name == 'push' || github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    continue-on-error: true
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -241,8 +257,9 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt -r requirements-dev.txt
-      - name: pylint
-        run: pylint app --rcfile=.pylintrc
+      # Порог держит достигнутое и падает при регрессе; список замечаний остаётся в логе.
+      - name: pylint (порог 9.6 — только вверх)
+        run: pylint app --rcfile=.pylintrc --fail-under=9.6
 
   # ── (2) ПОЛНЫЙ — на тегах vX.Y.Z и вручную. Здесь CDN Playwright доступен, ──
   #    поэтому реально гоняются firefox и webkit (в песочнице CDN заблокирован).
@@ -264,7 +281,14 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt -r requirements-dev.txt pillow
       - name: Установка браузеров (chromium + firefox + webkit)
-        run: playwright install --with-deps chromium firefox webkit
+        run: |
+          # 🔴 Раннер несёт apt-репозиторий Microsoft, который 24.09.2026 начал отдавать
+          # 403 Forbidden («The repository ... is no longer signed»). `--with-deps` зовёт
+          # `apt-get update`, тот выходит ненулевым — и установка браузеров падает с кодом 100,
+          # унося джобу целиком. К нашему коду отношения не имеет; снимаем чужой источник
+          # перед установкой. Список и ключ удаляются оба: без ключа apt ругается снова.
+          sudo rm -f /etc/apt/sources.list.d/microsoft-prod.list /etc/apt/trusted.gpg.d/microsoft.gpg || true
+          playwright install --with-deps chromium firefox webkit
       # 🔴 Node и сборка фронта — ДО pytest, а не после (исправлено v9.1.0).
       # Здесь они стояли ниже E2E, поэтому `frontend/dist` не существовал, сервер
       # `tests/e2e/conftest.py` отдавал 404 на `/`, не проходил проверку готовности —
@@ -290,7 +314,14 @@ jobs:
         run: pytest -m full --browser chromium
       - name: Фронт — браузеры Playwright (мультибраузер, как и бэк-E2E)
         working-directory: frontend
-        run: npx playwright install --with-deps chromium firefox webkit
+        run: |
+          # 🔴 Раннер несёт apt-репозиторий Microsoft, который 24.09.2026 начал отдавать
+          # 403 Forbidden («The repository ... is no longer signed»). `--with-deps` зовёт
+          # `apt-get update`, тот выходит ненулевым — и установка браузеров падает с кодом 100,
+          # унося джобу целиком. К нашему коду отношения не имеет; снимаем чужой источник
+          # перед установкой. Список и ключ удаляются оба: без ключа apt ругается снова.
+          sudo rm -f /etc/apt/sources.list.d/microsoft-prod.list /etc/apt/trusted.gpg.d/microsoft.gpg || true
+          npx playwright install --with-deps chromium firefox webkit
       - name: Фронт — E2E
         working-directory: frontend
         run: npm run test:e2e -- --project=chromium --project=firefox --project=webkit
