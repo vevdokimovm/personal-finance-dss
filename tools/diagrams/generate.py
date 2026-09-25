@@ -34,6 +34,7 @@ from xml.sax.saxutils import escape
 
 REPO = Path(__file__).resolve().parents[2]
 DIAGRAMS = REPO / "docs/diagrams"
+SOURCES = DIAGRAMS / "src"
 
 COLUMN_WIDTH = 210
 ROW_HEIGHT = 34
@@ -400,10 +401,141 @@ def _render_dot(dot_text: str, target: Path) -> bool:
     return True
 
 
+# ─────────────────────────────────────────────────────────────────────────────
+# Смысловые диаграммы, написанные КОДОМ.
+#
+# 🔴 Они не выводятся из дерева исходников автоматически — их содержание задаёт
+# человек. Но храниться они должны так же, как структурные: текстом, который
+# диффится и рендерится одной командой. Иначе повторяется история v6.8.0 →
+# v9.13.23, когда `05_c4_container` десять версий описывала «Jinja2 + ванильный JS»
+# после того, как Jinja была снесена целиком, а `15_forecast_GOST` — «оценку
+# тренда b», отменённую каноном v3.10.0 по замеру на 300 портретах.
+# ─────────────────────────────────────────────────────────────────────────────
+
+def context_dot() -> str:
+    """C4 Level 1: система и её внешнее окружение.
+
+    Внешние системы перечислены по факту кода: `cbr_rate`/`cbr_fx` (ЦБ РФ),
+    `telegram`, `plaid`, `email_dispatch`. Прежняя редакция знала только
+    пользователя и банк — четыре интеграции появились после неё и в контекст
+    не попали.
+    """
+    return """digraph context {
+  graph [rankdir=LR, fontname="Helvetica", labelloc=t, fontsize=17,
+         label="FINPILOT — контекст системы (C4 Level 1)", nodesep=0.5, ranksep=1.4];
+  node [fontname="Helvetica", fontsize=11, style="rounded,filled"];
+  edge [color="#9aa4b1", fontname="Helvetica", fontsize=9];
+
+  user [label="Пользователь\\n[человек]", shape=box, fillcolor="#dae8fc", color="#6c8ebf"];
+  fin  [label="FINPILOT\\n[СППР]\\nраспределение потока\\nдолг / резерв / цели",
+        shape=box, fillcolor="#1f6feb", fontcolor=white,
+        color="#1a4f9c", width=2.8];
+
+  bank  [label="Банк клиента\\nвыписка CSV/XLSX/PDF/1C", shape=box,
+           fillcolor="#f5f5f5", color="#999999"];
+  cbr   [label="ЦБ РФ\\nключевая ставка, курсы валют", shape=box,
+           fillcolor="#f5f5f5", color="#999999"];
+  plaid [label="Plaid\\nагрегатор счетов (каркас)", shape=box,
+           fillcolor="#f5f5f5", color="#999999"];
+  tg    [label="Telegram\\nуведомления в чат", shape=box, fillcolor="#f5f5f5", color="#999999"];
+  mail  [label="Почтовый сервер\\nписьма и подтверждения", shape=box,
+           fillcolor="#f5f5f5", color="#999999"];
+
+  user -> fin [label="вводит данные,\\nполучает рекомендации [HTTPS]"];
+  bank -> fin [label="импорт выписки"];
+  cbr -> fin [label="ставка и курсы [HTTP+XML]"];
+  plaid -> fin [label="счета и операции [REST]"];
+  fin -> tg [label="уведомление"];
+  fin -> mail [label="письмо [SMTP]"];
+}
+"""
+
+
+def container_dot() -> str:
+    """C4 Level 2: контейнеры.
+
+    🔴 Прежняя редакция описывала фронт как «Jinja2 + ванильный JS, 7 страниц».
+    Jinja снесена целиком (веха 8): приложение отдаёт собранный React из
+    `frontend/dist` через `StaticFiles`, страниц 14.
+    """
+    return """digraph container {
+  graph [rankdir=TB, fontname="Helvetica", labelloc=t, fontsize=17,
+         label="FINPILOT — контейнеры (C4 Level 2)", nodesep=0.45, ranksep=0.9];
+  node [fontname="Helvetica", fontsize=11, style="rounded,filled", shape=box];
+  edge [color="#9aa4b1", fontname="Helvetica", fontsize=9];
+
+  user [label="Пользователь\\n[человек]", fillcolor="#dae8fc", color="#6c8ebf"];
+
+  subgraph cluster_app {
+    label="FINPILOT"; fontname="Helvetica"; fontsize=12; color="#6c8ebf"; style=dashed;
+    spa [label="SPA\\n[React 19 + TypeScript + Vite]\\n14 страниц, TanStack Router/Query",
+         fillcolor="#85BBF0", color="#6c8ebf", width=2.6];
+    api [label="HTTP-слой\\n[FastAPI, 27 групп роутов]\\nCSRF, rate-limit, гейт согласия",
+         fillcolor="#85BBF0", color="#6c8ebf", width=2.6];
+    svc [label="Сервисы\\n[26 модулей]\\nпланирование, импорт, уведомления",
+         fillcolor="#d5e8d4", color="#82b366", width=2.6];
+    core [label="Математическое ядро\\n[21 модуль, канон v3.10.0]\\nчистые функции: ни БД, ни HTTP",
+          fillcolor="#ffe6cc", color="#d79b00", width=2.6];
+    db [label="База данных\\n[PostgreSQL / SQLite]\\n31 таблица, SQLAlchemy 2.0",
+        shape=cylinder, fillcolor="#f8cecc", color="#b85450", width=2.2];
+  }
+
+  user -> spa [label="HTTPS"];
+  spa -> api [label="JSON/REST"];
+  api -> svc [label="вызывает"];
+  svc -> core [label="делегирует расчёт"];
+  svc -> db [label="читает/пишет [ORM]"];
+  api -> spa [label="отдаёт сборку\\nfrontend/dist [StaticFiles]", style=dashed];
+}
+"""
+
+
+def forecast_dot() -> str:
+    """Схема прогноза по канону v3.10.0.
+
+    🔴 Прежняя редакция содержала «Этап 2. Оценка тренда b по сглаженным уровням».
+    Канон v3.10.0 тренд ОТМЕНИЛ: замер Г43 на 300 портретах показал ошибку суммы
+    0.606 против 0.205 у простого среднего при трёх точках — последнее место
+    из четырнадцати методов. `holt_forecast` остался в модуле как проверенная
+    реализация, но `forecast_indicator` его не вызывает.
+    """
+    return """digraph forecast {
+  graph [rankdir=TB, fontname="Helvetica", labelloc=t, fontsize=16,
+         label="FINPILOT — прогноз показателя (канон v3.10.0): SES без тренда + Монте-Карло",
+         nodesep=0.35, ranksep=0.55];
+  node [fontname="Helvetica", fontsize=11, style="rounded,filled",
+        fillcolor="#e1f5e1", color="#82b366", shape=box, width=3.4];
+  edge [color="#9aa4b1", arrowsize=0.7];
+
+  s0 [label="Вход: ряд history, горизонт h\\nα = 0.3, N = 1000",
+      fillcolor="#dae8fc", color="#6c8ebf"];
+  s1 [label="1. Сглаживание (Brown SES)\\nLt = α·yt + (1−α)·Lt−1"];
+  s2 [label="2. Точечный прогноз — ПЛОСКИЙ\\nŷ(t+h) = Lt для всех h\\nтренда НЕТ (канон §15)",
+      fillcolor="#fff2cc", color="#d6b656"];
+  s3 [label="3. Монте-Карло: N = 1000 траекторий\\nс растущей σ(h)"];
+  s4 [label="4. Перцентили по ансамблю\\np10, p50, p90 — интервал 80 %"];
+  s5 [label="Выход: точечный прогноз\\nи коридор [p10..p90]", fillcolor="#dae8fc", color="#6c8ebf"];
+
+  note [label="Holt отменён в v3.10.0:\\nзамер Г43: ошибка 0.606\\nпротив 0.205 (3 точки)",
+        shape=note, fillcolor="#f8cecc", color="#b85450", fontsize=10, width=3.2];
+
+  s0 -> s1 -> s2 -> s3 -> s4 -> s5;
+  s2 -> note [style=dashed, arrowhead=none, color="#b85450"];
+}
+"""
+
+
+AUTHORED = {
+    "04_c4_context.drawio.png": context_dot,
+    "05_c4_container.drawio.png": container_dot,
+    "15_forecast_GOST.drawio.png": forecast_dot,
+}
+
 PREVIEWS = {
     "10_er_database.drawio.png": ("dot", er_dot),
     "06_c4_component.drawio.png": ("svg", svg_component),
     "14_dependency_graph.drawio.png": ("dot", dependency_dot),
+    **{name: ("dot", builder) for name, builder in AUTHORED.items()},
 }
 
 
@@ -418,6 +550,19 @@ def main() -> int:
     for filename, builder in GENERATED.items():
         (DIAGRAMS / filename).write_text(builder(), encoding="utf-8")
         print(f"  собрано: {filename}")
+
+    # 🔴 Источник смысловых диаграмм — DOT, и он кладётся рядом. Без этого PNG
+    # обновлялся бы, а `.drawio` оставался со старым содержанием: источник
+    # противоречил бы превью, что хуже устаревшей пары целиком.
+    SOURCES.mkdir(parents=True, exist_ok=True)
+    for name, builder in AUTHORED.items():
+        stem = name.removesuffix(".drawio.png")
+        (SOURCES / f"{stem}.dot").write_text(builder(), encoding="utf-8")
+        stale = DIAGRAMS / f"{stem}.drawio"
+        if stale.exists():
+            stale.unlink()
+            print(f"  снят устаревший источник: {stale.name} "
+                  f"(заменён на src/{stem}.dot)")
 
     failures = []
     for name, (kind, builder) in PREVIEWS.items():

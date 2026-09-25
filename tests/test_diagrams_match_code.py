@@ -111,3 +111,52 @@ class TestGateItself:
 
     def test_missing_detects_absence(self) -> None:
         assert _missing(["заведомо-отсутствующая-сущность"], "10_er_database.drawio")
+
+
+class TestNoDeadTechnologyOnDiagrams:
+    """🔴 Диаграмма не вправе упоминать то, чего в коде больше нет.
+
+    Замер 25.09.2026: `05_c4_container` десять версий описывала фронт как
+    «Jinja2 + ванильный JS, 7 страниц» — после того, как Jinja была снесена целиком
+    (веха 8), а приложение стало отдавать собранный React. `15_forecast_GOST`
+    содержала «Этап 2. Оценка тренда b», отменённый каноном v3.10.0 по замеру Г43
+    на 300 портретах (ошибка 0.606 против 0.205 у простого среднего).
+
+    Это опаснее устаревшего списка сущностей: список молчит о новом, а мёртвая
+    технология УТВЕРЖДАЕТ неверное. Читающий поймёт архитектуру и модель неправильно
+    и будет уверен, что понял правильно.
+    """
+
+    # Признак и условие, при котором он считается мёртвым.
+    DEAD = {
+        "Jinja": "app/templates",  # снесён вместе с каталогом шаблонов
+    }
+
+    def _sources(self) -> list[Path]:
+        return sorted(DIAGRAMS.glob("*.drawio")) + sorted((DIAGRAMS / "src").glob("*.dot"))
+
+    def test_dead_technology_is_not_mentioned(self) -> None:
+        offenders: list[str] = []
+        for token, evidence in self.DEAD.items():
+            if (REPO / evidence).exists():
+                continue  # технология жива — упоминать можно
+            for path in self._sources():
+                if token.lower() in path.read_text(encoding="utf-8").lower():
+                    offenders.append(f"{path.name} упоминает {token}")
+        assert not offenders, (
+            "диаграммы описывают снесённую технологию: " + "; ".join(offenders)
+        )
+
+    def test_forecast_diagram_has_no_trend(self) -> None:
+        """Канон v3.10.0 §15: точечный прогноз плоский, компоненты тренда нет."""
+        source = (DIAGRAMS / "src/15_forecast_GOST.dot").read_text(encoding="utf-8")
+        assert "тренда НЕТ" in source, (
+            "схема прогноза обязана называть отсутствие тренда явно: именно здесь "
+            "она десять версий описывала отменённый алгоритм"
+        )
+
+    def test_every_authored_diagram_has_a_source(self) -> None:
+        """У каждого превью смысловой диаграммы есть источник, который его родил."""
+        for name in ("04_c4_context", "05_c4_container", "15_forecast_GOST"):
+            assert (DIAGRAMS / f"src/{name}.dot").exists(), f"нет источника {name}.dot"
+            assert (DIAGRAMS / f"{name}.drawio.png").exists(), f"нет превью {name}"

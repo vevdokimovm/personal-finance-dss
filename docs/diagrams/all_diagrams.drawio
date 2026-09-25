@@ -430,7 +430,7 @@
         </mxCell>
 
         
-        <mxCell id="d05_web" value="Web-фронтенд&#10;&#10;[Jinja2 + ванильный JS]&#10;&#10;7 страниц: dashboard, planning, transactions, obligations, goals, banks" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#438DD5;strokeColor=#3C7FC0;fontColor=#ffffff;fontSize=12;fontStyle=1;align=center;verticalAlign=middle;arcSize=10;" vertex="1" parent="1">
+        <mxCell id="d05_web" value="SPA&#10;&#10;[React 19 + TypeScript + Vite]&#10;&#10;14 страниц, TanStack Router/Query; сборка отдаётся из frontend/dist" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#438DD5;strokeColor=#3C7FC0;fontColor=#ffffff;fontSize=12;fontStyle=1;align=center;verticalAlign=middle;arcSize=10;" vertex="1" parent="1">
           <mxGeometry x="130" y="320" width="220" height="120" as="geometry" />
         </mxCell>
 

@@ -1,0 +1,23 @@
+digraph forecast {
+  graph [rankdir=TB, fontname="Helvetica", labelloc=t, fontsize=16,
+         label="FINPILOT — прогноз показателя (канон v3.10.0): SES без тренда + Монте-Карло",
+         nodesep=0.35, ranksep=0.55];
+  node [fontname="Helvetica", fontsize=11, style="rounded,filled",
+        fillcolor="#e1f5e1", color="#82b366", shape=box, width=3.4];
+  edge [color="#9aa4b1", arrowsize=0.7];
+
+  s0 [label="Вход: ряд history, горизонт h\nα = 0.3, N = 1000",
+      fillcolor="#dae8fc", color="#6c8ebf"];
+  s1 [label="1. Сглаживание (Brown SES)\nLt = α·yt + (1−α)·Lt−1"];
+  s2 [label="2. Точечный прогноз — ПЛОСКИЙ\nŷ(t+h) = Lt для всех h\nтренда НЕТ (канон §15)",
+      fillcolor="#fff2cc", color="#d6b656"];
+  s3 [label="3. Монте-Карло: N = 1000 траекторий\nс растущей σ(h)"];
+  s4 [label="4. Перцентили по ансамблю\np10, p50, p90 — интервал 80 %"];
+  s5 [label="Выход: точечный прогноз\nи коридор [p10..p90]", fillcolor="#dae8fc", color="#6c8ebf"];
+
+  note [label="Holt отменён в v3.10.0:\nзамер Г43: ошибка 0.606\nпротив 0.205 (3 точки)",
+        shape=note, fillcolor="#f8cecc", color="#b85450", fontsize=10, width=3.2];
+
+  s0 -> s1 -> s2 -> s3 -> s4 -> s5;
+  s2 -> note [style=dashed, arrowhead=none, color="#b85450"];
+}

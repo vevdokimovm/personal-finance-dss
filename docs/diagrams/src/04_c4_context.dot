@@ -1,0 +1,28 @@
+digraph context {
+  graph [rankdir=LR, fontname="Helvetica", labelloc=t, fontsize=17,
+         label="FINPILOT — контекст системы (C4 Level 1)", nodesep=0.5, ranksep=1.4];
+  node [fontname="Helvetica", fontsize=11, style="rounded,filled"];
+  edge [color="#9aa4b1", fontname="Helvetica", fontsize=9];
+
+  user [label="Пользователь\n[человек]", shape=box, fillcolor="#dae8fc", color="#6c8ebf"];
+  fin  [label="FINPILOT\n[СППР]\nраспределение потока\nдолг / резерв / цели",
+        shape=box, fillcolor="#1f6feb", fontcolor=white,
+        color="#1a4f9c", width=2.8];
+
+  bank  [label="Банк клиента\nвыписка CSV/XLSX/PDF/1C", shape=box,
+           fillcolor="#f5f5f5", color="#999999"];
+  cbr   [label="ЦБ РФ\nключевая ставка, курсы валют", shape=box,
+           fillcolor="#f5f5f5", color="#999999"];
+  plaid [label="Plaid\nагрегатор счетов (каркас)", shape=box,
+           fillcolor="#f5f5f5", color="#999999"];
+  tg    [label="Telegram\nуведомления в чат", shape=box, fillcolor="#f5f5f5", color="#999999"];
+  mail  [label="Почтовый сервер\nписьма и подтверждения", shape=box,
+           fillcolor="#f5f5f5", color="#999999"];
+
+  user -> fin [label="вводит данные,\nполучает рекомендации [HTTPS]"];
+  bank -> fin [label="импорт выписки"];
+  cbr -> fin [label="ставка и курсы [HTTP+XML]"];
+  plaid -> fin [label="счета и операции [REST]"];
+  fin -> tg [label="уведомление"];
+  fin -> mail [label="письмо [SMTP]"];
+}

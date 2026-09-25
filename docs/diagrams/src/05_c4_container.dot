@@ -1,0 +1,29 @@
+digraph container {
+  graph [rankdir=TB, fontname="Helvetica", labelloc=t, fontsize=17,
+         label="FINPILOT — контейнеры (C4 Level 2)", nodesep=0.45, ranksep=0.9];
+  node [fontname="Helvetica", fontsize=11, style="rounded,filled", shape=box];
+  edge [color="#9aa4b1", fontname="Helvetica", fontsize=9];
+
+  user [label="Пользователь\n[человек]", fillcolor="#dae8fc", color="#6c8ebf"];
+
+  subgraph cluster_app {
+    label="FINPILOT"; fontname="Helvetica"; fontsize=12; color="#6c8ebf"; style=dashed;
+    spa [label="SPA\n[React 19 + TypeScript + Vite]\n14 страниц, TanStack Router/Query",
+         fillcolor="#85BBF0", color="#6c8ebf", width=2.6];
+    api [label="HTTP-слой\n[FastAPI, 27 групп роутов]\nCSRF, rate-limit, гейт согласия",
+         fillcolor="#85BBF0", color="#6c8ebf", width=2.6];
+    svc [label="Сервисы\n[26 модулей]\nпланирование, импорт, уведомления",
+         fillcolor="#d5e8d4", color="#82b366", width=2.6];
+    core [label="Математическое ядро\n[21 модуль, канон v3.10.0]\nчистые функции: ни БД, ни HTTP",
+          fillcolor="#ffe6cc", color="#d79b00", width=2.6];
+    db [label="База данных\n[PostgreSQL / SQLite]\n31 таблица, SQLAlchemy 2.0",
+        shape=cylinder, fillcolor="#f8cecc", color="#b85450", width=2.2];
+  }
+
+  user -> spa [label="HTTPS"];
+  spa -> api [label="JSON/REST"];
+  api -> svc [label="вызывает"];
+  svc -> core [label="делегирует расчёт"];
+  svc -> db [label="читает/пишет [ORM]"];
+  api -> spa [label="отдаёт сборку\nfrontend/dist [StaticFiles]", style=dashed];
+}
