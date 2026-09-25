@@ -3,6 +3,30 @@
 Технические диаграммы проекта в формате **draw.io** (`.drawio`) с превью (`.png`/`.svg`).
 Мастер-файл со всеми диаграммами — `all_diagrams.drawio`.
 
+## Два класса диаграмм: генерируемые и рисуемые
+
+🔴 **Структурные диаграммы ГЕНЕРИРУЮТСЯ из кода** — `python -m tools.diagrams.generate`:
+
+| Диаграмма | Источник истины |
+|---|---|
+| `10_er_database` | `app/database/models.py` — таблицы |
+| `06_c4_component` | `app/api/routes_*.py`, `app/services/*.py`, `app/core/*.py` |
+| `14_dependency_graph` | импорты внутри `app/core/` |
+
+Править их руками бессмысленно: следующий батч добавит таблицу или роут, и диаграмма
+снова отстанет. Актуальность сторожит гейт `tests/test_diagrams_match_code.py` — он
+сверяет содержимое `.drawio` со списком сущностей в коде и валит прогон при расхождении.
+
+**Чем это оплачено:** замер 25.09.2026 показал, что нарисованные руками диаграммы отстали
+вдвое — `06_c4_component` знала 3 роутера из 27, `10_er_database` 28 таблиц из 31,
+`14_dependency_graph` 10 модулей ядра из 22. Разбор —
+`docs/reports/engineering/diagrams_drifted_from_code.md`.
+
+**Остальные диаграммы рисуются руками** и правятся, когда меняется ЗАМЫСЕЛ, а не
+структура: пайплайн модели, Avalanche, цели, прогноз, C4 context/container, sequence,
+state machine, IDEF0, use case, PDCA, BPMN, EPC, VSM, DMAIC. Из кода они не выводятся,
+и гейт их не судит.
+
 ## Состав (по ГОСТ и нотациям)
 - Пайплайн и модель: `01_main_pipeline_GOST`, `02_avalanche_GOST`, `03_goals_si_GOST`, `15_forecast_GOST`.
 - Архитектура C4: `04_c4_context`, `05_c4_container`, `06_c4_component`.

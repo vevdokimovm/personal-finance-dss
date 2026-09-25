@@ -1,56 +1,105 @@
-<mxfile host="app.diagrams.net" modified="2026-07-02T00:00:00.000Z" agent="finpilot-diagram-gen v5.14.0" version="24.0.0" type="device">
-  <diagram name="ER — модель данных (28 таблиц)" id="er_28_tables">
-    <mxGraphModel dx="1200" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1200" pageHeight="1296" math="0" shadow="0">
+<mxfile host="app.diagrams.net" type="device">
+  <diagram name="ER — таблицы базы" id="er_database">
+    <mxGraphModel dx="1000" dy="700" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1260" pageHeight="550" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
-        <mxCell id="er_title" value="FINPILOT — Модель данных: 28 таблиц (миграции 0001–0028). Канон: docs/diagrams.md §2 + app/database/models.py" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=14;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="40" y="20" width="1150" height="26" as="geometry" /></mxCell>
-        <mxCell id="er_h0" value="Пользователь и доступ" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=12;fontStyle=1;fontColor=#444444;" vertex="1" parent="1"><mxGeometry x="40" y="66" width="460" height="22" as="geometry" /></mxCell>
-        <mxCell id="er_users" value="users&#10;──────────────────────&#10;id PK&#10;email UK&#10;password_hash&#10;mfa_enabled&#10;plan_tier&#10;is_active" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=top;align=left;spacingLeft=6;spacingTop=4;fontSize=10;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1"><mxGeometry x="40" y="94" width="214" height="118" as="geometry" /></mxCell>
-        <mxCell id="er_user_prefs" value="user_prefs&#10;──────────────────────&#10;id PK&#10;l_min&#10;risk_tolerance&#10;r_bench&#10;base_currency" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=top;align=left;spacingLeft=6;spacingTop=4;fontSize=10;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1"><mxGeometry x="270" y="94" width="214" height="118" as="geometry" /></mxCell>
-        <mxCell id="er_revoked_tokens" value="revoked_tokens&#10;──────────────────────&#10;jti PK&#10;expires_at" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=top;align=left;spacingLeft=6;spacingTop=4;fontSize=10;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1"><mxGeometry x="500" y="94" width="214" height="118" as="geometry" /></mxCell>
-        <mxCell id="er_mfa_recovery_codes" value="mfa_recovery_codes&#10;──────────────────────&#10;id PK&#10;user_id FK&#10;code_hash" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=top;align=left;spacingLeft=6;spacingTop=4;fontSize=10;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1"><mxGeometry x="730" y="94" width="214" height="118" as="geometry" /></mxCell>
-        <mxCell id="er_user_category_rules" value="user_category_rules&#10;──────────────────────&#10;id PK&#10;match_token&#10;category" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=top;align=left;spacingLeft=6;spacingTop=4;fontSize=10;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1"><mxGeometry x="960" y="94" width="214" height="118" as="geometry" /></mxCell>
-        <mxCell id="er_h1" value="Домохозяйства (P3.7)" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=12;fontStyle=1;fontColor=#444444;" vertex="1" parent="1"><mxGeometry x="40" y="242" width="460" height="22" as="geometry" /></mxCell>
-        <mxCell id="er_households" value="households&#10;──────────────────────&#10;id PK&#10;name&#10;owner_id FK" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=top;align=left;spacingLeft=6;spacingTop=4;fontSize=10;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="1"><mxGeometry x="40" y="270" width="214" height="118" as="geometry" /></mxCell>
-        <mxCell id="er_household_memberships" value="household_memberships&#10;──────────────────────&#10;id PK&#10;household_id FK&#10;user_id FK&#10;role" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=top;align=left;spacingLeft=6;spacingTop=4;fontSize=10;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="1"><mxGeometry x="270" y="270" width="214" height="118" as="geometry" /></mxCell>
-        <mxCell id="er_household_invites" value="household_invites&#10;──────────────────────&#10;id PK&#10;household_id FK&#10;token UK&#10;created_by FK&#10;status" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=top;align=left;spacingLeft=6;spacingTop=4;fontSize=10;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="1"><mxGeometry x="500" y="270" width="214" height="118" as="geometry" /></mxCell>
-        <mxCell id="er_h2" value="Финансовый домен" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=12;fontStyle=1;fontColor=#444444;" vertex="1" parent="1"><mxGeometry x="40" y="418" width="460" height="22" as="geometry" /></mxCell>
-        <mxCell id="er_note" value="владение: user_id NULL-able (гость); household_id — оверлей на 6 доменных таблицах" style="text;html=1;strokeColor=none;fillColor=none;align=right;fontSize=9;fontStyle=2;fontColor=#666666;" vertex="1" parent="1"><mxGeometry x="520" y="418" width="670" height="22" as="geometry" /></mxCell>
-        <mxCell id="er_transactions" value="transactions&#10;──────────────────────&#10;id PK&#10;currency&#10;amount&#10;category&#10;date&#10;is_deleted" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=top;align=left;spacingLeft=6;spacingTop=4;fontSize=10;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1"><mxGeometry x="40" y="446" width="214" height="118" as="geometry" /></mxCell>
-        <mxCell id="er_obligations" value="obligations&#10;──────────────────────&#10;id PK&#10;name&#10;amount&#10;interest_rate&#10;monthly_payment" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=top;align=left;spacingLeft=6;spacingTop=4;fontSize=10;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1"><mxGeometry x="270" y="446" width="214" height="118" as="geometry" /></mxCell>
-        <mxCell id="er_obligation_payments" value="obligation_payments&#10;──────────────────────&#10;id PK&#10;obligation_id FK&#10;amount&#10;payment_date" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=top;align=left;spacingLeft=6;spacingTop=4;fontSize=10;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1"><mxGeometry x="500" y="446" width="214" height="118" as="geometry" /></mxCell>
-        <mxCell id="er_goals" value="goals&#10;──────────────────────&#10;id PK&#10;name&#10;target_amount&#10;current_amount&#10;priority" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=top;align=left;spacingLeft=6;spacingTop=4;fontSize=10;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1"><mxGeometry x="730" y="446" width="214" height="118" as="geometry" /></mxCell>
-        <mxCell id="er_goal_contributions" value="goal_contributions&#10;──────────────────────&#10;id PK&#10;goal_id FK&#10;amount&#10;contribution_date" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=top;align=left;spacingLeft=6;spacingTop=4;fontSize=10;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1"><mxGeometry x="960" y="446" width="214" height="118" as="geometry" /></mxCell>
-        <mxCell id="er_liquid_assets" value="liquid_assets&#10;──────────────────────&#10;id PK&#10;name&#10;amount&#10;interest_rate" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=top;align=left;spacingLeft=6;spacingTop=4;fontSize=10;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1"><mxGeometry x="40" y="580" width="214" height="118" as="geometry" /></mxCell>
-        <mxCell id="er_budgets" value="budgets&#10;──────────────────────&#10;id PK&#10;category UK&#10;limit_amount" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=top;align=left;spacingLeft=6;spacingTop=4;fontSize=10;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1"><mxGeometry x="270" y="580" width="214" height="118" as="geometry" /></mxCell>
-        <mxCell id="er_categories" value="categories&#10;──────────────────────&#10;id PK&#10;name&#10;type&#10;is_system" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=top;align=left;spacingLeft=6;spacingTop=4;fontSize=10;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1"><mxGeometry x="500" y="580" width="214" height="118" as="geometry" /></mxCell>
-        <mxCell id="er_h3" value="Планирование" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=12;fontStyle=1;fontColor=#444444;" vertex="1" parent="1"><mxGeometry x="40" y="728" width="460" height="22" as="geometry" /></mxCell>
-        <mxCell id="er_recommendations" value="recommendations&#10;──────────────────────&#10;id PK&#10;rt&#10;lt&#10;dt&#10;u_score" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=top;align=left;spacingLeft=6;spacingTop=4;fontSize=10;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1"><mxGeometry x="40" y="756" width="214" height="118" as="geometry" /></mxCell>
-        <mxCell id="er_plan_snapshots" value="plan_snapshots&#10;──────────────────────&#10;id PK&#10;risk_profile&#10;utility&#10;is_deleted" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=top;align=left;spacingLeft=6;spacingTop=4;fontSize=10;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1"><mxGeometry x="270" y="756" width="214" height="118" as="geometry" /></mxCell>
-        <mxCell id="er_scenarios" value="scenarios&#10;──────────────────────&#10;id PK&#10;name&#10;parameters_json" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=top;align=left;spacingLeft=6;spacingTop=4;fontSize=10;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1"><mxGeometry x="500" y="756" width="214" height="118" as="geometry" /></mxCell>
-        <mxCell id="er_h4" value="Аналитика и уведомления" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=12;fontStyle=1;fontColor=#444444;" vertex="1" parent="1"><mxGeometry x="40" y="904" width="460" height="22" as="geometry" /></mxCell>
-        <mxCell id="er_events" value="events&#10;──────────────────────&#10;id PK&#10;event_type&#10;created_at" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=top;align=left;spacingLeft=6;spacingTop=4;fontSize=10;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="1"><mxGeometry x="40" y="932" width="214" height="118" as="geometry" /></mxCell>
-        <mxCell id="er_notifications" value="notifications&#10;──────────────────────&#10;id PK&#10;user_id FK&#10;type&#10;is_read" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=top;align=left;spacingLeft=6;spacingTop=4;fontSize=10;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="1"><mxGeometry x="270" y="932" width="214" height="118" as="geometry" /></mxCell>
-        <mxCell id="er_notification_log" value="notification_log&#10;──────────────────────&#10;id PK&#10;user_id FK&#10;dedup_key" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=top;align=left;spacingLeft=6;spacingTop=4;fontSize=10;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="1"><mxGeometry x="500" y="932" width="214" height="118" as="geometry" /></mxCell>
-        <mxCell id="er_experiments" value="experiments&#10;──────────────────────&#10;id PK&#10;key UK&#10;status&#10;variants" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=top;align=left;spacingLeft=6;spacingTop=4;fontSize=10;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="1"><mxGeometry x="730" y="932" width="214" height="118" as="geometry" /></mxCell>
-        <mxCell id="er_experiment_assignments" value="experiment_assignments&#10;──────────────────────&#10;id PK&#10;experiment_id FK&#10;subject_id&#10;variant" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=top;align=left;spacingLeft=6;spacingTop=4;fontSize=10;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="1"><mxGeometry x="960" y="932" width="214" height="118" as="geometry" /></mxCell>
-        <mxCell id="er_h5" value="Справочное и интеграции" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=12;fontStyle=1;fontColor=#444444;" vertex="1" parent="1"><mxGeometry x="40" y="1080" width="460" height="22" as="geometry" /></mxCell>
-        <mxCell id="er_fx_rates" value="fx_rates&#10;──────────────────────&#10;currency PK&#10;rate_to_usd" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=top;align=left;spacingLeft=6;spacingTop=4;fontSize=10;fillColor=#f5f5f5;strokeColor=#666666;" vertex="1" parent="1"><mxGeometry x="40" y="1108" width="214" height="118" as="geometry" /></mxCell>
-        <mxCell id="er_cbr_key_rate_cache" value="cbr_key_rate_cache&#10;──────────────────────&#10;id PK&#10;effective_date UK&#10;rate" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=top;align=left;spacingLeft=6;spacingTop=4;fontSize=10;fillColor=#f5f5f5;strokeColor=#666666;" vertex="1" parent="1"><mxGeometry x="270" y="1108" width="214" height="118" as="geometry" /></mxCell>
-        <mxCell id="er_manual_snapshots" value="manual_snapshots&#10;──────────────────────&#10;id PK&#10;user_ref UK&#10;payload" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=top;align=left;spacingLeft=6;spacingTop=4;fontSize=10;fillColor=#f5f5f5;strokeColor=#666666;" vertex="1" parent="1"><mxGeometry x="500" y="1108" width="214" height="118" as="geometry" /></mxCell>
-        <mxCell id="er_plaid_tokens" value="plaid_tokens&#10;──────────────────────&#10;id PK&#10;user_id FK&#10;token_encrypted" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=top;align=left;spacingLeft=6;spacingTop=4;fontSize=10;fillColor=#f5f5f5;strokeColor=#666666;" vertex="1" parent="1"><mxGeometry x="730" y="1108" width="214" height="118" as="geometry" /></mxCell>
-        <mxCell id="er_e0" value="owner_id" style="endArrow=block;endFill=0;html=1;rounded=0;edgeStyle=orthogonalEdgeStyle;strokeColor=#999999;fontSize=9;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="er_households" target="er_users"><mxGeometry relative="1" as="geometry" /></mxCell>
-        <mxCell id="er_e1" style="endArrow=block;endFill=0;html=1;rounded=0;edgeStyle=orthogonalEdgeStyle;strokeColor=#999999;fontSize=9;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="er_household_memberships" target="er_households"><mxGeometry relative="1" as="geometry" /></mxCell>
-        <mxCell id="er_e2" style="endArrow=block;endFill=0;html=1;rounded=0;edgeStyle=orthogonalEdgeStyle;strokeColor=#999999;fontSize=9;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="er_household_memberships" target="er_users"><mxGeometry relative="1" as="geometry" /></mxCell>
-        <mxCell id="er_e3" style="endArrow=block;endFill=0;html=1;rounded=0;edgeStyle=orthogonalEdgeStyle;strokeColor=#999999;fontSize=9;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="er_household_invites" target="er_households"><mxGeometry relative="1" as="geometry" /></mxCell>
-        <mxCell id="er_e4" style="endArrow=block;endFill=0;html=1;rounded=0;edgeStyle=orthogonalEdgeStyle;strokeColor=#999999;fontSize=9;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="er_mfa_recovery_codes" target="er_users"><mxGeometry relative="1" as="geometry" /></mxCell>
-        <mxCell id="er_e5" style="endArrow=block;endFill=0;html=1;rounded=0;edgeStyle=orthogonalEdgeStyle;strokeColor=#999999;fontSize=9;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="er_plaid_tokens" target="er_users"><mxGeometry relative="1" as="geometry" /></mxCell>
-        <mxCell id="er_e6" style="endArrow=block;endFill=0;html=1;rounded=0;edgeStyle=orthogonalEdgeStyle;strokeColor=#999999;fontSize=9;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="er_notifications" target="er_users"><mxGeometry relative="1" as="geometry" /></mxCell>
-        <mxCell id="er_e7" style="endArrow=block;endFill=0;html=1;rounded=0;edgeStyle=orthogonalEdgeStyle;strokeColor=#999999;fontSize=9;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="er_notification_log" target="er_users"><mxGeometry relative="1" as="geometry" /></mxCell>
-        <mxCell id="er_e8" style="endArrow=block;endFill=0;html=1;rounded=0;edgeStyle=orthogonalEdgeStyle;strokeColor=#999999;fontSize=9;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="er_obligation_payments" target="er_obligations"><mxGeometry relative="1" as="geometry" /></mxCell>
-        <mxCell id="er_e9" style="endArrow=block;endFill=0;html=1;rounded=0;edgeStyle=orthogonalEdgeStyle;strokeColor=#999999;fontSize=9;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="er_goal_contributions" target="er_goals"><mxGeometry relative="1" as="geometry" /></mxCell>
-        <mxCell id="er_e10" style="endArrow=block;endFill=0;html=1;rounded=0;edgeStyle=orthogonalEdgeStyle;strokeColor=#999999;fontSize=9;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="er_experiment_assignments" target="er_experiments"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="title" value="FINPILOT — таблицы базы данных (31). Генерируется `python -m tools.diagrams.generate`" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=15;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="20" y="12" width="1220" height="28" as="geometry" />
+        </mxCell>
+        <mxCell id="t_budgets" value="budgets" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="40" y="70" width="210" height="34" as="geometry" />
+        </mxCell>
+        <mxCell id="t_categories" value="categories" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="280" y="70" width="210" height="34" as="geometry" />
+        </mxCell>
+        <mxCell id="t_cbr_key_rate_cache" value="cbr_key_rate_cache" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="520" y="70" width="210" height="34" as="geometry" />
+        </mxCell>
+        <mxCell id="t_events" value="events" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="760" y="70" width="210" height="34" as="geometry" />
+        </mxCell>
+        <mxCell id="t_experiment_assignments" value="experiment_assignments" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="1000" y="70" width="210" height="34" as="geometry" />
+        </mxCell>
+        <mxCell id="t_experiments" value="experiments" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="40" y="130" width="210" height="34" as="geometry" />
+        </mxCell>
+        <mxCell id="t_fx_rates" value="fx_rates" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="280" y="130" width="210" height="34" as="geometry" />
+        </mxCell>
+        <mxCell id="t_goal_contributions" value="goal_contributions" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="520" y="130" width="210" height="34" as="geometry" />
+        </mxCell>
+        <mxCell id="t_goals" value="goals" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="760" y="130" width="210" height="34" as="geometry" />
+        </mxCell>
+        <mxCell id="t_household_invites" value="household_invites" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="1000" y="130" width="210" height="34" as="geometry" />
+        </mxCell>
+        <mxCell id="t_household_memberships" value="household_memberships" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="40" y="190" width="210" height="34" as="geometry" />
+        </mxCell>
+        <mxCell id="t_households" value="households" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="280" y="190" width="210" height="34" as="geometry" />
+        </mxCell>
+        <mxCell id="t_liquid_assets" value="liquid_assets" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="520" y="190" width="210" height="34" as="geometry" />
+        </mxCell>
+        <mxCell id="t_manual_snapshots" value="manual_snapshots" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="760" y="190" width="210" height="34" as="geometry" />
+        </mxCell>
+        <mxCell id="t_mfa_pending_attempts" value="mfa_pending_attempts" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="1000" y="190" width="210" height="34" as="geometry" />
+        </mxCell>
+        <mxCell id="t_mfa_recovery_codes" value="mfa_recovery_codes" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="40" y="250" width="210" height="34" as="geometry" />
+        </mxCell>
+        <mxCell id="t_notification_log" value="notification_log" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="280" y="250" width="210" height="34" as="geometry" />
+        </mxCell>
+        <mxCell id="t_notifications" value="notifications" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="520" y="250" width="210" height="34" as="geometry" />
+        </mxCell>
+        <mxCell id="t_obligation_payments" value="obligation_payments" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="760" y="250" width="210" height="34" as="geometry" />
+        </mxCell>
+        <mxCell id="t_obligations" value="obligations" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="1000" y="250" width="210" height="34" as="geometry" />
+        </mxCell>
+        <mxCell id="t_plaid_tokens" value="plaid_tokens" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="40" y="310" width="210" height="34" as="geometry" />
+        </mxCell>
+        <mxCell id="t_plan_advice_events" value="plan_advice_events" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="280" y="310" width="210" height="34" as="geometry" />
+        </mxCell>
+        <mxCell id="t_plan_snapshots" value="plan_snapshots" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="520" y="310" width="210" height="34" as="geometry" />
+        </mxCell>
+        <mxCell id="t_recommendations" value="recommendations" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="760" y="310" width="210" height="34" as="geometry" />
+        </mxCell>
+        <mxCell id="t_revoked_tokens" value="revoked_tokens" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="1000" y="310" width="210" height="34" as="geometry" />
+        </mxCell>
+        <mxCell id="t_scenarios" value="scenarios" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="40" y="370" width="210" height="34" as="geometry" />
+        </mxCell>
+        <mxCell id="t_transactions" value="transactions" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="280" y="370" width="210" height="34" as="geometry" />
+        </mxCell>
+        <mxCell id="t_user_category_rules" value="user_category_rules" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="520" y="370" width="210" height="34" as="geometry" />
+        </mxCell>
+        <mxCell id="t_user_consents" value="user_consents" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="760" y="370" width="210" height="34" as="geometry" />
+        </mxCell>
+        <mxCell id="t_user_prefs" value="user_prefs" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="1000" y="370" width="210" height="34" as="geometry" />
+        </mxCell>
+        <mxCell id="t_users" value="users" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="40" y="430" width="210" height="34" as="geometry" />
+        </mxCell>
       </root>
     </mxGraphModel>
   </diagram>
