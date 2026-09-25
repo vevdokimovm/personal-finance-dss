@@ -1,6 +1,6 @@
 digraph forecast {
   graph [rankdir=TB, fontname="Helvetica", labelloc=t, fontsize=16,
-         label="FINPILOT — прогноз показателя: SES без тренда + Монте-Карло\nкод v9.13.27 · канон матмодели v3.10.0",
+         label="FINPILOT — прогноз показателя: SES без тренда + Монте-Карло\nкод v9.13.28 · канон матмодели v3.10.0",
          nodesep=0.35, ranksep=0.55];
   node [fontname="Helvetica", fontsize=11, style="rounded,filled",
         fillcolor="#e1f5e1", color="#82b366", shape=box, width=3.4];

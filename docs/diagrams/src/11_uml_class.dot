@@ -1,6 +1,6 @@
 digraph uml {
   graph [rankdir=LR, fontname="Helvetica", labelloc=t, fontsize=16,
-         label="FINPILOT — ORM-модели (31 классов)\nкод v9.13.27 · канон матмодели v3.10.0", nodesep=0.25, ranksep=0.8];
+         label="FINPILOT — ORM-модели (31 классов)\nкод v9.13.28 · канон матмодели v3.10.0", nodesep=0.25, ranksep=0.8];
   node [shape=box, style="rounded,filled", fillcolor="#e1d5e7",
         color="#9673a6", fontname="Helvetica", fontsize=11];
   "Budget";

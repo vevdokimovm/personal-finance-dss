@@ -1,0 +1,36 @@
+digraph avalanche {
+  graph [rankdir=TB, fontname="Helvetica", labelloc=t, fontsize=15,
+         label="FINPILOT — Avalanche + OCR-фильтр (ГОСТ 19.701-90)\nкод v9.13.28 · канон матмодели v3.10.0",
+         nodesep=0.3, ranksep=0.45];
+  node [fontname="Helvetica", fontsize=10, style="rounded,filled",
+        fillcolor="#e1f5e1", color="#82b366", shape=box, width=3.4];
+  edge [color="#9aa4b1", arrowsize=0.7, fontname="Helvetica", fontsize=9];
+
+  s0 [label="Вход: сумма досрочки x_obl,\nобязательства O, порог r_bench",
+      fillcolor="#dae8fc", color="#6c8ebf"];
+  q0 [label="x_obl ≤ 0 или O пусто ?", shape=diamond,
+      fillcolor="#fff2cc", color="#d6b656", width=2.4];
+  z0 [label="Вернуть x_eff = 0, x_unused = x_obl",
+      fillcolor="#f8cecc", color="#b85450"];
+  ocr [label="OCR-фильтр: targets = { k ∈ O : rk ≥ r_bench }\n"];
+  q1 [label="targets пусто ?", shape=diamond, fillcolor="#fff2cc",
+      color="#d6b656", width=2.2];
+  sort [label="Сортировка targets по убыванию ставки rk"];
+  loop [label="для каждого кредита ∈ targets", shape=hexagon,
+        fillcolor="#e1d5e7", color="#9673a6", width=3.0];
+  pay [label="Погасить min(remaining, остаток долга)\nremaining −= выплата"];
+  q2 [label="remaining ≤ 0\nили кредиты кончились ?", shape=diamond,
+      fillcolor="#fff2cc", color="#d6b656", width=2.6];
+  out [label="x_eff = x_obl − remaining\nx_unused = remaining",
+       fillcolor="#dae8fc", color="#6c8ebf"];
+
+  s0 -> q0;
+  q0 -> z0 [label="да"];
+  q0 -> ocr [label="нет"];
+  ocr -> q1;
+  q1 -> z0 [label="да"];
+  q1 -> sort [label="нет"];
+  sort -> loop -> pay -> q2;
+  q2 -> loop [label="нет", style=dashed];
+  q2 -> out [label="да"];
+}

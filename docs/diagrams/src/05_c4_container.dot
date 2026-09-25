@@ -1,6 +1,6 @@
 digraph container {
   graph [rankdir=TB, fontname="Helvetica", labelloc=t, fontsize=17,
-         label="FINPILOT — контейнеры (C4 Level 2)\nкод v9.13.27 · канон матмодели v3.10.0",
+         label="FINPILOT — контейнеры (C4 Level 2)\nкод v9.13.28 · канон матмодели v3.10.0",
          nodesep=0.45, ranksep=0.9];
   node [fontname="Helvetica", fontsize=11, style="rounded,filled", shape=box];
   edge [color="#9aa4b1", fontname="Helvetica", fontsize=9];

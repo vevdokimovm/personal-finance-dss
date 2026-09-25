@@ -1,0 +1,28 @@
+digraph bpmn {
+  graph [rankdir=LR, fontname="Helvetica", labelloc=t, fontsize=15,
+         label="FINPILOT — получение рекомендации (BPMN 2.0)\nкод v9.13.28 · канон матмодели v3.10.0",
+         nodesep=0.35, ranksep=0.7];
+  node [fontname="Helvetica", fontsize=10, style="rounded,filled", shape=box];
+  edge [color="#9aa4b1", arrowsize=0.7, fontname="Helvetica", fontsize=9];
+
+  start [label="Нужна\nрекомендация", shape=circle, fillcolor="#d5e8d4",
+         color="#82b366", width=1.0];
+  t1 [label="Заполнить данные:\nцели, долги, активы", fillcolor="#dae8fc",
+      color="#6c8ebf"];
+  t2 [label="Запросить расчёт", fillcolor="#dae8fc", color="#6c8ebf"];
+  t3 [label="Рассчитать показатели\nи альтернативы", fillcolor="#e1f5e1",
+      color="#82b366"];
+  g1 [label="Есть допустимые\nальтернативы ?", shape=diamond,
+      fillcolor="#fff2cc", color="#d6b656", width=2.0];
+  t4 [label="Ранжировать (SAW)\nи объяснить выбор", fillcolor="#e1f5e1",
+      color="#82b366"];
+  t5 [label="Вернуть отказ\nс диагнозом (fail-loud)", fillcolor="#f8cecc",
+      color="#b85450"];
+  endok [label="Решение\nпринято", shape=doublecircle, fillcolor="#d5e8d4",
+         color="#82b366", width=1.0];
+
+  start -> t1 -> t2 -> t3 -> g1;
+  g1 -> t4 [label="да"];
+  g1 -> t5 [label="нет"];
+  t4 -> endok; t5 -> endok;
+}

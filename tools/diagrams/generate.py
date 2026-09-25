@@ -755,9 +755,174 @@ def usecase_dot() -> str:
 """
 
 
+def avalanche_dot() -> str:
+    """Avalanche + OCR-фильтр досрочного погашения (ГОСТ 19.701-90).
+
+    Содержание сверено с `app/core/avalanche.py`: функция и порядок шагов совпадают,
+    переписана ради превью (rsvg не читает формат draw.io) и подписи версии.
+    """
+    return f"""digraph avalanche {{
+  graph [rankdir=TB, fontname="Helvetica", labelloc=t, fontsize=15,
+         label="FINPILOT — Avalanche + OCR-фильтр (ГОСТ 19.701-90)\\n{stamp()}",
+         nodesep=0.3, ranksep=0.45];
+  node [fontname="Helvetica", fontsize=10, style="rounded,filled",
+        fillcolor="#e1f5e1", color="#82b366", shape=box, width=3.4];
+  edge [color="#9aa4b1", arrowsize=0.7, fontname="Helvetica", fontsize=9];
+
+  s0 [label="Вход: сумма досрочки x_obl,\\nобязательства O, порог r_bench",
+      fillcolor="#dae8fc", color="#6c8ebf"];
+  q0 [label="x_obl ≤ 0 или O пусто ?", shape=diamond,
+      fillcolor="#fff2cc", color="#d6b656", width=2.4];
+  z0 [label="Вернуть x_eff = 0, x_unused = x_obl",
+      fillcolor="#f8cecc", color="#b85450"];
+  ocr [label="OCR-фильтр: targets = {{ k ∈ O : rk ≥ r_bench }}\\n"];
+  q1 [label="targets пусто ?", shape=diamond, fillcolor="#fff2cc",
+      color="#d6b656", width=2.2];
+  sort [label="Сортировка targets по убыванию ставки rk"];
+  loop [label="для каждого кредита ∈ targets", shape=hexagon,
+        fillcolor="#e1d5e7", color="#9673a6", width=3.0];
+  pay [label="Погасить min(remaining, остаток долга)\\nremaining −= выплата"];
+  q2 [label="remaining ≤ 0\\nили кредиты кончились ?", shape=diamond,
+      fillcolor="#fff2cc", color="#d6b656", width=2.6];
+  out [label="x_eff = x_obl − remaining\\nx_unused = remaining",
+       fillcolor="#dae8fc", color="#6c8ebf"];
+
+  s0 -> q0;
+  q0 -> z0 [label="да"];
+  q0 -> ocr [label="нет"];
+  ocr -> q1;
+  q1 -> z0 [label="да"];
+  q1 -> sort [label="нет"];
+  sort -> loop -> pay -> q2;
+  q2 -> loop [label="нет", style=dashed];
+  q2 -> out [label="да"];
+}}
+"""
+
+
+def planning_sequence_dot() -> str:
+    """Цикл планирования — порядок вызовов `services/planning.py`."""
+    return f"""digraph planning_seq {{
+  graph [rankdir=TB, fontname="Helvetica", labelloc=t, fontsize=15,
+         label="FINPILOT — цикл планирования (POST /api/planning/calculate)\\n{stamp()}",
+         nodesep=0.3, ranksep=0.5];
+  node [fontname="Helvetica", fontsize=10, style="rounded,filled",
+        fillcolor="#e1f5e1", color="#82b366", shape=box, width=3.6];
+  edge [color="#9aa4b1", arrowsize=0.7, fontname="Helvetica", fontsize=9];
+
+  u [label="Пользователь", fillcolor="#dae8fc", color="#6c8ebf"];
+  r [label="routes_planning\\nPOST /planning/calculate {{risk, l_min, r_bench}}"];
+  db [label="Чтение: user_prefs, transactions,\\nobligations, goals, liquid_assets",
+      shape=cylinder, fillcolor="#f8cecc", color="#b85450", width=3.0];
+  run [label="planning.run_planning(...)"];
+  pre [label="preallocate_from_bliq — разовое закрытие\\nблизких целей из Bliq"];
+  crisis [label="crisis.build_crisis_plan\\nтолько при дефиците (Rt < 0)",
+          fillcolor="#f8cecc", color="#b85450"];
+  alt [label="alternatives.generate_alternatives\\n66 вариантов, шаг 10 %"];
+  av [label="avalanche + goals_priority\\nраспределение внутри альтернативы"];
+  filt [label="filtering: Rt' ≥ 0, Lt' ≥ Lmin, ПДН ≤ 0.40"];
+  rank [label="ranking.rank_alternatives — SAW"];
+  fc [label="forecast: SES без тренда + Монте-Карло"];
+  out [label="Ответ: план, top-3, объяснение, прогноз",
+       fillcolor="#dae8fc", color="#6c8ebf"];
+
+  u -> r -> db -> run -> pre -> crisis -> alt -> av -> filt -> rank -> fc -> out;
+}}
+"""
+
+
+def bpmn_dot() -> str:
+    """BPMN: получение финансовой рекомендации."""
+    return f"""digraph bpmn {{
+  graph [rankdir=LR, fontname="Helvetica", labelloc=t, fontsize=15,
+         label="FINPILOT — получение рекомендации (BPMN 2.0)\\n{stamp()}",
+         nodesep=0.35, ranksep=0.7];
+  node [fontname="Helvetica", fontsize=10, style="rounded,filled", shape=box];
+  edge [color="#9aa4b1", arrowsize=0.7, fontname="Helvetica", fontsize=9];
+
+  start [label="Нужна\\nрекомендация", shape=circle, fillcolor="#d5e8d4",
+         color="#82b366", width=1.0];
+  t1 [label="Заполнить данные:\\nцели, долги, активы", fillcolor="#dae8fc",
+      color="#6c8ebf"];
+  t2 [label="Запросить расчёт", fillcolor="#dae8fc", color="#6c8ebf"];
+  t3 [label="Рассчитать показатели\\nи альтернативы", fillcolor="#e1f5e1",
+      color="#82b366"];
+  g1 [label="Есть допустимые\\nальтернативы ?", shape=diamond,
+      fillcolor="#fff2cc", color="#d6b656", width=2.0];
+  t4 [label="Ранжировать (SAW)\\nи объяснить выбор", fillcolor="#e1f5e1",
+      color="#82b366"];
+  t5 [label="Вернуть отказ\\nс диагнозом (fail-loud)", fillcolor="#f8cecc",
+      color="#b85450"];
+  endok [label="Решение\\nпринято", shape=doublecircle, fillcolor="#d5e8d4",
+         color="#82b366", width=1.0];
+
+  start -> t1 -> t2 -> t3 -> g1;
+  g1 -> t4 [label="да"];
+  g1 -> t5 [label="нет"];
+  t4 -> endok; t5 -> endok;
+}}
+"""
+
+
+def epc_dot() -> str:
+    """EPC: событийная цепочка процесса планирования."""
+    return f"""digraph epc {{
+  graph [rankdir=TB, fontname="Helvetica", labelloc=t, fontsize=15,
+         label="FINPILOT — событийная цепочка планирования (EPC)\\n{stamp()}",
+         nodesep=0.3, ranksep=0.4];
+  node [fontname="Helvetica", fontsize=10, style="filled"];
+  edge [color="#9aa4b1", arrowsize=0.7];
+
+  e1 [label="Данные пользователя обновлены", shape=hexagon,
+      fillcolor="#f8cecc", color="#b85450"];
+  f1 [label="Расчёт базовых показателей", shape=box, style="rounded,filled",
+      fillcolor="#e1f5e1", color="#82b366"];
+  e2 [label="Показатели рассчитаны", shape=hexagon, fillcolor="#f8cecc",
+      color="#b85450"];
+  f2 [label="Генерация и оценка альтернатив", shape=box, style="rounded,filled",
+      fillcolor="#e1f5e1", color="#82b366"];
+  e3 [label="Альтернативы оценены", shape=hexagon, fillcolor="#f8cecc",
+      color="#b85450"];
+  f3 [label="Фильтрация и ранжирование", shape=box, style="rounded,filled",
+      fillcolor="#e1f5e1", color="#82b366"];
+  e4 [label="Рекомендация сформирована", shape=hexagon, fillcolor="#f8cecc",
+      color="#b85450"];
+
+  e1 -> f1 -> e2 -> f2 -> e3 -> f3 -> e4;
+}}
+"""
+
+
+def dmaic_dot() -> str:
+    """DMAIC: цикл улучшения финансового состояния."""
+    return f"""digraph dmaic {{
+  graph [rankdir=LR, fontname="Helvetica", labelloc=t, fontsize=15,
+         label="FINPILOT — цикл улучшения (DMAIC)\\n{stamp()}",
+         nodesep=0.4, ranksep=0.8];
+  node [fontname="Helvetica", fontsize=11, style="rounded,filled",
+        fillcolor="#dae8fc", color="#6c8ebf", shape=box, width=2.0];
+  edge [color="#9aa4b1", arrowsize=0.7];
+
+  d [label="Define\\nцели и ограничения"];
+  m [label="Measure\\nCFt, Rt, Lt, ПДН, Si"];
+  a [label="Analyze\\n66 альтернатив, SAW"];
+  i [label="Improve\\nисполнение плана"];
+  c [label="Control\\nснимки плана, прогноз"];
+
+  d -> m -> a -> i -> c;
+  c -> d [style=dashed, label="следующий период"];
+}}
+"""
+
+
 AUTHORED = {
     "01_main_pipeline_GOST.drawio.png": pipeline_dot,
+    "02_avalanche_GOST.drawio.png": avalanche_dot,
     "04_c4_context.drawio.png": context_dot,
+    "07_sequence_planning.drawio.png": planning_sequence_dot,
+    "17_bpmn.drawio.png": bpmn_dot,
+    "18_epc.drawio.png": epc_dot,
+    "20_dmaic.drawio.png": dmaic_dot,
     "08_sequence_import.drawio.png": import_sequence_dot,
     "11_uml_class.drawio.png": uml_class_dot,
     "13_usecase.drawio.png": usecase_dot,

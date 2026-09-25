@@ -1,6 +1,6 @@
 digraph usecase {
   graph [rankdir=LR, fontname="Helvetica", labelloc=t, fontsize=15,
-         label="FINPILOT — варианты использования\nкод v9.13.27 · канон матмодели v3.10.0",
+         label="FINPILOT — варианты использования\nкод v9.13.28 · канон матмодели v3.10.0",
          nodesep=0.22, ranksep=1.6];
   node [fontname="Helvetica", fontsize=10];
   edge [color="#9aa4b1", arrowsize=0.6];

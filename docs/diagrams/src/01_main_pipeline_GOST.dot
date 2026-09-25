@@ -1,6 +1,6 @@
 digraph pipeline {
   graph [rankdir=TB, fontname="Helvetica", labelloc=t, fontsize=16,
-         label="FINPILOT — главный пайплайн расчёта (ГОСТ 19.701-90)\nкод v9.13.27 · канон матмодели v3.10.0",
+         label="FINPILOT — главный пайплайн расчёта (ГОСТ 19.701-90)\nкод v9.13.28 · канон матмодели v3.10.0",
          nodesep=0.3, ranksep=0.45];
   node [fontname="Helvetica", fontsize=10, style="rounded,filled",
         fillcolor="#e1f5e1", color="#82b366", shape=box, width=3.6];

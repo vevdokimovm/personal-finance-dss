@@ -1,0 +1,17 @@
+digraph dmaic {
+  graph [rankdir=LR, fontname="Helvetica", labelloc=t, fontsize=15,
+         label="FINPILOT — цикл улучшения (DMAIC)\nкод v9.13.28 · канон матмодели v3.10.0",
+         nodesep=0.4, ranksep=0.8];
+  node [fontname="Helvetica", fontsize=11, style="rounded,filled",
+        fillcolor="#dae8fc", color="#6c8ebf", shape=box, width=2.0];
+  edge [color="#9aa4b1", arrowsize=0.7];
+
+  d [label="Define\nцели и ограничения"];
+  m [label="Measure\nCFt, Rt, Lt, ПДН, Si"];
+  a [label="Analyze\n66 альтернатив, SAW"];
+  i [label="Improve\nисполнение плана"];
+  c [label="Control\nснимки плана, прогноз"];
+
+  d -> m -> a -> i -> c;
+  c -> d [style=dashed, label="следующий период"];
+}

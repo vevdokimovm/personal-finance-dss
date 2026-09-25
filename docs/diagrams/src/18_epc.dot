@@ -1,0 +1,24 @@
+digraph epc {
+  graph [rankdir=TB, fontname="Helvetica", labelloc=t, fontsize=15,
+         label="FINPILOT — событийная цепочка планирования (EPC)\nкод v9.13.28 · канон матмодели v3.10.0",
+         nodesep=0.3, ranksep=0.4];
+  node [fontname="Helvetica", fontsize=10, style="filled"];
+  edge [color="#9aa4b1", arrowsize=0.7];
+
+  e1 [label="Данные пользователя обновлены", shape=hexagon,
+      fillcolor="#f8cecc", color="#b85450"];
+  f1 [label="Расчёт базовых показателей", shape=box, style="rounded,filled",
+      fillcolor="#e1f5e1", color="#82b366"];
+  e2 [label="Показатели рассчитаны", shape=hexagon, fillcolor="#f8cecc",
+      color="#b85450"];
+  f2 [label="Генерация и оценка альтернатив", shape=box, style="rounded,filled",
+      fillcolor="#e1f5e1", color="#82b366"];
+  e3 [label="Альтернативы оценены", shape=hexagon, fillcolor="#f8cecc",
+      color="#b85450"];
+  f3 [label="Фильтрация и ранжирование", shape=box, style="rounded,filled",
+      fillcolor="#e1f5e1", color="#82b366"];
+  e4 [label="Рекомендация сформирована", shape=hexagon, fillcolor="#f8cecc",
+      color="#b85450"];
+
+  e1 -> f1 -> e2 -> f2 -> e3 -> f3 -> e4;
+}
