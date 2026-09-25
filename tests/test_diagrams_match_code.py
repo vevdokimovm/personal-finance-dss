@@ -157,6 +157,37 @@ class TestNoDeadTechnologyOnDiagrams:
 
     def test_every_authored_diagram_has_a_source(self) -> None:
         """У каждого превью смысловой диаграммы есть источник, который его родил."""
-        for name in ("04_c4_context", "05_c4_container", "15_forecast_GOST"):
+        authored = ("01_main_pipeline_GOST", "04_c4_context", "05_c4_container",
+                    "08_sequence_import", "11_uml_class", "13_usecase",
+                    "15_forecast_GOST")
+        for name in authored:
             assert (DIAGRAMS / f"src/{name}.dot").exists(), f"нет источника {name}.dot"
             assert (DIAGRAMS / f"{name}.drawio.png").exists(), f"нет превью {name}"
+
+
+class TestEveryDiagramNamesItsVersion:
+    """🔴 Диаграмма обязана называть версию, которой соответствует.
+
+    Требование владельца 25.09.2026: «пиши какой версии они соответствуют».
+    Без подписи свежая диаграмма неотличима от отставшей на десять версий —
+    ровно та слепота, из-за которой `05_c4_container` описывала снесённую Jinja,
+    а `15_forecast_GOST` — отменённый каноном тренд.
+    """
+
+    def test_authored_sources_carry_the_stamp(self) -> None:
+        from tools.diagrams.generate import code_version
+
+        version = code_version()
+        naked = [
+            path.name for path in sorted((DIAGRAMS / "src").glob("*.dot"))
+            if f"v{version}" not in path.read_text(encoding="utf-8")
+        ]
+        assert not naked, (
+            "диаграммы не называют версию, которой соответствуют: " + ", ".join(naked)
+        )
+
+    def test_canon_version_is_read_from_the_model(self) -> None:
+        """Версия канона берётся из `docs/math_model.md`, а не вписана руками."""
+        from tools.diagrams.generate import canon_version
+
+        assert canon_version() != "?", "версия канона не читается из math_model.md"

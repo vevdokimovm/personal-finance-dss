@@ -1,0 +1,47 @@
+digraph pipeline {
+  graph [rankdir=TB, fontname="Helvetica", labelloc=t, fontsize=16,
+         label="FINPILOT — главный пайплайн расчёта (ГОСТ 19.701-90)\nкод v9.13.26 · канон матмодели v3.10.0",
+         nodesep=0.3, ranksep=0.45];
+  node [fontname="Helvetica", fontsize=10, style="rounded,filled",
+        fillcolor="#e1f5e1", color="#82b366", shape=box, width=3.6];
+  edge [color="#9aa4b1", arrowsize=0.7, fontname="Helvetica", fontsize=9];
+
+  start [label="Вход: доходы, расходы, обязательства,\nцели, активы, параметры пользователя",
+         fillcolor="#dae8fc", color="#6c8ebf"];
+  s1 [label="Этап 1. Предобработка\nнормализация, фильтр активных целей"];
+  s2 [label="Этап 2. Базовые показатели\nCFt, Rt, Lt, Dt, BLR, Si"];
+  q1 [label="Rt > 0 ?", shape=diamond, fillcolor="#fff2cc", color="#d6b656", width=1.6];
+
+  crisis [
+    label="Кризисный модуль (v3.1.0, G2)\nbuild_crisis_plan — план,\nа не только диагноз",
+          fillcolor="#f8cecc", color="#b85450"];
+
+  s40 [label="Этап 4.0. Разовое закрытие близких целей\nиз Bliq, если Σ ≤ 0.5·Bliq"];
+  s4 [label="Этап 4. Генерация 66 альтернатив\nstars-and-bars, шаг 10 %"];
+  loop [label="для каждой альтернативы a ∈ A", shape=hexagon,
+        fillcolor="#e1d5e7", color="#9673a6", width=2.8];
+  s4b [label="Этап 4b. Avalanche + OCR-фильтр\n(отдельная схема)"];
+  si [label="Взвешенная обеспеченность Si\n(отдельная схема)"];
+  recalc [label="Пересчёт Rt', Lt', Dt' для альтернативы"];
+  s5 [label="Этап 5. Фильтрация по ограничениям\nRt' ≥ 0, Lt' ≥ Lmin, Dt' ≤ 0.40"];
+  q2 [label="A' не пусто ?", shape=diamond, fillcolor="#fff2cc",
+      color="#d6b656", width=1.8];
+  empty [label="Нет допустимых: ослабить ограничения\nили пересмотреть бюджет",
+         fillcolor="#f8cecc", color="#b85450"];
+  s6 [label="Этап 6. Min-max нормализация +\nсвёртка U(a) = Σ wk·критерий (SAW)"];
+  best [label="a* = argmax U(a)"];
+  out [label="Выход: a*, top-3 и объяснения",
+       fillcolor="#dae8fc", color="#6c8ebf"];
+
+  start -> s1 -> s2 -> q1;
+  q1 -> crisis [label="нет (дефицит)"];
+  crisis -> out [style=dashed, label="план действий"];
+  q1 -> s40 [label="да"];
+  s40 -> s4 -> loop -> s4b -> si -> recalc;
+  recalc -> loop [label="следующая", style=dashed];
+  recalc -> s5 [label="альтернативы кончились"];
+  s5 -> q2;
+  q2 -> empty [label="нет"];
+  q2 -> s6 [label="да"];
+  s6 -> best -> out;
+}

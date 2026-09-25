@@ -1,6 +1,7 @@
 digraph context {
   graph [rankdir=LR, fontname="Helvetica", labelloc=t, fontsize=17,
-         label="FINPILOT — контекст системы (C4 Level 1)", nodesep=0.5, ranksep=1.4];
+         label="FINPILOT — контекст системы (C4 Level 1)\nкод v9.13.26 · канон матмодели v3.10.0",
+         nodesep=0.5, ranksep=1.4];
   node [fontname="Helvetica", fontsize=11, style="rounded,filled"];
   edge [color="#9aa4b1", fontname="Helvetica", fontsize=9];
 

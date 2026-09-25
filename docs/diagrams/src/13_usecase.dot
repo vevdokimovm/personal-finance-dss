@@ -1,0 +1,34 @@
+digraph usecase {
+  graph [rankdir=LR, fontname="Helvetica", labelloc=t, fontsize=15,
+         label="FINPILOT — варианты использования\nкод v9.13.26 · канон матмодели v3.10.0",
+         nodesep=0.22, ranksep=1.6];
+  node [fontname="Helvetica", fontsize=10];
+  edge [color="#9aa4b1", arrowsize=0.6];
+
+  user [label="Пользователь", shape=box, style="rounded,filled",
+        fillcolor="#dae8fc", color="#6c8ebf"];
+  owner [label="Владелец продукта", shape=box, style="rounded,filled",
+         fillcolor="#dae8fc", color="#6c8ebf"];
+
+  subgraph cluster_uc {
+    label="FINPILOT"; color="#6c8ebf"; style=dashed; fontname="Helvetica";
+    node [shape=ellipse, style=filled, fillcolor="#e1f5e1", color="#82b366"];
+    uc1 [label="Вести операции, обязательства,\nцели и активы"];
+    uc2 [label="Импортировать выписку\nCSV / XLSX / PDF"];
+    uc3 [label="Получить рекомендацию\n(полный цикл СППР)"];
+    uc4 [label="Настроить риск-профиль\nи пороги"];
+    uc5 [label="Семейный доступ:\nобщий бюджет, приглашения"];
+    uc6 [label="Пригласить по реферальной\nссылке"];
+    uc7 [label="Подписка и тариф"];
+    uc8 [label="Уведомления:\nлента, почта, Telegram"];
+    uc9 [label="Согласия и юрдокументы\n(152-ФЗ)"];
+    uc10 [label="Двухфакторная аутентификация"];
+    uc11 [label="Выгрузка плана\nCSV / XLSX / PDF"];
+    uc12 [label="Аналитика продукта\nи A/B-эксперименты",
+          fillcolor="#fff2cc", color="#d6b656"];
+  }
+
+  user -> uc1; user -> uc2; user -> uc3; user -> uc4; user -> uc5;
+  user -> uc6; user -> uc7; user -> uc8; user -> uc9; user -> uc10; user -> uc11;
+  owner -> uc12;
+}

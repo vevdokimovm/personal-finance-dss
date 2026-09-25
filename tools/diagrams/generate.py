@@ -56,6 +56,29 @@ class Node:
     stroke: str
 
 
+def canon_version() -> str:
+    """Версия канона матмодели из `docs/math_model.md` — источник истины."""
+    head = (REPO / "docs/math_model.md").read_text(encoding="utf-8")[:400]
+    match = re.search(r"версия\s+(\d+\.\d+\.\d+)", head)
+    return match.group(1) if match else "?"
+
+
+def code_version() -> str:
+    """Версия проекта из `VERSION`."""
+    return (REPO / "VERSION").read_text(encoding="utf-8").strip()
+
+
+def stamp() -> str:
+    """Подпись «какой версии соответствует диаграмма».
+
+    🔴 Требование владельца 25.09.2026: «пиши какой версии они соответствуют».
+    Без неё нельзя отличить свежую диаграмму от отставшей на десять версий —
+    ровно та слепота, из-за которой `05_c4_container` описывала снесённую Jinja,
+    а `15_forecast_GOST` — отменённый канономтренд.
+    """
+    return f"код v{code_version()} · канон матмодели v{canon_version()}"
+
+
 def _header(name: str, diagram_id: str, width: int, height: int) -> str:
     return (
         '<mxfile host="app.diagrams.net" type="device">\n'
@@ -422,7 +445,8 @@ def context_dot() -> str:
     """
     return """digraph context {
   graph [rankdir=LR, fontname="Helvetica", labelloc=t, fontsize=17,
-         label="FINPILOT — контекст системы (C4 Level 1)", nodesep=0.5, ranksep=1.4];
+         label="FINPILOT — контекст системы (C4 Level 1)\\n""" + stamp() + """",
+         nodesep=0.5, ranksep=1.4];
   node [fontname="Helvetica", fontsize=11, style="rounded,filled"];
   edge [color="#9aa4b1", fontname="Helvetica", fontsize=9];
 
@@ -458,15 +482,16 @@ def container_dot() -> str:
     Jinja снесена целиком (веха 8): приложение отдаёт собранный React из
     `frontend/dist` через `StaticFiles`, страниц 14.
     """
-    return """digraph container {
+    return f"""digraph container {{
   graph [rankdir=TB, fontname="Helvetica", labelloc=t, fontsize=17,
-         label="FINPILOT — контейнеры (C4 Level 2)", nodesep=0.45, ranksep=0.9];
+         label="FINPILOT — контейнеры (C4 Level 2)\\n{stamp()}",
+         nodesep=0.45, ranksep=0.9];
   node [fontname="Helvetica", fontsize=11, style="rounded,filled", shape=box];
   edge [color="#9aa4b1", fontname="Helvetica", fontsize=9];
 
   user [label="Пользователь\\n[человек]", fillcolor="#dae8fc", color="#6c8ebf"];
 
-  subgraph cluster_app {
+  subgraph cluster_app {{
     label="FINPILOT"; fontname="Helvetica"; fontsize=12; color="#6c8ebf"; style=dashed;
     spa [label="SPA\\n[React 19 + TypeScript + Vite]\\n14 страниц, TanStack Router/Query",
          fillcolor="#85BBF0", color="#6c8ebf", width=2.6];
@@ -478,7 +503,7 @@ def container_dot() -> str:
           fillcolor="#ffe6cc", color="#d79b00", width=2.6];
     db [label="База данных\\n[PostgreSQL / SQLite]\\n31 таблица, SQLAlchemy 2.0",
         shape=cylinder, fillcolor="#f8cecc", color="#b85450", width=2.2];
-  }
+  }}
 
   user -> spa [label="HTTPS"];
   spa -> api [label="JSON/REST"];
@@ -486,7 +511,7 @@ def container_dot() -> str:
   svc -> core [label="делегирует расчёт"];
   svc -> db [label="читает/пишет [ORM]"];
   api -> spa [label="отдаёт сборку\\nfrontend/dist [StaticFiles]", style=dashed];
-}
+}}
 """
 
 
@@ -501,7 +526,7 @@ def forecast_dot() -> str:
     """
     return """digraph forecast {
   graph [rankdir=TB, fontname="Helvetica", labelloc=t, fontsize=16,
-         label="FINPILOT — прогноз показателя (канон v3.10.0): SES без тренда + Монте-Карло",
+         label="FINPILOT — прогноз показателя: SES без тренда + Монте-Карло\\n""" + stamp() + """",
          nodesep=0.35, ranksep=0.55];
   node [fontname="Helvetica", fontsize=11, style="rounded,filled",
         fillcolor="#e1f5e1", color="#82b366", shape=box, width=3.4];
@@ -525,8 +550,177 @@ def forecast_dot() -> str:
 """
 
 
+def pipeline_dot() -> str:
+    """Главный пайплайн расчёта плана (ГОСТ 19.701-90).
+
+    🔴 Прежняя редакция обрывала ветку дефицита на «вернуть структурный диагноз
+    (Fail-loud)». Кризисный модуль (`app/core/crisis.py`, канон v3.1.0 G2) появился
+    позже: при Rt < 0 приложение СТРОИТ ПЛАН ДЕЙСТВИЙ, а не только ставит диагноз —
+    `build_crisis_plan` вызывается из `planning.py` до генерации альтернатив.
+    Поведение продукта изменилось, схема осталась.
+    """
+    return f"""digraph pipeline {{
+  graph [rankdir=TB, fontname="Helvetica", labelloc=t, fontsize=16,
+         label="FINPILOT — главный пайплайн расчёта (ГОСТ 19.701-90)\\n{stamp()}",
+         nodesep=0.3, ranksep=0.45];
+  node [fontname="Helvetica", fontsize=10, style="rounded,filled",
+        fillcolor="#e1f5e1", color="#82b366", shape=box, width=3.6];
+  edge [color="#9aa4b1", arrowsize=0.7, fontname="Helvetica", fontsize=9];
+
+  start [label="Вход: доходы, расходы, обязательства,\\nцели, активы, параметры пользователя",
+         fillcolor="#dae8fc", color="#6c8ebf"];
+  s1 [label="Этап 1. Предобработка\\nнормализация, фильтр активных целей"];
+  s2 [label="Этап 2. Базовые показатели\\nCFt, Rt, Lt, Dt, BLR, Si"];
+  q1 [label="Rt > 0 ?", shape=diamond, fillcolor="#fff2cc", color="#d6b656", width=1.6];
+
+  crisis [
+    label="Кризисный модуль (v3.1.0, G2)\\nbuild_crisis_plan — план,\\nа не только диагноз",
+          fillcolor="#f8cecc", color="#b85450"];
+
+  s40 [label="Этап 4.0. Разовое закрытие близких целей\\nиз Bliq, если Σ ≤ 0.5·Bliq"];
+  s4 [label="Этап 4. Генерация 66 альтернатив\\nstars-and-bars, шаг 10 %"];
+  loop [label="для каждой альтернативы a ∈ A", shape=hexagon,
+        fillcolor="#e1d5e7", color="#9673a6", width=2.8];
+  s4b [label="Этап 4b. Avalanche + OCR-фильтр\\n(отдельная схема)"];
+  si [label="Взвешенная обеспеченность Si\\n(отдельная схема)"];
+  recalc [label="Пересчёт Rt', Lt', Dt' для альтернативы"];
+  s5 [label="Этап 5. Фильтрация по ограничениям\\nRt' ≥ 0, Lt' ≥ Lmin, Dt' ≤ 0.40"];
+  q2 [label="A' не пусто ?", shape=diamond, fillcolor="#fff2cc",
+      color="#d6b656", width=1.8];
+  empty [label="Нет допустимых: ослабить ограничения\\nили пересмотреть бюджет",
+         fillcolor="#f8cecc", color="#b85450"];
+  s6 [label="Этап 6. Min-max нормализация +\\nсвёртка U(a) = Σ wk·критерий (SAW)"];
+  best [label="a* = argmax U(a)"];
+  out [label="Выход: a*, top-3 и объяснения",
+       fillcolor="#dae8fc", color="#6c8ebf"];
+
+  start -> s1 -> s2 -> q1;
+  q1 -> crisis [label="нет (дефицит)"];
+  crisis -> out [style=dashed, label="план действий"];
+  q1 -> s40 [label="да"];
+  s40 -> s4 -> loop -> s4b -> si -> recalc;
+  recalc -> loop [label="следующая", style=dashed];
+  recalc -> s5 [label="альтернативы кончились"];
+  s5 -> q2;
+  q2 -> empty [label="нет"];
+  q2 -> s6 [label="да"];
+  s6 -> best -> out;
+}}
+"""
+
+
+def uml_class_dot() -> str:
+    """UML-классы: ORM-модели по факту `app/database/models.py`.
+
+    🔴 Прежняя редакция знала 5 классов из 31. Схема структурная — генерируется,
+    а не рисуется: перечень моделей меняется каждую веху.
+    """
+    source = (REPO / "app/database/models.py").read_text(encoding="utf-8")
+    classes = sorted(set(re.findall(r"^class\s+([A-Za-z_]+)\(", source, re.M)))
+    lines = [
+        "digraph uml {",
+        '  graph [rankdir=LR, fontname="Helvetica", labelloc=t, fontsize=16,',
+        f'         label="FINPILOT — ORM-модели ({len(classes)} классов)'
+        f'\\n{stamp()}", nodesep=0.25, ranksep=0.8];',
+        '  node [shape=box, style="rounded,filled", fillcolor="#e1d5e7",',
+        '        color="#9673a6", fontname="Helvetica", fontsize=11];',
+    ]
+    lines.extend(f'  "{name}";' for name in classes)
+    lines.append("}")
+    return "\n".join(lines) + "\n"
+
+
+def import_sequence_dot() -> str:
+    """Импорт банковской выписки — по факту `app/services/statement_parser.py`.
+
+    🔴 Прежняя редакция знала только CSV («loop по строкам CSV») и парсеры
+    tinkoff/sber/universal. Сейчас поддержаны CSV, XLSX (`openpyxl`) и PDF
+    (`pdfplumber`), а разбор возвращает отчёт о качестве: сколько строк прочитано,
+    сколько пропущено и почему.
+    """
+    return f"""digraph import_seq {{
+  graph [rankdir=TB, fontname="Helvetica", labelloc=t, fontsize=15,
+         label="FINPILOT — импорт выписки (POST /api/banks/import)\\n{stamp()}",
+         nodesep=0.3, ranksep=0.5];
+  node [fontname="Helvetica", fontsize=10, style="rounded,filled",
+        fillcolor="#e1f5e1", color="#82b366", shape=box, width=3.4];
+  edge [color="#9aa4b1", arrowsize=0.7, fontname="Helvetica", fontsize=9];
+
+  u [label="Пользователь: файл выписки", fillcolor="#dae8fc", color="#6c8ebf"];
+  r [label="routes_banks\\nPOST /banks/import {{file, bank_id}}"];
+  g [label="Гейт согласия на финданные\\n403 consent_required, если не выдано",
+     fillcolor="#fff2cc", color="#d6b656"];
+  fmt [label="Определение формата", shape=diamond, fillcolor="#fff2cc",
+       color="#d6b656", width=2.0];
+  csv [label="CSV\\nparse_tinkoff_csv / parse_sber_csv\\nуниверсальный разбор по заголовкам"];
+  xlsx [label="XLSX\\nopenpyxl: поиск таблицы,\\nпропуск шапки"];
+  pdf [label="PDF\\npdfplumber: извлечение таблиц"];
+  norm [label="Нормализация: дата, сумма, знак\\nклассификация доход/расход"];
+  rep [label="Отчёт о разборе\\nстрок прочитано / пропущено и почему",
+       fillcolor="#f8cecc", color="#b85450"];
+  rec [label="statement_reconcile\\nсверка с существующими операциями"];
+  db [label="Запись транзакций", shape=cylinder, fillcolor="#f8cecc",
+      color="#b85450", width=2.4];
+
+  u -> r -> g -> fmt;
+  fmt -> csv; fmt -> xlsx; fmt -> pdf;
+  csv -> norm; xlsx -> norm; pdf -> norm;
+  norm -> rep [style=dashed];
+  norm -> rec -> db;
+}}
+"""
+
+
+def usecase_dot() -> str:
+    """Варианты использования — по факту групп роутов.
+
+    🔴 Прежняя редакция знала базовый CRUD и импорт. После вех 7–8 появились
+    семейный доступ, рефералка, подписки, Telegram, A/B-эксперименты, MFA,
+    юрблок и аналитика владельца — ни одного из них на схеме не было.
+    """
+    return f"""digraph usecase {{
+  graph [rankdir=LR, fontname="Helvetica", labelloc=t, fontsize=15,
+         label="FINPILOT — варианты использования\\n{stamp()}",
+         nodesep=0.22, ranksep=1.6];
+  node [fontname="Helvetica", fontsize=10];
+  edge [color="#9aa4b1", arrowsize=0.6];
+
+  user [label="Пользователь", shape=box, style="rounded,filled",
+        fillcolor="#dae8fc", color="#6c8ebf"];
+  owner [label="Владелец продукта", shape=box, style="rounded,filled",
+         fillcolor="#dae8fc", color="#6c8ebf"];
+
+  subgraph cluster_uc {{
+    label="FINPILOT"; color="#6c8ebf"; style=dashed; fontname="Helvetica";
+    node [shape=ellipse, style=filled, fillcolor="#e1f5e1", color="#82b366"];
+    uc1 [label="Вести операции, обязательства,\\nцели и активы"];
+    uc2 [label="Импортировать выписку\\nCSV / XLSX / PDF"];
+    uc3 [label="Получить рекомендацию\\n(полный цикл СППР)"];
+    uc4 [label="Настроить риск-профиль\\nи пороги"];
+    uc5 [label="Семейный доступ:\\nобщий бюджет, приглашения"];
+    uc6 [label="Пригласить по реферальной\\nссылке"];
+    uc7 [label="Подписка и тариф"];
+    uc8 [label="Уведомления:\\nлента, почта, Telegram"];
+    uc9 [label="Согласия и юрдокументы\\n(152-ФЗ)"];
+    uc10 [label="Двухфакторная аутентификация"];
+    uc11 [label="Выгрузка плана\\nCSV / XLSX / PDF"];
+    uc12 [label="Аналитика продукта\\nи A/B-эксперименты",
+          fillcolor="#fff2cc", color="#d6b656"];
+  }}
+
+  user -> uc1; user -> uc2; user -> uc3; user -> uc4; user -> uc5;
+  user -> uc6; user -> uc7; user -> uc8; user -> uc9; user -> uc10; user -> uc11;
+  owner -> uc12;
+}}
+"""
+
+
 AUTHORED = {
+    "01_main_pipeline_GOST.drawio.png": pipeline_dot,
     "04_c4_context.drawio.png": context_dot,
+    "08_sequence_import.drawio.png": import_sequence_dot,
+    "11_uml_class.drawio.png": uml_class_dot,
+    "13_usecase.drawio.png": usecase_dot,
     "05_c4_container.drawio.png": container_dot,
     "15_forecast_GOST.drawio.png": forecast_dot,
 }
