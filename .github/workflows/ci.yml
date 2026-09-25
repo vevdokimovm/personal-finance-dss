@@ -2,7 +2,7 @@ name: CI
 
 # Три категории тестов (см. docs/testing_infrastructure.md):
 #   fast  — каждый push/PR: unit + integration + property + e2e-smoke (chromium), гейт 90%.
-#   full  — на тегах vX.Y.Z и вручную: мультибраузер E2E + визуальная регрессия + live-a11y + security.
+#   full  — КАЖДЫЙ push/PR (с 25.09.2026): мультибраузер E2E + визуал + live-a11y + security.
 #   deep  — КАЖДЫЙ push/PR (с 25.09.2026): стресс-property (тысячи примеров) + мутации.
 on:
   push:
@@ -276,11 +276,24 @@ jobs:
       - name: pylint (порог 9.6 — только вверх)
         run: pylint app --rcfile=.pylintrc --fail-under=9.6
 
-  # ── (2) ПОЛНЫЙ — на тегах vX.Y.Z и вручную. Здесь CDN Playwright доступен, ──
-  #    поэтому реально гоняются firefox и webkit (в песочнице CDN заблокирован).
+  # ── (2) ПОЛНЫЙ — КАЖДЫЙ ПРОГОН. Здесь CDN Playwright доступен, поэтому реально ──
+  #    гоняются firefox и webkit (в песочнице CDN заблокирован).
+  # 🔴 Переведён с «только теги» на каждый push/PR 25.09.2026 по решению владельца:
+  # «пусть на ci тоже прогоняет стресс тесты ВСЕ тесты» и далее — «чтобы КАЖДЫЙ РАЗ
+  # гонялись автоматом со всеми остальными». До этого мультибраузерные E2E, визуальная
+  # регрессия, live-a11y, bandit, pip-audit и нагрузка проверяли только тег: дефект,
+  # внесённый в main, жил до следующего релиза и всплывал там, где его уже трудно
+  # связать с причиной. Ровно так два месяца жил эталон скриншота без имени браузера
+  # (`ci_red_on_tags_for_a_month.md`).
+  #
+  # Цена: джоба идёт ~15–20 минут ПАРАЛЛЕЛЬНО остальным, то есть прогон в целом
+  # не удлиняется — его длительность задаёт «Быстрый» (~25 минут).
   full:
     name: Полный (мультибраузер + визуал + a11y + security)
-    if: startsWith(github.ref, 'refs/tags/v') || github.event_name == 'workflow_dispatch'
+    if: >-
+      github.event_name == 'push'
+      || github.event_name == 'pull_request'
+      || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     timeout-minutes: 60
     env:
