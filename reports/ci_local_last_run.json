@@ -1,16 +1,20 @@
 {
-  "tree": "e034638e1596021a",
+  "tree": "f88a7af94c01da86",
+  "environment": "clean",
   "jobs": [
     "preflight",
     "lint",
+    "pylint",
     "core",
     "fast",
     "frontend",
-    "full"
+    "full",
+    "deep"
   ],
   "green": false,
   "failures": [
-    "full → Нагрузка — smoke locust (headless, коротко)"
+    "preflight → Предполётная проверка",
+    "frontend → Vitest + покрытие (порог 90%)"
   ],
-  "at": "2026-09-24 23:33:48"
+  "at": "2026-09-25 11:44:05"
 }
