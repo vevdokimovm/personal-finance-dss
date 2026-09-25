@@ -19,6 +19,9 @@ from __future__ import annotations
 
 import pytest
 
+import json
+
+from tools import ci_verdict
 from tools.ci_verdict import Job, verdict
 
 
@@ -82,3 +85,51 @@ class TestGateItselfWorks:
     def test_any_non_success_conclusion_blocks(self, bad: str) -> None:
         ok, _ = verdict([job("X", bad)])
         assert not ok
+
+
+class TestVerdictIsTakenByCommit:
+    """🔴 Вердикт снимается по КОММИТУ, а не по тегу.
+
+    Решение владельца 25.09.2026, дословно: «снимай вердикт по КОММИТУ!» — после того
+    как из триггеров воркфлоу убраны теги. Пока `full` и `deep` гонялись только на тегах,
+    вердикт по тегу был единственным полным; теперь все три тира идут на каждый push,
+    и прогон по тегу дублировал прогон по коммиту один в один — два полных набора джоб
+    на один и тот же код, при нуле новой информации.
+
+    Тег остаётся удобным ИМЕНЕМ для человека: `ci_verdict v9.13.21` находит коммит,
+    на который тег указывает, и берёт прогон по нему.
+    """
+
+    def test_sha_is_resolved_from_a_ref(self, monkeypatch) -> None:
+        calls: list[tuple[str, ...]] = []
+
+        def fake_gh(*args: str) -> str:
+            calls.append(args)
+            return "abc123def456\n"
+
+        monkeypatch.setattr(ci_verdict, "_gh", fake_gh)
+        assert ci_verdict.commit_of("v9.13.21") == "abc123def456"
+        assert any("v9.13.21" in " ".join(args) for args in calls)
+
+    def test_run_is_found_by_head_sha(self, monkeypatch) -> None:
+        runs = [
+            {"databaseId": 1, "headSha": "other", "status": "completed"},
+            {"databaseId": 2, "headSha": "abc123", "status": "completed"},
+        ]
+
+        def fake_gh(*args: str) -> str:
+            if args[0] == "run" and args[1] == "list":
+                return json.dumps(runs)
+            return json.dumps({"jobs": [
+                {"name": "Быстрый", "status": "completed", "conclusion": "success"},
+            ]})
+
+        monkeypatch.setattr(ci_verdict, "_gh", fake_gh)
+        run_id, jobs = ci_verdict.fetch_jobs("abc123")
+        assert run_id == "2"
+        assert [j.name for j in jobs] == ["Быстрый"]
+
+    def test_missing_run_is_reported_not_guessed(self, monkeypatch) -> None:
+        monkeypatch.setattr(ci_verdict, "_gh", lambda *a: json.dumps([]))
+        run_id, jobs = ci_verdict.fetch_jobs("nosuchsha")
+        assert run_id == "" and jobs == []

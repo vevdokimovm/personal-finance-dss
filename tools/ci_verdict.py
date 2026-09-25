@@ -76,16 +76,40 @@ def latest_tag() -> str:
     return out.strip()
 
 
-def fetch_jobs(tag: str) -> tuple[str, list[Job]]:
-    """Джобы последнего прогона, запущенного по этому тегу."""
+def commit_of(ref: str) -> str:
+    """SHA коммита, на который указывает ссылка (тег, ветка или сам SHA).
+
+    `HEAD` разрешается ЛОКАЛЬНО: у GitHub API такой ссылки нет, а спрашивать сеть
+    о том, что лежит в рабочем дереве, незачем — и это единственный случай, когда
+    вердикт можно запросить без интернета вовсе.
+    """
+    if ref == "HEAD":
+        result = subprocess.run(
+            ["git", "rev-parse", "HEAD"], capture_output=True, text=True, check=False
+        )
+        if result.returncode == 0:
+            return result.stdout.strip()
+    return _gh("api", f"repos/{REPO}/commits/{ref}", "--jq", ".sha").strip()
+
+
+def fetch_jobs(sha: str) -> tuple[str, list[Job]]:
+    """Джобы последнего прогона, запущенного по ЭТОМУ КОММИТУ.
+
+    🔴 Раньше искали прогон по имени тега. Решение владельца 25.09.2026, дословно:
+    «снимай вердикт по КОММИТУ!». Причина: из триггеров воркфлоу убраны теги, потому
+    что все три тира (`fast`, `full`, `deep`) гоняются на каждый push — прогон по тегу
+    дублировал прогон по коммиту один в один, два полных набора джоб на один и тот же
+    код при нуле новой информации. Коммит — то, что реально проверено; тег лишь имя,
+    которое на него указывает.
+    """
     runs = json.loads(
         _gh(
             "run", "list", "--limit", "50",
-            "--json", "databaseId,headBranch,status",
+            "--json", "databaseId,headSha,status",
         )
     )
     for run in runs:
-        if run["headBranch"] == tag:
+        if run["headSha"].startswith(sha) or sha.startswith(run["headSha"]):
             raw = json.loads(
                 _gh("run", "view", str(run["databaseId"]), "--json", "jobs")
             )
@@ -98,12 +122,13 @@ def fetch_jobs(tag: str) -> tuple[str, list[Job]]:
 
 
 def main() -> int:
-    tag = sys.argv[1] if len(sys.argv) > 1 else latest_tag()
-    run_id, jobs = fetch_jobs(tag)
+    ref = sys.argv[1] if len(sys.argv) > 1 else "HEAD"
+    sha = commit_of(ref)
+    run_id, jobs = fetch_jobs(sha)
     if not run_id:
-        print(f"прогона по тегу {tag} не найдено")
+        print(f"прогона по коммиту {sha[:12]} ({ref}) не найдено")
         return 1
-    print(f"=== ВЕРДИКТ CI по тегу {tag} (прогон {run_id}) ===")
+    print(f"=== ВЕРДИКТ CI по коммиту {sha[:12]} ({ref}, прогон {run_id}) ===")
     for item in jobs:
         mark = "🟢" if item.conclusion == "success" else (
             "⚪️" if item.conclusion == "skipped" else "🔴"
