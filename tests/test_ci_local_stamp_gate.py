@@ -21,6 +21,8 @@
 from __future__ import annotations
 
 import json
+
+import pytest
 from pathlib import Path
 
 from tools.preflight import ci_local_failures
@@ -34,6 +36,19 @@ def write_stamp(tmp: Path, payload: dict) -> None:
     (target / "ci_local_last_run.json").write_text(
         json.dumps(payload, ensure_ascii=False), encoding="utf-8"
     )
+
+
+@pytest.fixture(autouse=True)
+def _not_in_ci(monkeypatch):
+    """Снять признак раннера: гейт следа намеренно молчит при `CI=true`.
+
+    🔴 Без этого тесты проходили только на рабочей станции, а в CI падали ВСЕ —
+    и падали невидимо: джоба умирала раньше, на `ModuleNotFoundError: defusedxml`,
+    и до них очередь не доходила. Вскрылось, когда импорт починили (тег v9.13.17).
+    Класс тот же, что у самого гейта: проверка написана и не исполняется.
+    """
+    monkeypatch.delenv("CI", raising=False)
+    monkeypatch.delenv("GITHUB_ACTIONS", raising=False)
 
 
 class TestStampGate:

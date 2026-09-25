@@ -64,6 +64,11 @@ INSTALL = re.compile(r"\bpip install\b|\bnpm ci\b|pip install --upgrade")
 # или он шёл на другом коде.
 STAMP = REPO_ROOT / "reports/ci_local_last_run.json"
 
+# Окружение, собранное строго по requirements — как на раннере. Собирается командой
+# `python3 -m venv .venv-ci && .venv-ci/bin/pip install -r requirements.txt \
+#  -r requirements-dev.txt`; в `.gitignore`, в репозиторий не попадает.
+CLEAN_VENV = ".venv-ci"
+
 
 @dataclass(frozen=True)
 class Step:
@@ -122,15 +127,27 @@ def is_install(step: Step) -> bool:
     return bool(commands) and all(INSTALL.search(cmd) for cmd in commands)
 
 
+def environment_name(repo: Path) -> str:
+    """`clean` — окружение собрано по requirements, `working` — рабочий венв."""
+    return "clean" if (repo / CLEAN_VENV / "bin").is_dir() else "working"
+
+
 def _env(repo: Path) -> dict[str, str]:
     """Окружение прогона: венв репозитория впереди PATH.
 
     🔴 Без этого `flake8`, `mypy` и `pytest` берутся из системного питона, которого
     в них нет, и локальный прогон краснеет там, где CI зелёный — то есть инструмент
     врал бы ровно в ту сторону, против которой заведён. Поймано первым же запуском.
+
+    🔴 Предпочитается `.venv-ci` — окружение, собранное СТРОГО по `requirements.txt`
+    и `requirements-dev.txt`, как на раннере. Рабочий венв накапливает пакеты, которых
+    в требованиях нет, и расхождение всегда в одну сторону: у разработчика их больше.
+    Так `defusedxml` прожил от v9.13.14 незамеченным — локально стоял, объявлен не был,
+    и на чистом раннере `conftest` не импортировался вовсе (четыре джобы из девяти).
     """
     env = dict(os.environ)
-    env["PATH"] = f"{repo / '.venv' / 'bin'}:{env.get('PATH', '')}"
+    venv = CLEAN_VENV if environment_name(repo) == "clean" else ".venv"
+    env["PATH"] = f"{repo / venv / 'bin'}:{env.get('PATH', '')}"
     return env
 
 
@@ -219,6 +236,10 @@ def write_stamp(jobs: list[str], failures: list[str], repo: Path) -> None:
         json.dumps(
             {
                 "tree": tree_hash(repo),
+                # Зелёный след из рабочего венва не равен зелёному из чистого:
+                # первый может скрывать необъявленную зависимость. Имя окружения
+                # пишется в след, чтобы это различие не терялось.
+                "environment": environment_name(repo),
                 "jobs": jobs,
                 "green": not failures,
                 "failures": failures,

@@ -31,6 +31,11 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 
 SKIP_DIRS = frozenset({
     ".git", "__pycache__", ".venv", "node_modules",
+    # `.venv-ci` — окружение по requirements для локального прогона гейтов
+    # (`tools/ci_local.py`). Чужие пакеты, не исходники: без исключения
+    # CJK-канарейка ловит таблицы IDNA внутри `pip`, и preflight валит батч
+    # на файле, который мы не писали. Тот же класс, что `.venv` строкой выше.
+    ".venv-ci",
     ".pytest_cache", ".mypy_cache", ".hypothesis",
     # Сборочные/тестовые артефакты фронта (frontend/.gitignore) — генерируются `npm run
     # build`/Playwright, не исходники. Без них CJK-канарейка ловит саму себя на минифицированном

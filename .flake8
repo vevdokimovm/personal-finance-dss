@@ -1,7 +1,12 @@
 [flake8]
 max-line-length = 100
 extend-ignore = F403, F405, F401
-exclude = .venv, venv, __pycache__, .mypy_cache, .pytest_cache, alembic, build, dist, knowledge,
+exclude = .venv,
+    # `.venv-ci` — окружение по requirements для локального прогона гейтов
+    # (`tools/ci_local.py`). Чужие пакеты, не наш код: без исключения `flake8 .`
+    # даёт сотни нарушений внутри `pip`, и «должно быть чисто» становится
+    # невыполнимым. Тот же класс, что `.venv` и `_base` ниже.
+    .venv-ci, venv, __pycache__, .mypy_cache, .pytest_cache, alembic, build, dist, knowledge,
     # артефакты-улики независимых экспертных движков (сертификация): их стиль — часть улик,
     # реформат фальсифицировал бы поставленный экспертом код
     docs/model/expert_certification/iterations,

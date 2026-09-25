@@ -22,6 +22,19 @@ from tools import preflight
 REPO = Path(__file__).resolve().parents[1]
 
 
+@pytest.fixture(autouse=True)
+def _not_in_ci(monkeypatch):
+    """Снять признак раннера: гейт следа намеренно молчит при `CI=true`.
+
+    🔴 Без этого тесты проходили только на рабочей станции, а в CI падали ВСЕ —
+    и падали невидимо: джоба умирала раньше, на `ModuleNotFoundError: defusedxml`,
+    и до них очередь не доходила. Вскрылось, когда импорт починили (тег v9.13.17).
+    Класс тот же, что у самого гейта: проверка написана и не исполняется.
+    """
+    monkeypatch.delenv("CI", raising=False)
+    monkeypatch.delenv("GITHUB_ACTIONS", raising=False)
+
+
 class TestStampGateIsWired:
     """Вердикт гейта обязан доходить до вывода и до кода возврата `preflight`."""
 
