@@ -14,6 +14,12 @@
 Смысловые диаграммы (пайплайн модели, BPMN, EPC, use case, state machine) сюда
 не входят: они описывают ЗАМЫСЕЛ, а не структуру, и из кода не выводятся.
 
+🔴 Превью рендерятся ЗДЕСЬ ЖЕ, а не «вручную на Mac». Прежняя редакция объявляла
+рендер невозможным (CDN Chromium в песочнице заблокирован) — и это было нарушением
+правила §8 `CLAUDE.md`: задача объявлена невозможной, не исчерпав каналы. Каналы
+проверены 25.09.2026 и оба живые: `rsvg-convert` 2.61.1 для SVG → PNG и Graphviz
+14.0.0 (`dot`) для графа зависимостей. draw.io для превью не нужен вовсе.
+
 Запуск из корня репозитория:
     python -m tools.diagrams.generate
 """
@@ -21,6 +27,7 @@ from __future__ import annotations
 
 import ast
 import re
+import subprocess
 from dataclasses import dataclass
 from pathlib import Path
 from xml.sax.saxutils import escape
@@ -132,6 +139,28 @@ def tables() -> list[str]:
     return sorted(set(re.findall(r'__tablename__\s*=\s*"([a-z_]+)"', source)))
 
 
+def foreign_keys() -> list[tuple[str, str]]:
+    """Рёбра «таблица ссылается на таблицу» из объявлений `ForeignKey`.
+
+    🔴 Без связей ER-диаграмма — просто список имён: она показывает, ЧТО есть,
+    и молчит о том, как оно связано, то есть о самом предмете модели данных.
+    Разбор построчный: `__tablename__` задаёт текущую таблицу, все `ForeignKey`
+    до следующего `__tablename__` принадлежат ей.
+    """
+    source = (REPO / "app/database/models.py").read_text(encoding="utf-8")
+    edges: set[tuple[str, str]] = set()
+    current = ""
+    for line in source.splitlines():
+        table = re.search(r'__tablename__\s*=\s*"([a-z_]+)"', line)
+        if table:
+            current = table.group(1)
+            continue
+        target = re.search(r'ForeignKey\(\s*"([a-z_]+)\.', line)
+        if target and current and target.group(1) != current:
+            edges.add((current, target.group(1)))
+    return sorted(edges)
+
+
 def routers() -> list[str]:
     """Домены HTTP-слоя."""
     return sorted(p.stem.removeprefix("routes_")
@@ -179,11 +208,15 @@ def build_er() -> str:
     nodes, block = _grid(names, 40, 70, 5, "#dae8fc", "#6c8ebf", "t")
     width = 40 + 5 * (COLUMN_WIDTH + GAP_X) + 20
     height = 70 + block + 60
+    by_name = {node.label: node.key for node in nodes}
+    edges = foreign_keys()
     parts = [_header("ER — таблицы базы", "er_database", width, height)]
     parts.append(_title(
-        f"FINPILOT — таблицы базы данных ({len(names)}). Генерируется "
-        "`python -m tools.diagrams.generate`", width))
+        f"FINPILOT — база данных: {len(names)} таблиц, {len(edges)} связей. "
+        "Генерируется `python -m tools.diagrams.generate`", width))
     parts.extend(_box(node) for node in nodes)
+    for index, (source, target) in enumerate(edges):
+        parts.append(_edge(f"fk{index}", by_name[source], by_name[target]))
     parts.append(FOOTER)
     return "".join(parts)
 
@@ -236,6 +269,144 @@ def build_dependency_graph() -> str:
     return "".join(parts)
 
 
+SVG_HEADER = (
+    '<?xml version="1.0" encoding="UTF-8"?>\n'
+    '<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" '
+    'viewBox="0 0 {width} {height}" font-family="Helvetica, Arial, sans-serif">\n'
+    '  <rect width="{width}" height="{height}" fill="#ffffff"/>\n'
+)
+
+
+def _svg_box(node: Node) -> str:
+    """Прямоугольник с подписью; длинное имя переносится по словам."""
+    label = escape(node.label)
+    return (
+        f'  <rect x="{node.x}" y="{node.y}" width="{node.width}" '
+        f'height="{node.height}" rx="6" fill="{node.fill}" stroke="{node.stroke}"/>\n'
+        f'  <text x="{node.x + node.width // 2}" y="{node.y + node.height // 2 + 4}" '
+        f'font-size="12" text-anchor="middle" fill="#1f2933">{label}</text>\n'
+    )
+
+
+def _svg_cluster(label: str, x: int, y: int, width: int, height: int,
+                 color: str) -> str:
+    return (
+        f'  <rect x="{x}" y="{y}" width="{width}" height="{height}" rx="8" '
+        f'fill="none" stroke="{color}" stroke-dasharray="6 6"/>\n'
+        f'  <text x="{x + 12}" y="{y + 20}" font-size="13" font-style="italic" '
+        f'fill="{color}">{escape(label)}</text>\n'
+    )
+
+
+def _svg_title(text: str, width: int) -> str:
+    return (
+        f'  <text x="{width // 2}" y="32" font-size="16" font-weight="bold" '
+        f'text-anchor="middle" fill="#1f2933">{escape(text)}</text>\n'
+    )
+
+
+def er_dot() -> str:
+    """ER на языке Graphviz: таблицы и связи по внешним ключам.
+
+    Раскладку считает `dot`: `users` собирает на себя большинство ссылок, и ручная
+    сетка превратила бы это в клубок. Кит `15-image-kit` §1 называет DOT умолчанием
+    для графов.
+    """
+    names, edges = tables(), foreign_keys()
+    lines = [
+        "digraph er {",
+        '  graph [rankdir=LR, splines=spline, nodesep=0.3, ranksep=1.1, '
+        'fontname="Helvetica", labelloc=t, fontsize=16, '
+        f'label="FINPILOT — база данных: {len(names)} таблиц, {len(edges)} связей"];',
+        '  node [shape=box, style="rounded,filled", fillcolor="#dae8fc", '
+        'color="#6c8ebf", fontname="Helvetica", fontsize=11];',
+        '  edge [color="#9aa4b1", arrowsize=0.7, arrowhead=crow];',
+    ]
+    lines.extend(f'  "{name}";' for name in names)
+    lines.extend(f'  "{source}" -> "{target}";' for source, target in edges)
+    lines.append("}")
+    return "\n".join(lines) + "\n"
+
+
+def svg_component() -> str:
+    api, svc, core = routers(), services(), core_modules()
+    width = 40 + 5 * (COLUMN_WIDTH + GAP_X) + 20
+    body: list[str] = []
+    y = 56
+    for label, names, fill, stroke, prefix, color in (
+        ("app/api — HTTP-слой", api, "#85BBF0", "#6c8ebf", "r", "#6c8ebf"),
+        ("app/services — прикладные сервисы", svc, "#d5e8d4", "#82b366", "s", "#82b366"),
+        ("app/core — математическое ядро", core, "#ffe6cc", "#d79b00", "c", "#d79b00"),
+    ):
+        nodes, block = _grid(names, 60, y + 34, 5, fill, stroke, prefix)
+        body.append(_svg_cluster(label, 40, y, width - 80, block + 44, color))
+        body.extend(_svg_box(node) for node in nodes)
+        y += block + 70
+    height = y + 20
+    parts = [SVG_HEADER.format(width=width, height=height)]
+    parts.append(_svg_title(
+        f"FINPILOT — компоненты: {len(api)} роутов, {len(svc)} сервисов, "
+        f"{len(core)} модулей ядра", width))
+    parts.extend(body)
+    parts.append("</svg>\n")
+    return "".join(parts)
+
+
+def dependency_dot() -> str:
+    """Граф зависимостей ядра на языке Graphviz.
+
+    Раскладку считает `dot`: у графа с рёбрами ручная сетка нечитаема, а Graphviz
+    разводит связи по слоям. Кит `15-image-kit` §1 называет DOT умолчанием
+    для графов и деревьев.
+    """
+    lines = [
+        "digraph core {",
+        '  graph [rankdir=LR, splines=spline, nodesep=0.35, ranksep=0.9, '
+        'fontname="Helvetica", label="FINPILOT — зависимости внутри app/core", '
+        'labelloc=t, fontsize=16];',
+        '  node [shape=box, style="rounded,filled", fillcolor="#ffe6cc", '
+        'color="#d79b00", fontname="Helvetica", fontsize=11];',
+        '  edge [color="#9aa4b1", arrowsize=0.7];',
+    ]
+    for name in core_modules():
+        lines.append(f'  "{name}";')
+    for source, target in core_dependencies():
+        lines.append(f'  "{source}" -> "{target}";')
+    lines.append("}")
+    return "\n".join(lines) + "\n"
+
+
+def _render_png(svg_text: str, target: Path) -> bool:
+    """SVG → PNG через `rsvg-convert`. Молчаливого пропуска нет: канал или есть, или назван."""
+    result = subprocess.run(
+        ["rsvg-convert", "--zoom", "1.5", "-o", str(target)],
+        input=svg_text.encode("utf-8"), capture_output=True, check=False,
+    )
+    if result.returncode != 0:
+        print(f"    🔴 rsvg-convert не смог: {result.stderr.decode().strip()}")
+        return False
+    return True
+
+
+def _render_dot(dot_text: str, target: Path) -> bool:
+    """DOT → PNG через Graphviz."""
+    result = subprocess.run(
+        ["dot", "-Tpng", "-Gdpi=110", "-o", str(target)],
+        input=dot_text.encode("utf-8"), capture_output=True, check=False,
+    )
+    if result.returncode != 0:
+        print(f"    🔴 dot не смог: {result.stderr.decode().strip()}")
+        return False
+    return True
+
+
+PREVIEWS = {
+    "10_er_database.drawio.png": ("dot", er_dot),
+    "06_c4_component.drawio.png": ("svg", svg_component),
+    "14_dependency_graph.drawio.png": ("dot", dependency_dot),
+}
+
+
 GENERATED = {
     "10_er_database.drawio": build_er,
     "06_c4_component.drawio": build_component,
@@ -245,19 +416,21 @@ GENERATED = {
 
 def main() -> int:
     for filename, builder in GENERATED.items():
-        target = DIAGRAMS / filename
-        target.write_text(builder(), encoding="utf-8")
+        (DIAGRAMS / filename).write_text(builder(), encoding="utf-8")
         print(f"  собрано: {filename}")
-        # 🔴 Превью производно от источника и рендерится только вручную на Mac
-        # (в песочнице CDN Chromium заблокирован). Протухший PNG рядом со свежим
-        # XML вводит в заблуждение сильнее, чем его отсутствие — правило
-        # `docs/diagrams/README.md`, поэтому он удаляется.
-        for suffix in (".png", ".svg"):
-            stale = DIAGRAMS / f"{filename}{suffix}"
-            if stale.exists():
-                stale.unlink()
-                print(f"    снято протухшее превью: {stale.name}")
-    print("\nПревью регенерируются вручную: drawio desktop → Export as → PNG, масштаб 1.5")
+
+    failures = []
+    for name, (kind, builder) in PREVIEWS.items():
+        target = DIAGRAMS / name
+        ok = (_render_png(builder(), target) if kind == "svg"
+              else _render_dot(builder(), target))
+        if ok:
+            print(f"  отрисовано: {name} ({target.stat().st_size // 1024} КБ)")
+        else:
+            failures.append(name)
+    if failures:
+        print("\n🔴 НЕ отрисовано: " + ", ".join(failures))
+        return 1
     return 0
 
 

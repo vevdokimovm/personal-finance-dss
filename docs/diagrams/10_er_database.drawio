@@ -4,7 +4,7 @@
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
-        <mxCell id="title" value="FINPILOT — таблицы базы данных (31). Генерируется `python -m tools.diagrams.generate`" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=15;fontStyle=1;" vertex="1" parent="1">
+        <mxCell id="title" value="FINPILOT — база данных: 31 таблиц, 33 связей. Генерируется `python -m tools.diagrams.generate`" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=15;fontStyle=1;" vertex="1" parent="1">
           <mxGeometry x="20" y="12" width="1220" height="28" as="geometry" />
         </mxCell>
         <mxCell id="t_budgets" value="budgets" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;" vertex="1" parent="1">
@@ -99,6 +99,105 @@
         </mxCell>
         <mxCell id="t_users" value="users" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;" vertex="1" parent="1">
           <mxGeometry x="40" y="430" width="210" height="34" as="geometry" />
+        </mxCell>
+        <mxCell id="fk0" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#9aa4b1;endArrow=block;endFill=1;fontSize=9;" edge="1" parent="1" source="t_budgets" target="t_households">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="fk1" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#9aa4b1;endArrow=block;endFill=1;fontSize=9;" edge="1" parent="1" source="t_budgets" target="t_users">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="fk2" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#9aa4b1;endArrow=block;endFill=1;fontSize=9;" edge="1" parent="1" source="t_experiment_assignments" target="t_experiments">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="fk3" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#9aa4b1;endArrow=block;endFill=1;fontSize=9;" edge="1" parent="1" source="t_goal_contributions" target="t_goals">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="fk4" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#9aa4b1;endArrow=block;endFill=1;fontSize=9;" edge="1" parent="1" source="t_goals" target="t_households">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="fk5" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#9aa4b1;endArrow=block;endFill=1;fontSize=9;" edge="1" parent="1" source="t_goals" target="t_liquid_assets">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="fk6" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#9aa4b1;endArrow=block;endFill=1;fontSize=9;" edge="1" parent="1" source="t_goals" target="t_users">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="fk7" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#9aa4b1;endArrow=block;endFill=1;fontSize=9;" edge="1" parent="1" source="t_household_invites" target="t_households">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="fk8" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#9aa4b1;endArrow=block;endFill=1;fontSize=9;" edge="1" parent="1" source="t_household_invites" target="t_users">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="fk9" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#9aa4b1;endArrow=block;endFill=1;fontSize=9;" edge="1" parent="1" source="t_household_memberships" target="t_households">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="fk10" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#9aa4b1;endArrow=block;endFill=1;fontSize=9;" edge="1" parent="1" source="t_household_memberships" target="t_users">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="fk11" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#9aa4b1;endArrow=block;endFill=1;fontSize=9;" edge="1" parent="1" source="t_households" target="t_users">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="fk12" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#9aa4b1;endArrow=block;endFill=1;fontSize=9;" edge="1" parent="1" source="t_liquid_assets" target="t_households">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="fk13" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#9aa4b1;endArrow=block;endFill=1;fontSize=9;" edge="1" parent="1" source="t_liquid_assets" target="t_users">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="fk14" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#9aa4b1;endArrow=block;endFill=1;fontSize=9;" edge="1" parent="1" source="t_mfa_pending_attempts" target="t_users">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="fk15" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#9aa4b1;endArrow=block;endFill=1;fontSize=9;" edge="1" parent="1" source="t_mfa_recovery_codes" target="t_users">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="fk16" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#9aa4b1;endArrow=block;endFill=1;fontSize=9;" edge="1" parent="1" source="t_obligation_payments" target="t_obligations">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="fk17" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#9aa4b1;endArrow=block;endFill=1;fontSize=9;" edge="1" parent="1" source="t_obligations" target="t_households">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="fk18" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#9aa4b1;endArrow=block;endFill=1;fontSize=9;" edge="1" parent="1" source="t_obligations" target="t_users">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="fk19" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#9aa4b1;endArrow=block;endFill=1;fontSize=9;" edge="1" parent="1" source="t_plaid_tokens" target="t_users">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="fk20" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#9aa4b1;endArrow=block;endFill=1;fontSize=9;" edge="1" parent="1" source="t_plan_advice_events" target="t_users">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="fk21" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#9aa4b1;endArrow=block;endFill=1;fontSize=9;" edge="1" parent="1" source="t_plan_snapshots" target="t_households">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="fk22" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#9aa4b1;endArrow=block;endFill=1;fontSize=9;" edge="1" parent="1" source="t_plan_snapshots" target="t_users">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="fk23" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#9aa4b1;endArrow=block;endFill=1;fontSize=9;" edge="1" parent="1" source="t_scenarios" target="t_households">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="fk24" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#9aa4b1;endArrow=block;endFill=1;fontSize=9;" edge="1" parent="1" source="t_scenarios" target="t_recommendations">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="fk25" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#9aa4b1;endArrow=block;endFill=1;fontSize=9;" edge="1" parent="1" source="t_scenarios" target="t_users">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="fk26" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#9aa4b1;endArrow=block;endFill=1;fontSize=9;" edge="1" parent="1" source="t_transactions" target="t_categories">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="fk27" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#9aa4b1;endArrow=block;endFill=1;fontSize=9;" edge="1" parent="1" source="t_transactions" target="t_households">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="fk28" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#9aa4b1;endArrow=block;endFill=1;fontSize=9;" edge="1" parent="1" source="t_transactions" target="t_users">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="fk29" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#9aa4b1;endArrow=block;endFill=1;fontSize=9;" edge="1" parent="1" source="t_user_category_rules" target="t_categories">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="fk30" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#9aa4b1;endArrow=block;endFill=1;fontSize=9;" edge="1" parent="1" source="t_user_category_rules" target="t_users">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="fk31" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#9aa4b1;endArrow=block;endFill=1;fontSize=9;" edge="1" parent="1" source="t_user_consents" target="t_users">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="fk32" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#9aa4b1;endArrow=block;endFill=1;fontSize=9;" edge="1" parent="1" source="t_user_prefs" target="t_users">
+          <mxGeometry relative="1" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
