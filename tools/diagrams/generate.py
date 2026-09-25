@@ -79,6 +79,46 @@ def stamp() -> str:
     return f"код v{code_version()} · канон матмодели v{canon_version()}"
 
 
+# 🔴 Штамп версии в РИСУЕМЫХ вручную диаграммах.
+# Требование владельца 25.09.2026: «если они до сих пор актуальны, то ты всё равно
+# должен пройтись и проставить версии». Признание диаграммы актуальной — это факт
+# о конкретной версии кода, и он обязан быть записан НА диаграмме: иначе следующий
+# читатель снова не отличит проверенную схему от забытой с v6.8.0.
+#
+# Штамп идемпотентен: ячейка с фиксированным id перезаписывается при каждом прогоне,
+# а не добавляется заново. Иначе после десяти прогонов на схеме было бы десять подписей.
+STAMP_CELL_ID = "finpilot_version_stamp"
+
+
+def stamp_drawio(path: Path, text: str) -> bool:
+    """Проставить или обновить подпись версии в `.drawio`. True — файл изменён."""
+    source = path.read_text(encoding="utf-8")
+    style = ("text;html=1;strokeColor=none;fillColor=none;align=left;"
+             "verticalAlign=middle;fontSize=10;fontColor=#6b7280;")
+    cell = (f'        <mxCell id="{STAMP_CELL_ID}" value="{escape(text)}" '
+            f'style="{style}" vertex="1" parent="1">\n'
+            f'          <mxGeometry x="20" y="6" width="520" height="20" '
+            f'as="geometry" />\n        </mxCell>\n')
+
+    existing = re.search(
+        rf'        <mxCell id="{STAMP_CELL_ID}".*?</mxCell>\n',
+        source, flags=re.S,
+    )
+    if existing:
+        if existing.group(0) == cell:
+            return False
+        updated = source[:existing.start()] + cell + source[existing.end():]
+    else:
+        # Вставка в КАЖДУЮ диаграмму файла: мастер-файл несёт 29 страниц,
+        # и подпись на первой ничего не говорит о двадцать девятой.
+        updated = source.replace('        <mxCell id="1" parent="0" />\n',
+                                 '        <mxCell id="1" parent="0" />\n' + cell)
+        if updated == source:
+            return False
+    path.write_text(updated, encoding="utf-8")
+    return True
+
+
 def _header(name: str, diagram_id: str, width: int, height: int) -> str:
     return (
         '<mxfile host="app.diagrams.net" type="device">\n'
@@ -236,8 +276,8 @@ def build_er() -> str:
     edges = foreign_keys()
     parts = [_header("ER — таблицы базы", "er_database", width, height)]
     parts.append(_title(
-        f"FINPILOT — база данных: {len(names)} таблиц, {len(edges)} связей. "
-        "Генерируется `python -m tools.diagrams.generate`", width))
+        f"FINPILOT — база данных: {len(names)} таблиц, {len(edges)} связей"
+        f" · {stamp()}", width))
     parts.extend(_box(node) for node in nodes)
     for index, (source, target) in enumerate(edges):
         parts.append(_edge(f"fk{index}", by_name[source], by_name[target]))
@@ -253,7 +293,7 @@ def build_component() -> str:
     parts = [_header("C4 — компоненты", "c4_component", width, 1)]
     parts.append(_title(
         f"FINPILOT — компоненты: {len(api)} роутов, {len(services_list)} сервисов, "
-        f"{len(core)} модулей ядра", width))
+        f"{len(core)} модулей ядра · {stamp()}", width))
 
     y = 60
     for label, names, fill, stroke, prefix, color in (
@@ -285,7 +325,7 @@ def build_dependency_graph() -> str:
     parts = [_header("Граф зависимостей ядра", "depgraph", width, height)]
     parts.append(_title(
         f"FINPILOT — зависимости внутри `app/core` ({len(names)} модулей, "
-        f"{len(edges)} связей)", width))
+        f"{len(edges)} связей) · {stamp()}", width))
     parts.extend(_box(node) for node in nodes)
     for index, (source, target) in enumerate(edges):
         parts.append(_edge(f"e{index}", by_name[source], by_name[target]))
@@ -757,6 +797,14 @@ def main() -> int:
             stale.unlink()
             print(f"  снят устаревший источник: {stale.name} "
                   f"(заменён на src/{stem}.dot)")
+
+    # Генерируемые `.drawio` несут версию в СВОЁМ заголовке и переписываются целиком —
+    # штамповать их отдельной ячейкой значит добавлять её на каждом прогоне заново.
+    text = f"Соответствует: {stamp()} · проверено сверкой с кодом"
+    stamped = [path.name for path in sorted(DIAGRAMS.glob("*.drawio"))
+               if path.name not in GENERATED and stamp_drawio(path, text)]
+    if stamped:
+        print(f"  проставлен штамп версии: {len(stamped)} файл(ов)")
 
     failures = []
     for name, (kind, builder) in PREVIEWS.items():

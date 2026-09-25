@@ -186,6 +186,25 @@ class TestEveryDiagramNamesItsVersion:
             "диаграммы не называют версию, которой соответствуют: " + ", ".join(naked)
         )
 
+    def test_every_drawio_carries_the_stamp(self) -> None:
+        """🔴 И РИСУЕМЫЕ вручную тоже — требование владельца 25.09.2026.
+
+        Дословно: «если они до сих пор актуальны, то ты всё равно должен пройтись
+        и проставить версии». Признание диаграммы актуальной — факт о КОНКРЕТНОЙ
+        версии кода; без записи на самой схеме следующий читатель не отличит
+        проверенную от забытой с v6.8.0, и проверка пропадает вместе с сессией.
+        """
+        from tools.diagrams.generate import code_version
+
+        version = f"v{code_version()}"
+        naked = [
+            path.name for path in sorted(DIAGRAMS.glob("*.drawio"))
+            if version not in path.read_text(encoding="utf-8")
+        ]
+        assert not naked, (
+            "диаграммы без версии, которой соответствуют: " + ", ".join(naked)
+        )
+
     def test_canon_version_is_read_from_the_model(self) -> None:
         """Версия канона берётся из `docs/math_model.md`, а не вписана руками."""
         from tools.diagrams.generate import canon_version

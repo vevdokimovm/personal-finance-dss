@@ -4,6 +4,9 @@
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
+        <mxCell id="finpilot_version_stamp" value="Соответствует: код v9.13.27 · канон матмодели v3.10.0 · проверено сверкой с кодом" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=10;fontColor=#6b7280;" vertex="1" parent="1">
+          <mxGeometry x="20" y="6" width="520" height="20" as="geometry" />
+        </mxCell>
 
         <mxCell id="title" value="FINPILOT — Жизненный цикл альтернативы (UML State Machine)" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=15;fontStyle=1;" vertex="1" parent="1">
           <mxGeometry x="230" y="15" width="500" height="30" as="geometry" />

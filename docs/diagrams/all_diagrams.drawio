@@ -4,6 +4,9 @@
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
+        <mxCell id="finpilot_version_stamp" value="Соответствует: код v9.13.27 · канон матмодели v3.10.0 · проверено сверкой с кодом" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=10;fontColor=#6b7280;" vertex="1" parent="1">
+          <mxGeometry x="20" y="6" width="520" height="20" as="geometry" />
+        </mxCell>
 
         <mxCell id="d01_start" value="Начало" style="rounded=1;whiteSpace=wrap;html=1;arcSize=40;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=12;" vertex="1" parent="1">
           <mxGeometry x="340" y="20" width="160" height="50" as="geometry" />
@@ -153,6 +156,9 @@
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
+        <mxCell id="finpilot_version_stamp" value="Соответствует: код v9.13.26 · канон матмодели v3.10.0 · проверено сверкой с кодом" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=10;fontColor=#6b7280;" vertex="1" parent="1">
+          <mxGeometry x="20" y="6" width="520" height="20" as="geometry" />
+        </mxCell>
 
         <mxCell id="d02_start" value="Начало&#10;allocate_obligations_avalanche" style="rounded=1;whiteSpace=wrap;html=1;arcSize=40;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=12;" vertex="1" parent="1">
           <mxGeometry x="300" y="20" width="240" height="50" as="geometry" />
@@ -280,6 +286,9 @@
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
+        <mxCell id="finpilot_version_stamp" value="Соответствует: код v9.13.26 · канон матмодели v3.10.0 · проверено сверкой с кодом" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=10;fontColor=#6b7280;" vertex="1" parent="1">
+          <mxGeometry x="20" y="6" width="520" height="20" as="geometry" />
+        </mxCell>
 
         <mxCell id="d03_start" value="Начало&#10;calculate_goals_si" style="rounded=1;whiteSpace=wrap;html=1;arcSize=40;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=12;" vertex="1" parent="1">
           <mxGeometry x="310" y="20" width="220" height="50" as="geometry" />
@@ -354,6 +363,9 @@
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
+        <mxCell id="finpilot_version_stamp" value="Соответствует: код v9.13.26 · канон матмодели v3.10.0 · проверено сверкой с кодом" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=10;fontColor=#6b7280;" vertex="1" parent="1">
+          <mxGeometry x="20" y="6" width="520" height="20" as="geometry" />
+        </mxCell>
 
         <mxCell id="d04_title" value="FINPILOT — Контекст системы (C4 Level 1)" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=16;fontStyle=1;" vertex="1" parent="1">
           <mxGeometry x="250" y="20" width="400" height="30" as="geometry" />
@@ -409,6 +421,9 @@
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
+        <mxCell id="finpilot_version_stamp" value="Соответствует: код v9.13.26 · канон матмодели v3.10.0 · проверено сверкой с кодом" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=10;fontColor=#6b7280;" vertex="1" parent="1">
+          <mxGeometry x="20" y="6" width="520" height="20" as="geometry" />
+        </mxCell>
 
         <mxCell id="d05_title" value="FINPILOT — Контейнеры (C4 Level 2)" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=16;fontStyle=1;" vertex="1" parent="1">
           <mxGeometry x="280" y="20" width="400" height="30" as="geometry" />
@@ -474,6 +489,9 @@
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
+        <mxCell id="finpilot_version_stamp" value="Соответствует: код v9.13.26 · канон матмодели v3.10.0 · проверено сверкой с кодом" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=10;fontColor=#6b7280;" vertex="1" parent="1">
+          <mxGeometry x="20" y="6" width="520" height="20" as="geometry" />
+        </mxCell>
 
         <mxCell id="d06_title" value="FINPILOT — Компоненты ядра (C4 Level 3)" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;fontSize=16;fontStyle=1;" vertex="1" parent="1">
           <mxGeometry x="350" y="15" width="400" height="30" as="geometry" />
@@ -580,6 +598,9 @@
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
+        <mxCell id="finpilot_version_stamp" value="Соответствует: код v9.13.26 · канон матмодели v3.10.0 · проверено сверкой с кодом" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=10;fontColor=#6b7280;" vertex="1" parent="1">
+          <mxGeometry x="20" y="6" width="520" height="20" as="geometry" />
+        </mxCell>
 
         <mxCell id="d07_title" value="FINPILOT — Цикл планирования (POST /api/planning/calculate)" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=15;fontStyle=1;" vertex="1" parent="1">
           <mxGeometry x="350" y="10" width="560" height="30" as="geometry" />
@@ -663,6 +684,9 @@
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
+        <mxCell id="finpilot_version_stamp" value="Соответствует: код v9.13.26 · канон матмодели v3.10.0 · проверено сверкой с кодом" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=10;fontColor=#6b7280;" vertex="1" parent="1">
+          <mxGeometry x="20" y="6" width="520" height="20" as="geometry" />
+        </mxCell>
 
         <mxCell id="d08_title" value="FINPILOT — Импорт банковской выписки (POST /api/banks/import)" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=15;fontStyle=1;" vertex="1" parent="1">
           <mxGeometry x="250" y="10" width="560" height="30" as="geometry" />
@@ -732,6 +756,9 @@
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
+        <mxCell id="finpilot_version_stamp" value="Соответствует: код v9.13.26 · канон матмодели v3.10.0 · проверено сверкой с кодом" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=10;fontColor=#6b7280;" vertex="1" parent="1">
+          <mxGeometry x="20" y="6" width="520" height="20" as="geometry" />
+        </mxCell>
 
         <mxCell id="d09_title" value="FINPILOT — Жизненный цикл альтернативы (UML State Machine)" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=15;fontStyle=1;" vertex="1" parent="1">
           <mxGeometry x="230" y="15" width="500" height="30" as="geometry" />
@@ -858,6 +885,9 @@
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
+        <mxCell id="finpilot_version_stamp" value="Соответствует: код v9.13.26 · канон матмодели v3.10.0 · проверено сверкой с кодом" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=10;fontColor=#6b7280;" vertex="1" parent="1">
+          <mxGeometry x="20" y="6" width="520" height="20" as="geometry" />
+        </mxCell>
 
         <mxCell id="d11_title" value="FINPILOT — Диаграмма классов (UML Class)" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=15;fontStyle=1;" vertex="1" parent="1">
           <mxGeometry x="400" y="10" width="450" height="30" as="geometry" />
@@ -960,6 +990,9 @@
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
+        <mxCell id="finpilot_version_stamp" value="Соответствует: код v9.13.26 · канон матмодели v3.10.0 · проверено сверкой с кодом" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=10;fontColor=#6b7280;" vertex="1" parent="1">
+          <mxGeometry x="20" y="6" width="520" height="20" as="geometry" />
+        </mxCell>
 
         <mxCell id="d12_title" value="FINPILOT — Функциональный контекст (IDEF0, диаграмма A-0)" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=15;fontStyle=1;" vertex="1" parent="1">
           <mxGeometry x="220" y="15" width="520" height="30" as="geometry" />
@@ -1039,6 +1072,9 @@
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
+        <mxCell id="finpilot_version_stamp" value="Соответствует: код v9.13.26 · канон матмодели v3.10.0 · проверено сверкой с кодом" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=10;fontColor=#6b7280;" vertex="1" parent="1">
+          <mxGeometry x="20" y="6" width="520" height="20" as="geometry" />
+        </mxCell>
 
         <mxCell id="d13_title" value="FINPILOT — Варианты использования (UML Use Case)" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=15;fontStyle=1;" vertex="1" parent="1">
           <mxGeometry x="280" y="15" width="450" height="30" as="geometry" />
@@ -1132,6 +1168,9 @@
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
+        <mxCell id="finpilot_version_stamp" value="Соответствует: код v9.13.26 · канон матмодели v3.10.0 · проверено сверкой с кодом" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=10;fontColor=#6b7280;" vertex="1" parent="1">
+          <mxGeometry x="20" y="6" width="520" height="20" as="geometry" />
+        </mxCell>
 
         <mxCell id="d14_title" value="FINPILOT — Граф зависимостей модулей (импорты между пакетами)" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=15;fontStyle=1;" vertex="1" parent="1">
           <mxGeometry x="250" y="15" width="600" height="30" as="geometry" />
@@ -1255,6 +1294,9 @@
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
+        <mxCell id="finpilot_version_stamp" value="Соответствует: код v9.13.26 · канон матмодели v3.10.0 · проверено сверкой с кодом" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=10;fontColor=#6b7280;" vertex="1" parent="1">
+          <mxGeometry x="20" y="6" width="520" height="20" as="geometry" />
+        </mxCell>
 
         <mxCell id="d15_title" value="FINPILOT — Прогнозирование показателей (SES + Monte-Carlo), ГОСТ 19.701-90" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=14;fontStyle=1;" vertex="1" parent="1">
           <mxGeometry x="120" y="15" width="560" height="30" as="geometry" />
@@ -1348,6 +1390,9 @@
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
+        <mxCell id="finpilot_version_stamp" value="Соответствует: код v9.13.26 · канон матмодели v3.10.0 · проверено сверкой с кодом" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=10;fontColor=#6b7280;" vertex="1" parent="1">
+          <mxGeometry x="20" y="6" width="520" height="20" as="geometry" />
+        </mxCell>
 
         <mxCell id="d16_title" value="FINPILOT — Управление личными финансами как цикл PDCA (Деминга)" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=15;fontStyle=1;" vertex="1" parent="1">
           <mxGeometry x="130" y="20" width="590" height="30" as="geometry" />
@@ -1392,6 +1437,9 @@
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
+        <mxCell id="finpilot_version_stamp" value="Соответствует: код v9.13.26 · канон матмодели v3.10.0 · проверено сверкой с кодом" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=10;fontColor=#6b7280;" vertex="1" parent="1">
+          <mxGeometry x="20" y="6" width="520" height="20" as="geometry" />
+        </mxCell>
 
         <mxCell id="d17_title" value="FINPILOT — Получение финансовой рекомендации (BPMN 2.0)" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=15;fontStyle=1;" vertex="1" parent="1">
           <mxGeometry x="450" y="10" width="500" height="30" as="geometry" />
@@ -1493,6 +1541,9 @@
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
+        <mxCell id="finpilot_version_stamp" value="Соответствует: код v9.13.26 · канон матмодели v3.10.0 · проверено сверкой с кодом" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=10;fontColor=#6b7280;" vertex="1" parent="1">
+          <mxGeometry x="20" y="6" width="520" height="20" as="geometry" />
+        </mxCell>
 
         <mxCell id="d18_title" value="FINPILOT — Событийная цепочка процессов (EPC)" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=15;fontStyle=1;" vertex="1" parent="1">
           <mxGeometry x="130" y="15" width="500" height="30" as="geometry" />
@@ -1577,6 +1628,9 @@
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
+        <mxCell id="finpilot_version_stamp" value="Соответствует: код v9.13.26 · канон матмодели v3.10.0 · проверено сверкой с кодом" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=10;fontColor=#6b7280;" vertex="1" parent="1">
+          <mxGeometry x="20" y="6" width="520" height="20" as="geometry" />
+        </mxCell>
 
         <mxCell id="d19_title" value="FINPILOT — Карта потока создания ценности (VSM): от данных до решения" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=15;fontStyle=1;" vertex="1" parent="1">
           <mxGeometry x="350" y="15" width="600" height="30" as="geometry" />
@@ -1664,6 +1718,9 @@
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
+        <mxCell id="finpilot_version_stamp" value="Соответствует: код v9.13.26 · канон матмодели v3.10.0 · проверено сверкой с кодом" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=10;fontColor=#6b7280;" vertex="1" parent="1">
+          <mxGeometry x="20" y="6" width="520" height="20" as="geometry" />
+        </mxCell>
 
         <mxCell id="d20_title" value="FINPILOT — Методология DMAIC (Six Sigma) применительно к финансовому здоровью" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=15;fontStyle=1;" vertex="1" parent="1">
           <mxGeometry x="280" y="20" width="740" height="30" as="geometry" />
@@ -1747,6 +1804,9 @@
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
+        <mxCell id="finpilot_version_stamp" value="Соответствует: код v9.13.26 · канон матмодели v3.10.0 · проверено сверкой с кодом" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=10;fontColor=#6b7280;" vertex="1" parent="1">
+          <mxGeometry x="20" y="6" width="520" height="20" as="geometry" />
+        </mxCell>
 
         <mxCell id="d21_t" value="FINPILOT — Бизнес-модель (Business Model Canvas)" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=15;fontStyle=1;" vertex="1" parent="1">
           <mxGeometry x="300" y="15" width="640" height="30" as="geometry" />
@@ -1786,6 +1846,9 @@
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
+        <mxCell id="finpilot_version_stamp" value="Соответствует: код v9.13.26 · канон матмодели v3.10.0 · проверено сверкой с кодом" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=10;fontColor=#6b7280;" vertex="1" parent="1">
+          <mxGeometry x="20" y="6" width="520" height="20" as="geometry" />
+        </mxCell>
 
         <mxCell id="d22_t" value="FINPILOT — Карта пути клиента (Customer Journey Map)" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=15;fontStyle=1;" vertex="1" parent="1">
           <mxGeometry x="300" y="15" width="640" height="30" as="geometry" />
@@ -1876,6 +1939,9 @@
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
+        <mxCell id="finpilot_version_stamp" value="Соответствует: код v9.13.26 · канон матмодели v3.10.0 · проверено сверкой с кодом" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=10;fontColor=#6b7280;" vertex="1" parent="1">
+          <mxGeometry x="20" y="6" width="520" height="20" as="geometry" />
+        </mxCell>
 
         <mxCell id="d23_t" value="FINPILOT — Канва ценностного предложения (Value Proposition Canvas)" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=15;fontStyle=1;" vertex="1" parent="1">
           <mxGeometry x="250" y="15" width="740" height="30" as="geometry" />
@@ -1919,6 +1985,9 @@
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
+        <mxCell id="finpilot_version_stamp" value="Соответствует: код v9.13.26 · канон матмодели v3.10.0 · проверено сверкой с кодом" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=10;fontColor=#6b7280;" vertex="1" parent="1">
+          <mxGeometry x="20" y="6" width="520" height="20" as="geometry" />
+        </mxCell>
 
         <mxCell id="d24_t" value="FINPILOT — SWOT-анализ" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=15;fontStyle=1;" vertex="1" parent="1">
           <mxGeometry x="350" y="15" width="540" height="30" as="geometry" />
@@ -1943,6 +2012,9 @@
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
+        <mxCell id="finpilot_version_stamp" value="Соответствует: код v9.13.26 · канон матмодели v3.10.0 · проверено сверкой с кодом" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=10;fontColor=#6b7280;" vertex="1" parent="1">
+          <mxGeometry x="20" y="6" width="520" height="20" as="geometry" />
+        </mxCell>
 
         <mxCell id="d25_t" value="FINPILOT — Конкурентное позиционирование" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=15;fontStyle=1;" vertex="1" parent="1">
           <mxGeometry x="300" y="15" width="640" height="30" as="geometry" />
@@ -2003,6 +2075,9 @@
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
+        <mxCell id="finpilot_version_stamp" value="Соответствует: код v9.13.26 · канон матмодели v3.10.0 · проверено сверкой с кодом" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=10;fontColor=#6b7280;" vertex="1" parent="1">
+          <mxGeometry x="20" y="6" width="520" height="20" as="geometry" />
+        </mxCell>
 
         <mxCell id="d26_t" value="FINPILOT — Карта бизнес-процессов верхнего уровня" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=15;fontStyle=1;" vertex="1" parent="1">
           <mxGeometry x="300" y="15" width="640" height="30" as="geometry" />
@@ -2078,6 +2153,9 @@
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
+        <mxCell id="finpilot_version_stamp" value="Соответствует: код v9.13.26 · канон матмодели v3.10.0 · проверено сверкой с кодом" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=10;fontColor=#6b7280;" vertex="1" parent="1">
+          <mxGeometry x="20" y="6" width="520" height="20" as="geometry" />
+        </mxCell>
 
         <mxCell id="d27_t" value="FINPILOT — Процесс разработки продукта (SDLC)" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=15;fontStyle=1;" vertex="1" parent="1">
           <mxGeometry x="300" y="15" width="640" height="30" as="geometry" />
@@ -2150,6 +2228,9 @@
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
+        <mxCell id="finpilot_version_stamp" value="Соответствует: код v9.13.26 · канон матмодели v3.10.0 · проверено сверкой с кодом" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=10;fontColor=#6b7280;" vertex="1" parent="1">
+          <mxGeometry x="20" y="6" width="520" height="20" as="geometry" />
+        </mxCell>
 
         <mxCell id="d28_t" value="FINPILOT — Модель монетизации (Freemium-воронка)" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=15;fontStyle=1;" vertex="1" parent="1">
           <mxGeometry x="300" y="15" width="640" height="30" as="geometry" />
@@ -2207,6 +2288,9 @@
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
+        <mxCell id="finpilot_version_stamp" value="Соответствует: код v9.13.26 · канон матмодели v3.10.0 · проверено сверкой с кодом" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=10;fontColor=#6b7280;" vertex="1" parent="1">
+          <mxGeometry x="20" y="6" width="520" height="20" as="geometry" />
+        </mxCell>
 
         <mxCell id="d29_t" value="FINPILOT — Дорожная карта развития (Roadmap)" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=15;fontStyle=1;" vertex="1" parent="1">
           <mxGeometry x="300" y="15" width="640" height="30" as="geometry" />
