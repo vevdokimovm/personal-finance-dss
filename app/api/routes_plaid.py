@@ -59,11 +59,11 @@ def exchange_token(
         # SDK-метод обмена; обёрнут в RealPlaidClient на стороне реальной интеграции.
         access_token = client.exchange_public_token(
             payload.public_token)  # type: ignore[attr-defined]
-    except AttributeError:
+    except AttributeError as exc:
         raise HTTPException(
             status_code=status.HTTP_501_NOT_IMPLEMENTED,
             detail="Метод обмена токена не реализован в текущем клиенте.",
-        )
+        ) from exc
     store = EncryptedTokenStore(db, TokenCipher())
     store.save(user.id, payload.item_id, access_token)
     log_event("plaid_linked", {"item_id": payload.item_id}, user_id=user.id)

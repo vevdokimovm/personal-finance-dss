@@ -94,13 +94,13 @@ def withdraw(consent_type: str, user: User = Depends(require_user),
         raise HTTPException(status_code=404, detail="Неизвестный тип согласия")
     try:
         withdraw_consent(db, user.id, consent_type)
-    except ConsentWithdrawalNotAllowed:
+    except ConsentWithdrawalNotAllowed as exc:
         raise HTTPException(
             status_code=409,
             detail="Это согласие — основание обработки ваших данных. "
                    "Отозвать его можно только вместе с удалением аккаунта: "
                    "DELETE /api/auth/account",
-        )
+        ) from exc
     # 204 отдаётся явным Response без status_code в декораторе: иначе FastAPI
     # ставит application/json на пустое тело и WebKit ломается (engineering_practices).
     return Response(status_code=204)
@@ -185,14 +185,14 @@ def legal_document_content(slug: str) -> LegalDocumentContent:
     path = BASE_DIR / doc["path"]
     try:
         content = path.read_text(encoding="utf-8")
-    except OSError:
+    except OSError as exc:
         # Файл пакета пропал или недоступен. Молча отдать пустой текст нельзя: снаружи
         # это неотличимо от документа, который так и написан, — и человек «ознакомился»
         # с пустой страницей.
         raise HTTPException(
             status_code=503,
             detail="Текст документа временно недоступен. Обратитесь в поддержку.",
-        )
+        ) from exc
     return LegalDocumentContent(
         slug=slug,
         title=doc["title"],

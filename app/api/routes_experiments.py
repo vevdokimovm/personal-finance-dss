@@ -86,7 +86,8 @@ def create_experiment_endpoint(payload: ExperimentCreate, db: Session = Depends(
             status=payload.status,
         )
     except ValueError as exc:
-        raise HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY, str(exc))
+        raise HTTPException(
+            status.HTTP_422_UNPROCESSABLE_ENTITY, str(exc)) from exc
 
 
 @admin_router.get("", response_model=list[ExperimentResponse])
@@ -107,7 +108,8 @@ def update_experiment_endpoint(key: str, payload: ExperimentUpdate, db: Session 
             status=payload.status,
         )
     except ValueError as exc:
-        raise HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY, str(exc))
+        raise HTTPException(
+            status.HTTP_422_UNPROCESSABLE_ENTITY, str(exc)) from exc
     if experiment is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Эксперимент не найден.")
     return experiment

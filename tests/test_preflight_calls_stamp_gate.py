@@ -28,7 +28,7 @@ class TestStampGateIsWired:
     def test_gate_is_called(self, monkeypatch, capsys) -> None:
         calls: list[Path] = []
 
-        def spy(repo: Path, tree: str, *args, **kwargs) -> list[str]:
+        def spy(repo: Path, tree: str | None = None, *args, **kwargs) -> list[str]:
             calls.append(repo)
             return []
 
@@ -37,18 +37,25 @@ class TestStampGateIsWired:
         capsys.readouterr()
         assert calls, "preflight не зовёт гейт следа — правило не исполняется"
 
-    def test_gate_receives_the_real_tree_hash(self, monkeypatch, capsys) -> None:
-        """Отпечаток обязан считаться по факту, а не подставляться из следа."""
+    def test_gate_computes_the_real_tree_hash(self) -> None:
+        """Отпечаток считается по факту дерева, а не берётся из следа.
+
+        🔴 Импорт `tools.ci_local` живёт ВНУТРИ функции, после выхода по CI: он тянет
+        `yaml`, которого в джобе `Preflight` нет — она намеренно не ставит зависимости.
+        Импорт на уровне модуля уронил её с `ModuleNotFoundError` (прогон 36067273525).
+        """
         from tools.ci_local import tree_hash
 
-        seen: list[str] = []
-        monkeypatch.setattr(
-            preflight, "ci_local_failures",
-            lambda repo, tree, *a, **k: seen.append(tree) or [],
+        assert (preflight.ci_local_failures(REPO)
+                == preflight.ci_local_failures(REPO, tree_hash(REPO))), (
+            "без явного отпечатка гейт обязан считать его сам, а не брать из следа"
         )
-        preflight.run(REPO)
-        capsys.readouterr()
-        assert seen and seen[0] == tree_hash(REPO)
+
+    def test_foreign_tree_is_rejected(self) -> None:
+        """Чужой отпечаток — всегда отказ, каким бы ни было состояние следа."""
+        reasons = preflight.ci_local_failures(REPO, "0000000000000000")
+        assert any("ДРУГОМ дереве" in reason or "не прогонялись" in reason
+                   for reason in reasons)
 
     def test_red_verdict_reaches_output(self, monkeypatch, capsys) -> None:
         monkeypatch.setattr(

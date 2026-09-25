@@ -204,13 +204,15 @@ CI_LOCAL_REQUIRED = ("preflight", "lint", "core", "fast", "frontend", "full")
 
 
 def ci_local_failures(
-    repo: Path, tree: str, required: tuple[str, ...] = CI_LOCAL_REQUIRED
+    repo: Path, tree: str | None = None,
+    required: tuple[str, ...] = CI_LOCAL_REQUIRED,
 ) -> list[str]:
     """Прогнаны ли гейты гита локально на ЭТОМ дереве и целиком.
 
     Args:
         repo: корень репозитория.
-        tree: отпечаток рабочего дерева (`tools.ci_local.tree_hash`).
+        tree: отпечаток рабочего дерева; None — посчитать самостоятельно
+            (импорт `tools.ci_local` тогда происходит внутри, после выхода по CI).
         required: джобы, которые обязаны быть в прогоне.
 
     Returns:
@@ -222,6 +224,14 @@ def ci_local_failures(
     # сами гейты. Поймано до отгрузки, на разборе собственной правки.
     if os.environ.get("CI") or os.environ.get("GITHUB_ACTIONS"):
         return []
+    if tree is None:
+        # 🔴 Импорт ТОЛЬКО здесь, после выхода по CI. `tools.ci_local` тянет `yaml`,
+        # а джоба `Preflight` намеренно не ставит зависимости — она обязана стоить
+        # секунды. Импорт на уровне модуля уронил её с `ModuleNotFoundError: yaml`
+        # ещё до первой проверки (прогон 36067273525).
+        from tools.ci_local import tree_hash
+
+        tree = tree_hash(repo)
     stamp = repo / CI_LOCAL_STAMP
     if not stamp.exists():
         return ["гейты гита локально не прогонялись: нет "
@@ -287,9 +297,8 @@ def run(repo: Path) -> int:
     # «функция работает», а не «правило исполняется». Полтора батча подряд `preflight`
     # печатал «чисто» при КРАСНОМ следе с чужого дерева. Класс — «проверка написана,
     # но не подключена»; ловится только тестом на факт вызова, он рядом.
-    from tools.ci_local import tree_hash
-
-    failures.extend(ci_local_failures(repo, tree_hash(repo)))
+    # Отпечаток считает сама функция: её импорт `yaml` не должен трогать раннер.
+    failures.extend(ci_local_failures(repo))
 
     print("=== PREFLIGHT ===")
     for item in failures:

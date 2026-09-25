@@ -38,8 +38,9 @@ def validate_variants(variants: object) -> list[dict]:
         try:
             name = str(item["name"]).strip()
             weight = int(item["weight"])
-        except (KeyError, TypeError, ValueError):
-            raise ValueError("variants: каждый элемент — {name: str, weight: int}")
+        except (KeyError, TypeError, ValueError) as exc:
+            raise ValueError(
+                "variants: каждый элемент — {name: str, weight: int}") from exc
         if not name or weight <= 0:
             raise ValueError("variants: name непустой, weight > 0")
         normalized.append({"name": name, "weight": weight})
